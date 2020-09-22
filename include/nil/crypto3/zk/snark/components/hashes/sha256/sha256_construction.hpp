@@ -23,12 +23,12 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename FieldType>
-                pb_linear_combination_array<FieldType> SHA256_default_IV(blueprint<FieldType> &pb);
+                blueprint_linear_combination_vector<FieldType> SHA256_default_IV(blueprint<FieldType> &pb);
 
                 template<typename FieldType>
                 class sha256_message_schedule_component : public component<FieldType> {
                 public:
-                    std::vector<pb_variable_array<FieldType>> W_bits;
+                    std::vector<blueprint_variable_vector<FieldType>> W_bits;
                     std::vector<std::shared_ptr<packing_component<FieldType>>> pack_W;
 
                     std::vector<variable<FieldType>> sigma0;
@@ -39,11 +39,11 @@ namespace nil {
                     std::vector<std::shared_ptr<lastbits_component<FieldType>>> mod_reduce_W;
 
                 public:
-                    pb_variable_array<FieldType> M;
-                    pb_variable_array<FieldType> packed_W;
+                    blueprint_variable_vector<FieldType> M;
+                    blueprint_variable_vector<FieldType> packed_W;
                     sha256_message_schedule_component(blueprint<FieldType> &pb,
-                                                   const pb_variable_array<FieldType> &M,
-                                                   const pb_variable_array<FieldType> &packed_W);
+                                                   const blueprint_variable_vector<FieldType> &M,
+                                                   const blueprint_variable_vector<FieldType> &packed_W);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -71,51 +71,51 @@ namespace nil {
                     variable<FieldType> packed_new_e;
 
                 public:
-                    pb_linear_combination_array<FieldType> a;
-                    pb_linear_combination_array<FieldType> b;
-                    pb_linear_combination_array<FieldType> c;
-                    pb_linear_combination_array<FieldType> d;
-                    pb_linear_combination_array<FieldType> e;
-                    pb_linear_combination_array<FieldType> f;
-                    pb_linear_combination_array<FieldType> g;
-                    pb_linear_combination_array<FieldType> h;
+                    blueprint_linear_combination_vector<FieldType> a;
+                    blueprint_linear_combination_vector<FieldType> b;
+                    blueprint_linear_combination_vector<FieldType> c;
+                    blueprint_linear_combination_vector<FieldType> d;
+                    blueprint_linear_combination_vector<FieldType> e;
+                    blueprint_linear_combination_vector<FieldType> f;
+                    blueprint_linear_combination_vector<FieldType> g;
+                    blueprint_linear_combination_vector<FieldType> h;
                     variable<FieldType> W;
                     long K;
-                    pb_linear_combination_array<FieldType> new_a;
-                    pb_linear_combination_array<FieldType> new_e;
+                    blueprint_linear_combination_vector<FieldType> new_a;
+                    blueprint_linear_combination_vector<FieldType> new_e;
 
                     sha256_round_function_component(blueprint<FieldType> &pb,
-                                                 const pb_linear_combination_array<FieldType> &a,
-                                                 const pb_linear_combination_array<FieldType> &b,
-                                                 const pb_linear_combination_array<FieldType> &c,
-                                                 const pb_linear_combination_array<FieldType> &d,
-                                                 const pb_linear_combination_array<FieldType> &e,
-                                                 const pb_linear_combination_array<FieldType> &f,
-                                                 const pb_linear_combination_array<FieldType> &g,
-                                                 const pb_linear_combination_array<FieldType> &h,
+                                                 const blueprint_linear_combination_vector<FieldType> &a,
+                                                 const blueprint_linear_combination_vector<FieldType> &b,
+                                                 const blueprint_linear_combination_vector<FieldType> &c,
+                                                 const blueprint_linear_combination_vector<FieldType> &d,
+                                                 const blueprint_linear_combination_vector<FieldType> &e,
+                                                 const blueprint_linear_combination_vector<FieldType> &f,
+                                                 const blueprint_linear_combination_vector<FieldType> &g,
+                                                 const blueprint_linear_combination_vector<FieldType> &h,
                                                  const variable<FieldType> &W,
                                                  const long &K,
-                                                 const pb_linear_combination_array<FieldType> &new_a,
-                                                 const pb_linear_combination_array<FieldType> &new_e);
+                                                 const blueprint_linear_combination_vector<FieldType> &new_a,
+                                                 const blueprint_linear_combination_vector<FieldType> &new_e);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
                 template<typename FieldType>
-                pb_linear_combination_array<FieldType> SHA256_default_IV(blueprint<FieldType> &pb) {
+                blueprint_linear_combination_vector<FieldType> SHA256_default_IV(blueprint<FieldType> &pb) {
                     using namespace hashes::detail;
 
                     typename sha2_policy<256>::state_type iv = sha2_policy<256>::iv_generator()();
 
-                    pb_linear_combination_array<FieldType> result;
+                    blueprint_linear_combination_vector<FieldType> result;
                     result.reserve(hashes::sha2<256>::digest_bits);
 
                     for (std::size_t i = 0; i < hashes::sha2<256>::digest_bits; ++i) {
                         int iv_val =
                             iv[i / hashes::sha2<256>::word_bits] >> (31 - (i % hashes::sha2<256>::word_bits)) & 1;
 
-                        pb_linear_combination<FieldType> iv_element;
+                        blueprint_linear_combination<FieldType> iv_element;
                         iv_element.assign(pb, iv_val * variable<FieldType>(0));
                         iv_element.evaluate(pb);
 
@@ -128,8 +128,8 @@ namespace nil {
                 template<typename FieldType>
                 sha256_message_schedule_component<FieldType>::sha256_message_schedule_component(
                     blueprint<FieldType> &pb,
-                    const pb_variable_array<FieldType> &M,
-                    const pb_variable_array<FieldType> &packed_W) :
+                    const blueprint_variable_vector<FieldType> &M,
+                    const blueprint_variable_vector<FieldType> &packed_W) :
                     component<FieldType>(pb),
                     M(M), packed_W(packed_W) {
                     W_bits.resize(64);
@@ -137,7 +137,7 @@ namespace nil {
                     pack_W.resize(16);
                     for (std::size_t i = 0; i < 16; ++i) {
                         W_bits[i] =
-                            pb_variable_array<FieldType>(M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits, M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
+                            blueprint_variable_vector<FieldType>(M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits, M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
                         pack_W[i].reset(new packing_component<FieldType>(pb, W_bits[i], packed_W[i]));
                     }
 
@@ -208,18 +208,18 @@ namespace nil {
                 template<typename FieldType>
                 sha256_round_function_component<FieldType>::sha256_round_function_component(
                     blueprint<FieldType> &pb,
-                    const pb_linear_combination_array<FieldType> &a,
-                    const pb_linear_combination_array<FieldType> &b,
-                    const pb_linear_combination_array<FieldType> &c,
-                    const pb_linear_combination_array<FieldType> &d,
-                    const pb_linear_combination_array<FieldType> &e,
-                    const pb_linear_combination_array<FieldType> &f,
-                    const pb_linear_combination_array<FieldType> &g,
-                    const pb_linear_combination_array<FieldType> &h,
+                    const blueprint_linear_combination_vector<FieldType> &a,
+                    const blueprint_linear_combination_vector<FieldType> &b,
+                    const blueprint_linear_combination_vector<FieldType> &c,
+                    const blueprint_linear_combination_vector<FieldType> &d,
+                    const blueprint_linear_combination_vector<FieldType> &e,
+                    const blueprint_linear_combination_vector<FieldType> &f,
+                    const blueprint_linear_combination_vector<FieldType> &g,
+                    const blueprint_linear_combination_vector<FieldType> &h,
                     const variable<FieldType> &W,
                     const long &K,
-                    const pb_linear_combination_array<FieldType> &new_a,
-                    const pb_linear_combination_array<FieldType> &new_e) :
+                    const blueprint_linear_combination_vector<FieldType> &new_a,
+                    const blueprint_linear_combination_vector<FieldType> &new_e) :
                     component<FieldType>(pb),
                     a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h), W(W), K(K), new_a(new_a), new_e(new_e) {
                     /* compute sigma0 and sigma1 */

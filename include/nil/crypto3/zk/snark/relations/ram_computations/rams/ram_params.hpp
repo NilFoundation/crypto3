@@ -29,9 +29,9 @@ namespace nil {
                   architecture_params_type
 
                   For ram_to_r1cs reduction currently the following are also necessary:
-                  protoboard_type (e.g. tinyram_protoboard<FieldType>)
+                  protoboard_type (e.g. tinyram_blueprint<FieldType>)
                   component_base_type (e.g. tinyram_component<FieldType>)
-                  cpu_state_variable_type (must have pb_variable_array<FieldType> all_vars)
+                  cpu_state_variable_type (must have blueprint_variable_vector<FieldType> all_vars)
 
                   The RAMType class must also have a static std::size_t variable
                   timestamp_length, which specifies the zk-SNARK reduction timestamp
@@ -48,7 +48,7 @@ namespace nil {
                 using ram_boot_trace = memory_store_trace;
 
                 template<typename RAMType>
-                using ram_protoboard = typename RAMType::protoboard_type;
+                using ram_blueprint = typename RAMType::protoboard_type;
 
                 template<typename RAMType>
                 using ram_component_base = typename RAMType::component_base_type;

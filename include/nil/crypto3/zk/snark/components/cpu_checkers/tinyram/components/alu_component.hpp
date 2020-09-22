@@ -11,8 +11,8 @@
 // The component checks the correct execution of a given TinyRAM instruction.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_ALU_GADGET_HPP
-#define CRYPTO3_ZK_ALU_GADGET_HPP
+#ifndef CRYPTO3_ZK_ALU_COMPONENT_HPP
+#define CRYPTO3_ZK_ALU_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_arithmetic.hpp>
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_control_flow.hpp>
@@ -28,24 +28,24 @@ namespace nil {
                     std::vector<std::shared_ptr<tinyram_standard_component<FieldType>>> components;
 
                 public:
-                    pb_variable_array<FieldType> opcode_indicators;
+                    blueprint_variable_vector<FieldType> opcode_indicators;
                     word_variable_component<FieldType> pc;
                     word_variable_component<FieldType> desval;
                     word_variable_component<FieldType> arg1val;
                     word_variable_component<FieldType> arg2val;
                     blueprint_variable<FieldType> flag;
-                    pb_variable_array<FieldType> instruction_results;
-                    pb_variable_array<FieldType> instruction_flags;
+                    blueprint_variable_vector<FieldType> instruction_results;
+                    blueprint_variable_vector<FieldType> instruction_flags;
 
-                    ALU_component<FieldType>(tinyram_protoboard<FieldType> &pb,
-                                          const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_component<FieldType>(tinyram_blueprint<FieldType> &pb,
+                                          const blueprint_variable_vector<FieldType> &opcode_indicators,
                                           const word_variable_component<FieldType> &pc,
                                           const word_variable_component<FieldType> &desval,
                                           const word_variable_component<FieldType> &arg1val,
                                           const word_variable_component<FieldType> &arg2val,
                                           const blueprint_variable<FieldType> &flag,
-                                          const pb_variable_array<FieldType> &instruction_results,
-                                          const pb_variable_array<FieldType> &instruction_flags) :
+                                          const blueprint_variable_vector<FieldType> &instruction_results,
+                                          const blueprint_variable_vector<FieldType> &instruction_flags) :
                         tinyram_standard_component<FieldType>(pb),
                         opcode_indicators(opcode_indicators), pc(pc), desval(desval), arg1val(arg1val),
                         arg2val(arg2val), flag(flag), instruction_results(instruction_results),
@@ -147,4 +147,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_ALU_GADGET_HPP
+#endif    // CRYPTO3_ZK_ALU_COMPONENT_HPP

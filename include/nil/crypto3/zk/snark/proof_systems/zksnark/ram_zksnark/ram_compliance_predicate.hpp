@@ -99,18 +99,18 @@ namespace nil {
 
                     typedef ram_base_field<RAMType> FieldType;
 
-                    pb_variable_array<FieldType> packed_payload;
+                    blueprint_variable_vector<FieldType> packed_payload;
 
-                    pb_variable_array<FieldType> timestamp;
-                    pb_variable_array<FieldType> root_initial;
-                    pb_variable_array<FieldType> root;
-                    pb_variable_array<FieldType> pc_addr;
-                    pb_variable_array<FieldType> cpu_state;
-                    pb_variable_array<FieldType> pc_addr_initial;
-                    pb_variable_array<FieldType> cpu_state_initial;
+                    blueprint_variable_vector<FieldType> timestamp;
+                    blueprint_variable_vector<FieldType> root_initial;
+                    blueprint_variable_vector<FieldType> root;
+                    blueprint_variable_vector<FieldType> pc_addr;
+                    blueprint_variable_vector<FieldType> cpu_state;
+                    blueprint_variable_vector<FieldType> pc_addr_initial;
+                    blueprint_variable_vector<FieldType> cpu_state_initial;
                     variable<FieldType> has_accepted;
 
-                    pb_variable_array<FieldType> all_unpacked_vars;
+                    blueprint_variable_vector<FieldType> all_unpacked_vars;
 
                     std::shared_ptr<multipacking_component<FieldType>> unpack_payload;
 
@@ -158,14 +158,14 @@ namespace nil {
                  */
                 template<typename RAMType>
                 class ram_compliance_predicate_handler
-                    : public compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>> {
+                    : public compliance_predicate_handler<ram_base_field<RAMType>, ram_blueprint<RAMType>> {
                 protected:
                     ram_architecture_params<RAMType> ap;
 
                 public:
                     typedef ram_base_field<RAMType> FieldType;
                     typedef crh_with_bit_out_component<FieldType> Hash;
-                    typedef compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>> base_handler;
+                    typedef compliance_predicate_handler<ram_base_field<RAMType>, ram_blueprint<RAMType>> base_handler;
 
                     std::shared_ptr<ram_pcd_message_variable<RAMType>> next;
                     std::shared_ptr<ram_pcd_message_variable<RAMType>> cur;
@@ -184,16 +184,16 @@ namespace nil {
                     variable<FieldType> packed_next_timestamp;
                     std::shared_ptr<packing_component<FieldType>> pack_next_timestamp;
 
-                    pb_variable_array<FieldType> zero_cpu_state;
-                    pb_variable_array<FieldType> zero_pc_addr;
-                    pb_variable_array<FieldType> zero_root;
+                    blueprint_variable_vector<FieldType> zero_cpu_state;
+                    blueprint_variable_vector<FieldType> zero_pc_addr;
+                    blueprint_variable_vector<FieldType> zero_root;
 
                     std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_cur_cpu_state;
                     std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_prev_pc_addr;
 
                     std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_root;
 
-                    pb_variable_array<FieldType> prev_pc_val;
+                    blueprint_variable_vector<FieldType> prev_pc_val;
                     std::shared_ptr<digest_variable<FieldType>> prev_pc_val_digest;
                     std::shared_ptr<digest_variable<FieldType>> cur_root_digest;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>>
@@ -202,17 +202,17 @@ namespace nil {
 
                     std::shared_ptr<digest_variable<FieldType>> next_root_digest;
 
-                    pb_variable_array<FieldType> ls_addr;
-                    pb_variable_array<FieldType> ls_prev_val;
-                    pb_variable_array<FieldType> ls_next_val;
+                    blueprint_variable_vector<FieldType> ls_addr;
+                    blueprint_variable_vector<FieldType> ls_prev_val;
+                    blueprint_variable_vector<FieldType> ls_next_val;
                     std::shared_ptr<digest_variable<FieldType>> ls_prev_val_digest;
                     std::shared_ptr<digest_variable<FieldType>> ls_next_val_digest;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> load_merkle_proof;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> store_merkle_proof;
                     std::shared_ptr<memory_load_store_component<FieldType, Hash>> load_store_checker;
 
-                    pb_variable_array<FieldType> temp_next_pc_addr;
-                    pb_variable_array<FieldType> temp_next_cpu_state;
+                    blueprint_variable_vector<FieldType> temp_next_pc_addr;
+                    blueprint_variable_vector<FieldType> temp_next_cpu_state;
                     std::shared_ptr<ram_cpu_checker<RAMType>> cpu_checker;
 
                     variable<FieldType> do_halt;
@@ -457,7 +457,7 @@ namespace nil {
                 template<typename RAMType>
                 ram_compliance_predicate_handler<RAMType>::ram_compliance_predicate_handler(
                     const ram_architecture_params<RAMType> &ap) :
-                    compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>>(ram_protoboard<RAMType>(ap),
+                    compliance_predicate_handler<ram_base_field<RAMType>, ram_blueprint<RAMType>>(ram_blueprint<RAMType>(ap),
                                                                                              100,
                                                                                              1,
                                                                                              1,
@@ -516,8 +516,8 @@ namespace nil {
                     pack_cur_timestamp.reset(
                         new packing_component<FieldType>(this->pb, cur->timestamp, packed_cur_timestamp));
 
-                    zero_cpu_state = pb_variable_array<FieldType>(cur->cpu_state.size(), zero);
-                    zero_pc_addr = pb_variable_array<FieldType>(cur->pc_addr.size(), zero);
+                    zero_cpu_state = blueprint_variable_vector<FieldType>(cur->cpu_state.size(), zero);
+                    zero_pc_addr = blueprint_variable_vector<FieldType>(cur->pc_addr.size(), zero);
 
                     initialize_cur_cpu_state.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, cur->cpu_state_initial, cur->cpu_state, is_base_case, chunk_size));
@@ -575,7 +575,7 @@ namespace nil {
                       that next.timestamp = cur.timestamp and next.has_accepted = cur.has_accepted
                     */
                     do_halt.allocate(this->pb);
-                    zero_root = pb_variable_array<FieldType>(next->root.size(), zero);
+                    zero_root = blueprint_variable_vector<FieldType>(next->root.size(), zero);
                     clear_next_root.reset(
                         new bit_vector_copy_component<FieldType>(this->pb, zero_root, next->root, do_halt, chunk_size));
                     clear_next_pc_addr.reset(new bit_vector_copy_component<FieldType>(this->pb, zero_pc_addr,

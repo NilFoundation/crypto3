@@ -42,52 +42,52 @@ namespace nil {
                 template<typename FieldType>
                 class fooram_cpu_checker : public fooram_component<FieldType> {
                 public:
-                    pb_variable_array<FieldType> prev_pc_addr;
-                    pb_variable_array<FieldType> prev_pc_val;
-                    pb_variable_array<FieldType> prev_state;
-                    pb_variable_array<FieldType> guess;
-                    pb_variable_array<FieldType> ls_addr;
-                    pb_variable_array<FieldType> ls_prev_val;
-                    pb_variable_array<FieldType> ls_next_val;
-                    pb_variable_array<FieldType> next_state;
-                    pb_variable_array<FieldType> next_pc_addr;
+                    blueprint_variable_vector<FieldType> prev_pc_addr;
+                    blueprint_variable_vector<FieldType> prev_pc_val;
+                    blueprint_variable_vector<FieldType> prev_state;
+                    blueprint_variable_vector<FieldType> guess;
+                    blueprint_variable_vector<FieldType> ls_addr;
+                    blueprint_variable_vector<FieldType> ls_prev_val;
+                    blueprint_variable_vector<FieldType> ls_next_val;
+                    blueprint_variable_vector<FieldType> next_state;
+                    blueprint_variable_vector<FieldType> next_pc_addr;
                     variable<FieldType> next_has_accepted;
 
-                    variable<FieldType> zero;
-                    variable<FieldType> packed_next_pc_addr;
-                    pb_linear_combination_array<FieldType> one_as_addr;
+                    blueprint_variable<FieldType> zero;
+                    blueprint_variable<FieldType> packed_next_pc_addr;
+                    blueprint_linear_combination_vector<FieldType> one_as_addr;
                     std::shared_ptr<packing_component<FieldType>> pack_next_pc_addr;
 
-                    variable<FieldType> packed_load_addr;
-                    variable<FieldType> packed_store_addr;
-                    variable<FieldType> packed_store_val;
+                    blueprint_variable<FieldType> packed_load_addr;
+                    blueprint_variable<FieldType> packed_store_addr;
+                    blueprint_variable<FieldType> packed_store_val;
 
                     std::shared_ptr<bar_component<FieldType>> increment_pc;
                     std::shared_ptr<bar_component<FieldType>> compute_packed_load_addr;
                     std::shared_ptr<bar_component<FieldType>> compute_packed_store_addr;
                     std::shared_ptr<bar_component<FieldType>> compute_packed_store_val;
 
-                    variable<FieldType> packed_ls_addr;
-                    variable<FieldType> packed_ls_prev_val;
-                    variable<FieldType> packed_ls_next_val;
-                    variable<FieldType> packed_prev_state;
-                    variable<FieldType> packed_next_state;
+                    blueprint_variable<FieldType> packed_ls_addr;
+                    blueprint_variable<FieldType> packed_ls_prev_val;
+                    blueprint_variable<FieldType> packed_ls_next_val;
+                    blueprint_variable<FieldType> packed_prev_state;
+                    blueprint_variable<FieldType> packed_next_state;
                     std::shared_ptr<packing_component<FieldType>> pack_ls_addr;
                     std::shared_ptr<packing_component<FieldType>> pack_ls_prev_val;
                     std::shared_ptr<packing_component<FieldType>> pack_ls_next_val;
                     std::shared_ptr<packing_component<FieldType>> pack_prev_state;
                     std::shared_ptr<packing_component<FieldType>> pack_next_state;
 
-                    fooram_cpu_checker(fooram_protoboard<FieldType> &pb,
-                                       pb_variable_array<FieldType> &prev_pc_addr,
-                                       pb_variable_array<FieldType> &prev_pc_val,
-                                       pb_variable_array<FieldType> &prev_state,
-                                       pb_variable_array<FieldType> &ls_addr,
-                                       pb_variable_array<FieldType> &ls_prev_val,
-                                       pb_variable_array<FieldType> &ls_next_val,
-                                       pb_variable_array<FieldType> &next_state,
-                                       pb_variable_array<FieldType> &next_pc_addr,
-                                       variable<FieldType> &next_has_accepted);
+                    fooram_cpu_checker(fooram_blueprint<FieldType> &pb,
+                                       blueprint_variable_vector<FieldType> &prev_pc_addr,
+                                       blueprint_variable_vector<FieldType> &prev_pc_val,
+                                       blueprint_variable_vector<FieldType> &prev_state,
+                                       blueprint_variable_vector<FieldType> &ls_addr,
+                                       blueprint_variable_vector<FieldType> &ls_prev_val,
+                                       blueprint_variable_vector<FieldType> &ls_next_val,
+                                       blueprint_variable_vector<FieldType> &next_state,
+                                       blueprint_variable_vector<FieldType> &next_pc_addr,
+                                       blueprint_variable<FieldType> &next_has_accepted);
 
                     void generate_r1cs_constraints();
 
@@ -104,16 +104,16 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                fooram_cpu_checker<FieldType>::fooram_cpu_checker(fooram_protoboard<FieldType> &pb,
-                                                                  pb_variable_array<FieldType> &prev_pc_addr,
-                                                                  pb_variable_array<FieldType> &prev_pc_val,
-                                                                  pb_variable_array<FieldType> &prev_state,
-                                                                  pb_variable_array<FieldType> &ls_addr,
-                                                                  pb_variable_array<FieldType> &ls_prev_val,
-                                                                  pb_variable_array<FieldType> &ls_next_val,
-                                                                  pb_variable_array<FieldType> &next_state,
-                                                                  pb_variable_array<FieldType> &next_pc_addr,
-                                                                  variable<FieldType> &next_has_accepted) :
+                fooram_cpu_checker<FieldType>::fooram_cpu_checker(fooram_blueprint<FieldType> &pb,
+                                                                  blueprint_variable_vector<FieldType> &prev_pc_addr,
+                                                                  blueprint_variable_vector<FieldType> &prev_pc_val,
+                                                                  blueprint_variable_vector<FieldType> &prev_state,
+                                                                  blueprint_variable_vector<FieldType> &ls_addr,
+                                                                  blueprint_variable_vector<FieldType> &ls_prev_val,
+                                                                  blueprint_variable_vector<FieldType> &ls_next_val,
+                                                                  blueprint_variable_vector<FieldType> &next_state,
+                                                                  blueprint_variable_vector<FieldType> &next_pc_addr,
+                                                                  blueprint_variable<FieldType> &next_has_accepted) :
                     fooram_component<FieldType>(pb),
                     prev_pc_addr(prev_pc_addr), prev_pc_val(prev_pc_val), prev_state(prev_state), ls_addr(ls_addr),
                     ls_prev_val(ls_prev_val), ls_next_val(ls_next_val), next_state(next_state),

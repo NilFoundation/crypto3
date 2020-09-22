@@ -12,7 +12,7 @@
 
 #include "relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp"
 
-#include <nil/crypto3/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -20,20 +20,20 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const std::size_t num_constraints,
+                r1cs_example<FieldType> gen_r1cs_example_from_blueprint(const std::size_t num_constraints,
                                                                       const std::size_t num_inputs);
 
                 /* NOTE: all examples here actually generate one constraint less to account for soundness constraint in
                  * QAP */
 
                 template<typename FieldType>
-                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const std::size_t num_constraints) {
+                r1cs_example<FieldType> gen_r1cs_example_from_blueprint(const std::size_t num_constraints) {
                     const std::size_t new_num_constraints = num_constraints - 1;
 
                     /* construct dummy example: inner products of two vectors */
                     blueprint<FieldType> pb;
-                    pb_variable_array<FieldType> A;
-                    pb_variable_array<FieldType> B;
+                    blueprint_variable_vector<FieldType> A;
+                    blueprint_variable_vector<FieldType> B;
                     variable<FieldType> res;
 
                     // the variables on the protoboard are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],

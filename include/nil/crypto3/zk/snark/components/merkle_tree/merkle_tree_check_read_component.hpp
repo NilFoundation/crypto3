@@ -13,8 +13,8 @@
 // value V as the A-th leaf in a Merkle tree with root R.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_GADGET_HPP_
-#define CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP_
+#define CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/component.hpp>
@@ -42,19 +42,19 @@ namespace nil {
                 public:
                     const std::size_t digest_size;
                     const std::size_t tree_depth;
-                    pb_linear_combination_array<FieldType> address_bits;
+                    blueprint_linear_combination_vector<FieldType> address_bits;
                     digest_variable<FieldType> leaf;
                     digest_variable<FieldType> root;
                     merkle_authentication_path_variable<FieldType, Hash> path;
-                    pb_linear_combination<FieldType> read_successful;
+                    blueprint_linear_combination<FieldType> read_successful;
 
                     merkle_tree_check_read_component(blueprint<FieldType> &pb,
                                                   const std::size_t tree_depth,
-                                                  const pb_linear_combination_array<FieldType> &address_bits,
+                                                  const blueprint_linear_combination_vector<FieldType> &address_bits,
                                                   const digest_variable<FieldType> &leaf_digest,
                                                   const digest_variable<FieldType> &root_digest,
                                                   const merkle_authentication_path_variable<FieldType, Hash> &path,
-                                                  const pb_linear_combination<FieldType> &read_successful);
+                                                  const blueprint_linear_combination<FieldType> &read_successful);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -65,17 +65,14 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename Hash>
-                void test_merkle_tree_check_read_component();
-
-                template<typename FieldType, typename Hash>
                 merkle_tree_check_read_component<FieldType, Hash>::merkle_tree_check_read_component(
                     blueprint<FieldType> &pb,
                     const std::size_t tree_depth,
-                    const pb_linear_combination_array<FieldType> &address_bits,
+                    const blueprint_linear_combination_vector<FieldType> &address_bits,
                     const digest_variable<FieldType> &leaf,
                     const digest_variable<FieldType> &root,
                     const merkle_authentication_path_variable<FieldType, Hash> &path,
-                    const pb_linear_combination<FieldType> &read_successful) :
+                    const blueprint_linear_combination<FieldType> &read_successful) :
                     component<FieldType>(pb),
                     digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
                     leaf(leaf), root(root), path(path), read_successful(read_successful) {
@@ -167,72 +164,9 @@ namespace nil {
                     return hasher_constraints + propagator_constraints + authentication_path_constraints +
                            check_root_constraints;
                 }
-
-                template<typename FieldType, typename Hash>
-                void test_merkle_tree_check_read_component() {
-                    /* prepare test */
-                    const std::size_t digest_len = Hash::get_digest_len();
-                    const std::size_t tree_depth = 16;
-                    std::vector<merkle_authentication_node> path(tree_depth);
-
-                    std::vector<bool> prev_hash(digest_len);
-                    std::generate(prev_hash.begin(), prev_hash.end(), [&]() { return std::rand() % 2; });
-                    std::vector<bool> leaf = prev_hash;
-
-                    std::vector<bool> address_bits;
-
-                    std::size_t address = 0;
-                    for (long level = tree_depth - 1; level >= 0; --level) {
-                        const bool computed_is_right = (std::rand() % 2);
-                        address |= (computed_is_right ? 1ul << (tree_depth - 1 - level) : 0);
-                        address_bits.push_back(computed_is_right);
-                        std::vector<bool> other(digest_len);
-                        std::generate(other.begin(), other.end(), [&]() { return std::rand() % 2; });
-
-                        std::vector<bool> block = prev_hash;
-                        block.insert(computed_is_right ? block.begin() : block.end(), other.begin(), other.end());
-                        std::vector<bool> h = Hash::get_hash(block);
-
-                        path[level] = other;
-
-                        prev_hash = h;
-                    }
-                    std::vector<bool> root = prev_hash;
-
-                    /* execute test */
-                    blueprint<FieldType> pb;
-                    pb_variable_array<FieldType> address_bits_va;
-                    address_bits_va.allocate(pb, tree_depth);
-                    digest_variable<FieldType> leaf_digest(pb, digest_len);
-                    digest_variable<FieldType> root_digest(pb, digest_len);
-                    merkle_authentication_path_variable<FieldType, Hash> path_var(pb, tree_depth);
-                    merkle_tree_check_read_component<FieldType, Hash> ml(pb, tree_depth, address_bits_va, leaf_digest,
-                                                                       root_digest, path_var, variable<FieldType>(0));
-
-                    path_var.generate_r1cs_constraints();
-                    ml.generate_r1cs_constraints();
-
-                    address_bits_va.fill_with_bits(pb, address_bits);
-                    assert(address_bits_va.get_field_element_from_bits(pb).as_ulong() == address);
-                    leaf_digest.generate_r1cs_witness(leaf);
-                    path_var.generate_r1cs_witness(address, path);
-                    ml.generate_r1cs_witness();
-
-                    /* make sure that read checker didn't accidentally overwrite anything */
-                    address_bits_va.fill_with_bits(pb, address_bits);
-                    leaf_digest.generate_r1cs_witness(leaf);
-                    root_digest.generate_r1cs_witness(root);
-                    assert(pb.is_satisfied());
-
-                    const std::size_t num_constraints = pb.num_constraints();
-                    const std::size_t expected_constraints =
-                        merkle_tree_check_read_component<FieldType, Hash>::expected_constraints(tree_depth);
-                    assert(num_constraints == expected_constraints);
-                }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MERKLE_TREE_CHECK_READ_GADGET_HPP_
+#endif    // MERKLE_TREE_CHECK_READ_COMPONENT_HPP_

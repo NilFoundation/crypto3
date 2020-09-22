@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM argument decoder component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP
-#define CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP
+#ifndef CRYPTO3_ZK_ARGUMENT_DECODER_COMPONENT_HPP
+#define CRYPTO3_ZK_ARGUMENT_DECODER_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
 
@@ -39,20 +39,20 @@ namespace nil {
 
                 public:
                     blueprint_variable<FieldType> arg2_is_imm;
-                    pb_variable_array<FieldType> desidx;
-                    pb_variable_array<FieldType> arg1idx;
-                    pb_variable_array<FieldType> arg2idx;
-                    pb_variable_array<FieldType> packed_registers;
+                    blueprint_variable_vector<FieldType> desidx;
+                    blueprint_variable_vector<FieldType> arg1idx;
+                    blueprint_variable_vector<FieldType> arg2idx;
+                    blueprint_variable_vector<FieldType> packed_registers;
                     blueprint_variable<FieldType> packed_desval;
                     blueprint_variable<FieldType> packed_arg1val;
                     blueprint_variable<FieldType> packed_arg2val;
 
                     argument_decoder_component(tinyram_blueprint<FieldType> &pb,
                                             const blueprint_variable<FieldType> &arg2_is_imm,
-                                            const pb_variable_array<FieldType> &desidx,
-                                            const pb_variable_array<FieldType> &arg1idx,
-                                            const pb_variable_array<FieldType> &arg2idx,
-                                            const pb_variable_array<FieldType> &packed_registers,
+                                            const blueprint_variable_vector<FieldType> &desidx,
+                                            const blueprint_variable_vector<FieldType> &arg1idx,
+                                            const blueprint_variable_vector<FieldType> &arg2idx,
+                                            const blueprint_variable_vector<FieldType> &packed_registers,
                                             const blueprint_variable<FieldType> &packed_desval,
                                             const blueprint_variable<FieldType> &packed_arg1val,
                                             const blueprint_variable<FieldType> &packed_arg2val);
@@ -66,12 +66,12 @@ namespace nil {
 
                 template<typename FieldType>
                 argument_decoder_component<FieldType>::argument_decoder_component(
-                    tinyram_protoboard<FieldType> &pb,
+                    tinyram_blueprint<FieldType> &pb,
                     const blueprint_variable<FieldType> &arg2_is_imm,
-                    const pb_variable_array<FieldType> &desidx,
-                    const pb_variable_array<FieldType> &arg1idx,
-                    const pb_variable_array<FieldType> &arg2idx,
-                    const pb_variable_array<FieldType> &packed_registers,
+                    const blueprint_variable_vector<FieldType> &desidx,
+                    const blueprint_variable_vector<FieldType> &arg1idx,
+                    const blueprint_variable_vector<FieldType> &arg2idx,
+                    const blueprint_variable_vector<FieldType> &packed_registers,
                     const blueprint_variable<FieldType> &packed_desval,
                     const blueprint_variable<FieldType> &packed_arg1val,
                     const blueprint_variable<FieldType> &packed_arg2val) :
@@ -159,7 +159,7 @@ namespace nil {
                     P.instructions = generate_tinyram_prelude(ap);
                     tinyram_blueprint<FieldType> pb(ap, P.size(), 0, 10);
 
-                    pb_variable_array<FieldType> packed_registers;
+                    blueprint_variable_vector<FieldType> packed_registers;
                     packed_registers.allocate(pb, ap.k);
 
                     blueprint_variable<FieldType> arg2_is_imm;
@@ -214,4 +214,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP
+#endif    // CRYPTO3_ZK_ARGUMENT_DECODER_COMPONENT_HPP

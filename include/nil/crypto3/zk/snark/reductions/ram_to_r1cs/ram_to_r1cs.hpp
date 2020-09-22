@@ -30,8 +30,8 @@ namespace nil {
 
                     std::size_t boot_trace_size_bound;
 
-                    ram_protoboard<RAMType> main_protoboard;
-                    pb_variable_array<FieldType> r1cs_input;
+                    ram_blueprint<RAMType> main_blueprint;
+                    blueprint_variable_vector<FieldType> r1cs_input;
                     std::shared_ptr<ram_universal_component<RAMType>> universal_component;
 
                     ram_to_r1cs(const ram_architecture_params<RAMType> &ap,
@@ -61,13 +61,13 @@ namespace nil {
                                                   const std::size_t boot_trace_size_bound,
                                                   const std::size_t time_bound) :
                     boot_trace_size_bound(boot_trace_size_bound),
-                    main_protoboard(ap) {
+                    main_blueprint(ap) {
                     const std::size_t r1cs_input_size =
                         ram_universal_component<RAMType>::packed_input_size(ap, boot_trace_size_bound);
-                    r1cs_input.allocate(main_protoboard, r1cs_input_size);
+                    r1cs_input.allocate(main_blueprint, r1cs_input_size);
                     universal_component.reset(new ram_universal_component<RAMType>(
-                        main_protoboard, boot_trace_size_bound, time_bound, r1cs_input));
-                    main_protoboard.set_input_sizes(r1cs_input_size);
+                        main_blueprint, boot_trace_size_bound, time_bound, r1cs_input));
+                    main_blueprint.set_input_sizes(r1cs_input_size);
                 }
 
                 template<typename RAMType>
@@ -77,7 +77,7 @@ namespace nil {
 
                 template<typename RAMType>
                 r1cs_constraint_system<ram_base_field<RAMType>> ram_to_r1cs<RAMType>::get_constraint_system() const {
-                    return main_protoboard.get_constraint_system();
+                    return main_blueprint.get_constraint_system();
                 }
 
                 template<typename RAMType>
@@ -85,7 +85,7 @@ namespace nil {
                     ram_to_r1cs<RAMType>::auxiliary_input_map(const ram_boot_trace<RAMType> &boot_trace,
                                                               const ram_input_tape<RAMType> &auxiliary_input) {
                     universal_component->generate_r1cs_witness(boot_trace, auxiliary_input);
-                    return main_protoboard.auxiliary_input();
+                    return main_blueprint.auxiliary_input();
                 }
 
                 template<typename RAMType>

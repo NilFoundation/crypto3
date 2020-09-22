@@ -40,8 +40,8 @@
 // ECCC TR95-042
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KNAPSACK_GADGET_HPP
-#define CRYPTO3_ZK_KNAPSACK_GADGET_HPP
+#ifndef CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP
+#define CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -73,12 +73,12 @@ namespace nil {
                     std::size_t dimension;
 
                     block_variable<FieldType> input_block;
-                    pb_linear_combination_array<FieldType> output;
+                    blueprint_linear_combination_vector<FieldType> output;
 
                     knapsack_CRH_with_field_out_component(blueprint<FieldType> &pb,
                                                        std::size_t input_len,
                                                        const block_variable<FieldType> &input_block,
-                                                       const pb_linear_combination_array<FieldType> &output);
+                                                       const blueprint_linear_combination_vector<FieldType> &output);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
 
@@ -103,7 +103,7 @@ namespace nil {
                     std::size_t input_len;
                     std::size_t dimension;
 
-                    pb_linear_combination_array<FieldType> output;
+                    blueprint_linear_combination_vector<FieldType> output;
 
                     std::shared_ptr<knapsack_CRH_with_field_out_component<FieldType>> hasher;
 
@@ -128,9 +128,6 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_knapsack_crh_with_bit_out_component();
-
-                template<typename FieldType>
                 std::vector<typename FieldType::value_type> knapsack_CRH_with_field_out_component<FieldType>::knapsack_coefficients;
                 template<typename FieldType>
                 std::size_t knapsack_CRH_with_field_out_component<FieldType>::num_cached_coefficients;
@@ -140,7 +137,7 @@ namespace nil {
                     blueprint<FieldType> &pb,
                     std::size_t input_len,
                     const block_variable<FieldType> &input_block,
-                    const pb_linear_combination_array<FieldType> &output) :
+                    const blueprint_linear_combination_vector<FieldType> &output) :
                     component<FieldType>(pb),
                     input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension), input_block(input_block),
                     output(output) {
@@ -243,7 +240,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < dimension; ++i) {
                         output[i].assign(pb,
-                                         pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                                         pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                              output_digest.bits.begin() + i * FieldType::size_in_bits(),
                                              output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits())));
                     }
@@ -270,7 +267,7 @@ namespace nil {
                     /* do unpacking in place */
                     const std::vector<bool> input = input_block.bits.get_bits(this->pb);
                     for (std::size_t i = 0; i < dimension; ++i) {
-                        pb_variable_array<FieldType> va(output_digest.bits.begin() + i * FieldType::size_in_bits(),
+                        blueprint_variable_vector<FieldType> va(output_digest.bits.begin() + i * FieldType::size_in_bits(),
                                                         output_digest.bits.begin() +
                                                             (i + 1) * FieldType::size_in_bits());
                         va.fill_with_bits_of_field_element(this->pb, this->pb.lc_val(output[i]));
@@ -314,37 +311,9 @@ namespace nil {
                 void knapsack_crh_with_bit_out_component<FieldType>::sample_randomness(std::size_t input_len) {
                     knapsack_CRH_with_field_out_component<FieldType>::sample_randomness(input_len);
                 }
-
-                template<typename FieldType>
-                void test_knapsack_crh_with_bit_out_component_internal(std::size_t dimension,
-                                                                    const std::vector<bool> &input_bits,
-                                                                    const std::vector<bool> &digest_bits) {
-                    assert(knapsack_dimension<FieldType>::dimension == dimension);
-                    knapsack_crh_with_bit_out_component<FieldType>::sample_randomness(input_bits.size());
-                    blueprint<FieldType> pb;
-
-                    block_variable<FieldType> input_block(pb, input_bits.size());
-                    digest_variable<FieldType> output_digest(
-                        pb, knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
-                    knapsack_crh_with_bit_out_component<FieldType> H(
-                        pb, input_bits.size(), input_block, output_digest);
-
-                    input_block.generate_r1cs_witness(input_bits);
-                    H.generate_r1cs_constraints();
-                    H.generate_r1cs_witness();
-
-                    assert(output_digest.get_digest().size() == digest_bits.size());
-                    assert(pb.is_satisfied());
-
-                    const std::size_t num_constraints = pb.num_constraints();
-                    const std::size_t expected_constraints =
-                        knapsack_crh_with_bit_out_component<FieldType>::expected_constraints();
-                    assert(num_constraints == expected_constraints);
-                }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_KNAPSACK_GADGET_HPP
+#endif    // CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP

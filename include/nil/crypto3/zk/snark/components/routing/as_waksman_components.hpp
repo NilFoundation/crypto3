@@ -12,11 +12,11 @@
 // by use of an AS-Waksman network.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_GADGET_HPP_
-#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_GADGET_HPP_
+#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP_
+#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
-#include <nil/crypto3/zk/snark/routing_algorithms/as_waksman_routing_algorithm.hpp>
+#include <nil/crypto3/zk/snark/routing/as_waksman.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 
@@ -44,7 +44,7 @@ namespace nil {
                       allocated variables.
 
                     */
-                    std::vector<std::vector<pb_variable_array<FieldType>>> routed_packets;
+                    std::vector<std::vector<blueprint_variable_vector<FieldType>>> routed_packets;
                     std::vector<multipacking_component<FieldType>> pack_inputs, unpack_outputs;
 
                     /*
@@ -62,15 +62,15 @@ namespace nil {
                 public:
                     const std::size_t num_packets;
                     const std::size_t num_columns;
-                    const std::vector<pb_variable_array<FieldType>> routing_input_bits;
-                    const std::vector<pb_variable_array<FieldType>> routing_output_bits;
+                    const std::vector<blueprint_variable_vector<FieldType>> routing_input_bits;
+                    const std::vector<blueprint_variable_vector<FieldType>> routing_output_bits;
 
                     const std::size_t packet_size, num_subpackets;
 
                     as_waksman_routing_component(blueprint<FieldType> &pb,
                                               const std::size_t num_packets,
-                                              const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
-                                              const std::vector<pb_variable_array<FieldType>> &routing_output_bits);
+                                              const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
+                                              const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(const integer_permutation &permutation);
                 };
@@ -82,8 +82,8 @@ namespace nil {
                 as_waksman_routing_component<FieldType>::as_waksman_routing_component(
                     blueprint<FieldType> &pb,
                     const std::size_t num_packets,
-                    const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
-                    const std::vector<pb_variable_array<FieldType>> &routing_output_bits) :
+                    const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
+                    const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits) :
                     component<FieldType>(pb),
                     num_packets(num_packets), num_columns(as_waksman_num_columns(num_packets)),
                     routing_input_bits(routing_input_bits), routing_output_bits(routing_output_bits),
@@ -124,13 +124,13 @@ namespace nil {
                     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         pack_inputs.emplace_back(multipacking_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(routing_input_bits[packet_idx].begin(),
+                            blueprint_variable_vector<FieldType>(routing_input_bits[packet_idx].begin(),
                                                          routing_input_bits[packet_idx].end()),
                             routed_packets[0][packet_idx],
                             FieldType::capacity()));
                         unpack_outputs.emplace_back(multipacking_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(routing_output_bits[packet_idx].begin(),
+                            blueprint_variable_vector<FieldType>(routing_output_bits[packet_idx].begin(),
                                                          routing_output_bits[packet_idx].end()),
                             routed_packets[num_columns][packet_idx],
                             FieldType::capacity()));
@@ -274,7 +274,7 @@ namespace nil {
                     integer_permutation permutation(num_packets);
                     permutation.random_shuffle();
 
-                    std::vector<pb_variable_array<FieldType>> randbits(num_packets), outbits(num_packets);
+                    std::vector<blueprint_variable_vector<FieldType>> randbits(num_packets), outbits(num_packets);
                     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         randbits[packet_idx].allocate(pb, packet_size);
                         outbits[packet_idx].allocate(pb, packet_size);
@@ -304,4 +304,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // AS_WAKSMAN_ROUTING_GADGET_HPP_
+#endif    // AS_WAKSMAN_ROUTING_COMPONENT_HPP_

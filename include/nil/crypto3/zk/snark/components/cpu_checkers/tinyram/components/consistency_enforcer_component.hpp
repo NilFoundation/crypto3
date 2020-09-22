@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM consistency enforcer component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
-#define CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
+#ifndef CRYPTO3_ZK_CONSISTENCY_ENFORCER_COMPONENT_HPP
+#define CRYPTO3_ZK_CONSISTENCY_ENFORCER_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
 
@@ -39,30 +39,30 @@ namespace nil {
                     std::shared_ptr<loose_multiplexing_component<FieldType>> demux_packed_outgoing_desval;
 
                 public:
-                    pb_variable_array<FieldType> opcode_indicators;
-                    pb_variable_array<FieldType> instruction_results;
-                    pb_variable_array<FieldType> instruction_flags;
-                    pb_variable_array<FieldType> desidx;
+                    blueprint_variable_vector<FieldType> opcode_indicators;
+                    blueprint_variable_vector<FieldType> instruction_results;
+                    blueprint_variable_vector<FieldType> instruction_flags;
+                    blueprint_variable_vector<FieldType> desidx;
                     blueprint_variable<FieldType> packed_incoming_pc;
-                    pb_variable_array<FieldType> packed_incoming_registers;
+                    blueprint_variable_vector<FieldType> packed_incoming_registers;
                     blueprint_variable<FieldType> packed_incoming_desval;
                     blueprint_variable<FieldType> incoming_flag;
                     blueprint_variable<FieldType> packed_outgoing_pc;
-                    pb_variable_array<FieldType> packed_outgoing_registers;
+                    blueprint_variable_vector<FieldType> packed_outgoing_registers;
                     blueprint_variable<FieldType> outgoing_flag;
                     blueprint_variable<FieldType> packed_outgoing_desval;
 
                     consistency_enforcer_component(tinyram_blueprint<FieldType> &pb,
-                                                const pb_variable_array<FieldType> &opcode_indicators,
-                                                const pb_variable_array<FieldType> &instruction_results,
-                                                const pb_variable_array<FieldType> &instruction_flags,
-                                                const pb_variable_array<FieldType> &desidx,
+                                                const blueprint_variable_vector<FieldType> &opcode_indicators,
+                                                const blueprint_variable_vector<FieldType> &instruction_results,
+                                                const blueprint_variable_vector<FieldType> &instruction_flags,
+                                                const blueprint_variable_vector<FieldType> &desidx,
                                                 const blueprint_variable<FieldType> &packed_incoming_pc,
-                                                const pb_variable_array<FieldType> &packed_incoming_registers,
+                                                const blueprint_variable_vector<FieldType> &packed_incoming_registers,
                                                 const blueprint_variable<FieldType> &packed_incoming_desval,
                                                 const blueprint_variable<FieldType> &incoming_flag,
                                                 const blueprint_variable<FieldType> &packed_outgoing_pc,
-                                                const pb_variable_array<FieldType> &packed_outgoing_registers,
+                                                const blueprint_variable_vector<FieldType> &packed_outgoing_registers,
                                                 const blueprint_variable<FieldType> &outgoing_flag);
 
                     void generate_r1cs_constraints();
@@ -71,17 +71,17 @@ namespace nil {
 
                 template<typename FieldType>
                 consistency_enforcer_component<FieldType>::consistency_enforcer_component(
-                    tinyram_protoboard<FieldType> &pb,
-                    const pb_variable_array<FieldType> &opcode_indicators,
-                    const pb_variable_array<FieldType> &instruction_results,
-                    const pb_variable_array<FieldType> &instruction_flags,
-                    const pb_variable_array<FieldType> &desidx,
+                    tinyram_blueprint<FieldType> &pb,
+                    const blueprint_variable_vector<FieldType> &opcode_indicators,
+                    const blueprint_variable_vector<FieldType> &instruction_results,
+                    const blueprint_variable_vector<FieldType> &instruction_flags,
+                    const blueprint_variable_vector<FieldType> &desidx,
                     const blueprint_variable<FieldType> &packed_incoming_pc,
-                    const pb_variable_array<FieldType> &packed_incoming_registers,
+                    const blueprint_variable_vector<FieldType> &packed_incoming_registers,
                     const blueprint_variable<FieldType> &packed_incoming_desval,
                     const blueprint_variable<FieldType> &incoming_flag,
                     const blueprint_variable<FieldType> &packed_outgoing_pc,
-                    const pb_variable_array<FieldType> &packed_outgoing_registers,
+                    const blueprint_variable_vector<FieldType> &packed_outgoing_registers,
                     const blueprint_variable<FieldType> &outgoing_flag) :
                     tinyram_standard_component<FieldType>(pb),
                     opcode_indicators(opcode_indicators), instruction_results(instruction_results),
@@ -295,9 +295,9 @@ void test_arithmetic_consistency_enforcer_component()
 {
 
     tinyram_architecture_params ap(16, 16);
-    tinyram_protoboard<FieldType> pb(ap);
+    tinyram_blueprint<FieldType> pb(ap);
 
-    pb_variable_array<FieldType> opcode_indicators, instruction_results, instruction_flags;
+    blueprint_variable_vector<FieldType> opcode_indicators, instruction_results, instruction_flags;
     opcode_indicators.allocate(pb, 1ul<<ap.opcode_width());
     instruction_results.allocate(pb, 1ul<<ap.opcode_width());
     instruction_flags.allocate(pb, 1ul<<ap.opcode_width());
@@ -307,7 +307,7 @@ void test_arithmetic_consistency_enforcer_component()
     variable<FieldType>  incoming_pc;
     incoming_pc.allocate(pb);
 
-    pb_variable_array<FieldType> packed_incoming_registers;
+    blueprint_variable_vector<FieldType> packed_incoming_registers;
     packed_incoming_registers.allocate(pb, ap.k);
 
     variable<FieldType>  incoming_load_flag;
@@ -317,7 +317,7 @@ void test_arithmetic_consistency_enforcer_component()
     outgoing_pc.allocate(pb);
     outgoing_flag.allocate(pb);
 
-    pb_variable_array<FieldType> packed_outgoing_registers;
+    blueprint_variable_vector<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
     arithmetic_consistency_enforcer_component g(pb, opcode_indicators, instruction_results, instruction_flags,
@@ -414,9 +414,9 @@ void test_control_flow_consistency_enforcer_component()
 {
 
     tinyram_architecture_params ap(16, 16);
-    tinyram_protoboard<FieldType> pb(ap);
+    tinyram_blueprint<FieldType> pb(ap);
 
-    pb_variable_array<FieldType> opcode_indicators, instruction_results;
+    blueprint_variable_vector<FieldType> opcode_indicators, instruction_results;
     opcode_indicators.allocate(pb, 1ul<<ap.opcode_width());
     instruction_results.allocate(pb, 1ul<<ap.opcode_width());
 
@@ -424,14 +424,14 @@ void test_control_flow_consistency_enforcer_component()
     incoming_pc.allocate(pb);
     incoming_flag.allocate(pb);
 
-    pb_variable_array<FieldType> packed_incoming_registers;
+    blueprint_variable_vector<FieldType> packed_incoming_registers;
     packed_incoming_registers.allocate(pb, ap.k);
 
     variable<FieldType>  outgoing_pc, outgoing_flag;
     outgoing_pc.allocate(pb);
     outgoing_flag.allocate(pb);
 
-    pb_variable_array<FieldType> packed_outgoing_registers;
+    blueprint_variable_vector<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
     control_flow_consistency_enforcer_component g(pb, opcode_indicators, instruction_results,
@@ -479,9 +479,9 @@ void test_special_consistency_enforcer_component()
 
 
     tinyram_architecture_params ap(16, 16);
-    tinyram_protoboard<FieldType> pb(ap);
+    tinyram_blueprint<FieldType> pb(ap);
 
-    pb_variable_array<FieldType> opcode_indicators;
+    blueprint_variable_vector<FieldType> opcode_indicators;
     opcode_indicators.allocate(pb, 1ul<<ap.opcode_width());
 
     variable<FieldType>  incoming_pc, incoming_flag, incoming_load_flag;
@@ -489,7 +489,7 @@ void test_special_consistency_enforcer_component()
     incoming_flag.allocate(pb);
     incoming_load_flag.allocate(pb);
 
-    pb_variable_array<FieldType> packed_incoming_registers;
+    blueprint_variable_vector<FieldType> packed_incoming_registers;
     packed_incoming_registers.allocate(pb, ap.k);
 
     variable<FieldType>  outgoing_pc, outgoing_flag, outgoing_load_flag;
@@ -497,7 +497,7 @@ void test_special_consistency_enforcer_component()
     outgoing_flag.allocate(pb);
     outgoing_load_flag.allocate(pb);
 
-    pb_variable_array<FieldType> packed_outgoing_registers;
+    blueprint_variable_vector<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
     special_consistency_enforcer_component g(pb, opcode_indicators,
@@ -627,4 +627,4 @@ void test_special_consistency_enforcer_component()
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
+#endif    // CRYPTO3_ZK_CONSISTENCY_ENFORCER_COMPONENT_HPP

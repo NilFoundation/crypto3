@@ -12,11 +12,11 @@
 // by use of a Benes network.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BENES_ROUTING_GADGET_HPP_
-#define CRYPTO3_ZK_BENES_ROUTING_GADGET_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP_
+#define CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
-#include <nil/crypto3/zk/snark/routing_algorithms/benes_routing_algorithm.hpp>
+#include <nil/crypto3/zk/snark/routing/benes_routing_algorithm.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 
@@ -39,7 +39,7 @@ namespace nil {
                       (2*dimension-1 for switch bits/topology) and packet_idx is in
                       range 0 .. num_packets-1.
                     */
-                    std::vector<std::vector<pb_variable_array<FieldType>>> routed_packets;
+                    std::vector<std::vector<blueprint_variable_vector<FieldType>>> routed_packets;
                     std::vector<multipacking_component<FieldType>> pack_inputs, unpack_outputs;
 
                     /*
@@ -50,23 +50,23 @@ namespace nil {
                       For benes_switch_bits 0 corresponds to straight edge and 1
                       corresponds to cross edge.
                     */
-                    std::vector<pb_variable_array<FieldType>> benes_switch_bits;
+                    std::vector<blueprint_variable_vector<FieldType>> benes_switch_bits;
                     benes_topology neighbors;
 
                 public:
                     const std::size_t num_packets;
                     const std::size_t num_columns;
 
-                    const std::vector<pb_variable_array<FieldType>> routing_input_bits;
-                    const std::vector<pb_variable_array<FieldType>> routing_output_bits;
+                    const std::vector<blueprint_variable_vector<FieldType>> routing_input_bits;
+                    const std::vector<blueprint_variable_vector<FieldType>> routing_output_bits;
                     std::size_t lines_to_unpack;
 
                     const std::size_t packet_size, num_subpackets;
 
                     benes_routing_component(blueprint<FieldType> &pb,
                                          const std::size_t num_packets,
-                                         const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
-                                         const std::vector<pb_variable_array<FieldType>> &routing_output_bits,
+                                         const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
+                                         const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits,
                                          const std::size_t lines_to_unpack);
 
                     void generate_r1cs_constraints();
@@ -81,8 +81,8 @@ namespace nil {
                 benes_routing_component<FieldType>::benes_routing_component(
                     blueprint<FieldType> &pb,
                     const std::size_t num_packets,
-                    const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
-                    const std::vector<pb_variable_array<FieldType>> &routing_output_bits,
+                    const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
+                    const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits,
                     const std::size_t lines_to_unpack) :
                     component<FieldType>(pb),
                     num_packets(num_packets), num_columns(benes_num_columns(num_packets)),
@@ -109,14 +109,14 @@ namespace nil {
                     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         pack_inputs.emplace_back(multipacking_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(routing_input_bits[packet_idx].begin(),
+                            blueprint_variable_vector<FieldType>(routing_input_bits[packet_idx].begin(),
                                                          routing_input_bits[packet_idx].end()),
                             routed_packets[0][packet_idx],
                             FieldType::capacity()));
                         if (packet_idx < lines_to_unpack) {
                             unpack_outputs.emplace_back(multipacking_component<FieldType>(
                                 pb,
-                                pb_variable_array<FieldType>(routing_output_bits[packet_idx].begin(),
+                                blueprint_variable_vector<FieldType>(routing_output_bits[packet_idx].begin(),
                                                              routing_output_bits[packet_idx].end()),
                                 routed_packets[num_columns][packet_idx],
                                 FieldType::capacity()));
@@ -228,7 +228,7 @@ namespace nil {
                     integer_permutation permutation(num_packets);
                     permutation.random_shuffle();
 
-                    std::vector<pb_variable_array<FieldType>> randbits(num_packets), outbits(num_packets);
+                    std::vector<blueprint_variable_vector<FieldType>> randbits(num_packets), outbits(num_packets);
                     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         randbits[packet_idx].allocate(pb, packet_size);
                         outbits[packet_idx].allocate(pb, packet_size);
@@ -258,4 +258,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BENES_ROUTING_GADGET_HPP_
+#endif    // BENES_ROUTING_COMPONENT_HPP_

@@ -39,7 +39,7 @@ namespace nil {
                 public:
                     blueprint_variable<FieldType> type;
 
-                    pb_variable_array<FieldType> all_vars;
+                    blueprint_variable_vector<FieldType> all_vars;
 
                     r1cs_pcd_message_variable(blueprint<FieldType> &pb);
                     void update_all_vars();
@@ -60,7 +60,7 @@ namespace nil {
                     std::size_t num_vars_at_construction;
 
                 public:
-                    pb_variable_array<FieldType> all_vars;
+                    blueprint_variable_vector<FieldType> all_vars;
 
                     r1cs_pcd_local_data_variable(blueprint<FieldType> &pb);
                     void update_all_vars();

@@ -45,24 +45,24 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     r1cs_example<FieldT_A> example =
         generate_r1cs_example_with_field_input<FieldT_A>(num_constraints, primary_input_size);
-    assert(example.primary_input.size() == primary_input_size);
+    BOOST_CHECK(example.primary_input.size() == primary_input_size);
 
-    assert(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
+    BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
     const r1cs_ppzksnark_keypair<ppT_A> keypair = r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
     const r1cs_ppzksnark_proof<ppT_A> pi =
         r1cs_ppzksnark_prover<ppT_A>(keypair.pk, example.primary_input, example.auxiliary_input);
     bool bit = r1cs_ppzksnark_verifier_strong_IC<ppT_A>(keypair.vk, example.primary_input, pi);
-    assert(bit);
+    BOOST_CHECK(bit);
 
     const size_t elt_size = FieldT_A::size_in_bits();
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
     const size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
     blueprint<FieldT_B> pb;
-    pb_variable_array<FieldT_B> vk_bits;
+    blueprint_variable_vector<FieldT_B> vk_bits;
     vk_bits.allocate(pb, vk_size_in_bits);
 
-    pb_variable_array<FieldT_B> primary_input_bits;
+    blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(pb, primary_input_size_in_bits);
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(pb);
@@ -74,7 +74,7 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     r1cs_ppzksnark_verifier_component<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result);
 
-        proof.generate_r1cs_constraints();
+    proof.generate_r1cs_constraints();
     verifier.generate_r1cs_constraints();
 
     std::vector<bool> input_as_bits;
@@ -91,14 +91,14 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     pb.val(result) = FieldT_B::one();
 
     printf("positive test:\n");
-    assert(pb.is_satisfied());
+    BOOST_CHECK(pb.is_satisfied());
 
     pb.val(primary_input_bits[0]) = FieldT_B::one() - pb.val(primary_input_bits[0]);
     verifier.generate_r1cs_witness();
     pb.val(result) = FieldT_B::one();
 
     printf("negative test:\n");
-    assert(!pb.is_satisfied());
+    BOOST_CHECK(!pb.is_satisfied());
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
         pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
@@ -114,21 +114,21 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
 
     r1cs_example<FieldT_A> example =
         generate_r1cs_example_with_field_input<FieldT_A>(num_constraints, primary_input_size);
-    assert(example.primary_input.size() == primary_input_size);
+    BOOST_CHECK(example.primary_input.size() == primary_input_size);
 
-    assert(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
+    BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
     const r1cs_ppzksnark_keypair<ppT_A> keypair = r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
     const r1cs_ppzksnark_proof<ppT_A> pi =
         r1cs_ppzksnark_prover<ppT_A>(keypair.pk, example.primary_input, example.auxiliary_input);
     bool bit = r1cs_ppzksnark_verifier_strong_IC<ppT_A>(keypair.vk, example.primary_input, pi);
-    assert(bit);
+    BOOST_CHECK(bit);
 
     const size_t elt_size = FieldT_A::size_in_bits();
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
     blueprint<FieldT_B> pb;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk);
-    pb_variable_array<FieldT_B> primary_input_bits;
+    blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(pb, primary_input_size_in_bits);
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(pb);
@@ -136,10 +136,10 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     variable<FieldT_B> result;
     result.allocate(pb);
 
-    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
-                                                                 result);
+    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size,
+                                                                    proof, result);
 
-        proof.generate_r1cs_constraints();
+    proof.generate_r1cs_constraints();
     online_verifier.generate_r1cs_constraints();
 
     std::vector<bool> input_as_bits;
@@ -155,14 +155,14 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     pb.val(result) = FieldT_B::one();
 
     printf("positive test:\n");
-    assert(pb.is_satisfied());
+    BOOST_CHECK(pb.is_satisfied());
 
     pb.val(primary_input_bits[0]) = FieldT_B::one() - pb.val(primary_input_bits[0]);
     online_verifier.generate_r1cs_witness();
     pb.val(result) = FieldT_B::one();
 
     printf("negative test:\n");
-    assert(!pb.is_satisfied());
+    BOOST_CHECK(!pb.is_satisfied());
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
         pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
@@ -186,8 +186,8 @@ void test_mul(const std::string &annotation) {
         y.generate_r1cs_witness(y_val);
         mul.generate_r1cs_witness();
         const typename FpExtT::value_type res = xy.get_element();
-        assert(res == x_val * y_val);
-        assert(pb.is_satisfied());
+        BOOST_CHECK(res == x_val * y_val);
+        BOOST_CHECK(pb.is_satisfied());
     }
     printf("number of constraints for %s_mul = %zu\n", annotation.c_str(), pb.num_constraints());
 }
@@ -207,8 +207,8 @@ void test_sqr(const std::string &annotation) {
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();
         const typename FpExtT::value_type res = xsq.get_element();
-        assert(res == x_val.squared());
-        assert(pb.is_satisfied());
+        BOOST_CHECK(res == x_val.squared());
+        BOOST_CHECK(pb.is_satisfied());
     }
     printf("number of constraints for %s_sqr = %zu\n", annotation.c_str(), pb.num_constraints());
 }
@@ -231,8 +231,8 @@ void test_cyclotomic_sqr(const std::string &annotation) {
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();
         const typename FpExtT::value_type res = xsq.get_element();
-        assert(res == x_val.squared());
-        assert(pb.is_satisfied());
+        BOOST_CHECK(res == x_val.squared());
+        BOOST_CHECK(pb.is_satisfied());
     }
     printf("number of constraints for %s_cyclotomic_sqr = %zu\n", annotation.c_str(), pb.num_constraints());
 }
@@ -281,10 +281,10 @@ void test_full_pairing(const std::string &annotation) {
     result_is_one.allocate(pb);
     final_exp_component<CurveType> finexp(pb, miller_result, result_is_one);
 
-        compute_prec_P.generate_r1cs_constraints();
-        compute_prec_Q.generate_r1cs_constraints();
-        miller.generate_r1cs_constraints();
-        finexp.generate_r1cs_constraints();
+    compute_prec_P.generate_r1cs_constraints();
+    compute_prec_Q.generate_r1cs_constraints();
+    miller.generate_r1cs_constraints();
+    finexp.generate_r1cs_constraints();
 
     P.generate_r1cs_witness(P_val);
     compute_prec_P.generate_r1cs_witness();
@@ -294,12 +294,15 @@ void test_full_pairing(const std::string &annotation) {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(pb.is_satisfied());
 
-    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
-    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
+    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P =
+        other_curve<CurveType>::affine_ate_precompute_G1(P_val);
+    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q =
+        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
     algebra::Fqk<other_curve<CurveType>> native_miller_result =
         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    algebra::Fqk<other_curve<CurveType>> native_finexp_result = other_curve<CurveType>::final_exponentiation(native_miller_result);
+    algebra::Fqk<other_curve<CurveType>> native_finexp_result =
+        other_curve<CurveType>::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -328,19 +331,22 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     result_is_one.allocate(pb);
     final_exp_component<CurveType> finexp(pb, miller_result, result_is_one);
 
-        miller.generate_r1cs_constraints();
-        finexp.generate_r1cs_constraints();
+    miller.generate_r1cs_constraints();
+    finexp.generate_r1cs_constraints();
 
     miller.generate_r1cs_witness();
     finexp.generate_r1cs_witness();
     BOOST_CHECK(pb.is_satisfied());
 
-    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
-    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
+    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P =
+        other_curve<CurveType>::affine_ate_precompute_G1(P_val);
+    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q =
+        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
     algebra::Fqk<other_curve<CurveType>> native_miller_result =
         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    algebra::Fqk<other_curve<CurveType>> native_finexp_result = other_curve<CurveType>::final_exponentiation(native_miller_result);
+    algebra::Fqk<other_curve<CurveType>> native_finexp_result =
+        other_curve<CurveType>::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -351,6 +357,218 @@ void test_full_precomputed_pairing(const std::string &annotation) {
            pb.num_constraints());
 }
 
+template<typename ppT>
+void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
+    protoboard<algebra::Fr<ppT>> pb;
+    algebra::G1<other_curve<ppT>> P1_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q1_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    algebra::G1<other_curve<ppT>> P2_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q2_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    algebra::G1<other_curve<ppT>> P3_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q3_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    G1_variable<ppT> P1(pb, "P1");
+    G2_variable<ppT> Q1(pb, "Q1");
+    G1_variable<ppT> P2(pb, "P2");
+    G2_variable<ppT> Q2(pb, "Q2");
+    G1_variable<ppT> P3(pb, "P3");
+    G2_variable<ppT> Q3(pb, "Q3");
+
+    G1_precomputation<ppT> prec_P1;
+    precompute_G1_gadget<ppT> compute_prec_P1(pb, P1, prec_P1, "compute_prec_P1");
+    G1_precomputation<ppT> prec_P2;
+    precompute_G1_gadget<ppT> compute_prec_P2(pb, P2, prec_P2, "compute_prec_P2");
+    G1_precomputation<ppT> prec_P3;
+    precompute_G1_gadget<ppT> compute_prec_P3(pb, P3, prec_P3, "compute_prec_P3");
+    G2_precomputation<ppT> prec_Q1;
+    precompute_G2_gadget<ppT> compute_prec_Q1(pb, Q1, prec_Q1, "compute_prec_Q1");
+    G2_precomputation<ppT> prec_Q2;
+    precompute_G2_gadget<ppT> compute_prec_Q2(pb, Q2, prec_Q2, "compute_prec_Q2");
+    G2_precomputation<ppT> prec_Q3;
+    precompute_G2_gadget<ppT> compute_prec_Q3(pb, Q3, prec_Q3, "compute_prec_Q3");
+
+    Fqk_variable<ppT> result(pb, "result");
+    mnt_e_times_e_over_e_miller_loop_gadget<ppT> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, prec_P3, prec_Q3,
+                                                        result, "miller");
+
+    PROFILE_CONSTRAINTS(pb, "precompute P") {
+        compute_prec_P1.generate_r1cs_constraints();
+        compute_prec_P2.generate_r1cs_constraints();
+        compute_prec_P3.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "precompute Q") {
+        compute_prec_Q1.generate_r1cs_constraints();
+        compute_prec_Q2.generate_r1cs_constraints();
+        compute_prec_Q3.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "Miller loop") {
+        miller.generate_r1cs_constraints();
+    }
+    PRINT_CONSTRAINT_PROFILING();
+
+    P1.generate_r1cs_witness(P1_val);
+    compute_prec_P1.generate_r1cs_witness();
+    Q1.generate_r1cs_witness(Q1_val);
+    compute_prec_Q1.generate_r1cs_witness();
+    P2.generate_r1cs_witness(P2_val);
+    compute_prec_P2.generate_r1cs_witness();
+    Q2.generate_r1cs_witness(Q2_val);
+    compute_prec_Q2.generate_r1cs_witness();
+    P3.generate_r1cs_witness(P3_val);
+    compute_prec_P3.generate_r1cs_witness();
+    Q3.generate_r1cs_witness(Q3_val);
+    compute_prec_Q3.generate_r1cs_witness();
+    miller.generate_r1cs_witness();
+    BOOST_CHECK(pb.is_satisfied());
+
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P1 =
+        other_curve<ppT>::affine_ate_precompute_G1(P1_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q1 =
+        other_curve<ppT>::affine_ate_precompute_G2(Q1_val);
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P2 =
+        other_curve<ppT>::affine_ate_precompute_G1(P2_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q2 =
+        other_curve<ppT>::affine_ate_precompute_G2(Q2_val);
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P3 =
+        other_curve<ppT>::affine_ate_precompute_G1(P3_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q3 =
+        other_curve<ppT>::affine_ate_precompute_G2(Q3_val);
+    algebra::Fqk<other_curve<ppT>> native_result =
+        (other_curve<ppT>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
+         other_curve<ppT>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2) *
+         other_curve<ppT>::affine_ate_miller_loop(native_prec_P3, native_prec_Q3).inverse());
+
+    BOOST_CHECK(result.get_element() == native_result);
+    printf("number of constraints for e times e over e Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),
+           pb.num_constraints());
+}
+
+template<typename ppT>
+void test_mnt_miller_loop(const std::string &annotation) {
+    protoboard<algebra::Fr<ppT>> pb;
+    algebra::G1<other_curve<ppT>> P_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    G1_variable<ppT> P(pb, "P");
+    G2_variable<ppT> Q(pb, "Q");
+
+    G1_precomputation<ppT> prec_P;
+    G2_precomputation<ppT> prec_Q;
+
+    precompute_G1_gadget<ppT> compute_prec_P(pb, P, prec_P, "prec_P");
+    precompute_G2_gadget<ppT> compute_prec_Q(pb, Q, prec_Q, "prec_Q");
+
+    Fqk_variable<ppT> result(pb, "result");
+    mnt_miller_loop_gadget<ppT> miller(pb, prec_P, prec_Q, result, "miller");
+
+    PROFILE_CONSTRAINTS(pb, "precompute P") {
+        compute_prec_P.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "precompute Q") {
+        compute_prec_Q.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "Miller loop") {
+        miller.generate_r1cs_constraints();
+    }
+    PRINT_CONSTRAINT_PROFILING();
+
+    P.generate_r1cs_witness(P_val);
+    compute_prec_P.generate_r1cs_witness();
+    Q.generate_r1cs_witness(Q_val);
+    compute_prec_Q.generate_r1cs_witness();
+    miller.generate_r1cs_witness();
+    BOOST_CHECK(pb.is_satisfied());
+
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P = other_curve<ppT>::affine_ate_precompute_G1(P_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q = other_curve<ppT>::affine_ate_precompute_G2(Q_val);
+    algebra::Fqk<other_curve<ppT>> native_result =
+        other_curve<ppT>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
+
+    BOOST_CHECK(result.get_element() == native_result);
+    printf("number of constraints for Miller loop (Fr is %s)  = %zu\n", annotation.c_str(), pb.num_constraints());
+}
+
+template<typename ppT>
+void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
+    protoboard<algebra::Fr<ppT>> pb;
+    algebra::G1<other_curve<ppT>> P1_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q1_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    algebra::G1<other_curve<ppT>> P2_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+    algebra::G2<other_curve<ppT>> Q2_val =
+        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+
+    G1_variable<ppT> P1(pb, "P1");
+    G2_variable<ppT> Q1(pb, "Q1");
+    G1_variable<ppT> P2(pb, "P2");
+    G2_variable<ppT> Q2(pb, "Q2");
+
+    G1_precomputation<ppT> prec_P1;
+    precompute_G1_gadget<ppT> compute_prec_P1(pb, P1, prec_P1, "compute_prec_P1");
+    G1_precomputation<ppT> prec_P2;
+    precompute_G1_gadget<ppT> compute_prec_P2(pb, P2, prec_P2, "compute_prec_P2");
+    G2_precomputation<ppT> prec_Q1;
+    precompute_G2_gadget<ppT> compute_prec_Q1(pb, Q1, prec_Q1, "compute_prec_Q1");
+    G2_precomputation<ppT> prec_Q2;
+    precompute_G2_gadget<ppT> compute_prec_Q2(pb, Q2, prec_Q2, "compute_prec_Q2");
+
+    Fqk_variable<ppT> result(pb, "result");
+    mnt_e_over_e_miller_loop_gadget<ppT> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, result, "miller");
+
+    PROFILE_CONSTRAINTS(pb, "precompute P") {
+        compute_prec_P1.generate_r1cs_constraints();
+        compute_prec_P2.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "precompute Q") {
+        compute_prec_Q1.generate_r1cs_constraints();
+        compute_prec_Q2.generate_r1cs_constraints();
+    }
+    PROFILE_CONSTRAINTS(pb, "Miller loop") {
+        miller.generate_r1cs_constraints();
+    }
+    PRINT_CONSTRAINT_PROFILING();
+
+    P1.generate_r1cs_witness(P1_val);
+    compute_prec_P1.generate_r1cs_witness();
+    Q1.generate_r1cs_witness(Q1_val);
+    compute_prec_Q1.generate_r1cs_witness();
+    P2.generate_r1cs_witness(P2_val);
+    compute_prec_P2.generate_r1cs_witness();
+    Q2.generate_r1cs_witness(Q2_val);
+    compute_prec_Q2.generate_r1cs_witness();
+    miller.generate_r1cs_witness();
+    BOOST_CHECK(pb.is_satisfied());
+
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P1 =
+        other_curve<ppT>::affine_ate_precompute_G1(P1_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q1 =
+        other_curve<ppT>::affine_ate_precompute_G2(Q1_val);
+    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_prec_P2 =
+        other_curve<ppT>::affine_ate_precompute_G1(P2_val);
+    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_prec_Q2 =
+        other_curve<ppT>::affine_ate_precompute_G2(Q2_val);
+    algebra::Fqk<other_curve<ppT>> native_result =
+        (other_curve<ppT>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
+         other_curve<ppT>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2).inverse());
+
+    BOOST_CHECK(result.get_element() == native_result);
+    printf("number of constraints for e over e Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),
+           pb.num_constraints());
+}
+
 int main() {
     test_mul<algebra::mnt4_Fq2, Fp2_variable, Fp2_mul_component>("mnt4_Fp2");
     test_sqr<algebra::mnt4_Fq2, Fp2_variable, Fp2_sqr_component>("mnt4_Fp2");
@@ -358,8 +576,8 @@ int main() {
     test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component>("mnt4_Fp4");
     test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_component>("mnt4_Fp4");
     test_cyclotomic_sqr<curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>("mnt4_Fp4");
-    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component, algebra::mnt4_q_limbs>(
-        algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
+    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component,
+                                  algebra::mnt4_q_limbs>(algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
     test_Frobenius<algebra::mnt4_Fq4, Fp4_variable>("mnt4_Fq4");
 
     test_mul<algebra::mnt6_Fq3, Fp3_variable, Fp3_mul_component>("mnt6_Fp3");
@@ -368,8 +586,8 @@ int main() {
     test_mul<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component>("mnt6_Fp6");
     test_sqr<algebra::mnt6_Fq6, Fp6_variable, Fp6_sqr_component>("mnt6_Fp6");
     test_cyclotomic_sqr<curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_component>("mnt6_Fp6");
-    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component, algebra::mnt6_q_limbs>(
-        algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
+    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component,
+                                  algebra::mnt6_q_limbs>(algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
     test_Frobenius<algebra::mnt6_Fq6, Fp6_variable>("mnt6_Fq6");
 
     test_G2_checker_component<curves::mnt4>("mnt4");

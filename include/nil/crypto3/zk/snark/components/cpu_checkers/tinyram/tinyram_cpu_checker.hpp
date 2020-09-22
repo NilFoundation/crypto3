@@ -29,11 +29,11 @@ namespace nil {
                 template<typename FieldType>
                 class tinyram_cpu_checker : public tinyram_standard_component<FieldType> {
                 private:
-                    pb_variable_array<FieldType> opcode;
+                    blueprint_variable_vector<FieldType> opcode;
                     blueprint_variable<FieldType> arg2_is_imm;
-                    pb_variable_array<FieldType> desidx;
-                    pb_variable_array<FieldType> arg1idx;
-                    pb_variable_array<FieldType> arg2idx;
+                    blueprint_variable_vector<FieldType> desidx;
+                    blueprint_variable_vector<FieldType> arg1idx;
+                    blueprint_variable_vector<FieldType> arg2idx;
 
                     std::vector<word_variable_component<FieldType>> prev_registers;
                     std::vector<word_variable_component<FieldType>> next_registers;
@@ -48,45 +48,45 @@ namespace nil {
                     std::shared_ptr<word_variable_component<FieldType>> arg2val;
 
                     std::shared_ptr<argument_decoder_component<FieldType>> decode_arguments;
-                    pb_variable_array<FieldType> opcode_indicators;
+                    blueprint_variable_vector<FieldType> opcode_indicators;
                     std::shared_ptr<ALU_component<FieldType>> ALU;
 
                     std::shared_ptr<doubleword_variable_component<FieldType>> ls_prev_val_as_doubleword_variable;
                     std::shared_ptr<doubleword_variable_component<FieldType>> ls_next_val_as_doubleword_variable;
                     std::shared_ptr<dual_variable_component<FieldType>> memory_subaddress;
                     blueprint_variable<FieldType> memory_subcontents;
-                    pb_linear_combination<FieldType> memory_access_is_word;
-                    pb_linear_combination<FieldType> memory_access_is_byte;
+                    blueprint_linear_combination<FieldType> memory_access_is_word;
+                    blueprint_linear_combination<FieldType> memory_access_is_byte;
                     std::shared_ptr<memory_masking_component<FieldType>> check_memory;
 
                     std::shared_ptr<word_variable_component<FieldType>> next_pc_addr_as_word_variable;
                     std::shared_ptr<consistency_enforcer_component<FieldType>> consistency_enforcer;
 
-                    pb_variable_array<FieldType> instruction_results;
-                    pb_variable_array<FieldType> instruction_flags;
+                    blueprint_variable_vector<FieldType> instruction_results;
+                    blueprint_variable_vector<FieldType> instruction_flags;
 
                     blueprint_variable<FieldType> read_not1;
 
                 public:
-                    pb_variable_array<FieldType> prev_pc_addr;
-                    pb_variable_array<FieldType> prev_pc_val;
-                    pb_variable_array<FieldType> prev_state;
-                    pb_variable_array<FieldType> ls_addr;
-                    pb_variable_array<FieldType> ls_prev_val;
-                    pb_variable_array<FieldType> ls_next_val;
-                    pb_variable_array<FieldType> next_state;
-                    pb_variable_array<FieldType> next_pc_addr;
+                    blueprint_variable_vector<FieldType> prev_pc_addr;
+                    blueprint_variable_vector<FieldType> prev_pc_val;
+                    blueprint_variable_vector<FieldType> prev_state;
+                    blueprint_variable_vector<FieldType> ls_addr;
+                    blueprint_variable_vector<FieldType> ls_prev_val;
+                    blueprint_variable_vector<FieldType> ls_next_val;
+                    blueprint_variable_vector<FieldType> next_state;
+                    blueprint_variable_vector<FieldType> next_pc_addr;
                     blueprint_variable<FieldType> next_has_accepted;
 
                     tinyram_cpu_checker(tinyram_blueprint<FieldType> &pb,
-                                        pb_variable_array<FieldType> &prev_pc_addr,
-                                        pb_variable_array<FieldType> &prev_pc_val,
-                                        pb_variable_array<FieldType> &prev_state,
-                                        pb_variable_array<FieldType> &ls_addr,
-                                        pb_variable_array<FieldType> &ls_prev_val,
-                                        pb_variable_array<FieldType> &ls_next_val,
-                                        pb_variable_array<FieldType> &next_state,
-                                        pb_variable_array<FieldType> &next_pc_addr,
+                                        blueprint_variable_vector<FieldType> &prev_pc_addr,
+                                        blueprint_variable_vector<FieldType> &prev_pc_val,
+                                        blueprint_variable_vector<FieldType> &prev_state,
+                                        blueprint_variable_vector<FieldType> &ls_addr,
+                                        blueprint_variable_vector<FieldType> &ls_prev_val,
+                                        blueprint_variable_vector<FieldType> &ls_next_val,
+                                        blueprint_variable_vector<FieldType> &next_state,
+                                        blueprint_variable_vector<FieldType> &next_pc_addr,
                                         blueprint_variable<FieldType> &next_has_accepted);
 
                     void generate_r1cs_constraints();
@@ -101,14 +101,14 @@ namespace nil {
 
                 template<typename FieldType>
                 tinyram_cpu_checker<FieldType>::tinyram_cpu_checker(tinyram_blueprint<FieldType> &pb,
-                                                                    pb_variable_array<FieldType> &prev_pc_addr,
-                                                                    pb_variable_array<FieldType> &prev_pc_val,
-                                                                    pb_variable_array<FieldType> &prev_state,
-                                                                    pb_variable_array<FieldType> &ls_addr,
-                                                                    pb_variable_array<FieldType> &ls_prev_val,
-                                                                    pb_variable_array<FieldType> &ls_next_val,
-                                                                    pb_variable_array<FieldType> &next_state,
-                                                                    pb_variable_array<FieldType> &next_pc_addr,
+                                                                    blueprint_variable_vector<FieldType> &prev_pc_addr,
+                                                                    blueprint_variable_vector<FieldType> &prev_pc_val,
+                                                                    blueprint_variable_vector<FieldType> &prev_state,
+                                                                    blueprint_variable_vector<FieldType> &ls_addr,
+                                                                    blueprint_variable_vector<FieldType> &ls_prev_val,
+                                                                    blueprint_variable_vector<FieldType> &ls_next_val,
+                                                                    blueprint_variable_vector<FieldType> &next_state,
+                                                                    blueprint_variable_vector<FieldType> &next_pc_addr,
                                                                     blueprint_variable<FieldType> &next_has_accepted) :
                     tinyram_standard_component<FieldType>(pb),
                     prev_pc_addr(prev_pc_addr), prev_pc_val(prev_pc_val), prev_state(prev_state), ls_addr(ls_addr),
@@ -119,31 +119,31 @@ namespace nil {
                        MSB) */
                     auto pc_val_it = prev_pc_val.begin();
 
-                    arg2idx = pb_variable_array<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_or_imm_width());
+                    arg2idx = blueprint_variable_vector<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_or_imm_width());
                     std::advance(pc_val_it, pb.ap.reg_arg_or_imm_width());
                     std::advance(pc_val_it, pb.ap.instruction_padding_width());
-                    arg1idx = pb_variable_array<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_width());
+                    arg1idx = blueprint_variable_vector<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_width());
                     std::advance(pc_val_it, pb.ap.reg_arg_width());
-                    desidx = pb_variable_array<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_width());
+                    desidx = blueprint_variable_vector<FieldType>(pc_val_it, pc_val_it + pb.ap.reg_arg_width());
                     std::advance(pc_val_it, pb.ap.reg_arg_width());
                     arg2_is_imm = *pc_val_it;
                     std::advance(pc_val_it, 1);
-                    opcode = pb_variable_array<FieldType>(pc_val_it, pc_val_it + pb.ap.opcode_width());
+                    opcode = blueprint_variable_vector<FieldType>(pc_val_it, pc_val_it + pb.ap.opcode_width());
                     std::advance(pc_val_it, pb.ap.opcode_width());
 
                     assert(pc_val_it == prev_pc_val.end());
 
                     /* parse state as registers + flags */
-                    pb_variable_array<FieldType> packed_prev_registers, packed_next_registers;
+                    blueprint_variable_vector<FieldType> packed_prev_registers, packed_next_registers;
                     for (std::size_t i = 0; i < pb.ap.k; ++i) {
                         prev_registers.emplace_back(word_variable_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(prev_state.begin() + i * pb.ap.w,
-                                                         prev_state.begin() + (i + 1) * pb.ap.w)));
+                            blueprint_variable_vector<FieldType>(prev_state.begin() + i * pb.ap.w,
+                                                                 prev_state.begin() + (i + 1) * pb.ap.w)));
                         next_registers.emplace_back(word_variable_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(next_state.begin() + i * pb.ap.w,
-                                                         next_state.begin() + (i + 1) * pb.ap.w)));
+                            blueprint_variable_vector<FieldType>(next_state.begin() + i * pb.ap.w,
+                                                                 next_state.begin() + (i + 1) * pb.ap.w)));
 
                         packed_prev_registers.emplace_back(prev_registers[i].packed);
                         packed_next_registers.emplace_back(next_registers[i].packed);
@@ -170,9 +170,9 @@ namespace nil {
                     instruction_results.allocate(pb, 1ul << pb.ap.opcode_width());
                     instruction_flags.allocate(pb, 1ul << pb.ap.opcode_width());
 
-                    ALU.reset(new ALU_component<FieldType>(pb, opcode_indicators, *prev_pc_addr_as_word_variable, *desval,
-                                                        *arg1val, *arg2val, prev_flag, instruction_results,
-                                                        instruction_flags));
+                    ALU.reset(new ALU_component<FieldType>(pb, opcode_indicators, *prev_pc_addr_as_word_variable,
+                                                           *desval, *arg1val, *arg2val, prev_flag, instruction_results,
+                                                           instruction_flags));
 
                     /* check correctness of memory operations */
                     ls_prev_val_as_doubleword_variable.reset(
@@ -181,8 +181,8 @@ namespace nil {
                         new doubleword_variable_component<FieldType>(pb, ls_next_val));
                     memory_subaddress.reset(new dual_variable_component<FieldType>(
                         pb,
-                        pb_variable_array<FieldType>(arg2val->bits.begin(),
-                                                     arg2val->bits.begin() + pb.ap.subaddr_len())));
+                        blueprint_variable_vector<FieldType>(arg2val->bits.begin(),
+                                                             arg2val->bits.begin() + pb.ap.subaddr_len())));
 
                     memory_subcontents.allocate(pb);
                     memory_access_is_word.assign(
@@ -191,12 +191,12 @@ namespace nil {
                                                          opcode_indicators[tinyram_opcode_STOREB]);
 
                     check_memory.reset(new memory_masking_component<FieldType>(pb,
-                                                                            *ls_prev_val_as_doubleword_variable,
-                                                                            *memory_subaddress,
-                                                                            memory_subcontents,
-                                                                            memory_access_is_word,
-                                                                            memory_access_is_byte,
-                                                                            *ls_next_val_as_doubleword_variable));
+                                                                               *ls_prev_val_as_doubleword_variable,
+                                                                               *memory_subaddress,
+                                                                               memory_subcontents,
+                                                                               memory_access_is_word,
+                                                                               memory_access_is_byte,
+                                                                               *ls_next_val_as_doubleword_variable));
 
                     /* handle reads */
                     read_not1.allocate(pb);
@@ -245,7 +245,7 @@ namespace nil {
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         1,
-                        pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                        pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                             arg2val->bits.begin() + this->pb.ap.subaddr_len(), arg2val->bits.end())),
                         pb_packing_sum<FieldType>(ls_addr)));
 
@@ -267,7 +267,7 @@ namespace nil {
                                                    0));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         opcode_indicators[tinyram_opcode_STOREB],
-                        memory_subcontents - pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                        memory_subcontents - pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                                  desval->bits.begin(), desval->bits.begin() + 8)),
                         0));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(opcode_indicators[tinyram_opcode_STOREW],
@@ -334,7 +334,8 @@ namespace nil {
                     /* fill in the opcode indicators */
                     const std::size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
                     for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
-                        this->pb.val(opcode_indicators[i]) = (i == opcode_val ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                        this->pb.val(opcode_indicators[i]) =
+                            (i == opcode_val ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     /* execute the ALU */
@@ -343,8 +344,8 @@ namespace nil {
                     /* fill memory_subaddress */
                     memory_subaddress->bits.fill_with_bits(
                         this->pb,
-                        pb_variable_array<FieldType>(arg2val->bits.begin(),
-                                                     arg2val->bits.begin() + +this->pb.ap.subaddr_len())
+                        blueprint_variable_vector<FieldType>(arg2val->bits.begin(),
+                                                             arg2val->bits.begin() + +this->pb.ap.subaddr_len())
                             .get_bits(this->pb));
                     memory_subaddress->generate_r1cs_witness_from_bits();
 
@@ -362,11 +363,13 @@ namespace nil {
                         this->pb.val(instruction_results[tinyram_opcode_LOADB]) =
                             typename FieldType::value_type(loaded_byte);
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(loaded_byte);
-                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) == FieldType::value_type::zero()) {
-                        const std::size_t stored_byte = (static_cast<unsigned long>(this->pb.val(desval->packed))
-                                                                           ) & 0xFF;
+                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) ==
+                               FieldType::value_type::zero()) {
+                        const std::size_t stored_byte =
+                            (static_cast<unsigned long>(this->pb.val(desval->packed))) & 0xFF;
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_byte);
-                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) == FieldType::value_type::zero()) {
+                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) ==
+                               FieldType::value_type::zero()) {
                         const std::size_t stored_word = (static_cast<unsigned long>(this->pb.val(desval->packed)));
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_word);
                     } else {
@@ -401,7 +404,8 @@ namespace nil {
                     } else {
                         /* otherwise perform the actual read */
                         if (aux_it != aux_end) {
-                            this->pb.val(instruction_results[tinyram_opcode_READ]) = typename FieldType::value_type(*aux_it);
+                            this->pb.val(instruction_results[tinyram_opcode_READ]) =
+                                typename FieldType::value_type(*aux_it);
                             if (++aux_it == aux_end) {
                                 /* tape has ended! */
                                 this->pb.val(next_tape1_exhausted) = FieldType::value_type::zero();
@@ -435,8 +439,8 @@ namespace nil {
                 template<typename FieldType>
                 void tinyram_cpu_checker<FieldType>::dump() const {
                     printf("   pc = %lu, flag = %lu\n",
-                        static_cast<unsigned long>(this->pb.val(prev_pc_addr_as_word_variable->packed)),
-                        static_cast<unsigned long>(this->pb.val(prev_flag)));
+                           static_cast<unsigned long>(this->pb.val(prev_pc_addr_as_word_variable->packed)),
+                           static_cast<unsigned long>(this->pb.val(prev_flag)));
                     printf("   ");
 
                     for (std::size_t j = 0; j < this->pb.ap.k; ++j) {

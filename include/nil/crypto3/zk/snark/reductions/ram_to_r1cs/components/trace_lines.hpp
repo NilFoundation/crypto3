@@ -42,7 +42,7 @@ namespace nil {
                     std::shared_ptr<dual_variable_component<FieldType>> contents_after;
 
                 public:
-                    memory_line_variable_component(ram_protoboard<RAMType> &pb,
+                    memory_line_variable_component(ram_blueprint<RAMType> &pb,
                                                    const std::size_t timestamp_size,
                                                    const ram_architecture_params<RAMType> &ap);
 
@@ -50,7 +50,7 @@ namespace nil {
                     void generate_r1cs_witness_from_bits();
                     void generate_r1cs_witness_from_packed();
 
-                    pb_variable_array<FieldType> all_vars() const;
+                    blueprint_variable_vector<FieldType> all_vars() const;
                 };
 
                 /**
@@ -64,17 +64,17 @@ namespace nil {
                 public:
                     typedef ram_base_field<RAMType> FieldType;
 
-                    pb_variable_array<FieldType> cpu_state;
+                    blueprint_variable_vector<FieldType> cpu_state;
                     variable<FieldType> has_accepted;
 
-                    execution_line_variable_component(ram_protoboard<RAMType> &pb,
+                    execution_line_variable_component(ram_blueprint<RAMType> &pb,
                                                       const std::size_t timestamp_size,
                                                       const ram_architecture_params<RAMType> &ap);
                 };
 
                 template<typename RAMType>
                 memory_line_variable_component<RAMType>::memory_line_variable_component(
-                    ram_protoboard<RAMType> &pb,
+                    ram_blueprint<RAMType> &pb,
                     const std::size_t timestamp_size,
                     const ram_architecture_params<RAMType> &ap) :
                     ram_component_base<RAMType>(pb) {
@@ -112,8 +112,8 @@ namespace nil {
                 }
 
                 template<typename RAMType>
-                pb_variable_array<ram_base_field<RAMType>> memory_line_variable_component<RAMType>::all_vars() const {
-                    pb_variable_array<FieldType> r;
+                blueprint_variable_vector<ram_base_field<RAMType>> memory_line_variable_component<RAMType>::all_vars() const {
+                    blueprint_variable_vector<FieldType> r;
                     r.insert(r.end(), timestamp->bits.begin(), timestamp->bits.end());
                     r.insert(r.end(), address->bits.begin(), address->bits.end());
                     r.insert(r.end(), contents_before->bits.begin(), contents_before->bits.end());
@@ -124,7 +124,7 @@ namespace nil {
 
                 template<typename RAMType>
                 execution_line_variable_component<RAMType>::execution_line_variable_component(
-                    ram_protoboard<RAMType> &pb,
+                    ram_blueprint<RAMType> &pb,
                     const std::size_t timestamp_size,
                     const ram_architecture_params<RAMType> &ap) :
                     memory_line_variable_component<RAMType>(pb, timestamp_size, ap) {

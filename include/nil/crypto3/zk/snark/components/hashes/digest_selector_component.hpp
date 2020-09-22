@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP
-#define CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP
+#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP
+#define CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP
 
 #include <vector>
 
@@ -25,14 +25,14 @@ namespace nil {
                 public:
                     std::size_t digest_size;
                     digest_variable<FieldType> input;
-                    pb_linear_combination<FieldType> is_right;
+                    blueprint_linear_combination<FieldType> is_right;
                     digest_variable<FieldType> left;
                     digest_variable<FieldType> right;
 
                     digest_selector_component(blueprint<FieldType> &pb,
                                            const std::size_t digest_size,
                                            const digest_variable<FieldType> &input,
-                                           const pb_linear_combination<FieldType> &is_right,
+                                           const blueprint_linear_combination<FieldType> &is_right,
                                            const digest_variable<FieldType> &left,
                                            const digest_variable<FieldType> &right) :
                         component<FieldType>(pb),
@@ -70,4 +70,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP
+#endif    // CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP

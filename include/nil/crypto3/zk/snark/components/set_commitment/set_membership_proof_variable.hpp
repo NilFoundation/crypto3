@@ -26,7 +26,7 @@ namespace nil {
                 template<typename FieldType, typename Hash>
                 class set_membership_proof_variable : public component<FieldType> {
                 public:
-                    pb_variable_array<FieldType> address_bits;
+                    blueprint_variable_vector<FieldType> address_bits;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> merkle_path;
 
                     const std::size_t max_entries;

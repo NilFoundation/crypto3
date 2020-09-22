@@ -10,8 +10,8 @@
 // The component can be used to verify a memory load from a "delegated memory".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MEMORY_LOAD_GADGET_HPP_
-#define CRYPTO3_ZK_MEMORY_LOAD_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_LOAD_COMPONENT_HPP_
+#define CRYPTO3_ZK_MEMORY_LOAD_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_read_component.hpp>
 
@@ -28,4 +28,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // MEMORY_LOAD_GADGET_HPP_
+#endif    // MEMORY_LOAD_COMPONENT_HPP_

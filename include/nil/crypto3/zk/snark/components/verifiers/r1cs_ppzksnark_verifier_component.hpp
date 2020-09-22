@@ -16,8 +16,8 @@
 // r1cs_ppzksnark_online_verifier_strong_IC. See r1cs_ppzksnark.hpp for description of the aforementioned functions.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
-#define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
+#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_
+#define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
@@ -51,7 +51,7 @@ namespace nil {
                     std::vector<std::shared_ptr<G1_checker_component<CurveType>>> all_G1_checkers;
                     std::shared_ptr<G2_checker_component<CurveType>> G2_checker;
 
-                    pb_variable_array<FieldType> proof_contents;
+                    blueprint_variable_vector<FieldType> proof_contents;
 
                     r1cs_ppzksnark_proof_variable(blueprint<FieldType> &pb) : component<FieldType>(pb) {
                         const std::size_t num_G1 = 7;
@@ -135,8 +135,8 @@ namespace nil {
                     std::shared_ptr<G1_variable<CurveType>> encoded_IC_base;
                     std::vector<std::shared_ptr<G1_variable<CurveType>>> encoded_IC_query;
 
-                    pb_variable_array<FieldType> all_bits;
-                    pb_linear_combination_array<FieldType> all_vars;
+                    blueprint_variable_vector<FieldType> all_bits;
+                    blueprint_linear_combination_vector<FieldType> all_vars;
                     std::size_t input_size;
 
                     std::vector<std::shared_ptr<G1_variable<CurveType>>> all_G1_vars;
@@ -156,7 +156,7 @@ namespace nil {
 
                     __attribute__((noinline))
                     r1cs_ppzksnark_verification_key_variable(blueprint<FieldType> &pb,
-                                                             const pb_variable_array<FieldType> &all_bits,
+                                                             const blueprint_variable_vector<FieldType> &all_bits,
                                                              const std::size_t input_size) :
                         component<FieldType>(pb),
                         all_bits(all_bits), input_size(input_size) {
@@ -302,7 +302,7 @@ namespace nil {
 
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> pvk;
 
-                    pb_variable_array<FieldType> input;
+                    blueprint_variable_vector<FieldType> input;
                     std::size_t elt_size;
                     r1cs_ppzksnark_proof_variable<CurveType> proof;
                     variable<FieldType> result;
@@ -352,13 +352,13 @@ namespace nil {
                     variable<FieldType> QAP_valid;
                     variable<FieldType> CC_valid;
 
-                    pb_variable_array<FieldType> all_test_results;
+                    blueprint_variable_vector<FieldType> all_test_results;
                     std::shared_ptr<conjunction_component<FieldType>> all_tests_pass;
 
                     r1cs_ppzksnark_online_verifier_component(
                         blueprint<FieldType> &pb,
                         const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk,
-                        const pb_variable_array<FieldType> &input,
+                        const blueprint_variable_vector<FieldType> &input,
                         const std::size_t elt_size,
                         const r1cs_ppzksnark_proof_variable<CurveType> &proof,
                         const variable<FieldType> &result);
@@ -378,7 +378,7 @@ namespace nil {
 
                     r1cs_ppzksnark_verifier_component(blueprint<FieldType> &pb,
                                                       const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
-                                                      const pb_variable_array<FieldType> &input,
+                                                      const blueprint_variable_vector<FieldType> &input,
                                                       const std::size_t elt_size,
                                                       const r1cs_ppzksnark_proof_variable<CurveType> &proof,
                                                       const variable<FieldType> &result);
@@ -415,7 +415,7 @@ namespace nil {
                         r1cs_ppzksnark_verification_key_variable<CurveType>::size_in_bits(input_size_in_elts);
 
                     blueprint<FieldType> pb;
-                    pb_variable_array<FieldType> vk_bits;
+                    blueprint_variable_vector<FieldType> vk_bits;
                     vk_bits.allocate(pb, vk_size_in_bits);
                     r1cs_ppzksnark_verification_key_variable<CurveType> vk(pb, vk_bits, input_size_in_elts);
                     vk.generate_r1cs_witness(r1cs_vk);
@@ -521,7 +521,7 @@ namespace nil {
                 r1cs_ppzksnark_online_verifier_component<CurveType>::r1cs_ppzksnark_online_verifier_component(
                     blueprint<FieldType> &pb,
                     const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk,
-                    const pb_variable_array<FieldType> &input,
+                    const blueprint_variable_vector<FieldType> &input,
                     const std::size_t elt_size,
                     const r1cs_ppzksnark_proof_variable<CurveType> &proof,
                     const variable<FieldType> &result) :
@@ -700,7 +700,7 @@ namespace nil {
                 r1cs_ppzksnark_verifier_component<CurveType>::r1cs_ppzksnark_verifier_component(
                     blueprint<FieldType> &pb,
                     const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
-                    const pb_variable_array<FieldType> &input,
+                    const blueprint_variable_vector<FieldType> &input,
                     const std::size_t elt_size,
                     const r1cs_ppzksnark_proof_variable<CurveType> &proof,
                     const variable<FieldType> &result) :
@@ -728,4 +728,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
+#endif    // R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_

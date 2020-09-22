@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for top-level SHA256 components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SHA256_GADGET_HPP
-#define CRYPTO3_ZK_SHA256_GADGET_HPP
+#ifndef CRYPTO3_ZK_SHA256_COMPONENT_HPP
+#define CRYPTO3_ZK_SHA256_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -28,31 +28,31 @@ namespace nil {
                 template<typename FieldType>
                 class sha256_compression_function_component : public component<FieldType> {
                 public:
-                    std::vector<pb_linear_combination_array<FieldType>> round_a;
-                    std::vector<pb_linear_combination_array<FieldType>> round_b;
-                    std::vector<pb_linear_combination_array<FieldType>> round_c;
-                    std::vector<pb_linear_combination_array<FieldType>> round_d;
-                    std::vector<pb_linear_combination_array<FieldType>> round_e;
-                    std::vector<pb_linear_combination_array<FieldType>> round_f;
-                    std::vector<pb_linear_combination_array<FieldType>> round_g;
-                    std::vector<pb_linear_combination_array<FieldType>> round_h;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_a;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_b;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_c;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_d;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_e;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_f;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_g;
+                    std::vector<blueprint_linear_combination_vector<FieldType>> round_h;
 
-                    pb_variable_array<FieldType> packed_W;
+                    blueprint_variable_vector<FieldType> packed_W;
                     std::shared_ptr<sha256_message_schedule_component<FieldType>> message_schedule;
                     std::vector<sha256_round_function_component<FieldType>> round_functions;
 
-                    pb_variable_array<FieldType> unreduced_output;
-                    pb_variable_array<FieldType> reduced_output;
+                    blueprint_variable_vector<FieldType> unreduced_output;
+                    blueprint_variable_vector<FieldType> reduced_output;
                     std::vector<lastbits_component<FieldType>> reduce_output;
 
                 public:
-                    pb_linear_combination_array<FieldType> prev_output;
-                    pb_variable_array<FieldType> new_block;
+                    blueprint_linear_combination_vector<FieldType> prev_output;
+                    blueprint_variable_vector<FieldType> new_block;
                     digest_variable<FieldType> output;
 
                     sha256_compression_function_component(blueprint<FieldType> &pb,
-                                                       const pb_linear_combination_array<FieldType> &prev_output,
-                                                       const pb_variable_array<FieldType> &new_block,
+                                                       const blueprint_linear_combination_vector<FieldType> &prev_output,
+                                                       const blueprint_variable_vector<FieldType> &new_block,
                                                        const digest_variable<FieldType> &output);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -96,8 +96,8 @@ namespace nil {
                 template<typename FieldType>
                 sha256_compression_function_component<FieldType>::sha256_compression_function_component(
                     blueprint<FieldType> &pb,
-                    const pb_linear_combination_array<FieldType> &prev_output,
-                    const pb_variable_array<FieldType> &new_block,
+                    const blueprint_linear_combination_vector<FieldType> &prev_output,
+                    const blueprint_variable_vector<FieldType> &new_block,
                     const digest_variable<FieldType> &output) :
                     component<FieldType>(pb),
                     prev_output(prev_output), new_block(new_block), output(output) {
@@ -106,28 +106,28 @@ namespace nil {
                     message_schedule.reset(new sha256_message_schedule_component<FieldType>(pb, new_block, packed_W));
 
                     /* initalize */
-                    round_a.push_back(pb_linear_combination_array<FieldType>(
+                    round_a.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 7 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 8 * hashes::sha2<256>::word_bits));
-                    round_b.push_back(pb_linear_combination_array<FieldType>(
+                    round_b.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 6 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 7 * hashes::sha2<256>::word_bits));
-                    round_c.push_back(pb_linear_combination_array<FieldType>(
+                    round_c.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 5 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 6 * hashes::sha2<256>::word_bits));
-                    round_d.push_back(pb_linear_combination_array<FieldType>(
+                    round_d.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 4 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 5 * hashes::sha2<256>::word_bits));
-                    round_e.push_back(pb_linear_combination_array<FieldType>(
+                    round_e.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 3 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 4 * hashes::sha2<256>::word_bits));
-                    round_f.push_back(pb_linear_combination_array<FieldType>(
+                    round_f.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 2 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 3 * hashes::sha2<256>::word_bits));
-                    round_g.push_back(pb_linear_combination_array<FieldType>(
+                    round_g.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 1 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 2 * hashes::sha2<256>::word_bits));
-                    round_h.push_back(pb_linear_combination_array<FieldType>(
+                    round_h.push_back(blueprint_linear_combination_vector<FieldType>(
                         prev_output.rbegin() + 0 * hashes::sha2<256>::word_bits,
                         prev_output.rbegin() + 1 * hashes::sha2<256>::word_bits));
 
@@ -140,11 +140,11 @@ namespace nil {
                         round_c.push_back(round_b[i]);
                         round_b.push_back(round_a[i]);
 
-                        pb_variable_array<FieldType> new_round_a_variables;
+                        blueprint_variable_vector<FieldType> new_round_a_variables;
                         new_round_a_variables.allocate(pb, hashes::sha2<256>::word_bits);
                         round_a.emplace_back(new_round_a_variables);
 
-                        pb_variable_array<FieldType> new_round_e_variables;
+                        blueprint_variable_vector<FieldType> new_round_e_variables;
                         new_round_e_variables.allocate(pb, hashes::sha2<256>::word_bits);
                         round_e.emplace_back(new_round_e_variables);
 
@@ -163,7 +163,7 @@ namespace nil {
                             unreduced_output[i],
                             hashes::sha2<256>::word_bits + 1,
                             reduced_output[i],
-                            pb_variable_array<FieldType>(output.bits.rbegin() + (7 - i) * hashes::sha2<256>::word_bits,
+                            blueprint_variable_vector<FieldType>(output.bits.rbegin() + (7 - i) * hashes::sha2<256>::word_bits,
                                                          output.bits.rbegin() +
                                                              (8 - i) * hashes::sha2<256>::word_bits)));
                     }
@@ -221,7 +221,7 @@ namespace nil {
                     const digest_variable<FieldType> &output) :
                     component<FieldType>(pb) {
                     /* concatenate block = left || right */
-                    pb_variable_array<FieldType> block;
+                    blueprint_variable_vector<FieldType> block;
                     block.insert(block.end(), left.bits.begin(), left.bits.end());
                     block.insert(block.end(), right.bits.begin(), right.bits.end());
 
@@ -291,4 +291,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SHA256_GADGET_HPP
+#endif    // CRYPTO3_ZK_SHA256_COMPONENT_HPP

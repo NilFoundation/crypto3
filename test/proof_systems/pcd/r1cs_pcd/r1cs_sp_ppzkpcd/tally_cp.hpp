@@ -66,15 +66,15 @@ namespace nil {
                 class tally_cp_handler : public compliance_predicate_handler<FieldType, blueprint<FieldType>> {
                 public:
                     typedef compliance_predicate_handler<FieldType, blueprint<FieldType>> base_handler;
-                    pb_variable_array<FieldType> incoming_types;
+                    blueprint_variable_vector<FieldType> incoming_types;
 
                     blueprint_variable<FieldType> sum_out_packed;
                     blueprint_variable<FieldType> count_out_packed;
-                    pb_variable_array<FieldType> sum_in_packed;
-                    pb_variable_array<FieldType> count_in_packed;
+                    blueprint_variable_vector<FieldType> sum_in_packed;
+                    blueprint_variable_vector<FieldType> count_in_packed;
 
-                    pb_variable_array<FieldType> sum_in_packed_aux;
-                    pb_variable_array<FieldType> count_in_packed_aux;
+                    blueprint_variable_vector<FieldType> sum_in_packed_aux;
+                    blueprint_variable_vector<FieldType> count_in_packed_aux;
 
                     std::shared_ptr<packing_component<FieldType>> unpack_sum_out;
                     std::shared_ptr<packing_component<FieldType>> unpack_count_out;
@@ -84,7 +84,7 @@ namespace nil {
                     blueprint_variable<FieldType> type_val_inner_product;
                     std::shared_ptr<inner_product_component<FieldType>> compute_type_val_inner_product;
 
-                    pb_variable_array<FieldType> arity_indicators;
+                    blueprint_variable_vector<FieldType> arity_indicators;
 
                     std::size_t wordsize;
                     std::size_t message_length;
@@ -143,8 +143,8 @@ namespace nil {
                 template<typename FieldType>
                 class tally_pcd_message_variable : public r1cs_pcd_message_variable<FieldType> {
                 public:
-                    pb_variable_array<FieldType> sum_bits;
-                    pb_variable_array<FieldType> count_bits;
+                    blueprint_variable_vector<FieldType> sum_bits;
+                    blueprint_variable_vector<FieldType> count_bits;
                     std::size_t wordsize;
 
                     tally_pcd_message_variable(blueprint<FieldType> &pb,
@@ -286,7 +286,7 @@ namespace nil {
                     /* require that types of messages that are past arity (i.e. unbound wires) carry 0 */
                     for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(0 + pb_sum<FieldType>(pb_variable_array<FieldType>(
+                            r1cs_constraint<FieldType>(0 + pb_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                 arity_indicators.begin(), arity_indicators.begin() + i)),
                                 incoming_types[i], 0));
                     }

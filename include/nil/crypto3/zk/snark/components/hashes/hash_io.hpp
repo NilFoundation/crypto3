@@ -24,13 +24,13 @@ namespace nil {
                 class digest_variable : public component<FieldType> {
                 public:
                     std::size_t digest_size;
-                    pb_variable_array<FieldType> bits;
+                    blueprint_variable_vector<FieldType> bits;
 
                     digest_variable<FieldType>(blueprint<FieldType> &pb, std::size_t digest_size);
 
                     digest_variable<FieldType>(blueprint<FieldType> &pb,
                                                std::size_t digest_size,
-                                               const pb_variable_array<FieldType> &partial_bits,
+                                               const blueprint_variable_vector<FieldType> &partial_bits,
                                                const blueprint_variable<FieldType> &padding);
 
                     void generate_r1cs_constraints();
@@ -42,11 +42,11 @@ namespace nil {
                 class block_variable : public component<FieldType> {
                 public:
                     std::size_t block_size;
-                    pb_variable_array<FieldType> bits;
+                    blueprint_variable_vector<FieldType> bits;
 
                     block_variable(blueprint<FieldType> &pb, std::size_t block_size);
 
-                    block_variable(blueprint<FieldType> &pb, const std::vector<pb_variable_array<FieldType>> &parts);
+                    block_variable(blueprint<FieldType> &pb, const std::vector<blueprint_variable_vector<FieldType>> &parts);
 
                     block_variable(blueprint<FieldType> &pb,
                                    const digest_variable<FieldType> &left,
@@ -66,7 +66,7 @@ namespace nil {
                 template<typename FieldType>
                 digest_variable<FieldType>::digest_variable(blueprint<FieldType> &pb,
                                                             std::size_t digest_size,
-                                                            const pb_variable_array<FieldType> &partial_bits,
+                                                            const blueprint_variable_vector<FieldType> &partial_bits,
                                                             const blueprint_variable<FieldType> &padding) :
                     component<FieldType>(pb),
                     digest_size(digest_size) {
@@ -102,7 +102,7 @@ namespace nil {
 
                 template<typename FieldType>
                 block_variable<FieldType>::block_variable(blueprint<FieldType> &pb,
-                                                          const std::vector<pb_variable_array<FieldType>> &parts) :
+                                                          const std::vector<blueprint_variable_vector<FieldType>> &parts) :
                     component<FieldType>(pb) {
                     for (auto &part : parts) {
                         bits.insert(bits.end(), part.begin(), part.end());

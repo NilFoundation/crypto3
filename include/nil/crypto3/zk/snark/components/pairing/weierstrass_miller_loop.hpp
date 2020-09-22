@@ -17,7 +17,7 @@
 #include <memory>
 
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/as_waksman.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -135,9 +135,6 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                template<typename CurveType>
-                void test_mnt_miller_loop(const std::string &annotation);
-
                 /**
                  * Gadget for verifying a double Miller loop (where the second is inverted).
                  */
@@ -184,9 +181,6 @@ namespace nil {
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
-
-                template<typename CurveType>
-                void test_mnt_e_over_e_miller_loop(const std::string &annotation);
 
                 /**
                  * Gadget for verifying a triple Miller loop (where the third is inverted).
@@ -244,9 +238,6 @@ namespace nil {
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
-
-                template<typename CurveType>
-                void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation);
 
                 /*
                   performs

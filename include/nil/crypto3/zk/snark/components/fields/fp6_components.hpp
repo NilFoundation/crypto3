@@ -12,8 +12,8 @@
 // Fp3 = Fp[X]/(X^3-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FP6_GADGETS_HPP
-#define CRYPTO3_ZK_FP6_GADGETS_HPP
+#ifndef CRYPTO3_ZK_FP6_COMPONENTS_HPP
+#define CRYPTO3_ZK_FP6_COMPONENTS_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
@@ -28,8 +28,7 @@ namespace nil {
                  * Gadget that represents an Fp6 variable.
                  */
                 template<typename Fp6T>
-                class Fp6_variable : public component<typename Fp6T::my_Fp> {
-                public:
+                struct Fp6_variable : public component<typename Fp6T::my_Fp> {
                     typedef typename Fp6T::my_Fp FieldType;
                     typedef typename Fp6T::my_Fpe Fp3T;
 
@@ -50,8 +49,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp6 multiplication.
                  */
                 template<typename Fp6T>
-                class Fp6_mul_component : public component<typename Fp6T::my_Fp> {
-                public:
+                struct Fp6_mul_component : public component<typename Fp6T::my_Fp> {
                     typedef typename Fp6T::my_Fp FieldType;
                     typedef typename Fp6T::my_Fpe Fp3T;
 
@@ -59,26 +57,26 @@ namespace nil {
                     Fp6_variable<Fp6T> B;
                     Fp6_variable<Fp6T> result;
 
-                    pb_linear_combination<FieldType> v0_c0;
-                    pb_linear_combination<FieldType> v0_c1;
-                    pb_linear_combination<FieldType> v0_c2;
+                    blueprint_linear_combination<FieldType> v0_c0;
+                    blueprint_linear_combination<FieldType> v0_c1;
+                    blueprint_linear_combination<FieldType> v0_c2;
 
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c1;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c2;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> Ac0_plus_Ac1;
 
                     std::shared_ptr<Fp3_variable<Fp3T>> v0;
                     std::shared_ptr<Fp3_variable<Fp3T>> v1;
 
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c0;
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c1;
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c2;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c0;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c1;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> Bc0_plus_Bc1;
 
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c2;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> result_c1_plus_v0_plus_v1;
 
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_v0;
@@ -86,9 +84,9 @@ namespace nil {
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
                     Fp6_mul_component(blueprint<FieldType> &pb,
-                                   const Fp6_variable<Fp6T> &A,
-                                   const Fp6_variable<Fp6T> &B,
-                                   const Fp6_variable<Fp6T> &result);
+                                      const Fp6_variable<Fp6T> &A,
+                                      const Fp6_variable<Fp6T> &B,
+                                      const Fp6_variable<Fp6T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -98,8 +96,7 @@ namespace nil {
                  * = 0.
                  */
                 template<typename Fp6T>
-                class Fp6_mul_by_2345_component : public component<typename Fp6T::my_Fp> {
-                public:
+                struct Fp6_mul_by_2345_component : public component<typename Fp6T::my_Fp> {
                     typedef typename Fp6T::my_Fp FieldType;
                     typedef typename Fp6T::my_Fpe Fp3T;
 
@@ -107,35 +104,35 @@ namespace nil {
                     Fp6_variable<Fp6T> B;
                     Fp6_variable<Fp6T> result;
 
-                    pb_linear_combination<FieldType> v0_c0;
-                    pb_linear_combination<FieldType> v0_c1;
-                    pb_linear_combination<FieldType> v0_c2;
+                    blueprint_linear_combination<FieldType> v0_c0;
+                    blueprint_linear_combination<FieldType> v0_c1;
+                    blueprint_linear_combination<FieldType> v0_c2;
 
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c1;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c2;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> Ac0_plus_Ac1;
 
                     std::shared_ptr<Fp3_variable<Fp3T>> v0;
                     std::shared_ptr<Fp3_variable<Fp3T>> v1;
 
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c0;
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c1;
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c2;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c0;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c1;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> Bc0_plus_Bc1;
 
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c2;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c2;
                     std::shared_ptr<Fp3_variable<Fp3T>> result_c1_plus_v0_plus_v1;
 
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_v1;
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
                     Fp6_mul_by_2345_component(blueprint<FieldType> &pb,
-                                           const Fp6_variable<Fp6T> &A,
-                                           const Fp6_variable<Fp6T> &B,
-                                           const Fp6_variable<Fp6T> &result);
+                                              const Fp6_variable<Fp6T> &A,
+                                              const Fp6_variable<Fp6T> &B,
+                                              const Fp6_variable<Fp6T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -144,8 +141,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp6 squaring.
                  */
                 template<typename Fp6T>
-                class Fp6_sqr_component : public component<typename Fp6T::my_Fp> {
-                public:
+                struct Fp6_sqr_component : public component<typename Fp6T::my_Fp> {
                     typedef typename Fp6T::my_Fp FieldType;
 
                     Fp6_variable<Fp6T> A;
@@ -154,8 +150,8 @@ namespace nil {
                     std::shared_ptr<Fp6_mul_component<Fp6T>> mul;
 
                     Fp6_sqr_component(blueprint<FieldType> &pb,
-                                   const Fp6_variable<Fp6T> &A,
-                                   const Fp6_variable<Fp6T> &result);
+                                      const Fp6_variable<Fp6T> &A,
+                                      const Fp6_variable<Fp6T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -164,8 +160,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp6 cyclotomic squaring
                  */
                 template<typename Fp6T>
-                class Fp6_cyclotomic_sqr_component : public component<typename Fp6T::my_Fp> {
-                public:
+                struct Fp6_cyclotomic_sqr_component : public component<typename Fp6T::my_Fp> {
                     typedef typename Fp6T::my_Fp FieldType;
                     typedef typename Fp6T::my_Fp2 Fp2T;
 
@@ -176,14 +171,14 @@ namespace nil {
                     std::shared_ptr<Fp2_variable<Fp2T>> b;
                     std::shared_ptr<Fp2_variable<Fp2T>> c;
 
-                    pb_linear_combination<FieldType> asq_c0;
-                    pb_linear_combination<FieldType> asq_c1;
+                    blueprint_linear_combination<FieldType> asq_c0;
+                    blueprint_linear_combination<FieldType> asq_c1;
 
-                    pb_linear_combination<FieldType> bsq_c0;
-                    pb_linear_combination<FieldType> bsq_c1;
+                    blueprint_linear_combination<FieldType> bsq_c0;
+                    blueprint_linear_combination<FieldType> bsq_c1;
 
-                    pb_linear_combination<FieldType> csq_c0;
-                    pb_linear_combination<FieldType> csq_c1;
+                    blueprint_linear_combination<FieldType> csq_c0;
+                    blueprint_linear_combination<FieldType> csq_c1;
 
                     std::shared_ptr<Fp2_variable<Fp2T>> asq;
                     std::shared_ptr<Fp2_variable<Fp2T>> bsq;
@@ -194,8 +189,8 @@ namespace nil {
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_csq;
 
                     Fp6_cyclotomic_sqr_component(blueprint<FieldType> &pb,
-                                              const Fp6_variable<Fp6T> &A,
-                                              const Fp6_variable<Fp6T> &result);
+                                                 const Fp6_variable<Fp6T> &A,
+                                                 const Fp6_variable<Fp6T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -239,7 +234,7 @@ namespace nil {
 
                 template<typename Fp6T>
                 Fp6_variable<Fp6T> Fp6_variable<Fp6T>::Frobenius_map(const std::size_t power) const {
-                    pb_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1, new_c1c2;
+                    blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1, new_c1c2;
                     new_c0c0.assign(this->pb, c0.c0);
                     new_c0c1.assign(this->pb, c0.c1 * Fp3T::Frobenius_coeffs_c1[power % 3]);
                     new_c0c2.assign(this->pb, c0.c2 * Fp3T::Frobenius_coeffs_c2[power % 3]);
@@ -264,9 +259,9 @@ namespace nil {
 
                 template<typename Fp6T>
                 Fp6_mul_component<Fp6T>::Fp6_mul_component(blueprint<FieldType> &pb,
-                                                     const Fp6_variable<Fp6T> &A,
-                                                     const Fp6_variable<Fp6T> &B,
-                                                     const Fp6_variable<Fp6T> &result) :
+                                                           const Fp6_variable<Fp6T> &A,
+                                                           const Fp6_variable<Fp6T> &B,
+                                                           const Fp6_variable<Fp6T> &result) :
                     component<FieldType>(pb),
                     A(A), B(B), result(result) {
                     /*
@@ -354,9 +349,9 @@ namespace nil {
 
                 template<typename Fp6T>
                 Fp6_mul_by_2345_component<Fp6T>::Fp6_mul_by_2345_component(blueprint<FieldType> &pb,
-                                                                     const Fp6_variable<Fp6T> &A,
-                                                                     const Fp6_variable<Fp6T> &B,
-                                                                     const Fp6_variable<Fp6T> &result) :
+                                                                           const Fp6_variable<Fp6T> &A,
+                                                                           const Fp6_variable<Fp6T> &B,
+                                                                           const Fp6_variable<Fp6T> &result) :
                     component<FieldType>(pb),
                     A(A), B(B), result(result) {
                     /*
@@ -458,8 +453,8 @@ namespace nil {
 
                 template<typename Fp6T>
                 Fp6_sqr_component<Fp6T>::Fp6_sqr_component(blueprint<FieldType> &pb,
-                                                     const Fp6_variable<Fp6T> &A,
-                                                     const Fp6_variable<Fp6T> &result) :
+                                                           const Fp6_variable<Fp6T> &A,
+                                                           const Fp6_variable<Fp6T> &result) :
                     component<FieldType>(pb),
                     A(A), result(result) {
                     // We can't do better than 3 Fp3_mul_component's for squaring, so we just use multiplication.
@@ -478,8 +473,8 @@ namespace nil {
 
                 template<typename Fp6T>
                 Fp6_cyclotomic_sqr_component<Fp6T>::Fp6_cyclotomic_sqr_component(blueprint<FieldType> &pb,
-                                                                           const Fp6_variable<Fp6T> &A,
-                                                                           const Fp6_variable<Fp6T> &result) :
+                                                                                 const Fp6_variable<Fp6T> &A,
+                                                                                 const Fp6_variable<Fp6T> &result) :
                     component<FieldType>(pb),
                     A(A), result(result) {
                     /*
@@ -514,7 +509,9 @@ namespace nil {
                     bsq_c1.assign(pb, (result.c1.c2 - 2 * c->c1) * typename FieldType::value_type(3).inverse());
 
                     csq_c0.assign(pb, (result.c0.c2 + 2 * b->c1) * typename FieldType::value_type(3).inverse());
-                    csq_c1.assign(pb, (result.c1.c0 - 2 * b->c0) * (typename FieldType::value_type(3) * Fp2T::non_residue).inverse());
+                    csq_c1.assign(pb,
+                                  (result.c1.c0 - 2 * b->c0) *
+                                      (typename FieldType::value_type(3) * Fp2T::non_residue).inverse());
 
                     asq.reset(new Fp2_variable<Fp2T>(pb, asq_c0, asq_c1));
                     bsq.reset(new Fp2_variable<Fp2T>(pb, bsq_c0, bsq_c1));
@@ -552,4 +549,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_FP6_GADGETS_HPP
+#endif    // CRYPTO3_ZK_FP6_COMPONENTS_HPP

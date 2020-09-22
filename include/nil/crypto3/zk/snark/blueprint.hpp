@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PROTOBOARD_HPP
-#define CRYPTO3_ZK_PROTOBOARD_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -61,7 +61,7 @@ namespace nil {
                         return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
                     }
 
-                    typename FieldType::value_type &lc_val(const pb_linear_combination<FieldType> &lc) {
+                    typename FieldType::value_type &lc_val(const blueprint_linear_combination<FieldType> &lc) {
                         if (lc.is_variable) {
                             return this->val(blueprint_variable<FieldType>(lc.index));
                         } else {
@@ -70,7 +70,7 @@ namespace nil {
                         }
                     }
 
-                    typename FieldType::value_type lc_val(const pb_linear_combination<FieldType> &lc) const {
+                    typename FieldType::value_type lc_val(const blueprint_linear_combination<FieldType> &lc) const {
                         if (lc.is_variable) {
                             return this->val(blueprint_variable<FieldType>(lc.index));
                         } else {
@@ -122,7 +122,7 @@ namespace nil {
                     }
 
                     friend class variable<FieldType>;
-                    friend class pb_linear_combination<FieldType>;
+                    friend class blueprint_linear_combination<FieldType>;
 
                 private:
                     var_index_t allocate_var_index() {
@@ -141,4 +141,4 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_PROTOBOARD_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_HPP

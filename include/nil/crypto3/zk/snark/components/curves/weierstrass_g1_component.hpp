@@ -12,8 +12,8 @@
 // is an elliptic curve over F in short Weierstrass form.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_WEIERSTRASS_G1_GADGET_HPP_
-#define CRYPTO3_ZK_WEIERSTRASS_G1_GADGET_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP_
+#define CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
@@ -30,10 +30,10 @@ namespace nil {
                 struct G1_variable : public component<typename CurveType::scalar_field_type> {
                     typedef typename CurveType::scalar_field_type FieldType;
 
-                    pb_linear_combination<FieldType> X;
-                    pb_linear_combination<FieldType> Y;
+                    blueprint_linear_combination<FieldType> X;
+                    blueprint_linear_combination<FieldType> Y;
 
-                    pb_linear_combination_array<FieldType> all_vars;
+                    blueprint_linear_combination_vector<FieldType> all_vars;
 
                     G1_variable(blueprint<FieldType> &pb) : component<FieldType>(pb) {
                         variable<FieldType> X_var, Y_var;
@@ -41,8 +41,8 @@ namespace nil {
                         X_var.allocate(pb);
                         Y_var.allocate(pb);
 
-                        X = pb_linear_combination<FieldType>(X_var);
-                        Y = pb_linear_combination<FieldType>(Y_var);
+                        X = blueprint_linear_combination<FieldType>(X_var);
+                        Y = blueprint_linear_combination<FieldType>(Y_var);
 
                         all_vars.emplace_back(X);
                         all_vars.emplace_back(Y);
@@ -82,8 +82,7 @@ namespace nil {
                  * Gadget that creates constraints for the validity of a G1 variable.
                  */
                 template<typename CurveType>
-                class G1_checker_component : public component<typename CurveType::scalar_field_type> {
-                public:
+                struct G1_checker_component : public component<typename CurveType::scalar_field_type> {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     G1_variable<CurveType> P;
@@ -113,8 +112,7 @@ namespace nil {
                  * Gadget that creates constraints for G1 addition.
                  */
                 template<typename CurveType>
-                class G1_add_component : public component<typename CurveType::scalar_field_type> {
-                public:
+                struct G1_add_component : public component<typename CurveType::scalar_field_type> {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     variable<FieldType> lambda;
@@ -125,9 +123,9 @@ namespace nil {
                     G1_variable<CurveType> C;
 
                     G1_add_component(blueprint<FieldType> &pb,
-                                  const G1_variable<CurveType> &A,
-                                  const G1_variable<CurveType> &B,
-                                  const G1_variable<CurveType> &C) :
+                                     const G1_variable<CurveType> &A,
+                                     const G1_variable<CurveType> &B,
+                                     const G1_variable<CurveType> &C) :
                         component<FieldType>(pb),
                         A(A), B(B), C(C) {
                         /*
@@ -176,8 +174,7 @@ namespace nil {
                  * Gadget that creates constraints for G1 doubling.
                  */
                 template<typename CurveType>
-                class G1_dbl_component : public component<typename CurveType::scalar_field_type> {
-                public:
+                struct G1_dbl_component : public component<typename CurveType::scalar_field_type> {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     variable<FieldType> Xsquared;
@@ -187,8 +184,8 @@ namespace nil {
                     G1_variable<CurveType> B;
 
                     G1_dbl_component(blueprint<FieldType> &pb,
-                                  const G1_variable<CurveType> &A,
-                                  const G1_variable<CurveType> &B) :
+                                     const G1_variable<CurveType> &A,
+                                     const G1_variable<CurveType> &B) :
                         component<FieldType>(pb),
                         A(A), B(B) {
                         Xsquared.allocate(pb);
@@ -212,8 +209,8 @@ namespace nil {
                         this->pb.val(lambda) = (typename FieldType::value_type(0x03) * this->pb.val(Xsquared) +
                                                 other_curve<CurveType>::g1_type::a) *
                                                (typename FieldType::value_type(0x02) * this->pb.lc_val(A.Y)).inverse();
-                        this->pb.lc_val(B.X) =
-                            this->pb.val(lambda).squared() - typename FieldType::value_type(0x02) * this->pb.lc_val(A.X);
+                        this->pb.lc_val(B.X) = this->pb.val(lambda).squared() -
+                                               typename FieldType::value_type(0x02) * this->pb.lc_val(A.X);
                         this->pb.lc_val(B.Y) =
                             this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
                     }
@@ -223,8 +220,7 @@ namespace nil {
                  * Gadget that creates constraints for G1 multi-scalar multiplication.
                  */
                 template<typename CurveType>
-                class G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
-                public:
+                struct G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     std::vector<G1_variable<CurveType>> computed_results;
@@ -233,7 +229,7 @@ namespace nil {
                     std::vector<G1_dbl_component<CurveType>> doublers;
 
                     G1_variable<CurveType> base;
-                    pb_variable_array<FieldType> scalars;
+                    blueprint_variable_vector<FieldType> scalars;
                     std::vector<G1_variable<CurveType>> points;
                     std::vector<G1_variable<CurveType>> points_and_powers;
                     G1_variable<CurveType> result;
@@ -243,11 +239,11 @@ namespace nil {
                     const std::size_t scalar_size;
 
                     G1_multiscalar_mul_component(blueprint<FieldType> &pb,
-                                              const G1_variable<CurveType> &base,
-                                              const pb_variable_array<FieldType> &scalars,
-                                              const std::size_t elt_size,
-                                              const std::vector<G1_variable<CurveType>> &points,
-                                              const G1_variable<CurveType> &result) :
+                                                 const G1_variable<CurveType> &base,
+                                                 const blueprint_variable_vector<FieldType> &scalars,
+                                                 const std::size_t elt_size,
+                                                 const std::vector<G1_variable<CurveType>> &points,
+                                                 const G1_variable<CurveType> &result) :
                         component<FieldType>(pb),
                         base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
                         num_points(points.size()), scalar_size(scalars.size()) {
@@ -330,4 +326,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // WEIERSTRASS_G1_GADGET_TCC_
+#endif    // WEIERSTRASS_G1_COMPONENT_TCC_

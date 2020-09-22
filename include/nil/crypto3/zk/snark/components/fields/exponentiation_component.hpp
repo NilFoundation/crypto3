@@ -9,17 +9,16 @@
 // @file Declaration of interfaces for the exponentiation component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_EXPONENTIATION_GADGET_HPP_
-#define CRYPTO3_ZK_EXPONENTIATION_GADGET_HPP_
+#ifndef CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP_
+#define CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP_
 
 #include <memory>
 #include <vector>
 
 #include <nil/crypto3/algebra/scalar_multiplication/wnaf.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/component.hpp>
-
-#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -62,9 +61,9 @@ namespace nil {
                     template<typename Backend,
                              typename boost::multiprecision::expression_template_option ExpressionTemplates>
                     exponentiation_component(blueprint<FieldType> &pb,
-                                          const Fpk_variableT<FpkT> &elt,
-                                          const boost::multiprecision::number<Backend, ExpressionTemplates> &power,
-                                          const Fpk_variableT<FpkT> &result) :
+                                             const Fpk_variableT<FpkT> &elt,
+                                             const boost::multiprecision::number<Backend, ExpressionTemplates> &power,
+                                             const Fpk_variableT<FpkT> &result) :
                         component<FieldType>(pb),
                         elt(elt), power(power), result(result) {
                         NAF = find_wnaf(1, power);
@@ -192,44 +191,9 @@ namespace nil {
                         }
                     }
                 };
-
-                template<typename FpkT,
-                         template<class>
-                         class Fpk_variableT,
-                         template<class>
-                         class Fpk_mul_componentT,
-                         template<class>
-                         class Fpk_sqr_componentT,
-                         typename Backend,
-                         boost::multiprecision::expression_template_option ExpressionTemplates>
-                void test_exponentiation_component(
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> &power) {
-                    typedef typename FpkT::my_Fp FieldType;
-
-                    blueprint<FieldType> pb;
-                    Fpk_variableT<FpkT> x(pb);
-                    Fpk_variableT<FpkT> x_to_power(pb);
-                    exponentiation_component<FpkT,
-                                          Fpk_variableT,
-                                          Fpk_mul_componentT,
-                                          Fpk_sqr_componentT,
-                                          boost::multiprecision::number<Backend, ExpressionTemplates>>
-                        exp_component(pb, x, power, x_to_power);
-                    exp_component.generate_r1cs_constraints();
-
-                    for (std::size_t i = 0; i < 10; ++i) {
-                        const FpkT x_val = random_element<FpkT>();
-                        x.generate_r1cs_witness(x_val);
-                        exp_component.generate_r1cs_witness();
-                        const FpkT res = x_to_power.get_element();
-                        assert(pb.is_satisfied());
-                        assert(res == (x_val ^ power));
-                    }
-                    power.print();
-                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // EXPONENTIATION_GADGET_HPP_
+#endif    // EXPONENTIATION_COMPONENT_HPP_

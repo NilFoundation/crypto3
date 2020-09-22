@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_CRH_GADGET_HPP
-#define CRYPTO3_ZK_CRH_GADGET_HPP
+#ifndef CRYPTO3_ZK_CRH_COMPONENT_HPP
+#define CRYPTO3_ZK_CRH_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/hashes/knapsack/knapsack_component.hpp>
 
@@ -30,4 +30,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_CRH_GADGET_HPP
+#endif    // CRYPTO3_ZK_CRH_COMPONENT_HPP

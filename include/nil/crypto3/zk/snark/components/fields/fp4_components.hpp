@@ -12,8 +12,8 @@
 // Fp2 = Fp[U]/(U^2-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FP4_GADGETS_HPP
-#define CRYPTO3_ZK_FP4_GADGETS_HPP
+#ifndef CRYPTO3_ZK_FP4_COMPONENTS_HPP
+#define CRYPTO3_ZK_FP4_COMPONENTS_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
@@ -27,8 +27,7 @@ namespace nil {
                  * Gadget that represents an Fp4 variable.
                  */
                 template<typename Fp4T>
-                class Fp4_variable : public component<typename Fp4T::my_Fp> {
-                public:
+                struct Fp4_variable : public component<typename Fp4T::my_Fp> {
                     typedef typename Fp4T::my_Fp FieldType;
                     typedef typename Fp4T::my_Fpe Fp2T;
 
@@ -59,22 +58,22 @@ namespace nil {
                     Fp4_variable<Fp4T> B;
                     Fp4_variable<Fp4T> result;
 
-                    pb_linear_combination<FieldType> v0_c0;
-                    pb_linear_combination<FieldType> v0_c1;
+                    blueprint_linear_combination<FieldType> v0_c0;
+                    blueprint_linear_combination<FieldType> v0_c1;
 
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
 
                     std::shared_ptr<Fp2_variable<Fp2T>> v0;
                     std::shared_ptr<Fp2_variable<Fp2T>> v1;
 
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c0;
-                    pb_linear_combination<FieldType> Bc0_plus_Bc1_c1;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c0;
+                    blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> Bc0_plus_Bc1;
 
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
 
                     std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
 
@@ -135,19 +134,19 @@ namespace nil {
 
                     std::shared_ptr<Fp2_variable<Fp2T>> v1;
 
-                    pb_linear_combination<FieldType> v0_c0;
-                    pb_linear_combination<FieldType> v0_c1;
+                    blueprint_linear_combination<FieldType> v0_c0;
+                    blueprint_linear_combination<FieldType> v0_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> v0;
 
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v0;
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v1;
 
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                    pb_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
+                    blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
 
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                    pb_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
+                    blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
 
                     std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
 
@@ -174,17 +173,17 @@ namespace nil {
                     Fp4_variable<Fp4T> A;
                     Fp4_variable<Fp4T> result;
 
-                    pb_linear_combination<FieldType> c0_expr_c0;
-                    pb_linear_combination<FieldType> c0_expr_c1;
+                    blueprint_linear_combination<FieldType> c0_expr_c0;
+                    blueprint_linear_combination<FieldType> c0_expr_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> c0_expr;
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c0_expr;
 
-                    pb_linear_combination<FieldType> A_c0_plus_A_c1_c0;
-                    pb_linear_combination<FieldType> A_c0_plus_A_c1_c1;
+                    blueprint_linear_combination<FieldType> A_c0_plus_A_c1_c0;
+                    blueprint_linear_combination<FieldType> A_c0_plus_A_c1_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> A_c0_plus_A_c1;
 
-                    pb_linear_combination<FieldType> c1_expr_c0;
-                    pb_linear_combination<FieldType> c1_expr_c1;
+                    blueprint_linear_combination<FieldType> c1_expr_c0;
+                    blueprint_linear_combination<FieldType> c1_expr_c1;
                     std::shared_ptr<Fp2_variable<Fp2T>> c1_expr;
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c1_expr;
 
@@ -234,7 +233,7 @@ namespace nil {
 
                 template<typename Fp4T>
                 Fp4_variable<Fp4T> Fp4_variable<Fp4T>::Frobenius_map(const std::size_t power) const {
-                    pb_linear_combination<FieldType> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
+                    blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
                     new_c0c0.assign(this->pb, c0.c0);
                     new_c0c1.assign(this->pb, c0.c1 * Fp2T::Frobenius_coeffs_c1[power % 2]);
                     new_c1c0.assign(this->pb, c1.c0 * Fp4T::Frobenius_coeffs_c1[power % 4]);
@@ -400,7 +399,7 @@ namespace nil {
                     const typename FieldType::value_type beta = Fp4T::non_residue;
                     const typename FieldType::value_type u = (FieldType::value_type::zero() - beta).inverse();
 
-                    const pb_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
+                    const blueprint_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
                                                            &b0 = B.c0.c0, &b1 = B.c1.c0, &b2 = B.c0.c1, &b3 = B.c1.c1,
                                                            &c0 = result.c0.c0, &c1 = result.c1.c0, &c2 = result.c0.c1,
                                                            &c3 = result.c1.c1;
@@ -457,7 +456,7 @@ namespace nil {
 
                 template<typename Fp4T>
                 void Fp4_direct_mul_component<Fp4T>::generate_r1cs_witness() {
-                    const pb_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
+                    const blueprint_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
                                                            &b0 = B.c0.c0, &b1 = B.c1.c0, &b2 = B.c0.c1, &b3 = B.c1.c1;
 
                     this->pb.val(v1) =
@@ -623,4 +622,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_FP4_GADGETS_HPP
+#endif    // CRYPTO3_ZK_FP4_COMPONENTS_HPP

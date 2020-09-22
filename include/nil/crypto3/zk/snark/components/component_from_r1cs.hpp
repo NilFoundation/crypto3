@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a component that can be created from an R1CS constraint system.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_GADGET_FROM_R1CS_HPP
-#define CRYPTO3_ZK_GADGET_FROM_R1CS_HPP
+#ifndef CRYPTO3_ZK_COMPONENT_FROM_R1CS_HPP
+#define CRYPTO3_ZK_COMPONENT_FROM_R1CS_HPP
 
 #include <map>
 
@@ -25,13 +25,13 @@ namespace nil {
                 class component_from_r1cs : public component<FieldType> {
 
                 private:
-                    const std::vector<pb_variable_array<FieldType>> vars;
+                    const std::vector<blueprint_variable_vector<FieldType>> vars;
                     const r1cs_constraint_system<FieldType> cs;
                     std::map<std::size_t, std::size_t> cs_to_vars;
 
                 public:
                     component_from_r1cs(blueprint<FieldType> &pb,
-                                     const std::vector<pb_variable_array<FieldType>> &vars,
+                                     const std::vector<blueprint_variable_vector<FieldType>> &vars,
                                      const r1cs_constraint_system<FieldType> &cs);
 
                     void generate_r1cs_constraints();
@@ -41,7 +41,7 @@ namespace nil {
 
                 template<typename FieldType>
                 component_from_r1cs<FieldType>::component_from_r1cs(blueprint<FieldType> &pb,
-                                                              const std::vector<pb_variable_array<FieldType>> &vars,
+                                                              const std::vector<blueprint_variable_vector<FieldType>> &vars,
                                                               const r1cs_constraint_system<FieldType> &cs) :
                     component<FieldType>(pb),
                     vars(vars), cs(cs) {
@@ -104,4 +104,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_GADGET_FROM_R1CS_HPP
+#endif    // CRYPTO3_ZK_COMPONENT_FROM_R1CS_HPP

@@ -43,7 +43,7 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_arithmetic_component : public tinyram_standard_component<FieldType> {
                 public:
-                    const pb_variable_array<FieldType> opcode_indicators;
+                    const blueprint_variable_vector<FieldType> opcode_indicators;
                     const word_variable_component<FieldType> desval;
                     const word_variable_component<FieldType> arg1val;
                     const word_variable_component<FieldType> arg2val;
@@ -51,8 +51,8 @@ namespace nil {
                     const blueprint_variable<FieldType> result;
                     const blueprint_variable<FieldType> result_flag;
 
-                    ALU_arithmetic_component(tinyram_protoboard<FieldType> &pb,
-                                          const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_arithmetic_component(tinyram_blueprint<FieldType> &pb,
+                                          const blueprint_variable_vector<FieldType> &opcode_indicators,
                                           const word_variable_component<FieldType> &desval,
                                           const word_variable_component<FieldType> &arg1val,
                                           const word_variable_component<FieldType> &arg2val,
@@ -68,14 +68,14 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_and_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    pb_variable_array<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
                     blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_and_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_and_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -101,14 +101,14 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_or_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    pb_variable_array<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
                     blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_or_component(tinyram_protoboard<FieldType> &pb,
-                                  const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_or_component(tinyram_blueprint<FieldType> &pb,
+                                  const blueprint_variable_vector<FieldType> &opcode_indicators,
                                   const word_variable_component<FieldType> &desval,
                                   const word_variable_component<FieldType> &arg1val,
                                   const word_variable_component<FieldType> &arg2val,
@@ -134,14 +134,14 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_xor_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    pb_variable_array<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
                     blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_xor_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_xor_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -168,14 +168,14 @@ namespace nil {
                 class ALU_not_component : public ALU_arithmetic_component<FieldType> {
                     /* we do bitwise not, because we need to compute flag */
                 private:
-                    pb_variable_array<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
                     blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_not_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_not_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -202,13 +202,13 @@ namespace nil {
                 class ALU_add_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     blueprint_variable<FieldType> addition_result;
-                    pb_variable_array<FieldType> res_word;
-                    pb_variable_array<FieldType> res_word_and_flag;
+                    blueprint_variable_vector<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word_and_flag;
                     std::shared_ptr<packing_component<FieldType>> unpack_addition, pack_result;
 
                 public:
-                    ALU_add_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_add_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -238,14 +238,14 @@ namespace nil {
                 private:
                     blueprint_variable<FieldType> intermediate_result;
                     blueprint_variable<FieldType> negated_flag;
-                    pb_variable_array<FieldType> res_word;
-                    pb_variable_array<FieldType> res_word_and_negated_flag;
+                    blueprint_variable_vector<FieldType> res_word;
+                    blueprint_variable_vector<FieldType> res_word_and_negated_flag;
 
                     std::shared_ptr<packing_component<FieldType>> unpack_intermediate, pack_result;
 
                 public:
-                    ALU_sub_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_sub_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -275,8 +275,8 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_mov_component : public ALU_arithmetic_component<FieldType> {
                 public:
-                    ALU_mov_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_mov_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -297,8 +297,8 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_cmov_component : public ALU_arithmetic_component<FieldType> {
                 public:
-                    ALU_cmov_component(tinyram_protoboard<FieldType> &pb,
-                                    const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_cmov_component(tinyram_blueprint<FieldType> &pb,
+                                    const blueprint_variable_vector<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
@@ -329,8 +329,8 @@ namespace nil {
                     const blueprint_variable<FieldType> cmpae_result;
                     const blueprint_variable<FieldType> cmpae_result_flag;
 
-                    ALU_cmp_component(tinyram_protoboard<FieldType> &pb,
-                                   const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_cmp_component(tinyram_blueprint<FieldType> &pb,
+                                   const blueprint_variable_vector<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
@@ -367,8 +367,8 @@ namespace nil {
                 private:
                     blueprint_variable<FieldType> negated_arg1val_sign;
                     blueprint_variable<FieldType> negated_arg2val_sign;
-                    pb_variable_array<FieldType> modified_arg1;
-                    pb_variable_array<FieldType> modified_arg2;
+                    blueprint_variable_vector<FieldType> modified_arg1;
+                    blueprint_variable_vector<FieldType> modified_arg2;
                     blueprint_variable<FieldType> packed_modified_arg1;
                     blueprint_variable<FieldType> packed_modified_arg2;
                     std::shared_ptr<packing_component<FieldType>> pack_modified_arg1;
@@ -381,8 +381,8 @@ namespace nil {
                     const blueprint_variable<FieldType> cmpge_result;
                     const blueprint_variable<FieldType> cmpge_result_flag;
 
-                    ALU_cmps_component(tinyram_protoboard<FieldType> &pb,
-                                    const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_cmps_component(tinyram_blueprint<FieldType> &pb,
+                                    const blueprint_variable_vector<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
@@ -398,10 +398,10 @@ namespace nil {
                         negated_arg1val_sign.allocate(pb);
                         negated_arg2val_sign.allocate(pb);
 
-                        modified_arg1 = pb_variable_array<FieldType>(arg1val.bits.begin(), --arg1val.bits.end());
+                        modified_arg1 = blueprint_variable_vector<FieldType>(arg1val.bits.begin(), --arg1val.bits.end());
                         modified_arg1.emplace_back(negated_arg1val_sign);
 
-                        modified_arg2 = pb_variable_array<FieldType>(arg2val.bits.begin(), --arg2val.bits.end());
+                        modified_arg2 = blueprint_variable_vector<FieldType>(arg2val.bits.begin(), --arg2val.bits.end());
                         modified_arg2.emplace_back(negated_arg2val_sign);
 
                         packed_modified_arg1.allocate(pb);
@@ -430,8 +430,8 @@ namespace nil {
                 class ALU_umul_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     dual_variable_component<FieldType> mul_result;
-                    pb_variable_array<FieldType> mull_bits;
-                    pb_variable_array<FieldType> umulh_bits;
+                    blueprint_variable_vector<FieldType> mull_bits;
+                    blueprint_variable_vector<FieldType> umulh_bits;
                     blueprint_variable<FieldType> result_flag;
                     std::shared_ptr<packing_component<FieldType>> pack_mull_result;
                     std::shared_ptr<packing_component<FieldType>> pack_umulh_result;
@@ -443,8 +443,8 @@ namespace nil {
                     const blueprint_variable<FieldType> umulh_result;
                     const blueprint_variable<FieldType> umulh_flag;
 
-                    ALU_umul_component(tinyram_protoboard<FieldType> &pb,
-                                    const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_umul_component(tinyram_blueprint<FieldType> &pb,
+                                    const blueprint_variable_vector<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
@@ -481,7 +481,7 @@ namespace nil {
                 class ALU_smul_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     dual_variable_component<FieldType> mul_result;
-                    pb_variable_array<FieldType> smulh_bits;
+                    blueprint_variable_vector<FieldType> smulh_bits;
 
                     blueprint_variable<FieldType> top;
                     std::shared_ptr<packing_component<FieldType>> pack_top;
@@ -496,8 +496,8 @@ namespace nil {
                     const blueprint_variable<FieldType> smulh_result;
                     const blueprint_variable<FieldType> smulh_flag;
 
-                    ALU_smul_component(tinyram_protoboard<FieldType> &pb,
-                                    const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_smul_component(tinyram_blueprint<FieldType> &pb,
+                                    const blueprint_variable_vector<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
@@ -516,7 +516,7 @@ namespace nil {
                         top.allocate(pb);
                         pack_top.reset(new packing_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(mul_result.bits.begin() + pb.ap.w - 1,
+                            blueprint_variable_vector<FieldType>(mul_result.bits.begin() + pb.ap.w - 1,
                                                          mul_result.bits.begin() + 2 * pb.ap.w),
                             top));
 
@@ -560,8 +560,8 @@ namespace nil {
                     const blueprint_variable<FieldType> umod_result;
                     const blueprint_variable<FieldType> umod_flag;
 
-                    ALU_divmod_component(tinyram_protoboard<FieldType> &pb,
-                                      const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_divmod_component(tinyram_blueprint<FieldType> &pb,
+                                      const blueprint_variable_vector<FieldType> &opcode_indicators,
                                       const word_variable_component<FieldType> &desval,
                                       const word_variable_component<FieldType> &arg1val,
                                       const word_variable_component<FieldType> &arg2val,
@@ -595,14 +595,14 @@ namespace nil {
                     blueprint_variable<FieldType> reversed_input;
                     std::shared_ptr<packing_component<FieldType>> pack_reversed_input;
 
-                    pb_variable_array<FieldType> barrel_right_internal;
-                    std::vector<pb_variable_array<FieldType>> shifted_out_bits;
+                    blueprint_variable_vector<FieldType> barrel_right_internal;
+                    std::vector<blueprint_variable_vector<FieldType>> shifted_out_bits;
 
                     blueprint_variable<FieldType> is_oversize_shift;
                     std::shared_ptr<disjunction_component<FieldType>> check_oversize_shift;
                     blueprint_variable<FieldType> result;
 
-                    pb_variable_array<FieldType> result_bits;
+                    blueprint_variable_vector<FieldType> result_bits;
                     std::shared_ptr<packing_component<FieldType>> unpack_result;
                     blueprint_variable<FieldType> reversed_result;
                     std::shared_ptr<packing_component<FieldType>> pack_reversed_result;
@@ -615,8 +615,8 @@ namespace nil {
 
                     std::size_t logw;
 
-                    ALU_shr_shl_component(tinyram_protoboard<FieldType> &pb,
-                                       const pb_variable_array<FieldType> &opcode_indicators,
+                    ALU_shr_shl_component(tinyram_blueprint<FieldType> &pb,
+                                       const blueprint_variable_vector<FieldType> &opcode_indicators,
                                        const word_variable_component<FieldType> &desval,
                                        const word_variable_component<FieldType> &arg1val,
                                        const word_variable_component<FieldType> &arg2val,
@@ -632,7 +632,7 @@ namespace nil {
 
                         reversed_input.allocate(pb);
                         pack_reversed_input.reset(new packing_component<FieldType>(
-                            pb, pb_variable_array<FieldType>(arg1val.bits.rbegin(), arg1val.bits.rend()),
+                            pb, blueprint_variable_vector<FieldType>(arg1val.bits.rbegin(), arg1val.bits.rend()),
                             reversed_input));
 
                         barrel_right_internal.allocate(pb, logw + 1);
@@ -645,7 +645,7 @@ namespace nil {
                         is_oversize_shift.allocate(pb);
                         check_oversize_shift.reset(new disjunction_component<FieldType>(
                             pb,
-                            pb_variable_array<FieldType>(arg2val.bits.begin() + logw, arg2val.bits.end()),
+                            blueprint_variable_vector<FieldType>(arg2val.bits.begin() + logw, arg2val.bits.end()),
                             is_oversize_shift));
                         result.allocate(pb);
 
@@ -654,7 +654,7 @@ namespace nil {
 
                         reversed_result.allocate(pb);
                         pack_reversed_result.reset(new packing_component<FieldType>(
-                            pb, pb_variable_array<FieldType>(result_bits.rbegin(), result_bits.rend()),
+                            pb, blueprint_variable_vector<FieldType>(result_bits.rbegin(), result_bits.rend()),
                             reversed_result));
                     }
                     void generate_r1cs_constraints();
@@ -673,8 +673,8 @@ namespace nil {
                    the range of inputs which different success predicates */
 
                 template<class T, typename FieldType>
-                using initializer_fn = std::function<T *(tinyram_protoboard<FieldType> &,      // pb
-                                                         pb_variable_array<FieldType> &,       // opcode_indicators
+                using initializer_fn = std::function<T *(tinyram_blueprint<FieldType> &,      // pb
+                                                         blueprint_variable_vector<FieldType> &,       // opcode_indicators
                                                          word_variable_component<FieldType> &,    // desval
                                                          word_variable_component<FieldType> &,    // arg1val
                                                          word_variable_component<FieldType> &,    // arg2val
@@ -697,9 +697,9 @@ namespace nil {
                     tinyram_architecture_params ap(w, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
-                    tinyram_protoboard<FieldType> pb(ap, P.size(), 0, 10);
+                    tinyram_blueprint<FieldType> pb(ap, P.size(), 0, 10);
 
-                    pb_variable_array<FieldType> opcode_indicators;
+                    blueprint_variable_vector<FieldType> opcode_indicators;
                     opcode_indicators.allocate(pb, 1ul << ap.opcode_width());
                     for (std::size_t i = 0; i < 1ul << ap.opcode_width(); ++i) {
                         pb.val(opcode_indicators[i]) = (i == opcode ? FieldType::value_type::zero() : FieldType::value_type::zero());
@@ -787,8 +787,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_and_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_AND,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -839,8 +839,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_or_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_OR,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -893,8 +893,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_xor_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_XOR,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -943,8 +943,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_not_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_NOT,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -985,8 +985,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_add_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_ADD,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1047,8 +1047,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_sub_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SUB,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1088,8 +1088,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_mov_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MOV,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1131,8 +1131,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmov_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMOV,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1186,8 +1186,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPE,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1215,8 +1215,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPA,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1244,8 +1244,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPAE,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1316,8 +1316,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmps_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPG,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1342,8 +1342,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_cmps_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPGE,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1405,8 +1405,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_umul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MULL,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1429,8 +1429,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_umul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMULH,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1547,8 +1547,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_smul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SMULH,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1656,8 +1656,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_divmod_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UDIV,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1680,8 +1680,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_divmod_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMOD,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1849,8 +1849,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_shr_shl_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHR,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
@@ -1873,8 +1873,8 @@ namespace nil {
                     brute_force_arithmetic_component<ALU_shr_shl_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHL,
-                        [](tinyram_protoboard<FieldType> &pb,
-                           pb_variable_array<FieldType> &opcode_indicators,
+                        [](tinyram_blueprint<FieldType> &pb,
+                           blueprint_variable_vector<FieldType> &opcode_indicators,
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,

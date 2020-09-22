@@ -14,8 +14,8 @@
 #include <nil/crypto3/algebra/common/default_types/ec_pp.hpp>
 #include <nil/crypto3/algebra/common/profiling.hpp>
 
-#include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
-#include <nil/crypto3/zk/snark/components/routing/benes_routing_components.hpp>
+#include <nil/crypto3/zk/snark/components/routing/as_waksman_components.hpp>
+#include <nil/crypto3/zk/snark/components/routing/benes_components.hpp>
 
 using namespace nil::crypto3::zk::snark;
 
@@ -23,7 +23,7 @@ template<typename FieldType>
 void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints, std::size_t &num_variables) {
     blueprint<FieldType> pb;
 
-    std::vector<pb_variable_array<FieldType>> randbits(n), outbits(n);
+    std::vector<blueprint_variable_vector<FieldType>> randbits(n), outbits(n);
     for (std::size_t y = 0; y < n; ++y) {
         randbits[y].allocate(pb, l);
         outbits[y].allocate(pb, l);
@@ -43,7 +43,7 @@ void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_c
 
     blueprint<FieldType> pb;
 
-    std::vector<pb_variable_array<FieldType>> randbits(1ul << t), outbits(1ul << t);
+    std::vector<blueprint_variable_vector<FieldType>> randbits(1ul << t), outbits(1ul << t);
     for (std::size_t y = 0; y < 1ul << t; ++y) {
         randbits[y].allocate(pb, l);
         outbits[y].allocate(pb, l);

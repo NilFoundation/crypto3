@@ -152,7 +152,7 @@ namespace nil {
                     */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         this->flag,
-                        pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                        pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                             this->argval2.bits.begin() + this->pb.ap.subaddr_len(), this->argval2.bits.end())) -
                             this->pc.packed - 1,
                         this->result - this->pc.packed - 1));
@@ -225,10 +225,10 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         this->flag,
                         this->pc.packed + 1 -
-                            pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                            pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                 this->argval2.bits.begin() + this->pb.ap.subaddr_len(), this->argval2.bits.end())),
                         this->result -
-                            pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                            pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                 this->argval2.bits.begin() + this->pb.ap.subaddr_len(), this->argval2.bits.end()))));
                 }
 

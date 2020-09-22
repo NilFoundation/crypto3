@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SET_COMMITMENT_GADGET_HPP_
-#define CRYPTO3_ZK_SET_COMMITMENT_GADGET_HPP_
+#ifndef CRYPTO3_ZK_SET_COMMITMENT_COMPONENT_HPP_
+#define CRYPTO3_ZK_SET_COMMITMENT_COMPONENT_HPP_
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -34,17 +34,17 @@ namespace nil {
 
                 public:
                     std::size_t tree_depth;
-                    pb_variable_array<FieldType> element_bits;
+                    blueprint_variable_vector<FieldType> element_bits;
                     set_commitment_variable<FieldType, Hash> root_digest;
                     set_membership_proof_variable<FieldType, Hash> proof;
-                    pb_linear_combination<FieldType> check_successful;
+                    blueprint_linear_combination<FieldType> check_successful;
 
                     set_commitment_component(blueprint<FieldType> &pb,
                                           const std::size_t max_entries,
-                                          const pb_variable_array<FieldType> &element_bits,
+                                          const blueprint_variable_vector<FieldType> &element_bits,
                                           const set_commitment_variable<FieldType, Hash> &root_digest,
                                           const set_membership_proof_variable<FieldType, Hash> &proof,
-                                          const pb_linear_combination<FieldType> &check_successful);
+                                          const blueprint_linear_combination<FieldType> &check_successful);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -59,10 +59,10 @@ namespace nil {
                 set_commitment_component<FieldType, Hash>::set_commitment_component(
                     blueprint<FieldType> &pb,
                     const std::size_t max_entries,
-                    const pb_variable_array<FieldType> &element_bits,
+                    const blueprint_variable_vector<FieldType> &element_bits,
                     const set_commitment_variable<FieldType, Hash> &root_digest,
                     const set_membership_proof_variable<FieldType, Hash> &proof,
-                    const pb_linear_combination<FieldType> &check_successful) :
+                    const blueprint_linear_combination<FieldType> &check_successful) :
                     component<FieldType>(pb),
                     tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))), element_bits(element_bits),
                     root_digest(root_digest), proof(proof), check_successful(check_successful) {
@@ -124,7 +124,7 @@ namespace nil {
                     }
 
                     blueprint<FieldType> pb;
-                    pb_variable_array<FieldType> element_bits;
+                    blueprint_variable_vector<FieldType> element_bits;
                     element_bits.allocate(pb, value_size);
                     set_commitment_variable<FieldType, Hash> root_digest(pb, digest_len);
 
@@ -174,4 +174,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // SET_COMMITMENT_GADGET_HPP_
+#endif    // SET_COMMITMENT_COMPONENT_HPP_

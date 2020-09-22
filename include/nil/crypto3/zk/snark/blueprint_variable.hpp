@@ -39,7 +39,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class pb_variable_array : private std::vector<blueprint_variable<FieldType>> {
+                class blueprint_variable_vector : private std::vector<blueprint_variable<FieldType>> {
                     typedef std::vector<blueprint_variable<FieldType>> contents;
 
                 public:
@@ -60,13 +60,14 @@ namespace nil {
                     using contents::operator[];
                     using contents::resize;
 
-                    pb_variable_array() : contents() {};
-                    pb_variable_array(std::size_t count, const blueprint_variable<FieldType> &value) :
+                    blueprint_variable_vector() : contents() {};
+                    blueprint_variable_vector(std::size_t count, const blueprint_variable<FieldType> &value) :
                         contents(count, value) {};
-                    pb_variable_array(typename contents::const_iterator first, typename contents::const_iterator last) :
+                    blueprint_variable_vector(typename contents::const_iterator first,
+                                              typename contents::const_iterator last) :
                         contents(first, last) {};
-                    pb_variable_array(typename contents::const_reverse_iterator first,
-                                      typename contents::const_reverse_iterator last) :
+                    blueprint_variable_vector(typename contents::const_reverse_iterator first,
+                                              typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
                     /* allocates variable<FieldType> array in MSB->LSB order */
@@ -139,16 +140,16 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class pb_linear_combination : public linear_combination<FieldType> {
+                class blueprint_linear_combination : public linear_combination<FieldType> {
                 public:
                     bool is_variable;
                     lc_index_t index;
 
-                    pb_linear_combination() {
+                    blueprint_linear_combination() {
                         this->is_variable = false;
                     }
 
-                    pb_linear_combination(const blueprint_variable<FieldType> &var) {
+                    blueprint_linear_combination(const blueprint_variable<FieldType> &var) {
                         this->is_variable = true;
                         this->index = var.index;
                         this->terms.emplace_back(linear_term<FieldType>(var));
@@ -203,8 +204,9 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class pb_linear_combination_array : private std::vector<pb_linear_combination<FieldType>> {
-                    typedef std::vector<pb_linear_combination<FieldType>> contents;
+                class blueprint_linear_combination_vector
+                    : private std::vector<blueprint_linear_combination<FieldType>> {
+                    typedef std::vector<blueprint_linear_combination<FieldType>> contents;
 
                 public:
                     using typename contents::const_iterator;
@@ -224,19 +226,20 @@ namespace nil {
                     using contents::operator[];
                     using contents::resize;
 
-                    pb_linear_combination_array() : contents() {};
-                    pb_linear_combination_array(const pb_variable_array<FieldType> &arr) {
+                    blueprint_linear_combination_vector() : contents() {};
+                    blueprint_linear_combination_vector(const blueprint_variable_vector<FieldType> &arr) {
                         for (auto &v : arr)
-                            this->emplace_back(pb_linear_combination<FieldType>(v));
+                            this->emplace_back(blueprint_linear_combination<FieldType>(v));
                     };
-                    pb_linear_combination_array(std::size_t count) : contents(count) {};
-                    pb_linear_combination_array(std::size_t count, const pb_linear_combination<FieldType> &value) :
+                    blueprint_linear_combination_vector(std::size_t count) : contents(count) {};
+                    blueprint_linear_combination_vector(std::size_t count,
+                                                        const blueprint_linear_combination<FieldType> &value) :
                         contents(count, value) {};
-                    pb_linear_combination_array(typename contents::const_iterator first,
-                                                typename contents::const_iterator last) :
+                    blueprint_linear_combination_vector(typename contents::const_iterator first,
+                                                        typename contents::const_iterator last) :
                         contents(first, last) {};
-                    pb_linear_combination_array(typename contents::const_reverse_iterator first,
-                                                typename contents::const_reverse_iterator last) :
+                    blueprint_linear_combination_vector(typename contents::const_reverse_iterator first,
+                                                        typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
                     void evaluate(blueprint<FieldType> &pb) const {
@@ -308,7 +311,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_sum(const pb_linear_combination_array<FieldType> &v) {
+                linear_combination<FieldType> pb_sum(const blueprint_linear_combination_vector<FieldType> &v) {
                     linear_combination<FieldType> result;
                     for (auto &term : v) {
                         result = result + term;
@@ -318,7 +321,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_packing_sum(const pb_linear_combination_array<FieldType> &v) {
+                linear_combination<FieldType> pb_packing_sum(const blueprint_linear_combination_vector<FieldType> &v) {
                     typename FieldType::value_type twoi =
                         FieldType::value_type::zero();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
@@ -333,7 +336,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_coeff_sum(const pb_linear_combination_array<FieldType> &v,
+                linear_combination<FieldType> pb_coeff_sum(const blueprint_linear_combination_vector<FieldType> &v,
                                                            const std::vector<typename FieldType::value_type> &coeffs) {
                     assert(v.size() == coeffs.size());
                     std::vector<linear_term<FieldType>> all_terms;
@@ -348,7 +351,6 @@ namespace nil {
 
                     return linear_combination<FieldType>(all_terms);
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

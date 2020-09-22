@@ -58,7 +58,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/detail/sparse_vector.hpp
 
      include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/bar_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/fooram_protoboard.hpp
+     include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/fooram_blueprint.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/fooram_cpu_checker.hpp
 
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_arithmetic.hpp
@@ -67,7 +67,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/argument_decoder_component.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/consistency_enforcer_component.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/memory_masking_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_protoboard.hpp
+     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/word_variable_component.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/tinyram_cpu_checker.hpp
 
@@ -102,7 +102,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/pairing/pairing_params.hpp
      include/nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp
      include/nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation.hpp
+     include/nil/crypto3/zk/snark/components/pairing/as_waksman.hpp
 
      include/nil/crypto3/zk/snark/components/routing/as_waksman_routing_component.hpp
      include/nil/crypto3/zk/snark/components/routing/benes_routing_component.hpp
@@ -201,8 +201,8 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp
      include/nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp
      include/nil/crypto3/zk/snark/relations/variable.hpp
-     include/nil/crypto3/zk/snark/routing_algorithms/as_waksman_routing_algorithm.hpp
-     include/nil/crypto3/zk/snark/routing_algorithms/benes_routing_algorithm.hpp
+     include/nil/crypto3/zk/snark/routing/as_waksman.hpp
+     include/nil/crypto3/zk/snark/routing/benes.hpp
      include/nil/crypto3/zk/snark/constraint_profiling.hpp
      include/nil/crypto3/zk/snark/component.hpp
      include/nil/crypto3/zk/snark/integer_permutation.hpp

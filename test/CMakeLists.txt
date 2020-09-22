@@ -48,7 +48,13 @@ set(TESTS_NAMES
     "components/hashes/knapsack/test_knapsack_component"
     "components/hashes/sha256/test_sha256_component"
 
+    "components/routing/as_waksman"
+
+    "components/pairing/weierstrass_precomputation"
+
     "components/r1cs_ppzksnark_verifier_component"
+    "components/basic_components"
+    "components/exponentiation_component"
     "components/merkle_tree_components"
     "components/set_commitment_component"
 

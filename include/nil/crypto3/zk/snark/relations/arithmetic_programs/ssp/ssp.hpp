@@ -27,7 +27,7 @@
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/crypto3/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/fft/evaluation_domain.hpp>
 

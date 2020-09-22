@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for (single and double) word components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP
-#define CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP
+#ifndef CRYPTO3_ZK_WORD_VARIABLE_COMPONENT_HPP
+#define CRYPTO3_ZK_WORD_VARIABLE_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
 
@@ -28,10 +28,12 @@ namespace nil {
                     word_variable_component(tinyram_blueprint<FieldType> &pb) :
                         dual_variable_component<FieldType>(pb, pb.ap.w) {
                     }
-                    word_variable_component(tinyram_blueprint<FieldType> &pb, const pb_variable_array<FieldType> &bits) :
+                    word_variable_component(tinyram_blueprint<FieldType> &pb,
+                                            const blueprint_variable_vector<FieldType> &bits) :
                         dual_variable_component<FieldType>(pb, bits) {
                     }
-                    word_variable_component(tinyram_blueprint<FieldType> &pb, const blueprint_variable<FieldType> &packed) :
+                    word_variable_component(tinyram_blueprint<FieldType> &pb,
+                                            const blueprint_variable<FieldType> &packed) :
                         dual_variable_component<FieldType>(pb, packed, pb.ap.w) {
                     }
                 };
@@ -46,11 +48,11 @@ namespace nil {
                         dual_variable_component<FieldType>(pb, 2 * pb.ap.w) {
                     }
                     doubleword_variable_component(tinyram_blueprint<FieldType> &pb,
-                                               const pb_variable_array<FieldType> &bits) :
+                                                  const blueprint_variable_vector<FieldType> &bits) :
                         dual_variable_component<FieldType>(pb, bits) {
                     }
                     doubleword_variable_component(tinyram_blueprint<FieldType> &pb,
-                                               const blueprint_variable<FieldType> &packed) :
+                                                  const blueprint_variable<FieldType> &packed) :
                         dual_variable_component<FieldType>(pb, packed, 2 * pb.ap.w) {
                     }
                 };
@@ -60,4 +62,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP
+#endif    // CRYPTO3_ZK_WORD_VARIABLE_COMPONENT_HPP

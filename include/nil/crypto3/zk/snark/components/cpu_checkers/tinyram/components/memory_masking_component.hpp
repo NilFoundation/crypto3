@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM consistency enforcer component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP
-#define CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP
+#ifndef CRYPTO3_ZK_MEMORY_MASKING_COMPONENT_HPP
+#define CRYPTO3_ZK_MEMORY_MASKING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/word_variable_component.hpp>
@@ -59,15 +59,15 @@ namespace nil {
                 template<typename FieldType>
                 class memory_masking_component : public tinyram_standard_component<FieldType> {
                 private:
-                    pb_linear_combination<FieldType> shift;
+                    blueprint_linear_combination<FieldType> shift;
                     blueprint_variable<FieldType> is_word0;
                     blueprint_variable<FieldType> is_word1;
-                    pb_variable_array<FieldType> is_subaddress;
-                    pb_variable_array<FieldType> is_byte;
+                    blueprint_variable_vector<FieldType> is_subaddress;
+                    blueprint_variable_vector<FieldType> is_byte;
 
-                    pb_linear_combination<FieldType> masked_out_word0;
-                    pb_linear_combination<FieldType> masked_out_word1;
-                    pb_linear_combination_array<FieldType> masked_out_bytes;
+                    blueprint_linear_combination<FieldType> masked_out_word0;
+                    blueprint_linear_combination<FieldType> masked_out_word1;
+                    blueprint_linear_combination_vector<FieldType> masked_out_bytes;
 
                     std::shared_ptr<inner_product_component<FieldType>> get_masked_out_dw_contents_prev;
 
@@ -77,17 +77,17 @@ namespace nil {
                 public:
                     doubleword_variable_component<FieldType> dw_contents_prev;
                     dual_variable_component<FieldType> subaddress;
-                    pb_linear_combination<FieldType> subcontents;
-                    pb_linear_combination<FieldType> access_is_word;
-                    pb_linear_combination<FieldType> access_is_byte;
+                    blueprint_linear_combination<FieldType> subcontents;
+                    blueprint_linear_combination<FieldType> access_is_word;
+                    blueprint_linear_combination<FieldType> access_is_byte;
                     doubleword_variable_component<FieldType> dw_contents_next;
 
                     memory_masking_component(tinyram_blueprint<FieldType> &pb,
                                           const doubleword_variable_component<FieldType> &dw_contents_prev,
                                           const dual_variable_component<FieldType> &subaddress,
-                                          const pb_linear_combination<FieldType> &subcontents,
-                                          const pb_linear_combination<FieldType> &access_is_word,
-                                          const pb_linear_combination<FieldType> &access_is_byte,
+                                          const blueprint_linear_combination<FieldType> &subcontents,
+                                          const blueprint_linear_combination<FieldType> &access_is_word,
+                                          const blueprint_linear_combination<FieldType> &access_is_byte,
                                           const doubleword_variable_component<FieldType> &dw_contents_next) :
                         tinyram_standard_component<FieldType>(pb),
                         dw_contents_prev(dw_contents_prev), subaddress(subaddress), subcontents(subcontents),
@@ -113,10 +113,10 @@ namespace nil {
                         masked_out_word0.assign(
                             pb,
                             (typename FieldType::value_type(2) ^ pb.ap.w) *
-                                pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                                pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                     dw_contents_prev.bits.begin() + pb.ap.w, dw_contents_prev.bits.begin() + 2 * pb.ap.w)));
                         masked_out_word1.assign(
-                            pb, pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                            pb, pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                     dw_contents_prev.bits.begin(), dw_contents_prev.bits.begin() + pb.ap.w)));
                         masked_out_bytes.resize(2 * pb.ap.bytes_in_word());
 
@@ -124,7 +124,7 @@ namespace nil {
                             /* just subtract out the byte to be masked */
                             masked_out_bytes[i].assign(
                                 pb, (dw_contents_prev.packed -
-                                     (typename FieldType::value_type(2) ^ (8 * i)) * pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                                     (typename FieldType::value_type(2) ^ (8 * i)) * pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                                                     dw_contents_prev.bits.begin() + 8 * i,
                                                                     dw_contents_prev.bits.begin() + 8 * (i + 1)))));
                         }
@@ -134,12 +134,12 @@ namespace nil {
                           contents for the current access type.
                         */
 
-                        pb_linear_combination_array<FieldType> masked_out_indicators;
+                        blueprint_linear_combination_vector<FieldType> masked_out_indicators;
                         masked_out_indicators.emplace_back(is_word0);
                         masked_out_indicators.emplace_back(is_word1);
                         masked_out_indicators.insert(masked_out_indicators.end(), is_byte.begin(), is_byte.end());
 
-                        pb_linear_combination_array<FieldType> masked_out_results;
+                        blueprint_linear_combination_vector<FieldType> masked_out_results;
                         masked_out_results.emplace_back(masked_out_word0);
                         masked_out_results.emplace_back(masked_out_word1);
                         masked_out_results.insert(masked_out_results.end(), masked_out_bytes.begin(),
@@ -229,4 +229,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP
+#endif    // CRYPTO3_ZK_MEMORY_MASKING_COMPONENT_HPP

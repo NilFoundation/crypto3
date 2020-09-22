@@ -61,41 +61,41 @@ namespace nil {
                     std::shared_ptr<crh_with_field_out_component<FieldType>> hash_outgoing_message;
 
                     std::vector<block_variable<FieldType>> blocks_for_incoming_messages;
-                    std::vector<pb_variable_array<FieldType>>
+                    std::vector<blueprint_variable_vector<FieldType>>
                         sp_translation_step_vk_and_incoming_message_payload_digests;
                     std::vector<multipacking_component<FieldType>>
                         unpack_sp_translation_step_vk_and_incoming_message_payload_digests;
-                    std::vector<pb_variable_array<FieldType>>
+                    std::vector<blueprint_variable_vector<FieldType>>
                         sp_translation_step_vk_and_incoming_message_payload_digest_bits;
                     std::vector<crh_with_field_out_component<FieldType>> hash_incoming_messages;
 
                     std::shared_ptr<r1cs_ppzksnark_verification_key_variable<CurveType>> sp_translation_step_vk;
-                    pb_variable_array<FieldType> sp_translation_step_vk_bits;
+                    blueprint_variable_vector<FieldType> sp_translation_step_vk_bits;
 
                     variable<FieldType> outgoing_message_type;
-                    pb_variable_array<FieldType> outgoing_message_payload;
-                    pb_variable_array<FieldType> outgoing_message_vars;
+                    blueprint_variable_vector<FieldType> outgoing_message_payload;
+                    blueprint_variable_vector<FieldType> outgoing_message_vars;
 
                     variable<FieldType> arity;
                     std::vector<variable<FieldType>> incoming_message_types;
-                    std::vector<pb_variable_array<FieldType>> incoming_message_payloads;
-                    std::vector<pb_variable_array<FieldType>> incoming_message_vars;
+                    std::vector<blueprint_variable_vector<FieldType>> incoming_message_payloads;
+                    std::vector<blueprint_variable_vector<FieldType>> incoming_message_vars;
 
-                    pb_variable_array<FieldType> local_data;
-                    pb_variable_array<FieldType> cp_witness;
+                    blueprint_variable_vector<FieldType> local_data;
+                    blueprint_variable_vector<FieldType> cp_witness;
                     std::shared_ptr<component_from_r1cs<FieldType>> compliance_predicate_as_component;
 
-                    pb_variable_array<FieldType> outgoing_message_bits;
+                    blueprint_variable_vector<FieldType> outgoing_message_bits;
                     std::shared_ptr<multipacking_component<FieldType>> unpack_outgoing_message;
 
-                    std::vector<pb_variable_array<FieldType>> incoming_messages_bits;
+                    std::vector<blueprint_variable_vector<FieldType>> incoming_messages_bits;
                     std::vector<multipacking_component<FieldType>> unpack_incoming_messages;
 
-                    pb_variable_array<FieldType> sp_compliance_step_pcd_circuit_input;
-                    pb_variable_array<FieldType> padded_translation_step_vk_and_outgoing_message_digest;
-                    std::vector<pb_variable_array<FieldType>> padded_translation_step_vk_and_incoming_messages_digests;
+                    blueprint_variable_vector<FieldType> sp_compliance_step_pcd_circuit_input;
+                    blueprint_variable_vector<FieldType> padded_translation_step_vk_and_outgoing_message_digest;
+                    std::vector<blueprint_variable_vector<FieldType>> padded_translation_step_vk_and_incoming_messages_digests;
 
-                    std::vector<pb_variable_array<FieldType>> verifier_input;
+                    std::vector<blueprint_variable_vector<FieldType>> verifier_input;
                     std::vector<r1cs_ppzksnark_proof_variable<CurveType>> proof;
                     variable<FieldType> verification_result;
                     std::vector<r1cs_ppzksnark_verifier_component<CurveType>> verifiers;
@@ -136,9 +136,9 @@ namespace nil {
 
                     blueprint<FieldType> pb;
 
-                    pb_variable_array<FieldType> sp_translation_step_pcd_circuit_input;
-                    pb_variable_array<FieldType> unpacked_sp_translation_step_pcd_circuit_input;
-                    pb_variable_array<FieldType> verifier_input;
+                    blueprint_variable_vector<FieldType> sp_translation_step_pcd_circuit_input;
+                    blueprint_variable_vector<FieldType> unpacked_sp_translation_step_pcd_circuit_input;
+                    blueprint_variable_vector<FieldType> verifier_input;
                     std::shared_ptr<multipacking_component<FieldType>> unpack_sp_translation_step_pcd_circuit_input;
 
                     std::shared_ptr<r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>>
@@ -232,7 +232,7 @@ namespace nil {
                     cp_witness.allocate(pb, compliance_predicate.witness_length);
 
                     /* convert compliance predicate from a constraint system into a component */
-                    pb_variable_array<FieldType> incoming_messages_concat;
+                    blueprint_variable_vector<FieldType> incoming_messages_concat;
                     for (std::size_t i = 0; i < compliance_predicate_arity; ++i) {
                         incoming_messages_concat.insert(incoming_messages_concat.end(),
                                                         incoming_message_vars[i].begin(),
@@ -241,7 +241,7 @@ namespace nil {
 
                     compliance_predicate_as_component.reset(
                         new component_from_r1cs<FieldType>(pb,
-                                                        {outgoing_message_vars, pb_variable_array<FieldType>(1, arity),
+                                                        {outgoing_message_vars, blueprint_variable_vector<FieldType>(1, arity),
                                                          incoming_messages_concat, local_data, cp_witness},
                                                         compliance_predicate.constraint_system));
 

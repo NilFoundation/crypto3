@@ -39,10 +39,10 @@
 // <http://eprint.iacr.org/2013/879>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
-#define CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
+#ifndef CRYPTO3_ZK_RAM_UNIVERSAL_COMPONENT_HPP_
+#define CRYPTO3_ZK_RAM_UNIVERSAL_COMPONENT_HPP_
 
-#include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
+#include <nil/crypto3/zk/snark/components/routing/as_waksman_components.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/memory_checker_component.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
@@ -93,7 +93,7 @@ namespace nil {
                     std::size_t num_memory_lines;
 
                     std::vector<memory_line_variable_component<RAMType>> boot_lines;
-                    std::vector<pb_variable_array<FieldType>> boot_line_bits;
+                    std::vector<blueprint_variable_vector<FieldType>> boot_line_bits;
                     std::vector<multipacking_component<FieldType>> unpack_boot_lines;
 
                     std::vector<memory_line_variable_component<RAMType>> load_instruction_lines;
@@ -106,20 +106,20 @@ namespace nil {
                     std::vector<ram_cpu_checker<RAMType>> execution_checkers;
                     std::vector<memory_checker_component<RAMType>> memory_checkers;
 
-                    std::vector<pb_variable_array<FieldType>> routing_inputs;
-                    std::vector<pb_variable_array<FieldType>> routing_outputs;
+                    std::vector<blueprint_variable_vector<FieldType>> routing_inputs;
+                    std::vector<blueprint_variable_vector<FieldType>> routing_outputs;
 
                     std::shared_ptr<as_waksman_routing_component<FieldType>> routing_network;
 
                 public:
                     std::size_t boot_trace_size_bound;
                     std::size_t time_bound;
-                    pb_variable_array<FieldType> packed_input;
+                    blueprint_variable_vector<FieldType> packed_input;
 
-                    ram_universal_component(ram_protoboard<RAMType> &pb,
+                    ram_universal_component(ram_blueprint<RAMType> &pb,
                                             const std::size_t boot_trace_size_bound,
                                             const std::size_t time_bound,
-                                            const pb_variable_array<FieldType> &packed_input);
+                                            const blueprint_variable_vector<FieldType> &packed_input);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(const ram_boot_trace<RAMType> &boot_trace,
@@ -136,10 +136,10 @@ namespace nil {
 
                 template<typename RAMType>
                 ram_universal_component<RAMType>::ram_universal_component(
-                    ram_protoboard<RAMType> &pb,
+                    ram_blueprint<RAMType> &pb,
                     const std::size_t boot_trace_size_bound,
                     const std::size_t time_bound,
-                    const pb_variable_array<FieldType> &packed_input) :
+                    const blueprint_variable_vector<FieldType> &packed_input) :
                     ram_component_base<RAMType>(pb),
                     boot_trace_size_bound(boot_trace_size_bound), time_bound(time_bound), packed_input(packed_input) {
                     num_memory_lines = boot_trace_size_bound + (time_bound + 1) +
@@ -182,7 +182,7 @@ namespace nil {
                     auto input_it = packed_input.begin();
                     for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         /* note the reversed order */
-                        pb_variable_array<FieldType> boot_line_bits;
+                        blueprint_variable_vector<FieldType> boot_line_bits;
                         boot_line_bits.insert(boot_line_bits.end(),
                                               boot_lines[boot_trace_size_bound - 1 - i].address->bits.begin(),
                                               boot_lines[boot_trace_size_bound - 1 - i].address->bits.end());
@@ -190,8 +190,8 @@ namespace nil {
                                               boot_lines[boot_trace_size_bound - 1 - i].contents_after->bits.begin(),
                                               boot_lines[boot_trace_size_bound - 1 - i].contents_after->bits.end());
 
-                        pb_variable_array<FieldType> packed_boot_line =
-                            pb_variable_array<FieldType>(input_it, input_it + packed_line_size);
+                        blueprint_variable_vector<FieldType> packed_boot_line =
+                            blueprint_variable_vector<FieldType>(input_it, input_it + packed_line_size);
                         std::advance(input_it, packed_line_size);
 
                         unpack_boot_lines.emplace_back(
@@ -507,4 +507,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_UNIVERSAL_GADGET_HPP_
+#endif    // RAM_UNIVERSAL_COMPONENT_HPP_

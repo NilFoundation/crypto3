@@ -12,8 +12,8 @@
 // where non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FP3_GADGETS_HPP
-#define CRYPTO3_ZK_FP3_GADGETS_HPP
+#ifndef CRYPTO3_ZK_FP3_COMPONENTS_HPP
+#define CRYPTO3_ZK_FP3_COMPONENTS_HPP
 
 #include <memory>
 
@@ -32,21 +32,21 @@ namespace nil {
                 public:
                     typedef typename Fp3T::my_Fp FieldType;
 
-                    pb_linear_combination<FieldType> c0;
-                    pb_linear_combination<FieldType> c1;
-                    pb_linear_combination<FieldType> c2;
+                    blueprint_linear_combination<FieldType> c0;
+                    blueprint_linear_combination<FieldType> c1;
+                    blueprint_linear_combination<FieldType> c2;
 
-                    pb_linear_combination_array<FieldType> all_vars;
+                    blueprint_linear_combination_vector<FieldType> all_vars;
 
                     Fp3_variable(blueprint<FieldType> &pb);
                     Fp3_variable(blueprint<FieldType> &pb, const Fp3T &el);
                     Fp3_variable(blueprint<FieldType> &pb,
                                  const Fp3T &el,
-                                 const pb_linear_combination<FieldType> &coeff);
+                                 const blueprint_linear_combination<FieldType> &coeff);
                     Fp3_variable(blueprint<FieldType> &pb,
-                                 const pb_linear_combination<FieldType> &c0,
-                                 const pb_linear_combination<FieldType> &c1,
-                                 const pb_linear_combination<FieldType> &c2);
+                                 const blueprint_linear_combination<FieldType> &c0,
+                                 const blueprint_linear_combination<FieldType> &c1,
+                                 const blueprint_linear_combination<FieldType> &c2);
 
                     void generate_r1cs_equals_const_constraints(const Fp3T &el);
                     void generate_r1cs_witness(const Fp3T &el);
@@ -79,9 +79,9 @@ namespace nil {
                     variable<FieldType> v4;
 
                     Fp3_mul_component(blueprint<FieldType> &pb,
-                                   const Fp3_variable<Fp3T> &A,
-                                   const Fp3_variable<Fp3T> &B,
-                                   const Fp3_variable<Fp3T> &result);
+                                      const Fp3_variable<Fp3T> &A,
+                                      const Fp3_variable<Fp3T> &B,
+                                      const Fp3_variable<Fp3T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -95,13 +95,13 @@ namespace nil {
                     typedef typename Fp3T::my_Fp FieldType;
 
                     Fp3_variable<Fp3T> A;
-                    pb_linear_combination<FieldType> lc;
+                    blueprint_linear_combination<FieldType> lc;
                     Fp3_variable<Fp3T> result;
 
                     Fp3_mul_by_lc_component(blueprint<FieldType> &pb,
-                                         const Fp3_variable<Fp3T> &A,
-                                         const pb_linear_combination<FieldType> &lc,
-                                         const Fp3_variable<Fp3T> &result);
+                                            const Fp3_variable<Fp3T> &A,
+                                            const blueprint_linear_combination<FieldType> &lc,
+                                            const Fp3_variable<Fp3T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -120,8 +120,8 @@ namespace nil {
                     std::shared_ptr<Fp3_mul_component<Fp3T>> mul;
 
                     Fp3_sqr_component(blueprint<FieldType> &pb,
-                                   const Fp3_variable<Fp3T> &A,
-                                   const Fp3_variable<Fp3T> &result);
+                                      const Fp3_variable<Fp3T> &A,
+                                      const Fp3_variable<Fp3T> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -133,9 +133,9 @@ namespace nil {
                     c1_var.allocate(pb);
                     c2_var.allocate(pb);
 
-                    c0 = pb_linear_combination<FieldType>(c0_var);
-                    c1 = pb_linear_combination<FieldType>(c1_var);
-                    c2 = pb_linear_combination<FieldType>(c2_var);
+                    c0 = blueprint_linear_combination<FieldType>(c0_var);
+                    c1 = blueprint_linear_combination<FieldType>(c1_var);
+                    c2 = blueprint_linear_combination<FieldType>(c2_var);
 
                     all_vars.emplace_back(c0);
                     all_vars.emplace_back(c1);
@@ -160,7 +160,7 @@ namespace nil {
                 template<typename Fp3T>
                 Fp3_variable<Fp3T>::Fp3_variable(blueprint<FieldType> &pb,
                                                  const Fp3T &el,
-                                                 const pb_linear_combination<FieldType> &coeff) :
+                                                 const blueprint_linear_combination<FieldType> &coeff) :
                     component<FieldType>(pb) {
                     c0.assign(pb, el.c0 * coeff);
                     c1.assign(pb, el.c1 * coeff);
@@ -173,9 +173,9 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_variable<Fp3T>::Fp3_variable(blueprint<FieldType> &pb,
-                                                 const pb_linear_combination<FieldType> &c0,
-                                                 const pb_linear_combination<FieldType> &c1,
-                                                 const pb_linear_combination<FieldType> &c2) :
+                                                 const blueprint_linear_combination<FieldType> &c0,
+                                                 const blueprint_linear_combination<FieldType> &c1,
+                                                 const blueprint_linear_combination<FieldType> &c2) :
                     component<FieldType>(pb),
                     c0(c0), c1(c1), c2(c2) {
                     all_vars.emplace_back(c0);
@@ -208,7 +208,7 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_variable<Fp3T> Fp3_variable<Fp3T>::operator*(const typename FieldType::value_type &coeff) const {
-                    pb_linear_combination<FieldType> new_c0, new_c1, new_c2;
+                    blueprint_linear_combination<FieldType> new_c0, new_c1, new_c2;
                     new_c0.assign(this->pb, this->c0 * coeff);
                     new_c1.assign(this->pb, this->c1 * coeff);
                     new_c2.assign(this->pb, this->c2 * coeff);
@@ -217,7 +217,7 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_variable<Fp3T> Fp3_variable<Fp3T>::operator+(const Fp3_variable<Fp3T> &other) const {
-                    pb_linear_combination<FieldType> new_c0, new_c1, new_c2;
+                    blueprint_linear_combination<FieldType> new_c0, new_c1, new_c2;
                     new_c0.assign(this->pb, this->c0 + other.c0);
                     new_c1.assign(this->pb, this->c1 + other.c1);
                     new_c2.assign(this->pb, this->c2 + other.c2);
@@ -226,7 +226,7 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_variable<Fp3T> Fp3_variable<Fp3T>::operator+(const Fp3T &other) const {
-                    pb_linear_combination<FieldType> new_c0, new_c1, new_c2;
+                    blueprint_linear_combination<FieldType> new_c0, new_c1, new_c2;
                     new_c0.assign(this->pb, this->c0 + other.c0);
                     new_c1.assign(this->pb, this->c1 + other.c1);
                     new_c2.assign(this->pb, this->c2 + other.c2);
@@ -235,7 +235,7 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_variable<Fp3T> Fp3_variable<Fp3T>::mul_by_X() const {
-                    pb_linear_combination<FieldType> new_c0, new_c1, new_c2;
+                    blueprint_linear_combination<FieldType> new_c0, new_c1, new_c2;
                     new_c0.assign(this->pb, this->c2 * Fp3T::non_residue);
                     new_c1.assign(this->pb, this->c0);
                     new_c2.assign(this->pb, this->c1);
@@ -266,9 +266,9 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_mul_component<Fp3T>::Fp3_mul_component(blueprint<FieldType> &pb,
-                                                     const Fp3_variable<Fp3T> &A,
-                                                     const Fp3_variable<Fp3T> &B,
-                                                     const Fp3_variable<Fp3T> &result) :
+                                                           const Fp3_variable<Fp3T> &A,
+                                                           const Fp3_variable<Fp3T> &B,
+                                                           const Fp3_variable<Fp3T> &result) :
                     component<FieldType>(pb),
                     A(A), B(B), result(result) {
                     v0.allocate(pb);
@@ -318,21 +318,24 @@ namespace nil {
 
                     const typename FieldType::value_type beta = Fp3T::non_residue;
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        A.c0 + A.c1 + A.c2,
-                        B.c0 + B.c1 + B.c2,
-                        result.c1 + result.c2 + result.c0 * beta.inverse() + v0 * (typename FieldType::value_type(1) - beta.inverse()) +
-                            v4 * (typename FieldType::value_type(1) - beta)));
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(A.c0 - A.c1 + A.c2,
-                                                   B.c0 - B.c1 + B.c2,
-                                                   -result.c1 + result.c2 + v0 * (typename FieldType::value_type(1) + beta.inverse()) -
-                                                       result.c0 * beta.inverse() + v4 * (typename FieldType::value_type(1) + beta)));
+                        r1cs_constraint<FieldType>(A.c0 + A.c1 + A.c2,
+                                                   B.c0 + B.c1 + B.c2,
+                                                   result.c1 + result.c2 + result.c0 * beta.inverse() +
+                                                       v0 * (typename FieldType::value_type(1) - beta.inverse()) +
+                                                       v4 * (typename FieldType::value_type(1) - beta)));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        A.c0 - A.c1 + A.c2,
+                        B.c0 - B.c1 + B.c2,
+                        -result.c1 + result.c2 + v0 * (typename FieldType::value_type(1) + beta.inverse()) -
+                            result.c0 * beta.inverse() + v4 * (typename FieldType::value_type(1) + beta)));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + 2 * A.c1 + 4 * A.c2,
                         B.c0 + 2 * B.c1 + 4 * B.c2,
-                        2 * result.c1 + 4 * result.c2 + result.c0 * (typename FieldType::value_type(8) * beta.inverse()) +
-                            v0 * (typename FieldType::value_type(1) - typename FieldType::value_type(8) * beta.inverse()) +
+                        2 * result.c1 + 4 * result.c2 +
+                            result.c0 * (typename FieldType::value_type(8) * beta.inverse()) +
+                            v0 * (typename FieldType::value_type(1) -
+                                  typename FieldType::value_type(8) * beta.inverse()) +
                             v4 * (typename FieldType::value_type(16) - typename FieldType::value_type(2) * beta)));
                 }
 
@@ -348,10 +351,11 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                Fp3_mul_by_lc_component<Fp3T>::Fp3_mul_by_lc_component(blueprint<FieldType> &pb,
-                                                                 const Fp3_variable<Fp3T> &A,
-                                                                 const pb_linear_combination<FieldType> &lc,
-                                                                 const Fp3_variable<Fp3T> &result) :
+                Fp3_mul_by_lc_component<Fp3T>::Fp3_mul_by_lc_component(
+                    blueprint<FieldType> &pb,
+                    const Fp3_variable<Fp3T> &A,
+                    const blueprint_linear_combination<FieldType> &lc,
+                    const Fp3_variable<Fp3T> &result) :
                     component<FieldType>(pb),
                     A(A), lc(lc), result(result) {
                 }
@@ -372,8 +376,8 @@ namespace nil {
 
                 template<typename Fp3T>
                 Fp3_sqr_component<Fp3T>::Fp3_sqr_component(blueprint<FieldType> &pb,
-                                                     const Fp3_variable<Fp3T> &A,
-                                                     const Fp3_variable<Fp3T> &result) :
+                                                           const Fp3_variable<Fp3T> &A,
+                                                           const Fp3_variable<Fp3T> &result) :
                     component<FieldType>(pb),
                     A(A), result(result) {
                     mul.reset(new Fp3_mul_component<Fp3T>(pb, A, A, result));
@@ -395,4 +399,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_FP3_GADGETS_HPP
+#endif    // CRYPTO3_ZK_FP3_COMPONENTS_HPP

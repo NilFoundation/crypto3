@@ -57,10 +57,10 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     const size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
     blueprint<FieldT_B> pb;
-    pb_variable_array<FieldT_B> vk_bits;
+    blueprint_variable_vector<FieldT_B> vk_bits;
     vk_bits.allocate(pb, vk_size_in_bits, "vk_bits");
 
-    pb_variable_array<FieldT_B> primary_input_bits;
+    blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
@@ -130,7 +130,7 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     blueprint<FieldT_B> pb;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk,
                                                                                              "hardcoded_vk");
-    pb_variable_array<FieldT_B> primary_input_bits;
+    blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
