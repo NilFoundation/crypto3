@@ -102,6 +102,9 @@ namespace nil {
                         typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                             fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
 
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         2> const fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

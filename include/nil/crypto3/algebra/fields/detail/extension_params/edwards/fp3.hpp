@@ -111,6 +111,10 @@ namespace nil {
                         edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                         fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus;
 
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    constexpr std::array<typename fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         3> const fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
