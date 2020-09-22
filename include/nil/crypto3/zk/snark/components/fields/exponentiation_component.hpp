@@ -177,7 +177,7 @@ namespace nil {
                                 } else {
                                     const FpkT cur_val = intermediate[intermed_id]->get_element();
                                     const FpkT elt_val = elt.get_element();
-                                    const FpkT next_val = cur_val * elt_val.inverse();
+                                    const FpkT next_val = cur_val * elt_val.inversed();
 
                                     (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])
                                         .generate_r1cs_witness(next_val);

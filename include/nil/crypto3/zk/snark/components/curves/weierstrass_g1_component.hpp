@@ -161,7 +161,7 @@ namespace nil {
                             r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {variable<FieldType>(0)}));
                     }
                     void generate_r1cs_witness() {
-                        this->pb.val(inv) = (this->pb.lc_val(B.X) - this->pb.lc_val(A.X)).inverse();
+                        this->pb.val(inv) = (this->pb.lc_val(B.X) - this->pb.lc_val(A.X)).inversed();
                         this->pb.val(lambda) = (this->pb.lc_val(B.Y) - this->pb.lc_val(A.Y)) * this->pb.val(inv);
                         this->pb.lc_val(C.X) =
                             this->pb.val(lambda).squared() - this->pb.lc_val(A.X) - this->pb.lc_val(B.X);
@@ -208,7 +208,7 @@ namespace nil {
                         this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
                         this->pb.val(lambda) = (typename FieldType::value_type(0x03) * this->pb.val(Xsquared) +
                                                 other_curve<CurveType>::g1_type::a) *
-                                               (typename FieldType::value_type(0x02) * this->pb.lc_val(A.Y)).inverse();
+                                               (typename FieldType::value_type(0x02) * this->pb.lc_val(A.Y)).inversed();
                         this->pb.lc_val(B.X) = this->pb.val(lambda).squared() -
                                                typename FieldType::value_type(0x02) * this->pb.lc_val(A.X);
                         this->pb.lc_val(B.Y) =

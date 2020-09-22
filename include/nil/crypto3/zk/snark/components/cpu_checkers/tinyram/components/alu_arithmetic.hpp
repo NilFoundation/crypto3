@@ -1525,7 +1525,7 @@ namespace nil {
                         this->pb.val(is_top_empty_aux) = FieldType::value_type::zero();
                     } else {
                         this->pb.val(is_top_empty) = FieldType::value_type::zero();
-                        this->pb.val(is_top_empty_aux) = this->pb.val(top).inverse();
+                        this->pb.val(is_top_empty_aux) = this->pb.val(top).inversed();
                     }
 
                     if (topval == ((1ul << (this->pb.ap.w + 1)) - 1)) {
@@ -1534,7 +1534,7 @@ namespace nil {
                     } else {
                         this->pb.val(is_top_full) = FieldType::value_type::zero();
                         this->pb.val(is_top_full_aux) =
-                            (this->pb.val(top) - typename FieldType::value_type((1ul << (this->pb.ap.w + 1)) - 1)).inverse();
+                            (this->pb.val(top) - typename FieldType::value_type((1ul << (this->pb.ap.w + 1)) - 1)).inversed();
                     }
 
                     /* smulh_flag = 1 - (is_top_full + is_top_empty) */
@@ -1633,7 +1633,7 @@ namespace nil {
                         this->pb.val(udiv_flag) = FieldType::value_type::zero();
                         this->pb.val(umod_flag) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(B_inv) = this->pb.val(this->arg2val.packed).inverse();
+                        this->pb.val(B_inv) = this->pb.val(this->arg2val.packed).inversed();
                         this->pb.val(B_nonzero) = FieldType::value_type::zero();
 
                         std::size_t A = static_cast<unsigned long>(this->pb.val(this->arg1val.packed));

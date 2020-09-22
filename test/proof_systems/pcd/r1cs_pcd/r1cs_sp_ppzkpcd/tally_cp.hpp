@@ -320,9 +320,9 @@ namespace nil {
 
                         if (!this->pb.val(incoming_types[i]).is_zero()) {
                             this->pb.val(sum_in_packed_aux[i]) =
-                                this->pb.val(sum_in_packed[i]) * this->pb.val(incoming_types[i]).inverse();
+                                this->pb.val(sum_in_packed[i]) * this->pb.val(incoming_types[i]).inversed();
                             this->pb.val(count_in_packed_aux[i]) =
-                                this->pb.val(count_in_packed[i]) * this->pb.val(incoming_types[i]).inverse();
+                                this->pb.val(count_in_packed[i]) * this->pb.val(incoming_types[i]).inversed();
                         }
                     }
 

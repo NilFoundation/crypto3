@@ -126,11 +126,11 @@ namespace nil {
 
                             if (std::rand() % 2 == 0) {
                                 const field_value_type lhs_val = gate.lhs.evaluate(all_vals);
-                                const field_value_type coeff = -(lhs_val * var_val.inverse());
+                                const field_value_type coeff = -(lhs_val * var_val.inversed());
                                 gate.lhs = gate.lhs + coeff * variable<FieldType>(var_idx);
                             } else {
                                 const field_value_type rhs_val = gate.rhs.evaluate(all_vals);
-                                const field_value_type coeff = -(rhs_val * var_val.inverse());
+                                const field_value_type coeff = -(rhs_val * var_val.inversed());
                                 gate.rhs = gate.rhs + coeff * variable<FieldType>(var_idx);
                             }
 

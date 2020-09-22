@@ -444,7 +444,7 @@ void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
     algebra::Fqk<other_curve<ppT>> native_result =
         (other_curve<ppT>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
          other_curve<ppT>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2) *
-         other_curve<ppT>::affine_ate_miller_loop(native_prec_P3, native_prec_Q3).inverse());
+         other_curve<ppT>::affine_ate_miller_loop(native_prec_P3, native_prec_Q3).inversed());
 
     BOOST_CHECK(result.get_element() == native_result);
     printf("number of constraints for e times e over e Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),
@@ -562,7 +562,7 @@ void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
         other_curve<ppT>::affine_ate_precompute_G2(Q2_val);
     algebra::Fqk<other_curve<ppT>> native_result =
         (other_curve<ppT>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
-         other_curve<ppT>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2).inverse());
+         other_curve<ppT>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2).inversed());
 
     BOOST_CHECK(result.get_element() == native_result);
     printf("number of constraints for e over e Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),

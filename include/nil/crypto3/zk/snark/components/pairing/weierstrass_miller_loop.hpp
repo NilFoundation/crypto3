@@ -641,7 +641,7 @@ namespace nil {
                         ++f_id;
                         (f_id + 1 == f_count ? result : *fs[f_id + 1])
                             .generate_r1cs_witness(fs[f_id]->get_element() *
-                                                   g_RR_at_P2s[dbl_id]->get_element().inverse());
+                                                   g_RR_at_P2s[dbl_id]->get_element().inversed());
                         dbl_muls2[dbl_id]->generate_r1cs_witness();
                         ++f_id;
                         ++dbl_id;
@@ -653,7 +653,7 @@ namespace nil {
                             ++f_id;
                             (f_id + 1 == f_count ? result : *fs[f_id + 1])
                                 .generate_r1cs_witness(fs[f_id]->get_element() *
-                                                       g_RQ_at_P2s[add_id]->get_element().inverse());
+                                                       g_RQ_at_P2s[add_id]->get_element().inversed());
                             add_muls2[add_id]->generate_r1cs_witness();
                             ++f_id;
                             ++add_id;
@@ -832,7 +832,7 @@ namespace nil {
                         ++f_id;
                         (f_id + 1 == f_count ? result : *fs[f_id + 1])
                             .generate_r1cs_witness(fs[f_id]->get_element() *
-                                                   g_RR_at_P3s[dbl_id]->get_element().inverse());
+                                                   g_RR_at_P3s[dbl_id]->get_element().inversed());
                         dbl_muls3[dbl_id]->generate_r1cs_witness();
                         ++f_id;
                         ++dbl_id;
@@ -847,7 +847,7 @@ namespace nil {
                             ++f_id;
                             (f_id + 1 == f_count ? result : *fs[f_id + 1])
                                 .generate_r1cs_witness(fs[f_id]->get_element() *
-                                                       g_RQ_at_P3s[add_id]->get_element().inverse());
+                                                       g_RQ_at_P3s[add_id]->get_element().inversed());
                             add_muls3[add_id]->generate_r1cs_witness();
                             ++f_id;
                             ++add_id;

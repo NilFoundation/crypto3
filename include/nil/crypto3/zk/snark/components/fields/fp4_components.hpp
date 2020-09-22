@@ -397,7 +397,7 @@ namespace nil {
                 template<typename Fp4T>
                 void Fp4_direct_mul_component<Fp4T>::generate_r1cs_constraints() {
                     const typename FieldType::value_type beta = Fp4T::non_residue;
-                    const typename FieldType::value_type u = (FieldType::value_type::zero() - beta).inverse();
+                    const typename FieldType::value_type u = (FieldType::value_type::zero() - beta).inversed();
 
                     const blueprint_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
                                                            &b0 = B.c0.c0, &b1 = B.c1.c0, &b2 = B.c0.c1, &b3 = B.c1.c1,
@@ -411,8 +411,8 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         a0,
                         b0,
-                        u * c0 + beta * u * c2 - beta * u * typename FieldType::value_type(2).inverse() * v1 -
-                            beta * u * typename FieldType::value_type(2).inverse() * v2 + beta * v6));
+                        u * c0 + beta * u * c2 - beta * u * typename FieldType::value_type(2).inversed() * v1 -
+                            beta * u * typename FieldType::value_type(2).inversed() * v2 + beta * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         a0 + typename FieldType::value_type(2) * a1 + typename FieldType::value_type(4) * a2 +
                             typename FieldType::value_type(8) * a3,
@@ -422,9 +422,9 @@ namespace nil {
                             typename FieldType::value_type(3) * (typename FieldType::value_type(4) + beta) * u * c2 -
                             typename FieldType::value_type(6) * (typename FieldType::value_type(4) + beta) * u * c3 +
                             (typename FieldType::value_type(24) -
-                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inverse()) *
+                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inversed()) *
                                 u * v1 +
-                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inverse()) *
+                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inversed()) *
                                 u * v2 -
                             typename FieldType::value_type(3) * (-typename FieldType::value_type(16) + beta) * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
@@ -436,9 +436,9 @@ namespace nil {
                             typename FieldType::value_type(3) * (typename FieldType::value_type(4) + beta) * u * c2 +
                             typename FieldType::value_type(6) * (typename FieldType::value_type(4) + beta) * u * c3 +
                             (typename FieldType::value_type(24) -
-                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inverse()) *
+                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inversed()) *
                                 u * v2 +
-                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inverse()) *
+                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inversed()) *
                                 u * v1 -
                             typename FieldType::value_type(3) * (-typename FieldType::value_type(16) + beta) * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
@@ -571,13 +571,13 @@ namespace nil {
                       Corresponding test code:
 
                         assert(B.squared() == A + G + my_Fp2(A.c1 * non_residue + my_Fp::one(), A.c0));
-                        assert(this->c1.squared().c0 == F.c1 * my_Fp(2).inverse());
-                        assert(this->c1.squared().c1 == (F.c0 - my_Fp(1)) * (my_Fp(2) * non_residue).inverse());
+                        assert(this->c1.squared().c0 == F.c1 * my_Fp(2).inversed());
+                        assert(this->c1.squared().c1 == (F.c0 - my_Fp(1)) * (my_Fp(2) * non_residue).inversed());
                     */
-                    c0_expr_c0.assign(pb, result.c0.c1 * typename FieldType::value_type(2).inverse());
+                    c0_expr_c0.assign(pb, result.c0.c1 * typename FieldType::value_type(2).inversed());
                     c0_expr_c1.assign(pb,
                                       (result.c0.c0 - typename FieldType::value_type(1)) *
-                                          (typename FieldType::value_type(2) * Fp4T::non_residue).inverse());
+                                          (typename FieldType::value_type(2) * Fp4T::non_residue).inversed());
                     c0_expr.reset(new Fp2_variable<Fp2T>(pb, c0_expr_c0, c0_expr_c1));
                     compute_c0_expr.reset(new Fp2_sqr_component<Fp2T>(pb, A.c1, *c0_expr));
 
@@ -587,12 +587,12 @@ namespace nil {
 
                     c1_expr_c0.assign(pb,
                                       (result.c0.c1 + result.c0.c0 - typename FieldType::value_type(1)) *
-                                              typename FieldType::value_type(2).inverse() +
+                                              typename FieldType::value_type(2).inversed() +
                                           result.c1.c0 + typename FieldType::value_type(1));
                     c1_expr_c1.assign(pb,
                                       (result.c0.c0 - typename FieldType::value_type(1)) *
-                                              (typename FieldType::value_type(2) * Fp4T::non_residue).inverse() +
-                                          result.c1.c1 + result.c0.c1 * typename FieldType::value_type(2).inverse());
+                                              (typename FieldType::value_type(2) * Fp4T::non_residue).inversed() +
+                                          result.c1.c1 + result.c0.c1 * typename FieldType::value_type(2).inversed());
                     c1_expr.reset(new Fp2_variable<Fp2T>(pb, c1_expr_c0, c1_expr_c1));
 
                     compute_c1_expr.reset(new Fp2_sqr_component<Fp2T>(pb, *A_c0_plus_A_c1, *c1_expr));

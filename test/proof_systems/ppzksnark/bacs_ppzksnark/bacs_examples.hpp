@@ -115,11 +115,11 @@ namespace nil {
 
                             if (std::rand() % 2 == 0) {
                                 const typename FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);
-                                const typename FieldType::value_type coeff = -(lhs_val * var_val.inverse());
+                                const typename FieldType::value_type coeff = -(lhs_val * var_val.inversed());
                                 gate.lhs = gate.lhs + coeff * blueprint_variable<FieldType>(var_idx);
                             } else {
                                 const typename FieldType::value_type rhs_val = gate.rhs.evaluate(all_vals);
-                                const typename FieldType::value_type coeff = -(rhs_val * var_val.inverse());
+                                const typename FieldType::value_type coeff = -(rhs_val * var_val.inversed());
                                 gate.rhs = gate.rhs + coeff * blueprint_variable<FieldType>(var_idx);
                             }
 

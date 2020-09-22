@@ -313,6 +313,8 @@ namespace nil {
                 r1cs_gg_ppzksnark_keypair<CurveType>
                     r1cs_gg_ppzksnark_generator(const r1cs_gg_ppzksnark_constraint_system<CurveType> &cs) {
 
+                    using pairing_policy = typename CurveType::pairing_policy;
+
                     /* Make the B_query "lighter" if possible */
                     r1cs_gg_ppzksnark_constraint_system<CurveType> r1cs_copy(cs);
                     r1cs_copy.swap_AB_if_beneficial();
@@ -328,8 +330,8 @@ namespace nil {
                         random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type delta =
                         random_element<typename CurveType::scalar_field_type>();
-                    const typename CurveType::scalar_field_type::value_type gamma_inverse = gamma.inverse();
-                    const typename CurveType::scalar_field_type::value_type delta_inverse = delta.inverse();
+                    const typename CurveType::scalar_field_type::value_type gamma_inverse = gamma.inversed();
+                    const typename CurveType::scalar_field_type::value_type delta_inverse = delta.inversed();
 
                     /* A quadratic arithmetic program evaluated at t. */
                     qap_instance_evaluation<typename CurveType::scalar_field_type> qap =
@@ -356,7 +358,7 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> gamma_ABC;
                     gamma_ABC.reserve(qap.num_inputs());
 
-                    const typename CurveType::scalar_field_type gamma_ABC_0 =
+                    const typename CurveType::scalar_field_type::value_type gamma_ABC_0 =
                         (beta * At[0] + alpha * Bt[0] + Ct[0]) * gamma_inverse;
                     for (std::size_t i = 1; i < qap.num_inputs() + 1; ++i) {
                         gamma_ABC.emplace_back((beta * At[i] + alpha * Bt[i] + Ct[i]) * gamma_inverse);
@@ -417,8 +419,8 @@ namespace nil {
 
                     knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query =
                         kc_batch_exp(CurveType::scalar_field_type::size_in_bits(), g2_window_size, g1_window_size,
-                                     g2_table, g1_table, CurveType::scalar_field_type::one(),
-                                     CurveType::scalar_field_type::one(), Bt, chunks);
+                                     g2_table, g1_table, CurveType::scalar_field_type::value_type::one(),
+                                     CurveType::scalar_field_type::value_type::one(), Bt, chunks);
                     // NOTE: if USE_MIXED_ADDITION is defined,
                     // kc_batch_exp will convert its output to special form internally
 
@@ -433,7 +435,7 @@ namespace nil {
                     algebra::batch_to_special<typename CurveType::g1_type>(L_query);
 #endif
 
-                    typename CurveType::gt_type alpha_g1_beta_g2 = CurveType::reduced_pairing(alpha_g1, beta_g2);
+                    typename CurveType::gt_type alpha_g1_beta_g2 = pairing_policy::reduced_pairing(alpha_g1, beta_g2);
                     typename CurveType::g2_type gamma_g2 = gamma * G2_gen;
 
                     typename CurveType::g1_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
@@ -482,8 +484,8 @@ namespace nil {
 #endif
 
                     const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap_witness_map(
-                        pk.constraint_system, primary_input, auxiliary_input, CurveType::scalar_field_type::zero(),
-                        CurveType::scalar_field_type::zero(), CurveType::scalar_field_type::zero());
+                        pk.constraint_system, primary_input, auxiliary_input, CurveType::scalar_field_type::value_type::zero(),
+                        CurveType::scalar_field_type::value_type::zero(), CurveType::scalar_field_type::value_type::zero());
 
                     /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                        and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
@@ -504,7 +506,7 @@ namespace nil {
 
                     // TODO: sort out indexing
                     std::vector<typename CurveType::scalar_field_type::value_type> const_padded_assignment(
-                        1, CurveType::scalar_field_type::one());
+                        1, CurveType::scalar_field_type::value_type::one());
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
                                                    qap_wit.coefficients_for_ABCs.end());
 
@@ -648,10 +650,12 @@ namespace nil {
                 r1cs_gg_ppzksnark_processed_verification_key<CurveType>
                     r1cs_gg_ppzksnark_verifier_process_vk(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk) {
 
+                    using pairing_policy = typename CurveType::pairing_policy;
+
                     r1cs_gg_ppzksnark_processed_verification_key<CurveType> pvk;
                     pvk.vk_alpha_g1_beta_g2 = vk.alpha_g1_beta_g2;
-                    pvk.vk_gamma_g2_precomp = CurveType::precompute_G2(vk.gamma_g2);
-                    pvk.vk_delta_g2_precomp = CurveType::precompute_G2(vk.delta_g2);
+                    pvk.vk_gamma_g2_precomp = pairing_policy::precompute_G2(vk.gamma_g2);
+                    pvk.vk_delta_g2_precomp = pairing_policy::precompute_G2(vk.delta_g2);
                     pvk.gamma_ABC_g1 = vk.gamma_ABC_g1;
 
                     return pvk;
@@ -659,6 +663,9 @@ namespace nil {
 
                 template<typename CurveType>
                 bool r1cs_gg_ppzksnark_online_verifier_weak_IC(
+
+                    using pairing_policy = typename CurveType::pairing_policy;
+
                     const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
                     const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
                     const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
@@ -674,16 +681,16 @@ namespace nil {
                     if (!proof.is_well_formed()) {
                         result = false;
                     }
-                    const algebra::G1_precomp<CurveType> proof_g_A_precomp = CurveType::precompute_G1(proof.g_A);
-                    const algebra::G2_precomp<CurveType> proof_g_B_precomp = CurveType::precompute_G2(proof.g_B);
-                    const algebra::G1_precomp<CurveType> proof_g_C_precomp = CurveType::precompute_G1(proof.g_C);
-                    const algebra::G1_precomp<CurveType> acc_precomp = CurveType::precompute_G1(acc);
+                    const algebra::G1_precomp<CurveType> proof_g_A_precomp = pairing_policy::precompute_G1(proof.g_A);
+                    const algebra::G2_precomp<CurveType> proof_g_B_precomp = pairing_policy::precompute_G2(proof.g_B);
+                    const algebra::G1_precomp<CurveType> proof_g_C_precomp = pairing_policy::precompute_G1(proof.g_C);
+                    const algebra::G1_precomp<CurveType> acc_precomp = pairing_policy::precompute_G1(acc);
 
-                    const algebra::Fqk<CurveType> QAP1 = miller_loop<CurveType>(proof_g_A_precomp, proof_g_B_precomp);
-                    const algebra::Fqk<CurveType> QAP2 = double_miller_loop<CurveType>(
+                    const algebra::Fqk<CurveType> QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
+                    const algebra::Fqk<CurveType> QAP2 = pairing_policy::double_miller_loop(
                         acc_precomp, pvk.vk_gamma_g2_precomp, proof_g_C_precomp, pvk.vk_delta_g2_precomp);
                     const typename CurveType::gt_type QAP =
-                        final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
+                        pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
 
                     if (QAP != pvk.vk_alpha_g1_beta_g2) {
                         result = false;
@@ -731,6 +738,9 @@ namespace nil {
 
                 template<typename CurveType>
                 bool r1cs_gg_ppzksnark_affine_verifier_weak_IC(
+
+                    using pairing_policy = typename CurveType::pairing_policy;
+
                     const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
                     const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
                     const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
@@ -765,7 +775,7 @@ namespace nil {
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
                     const typename CurveType::gt_type QAP =
-                        final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
+                        pairing_policy::final_exponentiation(QAP_miller.unitary_inversed());
 
                     if (QAP != vk.alpha_g1_beta_g2) {
                         result = false;

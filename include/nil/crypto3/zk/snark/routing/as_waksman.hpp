@@ -598,7 +598,7 @@ namespace nil {
                     const std::size_t width = as_waksman_num_columns(num_packets);
 
                     as_waksman_routing routing(width);
-                    as_waksman_route_inner(0, width - 1, 0, num_packets - 1, permutation, permutation.inverse(),
+                    as_waksman_route_inner(0, width - 1, 0, num_packets - 1, permutation, permutation.inversed(),
                                            routing);
                     return routing;
                 }
@@ -634,7 +634,7 @@ namespace nil {
                         curperm = nextperm;
                     }
 
-                    return (curperm == permutation.inverse());
+                    return (curperm == permutation.inversed());
                 }
             }    // namespace snark
         }        // namespace zk

@@ -66,9 +66,9 @@ namespace nil {
                         blueprint<FieldType> &pb,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
-using FieldType = typename CurveType::pairing_policy::Fp_type;
-using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-using fqk_type = typename ;
+                        using FieldType = typename CurveType::pairing_policy::Fp_type;
+                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                         const typename std::enable_if<other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 4,
                                                       FieldType>::type & = typename FieldType::value_type()) :
@@ -112,9 +112,9 @@ using fqk_type = typename ;
                 template<typename CurveType>
                 class precompute_G2_component_coeffs {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::shared_ptr<Fqe_variable<CurveType>> RX;
                     std::shared_ptr<Fqe_variable<CurveType>> RY;
@@ -132,9 +132,9 @@ using fqk_type = typename ;
                 template<typename CurveType>
                 class G2_precomputation {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::shared_ptr<G2_variable<CurveType>> Q;
 
@@ -156,7 +156,7 @@ using fqk_type = typename ;
                  * G2_precompute_doubling_step relates coeffs[i] and coeffs[i+1] as follows
                  *
                  * coeffs[i]
-                 * gamma = (3 * RX^2 + twist_coeff_a) * (2*RY).inverse()
+                 * gamma = (3 * RX^2 + twist_coeff_a) * (2*RY).inversed()
                  * gamma_X = gamma * RX
                  *
                  * coeffs[i+1]
@@ -166,9 +166,9 @@ using fqk_type = typename ;
                 template<typename CurveType>
                 class precompute_G2_component_doubling_step : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     precompute_G2_component_coeffs<CurveType> cur;
                     precompute_G2_component_coeffs<CurveType> next;
@@ -200,7 +200,7 @@ using fqk_type = typename ;
                  * G2_precompute_addition_step relates coeffs[i] and coeffs[i+1] as follows
                  *
                  * coeffs[i]
-                 * gamma = (RY - QY) * (RX - QX).inverse()
+                 * gamma = (RY - QY) * (RX - QX).inversed()
                  * gamma_X = gamma * QX
                  *
                  * coeffs[i+1]
@@ -214,9 +214,9 @@ using fqk_type = typename ;
                 template<typename CurveType>
                 class precompute_G2_component_addition_step : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     bool invert_Q;
                     precompute_G2_component_coeffs<CurveType> cur;
@@ -250,9 +250,9 @@ using fqk_type = typename ;
                 template<typename CurveType>
                 class precompute_G2_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::vector<std::shared_ptr<precompute_G2_component_addition_step<CurveType>>> addition_steps;
                     std::vector<std::shared_ptr<precompute_G2_component_doubling_step<CurveType>>> doubling_steps;
@@ -348,7 +348,7 @@ using fqk_type = typename ;
                  G2_precompute_doubling_step relates coeffs[i] and coeffs[i+1] as follows
 
                  coeffs[i]
-                 gamma = (3 * RX^2 + twist_coeff_a) * (2*RY).inverse()
+                 gamma = (3 * RX^2 + twist_coeff_a) * (2*RY).inversed()
                  gamma_X = gamma * RX
 
                  coeffs[i+1]
@@ -398,7 +398,7 @@ using fqk_type = typename ;
 
                     const fqe_type three_RXsquared_plus_a_val = three_RXsquared_plus_a->get_element();
                     const fqe_type two_RY_val = two_RY->get_element();
-                    const fqe_type gamma_val = three_RXsquared_plus_a_val * two_RY_val.inverse();
+                    const fqe_type gamma_val = three_RXsquared_plus_a_val * two_RY_val.inversed();
                     cur.gamma->generate_r1cs_witness(gamma_val);
 
                     compute_gamma->generate_r1cs_witness();
@@ -423,7 +423,7 @@ using fqk_type = typename ;
                  G2_precompute_addition_step relates coeffs[i] and coeffs[i+1] as follows
 
                  coeffs[i]
-                 gamma = (RY - QY) * (RX - QX).inverse()
+                 gamma = (RY - QY) * (RX - QX).inversed()
                  gamma_X = gamma * QX
 
                  coeffs[i+1]
@@ -474,7 +474,7 @@ using fqk_type = typename ;
 
                     const fqe_type RY_minus_QY_val = RY_minus_QY->get_element();
                     const fqe_type RX_minus_QX_val = RX_minus_QX->get_element();
-                    const fqe_type gamma_val = RY_minus_QY_val * RX_minus_QX_val.inverse();
+                    const fqe_type gamma_val = RY_minus_QY_val * RX_minus_QX_val.inversed();
                     cur.gamma->generate_r1cs_witness(gamma_val);
 
                     compute_gamma->generate_r1cs_witness();

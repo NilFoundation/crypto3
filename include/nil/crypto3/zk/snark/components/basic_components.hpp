@@ -541,7 +541,7 @@ namespace nil {
                         this->pb.val(inv) = FieldType::value_type::zero();
                         this->pb.val(output) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(inv) = sum.inverse();
+                        this->pb.val(inv) = sum.inversed();
                         this->pb.val(output) = FieldType::value_type::zero();
                     }
                 }
@@ -584,7 +584,7 @@ namespace nil {
                         this->pb.val(inv) = FieldType::value_type::zero();
                         this->pb.val(output) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(inv) = sum.inverse();
+                        this->pb.val(inv) = sum.inversed();
                         this->pb.val(output) = FieldType::value_type::zero();
                     }
                 }

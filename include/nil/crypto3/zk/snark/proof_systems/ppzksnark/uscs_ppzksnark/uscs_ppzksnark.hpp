@@ -601,7 +601,7 @@ namespace nil {
                     algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_G2(proof.V_g2);
                     algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                     algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                    typename CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inverse());
+                    typename CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inversed());
                     if (V != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -610,7 +610,7 @@ namespace nil {
                     algebra::Fqk<CurveType> SSP_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
                     algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
                     typename CurveType::gt_type SSP =
-                        final_exponentiation<CurveType>(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
+                        final_exponentiation<CurveType>(SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
                     if (SSP != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -619,7 +619,7 @@ namespace nil {
                     algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_G1(proof.alpha_V_g1);
                     algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
                     algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                    typename CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inverse());
+                    typename CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inversed());
                     if (alpha_V != typename CurveType::gt_type::one()) {
                         result = false;
                     }

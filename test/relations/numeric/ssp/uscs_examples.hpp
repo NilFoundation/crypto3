@@ -80,7 +80,7 @@ namespace nil {
                         const typename FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
                         const typename FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
-                            full_variable_assignment[z].inverse();
+                            full_variable_assignment[z].inversed();
 
                         uscs_constraint<FieldType> constr;
                         constr.add_term(x + 1, x_coeff);

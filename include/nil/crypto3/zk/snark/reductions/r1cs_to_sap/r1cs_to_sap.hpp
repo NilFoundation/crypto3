@@ -419,7 +419,7 @@ namespace nil {
                     domain->divide_by_Z_on_coset(H_tmp);
 
                     domain->iFFT(H_tmp, FieldType::multiplicative_generator);
-                    multiply_by_coset(H_tmp, FieldType::multiplicative_generator.inverse());
+                    multiply_by_coset(H_tmp, FieldType::multiplicative_generator.inversed());
 
 #ifdef MULTICORE
 #pragma omp parallel for

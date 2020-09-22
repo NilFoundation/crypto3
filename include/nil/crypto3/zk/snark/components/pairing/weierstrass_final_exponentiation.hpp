@@ -176,7 +176,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt4_final_exp_component<CurveType>::generate_r1cs_constraints() {
-                    one->generate_r1cs_equals_const_constraints(algebra::Fqk<other_curve<CurveType>>::one());
+                    one->generate_r1cs_equals_const_constraints(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
 
                     compute_el_inv->generate_r1cs_constraints();
                     compute_el_q_3_minus_1->generate_r1cs_constraints();
@@ -200,8 +200,8 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt4_final_exp_component<CurveType>::generate_r1cs_witness() {
-                    one->generate_r1cs_witness(algebra::Fqk<other_curve<CurveType>>::one());
-                    el_inv->generate_r1cs_witness(el.get_element().inverse());
+                    one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                    el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                     compute_el_inv->generate_r1cs_witness();
                     el_q_3->evaluate();
@@ -264,7 +264,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt6_final_exp_component<CurveType>::generate_r1cs_constraints() {
-                    one->generate_r1cs_equals_const_constraints(algebra::Fqk<other_curve<CurveType>>::one());
+                    one->generate_r1cs_equals_const_constraints(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
 
                     compute_el_inv->generate_r1cs_constraints();
                     compute_el_q_2_minus_1->generate_r1cs_constraints();
@@ -282,8 +282,8 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt6_final_exp_component<CurveType>::generate_r1cs_witness() {
-                    one->generate_r1cs_witness(algebra::Fqk<other_curve<CurveType>>::one());
-                    el_inv->generate_r1cs_witness(el.get_element().inverse());
+                    one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                    el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                     compute_el_inv->generate_r1cs_witness();
                     el_q_2->evaluate();

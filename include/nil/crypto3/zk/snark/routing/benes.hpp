@@ -227,7 +227,7 @@ namespace nil {
                                        benes_routing &routing) {
                     assert(permutation.size() == subnetwork_size);
                     assert(permutation.is_valid());
-                    assert(permutation.inverse() == permutation_inv);
+                    assert(permutation.inversed() == permutation_inv);
 
                     if (column_idx_start == column_idx_end) {
                         /* nothing to route */
@@ -328,7 +328,7 @@ namespace nil {
 
                     benes_routing routing(num_columns, std::vector<bool>(num_packets));
 
-                    route_benes_inner(dimension, permutation, permutation.inverse(), 0, num_columns, 0, num_packets,
+                    route_benes_inner(dimension, permutation, permutation.inversed(), 0, num_columns, 0, num_packets,
                                       routing);
 
                     return routing;

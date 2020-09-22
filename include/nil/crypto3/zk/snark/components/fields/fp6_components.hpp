@@ -502,16 +502,16 @@ namespace nil {
                     b.reset(new Fp2_variable<Fp2T>(pb, A.c1.c0, A.c0.c2));
                     c.reset(new Fp2_variable<Fp2T>(pb, A.c0.c1, A.c1.c2));
 
-                    asq_c0.assign(pb, (result.c0.c0 + 2 * a->c0) * typename FieldType::value_type(3).inverse());
-                    asq_c1.assign(pb, (result.c1.c1 - 2 * a->c1) * typename FieldType::value_type(3).inverse());
+                    asq_c0.assign(pb, (result.c0.c0 + 2 * a->c0) * typename FieldType::value_type(3).inversed());
+                    asq_c1.assign(pb, (result.c1.c1 - 2 * a->c1) * typename FieldType::value_type(3).inversed());
 
-                    bsq_c0.assign(pb, (result.c0.c1 + 2 * c->c0) * typename FieldType::value_type(3).inverse());
-                    bsq_c1.assign(pb, (result.c1.c2 - 2 * c->c1) * typename FieldType::value_type(3).inverse());
+                    bsq_c0.assign(pb, (result.c0.c1 + 2 * c->c0) * typename FieldType::value_type(3).inversed());
+                    bsq_c1.assign(pb, (result.c1.c2 - 2 * c->c1) * typename FieldType::value_type(3).inversed());
 
-                    csq_c0.assign(pb, (result.c0.c2 + 2 * b->c1) * typename FieldType::value_type(3).inverse());
+                    csq_c0.assign(pb, (result.c0.c2 + 2 * b->c1) * typename FieldType::value_type(3).inversed());
                     csq_c1.assign(pb,
                                   (result.c1.c0 - 2 * b->c0) *
-                                      (typename FieldType::value_type(3) * Fp2T::non_residue).inverse());
+                                      (typename FieldType::value_type(3) * Fp2T::non_residue).inversed());
 
                     asq.reset(new Fp2_variable<Fp2T>(pb, asq_c0, asq_c1));
                     bsq.reset(new Fp2_variable<Fp2T>(pb, bsq_c0, bsq_c1));

@@ -335,7 +335,7 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + A.c1,
                         A.c0 + Fp2T::non_residue * A.c1,
-                        result.c0 + result.c1 * (FieldType::value_type::zero() + Fp2T::non_residue) * typename FieldType::value_type(2).inverse()));
+                        result.c0 + result.c1 * (FieldType::value_type::zero() + Fp2T::non_residue) * typename FieldType::value_type(2).inversed()));
                 }
 
                 template<typename Fp2T>

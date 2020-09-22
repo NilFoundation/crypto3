@@ -697,7 +697,7 @@ namespace nil {
                     algebra::G1_precomp<CurveType> proof_g_A_h_precomp = CurveType::precompute_G1(proof.g_A.h);
                     algebra::Fqk<CurveType> kc_A_1 = miller_loop<CurveType>(proof_g_A_g_precomp, pvk.vk_alphaA_g2_precomp);
                     algebra::Fqk<CurveType> kc_A_2 = miller_loop<CurveType>(proof_g_A_h_precomp, pvk.pp_G2_one_precomp);
-                    typename CurveType::gt_type kc_A = final_exponentiation<CurveType>(kc_A_1 * kc_A_2.unitary_inverse());
+                    typename CurveType::gt_type kc_A = final_exponentiation<CurveType>(kc_A_1 * kc_A_2.unitary_inversed());
                     if (kc_A != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -706,7 +706,7 @@ namespace nil {
                     algebra::G1_precomp<CurveType> proof_g_B_h_precomp = CurveType::precompute_G1(proof.g_B.h);
                     algebra::Fqk<CurveType> kc_B_1 = miller_loop<CurveType>(pvk.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
                     algebra::Fqk<CurveType> kc_B_2 = miller_loop<CurveType>(proof_g_B_h_precomp, pvk.pp_G2_one_precomp);
-                    typename CurveType::gt_type kc_B = final_exponentiation<CurveType>(kc_B_1 * kc_B_2.unitary_inverse());
+                    typename CurveType::gt_type kc_B = final_exponentiation<CurveType>(kc_B_1 * kc_B_2.unitary_inversed());
                     if (kc_B != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -715,7 +715,7 @@ namespace nil {
                     algebra::G1_precomp<CurveType> proof_g_C_h_precomp = CurveType::precompute_G1(proof.g_C.h);
                     algebra::Fqk<CurveType> kc_C_1 = miller_loop<CurveType>(proof_g_C_g_precomp, pvk.vk_alphaC_g2_precomp);
                     algebra::Fqk<CurveType> kc_C_2 = miller_loop<CurveType>(proof_g_C_h_precomp, pvk.pp_G2_one_precomp);
-                    typename CurveType::gt_type kc_C = final_exponentiation<CurveType>(kc_C_1 * kc_C_2.unitary_inverse());
+                    typename CurveType::gt_type kc_C = final_exponentiation<CurveType>(kc_C_1 * kc_C_2.unitary_inversed());
                     if (kc_C != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -727,7 +727,7 @@ namespace nil {
                     algebra::Fqk<CurveType> QAP_1 = miller_loop<CurveType>(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
                     algebra::Fqk<CurveType> QAP_23 = double_miller_loop<CurveType>(proof_g_H_precomp, pvk.vk_rC_Z_g2_precomp,
                                                                        proof_g_C_g_precomp, pvk.pp_G2_one_precomp);
-                    typename CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP_1 * QAP_23.unitary_inverse());
+                    typename CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP_1 * QAP_23.unitary_inversed());
                     if (QAP != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -739,7 +739,7 @@ namespace nil {
                     algebra::Fqk<CurveType> K_23 =
                         double_miller_loop<CurveType>(proof_g_A_g_acc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
                                                 pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
-                    typename CurveType::gt_type K = final_exponentiation<CurveType>(K_1 * K_23.unitary_inverse());
+                    typename CurveType::gt_type K = final_exponentiation<CurveType>(K_1 * K_23.unitary_inversed());
                     if (K != typename CurveType::gt_type::one()) {
                         result = false;
                     }
