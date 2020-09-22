@@ -47,7 +47,8 @@ namespace nil {
                     }
 
                     // add constexpr
-                    static inline policy_constants_operator_t policy_constants_operator = get_policy_constant_operator();
+                    static inline policy_constants_operator_t policy_constants_operator =
+                        get_policy_constant_operator();
 
                     static inline void permute(state_type &A) {
                         std::size_t round_number = 0;

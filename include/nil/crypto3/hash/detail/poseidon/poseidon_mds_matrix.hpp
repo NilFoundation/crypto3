@@ -43,19 +43,19 @@ namespace nil {
                     }
 
                     inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
-                                                                               state_vector_type &A_vector_out) {
+                                                                        state_vector_type &A_vector_out) {
                         A_vector_out = algebra::vectmatmul(A_vector_in, mds_matrix_inverse);
                     }
 
                     inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector,
-                                                                               std::size_t round_number) {
+                                                                        std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix_init");
                         A_vector = algebra::vectmatmul(A_vector, get_M_i());
                     }
 
                     inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
-                                                                          std::size_t round_number) {
+                                                                   std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                             round_number < half_full_rounds + part_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix");

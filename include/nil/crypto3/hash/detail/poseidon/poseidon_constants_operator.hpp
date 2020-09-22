@@ -48,7 +48,7 @@ namespace nil {
                      */
 
                     inline void arc_sbox_mds_full_round_optimized_first(state_vector_type &A,
-                                                                               std::size_t round_number) {
+                                                                        std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_first");
                         std::size_t constant_number_base = round_number * state_words;
@@ -60,7 +60,7 @@ namespace nil {
                     }
 
                     inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A,
-                                                                              std::size_t round_number) {
+                                                                       std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_last");
                         std::size_t constant_number_base =
@@ -74,7 +74,7 @@ namespace nil {
                     }
 
                     inline void arc_mds_part_round_optimized_init(state_vector_type &A,
-                                                                         std::size_t round_number) {
+                                                                  std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: arc_mds_part_round_optimized_init");
                         std::size_t constant_number_base = half_full_rounds * state_words;
@@ -85,7 +85,7 @@ namespace nil {
                     }
 
                     inline void sbox_arc_mds_part_round_optimized(state_vector_type &A,
-                                                                         std::size_t round_number) {
+                                                                  std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds - 1,
                                          "wrong using: sbox_arc_mds_part_round_optimized");
@@ -164,7 +164,7 @@ namespace nil {
                         for (std::size_t r = half_full_rounds + part_rounds - 2; r >= half_full_rounds; r--) {
                             agregated_round_constants = get_round_constants_slice((r + 1) * state_words) + inv_cip1;
                             policy_matrix.product_with_inverse_mds_matrix_noalias(agregated_round_constants,
-                                                                                        inv_cip1);
+                                                                                  inv_cip1);
                             equivalent_round_constants[equivalent_constant_number_base + r] = inv_cip1[0];
                             inv_cip1[0] = 0;
                         }
