@@ -179,7 +179,7 @@ namespace nil {
                                 m[ip][jp] = m[i][jp];
                                 m[i][jp] = tmp;
                             }
-                            det *= -1;
+                            det = -det;
                             break;
                         }
                     }
@@ -220,7 +220,7 @@ namespace nil {
             /// @private
             template<typename T, std::size_t M, std::size_t N>
             constexpr std::tuple<matrix<T, M, N>, std::size_t, T> gauss_jordan_impl(const matrix<T, M, N> &m) {
-                T tol = std::max(N, M) * std::numeric_limits<T>::epsilon() * mars(m);
+                T tol = T(std::max(N, M)) * std::numeric_limits<T>::epsilon() * mars(m);
                 return gauss_jordan_impl(m, tol);
             }
 
@@ -288,7 +288,7 @@ namespace nil {
             constexpr matrix<T, M, M> inverse(const matrix<T, M, M> &m) {
                 if (rank(m) < M)
                     throw "matrix is not invertible";
-                return submat<M, M>(rref(horzcat(m, identity<T, M>)), 0, M);
+                return submat<M, M>(rref(horzcat(m, get_identity<T, M>())), 0, M);
             }
 
             /** @brief computes the trace
