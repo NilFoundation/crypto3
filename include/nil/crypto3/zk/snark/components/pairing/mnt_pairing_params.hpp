@@ -27,8 +27,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                using namespace nil::crypto3::algebra;
-
                 template<typename CurveType>
                 class mnt_e_over_e_miller_loop_component;
 

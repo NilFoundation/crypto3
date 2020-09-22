@@ -218,8 +218,8 @@ namespace nil {
                 struct r1cs_gg_ppzksnark_processed_verification_key {
 
                     typename CurveType::gt_type vk_alpha_g1_beta_g2;
-                    algebra::G2_precomp<CurveType> vk_gamma_g2_precomp;
-                    algebra::G2_precomp<CurveType> vk_delta_g2_precomp;
+                    typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
+                    typename pairing_policy::G2_precomp vk_delta_g2_precomp;
 
                     accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
@@ -681,13 +681,13 @@ namespace nil {
                     if (!proof.is_well_formed()) {
                         result = false;
                     }
-                    const algebra::G1_precomp<CurveType> proof_g_A_precomp = pairing_policy::precompute_G1(proof.g_A);
-                    const algebra::G2_precomp<CurveType> proof_g_B_precomp = pairing_policy::precompute_G2(proof.g_B);
-                    const algebra::G1_precomp<CurveType> proof_g_C_precomp = pairing_policy::precompute_G1(proof.g_C);
-                    const algebra::G1_precomp<CurveType> acc_precomp = pairing_policy::precompute_G1(acc);
+                    const pairing_policy::G1_precomp proof_g_A_precomp = pairing_policy::precompute_G1(proof.g_A);
+                    const pairing_policy::G2_precomp proof_g_B_precomp = pairing_policy::precompute_G2(proof.g_B);
+                    const pairing_policy::G1_precomp proof_g_C_precomp = pairing_policy::precompute_G1(proof.g_C);
+                    const pairing_policy::G1_precomp acc_precomp = pairing_policy::precompute_G1(acc);
 
-                    const algebra::Fqk<CurveType> QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                    const algebra::Fqk<CurveType> QAP2 = pairing_policy::double_miller_loop(
+                    const pairing_policy::Fqk::value_type QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
+                    const pairing_policy::Fqk::value_type QAP2 = pairing_policy::double_miller_loop(
                         acc_precomp, pvk.vk_gamma_g2_precomp, proof_g_C_precomp, pvk.vk_delta_g2_precomp);
                     const typename CurveType::gt_type QAP =
                         pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
@@ -746,10 +746,10 @@ namespace nil {
                     const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
                     assert(vk.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                    algebra::affine_ate_G2_precomp<CurveType> pvk_vk_gamma_g2_precomp =
-                        CurveType::affine_ate_precompute_G2(vk.gamma_g2);
-                    algebra::affine_ate_G2_precomp<CurveType> pvk_vk_delta_g2_precomp =
-                        CurveType::affine_ate_precompute_G2(vk.delta_g2);
+                    typename pairing_policy::affine_ate_G2_precomp pvk_vk_gamma_g2_precomp =
+                        pairing_policy::affine_ate_precompute_G2(vk.gamma_g2);
+                    typename pairing_policy::affine_ate_G2_precomp pvk_vk_delta_g2_precomp =
+                        pairing_policy::affine_ate_precompute_G2(vk.delta_g2);
 
                     const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
                         vk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
@@ -762,16 +762,16 @@ namespace nil {
                         result = false;
                     }
 
-                    const algebra::affine_ate_G1_precomp<CurveType> proof_g_A_precomp =
-                        CurveType::affine_ate_precompute_G1(proof.g_A);
-                    const algebra::affine_ate_G2_precomp<CurveType> proof_g_B_precomp =
-                        CurveType::affine_ate_precompute_G2(proof.g_B);
-                    const algebra::affine_ate_G1_precomp<CurveType> proof_g_C_precomp =
-                        CurveType::affine_ate_precompute_G1(proof.g_C);
-                    const algebra::affine_ate_G1_precomp<CurveType> acc_precomp =
-                        CurveType::affine_ate_precompute_G1(acc);
+                    const pairing_policy::affine_ate_G1_precomp proof_g_A_precomp =
+                        pairing_policy::affine_ate_precompute_G1(proof.g_A);
+                    const pairing_policy::affine_ate_G2_precomp proof_g_B_precomp =
+                        pairing_policy::affine_ate_precompute_G2(proof.g_B);
+                    const pairing_policy::affine_ate_G1_precomp proof_g_C_precomp =
+                        pairing_policy::affine_ate_precompute_G1(proof.g_C);
+                    const pairing_policy::affine_ate_G1_precomp acc_precomp =
+                        pairing_policy::affine_ate_precompute_G1(acc);
 
-                    const algebra::Fqk<CurveType> QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
+                    const pairing_policy::Fqk::value_type QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
                     const typename CurveType::gt_type QAP =
