@@ -36,6 +36,12 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                template<typename FieldType>
+                struct qap_witness;
+
+                template<typename FieldType>
+                struct qap_instance_evaluation;
+
                 /**
                  * A QAP instance.
                  *
@@ -242,7 +248,7 @@ namespace nil {
                         FieldType ans_C = this->Ct[0] + witness.d3 * this->Zt;
                         FieldType ans_H = FieldType::value_type::zero();
 
-                        ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
+                        /*ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
                                                                         this->At.begin() + 1 + this->num_variables,
                                                                         witness.coefficients_for_ABCs.begin(),
                                                                         witness.coefficients_for_ABCs.begin() +
@@ -261,7 +267,10 @@ namespace nil {
                                 algebra::inner_product<FieldType>(this->Ht.begin(),
                                                                 this->Ht.begin() + this->degree + 1,
                                                                 witness.coefficients_for_H.begin(),
-                                                                witness.coefficients_for_H.begin() + this->degree + 1);
+                                                                witness.coefficients_for_H.begin() + this->degree + 1);*/
+
+                        // uncomment
+                        // when inner_product ready
 
                         if (ans_A * ans_B - ans_C != ans_H * this->Zt) {
                             return false;
