@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the AS-Waksman routing gadget.
+// @file Declaration of interfaces for the AS-Waksman routing component.
 //
-// The gadget verifies that the outputs are a permutation of the inputs,
+// The component verifies that the outputs are a permutation of the inputs,
 // by use of an AS-Waksman network.
 //---------------------------------------------------------------------------//
 
@@ -118,7 +118,7 @@ namespace nil {
                         }
                     }
 
-                    /* create packing/unpacking gadgets */
+                    /* create packing/unpacking components */
                     pack_inputs.reserve(num_packets);
                     unpack_outputs.reserve(num_packets);
                     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {

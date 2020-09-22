@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a RAM-to-R1CS reduction, that is, constructing
 // a R1CS ("Rank-1 Constraint System") from a RAM ("Random-Access Machine").
 //
-// The implementation is a thin layer around a "RAM universal gadget", which is
-// where most of the work is done. See gadgets/ram_universal_component.hpp for details.
+// The implementation is a thin layer around a "RAM universal component", which is
+// where most of the work is done. See components/ram_universal_component.hpp for details.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_RAM_TO_R1CS_HPP_

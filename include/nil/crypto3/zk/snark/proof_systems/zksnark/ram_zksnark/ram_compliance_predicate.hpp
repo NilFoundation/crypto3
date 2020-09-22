@@ -22,7 +22,7 @@
 // of memory. The third mostly consists of bookkeeping (with some subtleties arising
 // from the need to not break zero knowledge).
 //
-// The laying out of R1CS constraints is done via gadgetlib1 (a minimalistic
+// The laying out of R1CS constraints is done via componentlib1 (a minimalistic
 // library for writing R1CS constraint systems).
 //
 // References:
@@ -468,7 +468,7 @@ namespace nil {
                     // TODO: assert that message has fields of lengths consistent with num_addresses/value_size (as a
                     // method for ram_message) choose a constant for timestamp_len check that value_size <= digest_size;
                     // digest_size is not assumed to fit in chunk size (more precisely, it is handled correctly in the
-                    // other gadgets). check if others fit (timestamp_length, value_size, addr_size)
+                    // other components). check if others fit (timestamp_length, value_size, addr_size)
 
                     // the variables allocated are: next, cur, local data (nil for us), is_base_case, witness
 

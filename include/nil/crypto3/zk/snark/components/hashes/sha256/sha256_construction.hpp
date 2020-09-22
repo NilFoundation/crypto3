@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for gadgets for the SHA256 message schedule and round function.
+// @file Declaration of interfaces for components for the SHA256 message schedule and round function.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_SHA256_COMPONENTS_HPP

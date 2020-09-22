@@ -248,7 +248,7 @@ namespace nil {
                     local_data.allocate(pb, compliance_predicate.local_data_length);
                     cp_witness.allocate(pb, compliance_predicate.witness_length);
 
-                    /* convert compliance predicate from a constraint system into a gadget */
+                    /* convert compliance predicate from a constraint system into a component */
                     pb_variable_array<FieldType> incoming_messages_concat;
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         incoming_messages_concat.insert(incoming_messages_concat.end(),

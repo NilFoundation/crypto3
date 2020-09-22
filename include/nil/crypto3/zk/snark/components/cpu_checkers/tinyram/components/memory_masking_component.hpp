@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM consistency enforcer gadget.
+// @file Declaration of interfaces for the TinyRAM consistency enforcer component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP
@@ -21,12 +21,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * The memory masking gadget checks if a specified part of a double
+                 * The memory masking component checks if a specified part of a double
                  * word is correctly modified. In TinyRAM CPU checker we use this to
                  * implement byte addressing and word addressing for the memory that
                  * consists of double words.
                  *
-                 * More precisely, memory masking gadgets takes the following
+                 * More precisely, memory masking components takes the following
                  * arguments:
                  *
                  * dw_contents_prev, dw_contents_next -- the contents of the memory
@@ -42,7 +42,7 @@ namespace nil {
                  *
                  * subcontents -- contents of the byte, resp., word to be operated on
                  *
-                 * Memory masking gadget enforces that dw_contents_prev is equal to
+                 * Memory masking component enforces that dw_contents_prev is equal to
                  * dw_contents_next everywhere, except subaddres-th byte (if
                  * access_is_byte = 1), or MSB(subaddress)-th word (if access_is_word =
                  * 1). The corresponding byte, resp., word in dw_contents_next is

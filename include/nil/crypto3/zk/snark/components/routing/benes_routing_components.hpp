@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the Benes routing gadget.
+// @file Declaration of interfaces for the Benes routing component.
 //
-// The gadget verifies that the outputs are a permutation of the inputs,
+// The component verifies that the outputs are a permutation of the inputs,
 // by use of a Benes network.
 //---------------------------------------------------------------------------//
 

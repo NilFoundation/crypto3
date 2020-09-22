@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for G1 gadgets.
+// @file Declaration of interfaces for G1 components.
 //
-// The gadgets verify curve arithmetic in G1 = E(F) where E/F: y^2 = x^3 + A * X + B
+// The components verify curve arithmetic in G1 = E(F) where E/F: y^2 = x^3 + A * X + B
 // is an elliptic curve over F in short Weierstrass form.
 //---------------------------------------------------------------------------//
 

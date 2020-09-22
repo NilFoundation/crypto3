@@ -9,7 +9,7 @@
 // @file Declaration of interfaces for ram_universal_component.
 //
 // Given bounds on a RAM computation size (program size bound, primary input
-// size bound, and time bound), the "RAM universal gadget" checks the correct
+// size bound, and time bound), the "RAM universal component" checks the correct
 // execution of any RAM computation that fits the bounds.
 //
 // The implementation follows, extends, and optimizes the approach described
@@ -17,7 +17,7 @@
 // the template parameter RAMType, in order to support any RAM that fits certain
 // abstract interfaces.
 //
-// Roughly, the gadget has three main components:
+// Roughly, the component has three main components:
 // - For each time step, a copy of a *execution checker* (which is the RAM CPU checker).
 // - For each time step, a copy of a *memory checker* (which verifies memory consistency
 //   between two 'memory lines' that are adjacent in a memory sort).

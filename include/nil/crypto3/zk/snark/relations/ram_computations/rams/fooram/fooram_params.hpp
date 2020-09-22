@@ -26,7 +26,7 @@ namespace nil {
                 public:
                     typedef FieldType base_field_type;
                     typedef fooram_protoboard<FieldType> protoboard_type;
-                    typedef fooram_component<FieldType> gadget_base_type;
+                    typedef fooram_component<FieldType> component_base_type;
                     typedef fooram_cpu_checker<FieldType> cpu_checker_type;
                     typedef fooram_architecture_params architecture_params_type;
 

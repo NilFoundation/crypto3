@@ -39,7 +39,7 @@ namespace nil {
                     tinyram_component(tinyram_blueprint<FieldType> &pb);
                 };
 
-                // standard gadgets provide two methods: generate_r1cs_constraints and generate_r1cs_witness
+                // standard components provide two methods: generate_r1cs_constraints and generate_r1cs_witness
                 template<typename FieldType>
                 class tinyram_standard_component : public tinyram_component<FieldType> {
                 public:

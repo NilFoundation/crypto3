@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM ALU control-flow gadgets.
+// @file Declaration of interfaces for the TinyRAM ALU control-flow components.
 //
-// This gadget check the correct execution of control-flow TinyRAM instructions.
+// This component check the correct execution of control-flow TinyRAM instructions.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP
@@ -23,7 +23,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                /* control flow gadgets */
+                /* control flow components */
                 template<typename FieldType>
                 class ALU_control_flow_component : public tinyram_standard_component<FieldType> {
                 public:

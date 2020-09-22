@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for (single and double) word gadgets.
+// @file Declaration of interfaces for (single and double) word components.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP

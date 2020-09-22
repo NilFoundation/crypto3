@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for Fp2 gadgets.
+// @file Declaration of interfaces for Fp2 components.
 //
-// The gadgets verify field arithmetic in Fp2 = Fp[U]/(U^2-non_residue),
+// The components verify field arithmetic in Fp2 = Fp[U]/(U^2-non_residue),
 // where non_residue is in Fp.
 //---------------------------------------------------------------------------//
 

@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the knapsack gadget.
+// @file Declaration of interfaces for the knapsack component.
 //
-// The gadget checks the correct execution of a knapsack (modular subset-sum) over
+// The component checks the correct execution of a knapsack (modular subset-sum) over
 // the field specified in the template parameter. With suitable choices of parameters
 // such knapsacks are collision-resistant hashes (CRHs). See \[Ajt96] and \[GGH96].
 //
@@ -17,14 +17,14 @@
 // to F^d by sending x to M*x. Security of the function (very roughly) depends on
 // d*log(|F|).
 //
-// Below, we give two different gadgets:
+// Below, we give two different components:
 // - knapsack_CRH_with_field_out_component, which verifies H_M
 // - knapsack_crh_with_bit_out_component, which verifies H_M when its output is "expanded" to bits.
 // In both cases, a method ("sample_randomness") allows to sample M.
 //
 // The parameter d (the dimension) is fixed at compile time in the struct
 // knapsack_dimension below. The parameter m (the input length) can be chosen
-// at run time (in either gadget).
+// at run time (in either component).
 //
 //
 // References:

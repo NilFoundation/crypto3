@@ -89,7 +89,6 @@ namespace nil {
 
                     return ans;
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

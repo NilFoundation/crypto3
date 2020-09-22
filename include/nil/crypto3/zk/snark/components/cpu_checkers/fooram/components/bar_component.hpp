@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for an auxiliarry gadget for the FOORAM CPU.
+// @file Declaration of interfaces for an auxiliarry component for the FOORAM CPU.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BAR_GADGET_HPP
@@ -21,12 +21,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * The bar gadget checks linear combination
+                 * The bar component checks linear combination
                  *                   Z = aX + bY (mod 2^w)
                  * for a, b - const, X, Y - vectors of w bits,
                  * where w is implicitly inferred, Z - a packed variable.
                  *
-                 * This gadget is used four times in fooram:
+                 * This component is used four times in fooram:
                  * - PC' = PC + 1
                  * - load_addr = 2 * x + PC'
                  * - store_addr = x + PC

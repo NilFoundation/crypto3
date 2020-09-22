@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the exponentiation gadget.
+// @file Declaration of interfaces for the exponentiation component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_EXPONENTIATION_GADGET_HPP_
@@ -27,9 +27,9 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * The exponentiation gadget verifies field exponentiation in the field F_{p^k}.
+                 * The exponentiation component verifies field exponentiation in the field F_{p^k}.
                  *
-                 * Note that the power is a constant (i.e., hardcoded into the gadget).
+                 * Note that the power is a constant (i.e., hardcoded into the component).
                  */
                 template<typename FpkT,
                          template<class>

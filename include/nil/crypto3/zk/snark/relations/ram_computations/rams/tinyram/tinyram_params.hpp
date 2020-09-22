@@ -28,7 +28,7 @@ namespace nil {
 
                     typedef FieldType base_field_type;
                     typedef tinyram_blueprint<FieldType> protoboard_type;
-                    typedef tinyram_component<FieldType> gadget_base_type;
+                    typedef tinyram_component<FieldType> component_base_type;
                     typedef tinyram_cpu_checker<FieldType> cpu_checker_type;
                     typedef tinyram_architecture_params architecture_params_type;
                 };

@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the FOORAM CPU checker gadget.
+// @file Declaration of interfaces for the FOORAM CPU checker component.
 //
-// The gadget checks the correct operation for the CPU of the FOORAM architecture.
+// The component checks the correct operation for the CPU of the FOORAM architecture.
 //
 // In FOORAM, the only instruction is FOO(x) and its encoding is x.
 // The instruction FOO(x) has the following semantics:

@@ -30,7 +30,7 @@ namespace nil {
 
                   For ram_to_r1cs reduction currently the following are also necessary:
                   protoboard_type (e.g. tinyram_protoboard<FieldType>)
-                  gadget_base_type (e.g. tinyram_component<FieldType>)
+                  component_base_type (e.g. tinyram_component<FieldType>)
                   cpu_state_variable_type (must have pb_variable_array<FieldType> all_vars)
 
                   The RAMType class must also have a static std::size_t variable
@@ -51,7 +51,7 @@ namespace nil {
                 using ram_protoboard = typename RAMType::protoboard_type;
 
                 template<typename RAMType>
-                using ram_component_base = typename RAMType::gadget_base_type;
+                using ram_component_base = typename RAMType::component_base_type;
 
                 template<typename RAMType>
                 using ram_cpu_checker = typename RAMType::cpu_checker_type;

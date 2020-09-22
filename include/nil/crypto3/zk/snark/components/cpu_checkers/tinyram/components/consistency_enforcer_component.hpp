@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM consistency enforcer gadget.
+// @file Declaration of interfaces for the TinyRAM consistency enforcer component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
@@ -186,7 +186,7 @@ namespace nil {
                       (1-indicator) * (new-old) = 0
 
                       In order to save constraints we "borrow" indicator variables
-                      from loose multiplexing gadget.
+                      from loose multiplexing component.
                     */
                     for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(

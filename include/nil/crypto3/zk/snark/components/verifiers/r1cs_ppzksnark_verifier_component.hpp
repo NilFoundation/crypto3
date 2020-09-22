@@ -6,10 +6,10 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the the R1CS ppzkSNARK verifier gadget.
+// @file Declaration of interfaces for the the R1CS ppzkSNARK verifier component.
 //
-// The gadget r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark_verifier_strong_IC.
-// The gadget is built from two main sub-gadgets:
+// The component r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark_verifier_strong_IC.
+// The component is built from two main sub-components:
 // - r1cs_ppzksnark_verifier_process_vk_component, which verifies correct computation of
 // r1cs_ppzksnark_verifier_process_vk, and
 // - r1cs_ppzksnark_online_verifier_component, which verifies correct computation of

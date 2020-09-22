@@ -17,7 +17,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                // for now all CRH gadgets are knapsack CRH's; can be easily extended
+                // for now all CRH components are knapsack CRH's; can be easily extended
                 // later to more expressive selector types.
                 template<typename FieldType>
                 using crh_with_field_out_component = knapsack_crh_with_field_out_component<FieldType>;

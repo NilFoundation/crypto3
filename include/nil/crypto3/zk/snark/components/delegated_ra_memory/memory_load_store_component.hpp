@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the memory load&store gadget.
+// @file Declaration of interfaces for the memory load&store component.
 //
-// The gadget can be used to verify a memory load, followed by a store to the
+// The component can be used to verify a memory load, followed by a store to the
 // same address, from a "delegated memory".
 //---------------------------------------------------------------------------//
 

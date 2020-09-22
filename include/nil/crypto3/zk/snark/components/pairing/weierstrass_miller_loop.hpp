@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for gadgets for Miller loops.
+// @file Declaration of interfaces for components for Miller loops.
 //
-// The gadgets verify computations of (single or multiple simultaneous) Miller loops.
+// The components verify computations of (single or multiple simultaneous) Miller loops.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP
@@ -34,7 +34,7 @@ namespace nil {
                  *
                  *(later in Miller loop: f = f.squared() * g_RR_at_P)
                  *
-                 * Note the slight interface change: this gadget allocates g_RR_at_P inside itself (!)
+                 * Note the slight interface change: this component allocates g_RR_at_P inside itself (!)
                  */
                 template<typename CurveType>
                 class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
@@ -69,7 +69,7 @@ namespace nil {
                  *
                  * (later in Miller loop: f = f * g_RQ_at_P)
                  *
-                 * Note the slight interface change: this gadget will allocate g_RQ_at_P inside itself (!)
+                 * Note the slight interface change: this component will allocate g_RQ_at_P inside itself (!)
                  */
                 template<typename CurveType>
                 class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
@@ -257,7 +257,7 @@ namespace nil {
                   (later in Miller loop: f = f.squared() * g_RR_at_P)
                 */
 
-                /* Note the slight interface change: this gadget will allocate g_RR_at_P inside itself (!) */
+                /* Note the slight interface change: this component will allocate g_RR_at_P inside itself (!) */
                 template<typename CurveType>
                 mnt_miller_loop_dbl_line_eval<CurveType>::mnt_miller_loop_dbl_line_eval(
                     blueprint<FieldType> &pb,
@@ -321,7 +321,7 @@ namespace nil {
                   If invert_Q is set to true: use -QY in place of QY everywhere above.
                 */
 
-                /* Note the slight interface change: this gadget will allocate g_RQ_at_P inside itself (!) */
+                /* Note the slight interface change: this component will allocate g_RQ_at_P inside itself (!) */
                 template<typename CurveType>
                 mnt_miller_loop_add_line_eval<CurveType>::mnt_miller_loop_add_line_eval(
                     blueprint<FieldType> &pb,

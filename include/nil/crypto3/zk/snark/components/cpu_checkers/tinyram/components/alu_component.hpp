@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM ALU gadget.
+// @file Declaration of interfaces for the TinyRAM ALU component.
 //
-// The gadget checks the correct execution of a given TinyRAM instruction.
+// The component checks the correct execution of a given TinyRAM instruction.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_ALU_GADGET_HPP

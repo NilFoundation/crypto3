@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM argument decoder gadget.
+// @file Declaration of interfaces for the TinyRAM argument decoder component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP

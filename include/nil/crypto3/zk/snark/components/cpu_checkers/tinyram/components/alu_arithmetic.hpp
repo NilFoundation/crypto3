@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM ALU arithmetic gadgets.
+// @file Declaration of interfaces for the TinyRAM ALU arithmetic components.
 //
-// This gadget check the correct execution of arithmetic TinyRAM instructions.
+// This component check the correct execution of arithmetic TinyRAM instructions.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_ALU_ARITHMETIC_HPP
@@ -39,7 +39,7 @@ namespace nil {
                     }
                 }
 
-                /* arithmetic gadgets */
+                /* arithmetic components */
                 template<typename FieldType>
                 class ALU_arithmetic_component : public tinyram_standard_component<FieldType> {
                 public:
@@ -1474,7 +1474,7 @@ namespace nil {
                     pack_top->generate_r1cs_constraints(false);
 
                     /*
-                      the gadgets below are typename FieldType::value_type specific:
+                      the components below are typename FieldType::value_type specific:
                       I * X = (1-R)
                       R * X = 0
 

@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a gadget that can be created from an R1CS constraint system.
+// @file Declaration of interfaces for a component that can be created from an R1CS constraint system.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_GADGET_FROM_R1CS_HPP

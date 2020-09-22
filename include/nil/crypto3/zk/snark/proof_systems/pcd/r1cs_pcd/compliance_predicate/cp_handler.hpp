@@ -9,7 +9,7 @@
 // @file Declaration of interfaces for a compliance predicate handler.
 //
 // A compliance predicate handler is a base class for creating compliance predicates.
-// It relies on classes declared in gadgets.
+// It relies on classes declared in components.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_CP_HANDLER_HPP_
@@ -125,7 +125,7 @@ namespace nil {
                 template<typename FieldType>
                 void r1cs_pcd_message_variable<FieldType>::update_all_vars() {
                     /* NOTE: this assumes that r1cs_pcd_message_variable has been the
-                     * only gadget allocating variables on the protoboard and needs to
+                     * only component allocating variables on the protoboard and needs to
                      * be updated, e.g., in multicore variable allocation scenario. */
 
                     for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();

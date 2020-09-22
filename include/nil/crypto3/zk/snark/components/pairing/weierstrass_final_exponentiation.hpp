@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for final exponentiation gadgets.
+// @file Declaration of interfaces for final exponentiation components.
 //
-// The gadgets verify final exponentiation for Weiersrass curves with embedding
+// The components verify final exponentiation for Weiersrass curves with embedding
 // degrees 4 and 6.
 //---------------------------------------------------------------------------//
 

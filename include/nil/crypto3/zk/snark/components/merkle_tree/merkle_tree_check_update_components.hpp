@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the Merkle tree check update gadget.
+// @file Declaration of interfaces for the Merkle tree check update component.
 //
-// The gadget checks the following: given two roots R1 and R2, address A, two
+// The component checks the following: given two roots R1 and R2, address A, two
 // values V1 and V2, and authentication path P, check that
 // - P is a valid authentication path for the value V1 as the A-th leaf in a Merkle tree with root R1, and
 // - P is a valid authentication path for the value V2 as the A-th leaf in a Merkle tree with root R2.

@@ -147,7 +147,7 @@ namespace nil {
                 };
 
                 /*
-                  the gadgets below are Fp specific:
+                  the components below are Fp specific:
                   I * X = R
                   (1-R) * X = 0
 
@@ -673,7 +673,7 @@ namespace nil {
                       therefore alpha_n = less_or_eq and alpha_n * not_all_zeros = less
                      */
 
-                    /* not_all_zeros to be Boolean, alpha_i are Boolean by packing gadget */
+                    /* not_all_zeros to be Boolean, alpha_i are Boolean by packing component */
                     generate_boolean_r1cs_constraint<FieldType>(this->pb, not_all_zeros);
 
                     /* constraints for packed(alpha) = 2^n + B - A */

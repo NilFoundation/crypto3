@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for memory_checker_component, a gadget that verifies the
+// @file Declaration of interfaces for memory_checker_component, a component that verifies the
 // consistency of two accesses to memory that are adjacent in a "memory sort".
 //---------------------------------------------------------------------------//
 

@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for pairing precomputation gadgets.
+// @file Declaration of interfaces for pairing precomputation components.
 //
-// The gadgets verify correct precomputation of values for the G1 and G2 variables.
+// The components verify correct precomputation of values for the G1 and G2 variables.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_WEIERSTRASS_PRECOMPUTATION_HPP
@@ -33,7 +33,7 @@ namespace nil {
                 /**************************** G1 Precomputation ******************************/
 
                 /**
-                 * Not a gadget. It only holds values.
+                 * Not a component. It only holds values.
                  */
                 template<typename CurveType>
                 class G1_precomputation {
@@ -110,7 +110,7 @@ using fqk_type = typename ;
                 /**************************** G2 Precomputation ******************************/
 
                 /**
-                 * Not a gadget. It only holds values.
+                 * Not a component. It only holds values.
                  */
                 template<typename CurveType>
                 class precompute_G2_component_coeffs {
@@ -130,7 +130,7 @@ using fqk_type = typename ;
                 };
 
                 /**
-                 * Not a gadget. It only holds values.
+                 * Not a component. It only holds values.
                  */
                 template<typename CurveType>
                 class G2_precomputation {

@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of selector for the pairing gadget.
+// @file Declaration of selector for the pairing component.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_PAIRING_PARAMS_HPP_
@@ -18,7 +18,7 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * The interfaces of pairing gadgets are templatized via the parameter
+                 * The interfaces of pairing components are templatized via the parameter
                  * ec_ppT. When used, the interfaces must be invoked with
                  * a particular parameter choice; let 'my_ec_pp' denote this choice.
                  *

@@ -6,11 +6,11 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for pairing-check gadgets.
+// @file Declaration of interfaces for pairing-check components.
 //
 // Given that e(.,.) denotes a pairing,
-// - the gadget "check_e_equals_e_component" checks the equation "e(P1,Q1)=e(P2,Q2)"; and
-// - the gadget "check_e_equals_ee_component" checks the equation "e(P1,Q1)=e(P2,Q2)*e(P3,Q3)".
+// - the component "check_e_equals_e_component" checks the equation "e(P1,Q1)=e(P2,Q2)"; and
+// - the component "check_e_equals_ee_component" checks the equation "e(P1,Q1)=e(P2,Q2)*e(P3,Q3)".
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_PAIRING_CHECKS_HPP_

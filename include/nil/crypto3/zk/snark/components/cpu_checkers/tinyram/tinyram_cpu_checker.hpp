@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for the TinyRAM CPU checker gadget.
+// @file Declaration of interfaces for the TinyRAM CPU checker component.
 //
-// The gadget checks the correct operation for the CPU of the TinyRAM architecture.
+// The component checks the correct operation for the CPU of the TinyRAM architecture.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP

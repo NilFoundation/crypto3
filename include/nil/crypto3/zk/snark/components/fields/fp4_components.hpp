@@ -6,9 +6,9 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for Fp4 gadgets.
+// @file Declaration of interfaces for Fp4 components.
 //
-// The gadgets verify field arithmetic in Fp4 = Fp2[V]/(V^2-U) where
+// The components verify field arithmetic in Fp4 = Fp2[V]/(V^2-U) where
 // Fp2 = Fp[U]/(U^2-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
@@ -116,7 +116,7 @@ namespace nil {
                 };
 
                 /**
-                 * Alias default multiplication gadget
+                 * Alias default multiplication component
                  */
                 template<typename Fp4T>
                 using Fp4_mul_component = Fp4_direct_mul_component<Fp4T>;
