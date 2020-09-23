@@ -42,8 +42,6 @@ namespace nil {
 
                         element_fp(int data) : data(data, modulus) {};
 
-                        element_fp(size_t data) : data(data, modulus) {};
-
                         element_fp(const element_fp &B) {
                             data = B.data;
                         };
