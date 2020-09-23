@@ -16,10 +16,10 @@
 // namespace nil {
 //     namespace crypto3 {
 //         namespace hashes {
-//             template<typename FieldT, typename element_type, std::size_t t, bool strength>
+//             template<typename FieldType, typename element_type, std::size_t t, bool strength>
 //             class poseidon_compressor {
 //             protected:
-//                 typedef detail::poseidon_functions<FieldT, element_type, t, strength> policy_type;
+//                 typedef detail::poseidon_functions<FieldType, element_type, t, strength> policy_type;
 
 //             public:
 //                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -47,10 +47,10 @@
 //                 }
 //             };
 
-//             template<typename FieldT, typename element_type, std::size_t t, bool strength>
+//             template<typename FieldType, typename element_type, std::size_t t, bool strength>
 //             struct poseidon {
 //             protected:
-//                 typedef detail::poseidon_policy<FieldT, element_type, t, strength> policy_type;
+//                 typedef detail::poseidon_policy<FieldType, element_type, t, strength> policy_type;
 
 //             public:
 //                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -72,7 +72,7 @@
 //                     };
 
 //                     typedef sponge_construction<
-//                         params_type, typename policy_type::iv_generator, poseidon_compressor<FieldT, element_type, t,
+//                         params_type, typename policy_type::iv_generator, poseidon_compressor<FieldType, element_type, t,
 //                         strength>,
 //                         // TODO: padding and finalizer
 //                         detail::poseidon_padding<policy_type>, detail::poseidon_finalizer<policy_type>>
