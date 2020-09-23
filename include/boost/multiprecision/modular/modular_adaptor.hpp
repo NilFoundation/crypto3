@@ -180,12 +180,8 @@ class modular_adaptor
 
    inline void negate()
    {
-      typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
       base_data().negate();
-      while (eval_lt(base_data(), ui_type(0u)))
-      {
-         eval_add(base_data(), mod_data().get_mod().backend());
-      }
+      eval_add(base_data(), mod_data().get_mod().backend());
    }
 
    template <typename BackendT, expression_template_option ExpressionTemplates>
@@ -217,6 +213,7 @@ template <class Backend>
 inline void eval_redc(Backend& result, const modular_params<Backend>& mod)
 {
    mod.reduce(result);
+   eval_modulus(result, mod.get_mod().backend());
 }
 
 template <class Backend>
@@ -239,7 +236,7 @@ inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adapto
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
    using default_ops::eval_lt;
    eval_subtract(result.base_data(), o.base_data());
-   while (eval_lt(result.base_data(), ui_type(0u)))
+   if (eval_lt(result.base_data(), ui_type(0u)))
    {
       eval_add(result.base_data(), result.mod_data().get_mod().backend());
    }
