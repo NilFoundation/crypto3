@@ -134,7 +134,7 @@ namespace nil {
                 using value_type = typename FieldType::value_type;
 
                 const size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
-                value_type omega = detail::unity_root<value_type>(n);
+                value_type omega = detail::unity_root<FieldType>(n);
 
                 std::vector<value_type> u(a);
                 std::vector<value_type> v(b);

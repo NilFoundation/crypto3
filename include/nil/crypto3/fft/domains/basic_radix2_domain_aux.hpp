@@ -53,7 +53,7 @@ namespace nil {
                     size_t m = 1;    // invariant: m = 2^{s-1}
                     for (size_t s = 1; s <= logn; ++s) {
                         // w_m is 2^s-th root of unity now
-                        const value_type w_m = omega ^ (n / (2 * m));
+                        const value_type w_m = omega.pow(n / (2 * m));
 
                         asm volatile("/* pre-inner */");
                         for (size_t k = 0; k < n; k += 2 * m) {

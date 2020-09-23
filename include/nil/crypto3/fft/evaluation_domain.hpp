@@ -70,6 +70,86 @@ namespace nil {
                     typedef std::conditional<is_basic_radix2_domain<MinSize>::value,
                                              basic_radix2_domain<FieldType, MinSize>, void>::type domain_type;
                 };*/
+
+                template<typename FieldType, std::size_t MinSize>
+                struct domain_switch {
+
+                    typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
+
+                    constexpr static const std::size_t big = 1ul << (boost::static_log2<MinSize>::value - 1);
+                    constexpr static const std::size_t rounded_small = (1ul << boost::static_log2<MinSize - big>::value);
+
+                    typename std::enable_if<is_basic_radix2_domain<FieldType, MinSize>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new basic_radix2_domain<FieldType, MinSize>());
+                        return result;
+                    }
+
+                    typename std::enable_if<!is_basic_radix2_domain<FieldType, MinSize>::value && 
+                                             is_basic_radix2_domain<FieldType, big + rounded_small>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new basic_radix2_domain<FieldType, big + rounded_small>());
+                        return result;
+                    }
+
+                    typename std::enable_if<is_extended_radix2_domain<FieldType, MinSize>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new extended_radix2_domain<FieldType, MinSize>());
+                        return result;
+                    }
+
+                    typename std::enable_if<!is_extended_radix2_domain<FieldType, MinSize>::value &&
+                                             is_extended_radix2_domain<FieldType, big + rounded_small>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new extended_radix2_domain<FieldType, big + rounded_small>());
+                        return result;
+                    }
+
+                    typename std::enable_if<is_step_radix2_domain<FieldType, MinSize>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new step_radix2_domain<FieldType, MinSize>());
+                        return result;
+                    }
+
+                    typename std::enable_if<!is_step_radix2_domain<FieldType, MinSize>::value && 
+                                             is_step_radix2_domain<FieldType, big + rounded_small>::value, ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new step_radix2_domain<FieldType, big + rounded_small>());
+                        return result;
+                    }
+
+                    typename std::enable_if<FieldType::geometric_generator() != FieldType::zero(), ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new geometric_sequence_domain<FieldType, MinSize>());
+                        return result;
+                    }
+
+                    typename std::enable_if<FieldType::arithmetic_generator() != FieldType::zero(), ret_type>::type 
+                        get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new arithmetic_sequence_domain<FieldType, MinSize>());
+                        return result;
+                    }
+                };
+
+                template<std::size_t MinSize>
+                struct domain_switch<std::complex<double>, MinSize> {
+
+                    typedef std::shared_ptr<evaluation_domain<std::complex<double>, MinSize>> ret_type;
+
+                    ret_type get_evaluation_domain() {
+                        ret_type result;
+                        result.reset(new basic_radix2_domain<std::complex<double>, MinSize>());
+                        return result;
+                    }
+                };
             }    // namespace detail
 
             /**
