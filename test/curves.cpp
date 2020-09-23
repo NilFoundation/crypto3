@@ -200,11 +200,9 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
     BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
-    CurveGroup p1_copy(points[p1]);
-    p1_copy.to_affine_coordinates();
+    CurveGroup p1_copy = CurveGroup(points[p1]).to_affine_coordinates();
     BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
-    CurveGroup p2_copy(points[p2]);
-    p2_copy.to_special();
+    CurveGroup p2_copy = CurveGroup(points[p2]).to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 }
 
