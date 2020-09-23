@@ -193,7 +193,7 @@ namespace nil {
                     constexpr static const std::size_t part_rounds = Strength ? 77 : 61;
                 };
 
-                // continue define partial specialized temlate classes for each arity separately...
+                // continue define partial specialized template classes for each arity separately...
 
             }    // namespace detail
         }        // namespace hashes
