@@ -73,12 +73,12 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef sponge_construction<params_type, typename policy_type::iv_generator,
-                                                poseidon_compressor<FieldType, Arity, strength>,
-                                                // TODO: padding and finalizer
-                                                detail::poseidon_padding<policy_type>,
-                                                detail::poseidon_finalizer<policy_type>>
-                        type;
+                    // typedef sponge_construction<params_type, typename policy_type::iv_generator,
+                    //                             poseidon_compressor<FieldType, Arity, strength>,
+                    //                             // TODO: padding and finalizer
+                    //                             detail::poseidon_padding<policy_type>,
+                    //                             detail::poseidon_finalizer<policy_type>>
+                    //     type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
