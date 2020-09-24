@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -20,10 +21,13 @@ namespace nil {
                 // filecoin oriented implementation
                 template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_functions {
-                    typedef poseidon_policy<FieldType, Arity, strength> policy_type;
-                    typedef poseidon_constants_operator<FieldType, Arity, strength> policy_constants_operator_t;
-                    typedef typename FieldType::value_type element_type;
-                    typedef typename policy_constants_operator_t::state_vector_type state_vector_type;
+                    typedef FieldType field_type;
+
+                    typedef poseidon_policy<field_type, Arity, strength> policy_type;
+                    typedef poseidon_constants_operator<FieldType, Arity, strength> constants_operator_policy_type;
+
+                    typedef typename field_type::value_type element_type;
+                    typedef typename constants_operator_policy_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_bits = policy_type::state_bits;
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -40,14 +44,12 @@ namespace nil {
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t grain_lfsr_state_len = 80;
-
-                    constexpr static const policy_constants_operator_t get_policy_constant_operator() {
-                        return policy_constants_operator_t();
+                    constexpr static constants_operator_policy_type get_policy_constant_operator() {
+                        return constants_operator_policy_type();
                     }
 
                     // add constexpr
-                    static inline policy_constants_operator_t policy_constants_operator =
+                    static inline constants_operator_policy_type policy_constants_operator =
                         get_policy_constant_operator();
 
                     static inline void permute(state_type &A) {

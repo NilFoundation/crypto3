@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -21,7 +22,7 @@ namespace nil {
                  * @brief Poseidon internal parameters
                  * @tparam FieldType type of field
                  * @tparam Arity arity of input block for Poseidon permutation in field elements
-                 * @tparam Strength mode of Poseidon permutatuion
+                 * @tparam Strength mode of Poseidon permutation
                  */
                 template<typename FieldType, std::size_t Arity, bool Strength>
                 struct base_poseidon_policy {

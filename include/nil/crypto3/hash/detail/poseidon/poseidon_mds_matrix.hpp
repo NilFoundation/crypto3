@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -57,7 +58,7 @@ namespace nil {
                     inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
                                                                    std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
-                                            round_number < half_full_rounds + part_rounds,
+                                             round_number < half_full_rounds + part_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix");
                         const std::size_t matrix_number_base = part_rounds - (round_number - half_full_rounds) - 1;
                         const substate_vector_type &v = get_v(matrix_number_base);
@@ -73,7 +74,7 @@ namespace nil {
                         }
                     }
 
-                // private:
+                    // private:
                     constexpr inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
@@ -87,8 +88,8 @@ namespace nil {
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
-                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix)
-                            : M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
+                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
+                            M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
                             substate_vector_type M_mul_column_slice;
@@ -96,8 +97,8 @@ namespace nil {
                             for (std::size_t i = 0; i < part_rounds; i++) {
                                 M_hat_inverse =
                                     algebra::inverse(algebra::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
-                                w_hat_list[i] = algebra::matvectmul(M_hat_inverse,
-                                    algebra::slice<state_words - 1>(M_mul.column(0), 1));
+                                w_hat_list[i] = algebra::matvectmul(
+                                    M_hat_inverse, algebra::slice<state_words - 1>(M_mul.column(0), 1));
                                 v_list[i] = algebra::slice<state_words - 1>(M_mul.row(0), 1);
                                 for (std::size_t j = 1; j < state_words; j++) {
                                     for (std::size_t k = 1; k < state_words; k++) {
@@ -128,11 +129,10 @@ namespace nil {
                         return equivalent_mds_matrix.M_i;
                     }
 
-                    constexpr poseidon_mds_matrix()
-                        : mds_matrix(generate_mds_matrix()),
-                          mds_matrix_inverse(algebra::inverse(mds_matrix)),
-                          equivalent_mds_matrix(mds_matrix)
-                    {}
+                    constexpr poseidon_mds_matrix() :
+                        mds_matrix(generate_mds_matrix()), mds_matrix_inverse(algebra::inverse(mds_matrix)),
+                        equivalent_mds_matrix(mds_matrix) {
+                    }
 
                     mds_matrix_type mds_matrix;
                     mds_matrix_type mds_matrix_inverse;

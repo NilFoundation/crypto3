@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -47,10 +48,10 @@ namespace nil {
                 }
             };
 
-            template<typename FieldType, std::size_t t, bool strength>
+            template<typename FieldType, std::size_t Arity, bool strength>
             struct poseidon {
             protected:
-                typedef detail::poseidon_policy<FieldType, t, strength> policy_type;
+                typedef detail::poseidon_policy<FieldType, Arity, strength> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -71,10 +72,11 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef sponge_construction<
-                        params_type, typename policy_type::iv_generator, poseidon_compressor<FieldType, t, strength>,
-                        // TODO: padding and finalizer
-                        detail::poseidon_padding<policy_type>, detail::poseidon_finalizer<policy_type>>
+                    typedef sponge_construction<params_type, typename policy_type::iv_generator,
+                                                poseidon_compressor<FieldType, Arity, strength>,
+                                                // TODO: padding and finalizer
+                                                detail::poseidon_padding<policy_type>,
+                                                detail::poseidon_finalizer<policy_type>>
                         type;
                 };
 
