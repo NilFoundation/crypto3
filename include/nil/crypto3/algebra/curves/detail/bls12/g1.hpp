@@ -36,6 +36,8 @@ namespace nil {
 
                         using underlying_field_type_value = g1_field_type_value;
 
+                        constexpr static const std::size_t size_in_bits =  policy_type::g1_field_type::size_in_bits + 1;
+
                         underlying_field_type_value p[3];
                         underlying_field_type_value &X = p[0];
                         underlying_field_type_value &Y = p[1];
@@ -306,6 +308,8 @@ namespace nil {
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_type_value = g1_field_type_value;
+
+                        constexpr static const std::size_t size_in_bits =  policy_type::g1_field_type::size_in_bits;
 
                         underlying_field_type_value p[3];
 

@@ -54,8 +54,8 @@ namespace nil {
 
                     typedef typename detail::element_fp4<extension_policy> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 4;
+                    constexpr static const std::size_t size_in_bits = arity * modulus_bits;
                 };
 
                 template<typename BaseField>
