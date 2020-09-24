@@ -125,8 +125,8 @@ namespace nil {
                     std::size_t size_in_bits() const {
                         return 128 /*(algebra::size_in_bits(A_query) + B_query.size_in_bits() +
                                 algebra::size_in_bits(H_query) + algebra::size_in_bits(L_query) +
-                                1 * typename CurveType::g1_type::size_in_bits() +
-                                1 * typename CurveType::g2_type::size_in_bits())*/;
+                                1 * typename CurveType::g1_type::size_in_bits +
+                                1 * typename CurveType::g2_type::size_in_bits)*/;
 
                         // uncomment
                         // when size_in_bits ready
@@ -178,7 +178,7 @@ namespace nil {
 
                     std::size_t size_in_bits() const {
                         // TODO: include GT size
-                        return (gamma_ABC_g1.size_in_bits() + 2 * typename CurveType::g2_type::size_in_bits());
+                        return (gamma_ABC_g1.size_in_bits() + 2 * typename CurveType::g2_type::size_in_bits);
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_verification_key<CurveType> &other) const {
@@ -294,8 +294,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits() +
-                               G2_size() * typename CurveType::g2_type::size_in_bits();
+                        return G1_size() * typename CurveType::g1_type::size_in_bits +
+                               G2_size() * typename CurveType::g2_type::size_in_bits;
                     }
 
                     bool is_well_formed() const {
@@ -399,10 +399,7 @@ namespace nil {
 
                     const typename CurveType::g1_type g1_generator = curve_random_element<typename CurveType::g1_type>();
                     const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables;
-                    const std::size_t g1_scalar_size = 128;
-                        //CurveType::scalar_field_type::size_in_bits;
-                        // uncomment
-                        // when size_n_bits ready
+                    const std::size_t g1_scalar_size = CurveType::scalar_field_type::size_in_bits;
                     const std::size_t g1_window_size = 128;
                         //algebra::get_exp_window_size<typename CurveType::g1_type>(g1_scalar_count);
                         // uncomment
@@ -416,10 +413,7 @@ namespace nil {
 
                     const typename CurveType::g2_type G2_gen = curve_random_element<typename CurveType::g2_type>();
                     const std::size_t g2_scalar_count = non_zero_Bt;
-                    const std::size_t g2_scalar_size = 128;
-                    //CurveType::scalar_field_type::size_in_bits;
-                        // uncomment
-                        // when size_n_bits ready
+                    const std::size_t g2_scalar_size = CurveType::scalar_field_type::size_in_bits;
                     std::size_t g2_window_size = 128;
                         //algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
                         // uncomment
@@ -454,7 +448,7 @@ namespace nil {
 #endif
 
                     knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query /*=
-                        kc_batch_exp(CurveType::scalar_field_type::size_in_bits(), g2_window_size, g1_window_size,
+                        kc_batch_exp(CurveType::scalar_field_type::size_in_bits, g2_window_size, g1_window_size,
                                      g2_table, g1_table, CurveType::scalar_field_type::value_type::one(),
                                      CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/;
 
