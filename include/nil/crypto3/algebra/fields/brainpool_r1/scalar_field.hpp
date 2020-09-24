@@ -51,6 +51,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<160, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -73,6 +74,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<192, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -95,6 +97,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<224, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -117,6 +120,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<256, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -139,6 +143,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<320, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -161,6 +166,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<384, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -183,6 +189,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<512, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 

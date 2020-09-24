@@ -52,6 +52,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<bls12_scalar_field<381, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -64,6 +65,9 @@ namespace nil {
 
                     typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::number_type number_type;
+                    
                     constexpr static const modulus_type modulus =
                         0x12AB655E9A2CA55660B44D1E5C37B00159AA76FED00000010A11800000000001_cppui253;
 
@@ -74,8 +78,24 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<bls12_scalar_field<377, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
+
+                constexpr typename std::size_t const
+                    bls12_scalar_field<381, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const
+                    bls12_scalar_field<377, CHAR_BIT>::modulus_bits;
+
+                constexpr typename std::size_t const
+                    bls12_scalar_field<381, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const
+                    bls12_scalar_field<377, CHAR_BIT>::number_bits;
+
+                constexpr typename std::size_t const
+                    bls12_scalar_field<381, CHAR_BIT>::size_in_bits;
+                constexpr typename std::size_t const
+                    bls12_scalar_field<377, CHAR_BIT>::size_in_bits;
 
                 constexpr typename bls12_scalar_field<381, CHAR_BIT>::modulus_type const
                     bls12_scalar_field<381, CHAR_BIT>::modulus;

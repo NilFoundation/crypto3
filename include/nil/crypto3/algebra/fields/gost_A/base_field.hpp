@@ -52,6 +52,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<gost_A_base_field<256, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 

@@ -52,8 +52,18 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<bn128_base_field<254, CHAR_BIT>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
+
+                constexpr typename std::size_t const
+                    bn128_base_field<254, CHAR_BIT>::modulus_bits;
+
+                constexpr typename std::size_t const
+                    bn128_base_field<254, CHAR_BIT>::number_bits;
+
+                constexpr typename std::size_t const
+                    bn128_base_field<254, CHAR_BIT>::size_in_bits;
 
                 constexpr typename bn128_base_field<254, CHAR_BIT>::modulus_type const
                     bn128_base_field<254, CHAR_BIT>::modulus;

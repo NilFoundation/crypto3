@@ -53,6 +53,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<dsa_jce<modulus_bits, generator_bits>>> value_type;
 
+                    constexpr static const std::size_t size_in_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
