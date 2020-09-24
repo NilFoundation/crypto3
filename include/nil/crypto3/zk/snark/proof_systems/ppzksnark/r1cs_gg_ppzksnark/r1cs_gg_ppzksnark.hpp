@@ -123,10 +123,11 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return 128 /*(algebra::size_in_bits(A_query) + B_query.size_in_bits() +
-                                algebra::size_in_bits(H_query) + algebra::size_in_bits(L_query) +
+                        return A_query.size() * CurveType::g1_type::size_in_bits + B_query.size_in_bits() +
+                                H_query.size() * CurveType::g1_type::size_in_bits + 
+                                L_query.size() * CurveType::g1_type::size_in_bits +
                                 1 * typename CurveType::g1_type::size_in_bits +
-                                1 * typename CurveType::g2_type::size_in_bits)*/;
+                                1 * typename CurveType::g2_type::size_in_bits;
 
                         // uncomment
                         // when size_in_bits ready

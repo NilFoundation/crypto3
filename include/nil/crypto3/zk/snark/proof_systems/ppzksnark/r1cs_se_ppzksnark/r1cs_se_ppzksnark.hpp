@@ -138,8 +138,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits() +
-                               G2_size() * typename CurveType::g2_type::size_in_bits();
+                        return G1_size() * typename CurveType::g1_type::size_in_bits +
+                               G2_size() * typename CurveType::g2_type::size_in_bits;
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_proving_key<CurveType> &other) const;
@@ -191,8 +191,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (G1_size() * typename CurveType::g1_type::size_in_bits() +
-                                G2_size() * typename CurveType::g2_type::size_in_bits());
+                        return (G1_size() * typename CurveType::g1_type::size_in_bits +
+                                G2_size() * typename CurveType::g2_type::size_in_bits);
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_verification_key<CurveType> &other) const;
@@ -274,8 +274,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits() +
-                               G2_size() * typename CurveType::g2_type::size_in_bits();
+                        return G1_size() * typename CurveType::g1_type::size_in_bits +
+                               G2_size() * typename CurveType::g2_type::size_in_bits;
                     }
 
                     bool is_well_formed() const {
@@ -474,13 +474,13 @@ namespace nil {
                         G_window = algebra::get_exp_window_size<typename CurveType::g1_type>(G_exp_count);
 
                     algebra::window_table<typename CurveType::g1_type> G_table =
-                        get_window_table(typename CurveType::scalar_field_type::size_in_bits(), G_window, G);
+                        get_window_table(typename CurveType::scalar_field_type::size_in_bits, G_window, G);
 
                     typename CurveType::g2_type H_gamma = gamma * H;
                     std::size_t H_gamma_exp_count = non_zero_At,    // B_query
                         H_gamma_window = algebra::get_exp_window_size<typename CurveType::g2_type>(H_gamma_exp_count);
                     algebra::window_table<typename CurveType::g2_type> H_gamma_table =
-                        get_window_table(typename CurveType::scalar_field_type::size_in_bits(), H_gamma_window, H_gamma);
+                        get_window_table(typename CurveType::scalar_field_type::size_in_bits, H_gamma_window, H_gamma);
 
                     typename CurveType::g1_type G_alpha = alpha * G;
                     typename CurveType::g2_type H_beta = beta * H;
@@ -491,7 +491,7 @@ namespace nil {
                         tmp_exponents.emplace_back(gamma * Ct[i] + (alpha + beta) * At[i]);
                     }
                     typename CurveType::g1_vector verifier_query = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), G_window, G_table, tmp_exponents);
+                        typename CurveType::scalar_field_type::size_in_bits, G_window, G_table, tmp_exponents);
                     tmp_exponents.clear();
 
                     tmp_exponents.reserve(sap_inst.num_variables() + 1);
@@ -500,13 +500,13 @@ namespace nil {
                     }
 
                     typename CurveType::g1_vector A_query = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), G_window, G_table, tmp_exponents);
+                        typename CurveType::scalar_field_type::size_in_bits, G_window, G_table, tmp_exponents);
                     tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(A_query);
 #endif
                     typename CurveType::g2_vector B_query = algebra::batch_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), H_gamma_window, H_gamma_table, At);
+                        typename CurveType::scalar_field_type::size_in_bits, H_gamma_window, H_gamma_table, At);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g2_type>(B_query);
 #endif
@@ -525,7 +525,7 @@ namespace nil {
                         gamma2_Z_t *= t;
                     }
                     typename CurveType::g1_vector G_gamma2_Z_t = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), G_window, G_table, tmp_exponents);
+                        typename CurveType::scalar_field_type::size_in_bits, G_window, G_table, tmp_exponents);
                     tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(G_gamma2_Z_t);
@@ -535,7 +535,7 @@ namespace nil {
                         tmp_exponents.emplace_back(gamma * (gamma * Ct[i] + (alpha + beta) * At[i]));
                     }
                     typename CurveType::g1_vector C_query_1 = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), G_window, G_table, tmp_exponents);
+                        typename CurveType::scalar_field_type::size_in_bits, G_window, G_table, tmp_exponents);
                     tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(C_query_1);
@@ -548,7 +548,7 @@ namespace nil {
                         tmp_exponents.emplace_back(double_gamma2_Z * At[i]);
                     }
                     typename CurveType::g1_vector C_query_2 = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                        typename CurveType::scalar_field_type::size_in_bits(), G_window, G_table, tmp_exponents);
+                        typename CurveType::scalar_field_type::size_in_bits, G_window, G_table, tmp_exponents);
                     tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(C_query_2);
