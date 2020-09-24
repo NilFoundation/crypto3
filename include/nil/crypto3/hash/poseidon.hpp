@@ -35,7 +35,8 @@ namespace nil {
                 typedef typename policy_type::block_type block_type;
 
                 static void process_block(state_type &state, const block_type &block) {
-                    for (std::size_t i = state_words - block_words; i != state_words; ++i)
+
+                    for (std::size_t i = 0; i < state_words; ++i)
                         state[i] ^= block[i];
 
                     // for (std::size_t i = 0; i != state_words; ++i)
