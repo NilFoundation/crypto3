@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 
 using namespace nil::crypto3::algebra::pairing;
 
@@ -20,10 +20,10 @@ void pairing_example(){
     typename PairingT::G1_type g1_el2 = PairingT::G1_type::zero();
     typename PairingT::G1_precomp g1_precomp_el2 = PairingT::precompute_g1(g1_el2);
 
-    typename PairingT::G1_type g2_el1 = PairingT::G2_type::one();
-    typename PairingT::G1_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
-    typename PairingT::G1_type g2_el2 = PairingT::G2_type::zero();
-    typename PairingT::G1_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
+    typename PairingT::G2_type g2_el1 = PairingT::G2_type::one();
+    typename PairingT::G2_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
+    typename PairingT::G2_type g2_el2 = PairingT::G2_type::zero();
+    typename PairingT::G2_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
 
     typename PairingT::GT_type gt_el1 = PairingT::reduced_pairing(g1_el1, g2_el1);
 
@@ -39,6 +39,6 @@ void pairing_example(){
 }
 
 int main() {
-    pairing_example<pairing_policy<curves::bls12<381, CHAR_BIT>>>();
+    pairing_example<curves::bls12<381, CHAR_BIT>::pairing_policy>();
 }
 
