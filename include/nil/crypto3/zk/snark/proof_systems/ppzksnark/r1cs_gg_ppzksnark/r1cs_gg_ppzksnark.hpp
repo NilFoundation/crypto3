@@ -126,11 +126,8 @@ namespace nil {
                         return A_query.size() * CurveType::g1_type::size_in_bits + B_query.size_in_bits() +
                                 H_query.size() * CurveType::g1_type::size_in_bits + 
                                 L_query.size() * CurveType::g1_type::size_in_bits +
-                                1 * typename CurveType::g1_type::size_in_bits +
-                                1 * typename CurveType::g2_type::size_in_bits;
-
-                        // uncomment
-                        // when size_in_bits ready
+                                1 * CurveType::g1_type::size_in_bits +
+                                1 * CurveType::g2_type::size_in_bits;
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_proving_key<CurveType> &other) const {
@@ -179,7 +176,7 @@ namespace nil {
 
                     std::size_t size_in_bits() const {
                         // TODO: include GT size
-                        return (gamma_ABC_g1.size_in_bits() + 2 * typename CurveType::g2_type::size_in_bits);
+                        return (gamma_ABC_g1.size_in_bits() + 2 * CurveType::g2_type::size_in_bits);
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_verification_key<CurveType> &other) const {
@@ -295,8 +292,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits +
-                               G2_size() * typename CurveType::g2_type::size_in_bits;
+                        return G1_size() * CurveType::g1_type::size_in_bits +
+                               G2_size() * CurveType::g2_type::size_in_bits;
                     }
 
                     bool is_well_formed() const {
@@ -454,7 +451,7 @@ namespace nil {
                                      CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/;
 
                         // uncomment
-                        // when size_n_bits ready
+                        // when multiexp ready
 
                     // NOTE: if USE_MIXED_ADDITION is defined,
                     // kc_batch_exp will convert its output to special form internally

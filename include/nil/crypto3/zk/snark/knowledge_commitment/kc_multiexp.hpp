@@ -19,7 +19,7 @@
   Will probably go away in more general exp refactoring.
 */
 
-#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
+//#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
 
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 

@@ -244,7 +244,7 @@ namespace nil {
                     std::size_t size_in_bits() const {
                         return A_query.size_in_bits() + B_query.size_in_bits() + C_query.size_in_bits() +
                                H_query.size() * CurveType::g1_type::size_in_bits + K_query.size() * CurveType::g1_type::size_in_bits +
-                               typename CurveType::g1_type::size_in_bits;
+                               CurveType::g1_type::size_in_bits;
                     }
 
                     bool operator==(const r1cs_ppzkadsnark_proving_key<CurveType> &other) const;
@@ -292,8 +292,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits +
-                               G2_size() * typename CurveType::g2_type::size_in_bits;    // possible zksnark bug
+                        return G1_size() * CurveType::g1_type::size_in_bits +
+                               G2_size() * CurveType::g2_type::size_in_bits;    // possible zksnark bug
                     }
 
                     bool operator==(const r1cs_ppzkadsnark_verification_key<CurveType> &other) const;
@@ -410,8 +410,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits +
-                               G2_size() * typename CurveType::g2_type::size_in_bits;
+                        return G1_size() * CurveType::g1_type::size_in_bits +
+                               G2_size() * CurveType::g2_type::size_in_bits;
                     }
 
                     bool is_well_formed() const {

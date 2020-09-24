@@ -138,8 +138,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits +
-                               G2_size() * typename CurveType::g2_type::size_in_bits;
+                        return G1_size() * CurveType::g1_type::size_in_bits +
+                               G2_size() * CurveType::g2_type::size_in_bits;
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_proving_key<CurveType> &other) const;
@@ -191,8 +191,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (G1_size() * typename CurveType::g1_type::size_in_bits +
-                                G2_size() * typename CurveType::g2_type::size_in_bits);
+                        return (G1_size() * CurveType::g1_type::size_in_bits +
+                                G2_size() * CurveType::g2_type::size_in_bits);
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_verification_key<CurveType> &other) const;
@@ -274,8 +274,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * typename CurveType::g1_type::size_in_bits +
-                               G2_size() * typename CurveType::g2_type::size_in_bits;
+                        return G1_size() * CurveType::g1_type::size_in_bits +
+                               G2_size() * CurveType::g2_type::size_in_bits;
                     }
 
                     bool is_well_formed() const {
