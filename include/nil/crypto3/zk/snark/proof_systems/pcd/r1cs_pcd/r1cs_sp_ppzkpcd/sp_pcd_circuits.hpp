@@ -434,7 +434,7 @@ namespace nil {
 
                 template<typename CurveType>
                 std::size_t sp_compliance_step_pcd_circuit_maker<CurveType>::field_logsize() {
-                    return typename CurveType::scalar_field_type::size_in_bits;
+                    return typename CurveType::scalar_field_type::element_size;
                 }
 
                 template<typename CurveType>
@@ -529,7 +529,7 @@ namespace nil {
 
                 template<typename CurveType>
                 std::size_t sp_translation_step_pcd_circuit_maker<CurveType>::field_logsize() {
-                    return typename CurveType::scalar_field_type::size_in_bits;
+                    return typename CurveType::scalar_field_type::element_size;
                 }
 
                 template<typename CurveType>
