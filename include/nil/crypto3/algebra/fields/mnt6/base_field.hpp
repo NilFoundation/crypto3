@@ -52,7 +52,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<mnt6_base_field<298, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -63,7 +63,7 @@ namespace nil {
                     mnt6_base_field<298, CHAR_BIT>::number_bits;
 
                 constexpr typename std::size_t const
-                    mnt6_base_field<298, CHAR_BIT>::size_in_bits;
+                    mnt6_base_field<298, CHAR_BIT>::element_size;
 
                 constexpr
                     typename mnt6_base_field<298, CHAR_BIT>::modulus_type const mnt6_base_field<298, CHAR_BIT>::modulus;

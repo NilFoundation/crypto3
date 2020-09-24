@@ -57,7 +57,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<160, CHAR_BIT>>> value_type;
 
-constexpr static const std::size_t size_in_bits = modulus_bits;
+constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -79,7 +79,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_r1_base_field<160, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -101,7 +101,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_r2_base_field<160, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -124,7 +124,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<192, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -147,7 +147,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_r1_base_field<192, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -170,7 +170,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<224, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -193,7 +193,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_r1_base_field<224, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -216,7 +216,7 @@ constexpr static const std::size_t size_in_bits = modulus_bits;
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<256, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t size_in_bits = modulus_bits;
+                    constexpr static const std::size_t element_size = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
