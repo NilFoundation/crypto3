@@ -135,6 +135,10 @@ namespace nil {
                                 return (*this);
                             }
 
+                            if (*this == other) {
+                                return this->doubled();
+                            }
+                            
                             return this->add(other);
                         }
 

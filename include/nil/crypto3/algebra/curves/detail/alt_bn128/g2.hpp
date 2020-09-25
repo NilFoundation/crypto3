@@ -124,12 +124,13 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        alt_bn128_g2 operator-() const {
-                            return alt_bn128_g2(this->X, -(this->Y), this->Z);
-                        }
+                        alt_bn128_g2 operator=(const alt_bn128_g2 &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
 
-                        alt_bn128_g2 operator-(const alt_bn128_g2 &other) const {
-                            return (*this) + (-other);
+                            return *this;
                         }
 
                         alt_bn128_g2 operator+(const alt_bn128_g2 &other) const {
@@ -139,41 +140,22 @@ namespace nil {
                             }
 
                             if (other.is_zero()) {
-                                return *this;
+                                return (*this);
                             }
 
-                            // no need to handle points of order 2,4
-                            // (they cannot exist in a prime-order subgroup)
-
-                            // handle double case
-                            if (this->operator==(other)) {
+                            if (*this == other) {
                                 return this->doubled();
                             }
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+                            return this->add(other);
+                        }
 
-                            underlying_field_type_value Z1Z1 = (this->Z).squared();    // Z1Z1 = Z1^2
-                            underlying_field_type_value Z2Z2 = (other.Z).squared();    // Z2Z2 = Z2^2
-                            underlying_field_type_value U1 = (this->X) * Z2Z2;         // U1 = X1 * Z2Z2
-                            underlying_field_type_value U2 = (other.X) * Z1Z1;         // U2 = X2 * Z1Z1
-                            underlying_field_type_value S1 =
-                                (this->Y) * (other.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
-                            underlying_field_type_value S2 =
-                                (other.Y) * (this->Z) * Z1Z1;     // S2 = Y2 * Z1 * Z1Z1
-                            underlying_field_type_value H = U2 - U1;    // H = U2-U1
-                            underlying_field_type_value S2_minus_S1 = S2 - S1;
-                            underlying_field_type_value I = H.doubled().squared();             // I = (2 * H)^2
-                            underlying_field_type_value J = H * I;                             // J = H * I
-                            underlying_field_type_value r = S2_minus_S1.doubled();             // r = 2 * (S2-S1)
-                            underlying_field_type_value V = U1 * I;                            // V = U1 * I
-                            underlying_field_type_value X3 = r.squared() - J - V.doubled();    // X3 = r^2 - J - 2 * V
-                            underlying_field_type_value S1_J = S1 * J;
-                            underlying_field_type_value Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
-                            underlying_field_type_value Z3 = ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) *
-                                                             H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                        alt_bn128_g2 operator-() const {
+                            return alt_bn128_g2(this->X, -(this->Y), this->Z);
+                        }
 
-                            return alt_bn128_g2(X3, Y3, Z3);
+                        alt_bn128_g2 operator-(const alt_bn128_g2 &other) const {
+                            return (*this) + (-other);
                         }
 
                         alt_bn128_g2 doubled() const {
@@ -259,6 +241,38 @@ namespace nil {
 
                             return alt_bn128_g2(X3, Y3, Z3);
                         }
+
+                    private:
+
+                        alt_bn128_g2 add(const alt_bn128_g2 &other) const {
+
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+
+                            underlying_field_type_value Z1Z1 = (this->Z).squared();    // Z1Z1 = Z1^2
+                            underlying_field_type_value Z2Z2 = (other.Z).squared();    // Z2Z2 = Z2^2
+                            underlying_field_type_value U1 = (this->X) * Z2Z2;         // U1 = X1 * Z2Z2
+                            underlying_field_type_value U2 = (other.X) * Z1Z1;         // U2 = X2 * Z1Z1
+                            underlying_field_type_value S1 =
+                                (this->Y) * (other.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
+                            underlying_field_type_value S2 =
+                                (other.Y) * (this->Z) * Z1Z1;     // S2 = Y2 * Z1 * Z1Z1
+                            underlying_field_type_value H = U2 - U1;    // H = U2-U1
+                            underlying_field_type_value S2_minus_S1 = S2 - S1;
+                            underlying_field_type_value I = H.doubled().squared();             // I = (2 * H)^2
+                            underlying_field_type_value J = H * I;                             // J = H * I
+                            underlying_field_type_value r = S2_minus_S1.doubled();             // r = 2 * (S2-S1)
+                            underlying_field_type_value V = U1 * I;                            // V = U1 * I
+                            underlying_field_type_value X3 = r.squared() - J - V.doubled();    // X3 = r^2 - J - 2 * V
+                            underlying_field_type_value S1_J = S1 * J;
+                            underlying_field_type_value Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
+                            underlying_field_type_value Z3 = ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) *
+                                                             H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+
+                            return alt_bn128_g2(X3, Y3, Z3);
+                        }
+
+                    public:
 
                         /*************************  Extra arithmetic operations  ***********************************/
                     private: // probably shoould be public for pairing

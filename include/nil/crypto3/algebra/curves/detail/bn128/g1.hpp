@@ -120,26 +120,38 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
+                        bn128_g1 operator=(const bn128_g1 &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
+
+                            return *this;
+                        }
+
                         /*
                             Jacobi coordinate
                             (p_out[0], p_out[1], p_out[2]) = (X, Y, Z) + (other.X, other.Y, other.Z)
                         */
                         bn128_g1 operator+(const bn128_g1 &other) const {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                return other;
+                            }
 
-                            bn128_g1 res = *this;
+                            if (other.is_zero()) {
+                                return (*this);
+                            }
 
-                            res += other;
+                            if (*this == other) {
+                                return this->doubled();
+                            }
 
-                            return res;
+                            return this->add(other);
                         }
 
                         bn128_g1 operator-(const bn128_g1 &other) const {
-
-                            bn128_g1 res = *this;
-
-                            res -= other;
-
-                            return res;
+                            return *this + (-other);
                         }
 
                         bn128_g1 operator-() const {
@@ -165,54 +177,6 @@ namespace nil {
                             p_out[2] = (Y * Z).doubled();
 
                             return bn128_g1(p_out[0], p_out[1], p_out[2]);
-                        }
-
-                        bn128_g1 operator+=(const bn128_g1 &other) {
-
-                            if (Z.is_zero()) {
-                                return other;
-                            }
-                            if (other.Z.is_zero()) {
-                                return *this;
-                            }
-                            underlying_field_type_value Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
-
-                            Z1Z1 = Z.squared();
-                            Z2Z2 = other.Z.squared();
-                            U1 = X * Z2Z2;
-                            U2 = other.X * Z1Z1;
-
-                            S1 = Y * other.Z * Z2Z2;
-                            S2 = other.Y * Z * Z1Z1;
-
-                            H = U2 - U1;
-                            t3 = S2 - S1;
-
-                            if (H.is_zero()) {
-                                if (t3.is_zero()) {
-                                    return doubled();
-                                } else {
-                                    Z = underlying_field_type_value::zero();    // not sure
-                                }
-                                return *this;
-                            }
-
-                            I = H.doubled().squared();
-                            J = H * I;
-                            r = t3.doubled();
-                            V = U1 * I;
-                            X = r.squared() - J - V.doubled();
-                            Y = r * (V - X) - (S1 * J).doubled();
-                            Z = ((Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;
-
-                            return *this;
-                        }
-
-                        bn128_g1 &operator-=(const bn128_g1 &other) {
-
-                            *this += (-other);
-
-                            return *this;
                         }
 
                         bn128_g1 mixed_add(const bn128_g1 &other) const {
@@ -290,16 +254,39 @@ namespace nil {
                             return *this;
                         }
 
-                        template<class N>
-                        bn128_g1 &operator*=(const N &y) {
-                            bn128_g1 t = *this * y;
+                    private:
 
-                            X = t.X;
-                            Y = t.Y;
-                            Z = t.Z;
+                        bn128_g1 add (const bn128_g1 &other) const { // unfinished
+                            
+                            underlying_field_type_value Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
-                            return *this;
+                            underlying_field_type_value X_out, Y_out, Z_out;
+
+                            Z1Z1 = Z.squared();
+                            Z2Z2 = other.Z.squared();
+                            U1 = X * Z2Z2;
+                            U2 = other.X * Z1Z1;
+
+                            S1 = Y * other.Z * Z2Z2;
+                            S2 = other.Y * Z * Z1Z1;
+
+                            H = U2 - U1;
+                            t3 = S2 - S1;
+
+                            I = H.doubled().squared();
+                            J = H * I;
+                            r = t3.doubled();
+                            V = U1 * I;
+                            
+
+                            X_out = r.squared() - J - V.doubled();
+                            Y_out = r * (V - X) - (S1 * J).doubled();
+                            Z_out = ((Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;
+
+                            return bn128_g1(X_out, Y_out, Z_out);
                         }
+
+                    public:
 
                         /*************************  Reducing operations  ***********************************/
 

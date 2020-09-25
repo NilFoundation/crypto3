@@ -121,17 +121,17 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        mnt6_g2 operator-() const {
-                            return mnt6_g2(this->X, -(this->Y), this->Z);
-                        }
+                        mnt6_g2 operator=(const mnt6_g2 &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
 
-                        mnt6_g2 operator-(const mnt6_g2 &other) const {
-                            return (*this) + (-other);
+                            return *this;
                         }
 
                         mnt6_g2 operator+(const mnt6_g2 &other) const {
                             // handle special cases having to do with O
-
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -140,36 +140,48 @@ namespace nil {
                                 return (*this);
                             }
 
-                            // no need to handle points of order 2,4
-                            // (they cannot exist in a prime-order subgroup)
-
-                            // handle double case
-                            if (this->operator==(other)) {
+                            if (*this == other) {
                                 return this->doubled();
                             }
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+                            return this->add(other);
+                        }
 
-                            const underlying_field_type_value Y1Z2 = (this->Y) * (other.Z);    // Y1Z2 = Y1*Z2
-                            const underlying_field_type_value X1Z2 = (this->X) * (other.Z);    // X1Z2 = X1*Z2
-                            const underlying_field_type_value Z1Z2 = (this->Z) * (other.Z);    // Z1Z2 = Z1*Z2
-                            const underlying_field_type_value u =
-                                (other.Y) * (this->Z) - Y1Z2;                // u    = Y2*Z1-Y1Z2
-                            const underlying_field_type_value uu = u.squared();    // uu   = u^2
-                            const underlying_field_type_value v =
-                                (other.X) * (this->Z) - X1Z2;                // v    = X2*Z1-X1Z2
-                            const underlying_field_type_value vv = v.squared();    // vv   = v^2
-                            const underlying_field_type_value vvv = v * vv;        // vvv  = v*vv
-                            const underlying_field_type_value R = vv * X1Z2;       // R    = vv*X1Z2
-                            const underlying_field_type_value A =
-                                uu * Z1Z2 - (vvv + R + R);                   // A    = uu*Z1Z2 - vvv - 2*R
-                            const underlying_field_type_value X3 = v * A;    // X3   = v*A
-                            const underlying_field_type_value Y3 =
-                                u * (R - A) - vvv * Y1Z2;                         // Y3   = u*(R-A) - vvv*Y1Z2
-                            const underlying_field_type_value Z3 = vvv * Z1Z2;    // Z3   = vvv*Z1Z2
+                        mnt6_g2 operator-() const {
+                            return mnt6_g2(this->X, -(this->Y), this->Z);
+                        }
 
-                            return mnt6_g2(X3, Y3, Z3);
+                        mnt6_g2 operator-(const mnt6_g2 &other) const {
+                            return (*this) + (-other);
+                        }
+
+                        mnt6_g2 doubled() const {
+                            if (this->is_zero()) {
+                                return (*this);
+                            } else {
+                                // NOTE: does not handle O and pts of order 2,4
+                                // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
+
+                                const underlying_field_type_value XX = (this->X).squared();    // XX  = X1^2
+                                const underlying_field_type_value ZZ = (this->Z).squared();    // ZZ  = Z1^2
+                                const underlying_field_type_value w =
+                                    mul_by_a(ZZ) + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                                const underlying_field_type_value Y1Z1 = (this->Y) * (this->Z);
+                                const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
+                                const underlying_field_type_value ss = s.squared();        // ss  = s^2
+                                const underlying_field_type_value sss = s * ss;            // sss = s*ss
+                                const underlying_field_type_value R = (this->Y) * s;    // R   = Y1*s
+                                const underlying_field_type_value RR = R.squared();        // RR  = R^2
+                                const underlying_field_type_value B =
+                                    ((this->X) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
+                                const underlying_field_type_value h = w.squared() - (B + B);    // h   = w^2-2*B
+                                const underlying_field_type_value X3 = h * s;                   // X3  = h*s
+                                const underlying_field_type_value Y3 =
+                                    w * (B - h) - (RR + RR);                   // Y3  = w*(B-h) - 2*RR
+                                const underlying_field_type_value Z3 = sss;    // Z3  = sss
+
+                                return mnt6_g2(X3, Y3, Z3);
+                            }
                         }
 
                         mnt6_g2 mixed_add(const mnt6_g2 &other) const {
@@ -214,34 +226,35 @@ namespace nil {
                             return mnt6_g2(X3, Y3, Z3);
                         }
 
-                        mnt6_g2 doubled() const {
-                            if (this->is_zero()) {
-                                return (*this);
-                            } else {
-                                // NOTE: does not handle O and pts of order 2,4
-                                // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
+                    private:
 
-                                const underlying_field_type_value XX = (this->X).squared();    // XX  = X1^2
-                                const underlying_field_type_value ZZ = (this->Z).squared();    // ZZ  = Z1^2
-                                const underlying_field_type_value w =
-                                    mul_by_a(ZZ) + (XX + XX + XX);    // w   = a*ZZ + 3*XX
-                                const underlying_field_type_value Y1Z1 = (this->Y) * (this->Z);
-                                const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
-                                const underlying_field_type_value ss = s.squared();        // ss  = s^2
-                                const underlying_field_type_value sss = s * ss;            // sss = s*ss
-                                const underlying_field_type_value R = (this->Y) * s;    // R   = Y1*s
-                                const underlying_field_type_value RR = R.squared();        // RR  = R^2
-                                const underlying_field_type_value B =
-                                    ((this->X) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
-                                const underlying_field_type_value h = w.squared() - (B + B);    // h   = w^2-2*B
-                                const underlying_field_type_value X3 = h * s;                   // X3  = h*s
-                                const underlying_field_type_value Y3 =
-                                    w * (B - h) - (RR + RR);                   // Y3  = w*(B-h) - 2*RR
-                                const underlying_field_type_value Z3 = sss;    // Z3  = sss
+                        mnt6_g2 add (const mnt6_g2 &other) const {
 
-                                return mnt6_g2(X3, Y3, Z3);
-                            }
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
+
+                            const underlying_field_type_value Y1Z2 = (this->Y) * (other.Z);    // Y1Z2 = Y1*Z2
+                            const underlying_field_type_value X1Z2 = (this->X) * (other.Z);    // X1Z2 = X1*Z2
+                            const underlying_field_type_value Z1Z2 = (this->Z) * (other.Z);    // Z1Z2 = Z1*Z2
+                            const underlying_field_type_value u =
+                                (other.Y) * (this->Z) - Y1Z2;                // u    = Y2*Z1-Y1Z2
+                            const underlying_field_type_value uu = u.squared();    // uu   = u^2
+                            const underlying_field_type_value v =
+                                (other.X) * (this->Z) - X1Z2;                // v    = X2*Z1-X1Z2
+                            const underlying_field_type_value vv = v.squared();    // vv   = v^2
+                            const underlying_field_type_value vvv = v * vv;        // vvv  = v*vv
+                            const underlying_field_type_value R = vv * X1Z2;       // R    = vv*X1Z2
+                            const underlying_field_type_value A =
+                                uu * Z1Z2 - (vvv + R + R);                   // A    = uu*Z1Z2 - vvv - 2*R
+                            const underlying_field_type_value X3 = v * A;    // X3   = v*A
+                            const underlying_field_type_value Y3 =
+                                u * (R - A) - vvv * Y1Z2;                         // Y3   = u*(R-A) - vvv*Y1Z2
+                            const underlying_field_type_value Z3 = vvv * Z1Z2;    // Z3   = vvv*Z1Z2
+
+                            return mnt6_g2(X3, Y3, Z3);
                         }
+
+                    public:
 
                         /*************************  Extra arithmetic operations  ***********************************/
 
