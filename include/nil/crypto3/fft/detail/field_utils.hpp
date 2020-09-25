@@ -45,7 +45,7 @@ namespace nil {
 
                 template<typename FieldType>
                 typename FieldType::value_type coset_shift() {
-                    return value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).squared();
+                    return typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).squared();
                 }
 
                 template<typename FieldType>
@@ -54,7 +54,7 @@ namespace nil {
                     unity_root(const size_t n) {
                     const double PI = 3.141592653589793238460264338328L;
 
-                    return FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
+                    return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
                 }
 
                 template<typename FieldType>

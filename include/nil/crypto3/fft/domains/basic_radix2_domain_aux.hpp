@@ -97,8 +97,8 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (size_t j = 0; j < num_cpus; ++j) {
-                        const value_type omega_j = omega ^ j;
-                        const value_type omega_step = omega ^ (j << (log_m - log_cpus));
+                        const value_type omega_j = omega.pow(j);
+                        const value_type omega_step = omega.pow(j << (log_m - log_cpus));
 
                         value_type elt = value_type::one();
                         for (size_t i = 0; i < 1ul << (log_m - log_cpus); ++i) {
@@ -112,7 +112,7 @@ namespace nil {
                         }
                     }
 
-                    const value_type omega_num_cpus = omega ^ num_cpus;
+                    const value_type omega_num_cpus = omega.pow(num_cpus);
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -177,7 +177,7 @@ namespace nil {
                      then output 1 at the right place, and 0 elsewhere
                      */
 
-                    if ((t ^ m) == (value_type::one())) {
+                    if (t.pow(m) == value_type::one()) {
                         value_type omega_i = value_type::one();
                         for (size_t i = 0; i < m; ++i) {
                             if (omega_i == t)    // i.e., t equals omega^i
@@ -199,7 +199,7 @@ namespace nil {
                      Below we use the fact that v_{0} = 1/m and v_{i+1} = \omega * v_{i}.
                      */
 
-                    const value_type Z = (t ^ m) - value_type::one();
+                    const value_type Z = (t.pow(m)) - value_type::one();
                     value_type l = Z * value_type(m).inversed();
                     value_type r = value_type::one();
                     for (size_t i = 0; i < m; ++i) {

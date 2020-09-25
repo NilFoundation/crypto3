@@ -199,19 +199,19 @@ void test_compute_z() {
     const size_t m = 8;
     value_type t = value_type(10);
 
-    std::shared_ptr<evaluation_domain<value_type>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<value_type>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<value_type>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<value_type>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<value_type>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<value_type>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
             value_type a;
             a = domain->compute_vanishing_polynomial(t);

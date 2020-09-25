@@ -30,47 +30,6 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                /*template<typename FieldType, std::size_t MinSize>
-                struct domain_switch_impl {
-                    constexpr static const std::size_t big = 1ul << (boost::static_log2<MinSize>::value - 1);
-                    constexpr static const std::size_t rounded_small =
-                        (1ul << boost::static_log2<MinSize - big>::value);
-
-                    typedef std::conditional<
-                        detail::is_basic_radix2_domain<FieldType, MinSize>::value, basic_radix2_domain<FieldType>,
-                        std::conditional<
-                            !detail::is_basic_radix2_domain<FieldType,MinSize>::value &&
-                                detail::is_basic_radix2_domain<FieldType, big + rounded_small>::value,
-                            basic_radix2_domain<FieldType>,
-                            std::conditional<
-                                detail::is_extended_radix2_domain<FieldType, MinSize>::value,
-                                extended_radix2_domain<FieldType>,
-                                std::conditional<
-                                    !detail::is_extended_radix2_domain<FieldType, MinSize>::value &&
-                                        detail::is_extended_radix2_domain<FieldType, big + rounded_small>::value,
-                                    extended_radix2_domain<FieldType>,
-                                    std::conditional<
-                                        detail::is_step_radix2_domain<FieldType, MinSize>::value,
-                                        step_radix2_domain<FieldType>,
-                                        std::conditional<
-                                            !detail::is_step_radix2_domain<FieldType, MinSize>::value &&
-                                                detail::is_step_radix2_domain<FieldType, big + rounded_small>::value,
-                                            step_radix2_domain<FieldType>,
-                                            std::conditional<
-                                                !(fields::arithmetic_params<FieldType>::geometric_generator.is_zero()),
-                                                geometric_sequence_domain<FieldType>,
-                                                std::conditional<!(fields::arithmetic_params<
-                                                                       FieldType>::arithmetic_generator.is_zero()),
-                                                                 arithmetic_sequence_domain<FieldType>, void>::
-                                                    type>::type>::type>::type>::type>::type>::type>::type domain_type;
-                };*/
-
-                /*template<typename FieldType, std::size_t MinSize>
-                struct domain_switch_impl<std::complex<double>> {
-                    typedef std::conditional<is_basic_radix2_domain<MinSize>::value,
-                                             basic_radix2_domain<FieldType, MinSize>, void>::type domain_type;
-                };*/
-
                 template<typename FieldType, std::size_t MinSize>
                 struct domain_switch {
 
@@ -124,25 +83,29 @@ namespace nil {
                         return result;
                     }
 
-                    typename std::enable_if<FieldType::geometric_generator() != FieldType::zero(), ret_type>::type 
+                    /*typename std::enable_if<FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) != FieldType::value_type::zero(), ret_type>::type 
                         get_evaluation_domain() {
                         ret_type result;
                         result.reset(new geometric_sequence_domain<FieldType, MinSize>());
                         return result;
-                    }
+                    }*/
+                    // uncomment
+                    // when constexpr field element ready
 
-                    typename std::enable_if<FieldType::arithmetic_generator() != FieldType::zero(), ret_type>::type 
+                    /*typename std::enable_if<FieldType::value_type(fields::arithmetic_params<FieldType>::arithmetic_generator) != FieldType::value_type::zero(), ret_type>::type 
                         get_evaluation_domain() {
                         ret_type result;
                         result.reset(new arithmetic_sequence_domain<FieldType, MinSize>());
                         return result;
-                    }
+                    }*/
+                    // uncomment
+                    // when constexpr field element ready
                 };
 
                 template<std::size_t MinSize>
                 struct domain_switch<std::complex<double>, MinSize> {
 
-                    typedef std::shared_ptr<evaluation_domain<std::complex<double>, MinSize>> ret_type;
+                    typedef std::shared_ptr<evaluation_domain<std::complex<double>>> ret_type;
 
                     ret_type get_evaluation_domain() {
                         ret_type result;

@@ -75,11 +75,11 @@ namespace nil {
                 }
 
                 value_type get_domain_element(const size_t idx) {
-                    return omega ^ idx;
+                    return omega.pow(idx);
                 }
 
                 value_type compute_vanishing_polynomial(const value_type &t) {
-                    return (t ^ this->m) - value_type::one();
+                    return (t.pow(this->m)) - value_type::one();
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {

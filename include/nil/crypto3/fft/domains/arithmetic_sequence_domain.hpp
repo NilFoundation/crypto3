@@ -40,7 +40,7 @@ namespace nil {
                 value_type arithmetic_generator;
 
                 void do_precomputation() {
-                    compute_subproduct_tree(log2(this->m), this->subproduct_tree);
+                    compute_subproduct_tree<FieldType>(log2(this->m), this->subproduct_tree);
 
                     this->arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
 
@@ -166,7 +166,7 @@ namespace nil {
                     }
 
                     std::vector<value_type> w(this->m);
-                    w[0] = g_vanish.inversed() * (this->arithmetic_generator ^ (this->m - 1));
+                    w[0] = g_vanish.inversed() * (this->arithmetic_generator .pow(this->m - 1));
 
                     l[0] = l_vanish * l[0].inversed() * w[0];
                     for (size_t i = 1; i < this->m; i++) {

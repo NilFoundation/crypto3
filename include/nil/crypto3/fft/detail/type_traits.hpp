@@ -191,7 +191,7 @@ namespace nil {
                 public:
                     constexpr static bool const value =
                         (m > 1) && (m & (m - 1)) &&
-                        //(boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) &&
+                        (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s) &&
                         !(small_m & (small_m - 1));
                 };
             }    // namespace detail

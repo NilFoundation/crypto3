@@ -62,7 +62,7 @@ namespace nil {
                     std::vector<value_type> a0(small_m, value_type::zero());
                     std::vector<value_type> a1(small_m, value_type::zero());
 
-                    const value_type shift_to_small_m = shift ^ small_m;
+                    const value_type shift_to_small_m = shift.pow(small_m);
 
                     value_type shift_i = value_type::one();
                     for (size_t i = 0; i < small_m; ++i) {
@@ -92,7 +92,7 @@ namespace nil {
                     _basic_radix2_FFT(a0, omega_inverse);
                     _basic_radix2_FFT(a1, omega_inverse);
 
-                    const value_type shift_to_small_m = shift ^ small_m;
+                    const value_type shift_to_small_m = shift.pow(small_m);
                     const value_type sconst = (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();
 
                     const value_type shift_inverse = shift.inversed();
@@ -112,8 +112,8 @@ namespace nil {
 
                     std::vector<value_type> result(this->m, value_type::zero());
 
-                    const value_type t_to_small_m = t ^ small_m;
-                    const value_type shift_to_small_m = shift ^ small_m;
+                    const value_type t_to_small_m = t.pow(small_m);
+                    const value_type shift_to_small_m = shift.pow(small_m);
                     const value_type one_over_denom = (shift_to_small_m - value_type::one()).inversed();
                     const value_type T0_coeff = (t_to_small_m - shift_to_small_m) * (-one_over_denom);
                     const value_type T1_coeff = (t_to_small_m - value_type::one()) * one_over_denom;
@@ -127,21 +127,21 @@ namespace nil {
 
                 value_type get_domain_element(const size_t idx) {
                     if (idx < small_m) {
-                        return omega ^ idx;
+                        return omega.pow(idx);
                     } else {
-                        return shift * (omega ^ (idx - small_m));
+                        return shift * (omega.pow(idx - small_m));
                     }
                 }
 
                 value_type compute_vanishing_polynomial(const value_type &t) {
-                    return ((t ^ small_m) - value_type::one()) * ((t ^ small_m) - (shift ^ small_m));
+                    return (t.pow(small_m) - value_type::one()) * (t.pow(small_m) - shift.pow(small_m));
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
-                    const value_type shift_to_small_m = shift ^ small_m;
+                    const value_type shift_to_small_m = shift.pow(small_m);
 
                     H[this->m] += coeff;
                     H[small_m] -= coeff * (shift_to_small_m + value_type::one());
@@ -151,8 +151,8 @@ namespace nil {
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
                     const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    const value_type coset_to_small_m = coset ^ small_m;
-                    const value_type shift_to_small_m = shift ^ small_m;
+                    const value_type coset_to_small_m = coset.pow(small_m);
+                    const value_type shift_to_small_m = shift.pow(small_m);
 
                     const value_type Z0 =
                         (coset_to_small_m - value_type::one()) * (coset_to_small_m - shift_to_small_m);

@@ -155,9 +155,9 @@ namespace nil {
 
                     std::vector<value_type> result(this->m, value_type::zero());
 
-                    const value_type L0 = (t ^ small_m) - (omega ^ small_m);
-                    const value_type omega_to_small_m = omega ^ small_m;
-                    const value_type big_omega_to_small_m = big_omega ^ small_m;
+                    const value_type L0 = t.pow(small_m) - omega.pow(small_m);
+                    const value_type omega_to_small_m = omega.pow(small_m);
+                    const value_type big_omega_to_small_m = big_omega.pow(small_m);
                     value_type elt = value_type::one();
                     for (size_t i = 0; i < big_m; ++i) {
                         result[i] = inner_big[i] * L0 * (elt - omega_to_small_m).inversed();
@@ -165,7 +165,7 @@ namespace nil {
                     }
 
                     const value_type L1 =
-                        ((t ^ big_m) - value_type::one()) * ((omega ^ big_m) - value_type::one()).inversed();
+                        (t.pow(big_m) - value_type::one()) * (omega.pow(big_m) - value_type::one()).inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
                         result[big_m + i] = L1 * inner_small[i];
@@ -176,21 +176,21 @@ namespace nil {
 
                 value_type get_domain_element(const size_t idx) {
                     if (idx < big_m) {
-                        return big_omega ^ idx;
+                        return big_omega.pow(idx);
                     } else {
-                        return omega * (small_omega ^ (idx - big_m));
+                        return omega * (small_omega.pow(idx - big_m));
                     }
                 }
 
                 value_type compute_vanishing_polynomial(const value_type &t) {
-                    return ((t ^ big_m) - value_type::one()) * ((t ^ small_m) - (omega ^ small_m));
+                    return (t.pow(big_m) - value_type::one()) * (t.pow(small_m) - omega.pow(small_m));
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("step_radix2: expected H.size() == this->m+1");
 
-                    const value_type omega_to_small_m = omega ^ small_m;
+                    const value_type omega_to_small_m = omega.pow(small_m);
 
                     H[this->m] += coeff;
                     H[big_m] -= coeff * omega_to_small_m;
@@ -201,10 +201,10 @@ namespace nil {
                     // (c^{2^k}-1) * (c^{2^r} * w^{2^{r+1}*i) - w^{2^r})
                     const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    const value_type Z0 = (coset ^ big_m) - value_type::one();
-                    const value_type coset_to_small_m_times_Z0 = (coset ^ small_m) * Z0;
-                    const value_type omega_to_small_m_times_Z0 = (omega ^ small_m) * Z0;
-                    const value_type omega_to_2small_m = omega ^ (2 * small_m);
+                    const value_type Z0 = coset.pow(big_m) - value_type::one();
+                    const value_type coset_to_small_m_times_Z0 = coset.pow(small_m) * Z0;
+                    const value_type omega_to_small_m_times_Z0 = omega.pow(small_m) * Z0;
+                    const value_type omega_to_2small_m = omega.pow(2 * small_m);
                     value_type elt = value_type::one();
 
                     for (size_t i = 0; i < big_m; ++i) {
@@ -214,8 +214,8 @@ namespace nil {
 
                     // (c^{2^k}*w^{2^k}-1) * (c^{2^k} * w^{2^r} - w^{2^r})
 
-                    const value_type Z1 = ((((coset * omega) ^ big_m) - value_type::one()) *
-                                           (((coset * omega) ^ small_m) - (omega ^ small_m)));
+                    const value_type Z1 = (((coset * omega).pow(big_m) - value_type::one()) *
+                                           ((coset * omega).pow(small_m) - omega.pow(small_m)));
                     const value_type Z1_inverse = Z1.inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
