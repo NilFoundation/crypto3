@@ -34,7 +34,7 @@ namespace nil {
 
                         using underlying_field_type_value = g1_field_type_value;
 
-                        constexpr static const std::size_t element_size =  policy_type::g1_field_type::element_size;
+                        constexpr static const std::size_t value_bits =  policy_type::g1_field_type::value_bits;
 
                         underlying_field_type_value X;
                         underlying_field_type_value Y;

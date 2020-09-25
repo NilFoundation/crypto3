@@ -58,7 +58,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<x962_p_v2_base_field<192, CHAR_BIT>>> value_type;
 
-constexpr static const std::size_t element_size = modulus_bits;
+constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -81,7 +81,7 @@ constexpr static const std::size_t element_size = modulus_bits;
 
                     typedef typename detail::element_fp<params<x962_p_v3_base_field<192, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -104,7 +104,7 @@ constexpr static const std::size_t element_size = modulus_bits;
 
                     typedef typename detail::element_fp<params<x962_p_v1_base_field<239, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -127,7 +127,7 @@ constexpr static const std::size_t element_size = modulus_bits;
 
                     typedef typename detail::element_fp<params<x962_p_v2_base_field<239, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -150,7 +150,7 @@ constexpr static const std::size_t element_size = modulus_bits;
 
                     typedef typename detail::element_fp<params<x962_p_v3_base_field<239, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 

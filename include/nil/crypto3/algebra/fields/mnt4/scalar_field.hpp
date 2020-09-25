@@ -52,7 +52,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<mnt4_scalar_field<298, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
@@ -63,7 +63,7 @@ namespace nil {
                     mnt4_scalar_field<298, CHAR_BIT>::number_bits;
 
                 constexpr typename std::size_t const
-                    mnt4_scalar_field<298, CHAR_BIT>::element_size;
+                    mnt4_scalar_field<298, CHAR_BIT>::value_bits;
 
                 constexpr typename mnt4_scalar_field<298, CHAR_BIT>::modulus_type const
                     mnt4_scalar_field<298, CHAR_BIT>::modulus;

@@ -52,7 +52,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<frp_v1_base_fields<256, CHAR_BIT>>> value_type;
 
-                    constexpr static const std::size_t element_size = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
