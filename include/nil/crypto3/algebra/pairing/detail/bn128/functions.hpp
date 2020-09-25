@@ -33,10 +33,12 @@ namespace nil {
 
                     template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
                     struct bn128_ate_g1_precomp {
-                        typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type_value p[3];
+                        typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type_value X;
+                        typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type_value Y;
+                        typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type_value Z;
 
                         bool operator==(const bn128_ate_g1_precomp &other) const {
-                            return (p[0] == other.p[0] && p[1] == other.p[1] && p[2] == other.p[2]);
+                            return (X == other.X && Y == other.Y && Z == other.Z);
                         }
                     };
 

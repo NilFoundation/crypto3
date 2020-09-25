@@ -35,10 +35,11 @@ namespace nil {
 
                         constexpr static const std::size_t element_size =  policy_type::g1_field_type::element_size;
                         
-                        underlying_field_type_value p[3];
-                        underlying_field_type_value &X = p[0];
-                        underlying_field_type_value &Y = p[1];
-                        underlying_field_type_value &Z = p[2];
+                        underlying_field_type_value X;
+                        underlying_field_type_value Y;
+                        underlying_field_type_value Z;
+
+                        /*************************  Constructors and zero/one  ***********************************/
 
                         /*constexpr static */ const underlying_field_type_value x =
                             underlying_field_type_value(0x00);    //?
@@ -55,9 +56,9 @@ namespace nil {
                         mnt6_g1(underlying_field_type_value X,
                                 underlying_field_type_value Y,
                                 underlying_field_type_value Z) {
-                            p[0] = X;
-                            p[1] = Y;
-                            p[2] = Z;
+                            X = X;
+                            Y = Y;
+                            Z = Z;
                         };
 
                         static mnt6_g1 zero() {
@@ -76,6 +77,8 @@ namespace nil {
                             // when constexpr fields will be finished
                         }
 
+                        /*************************  Comparison operations  ***********************************/
+
                         bool operator==(const mnt6_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
@@ -88,12 +91,12 @@ namespace nil {
                             /* now neither is O */
 
                             // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
-                            if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])) {
+                            if ((this->X * other.Z) != (other.X * this->Z)) {
                                 return false;
                             }
 
                             // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
-                            if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])) {
+                            if ((this->Y * other.Z) != (other.Y * this->Z)) {
                                 return false;
                             }
 
@@ -105,11 +108,17 @@ namespace nil {
                         }
 
                         bool is_zero() const {
-                            return (this->p[0].is_zero() && this->p[2].is_zero());
+                            return (this->X.is_zero() && this->Z.is_zero());
                         }
 
+                        bool is_special() const {
+                            return (this->is_zero() || this->Z == underlying_field_type_value::one());
+                        }
+
+                        /*************************  Arithmetic operations  ***********************************/
+
                         mnt6_g1 operator-() const {
-                            return mnt6_g1(this->p[0], -(this->p[1]), this->p[2]);
+                            return mnt6_g1(this->X, -(this->Y), this->Z);
                         }
 
                         mnt6_g1 operator-(const mnt6_g1 &other) const {
@@ -137,14 +146,14 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                            const underlying_field_type_value Y1Z2 = (this->p[1]) * (other.p[2]);    // Y1Z2 = Y1*Z2
-                            const underlying_field_type_value X1Z2 = (this->p[0]) * (other.p[2]);    // X1Z2 = X1*Z2
-                            const underlying_field_type_value Z1Z2 = (this->p[2]) * (other.p[2]);    // Z1Z2 = Z1*Z2
+                            const underlying_field_type_value Y1Z2 = (this->Y) * (other.Z);    // Y1Z2 = Y1*Z2
+                            const underlying_field_type_value X1Z2 = (this->X) * (other.Z);    // X1Z2 = X1*Z2
+                            const underlying_field_type_value Z1Z2 = (this->Z) * (other.Z);    // Z1Z2 = Z1*Z2
                             const underlying_field_type_value u =
-                                (other.p[1]) * (this->p[2]) - Y1Z2;                // u    = Y2*Z1-Y1Z2
+                                (other.Y) * (this->Z) - Y1Z2;                // u    = Y2*Z1-Y1Z2
                             const underlying_field_type_value uu = u.squared();    // uu   = u^2
                             const underlying_field_type_value v =
-                                (other.p[0]) * (this->p[2]) - X1Z2;                // v    = X2*Z1-X1Z2
+                                (other.X) * (this->Z) - X1Z2;                // v    = X2*Z1-X1Z2
                             const underlying_field_type_value vv = v.squared();    // vv   = v^2
                             const underlying_field_type_value vvv = v * vv;        // vvv  = v*vv
                             const underlying_field_type_value R = vv * X1Z2;       // R    = vv*X1Z2
@@ -165,17 +174,17 @@ namespace nil {
                                 // NOTE: does not handle O and pts of order 2,4
                                 // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
 
-                                const underlying_field_type_value XX = (this->p[0]).squared();    // XX  = X1^2
-                                const underlying_field_type_value ZZ = (this->p[2]).squared();    // ZZ  = Z1^2
+                                const underlying_field_type_value XX = (this->X).squared();    // XX  = X1^2
+                                const underlying_field_type_value ZZ = (this->Z).squared();    // ZZ  = Z1^2
                                 const underlying_field_type_value w = a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
-                                const underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
+                                const underlying_field_type_value Y1Z1 = (this->Y) * (this->Z);
                                 const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
                                 const underlying_field_type_value ss = s.squared();        // ss  = s^2
                                 const underlying_field_type_value sss = s * ss;            // sss = s*ss
-                                const underlying_field_type_value R = (this->p[1]) * s;    // R   = Y1*s
+                                const underlying_field_type_value R = (this->Y) * s;    // R   = Y1*s
                                 const underlying_field_type_value RR = R.squared();        // RR  = R^2
                                 const underlying_field_type_value B =
-                                    ((this->p[0]) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
+                                    ((this->X) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
                                 const underlying_field_type_value h = w.squared() - (B + B);    // h   = w^2 - 2*B
                                 const underlying_field_type_value X3 = h * s;                   // X3  = h*s
                                 const underlying_field_type_value Y3 =
@@ -189,7 +198,7 @@ namespace nil {
                         mnt6_g1 mixed_add(const mnt6_g1 &other) const {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
-                            // assert(other.p[2] == underlying_field_type_value::one());
+                            // assert(other.Z == underlying_field_type_value::one());
 
                             if (this->is_zero()) {
                                 return other;
@@ -200,32 +209,34 @@ namespace nil {
                             }
 
                             const underlying_field_type_value &X1Z2 =
-                                (this->p[0]);    // X1Z2 = X1*Z2 (but other is special and not zero)
-                            const underlying_field_type_value X2Z1 = (this->p[2]) * (other.p[0]);    // X2Z1 = X2*Z1
+                                (this->X);    // X1Z2 = X1*Z2 (but other is special and not zero)
+                            const underlying_field_type_value X2Z1 = (this->Z) * (other.X);    // X2Z1 = X2*Z1
 
                             // (used both in add and double checks)
 
                             const underlying_field_type_value &Y1Z2 =
-                                (this->p[1]);    // Y1Z2 = Y1*Z2 (but other is special and not zero)
-                            const underlying_field_type_value Y2Z1 = (this->p[2]) * (other.p[1]);    // Y2Z1 = Y2*Z1
+                                (this->Y);    // Y1Z2 = Y1*Z2 (but other is special and not zero)
+                            const underlying_field_type_value Y2Z1 = (this->Z) * (other.Y);    // Y2Z1 = Y2*Z1
 
                             if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
                                 return this->doubled();
                             }
 
-                            underlying_field_type_value u = Y2Z1 - this->p[1];                  // u = Y2*Z1-Y1
+                            underlying_field_type_value u = Y2Z1 - this->Y;                  // u = Y2*Z1-Y1
                             underlying_field_type_value uu = u.squared();                       // uu = u2
-                            underlying_field_type_value v = X2Z1 - this->p[0];                  // v = X2*Z1-X1
+                            underlying_field_type_value v = X2Z1 - this->X;                  // v = X2*Z1-X1
                             underlying_field_type_value vv = v.squared();                       // vv = v2
                             underlying_field_type_value vvv = v * vv;                           // vvv = v*vv
-                            underlying_field_type_value R = vv * this->p[0];                    // R = vv*X1
-                            underlying_field_type_value A = uu * this->p[2] - vvv - R - R;      // A = uu*Z1-vvv-2*R
+                            underlying_field_type_value R = vv * this->X;                    // R = vv*X1
+                            underlying_field_type_value A = uu * this->Z - vvv - R - R;      // A = uu*Z1-vvv-2*R
                             underlying_field_type_value X3 = v * A;                             // X3 = v*A
-                            underlying_field_type_value Y3 = u * (R - A) - vvv * this->p[1];    // Y3 = u*(R-A)-vvv*Y1
-                            underlying_field_type_value Z3 = vvv * this->p[2];                  // Z3 = vvv*Z1
+                            underlying_field_type_value Y3 = u * (R - A) - vvv * this->Y;    // Y3 = u*(R-A)-vvv*Y1
+                            underlying_field_type_value Z3 = vvv * this->Z;                  // Z3 = vvv*Z1
 
                             return mnt6_g1(X3, Y3, Z3);
                         }
+
+                        /*************************  Reducing operations  ***********************************/
 
                         mnt6_g1 to_affine_coordinates() const {
                             underlying_field_type_value p_out[3];
@@ -235,9 +246,9 @@ namespace nil {
                                 p_out[1] = underlying_field_type_value::one();
                                 p_out[2] = underlying_field_type_value::zero();
                             } else {
-                                const underlying_field_type_value Z_inv = this->p[2].inversed();
-                                p_out[0] = this->p[0] * Z_inv;
-                                p_out[1] = this->p[1] * Z_inv;
+                                const underlying_field_type_value Z_inv = this->Z.inversed();
+                                p_out[0] = this->X * Z_inv;
+                                p_out[1] = this->Y * Z_inv;
                                 p_out[2] = underlying_field_type_value::one();
                             }
 
@@ -246,10 +257,6 @@ namespace nil {
 
                         mnt6_g1 to_special() const {
                             return this->to_affine_coordinates();
-                        }
-
-                        bool is_special() const {
-                            return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                         }
 
                     private:

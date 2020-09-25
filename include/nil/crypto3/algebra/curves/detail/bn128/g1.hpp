@@ -41,10 +41,11 @@ namespace nil {
 
                         //constexpr static const std::size_t element_size =  policy_type::g1_field_type::element_size;
 
-                        underlying_field_type_value p[3];
-                        underlying_field_type_value &X = p[0];
-                        underlying_field_type_value &Y = p[1];
-                        underlying_field_type_value &Z = p[2];
+                        underlying_field_type_value X;
+                        underlying_field_type_value Y;
+                        underlying_field_type_value Z;
+
+                        /*************************  Constructors and zero/one  ***********************************/
 
                         bn128_g1() :
                             bn128_g1(underlying_field_type_value::one(), underlying_field_type_value::one(),
@@ -56,9 +57,9 @@ namespace nil {
                         bn128_g1(underlying_field_type_value X,
                                  underlying_field_type_value Y,
                                  underlying_field_type_value Z) {
-                            p[0] = X;
-                            p[1] = Y;
-                            p[2] = Z;
+                            X = X;
+                            Y = Y;
+                            Z = Z;
                         };
 
                         static bn128_g1 zero() {
@@ -73,6 +74,8 @@ namespace nil {
                             // when constexpr fields will be finished
                         }
 
+                        /*************************  Comparison operations  ***********************************/
+
                         bool operator==(const bn128_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
@@ -85,20 +88,20 @@ namespace nil {
                             /* now neither is O */
 
                             underlying_field_type_value Z1sq, Z2sq, lhs, rhs;
-                            Z1sq = (this->p[2]).squared();
-                            Z2sq = other.p[2].squared();
-                            lhs = Z2sq * this->p[0];
-                            rhs = Z1sq * other.p[0];
+                            Z1sq = (this->Z).squared();
+                            Z2sq = other.Z.squared();
+                            lhs = Z2sq * this->X;
+                            rhs = Z1sq * other.X;
 
                             if (lhs != rhs) {
                                 return false;
                             }
 
                             underlying_field_type_value Z1cubed, Z2cubed;
-                            Z1cubed = Z1sq * this->p[2];
-                            Z2cubed = Z2sq * other.p[2];
-                            lhs = Z2cubed * this->p[1];
-                            rhs = Z1cubed * other.p[1];
+                            Z1cubed = Z1sq * this->Z;
+                            Z2cubed = Z2sq * other.Z;
+                            lhs = Z2cubed * this->Y;
+                            rhs = Z1cubed * other.Y;
 
                             return (lhs == rhs);
                         }
@@ -108,12 +111,18 @@ namespace nil {
                         }
 
                         bool is_zero() const {
-                            return p[2].is_zero();
+                            return Z.is_zero();
                         }
+
+                        bool is_special() const {
+                            return (this->is_zero() || this->Z == 1);
+                        }
+
+                        /*************************  Arithmetic operations  ***********************************/
 
                         /*
                             Jacobi coordinate
-                            (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (other.p[0], other.p[1], other.p[2])
+                            (p_out[0], p_out[1], p_out[2]) = (X, Y, Z) + (other.X, other.Y, other.Z)
                         */
                         bn128_g1 operator+(const bn128_g1 &other) const {
 
@@ -134,47 +143,47 @@ namespace nil {
                         }
 
                         bn128_g1 operator-() const {
-                            return bn128_g1(p[0], -p[1], p[2]);
+                            return bn128_g1(X, -Y, Z);
                         }
 
                         /*
                             Jacobi coordinate
-                            (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
+                            (p_out[0], p_out[1], p_out[2]) = 2(X, Y, Z)
                         */
                         bn128_g1 doubled() const {
                             underlying_field_type_value p_out[3];
 
                             underlying_field_type_value A, B, C, D, E;
-                            A = p[0].squared();
-                            B = p[1].squared();
+                            A = X.squared();
+                            B = Y.squared();
                             C = B.squared();
-                            D = ((p[0] + B).squared() - A - C).doubled();
+                            D = ((X + B).squared() - A - C).doubled();
                             E = A.doubled() + A;
 
                             p_out[0] = E.squared() - D.doubled();
                             p_out[1] = E * (D - p_out[0]) - C.doubled().doubled().doubled();
-                            p_out[2] = (p[1] * p[2]).doubled();
+                            p_out[2] = (Y * Z).doubled();
 
                             return bn128_g1(p_out[0], p_out[1], p_out[2]);
                         }
 
                         bn128_g1 operator+=(const bn128_g1 &other) {
 
-                            if (p[2].is_zero()) {
+                            if (Z.is_zero()) {
                                 return other;
                             }
-                            if (other.p[2].is_zero()) {
+                            if (other.Z.is_zero()) {
                                 return *this;
                             }
                             underlying_field_type_value Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
-                            Z1Z1 = p[2].squared();
-                            Z2Z2 = other.p[2].squared();
-                            U1 = p[0] * Z2Z2;
-                            U2 = other.p[0] * Z1Z1;
+                            Z1Z1 = Z.squared();
+                            Z2Z2 = other.Z.squared();
+                            U1 = X * Z2Z2;
+                            U2 = other.X * Z1Z1;
 
-                            S1 = p[1] * other.p[2] * Z2Z2;
-                            S2 = other.p[1] * p[2] * Z1Z1;
+                            S1 = Y * other.Z * Z2Z2;
+                            S2 = other.Y * Z * Z1Z1;
 
                             H = U2 - U1;
                             t3 = S2 - S1;
@@ -183,7 +192,7 @@ namespace nil {
                                 if (t3.is_zero()) {
                                     return doubled();
                                 } else {
-                                    p[2] = underlying_field_type_value::zero();    // not sure
+                                    Z = underlying_field_type_value::zero();    // not sure
                                 }
                                 return *this;
                             }
@@ -192,9 +201,9 @@ namespace nil {
                             J = H * I;
                             r = t3.doubled();
                             V = U1 * I;
-                            p[0] = r.squared() - J - V.doubled();
-                            p[1] = r * (V - p[0]) - (S1 * J).doubled();
-                            p[2] = ((p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) * H;
+                            X = r.squared() - J - V.doubled();
+                            Y = r * (V - X) - (S1 * J).doubled();
+                            Z = ((Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;
 
                             return *this;
                         }
@@ -229,14 +238,14 @@ namespace nil {
 
                             // we know that Z2 = 1
 
-                            underlying_field_type_value Z1Z1 = this->p[2].squared();
+                            underlying_field_type_value Z1Z1 = this->Z.squared();
 
-                            underlying_field_type_value U2 = other.p[0] * Z1Z1;
+                            underlying_field_type_value U2 = other.X * Z1Z1;
 
-                            underlying_field_type_value S2 = other.p[1] * this->p[2] * Z1Z1;
+                            underlying_field_type_value S2 = other.Y * this->Z * Z1Z1;
                             ;    // S2 = Y2*Z1*Z1Z1
 
-                            if (this->p[0] == U2 && this->p[1] == S2) {
+                            if (this->X == U2 && this->Y == S2) {
                                 // dbl case; nothing of above can be reused
                                 return this->doubled();
                             }
@@ -244,7 +253,7 @@ namespace nil {
                             bn128_g1 result;
                             underlying_field_type_value H, HH, I, J, r, V;
                             // H = U2-X1
-                            H = U2 - this->p[0];
+                            H = U2 - this->X;
                             // HH = H^2
                             HH = H.squared();
                             // I = 4*HH
@@ -252,15 +261,15 @@ namespace nil {
                             // J = H*I
                             J = H * I;
                             // r = 2*(S2-Y1)
-                            r = (S2 - this->p[1]).doubled();
+                            r = (S2 - this->Y).doubled();
                             // V = X1*I
-                            V = this->p[0] * I;
+                            V = this->X * I;
                             // X3 = r^2-J-2*V
-                            result.p[0] = r.squared() - J - V.doubled();
+                            result.X = r.squared() - J - V.doubled();
                             // Y3 = r*(V-X3)-2*Y1*J
-                            result.p[1] = r * (V - result.p[0]) - (this->p[1] * J).doubled();
+                            result.Y = r * (V - result.X) - (this->Y * J).doubled();
                             // Z3 = (Z1+H)^2-Z1Z1-HH
-                            result.p[2] = (this->p[2] + H).squared() - Z1Z1 - HH;
+                            result.Z = (this->Z + H).squared() - Z1Z1 - HH;
 
                             return result;
                         }
@@ -285,23 +294,25 @@ namespace nil {
                         bn128_g1 &operator*=(const N &y) {
                             bn128_g1 t = *this * y;
 
-                            p[0] = t.p[0];
-                            p[1] = t.p[1];
-                            p[2] = t.p[2];
+                            X = t.X;
+                            Y = t.Y;
+                            Z = t.Z;
 
                             return *this;
                         }
 
+                        /*************************  Reducing operations  ***********************************/
+
                         bn128_g1 to_affine_coordinates() const {
                             underlying_field_type_value p_out[3];
 
-                            if (is_zero() || p[2] == 1)
+                            if (is_zero() || Z == 1)
                                 return *this;
                             underlying_field_type_value r, r2;
-                            r = p[2].inversed();
+                            r = Z.inversed();
                             r2 = r.squared();
-                            p_out[0] = p[0] * r2;        // r2
-                            p_out[1] = p[1] * r * r2;    // r3
+                            p_out[0] = X * r2;        // r2
+                            p_out[1] = Y * r * r2;    // r3
                             p_out[2] = underlying_field_type_value::one();
 
                             return bn128_g1(p_out[0], p_out[1], p_out[2]);
@@ -309,10 +320,6 @@ namespace nil {
 
                         bn128_g1 to_special() const {
                             return this->to_affine_coordinates();
-                        }
-
-                        bool is_special() const {
-                            return (this->is_zero() || this->p[2] == 1);
                         }
 
                     private:

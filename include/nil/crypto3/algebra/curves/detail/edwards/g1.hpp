@@ -35,24 +35,26 @@ namespace nil {
                         using underlying_field_type_value = g1_field_type_value;
 
                         constexpr static const std::size_t element_size =  policy_type::g1_field_type::element_size;
-                        
-                        underlying_field_type_value p[3];
-                        underlying_field_type_value &X = p[0];
-                        underlying_field_type_value &Y = p[1];
-                        underlying_field_type_value &Z = p[2];
 
-                        edwards_g1() :
-                            edwards_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                                       underlying_field_type_value::zero()) {};
+                        underlying_field_type_value X;
+                        underlying_field_type_value Y;
+                        underlying_field_type_value Z;
+
+
+                        /*************************  Constructors and zero/one  ***********************************/
+
+                        edwards_g1() : edwards_g1(underlying_field_type_value::zero(), 
+                                                  underlying_field_type_value::one(),
+                                                  underlying_field_type_value::zero()) {};
                         // must be
                         // edwards_g1() : edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
-                        edwards_g1(underlying_field_type_value X, underlying_field_type_value Y,
-                                   underlying_field_type_value Z) {
-                            p[0] = X;
-                            p[1] = Y;
-                            p[2] = Z;
+                        edwards_g1(underlying_field_type_value in_X, underlying_field_type_value in_Y,
+                                   underlying_field_type_value in_Z) {
+                            X = X;
+                            Y = Y;
+                            Z = Z;
                         };
 
                         edwards_g1(underlying_field_type_value X, underlying_field_type_value Y) :
@@ -74,6 +76,8 @@ namespace nil {
                             // one_fill[2] when constexpr fields will be finished
                         }
 
+                        /*************************  Comparison operations  ***********************************/
+
                         bool operator==(const edwards_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
@@ -86,12 +90,12 @@ namespace nil {
                             /* now neither is O */
 
                             // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
-                            if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])) {
+                            if ((this->X * other.Z) != (other.X * this->Z)) {
                                 return false;
                             }
 
                             // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
-                            if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])) {
+                            if ((this->Y * other.Z) != (other.Y * this->Z)) {
                                 return false;
                             }
 
@@ -103,31 +107,39 @@ namespace nil {
                         }
 
                         bool is_zero() const {
-                            return (this->p[1].is_zero() && this->p[2].is_zero());
+                            return (this->Y.is_zero() && this->Z.is_zero());
+                        }
+
+                        bool is_special() const {
+                            return (this->is_zero() || this->Z == underlying_field_type_value::one());
+                        }
+
+                        /*************************  Arithmetic operations  ***********************************/
+
+                        edwards_g1 operator=(const edwards_g1 &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
+
+                            return *this;
                         }
 
                         edwards_g1 operator+(const edwards_g1 &other) const {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                return other;
+                            }
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
+                            if (other.is_zero()) {
+                                return (*this);
+                            }
 
-                            underlying_field_type_value A = (this->p[2]) * (other.p[2]);    // A = Z1*Z2
-                            underlying_field_type_value B = d * A.squared();                // B = d*A^2
-                            underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
-                            underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
-                            underlying_field_type_value E = C * D;                          // E = C*D
-                            underlying_field_type_value H = C - D;                          // H = C-D
-                            underlying_field_type_value I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C -
-                                                            D;               // I = (X1+Y1)*(X2+Y2)-C-D
-                            underlying_field_type_value X3 = (E + B) * H;    // X3 = c*(E+B)*H
-                            underlying_field_type_value Y3 = (E - B) * I;    // Y3 = c*(E-B)*I
-                            underlying_field_type_value Z3 = A * H * I;      // Z3 = A*H*I
-
-                            return edwards_g1(X3, Y3, Z3);
+                            return this->add(other);
                         }
 
                         edwards_g1 operator-() const {
-                            return edwards_g1(-(this->p[0]), this->p[1], this->p[2]);
+                            return edwards_g1(-(this->X), this->Y, this->Z);
                         }
 
                         edwards_g1 operator-(const edwards_g1 &B) const {
@@ -142,14 +154,14 @@ namespace nil {
                                 // NOTE: does not handle O and pts of order 2,4
                                 // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#doubling-dbl-2007-bl
 
-                                underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
-                                underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
+                                underlying_field_type_value A = (this->X).squared();    // A = X1^2
+                                underlying_field_type_value B = (this->Y).squared();    // B = Y1^2
                                 underlying_field_type_value C = A + B;                     // C = A+B
                                 underlying_field_type_value D = A - B;                     // D = A-B
                                 underlying_field_type_value E =
-                                    (this->p[0] + this->p[1]).squared() - C;    // E = (X1+Y1)^2-C
+                                    (this->X + this->Y).squared() - C;    // E = (X1+Y1)^2-C
                                 underlying_field_type_value X3 = C * D;         // X3 = C*D
-                                underlying_field_type_value dZZ = d * this->p[2].squared();
+                                underlying_field_type_value dZZ = d * this->Z.squared();
                                 underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                                 underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 
@@ -171,13 +183,13 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
 
-                            underlying_field_type_value A = this->p[2];                     // A = Z1
+                            underlying_field_type_value A = this->Z;                     // A = Z1
                             underlying_field_type_value B = d * A.squared();                // B = d*A^2
-                            underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
-                            underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
+                            underlying_field_type_value C = (this->X) * (other.X);    // C = X1*X2
+                            underlying_field_type_value D = (this->Y) * (other.Y);    // D = Y1*Y2
                             underlying_field_type_value E = C * D;                          // E = C*D
                             underlying_field_type_value H = C - D;                          // H = C-D
-                            underlying_field_type_value I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C -
+                            underlying_field_type_value I = (this->X + this->Y) * (other.X + other.Y) - C -
                                                             D;               // I = (X1+Y1)*(X2+Y2)-C-D
                             underlying_field_type_value X3 = (E + B) * H;    // X3 = c*(E+B)*H
                             underlying_field_type_value Y3 = (E - B) * I;    // Y3 = c*(E-B)*I
@@ -185,6 +197,31 @@ namespace nil {
 
                             return edwards_g1(X3, Y3, Z3);
                         }
+
+                    private:
+
+                        edwards_g1 add(const edwards_g1 &other) const {
+                        
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
+
+                            underlying_field_type_value A = (this->Z) * (other.Z);                   // A = Z1*Z2
+                            underlying_field_type_value B = d * A.squared();           // B = d*A^2
+                            underlying_field_type_value C = (this->X) * (other.X);                   // C = X1*X2
+                            underlying_field_type_value D = (this->Y) * (other.Y);                   // D = Y1*Y2
+                            underlying_field_type_value E = C * D;                                   // E = C*D
+                            underlying_field_type_value H = C - D;                                   // H = C-D
+                            underlying_field_type_value I = (this->X+this->Y)*(other.X+other.Y)-C-D; // I = (X1+Y1)*(X2+Y2)-C-D
+                            underlying_field_type_value X3 = (E+B)*H;                                // X3 = c*(E+B)*H
+                            underlying_field_type_value Y3 = (E-B)*I;                                // Y3 = c*(E-B)*I
+                            underlying_field_type_value Z3 = A*H*I;                                  // Z3 = A*H*I
+
+                            return edwards_g1(X3, Y3, Z3);
+                        }
+
+                    public:
+
+                        /*************************  Reducing operations  ***********************************/
 
                         edwards_g1 to_affine_coordinates() const {
                             underlying_field_type_value p_out[3];
@@ -195,9 +232,9 @@ namespace nil {
                                 p_out[2] = underlying_field_type_value::one();
                             } else {
                                 // go from inverted coordinates to projective coordinates
-                                underlying_field_type_value tX = this->p[1] * this->p[2];
-                                underlying_field_type_value tY = this->p[0] * this->p[2];
-                                underlying_field_type_value tZ = this->p[0] * this->p[1];
+                                underlying_field_type_value tX = this->Y * this->Z;
+                                underlying_field_type_value tY = this->X * this->Z;
+                                underlying_field_type_value tZ = this->X * this->Y;
                                 // go from projective coordinates to affine coordinates
                                 underlying_field_type_value tZ_inv = tZ.inversed();
                                 p_out[0] = tX * tZ_inv;
@@ -211,23 +248,20 @@ namespace nil {
                         edwards_g1 to_special() const {
                             underlying_field_type_value p_out[3];
 
-                            if (this->p[2].is_zero()) {
+                            if (this->Z.is_zero()) {
                                 return *this;
                             }
 
-                            underlying_field_type_value Z_inv = this->p[2].inversed();
-                            p_out[0] = this->p[0] * Z_inv;
-                            p_out[1] = this->p[1] * Z_inv;
+                            underlying_field_type_value Z_inv = this->Z.inversed();
+                            p_out[0] = this->X * Z_inv;
+                            p_out[1] = this->Y * Z_inv;
                             p_out[2] = underlying_field_type_value::one();
 
                             return edwards_g1(p_out[0], p_out[1], p_out[2]);
                         }
 
-                        bool is_special() const {
-                            return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
-                        }
-
                     private:
+
                         /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                         /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
 

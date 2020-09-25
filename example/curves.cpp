@@ -25,20 +25,20 @@ using namespace nil::crypto3::algebra;
 
 template<typename FpCurveGroup>
 void print_fp_curve_group_element(FpCurveGroup e) {
-    std::cout << e.p[0].data << " " << e.p[1].data << " " << e.p[2].data << std::endl;
+    std::cout << e.X.data << " " << e.Y.data << " " << e.Z.data << std::endl;
 }
 
 template<typename Fp2CurveGroup>
 void print_fp2_curve_group_element(Fp2CurveGroup e) {
-    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << ") (" << e.p[1].data[0].data << " "
-              << e.p[1].data[1].data << ") (" << e.p[2].data[0].data << " " << e.p[2].data[1].data << ")" << std::endl;
+    std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << ") (" << e.Y.data[0].data << " "
+              << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
 }
 
 template<typename Fp3CurveGroup>
 void print_fp3_curve_group_element(Fp3CurveGroup e) {
-    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << e.p[0].data[2].data << ") ("
-              << e.p[1].data[0].data << " " << e.p[1].data[1].data << e.p[1].data[2].data << ") ("
-              << e.p[2].data[0].data << " " << e.p[2].data[1].data << e.p[2].data[2].data << ")" << std::endl;
+    std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << e.X.data[2].data << ") ("
+              << e.Y.data[0].data << " " << e.Y.data[1].data << e.Y.data[2].data << ") ("
+              << e.Z.data[0].data << " " << e.Z.data[1].data << e.Z.data[2].data << ")" << std::endl;
 }
 
 // print dunctions can be made using arity in fields

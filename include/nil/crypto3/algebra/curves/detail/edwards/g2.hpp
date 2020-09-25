@@ -36,10 +36,11 @@ namespace nil {
 
                         constexpr static const std::size_t element_size =  policy_type::g2_field_type::element_size;
 
-                        underlying_field_type_value p[3];
-                        underlying_field_type_value &X = p[0];
-                        underlying_field_type_value &Y = p[1];
-                        underlying_field_type_value &Z = p[2];
+                        underlying_field_type_value X;
+                        underlying_field_type_value Y;
+                        underlying_field_type_value Z;
+
+                        /*************************  Constructors and zero/one  ***********************************/
 
                         edwards_g2() :
                             edwards_g2(
@@ -54,11 +55,11 @@ namespace nil {
                         // edwards_g2() : edwards_g2(one_fill[0], one_fill[1]) {};
                         // when constexpr fields will be finished
 
-                        edwards_g2(underlying_field_type_value X, underlying_field_type_value Y,
-                                   underlying_field_type_value Z) {
-                            p[0] = X;
-                            p[1] = Y;
-                            p[2] = Z;
+                        edwards_g2(underlying_field_type_value in_X, underlying_field_type_value in_Y,
+                                   underlying_field_type_value in_Z) {
+                            X = X;
+                            Y = Y;
+                            Z = Z;
 
                             // temporary, until fp3 will be literall
                             twist_mul_by_a_c0 = a * X.non_residue;
@@ -93,6 +94,8 @@ namespace nil {
                             // one_fill[2] when constexpr fields will be finished
                         }
 
+                        /*************************  Comparison operations  ***********************************/
+
                         bool operator==(const edwards_g2 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
@@ -105,12 +108,12 @@ namespace nil {
                             /* now neither is O */
 
                             // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
-                            if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])) {
+                            if ((this->X * other.Z) != (other.X * this->Z)) {
                                 return false;
                             }
 
                             // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
-                            if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])) {
+                            if ((this->Y * other.Z) != (other.Y * this->Z)) {
                                 return false;
                             }
 
@@ -122,32 +125,39 @@ namespace nil {
                         }
 
                         bool is_zero() const {
-                            return (this->p[1].is_zero() && this->p[2].is_zero());
+                            return (this->Y.is_zero() && this->Z.is_zero());
+                        }
+
+                        bool is_special() const {
+                            return (this->is_zero() || this->Z == underlying_field_type_value::one());
+                        }
+
+                        /*************************  Arithmetic operations  ***********************************/
+
+                        edwards_g2 operator=(const edwards_g2 &other) {
+                            // handle special cases having to do with O
+                            this->X = other.X;
+                            this->Y = other.Y;
+                            this->Z = other.Z;
+
+                            return *this;
                         }
 
                         edwards_g2 operator+(const edwards_g2 &other) const {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                return other;
+                            }
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
+                            if (other.is_zero()) {
+                                return (*this);
+                            }
 
-                            const underlying_field_type_value A = (this->p[2]) * (other.p[2]);    // A = Z1*Z2
-                            const underlying_field_type_value B = this->mul_by_d(A.squared());    // B = d*A^2
-                            const underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
-                            const underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
-                            const underlying_field_type_value E = C * D;                          // E = C*D
-                            const underlying_field_type_value H = C - this->mul_by_a(D);          // H = C-a*D
-                            const underlying_field_type_value I =
-                                (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C -
-                                D;                                                 // I = (X1+Y1)*(X2+Y2)-C-D
-                            const underlying_field_type_value X3 = (E + B) * H;    // X3 = (E+B)*H
-                            const underlying_field_type_value Y3 = (E - B) * I;    // Y3 = (E-B)*I
-                            const underlying_field_type_value Z3 = A * H * I;      // Z3 = A*H*I
-
-                            return edwards_g2(X3, Y3, Z3);
+                            return this->add(other);
                         }
 
                         edwards_g2 operator-() const {
-                            return edwards_g2(-(this->p[0]), this->p[1], this->p[2]);
+                            return edwards_g2(-(this->X), this->Y, this->Z);
                         }
 
                         edwards_g2 operator-(const edwards_g2 &other) const {
@@ -162,15 +172,15 @@ namespace nil {
                                 // NOTE: does not handle O and pts of order 2,4
                                 // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
 
-                                const underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
-                                const underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
+                                const underlying_field_type_value A = (this->X).squared();    // A = X1^2
+                                const underlying_field_type_value B = (this->Y).squared();    // B = Y1^2
                                 const underlying_field_type_value U = mul_by_a(B);               // U = a*B
                                 const underlying_field_type_value C = A + U;                     // C = A+U
                                 const underlying_field_type_value D = A - U;                     // D = A-U
                                 const underlying_field_type_value E =
-                                    (this->p[0] + this->p[1]).squared() - A - B;    // E = (X1+Y1)^2-A-B
+                                    (this->X + this->Y).squared() - A - B;    // E = (X1+Y1)^2-A-B
                                 const underlying_field_type_value X3 = C * D;       // X3 = C*D
-                                const underlying_field_type_value dZZ = mul_by_d(this->p[2].squared());
+                                const underlying_field_type_value dZZ = mul_by_d(this->Z.squared());
                                 const underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                                 const underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 
@@ -192,14 +202,14 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
 
-                            const underlying_field_type_value A = this->p[2];                     // A = Z1*Z2
+                            const underlying_field_type_value A = this->Z;                     // A = Z1*Z2
                             const underlying_field_type_value B = mul_by_d(A.squared());          // B = d*A^2
-                            const underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
-                            const underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
+                            const underlying_field_type_value C = (this->X) * (other.X);    // C = X1*X2
+                            const underlying_field_type_value D = (this->Y) * (other.Y);    // D = Y1*Y2
                             const underlying_field_type_value E = C * D;                          // E = C*D
                             const underlying_field_type_value H = C - mul_by_a(D);                // H = C-a*D
                             const underlying_field_type_value I =
-                                (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C -
+                                (this->X + this->Y) * (other.X + other.Y) - C -
                                 D;                                                 // I = (X1+Y1)*(X2+Y2)-C-D
                             const underlying_field_type_value X3 = (E + B) * H;    // X3 = (E+B)*H
                             const underlying_field_type_value Y3 = (E - B) * I;    // Y3 = (E-B)*I
@@ -208,46 +218,29 @@ namespace nil {
                             return edwards_g2(X3, Y3, Z3);
                         }
 
-                        edwards_g2 to_affine_coordinates() const {
-                            underlying_field_type_value p_out[3];
+                    private:
 
-                            if (this->is_zero()) {
-                                p_out[0] = underlying_field_type_value::zero();
-                                p_out[1] = underlying_field_type_value::one();
-                                p_out[2] = underlying_field_type_value::one();
-                            } else {
-                                // go from inverted coordinates to projective coordinates
-                                underlying_field_type_value tX = this->p[1] * this->p[2];
-                                underlying_field_type_value tY = this->p[0] * this->p[2];
-                                underlying_field_type_value tZ = this->p[0] * this->p[1];
-                                // go from projective coordinates to affine coordinates
-                                underlying_field_type_value tZ_inv = tZ.inversed();
-                                p_out[0] = tX * tZ_inv;
-                                p_out[1] = tY * tZ_inv;
-                                p_out[2] = underlying_field_type_value::one();
-                            }
+                        edwards_g2 add(const edwards_g2 &other) const {
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
-                            return edwards_g2(p_out[0], p_out[1], p_out[2]);
+                            const underlying_field_type_value A = (this->Z) * (other.Z);                       // A = Z1*Z2
+                            const underlying_field_type_value B = this->mul_by_d(A.squared());           // B = d*A^2
+                            const underlying_field_type_value C = (this->X) * (other.X);                       // C = X1*X2
+                            const underlying_field_type_value D = (this->Y) * (other.Y);                       // D = Y1*Y2
+                            const underlying_field_type_value E = C*D;                                         // E = C*D
+                            const underlying_field_type_value H = C - this->mul_by_a(D);                 // H = C-a*D
+                            const underlying_field_type_value I = (this->X+this->Y)*(other.X+other.Y)-C-D;     // I = (X1+Y1)*(X2+Y2)-C-D
+                            const underlying_field_type_value X3 = (E+B)*H;                                    // X3 = (E+B)*H
+                            const underlying_field_type_value Y3 = (E-B)*I;                                    // Y3 = (E-B)*I
+                            const underlying_field_type_value Z3 = A*H*I;                                      // Z3 = A*H*I
+
+                            return edwards_g2(X3, Y3, Z3);
                         }
 
-                        edwards_g2 to_special() const {
-                            underlying_field_type_value p_out[3];
+                    public:
 
-                            if (this->p[2].is_zero()) {
-                                return *this;
-                            }
-
-                            underlying_field_type_value Z_inv = this->p[2].inversed();
-                            p_out[0] = this->p[0] * Z_inv;
-                            p_out[1] = this->p[1] * Z_inv;
-                            p_out[2] = underlying_field_type_value::one();
-
-                            return edwards_g2(p_out[0], p_out[1], p_out[2]);
-                        }
-
-                        bool is_special() const {
-                            return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
-                        }
+                        /*************************  Extra arithmetic operations  ***********************************/
 
                         /*inline static */ underlying_field_type_value
                             mul_by_a(const underlying_field_type_value &elt) const {
@@ -262,13 +255,54 @@ namespace nil {
                                                                twist_mul_by_d_c2 * elt.data[1]);
                         }
 
+                        /*************************  Reducing operations  ***********************************/
+
+                        edwards_g2 to_affine_coordinates() const {
+                            underlying_field_type_value p_out[3];
+
+                            if (this->is_zero()) {
+                                p_out[0] = underlying_field_type_value::zero();
+                                p_out[1] = underlying_field_type_value::one();
+                                p_out[2] = underlying_field_type_value::one();
+                            } else {
+                                // go from inverted coordinates to projective coordinates
+                                underlying_field_type_value tX = this->Y * this->Z;
+                                underlying_field_type_value tY = this->X * this->Z;
+                                underlying_field_type_value tZ = this->X * this->Y;
+                                // go from projective coordinates to affine coordinates
+                                underlying_field_type_value tZ_inv = tZ.inversed();
+                                p_out[0] = tX * tZ_inv;
+                                p_out[1] = tY * tZ_inv;
+                                p_out[2] = underlying_field_type_value::one();
+                            }
+
+                            return edwards_g2(p_out[0], p_out[1], p_out[2]);
+                        }
+
+                        edwards_g2 to_special() const {
+                            underlying_field_type_value p_out[3];
+
+                            if (this->Z.is_zero()) {
+                                return *this;
+                            }
+
+                            underlying_field_type_value Z_inv = this->Z.inversed();
+                            p_out[0] = this->X * Z_inv;
+                            p_out[1] = this->Y * Z_inv;
+                            p_out[2] = underlying_field_type_value::one();
+
+                            return edwards_g2(p_out[0], p_out[1], p_out[2]);
+                        }
+
                     private:
+
                         /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                         /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
 
-                        /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
-                            {g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one(),
-                             g2_field_type_value::underlying_type::zero()});
+                        /*constexpr static */ const g2_field_type_value twist = g2_field_type_value( 
+                                                {g2_field_type_value::underlying_type::zero(), 
+                                                 g2_field_type_value::underlying_type::one(),
+                                                 g2_field_type_value::underlying_type::zero()});
                         ;
                         /*constexpr static */ const g2_field_type_value twist_coeff_a = a * twist;
                         /*constexpr static */ const g2_field_type_value twist_coeff_d = d * twist;
