@@ -52,9 +52,9 @@ namespace nil {
 
                         edwards_g1(underlying_field_type_value in_X, underlying_field_type_value in_Y,
                                    underlying_field_type_value in_Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
                         };
 
                         edwards_g1(underlying_field_type_value X, underlying_field_type_value Y) :

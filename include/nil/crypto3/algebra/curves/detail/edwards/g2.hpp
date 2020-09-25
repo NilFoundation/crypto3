@@ -57,9 +57,9 @@ namespace nil {
 
                         edwards_g2(underlying_field_type_value in_X, underlying_field_type_value in_Y,
                                    underlying_field_type_value in_Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
 
                             // temporary, until fp3 will be literall
                             twist_mul_by_a_c0 = a * X.non_residue;

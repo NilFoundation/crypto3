@@ -51,9 +51,9 @@ namespace nil {
 
                         alt_bn128_g1(underlying_field_type_value X, underlying_field_type_value Y,
                                      underlying_field_type_value Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
                         };
 
                         static alt_bn128_g1 zero() {

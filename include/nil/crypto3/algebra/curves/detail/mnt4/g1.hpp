@@ -57,9 +57,9 @@ namespace nil {
                         mnt4_g1(underlying_field_type_value X,
                                 underlying_field_type_value Y,
                                 underlying_field_type_value Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
                         };
 
                         static mnt4_g1 zero() {

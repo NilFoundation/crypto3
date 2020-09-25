@@ -54,9 +54,9 @@ namespace nil {
                         bls12_g2(underlying_field_type_value X,
                                  underlying_field_type_value Y,
                                  underlying_field_type_value Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
                         };
 
                         static bls12_g2 zero() {
@@ -353,9 +353,9 @@ namespace nil {
                         bls12_g2(underlying_field_type_value X,
                                  underlying_field_type_value Y,
                                  underlying_field_type_value Z) {
-                            X = X;
-                            Y = Y;
-                            Z = Z;
+                            this->X = X;
+                            this->Y = Y;
+                            this->Z = Z;
                         };
 
                         static bls12_g2 zero() {
