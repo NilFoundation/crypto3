@@ -129,8 +129,8 @@ namespace nil {
                                                             const ram_boot_trace<RAMType> &boot_trace) {
                     typedef ram_base_field<RAMType> FieldType;
 
-                    const std::size_t packed_input_element_size =
-                        ram_universal_component<RAMType>::packed_input_element_size(ap);
+                    const std::size_t packed_input_value_bits =
+                        ram_universal_component<RAMType>::packed_input_value_bits(ap);
                     r1cs_primary_input<FieldType> result(
                         ram_universal_component<RAMType>::packed_input_size(ap, boot_trace_size_bound));
 
@@ -147,7 +147,7 @@ namespace nil {
                             ram_to_r1cs<RAMType>::pack_primary_input_address_and_value(ap, av);
                         std::copy(packed_input_element.begin(),
                                   packed_input_element.end(),
-                                  result.begin() + packed_input_element_size * (boot_trace_size_bound - 1 - input_pos));
+                                  result.begin() + packed_input_value_bits * (boot_trace_size_bound - 1 - input_pos));
 
                         bound_input_locations.insert(input_pos);
                     }

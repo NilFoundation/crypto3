@@ -217,8 +217,8 @@ namespace nil {
 
                     ram_ppzksnark_verification_key<ram_ppzksnark_ppT> result(*this);
 
-                    const std::size_t packed_input_element_size =
-                        ram_universal_component<ram_ppT>::packed_input_element_size(ap);
+                    const std::size_t packed_input_value_bits =
+                        ram_universal_component<ram_ppT>::packed_input_value_bits(ap);
 
                     for (auto it : primary_input.get_all_trace_entries()) {
                         const std::size_t input_pos = it.first;
@@ -234,7 +234,7 @@ namespace nil {
                             result.r1cs_vk.encoded_IC_query.template accumulate_chunk<FieldType>(
                                 packed_input_element.begin(),
                                 packed_input_element.end(),
-                                packed_input_element_size * (primary_input_size_bound - 1 - input_pos));
+                                packed_input_value_bits * (primary_input_size_bound - 1 - input_pos));
 
                         result.bound_primary_input_locations.insert(input_pos);
                     }

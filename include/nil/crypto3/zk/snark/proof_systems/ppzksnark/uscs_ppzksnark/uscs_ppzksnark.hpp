@@ -114,8 +114,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return CurveType::g1_type::element_size * G1_size() +
-                               CurveType::g2_type::element_size * G2_size();
+                        return CurveType::g1_type::value_bits * G1_size() +
+                               CurveType::g2_type::value_bits * G2_size();
                     }
 
                     bool operator==(const uscs_ppzksnark_proving_key<CurveType> &other) const;
@@ -152,7 +152,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return encoded_IC_query.size_in_bits() + 3 * CurveType::g2_type::element_size;
+                        return encoded_IC_query.size_in_bits() + 3 * CurveType::g2_type::value_bits;
                     }
 
                     bool operator==(const uscs_ppzksnark_verification_key<CurveType> &other) const;
@@ -245,8 +245,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * CurveType::g1_type::element_size +
-                               G2_size() * CurveType::g2_type::element_size;
+                        return G1_size() * CurveType::g1_type::value_bits +
+                               G2_size() * CurveType::g2_type::value_bits;
                     }
 
                     bool is_well_formed() const {
@@ -438,31 +438,31 @@ namespace nil {
                     std::size_t g2_window = algebra::get_exp_window_size<typename CurveType::g2_type>(g2_exp_count);
 
                     algebra::window_table<typename CurveType::g1_type> g1_table =
-                        get_window_table(typename CurveType::scalar_field_type::element_size, g1_window, typename CurveType::g1_type::one());
+                        get_window_table(typename CurveType::scalar_field_type::value_bits, g1_window, typename CurveType::g1_type::one());
 
                     algebra::window_table<typename CurveType::g2_type> g2_table =
-                        get_window_table(typename CurveType::scalar_field_type::element_size, g2_window, typename CurveType::g2_type::one());
+                        get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window, typename CurveType::g2_type::one());
 
                     typename CurveType::g1_vector V_g1_query =
-                        batch_exp(typename CurveType::scalar_field_type::element_size, g1_window, g1_table, Vt_table_minus_Xt_table);
+                        batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(V_g1_query);
 #endif
 
                     typename CurveType::g1_vector alpha_V_g1_query = batch_exp_with_coeff(
-                        typename CurveType::scalar_field_type::element_size, g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
+                        typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(alpha_V_g1_query);
 #endif
 
                     typename CurveType::g1_vector H_g1_query =
-                        batch_exp(typename CurveType::scalar_field_type::element_size, g1_window, g1_table, Ht_table);
+                        batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(H_g1_query);
 #endif
 
                     typename CurveType::g2_vector V_g2_query =
-                        batch_exp(typename CurveType::scalar_field_type::element_size, g2_window, g2_table, Vt_table);
+                        batch_exp(typename CurveType::scalar_field_type::value_bits, g2_window, g2_table, Vt_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g2_type>(V_g2_query);
 #endif
@@ -473,7 +473,7 @@ namespace nil {
 
                     typename CurveType::g1_type encoded_IC_base = Xt_table[0] * typename CurveType::g1_type::one();
                     typename CurveType::g1_vector encoded_IC_values =
-                        batch_exp(typename CurveType::scalar_field_type::element_size, g1_window, g1_table,
+                        batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                   std::vector<typename CurveType::scalar_field_type::value_type>(Xt_table.begin() + 1, Xt_table.end()));
 
                     accumulation_vector<typename CurveType::g1_type> encoded_IC_query(std::move(encoded_IC_base),

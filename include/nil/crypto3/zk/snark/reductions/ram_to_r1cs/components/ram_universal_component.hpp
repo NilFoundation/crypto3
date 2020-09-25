@@ -129,7 +129,7 @@ namespace nil {
                     void print_execution_trace() const;
                     void print_memory_trace() const;
 
-                    static std::size_t packed_input_element_size(const ram_architecture_params<RAMType> &ap);
+                    static std::size_t packed_input_value_bits(const ram_architecture_params<RAMType> &ap);
                     static std::size_t packed_input_size(const ram_architecture_params<RAMType> &ap,
                                                          const std::size_t boot_trace_size_bound);
                 };
@@ -487,7 +487,7 @@ namespace nil {
                 }
 
                 template<typename RAMType>
-                std::size_t ram_universal_component<RAMType>::packed_input_element_size(
+                std::size_t ram_universal_component<RAMType>::packed_input_value_bits(
                     const ram_architecture_params<RAMType> &ap) {
                     const std::size_t line_size_bits = ap.address_size() + ap.value_size();
                     const std::size_t max_chunk_size = FieldType::capacity();
@@ -500,7 +500,7 @@ namespace nil {
                 std::size_t
                     ram_universal_component<RAMType>::packed_input_size(const ram_architecture_params<RAMType> &ap,
                                                                         const std::size_t boot_trace_size_bound) {
-                    return packed_input_element_size(ap) * boot_trace_size_bound;
+                    return packed_input_value_bits(ap) * boot_trace_size_bound;
                 }
             }    // namespace snark
         }        // namespace zk
