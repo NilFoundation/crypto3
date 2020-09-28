@@ -110,13 +110,13 @@ namespace nil {
                         return result;
                     }
 
-                    if (FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) != FieldType::value_type::zero()) {
+                    if (typename FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) != FieldType::value_type::zero()) {
                         ret_type result;
                         result.reset(new geometric_sequence_domain<FieldType>(m));
                         return result;
                     }
                     
-                    if (FieldType::value_type(fields::arithmetic_params<FieldType>::arithmetic_generator) != FieldType::value_type::zero()) {
+                    if (typename FieldType::value_type(fields::arithmetic_params<FieldType>::arithmetic_generator) != FieldType::value_type::zero()) {
                         ret_type result;
                         result.reset(new arithmetic_sequence_domain<FieldType>(m));
                         return result;
