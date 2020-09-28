@@ -29,10 +29,11 @@
 // <http://eprint.iacr.org/2014/718>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_USCS_TO_SSP_HPP_
-#define CRYPTO3_ZK_USCS_TO_SSP_HPP_
+#ifndef CRYPTO3_ZK_USCS_TO_SSP_HPP
+#define CRYPTO3_ZK_USCS_TO_SSP_HPP
 
-#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+#include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
@@ -41,6 +42,9 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                using namespace nil::crypto3::fft;
+
                 /**
                  * Instance map for the USCS-to-SSP reduction.
                  *
@@ -53,8 +57,8 @@ namespace nil {
                  */
                 template<typename FieldType>
                 ssp_instance<FieldType> uscs_to_ssp_instance_map(const uscs_constraint_system<FieldType> &cs) {
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints());
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints());
                     std::vector<std::map<std::size_t, FieldType>> V_in_Lagrange_basis(cs.num_variables() + 1);
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
@@ -86,8 +90,8 @@ namespace nil {
                 ssp_instance_evaluation<FieldType>
                     uscs_to_ssp_instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
                                                              const typename FieldType::value_type &t) {
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints());
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints());
 
                     std::vector<typename FieldType::value_type> Vt(cs.num_variables() + 1,
                                                                    FieldType::value_type::zero());
@@ -154,8 +158,8 @@ namespace nil {
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints());
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints());
 
                     std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero());
                     assert(domain->m >= cs.num_constraints());
@@ -215,4 +219,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // USCS_TO_SSP_HPP_
+#endif    // CRYPTO3_ZK_USCS_TO_SSP_HPP

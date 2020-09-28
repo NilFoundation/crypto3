@@ -33,7 +33,7 @@
 #ifndef CRYPTO3_ZK_R1CS_TO_SAP_HPP_
 #define CRYPTO3_ZK_R1CS_TO_SAP_HPP_
 
-#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap/sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>

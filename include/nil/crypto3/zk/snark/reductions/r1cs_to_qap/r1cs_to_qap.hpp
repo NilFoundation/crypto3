@@ -33,7 +33,8 @@
 #define CRYPTO3_ZK_R1CS_TO_QAP_HPP
 
 #include <nil/crypto3/fft/coset.hpp>
-#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+#include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
@@ -44,6 +45,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                using namespace nil::crypto3::fft;
 
                 /**
                  * Instance map for the R1CS-to-QAP reduction.
@@ -59,8 +62,8 @@ namespace nil {
                  */
                 template<typename FieldType>
                 qap_instance<FieldType> r1cs_to_qap_instance_map(const r1cs_constraint_system<FieldType> &cs) {
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
                     std::vector<std::map<std::size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
@@ -119,8 +122,8 @@ namespace nil {
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                              const typename FieldType::value_type &t) {
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
@@ -213,8 +216,8 @@ namespace nil {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
                     full_variable_assignment.insert(
