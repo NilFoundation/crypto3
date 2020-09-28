@@ -15,7 +15,7 @@
 
 #include <nil/crypto3/fft/detail/field_utils.hpp>
 
-#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>

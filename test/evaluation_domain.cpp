@@ -122,8 +122,8 @@ void test_inverse_coset_ftt_to_coset_fft() {
 
         std::vector<value_type> a(f);
         multiply_by_coset(a, coset);
-        domain->FFT(a, coset);
-        domain->iFFT(a, coset);
+        domain->FFT(a);
+        domain->iFFT(a);
         multiply_by_coset(a, coset.inversed());
 
         for (size_t i = 0; i < m; i++) {

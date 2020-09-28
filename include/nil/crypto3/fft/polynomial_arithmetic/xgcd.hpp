@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+//#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 #include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
 
 namespace nil {

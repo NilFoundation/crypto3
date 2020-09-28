@@ -12,8 +12,8 @@
 
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace crypto3 {

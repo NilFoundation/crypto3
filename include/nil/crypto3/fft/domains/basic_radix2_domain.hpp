@@ -14,8 +14,8 @@
 
 #include <nil/crypto3/fft/detail/field_utils.hpp>
 
-#include <nil/crypto3/fft/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -33,7 +33,7 @@ namespace nil {
             public:
                 value_type omega;
 
-                basic_radix2_domain(const size_t m) {
+                basic_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     //if (m <= 1)
                     //    throw std::invalid_argument("basic_radix2(): expected m > 1");
 

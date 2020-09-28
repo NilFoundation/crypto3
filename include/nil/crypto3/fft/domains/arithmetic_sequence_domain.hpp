@@ -12,8 +12,8 @@
 
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+//#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 #include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
 
 #ifdef MULTICORE
@@ -53,23 +53,23 @@ namespace nil {
                 }
 
                 arithmetic_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
-                    if (m <= 1) {
-                        throw std::invalid_argument("arithmetic(): expected m > 1");
-                    }
+                    //if (m <= 1) {
+                    //    throw std::invalid_argument("arithmetic(): expected m > 1");
+                    //}
 
-                    if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())) {
-                        throw std::invalid_argument(
-                            "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() "
-                            "!= true");
-                    }
+                    //if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())) {
+                    //    throw std::invalid_argument(
+                    //        "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() "
+                    //        "!= true");
+                    //}
 
                     precomputation_sentinel = 0;
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m) {
-                        throw std::invalid_argument("arithmetic: expected a.size() == this->m");
-                    }
+                    //if (a.size() != this->m) {
+                    //    throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                    //}
 
                     if (!this->precomputation_sentinel) {
                         do_precomputation();
@@ -99,8 +99,8 @@ namespace nil {
                     }
                 }
                 void iFFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                    //if (a.size() != this->m)
+                    //    throw std::invalid_argument("arithmetic: expected a.size() == this->m");
 
                     if (!this->precomputation_sentinel)
                         do_precomputation();

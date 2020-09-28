@@ -169,7 +169,7 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                template<typename FieldType, std::size_t m>
+                /*template<typename FieldType, std::size_t m>
                 struct is_basic_radix2_domain {
                     constexpr static bool const value =
                         (m > 1) && !(m & (m - 1)) &&
@@ -193,7 +193,7 @@ namespace nil {
                         (m > 1) && (m & (m - 1)) &&
                         (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s) &&
                         !(small_m & (small_m - 1));
-                };
+                };*/
             }    // namespace detail
         }        // namespace fft
     }            // namespace crypto3
