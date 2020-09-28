@@ -34,35 +34,31 @@ namespace nil {
                 value_type omega;
 
                 basic_radix2_domain(const size_t m) {
-                    if (m <= 1)
-                        throw std::invalid_argument("basic_radix2(): expected m > 1");
+                    //if (m <= 1)
+                    //    throw std::invalid_argument("basic_radix2(): expected m > 1");
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        if (logm > (fields::arithmetic_params<FieldType>::s))
-                            throw std::invalid_argument(
-                                "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
+                        //if (logm > (fields::arithmetic_params<FieldType>::s))
+                        //    throw std::invalid_argument(
+                        //        "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
 
-                    try {
-                        omega = detail::unity_root<FieldType>(m);
-                    } catch (const std::invalid_argument &e) {
-                        throw std::invalid_argument(e.what());
-                    }
+                    omega = detail::unity_root<FieldType>(m);
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                    //if (a.size() != this->m)
+                    //    throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
-                    _basic_radix2_FFT(a, omega);
+                    _basic_radix2_FFT<FieldType>(a, omega);
                 }
 
                 void iFFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                    //if (a.size() != this->m)
+                    //    throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
-                    _basic_radix2_FFT(a, omega.inversed());
+                    _basic_radix2_FFT<FieldType>(a, omega.inversed());
 
                     const value_type sconst = value_type(a.size()).inversed();
                     for (size_t i = 0; i < a.size(); ++i) {
@@ -71,7 +67,7 @@ namespace nil {
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
-                    return basic_radix2_evaluate_all_lagrange_polynomials(this->m, t);
+                    return detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(this->m, t);
                 }
 
                 value_type get_domain_element(const size_t idx) {
@@ -83,8 +79,8 @@ namespace nil {
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
-                    if (H.size() != this->m + 1)
-                        throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
+                    //if (H.size() != this->m + 1)
+                    //    throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
 
                     H[this->m] += coeff;
                     H[0] -= coeff;

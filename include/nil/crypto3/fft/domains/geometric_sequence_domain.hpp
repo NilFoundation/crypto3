@@ -78,7 +78,7 @@ namespace nil {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
-                    monomial_to_newton_basis_geometric(a, this->geometric_sequence, this->geometric_triangular_sequence,
+                    monomial_to_newton_basis_geometric<FieldType>(a, this->geometric_sequence, this->geometric_triangular_sequence,
                                                        this->m);
 
                     /* Newton to Evaluation */
@@ -137,7 +137,7 @@ namespace nil {
                         a[i] *= this->geometric_triangular_sequence[i].inversed();
                     }
 
-                    newton_to_monomial_basis_geometric(a, this->geometric_sequence, this->geometric_triangular_sequence,
+                    newton_to_monomial_basis_geometric<FieldType>(a, this->geometric_sequence, this->geometric_triangular_sequence,
                                                        this->m);
                 }
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {

@@ -30,7 +30,7 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                template<typename FieldType, std::size_t MinSize>
+                /*template<typename FieldType, std::size_t MinSize>
                 struct domain_switch {
 
                     typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
@@ -88,7 +88,7 @@ namespace nil {
                         ret_type result;
                         result.reset(new geometric_sequence_domain<FieldType, MinSize>());
                         return result;
-                    }*/
+                    }
                     // uncomment
                     // when constexpr field element ready
 
@@ -100,7 +100,7 @@ namespace nil {
                     }*/
                     // uncomment
                     // when constexpr field element ready
-                };
+                /*};
 
                 template<std::size_t MinSize>
                 struct domain_switch<std::complex<double>, MinSize> {
@@ -112,7 +112,7 @@ namespace nil {
                         result.reset(new basic_radix2_domain<std::complex<double>, MinSize>());
                         return result;
                     }
-                };
+                };*/
             }    // namespace detail
 
             /**

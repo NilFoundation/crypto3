@@ -40,8 +40,8 @@ namespace nil {
                     using value_type = typename FieldType::value_type;
 
                     const size_t n = a.size(), logn = log2(n);
-                    if (n != (1u << logn))
-                        throw std::invalid_argument("expected n == (1u << logn)");
+                    //if (n != (1u << logn))
+                    //    throw std::invalid_argument("expected n == (1u << logn)");
 
                     /* swapping in place (from Storer's book) */
                     for (size_t k = 0; k < n; ++k) {
@@ -80,8 +80,8 @@ namespace nil {
 
                     const size_t m = a.size();
                     const size_t log_m = log2(m);
-                    if (m != 1ul << log_m)
-                        throw std::invalid_argument("expected m == 1ul<<log_m");
+                    //if (m != 1ul << log_m)
+                    //    throw std::invalid_argument("expected m == 1ul<<log_m");
 
                     if (log_m < log_cpus) {
                         basic_serial_radix2_FFT<FieldType>(a, omega);
@@ -165,8 +165,8 @@ namespace nil {
                         return std::vector<value_type>(1, value_type::one());
                     }
 
-                    if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
-                        throw std::invalid_argument("expected m == (1u << log2(m))");
+                    //if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
+                    //    throw std::invalid_argument("expected m == (1u << log2(m))");
 
                     const value_type omega = unity_root<FieldType>(m);
 

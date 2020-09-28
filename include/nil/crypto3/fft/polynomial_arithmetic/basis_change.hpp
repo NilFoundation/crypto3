@@ -93,7 +93,7 @@ namespace nil {
                 std::vector<value_type> mod(n + 1, value_type::zero());
                 mod[n] = value_type::one();
 
-                _polynomial_xgcd(mod, I, mod, mod, I);
+                _polynomial_xgcd<FieldType>(mod, I, mod, mod, I);
 
                 I.resize(n);
 

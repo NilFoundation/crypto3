@@ -76,7 +76,7 @@ namespace nil {
                     }
 
                     /* Monomial to Newton */
-                    monomial_to_newton_basis(a, this->subproduct_tree, this->m);
+                    monomial_to_newton_basis<FieldType>(a, this->subproduct_tree, this->m);
 
                     /* Newton to Evaluation */
                     std::vector<value_type> S(this->m); /* i! * arithmetic_generator */
@@ -125,7 +125,7 @@ namespace nil {
                     a.resize(this->m);
 
                     /* Newton to Monomial */
-                    newton_to_monomial_basis(a, this->subproduct_tree, this->m);
+                    newton_to_monomial_basis<FieldType>(a, this->subproduct_tree, this->m);
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {

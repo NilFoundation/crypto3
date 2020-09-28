@@ -34,30 +34,26 @@ namespace nil {
                 value_type shift;
 
                 extended_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
-                    if (m <= 1)
-                        throw std::invalid_argument("extended_radix2(): expected m > 1");
+                    //if (m <= 1)
+                    //    throw std::invalid_argument("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        if (logm != (fields::arithmetic_params<FieldType>::s + 1))
-                            throw std::invalid_argument(
-                                "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
+                        //if (logm != (fields::arithmetic_params<FieldType>::s + 1))
+                        //    throw std::invalid_argument(
+                        //        "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
                     }
 
                     small_m = m / 2;
 
-                    try {
-                        omega = detail::unity_root<FieldType>(small_m);
-                    } catch (const std::invalid_argument &e) {
-                        throw std::invalid_argument(e.what());
-                    }
+                    omega = detail::unity_root<FieldType>(small_m);
 
                     shift = detail::coset_shift<FieldType>();
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
+                    //if (a.size() != this->m)
+                    //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     std::vector<value_type> a0(small_m, value_type::zero());
                     std::vector<value_type> a1(small_m, value_type::zero());
@@ -72,8 +68,8 @@ namespace nil {
                         shift_i *= shift;
                     }
 
-                    _basic_radix2_FFT(a0, omega);
-                    _basic_radix2_FFT(a1, omega);
+                    _basic_radix2_FFT<FieldType>(a0, omega);
+                    _basic_radix2_FFT<FieldType>(a1, omega);
 
                     for (size_t i = 0; i < small_m; ++i) {
                         a[i] = a0[i];
@@ -81,16 +77,16 @@ namespace nil {
                     }
                 }
                 void iFFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
-                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
+                    //if (a.size() != this->m)
+                    //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
                     std::vector<value_type> a0(a.begin(), a.begin() + small_m);
                     std::vector<value_type> a1(a.begin() + small_m, a.end());
 
                     const value_type omega_inverse = omega.inversed();
-                    _basic_radix2_FFT(a0, omega_inverse);
-                    _basic_radix2_FFT(a1, omega_inverse);
+                    _basic_radix2_FFT<FieldType>(a0, omega_inverse);
+                    _basic_radix2_FFT<FieldType>(a1, omega_inverse);
 
                     const value_type shift_to_small_m = shift.pow(small_m);
                     const value_type sconst = (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();
@@ -106,9 +102,9 @@ namespace nil {
                     }
                 }
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
-                    const std::vector<value_type> T0 = basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
+                    const std::vector<value_type> T0 = detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t);
                     const std::vector<value_type> T1 =
-                        basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inversed());
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t * shift.inversed());
 
                     std::vector<value_type> result(this->m, value_type::zero());
 
@@ -138,8 +134,8 @@ namespace nil {
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
-                    if (H.size() != this->m + 1)
-                        throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
+                    //if (H.size() != this->m + 1)
+                    //    throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
                     const value_type shift_to_small_m = shift.pow(small_m);
 
