@@ -283,7 +283,7 @@ namespace nil {
                             r = t3.doubled();
                             V = U1 * I;
                             X_out = r.squared() - J - V.doubled();
-                            Y_out = r * (V - X) - (S1 * J).doubled();
+                            Y_out = r * (V - X_out) - (S1 * J).doubled();
                             Z_out = ((Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;
 
                             return bn128_g2(X_out, Y_out, Z_out);
