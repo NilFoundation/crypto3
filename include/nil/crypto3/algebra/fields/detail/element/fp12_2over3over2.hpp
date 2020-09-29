@@ -248,12 +248,39 @@ namespace nil {
                                        const typename underlying_type::underlying_type &ell_VW,
                                        const typename underlying_type::underlying_type &ell_VV) const {
 
-                            element_fp12_2over3over2 a(
-                                underlying_type(ell_VW, underlying_type::underlying_type::zero(),
-                                                underlying_type::underlying_type::zero()),
-                                underlying_type(underlying_type::underlying_type::zero(), ell_0, ell_VV));
+                            // element_fp12_2over3over2 a(
+                            //     underlying_type(ell_VW, underlying_type::underlying_type::zero(),
+                            //                     underlying_type::underlying_type::zero()),
+                            //     underlying_type(underlying_type::underlying_type::zero(), ell_0, ell_VV));
+                            //
+                            // return (*this) * a;
 
-                            return (*this) * a;
+                            typename underlying_type::underlying_type z0 = this->data[0].data[0];
+                            typename underlying_type::underlying_type z1 = this->data[0].data[1];
+                            typename underlying_type::underlying_type z2 = this->data[0].data[2];
+                            typename underlying_type::underlying_type z3 = this->data[1].data[0];
+                            typename underlying_type::underlying_type z4 = this->data[1].data[1];
+                            typename underlying_type::underlying_type z5 = this->data[1].data[2];
+
+                            typename underlying_type::underlying_type x0 = ell_VW;
+                            typename underlying_type::underlying_type x4 = ell_0;
+                            typename underlying_type::underlying_type x5 = ell_VV;
+
+                            typename underlying_type::underlying_type t0, t1, t2, t3, t4, t5;
+                            typename underlying_type::underlying_type tmp1, tmp2;
+
+                            // TODO: non_residue should be used as static
+                            tmp1 = element_fp12_2over3over2().non_residue * x4;
+                            tmp2 = element_fp12_2over3over2().non_residue * x5;
+
+                            t0 = x0 * z0 + tmp1 * z4 + tmp2 * z3;
+                            t1 = x0 * z1 + tmp1 * z5 + tmp2 * z4;
+                            t2 = x0 * z2 + x4 * z3 + tmp2 * z5;
+                            t3 = x0 * z3 + tmp1 * z2 + tmp2 * z1;
+                            t4 = x0 * z4 + x4 * z0 + tmp2 * z2;
+                            t5 = x0 * z5 + x4 * z1 + x5 * z0;
+
+                            return element_fp12_2over3over2(underlying_type(t0,t1,t2),underlying_type(t3,t4,t5));
                         }
 
                         element_fp12_2over3over2
@@ -304,7 +331,7 @@ namespace nil {
                         }*/
 
                         /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
-                            return underlying_type(non_residue * A.data[2], A.data[1], A.data[0]);
+                            return underlying_type(non_residue * A.data[2], A.data[0], A.data[1]);
                         }
                     };
 

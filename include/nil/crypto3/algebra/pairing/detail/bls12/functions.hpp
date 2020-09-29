@@ -214,8 +214,7 @@ namespace nil {
 
                         static ate_g1_precomp ate_precompute_g1(const g1 &P) {
 
-                            g1 Pcopy = P;
-                            Pcopy.to_affine_coordinates();
+                            g1 Pcopy = P.to_affine_coordinates();
 
                             ate_g1_precomp result;
                             result.PX = Pcopy.X;
@@ -226,8 +225,7 @@ namespace nil {
 
                         static ate_g2_precomp ate_precompute_g2(const g2 &Q) {
 
-                            g2 Qcopy(Q);
-                            Qcopy.to_affine_coordinates();
+                            g2 Qcopy(Q.to_affine_coordinates());
 
                             Fq two_inv = (Fq(0x02).inversed());    // could add to global params if needed
 
