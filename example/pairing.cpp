@@ -74,7 +74,7 @@ void pairing_example(){
     std::cout << "g1_el1: "; print_fp_curve_group_element(g1_el1);
     typename PairingT::G1_precomp g1_precomp_el1 = PairingT::precompute_g1(g1_el1);
     std::cout << "g1_precomp_el1: "; print_ate_g1_precomp_element(g1_precomp_el1);
-    typename PairingT::G1_type g1_el2 = PairingT::G1_type::zero();
+    typename PairingT::G1_type g1_el2 = PairingT::G1_type::one();
     std::cout << "g1_el2: "; print_fp_curve_group_element(g1_el2);
     typename PairingT::G1_precomp g1_precomp_el2 = PairingT::precompute_g1(g1_el2);
     std::cout << "g1_precomp_el2: "; print_ate_g1_precomp_element(g1_precomp_el2);
@@ -83,7 +83,7 @@ void pairing_example(){
     std::cout << "g2_el1: "; print_fp2_curve_group_element(g2_el1);
     typename PairingT::G2_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
     std::cout << "g2_precomp_el1: "; print_ate_g2_precomp_element(g2_precomp_el1);
-    typename PairingT::G2_type g2_el2 = PairingT::G2_type::zero();
+    typename PairingT::G2_type g2_el2 = PairingT::G2_type::one();
     std::cout << "g2_el2: "; print_fp2_curve_group_element(g2_el2);
     typename PairingT::G2_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
     std::cout << "g2_precomp_el2: "; print_ate_g2_precomp_element(g2_precomp_el2);
