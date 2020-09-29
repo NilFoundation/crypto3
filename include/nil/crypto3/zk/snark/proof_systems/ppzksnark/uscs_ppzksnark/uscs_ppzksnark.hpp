@@ -62,7 +62,7 @@
 #endif
 
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp>
-#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/ssp.hpp>
+#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/instance.hpp>
 
 namespace nil {
     namespace crypto3 {

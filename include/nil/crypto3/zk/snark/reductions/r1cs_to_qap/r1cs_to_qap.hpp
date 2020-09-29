@@ -36,7 +36,7 @@
 #include <nil/crypto3/fft/domains/evaluation_domain.hpp>
 #include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap.hpp>
+#include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap_instance.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
 #include <nil/crypto3/algebra/fields/params.hpp>

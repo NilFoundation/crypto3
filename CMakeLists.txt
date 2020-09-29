@@ -175,11 +175,11 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
      include/nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap/instance.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap/sap.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap/instance.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/ssp.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/instance.hpp
 
      include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp
 

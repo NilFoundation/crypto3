@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a protoboard for TinyRAM.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TINYRAM_BLUEPRINT_HPP_
-#define CRYPTO3_ZK_TINYRAM_BLUEPRINT_HPP_
+#ifndef CRYPTO3_ZK_TINYRAM_BLUEPRINT_HPP
+#define CRYPTO3_ZK_TINYRAM_BLUEPRINT_HPP
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/blueprint.hpp>
@@ -67,4 +67,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // TINYRAM_BLUEPRINT_HPP_
+#endif    // CRYPTO3_ZK_TINYRAM_BLUEPRINT_HPP
