@@ -49,7 +49,7 @@ namespace nil {
                     
                     using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt6
 
-                    using FieldType = typename curve_type::pairing_policy::Fp_type;
+                    using field_type = typename curve_type::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve::pairing_policy::Fqk_type;
 
@@ -82,7 +82,7 @@ namespace nil {
 
                     using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt4
 
-                    using FieldType = typename curve_type::pairing_policy::Fp_type;
+                    using field_type = typename curve_type::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve::pairing_policy::Fqk_type;
 

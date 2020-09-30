@@ -39,7 +39,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -51,11 +51,11 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> g_RR_at_P_c1;
                     std::shared_ptr<Fqe_mul_by_lc_component<CurveType>> compute_g_RR_at_P_c1;
 
-                    mnt_miller_loop_dbl_line_eval(blueprint<FieldType> &pb,
+                    mnt_miller_loop_dbl_line_eval(blueprint<field_type> &pb,
                                                   const G1_precomputation<CurveType> &prec_P,
                                                   const precompute_G2_component_coeffs<CurveType> &c,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RR_at_P) :
-                                                  component<FieldType>(pb), prec_P(prec_P), 
+                                                  component<field_type>(pb), prec_P(prec_P), 
                                                   c(c), g_RR_at_P(g_RR_at_P) 
                     {
 
@@ -66,17 +66,17 @@ namespace nil {
                             const fqe_type gamma_twist_const = gamma_twist->get_element();
                             g_RR_at_P_c1.reset(
                                 new Fqe_variable<CurveType>(Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) +
-                                                      *(c.gamma_X) + *(c.RY) * (-FieldType::value_type::zero())));
+                                                      *(c.gamma_X) + *(c.RY) * (-field_type::value_type::zero())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(pb);
-                            const typename FieldType::value_type P_X_const = prec_P.P->X.constant_term();
+                            const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
                             g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                                     *(c.RY) * (-FieldType::value_type::zero())));
+                                                                     *(c.RY) * (-field_type::value_type::zero())));
                         } else {
                             g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
                             compute_g_RR_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                                 pb, *gamma_twist, prec_P.P->X,
-                                *(c.gamma_X) + *(c.RY) * (-FieldType::value_type::zero()) + (*g_RR_at_P_c1) * (-FieldType::value_type::zero())));
+                                *(c.gamma_X) + *(c.RY) * (-field_type::value_type::zero()) + (*g_RR_at_P_c1) * (-field_type::value_type::zero())));
                         }
                         g_RR_at_P.reset(new Fqk_variable<CurveType>(pb, *(prec_P.PY_twist_squared), *g_RR_at_P_c1));
                     }
@@ -90,7 +90,7 @@ namespace nil {
                     void generate_r1cs_witness() {
                         gamma_twist->evaluate();
                         const fqe_type gamma_twist_val = gamma_twist->get_element();
-                        const typename FieldType::value_type PX_val = this->pb.lc_val(prec_P.P->X);
+                        const typename field_type::value_type PX_val = this->pb.lc_val(prec_P.P->X);
                         const fqe_type gamma_X_val = c.gamma_X->get_element();
                         const fqe_type RY_val = c.RY->get_element();
                         const fqe_type g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
@@ -118,7 +118,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -132,13 +132,13 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> g_RQ_at_P_c1;
                     std::shared_ptr<Fqe_mul_by_lc_component<CurveType>> compute_g_RQ_at_P_c1;
 
-                    mnt_miller_loop_add_line_eval(blueprint<FieldType> &pb,
+                    mnt_miller_loop_add_line_eval(blueprint<field_type> &pb,
                                                   const bool invert_Q,
                                                   const G1_precomputation<CurveType> &prec_P,
                                                   const precompute_G2_component_coeffs<CurveType> &c,
                                                   const G2_variable<CurveType> &Q,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RQ_at_P) :
-                                                  component<FieldType>(pb), invert_Q(invert_Q), 
+                                                  component<field_type>(pb), invert_Q(invert_Q), 
                                                   prec_P(prec_P), c(c), Q(Q), g_RQ_at_P(g_RQ_at_P) 
                     {
                         gamma_twist.reset(new Fqe_variable<CurveType>(c.gamma->mul_by_X()));
@@ -148,19 +148,19 @@ namespace nil {
                             const fqe_type gamma_twist_const = gamma_twist->get_element();
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
                                 Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
-                                *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero())));
+                                *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(pb);
-                            const typename FieldType::value_type P_X_const = prec_P.P->X.constant_term();
+                            const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
                             g_RQ_at_P_c1.reset(
                                 new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                      *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero())));
+                                                      *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero())));
                         } else {
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
                             compute_g_RQ_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                                 pb, *gamma_twist, prec_P.P->X,
-                                *(c.gamma_X) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero()) +
-                                    (*g_RQ_at_P_c1) * (-FieldType::value_type::zero())));
+                                *(c.gamma_X) + *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero()) +
+                                    (*g_RQ_at_P_c1) * (-field_type::value_type::zero())));
                         }
                         g_RQ_at_P.reset(new Fqk_variable<CurveType>(pb, *(prec_P.PY_twist_squared), *g_RQ_at_P_c1));
                     }
@@ -172,7 +172,7 @@ namespace nil {
                     void generate_r1cs_witness() {
                         gamma_twist->evaluate();
                         const fqe_type gamma_twist_val = gamma_twist->get_element();
-                        const typename FieldType::value_type PX_val = this->pb.lc_val(prec_P.P->X);
+                        const typename field_type::value_type PX_val = this->pb.lc_val(prec_P.P->X);
                         const fqe_type gamma_X_val = c.gamma_X->get_element();
                         const fqe_type QY_val = Q.Y->get_element();
                         const fqe_type g_RQ_at_P_c1_val =
@@ -192,7 +192,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -215,11 +215,11 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q;
                     Fqk_variable<CurveType> result;
 
-                    mnt_miller_loop_component(blueprint<FieldType> &pb,
+                    mnt_miller_loop_component(blueprint<field_type> &pb,
                                            const G1_precomputation<CurveType> &prec_P,
                                            const G2_precomputation<CurveType> &prec_Q,
                                            const Fqk_variable<CurveType> &result) :
-                                           component<FieldType>(pb), prec_P(prec_P), 
+                                           component<field_type>(pb), prec_P(prec_P), 
                                            prec_Q(prec_Q), result(result) 
                      {
                         const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
@@ -343,7 +343,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -374,13 +374,13 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q2;
                     Fqk_variable<CurveType> result;
 
-                    mnt_e_over_e_miller_loop_component(blueprint<FieldType> &pb,
+                    mnt_e_over_e_miller_loop_component(blueprint<field_type> &pb,
                                                     const G1_precomputation<CurveType> &prec_P1,
                                                     const G2_precomputation<CurveType> &prec_Q1,
                                                     const G1_precomputation<CurveType> &prec_P2,
                                                     const G2_precomputation<CurveType> &prec_Q2,
                                                     const Fqk_variable<CurveType> &result) :
-                                                    component<FieldType>(pb), prec_P1(prec_P1), 
+                                                    component<field_type>(pb), prec_P1(prec_P1), 
                                                     prec_Q1(prec_Q1), prec_P2(prec_P2), 
                                                     prec_Q2(prec_Q2), result(result) 
                     {
@@ -542,7 +542,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_e_times_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -581,7 +581,7 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q3;
                     Fqk_variable<CurveType> result;
 
-                    mnt_e_times_e_over_e_miller_loop_component(blueprint<FieldType> &pb,
+                    mnt_e_times_e_over_e_miller_loop_component(blueprint<field_type> &pb,
                                                             const G1_precomputation<CurveType> &prec_P1,
                                                             const G2_precomputation<CurveType> &prec_Q1,
                                                             const G1_precomputation<CurveType> &prec_P2,
@@ -589,7 +589,7 @@ namespace nil {
                                                             const G1_precomputation<CurveType> &prec_P3,
                                                             const G2_precomputation<CurveType> &prec_Q3,
                                                             const Fqk_variable<CurveType> &result) :
-                                                            component<FieldType>(pb),
+                                                            component<field_type>(pb),
                                                             prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), 
                                                             prec_Q2(prec_Q2), prec_P3(prec_P3), prec_Q3(prec_Q3), 
                                                             result(result) 

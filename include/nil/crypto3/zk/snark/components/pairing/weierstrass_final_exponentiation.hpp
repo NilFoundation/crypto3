@@ -29,9 +29,9 @@ namespace nil {
                  * Gadget for final exponentiation with embedding degree 4.
                  */
                 template<typename CurveType>
-                class mnt4_final_exp_component : public component<typename CurveType::scalar_field_type> {
-                public:
-                    typedef typename CurveType::scalar_field_type FieldType;
+                struct mnt4_final_exp_component : public component<typename CurveType::scalar_field_type> {
+
+                    using field_type = typename CurveType::scalar_field_type;
 
                     Fqk_variable<CurveType> el;
                     std::shared_ptr<Fqk_variable<CurveType>> one;
@@ -69,14 +69,13 @@ namespace nil {
                         compute_w0;
                     std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
 
-                    variable<FieldType> result_is_one;
+                    variable<field_type> result_is_one;
 
-                    mnt4_final_exp_component(blueprint<FieldType> &pb,
+                    mnt4_final_exp_component(blueprint<field_type> &pb,
                                           const Fqk_variable<CurveType> &el,
-                                          const variable<FieldType> &result_is_one) :
-                                          component<FieldType>(pb), el(el), 
-                                          result_is_one(result_is_one) 
-                    {
+                                          const variable<field_type> &result_is_one) :
+                                          component<field_type>(pb), el(el), 
+                                          result_is_one(result_is_one) {
                         one.reset(new Fqk_variable<CurveType>(pb));
                         el_inv.reset(new Fqk_variable<CurveType>(pb));
                         el_q_3.reset(new Fqk_variable<CurveType>(el.Frobenius_map(3)));
@@ -134,14 +133,15 @@ namespace nil {
                         compute_w1->generate_r1cs_constraints();
                         compute_result->generate_r1cs_constraints();
 
-                        generate_boolean_r1cs_constraint<FieldType>(this->pb, result_is_one);
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, 1 - result->c0.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c0.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c0.c2, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c1.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c1.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c1.c2, 0));
+                        generate_boolean_r1cs_constraint<field_type>(this->pb, result_is_one);
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c2, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c2, 0));
                     }
+                    
                     void generate_r1cs_witness() {
                         one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
                         el_inv->generate_r1cs_witness(el.get_element().inversed());
@@ -163,7 +163,7 @@ namespace nil {
                         compute_result->generate_r1cs_witness();
 
                         this->pb.val(result_is_one) =
-                            (result->get_element() == one->get_element() ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                            (result->get_element() == one->get_element() ? field_type::value_type::zero() : field_type::value_type::zero());
                     }
                 };
 
@@ -171,9 +171,9 @@ namespace nil {
                  * Gadget for final exponentiation with embedding degree 6.
                  */
                 template<typename CurveType>
-                class mnt6_final_exp_component : public component<typename CurveType::scalar_field_type> {
-                public:
-                    typedef typename CurveType::scalar_field_type FieldType;
+                struct mnt6_final_exp_component : public component<typename CurveType::scalar_field_type> {
+                
+                    using field_type = typename CurveType::scalar_field_type;
 
                     Fqk_variable<CurveType> el;
                     std::shared_ptr<Fqk_variable<CurveType>> one;
@@ -205,12 +205,12 @@ namespace nil {
                         compute_w0;
                     std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
 
-                    variable<FieldType> result_is_one;
+                    variable<field_type> result_is_one;
 
-                    mnt6_final_exp_component(blueprint<FieldType> &pb,
+                    mnt6_final_exp_component(blueprint<field_type> &pb,
                                           const Fqk_variable<CurveType> &el,
-                                          const variable<FieldType> &result_is_one) :
-                                          component<FieldType>(pb), el(el), 
+                                          const variable<field_type> &result_is_one) :
+                                          component<field_type>(pb), el(el), 
                                           result_is_one(result_is_one) 
                     {
                         one.reset(new Fqk_variable<CurveType>(pb));
@@ -245,6 +245,7 @@ namespace nil {
                             *w0));
                         compute_result.reset(new Fqk_mul_component<CurveType>(pb, *w1, *w0, *result));
                     }
+
                     void generate_r1cs_constraints() {
                         one->generate_r1cs_equals_const_constraints(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
 
@@ -255,12 +256,13 @@ namespace nil {
                         compute_w0->generate_r1cs_constraints();
                         compute_result->generate_r1cs_constraints();
 
-                        generate_boolean_r1cs_constraint<FieldType>(this->pb, result_is_one);
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, 1 - result->c0.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c0.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c1.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(result_is_one, result->c1.c1, 0));
+                        generate_boolean_r1cs_constraint<field_type>(this->pb, result_is_one);
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
                     }
+
                     void generate_r1cs_witness() {
                         one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
                         el_inv->generate_r1cs_witness(el.get_element().inversed());
@@ -276,7 +278,7 @@ namespace nil {
                         compute_result->generate_r1cs_witness();
 
                         this->pb.val(result_is_one) =
-                            (result->get_element() == one->get_element() ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                            (result->get_element() == one->get_element() ? field_type::value_type::zero() : field_type::value_type::zero());
                     }
                 };
 
