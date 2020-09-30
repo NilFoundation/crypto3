@@ -58,9 +58,9 @@ set(TESTS_NAMES
     "components/merkle_tree_components"
     "components/set_commitment_component"
 
-    "relations/numeric/qap/qap"
-    "relations/numeric/sap/sap"
-    "relations/numeric/ssp/ssp"
+    "relations/numeric/qap"
+    "relations/numeric/sap"
+    "relations/numeric/ssp"
 
     "proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"

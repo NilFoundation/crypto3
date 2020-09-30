@@ -13,7 +13,7 @@
 #ifndef CRYPTO3_ZK_USCS_EXAMPLES_HPP_
 #define CRYPTO3_ZK_USCS_EXAMPLES_HPP_
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -9,10 +9,10 @@
 // @file Declaration of public-parameter selector for the R1CS ppzkSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_PARAMS_HPP_
-#define CRYPTO3_ZK_R1CS_PPZKSNARK_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_PARAMS_HPP
+#define CRYPTO3_ZK_R1CS_PPZKSNARK_PARAMS_HPP
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,4 +37,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_PPZKSNARK_PARAMS_HPP_
+#endif    // CRYPTO3_ZK_R1CS_PPZKSNARK_PARAMS_HPP

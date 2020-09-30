@@ -13,7 +13,7 @@
 #ifndef CRYPTO3_R1CS_EXAMPLES_HPP
 #define CRYPTO3_R1CS_EXAMPLES_HPP
 
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

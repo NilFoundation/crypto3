@@ -39,6 +39,13 @@ namespace nil {
 
                 using namespace nil::crypto3::fft;
 
+
+                template<typename FieldType>
+                struct ssp_witness;
+
+                template<typename FieldType>
+                struct ssp_instance_evaluation;
+
                 /*************************  INSTATNCE  ***********************************/
 
                 /**

@@ -52,7 +52,7 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark_params.hpp>
 
 //#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -64,7 +64,7 @@
 #endif
 
 #include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_sap/r1cs_to_sap.hpp>
+#include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 
 namespace nil {
     namespace crypto3 {
