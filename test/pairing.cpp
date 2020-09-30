@@ -158,6 +158,7 @@ enum G2_enum : std::size_t {
     B1, B2, VKy, VKz
 };
 enum GT_enum : std::size_t {
+    pairing_A1_B1, pairing_A2_B2,
     reduced_pairing_A1_B1, reduced_pairing_A2_B2,
     reduced_pairing_A1_B1_mul_reduced_pairing_A2_B2,
     reduced_pairing_VKx_poly_A1_B1,
@@ -209,6 +210,8 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A2]), G1_prec_elements[prec_A2]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B1]), G2_prec_elements[prec_B1]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B2]), G2_prec_elements[prec_B2]);
+    BOOST_CHECK_EQUAL(PairingT::pairing(G1_elements[A1], G2_elements[B1]), GT_elements[pairing_A1_B1]);
+    BOOST_CHECK_EQUAL(PairingT::pairing(G1_elements[A2], G2_elements[B2]), GT_elements[pairing_A2_B2]);
     // TODO: activate after reduced_pairing->cyclotomic_exp fixed. Bugs in final_exponentiation_last_chunk
     // BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]), GT_elements[reduced_pairing_A1_B1]);
     // BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]),
