@@ -26,11 +26,11 @@
 // <http://www0.cs.ucl.ac.uk/staff/J.Groth/NIZKJournal.pdf>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TBCS_TO_USCS_HPP_
-#define CRYPTO3_ZK_TBCS_TO_USCS_HPP_
+#ifndef CRYPTO3_ZK_TBCS_TO_USCS_HPP
+#define CRYPTO3_ZK_TBCS_TO_USCS_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
+#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -175,4 +175,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // TBCS_TO_USCS_HPP_
+#endif    // CRYPTO3_ZK_TBCS_TO_USCS_HPP

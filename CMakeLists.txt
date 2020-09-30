@@ -160,34 +160,34 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_zksnark.hpp
      include/nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_zksnark_params.hpp
 
-     include/nil/crypto3/zk/snark/reductions/bacs_to_r1cs/bacs_to_r1cs.hpp
+     include/nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp
 
-     include/nil/crypto3/zk/snark/reductions/r1cs_to_qap/r1cs_to_qap.hpp
+     include/nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp
 
-     include/nil/crypto3/zk/snark/reductions/r1cs_to_sap/r1cs_to_sap.hpp
+     include/nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp
 
      include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/memory_checker_component.hpp
      include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/ram_universal_component.hpp
      include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp
      include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/ram_to_r1cs.hpp
 
-     include/nil/crypto3/zk/snark/reductions/tbcs_to_uscs/tbcs_to_uscs.hpp
+     include/nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp
 
-     include/nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp
+     include/nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap/instance.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap/instance.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp
 
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/instance.hpp
+     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp
 
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp
+     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp
 
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp
+     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp
 
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp
+     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp
 
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp
+     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp
 
      include/nil/crypto3/zk/snark/relations/ram_computations/memory/delegated_ra_memory.hpp
      include/nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp

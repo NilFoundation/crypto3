@@ -12,7 +12,7 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_PARAMS_HPP_
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_PARAMS_HPP_
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
+#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
 
 namespace nil {
     namespace crypto3 {

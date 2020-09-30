@@ -35,8 +35,8 @@
 #include <nil/crypto3/fft/domains/evaluation_domain.hpp>
 #include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/instance.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
+#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 
 namespace nil {
     namespace crypto3 {

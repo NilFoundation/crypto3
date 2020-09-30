@@ -50,7 +50,7 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark_params.hpp>
 
 //#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -61,8 +61,8 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp>
-#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp/instance.hpp>
+#include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
+#include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
 
 namespace nil {
     namespace crypto3 {

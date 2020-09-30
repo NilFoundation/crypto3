@@ -13,7 +13,7 @@
 #ifndef CRYPTO3_BACS_EXAMPLES_HPP
 #define CRYPTO3_BACS_EXAMPLES_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp>
+#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

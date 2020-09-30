@@ -34,7 +34,7 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP_
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP_
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp>
+#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark_params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
