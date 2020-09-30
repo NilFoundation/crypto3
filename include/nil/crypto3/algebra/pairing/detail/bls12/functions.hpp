@@ -38,8 +38,10 @@ namespace nil {
                         using g2 = typename policy_type::g2;
 
                         struct ate_g1_precomp {
-                            Fq PX;
-                            Fq PY;
+                            using value_type = Fq;
+
+                            value_type PX;
+                            value_type PY;
 
                             bool operator==(const ate_g1_precomp &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY);
@@ -47,9 +49,11 @@ namespace nil {
                         };
 
                         struct ate_ell_coeffs {
-                            Fq2 ell_0;
-                            Fq2 ell_VW;
-                            Fq2 ell_VV;
+                            using value_type = Fq2;
+
+                            value_type ell_0;
+                            value_type ell_VW;
+                            value_type ell_VV;
 
                             bool operator==(const ate_ell_coeffs &other) const {
                                 return (this->ell_0 == other.ell_0 && this->ell_VW == other.ell_VW &&
@@ -58,9 +62,12 @@ namespace nil {
                         };
 
                         struct ate_g2_precomp {
-                            Fq2 QX;
-                            Fq2 QY;
-                            std::vector<ate_ell_coeffs> coeffs;
+                            using value_type = Fq2;
+                            using coeffs_type = std::vector<ate_ell_coeffs>;
+
+                            value_type QX;
+                            value_type QY;
+                            coeffs_type coeffs;
 
                             bool operator==(const ate_g2_precomp &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);
