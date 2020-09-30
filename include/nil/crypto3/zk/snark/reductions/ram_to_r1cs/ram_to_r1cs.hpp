@@ -13,8 +13,8 @@
 // where most of the work is done. See components/ram_universal_component.hpp for details.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_TO_R1CS_HPP_
-#define CRYPTO3_ZK_RAM_TO_R1CS_HPP_
+#ifndef CRYPTO3_ZK_RAM_TO_R1CS_HPP
+#define CRYPTO3_ZK_RAM_TO_R1CS_HPP
 
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/ram_universal_component.hpp>
 
@@ -160,4 +160,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_TO_R1CS_HPP_
+#endif    // CRYPTO3_ZK_RAM_TO_R1CS_HPP

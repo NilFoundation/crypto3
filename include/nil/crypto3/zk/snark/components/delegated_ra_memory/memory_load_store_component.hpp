@@ -12,8 +12,8 @@
 // same address, from a "delegated memory".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MEMORY_LOAD_STORE_COMPONENT_HPP_
-#define CRYPTO3_ZK_MEMORY_LOAD_STORE_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_LOAD_STORE_COMPONENT_HPP
+#define CRYPTO3_ZK_MEMORY_LOAD_STORE_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_update_components.hpp>
 
@@ -30,4 +30,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // MEMORY_LOAD_STORE_COMPONENT_HPP_
+#endif    // CRYPTO3_ZK_MEMORY_LOAD_STORE_COMPONENT_HPP

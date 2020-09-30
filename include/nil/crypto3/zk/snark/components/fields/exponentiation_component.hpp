@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the exponentiation component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP_
-#define CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP
+#define CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP
 
 #include <memory>
 #include <vector>
@@ -195,4 +195,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // EXPONENTIATION_COMPONENT_HPP_
+#endif    // CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP

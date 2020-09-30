@@ -9,8 +9,8 @@
 // @file Declaration of public-parameter selector for the BACS ppzkSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_PARAMS_HPP_
-#define CRYPTO3_ZK_BACS_PPZKSNARK_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_PARAMS_HPP
+#define CRYPTO3_ZK_BACS_PPZKSNARK_PARAMS_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 
@@ -37,4 +37,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BACS_PPZKSNARK_PARAMS_HPP_
+#endif    // CRYPTO3_ZK_BACS_PPZKSNARK_PARAMS_HPP

@@ -13,8 +13,8 @@
 // - the component "check_e_equals_ee_component" checks the equation "e(P1,Q1)=e(P2,Q2)*e(P3,Q3)".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PAIRING_CHECKS_HPP_
-#define CRYPTO3_ZK_PAIRING_CHECKS_HPP_
+#ifndef CRYPTO3_ZK_PAIRING_CHECKS_HPP
+#define CRYPTO3_ZK_PAIRING_CHECKS_HPP
 
 #include <memory>
 
@@ -28,9 +28,9 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
-                public:
-                    typedef typename CurveType::scalar_field_type FieldType;
+                struct check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
+                
+                    using field_type = typename CurveType::scalar_field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
                     std::shared_ptr<e_over_e_miller_loop_component<CurveType>> compute_ratio;
@@ -41,24 +41,37 @@ namespace nil {
                     G1_precomputation<CurveType> rhs_G1;
                     G2_precomputation<CurveType> rhs_G2;
 
-                    variable<FieldType> result;
+                    variable<field_type> result;
 
-                    check_e_equals_e_component(blueprint<FieldType> &pb,
+                    check_e_equals_e_component(blueprint<field_type> &pb,
                                             const G1_precomputation<CurveType> &lhs_G1,
                                             const G2_precomputation<CurveType> &lhs_G2,
                                             const G1_precomputation<CurveType> &rhs_G1,
                                             const G2_precomputation<CurveType> &rhs_G2,
-                                            const variable<FieldType> &result);
+                                            const variable<field_type> &result) :
+                        component<field_type>(pb),
+                        lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
+                        ratio.reset(new Fqk_variable<CurveType>(pb));
+                        compute_ratio.reset(
+                            new e_over_e_miller_loop_component<CurveType>(pb, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
+                        check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
+                    }
 
-                    void generate_r1cs_constraints();
+                    void generate_r1cs_constraints() {
+                        compute_ratio->generate_r1cs_constraints();
+                        check_finexp->generate_r1cs_constraints();
+                    }
 
-                    void generate_r1cs_witness();
+                    void generate_r1cs_witness() {
+                        compute_ratio->generate_r1cs_witness();
+                        check_finexp->generate_r1cs_witness();
+                    }
                 };
 
                 template<typename CurveType>
-                class check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
-                public:
-                    typedef typename CurveType::scalar_field_type FieldType;
+                struct check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
+                
+                    using field_type = typename CurveType::scalar_field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
                     std::shared_ptr<e_times_e_over_e_miller_loop_component<CurveType>> compute_ratio;
@@ -71,81 +84,39 @@ namespace nil {
                     G1_precomputation<CurveType> rhs2_G1;
                     G2_precomputation<CurveType> rhs2_G2;
 
-                    variable<FieldType> result;
+                    variable<field_type> result;
 
-                    check_e_equals_ee_component(blueprint<FieldType> &pb,
+                    check_e_equals_ee_component(blueprint<field_type> &pb,
                                              const G1_precomputation<CurveType> &lhs_G1,
                                              const G2_precomputation<CurveType> &lhs_G2,
                                              const G1_precomputation<CurveType> &rhs1_G1,
                                              const G2_precomputation<CurveType> &rhs1_G2,
                                              const G1_precomputation<CurveType> &rhs2_G1,
                                              const G2_precomputation<CurveType> &rhs2_G2,
-                                             const variable<FieldType> &result);
+                                             const variable<field_type> &result) :
+                        component<field_type>(pb),
+                        lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
+                        rhs2_G2(rhs2_G2), result(result) {
+                        ratio.reset(new Fqk_variable<CurveType>(pb));
+                        compute_ratio.reset(new e_times_e_over_e_miller_loop_component<CurveType>(
+                            pb, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
+                        check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
+                    }
 
-                    void generate_r1cs_constraints();
+                    void generate_r1cs_constraints() {
+                        compute_ratio->generate_r1cs_constraints();
+                        check_finexp->generate_r1cs_constraints();
+                    }
 
-                    void generate_r1cs_witness();
+                    void generate_r1cs_witness() {
+                        compute_ratio->generate_r1cs_witness();
+                        check_finexp->generate_r1cs_witness();
+                    }
                 };
-                template<typename CurveType>
-                check_e_equals_e_component<CurveType>::check_e_equals_e_component(blueprint<FieldType> &pb,
-                                                                      const G1_precomputation<CurveType> &lhs_G1,
-                                                                      const G2_precomputation<CurveType> &lhs_G2,
-                                                                      const G1_precomputation<CurveType> &rhs_G1,
-                                                                      const G2_precomputation<CurveType> &rhs_G2,
-                                                                      const variable<FieldType> &result) :
-                    component<FieldType>(pb),
-                    lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
-                    ratio.reset(new Fqk_variable<CurveType>(pb));
-                    compute_ratio.reset(
-                        new e_over_e_miller_loop_component<CurveType>(pb, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
-                    check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
-                }
 
-                template<typename CurveType>
-                void check_e_equals_e_component<CurveType>::generate_r1cs_constraints() {
-                    compute_ratio->generate_r1cs_constraints();
-                    check_finexp->generate_r1cs_constraints();
-                }
-
-                template<typename CurveType>
-                void check_e_equals_e_component<CurveType>::generate_r1cs_witness() {
-                    compute_ratio->generate_r1cs_witness();
-                    check_finexp->generate_r1cs_witness();
-                }
-
-                template<typename CurveType>
-                check_e_equals_ee_component<CurveType>::check_e_equals_ee_component(
-                    blueprint<FieldType> &pb,
-                                                                        const G1_precomputation<CurveType> &lhs_G1,
-                                                                        const G2_precomputation<CurveType> &lhs_G2,
-                                                                        const G1_precomputation<CurveType> &rhs1_G1,
-                                                                        const G2_precomputation<CurveType> &rhs1_G2,
-                                                                        const G1_precomputation<CurveType> &rhs2_G1,
-                                                                        const G2_precomputation<CurveType> &rhs2_G2,
-                                                                        const variable<FieldType> &result) :
-                    component<FieldType>(pb),
-                    lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
-                    rhs2_G2(rhs2_G2), result(result) {
-                    ratio.reset(new Fqk_variable<CurveType>(pb));
-                    compute_ratio.reset(new e_times_e_over_e_miller_loop_component<CurveType>(
-                        pb, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
-                    check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
-                }
-
-                template<typename CurveType>
-                void check_e_equals_ee_component<CurveType>::generate_r1cs_constraints() {
-                    compute_ratio->generate_r1cs_constraints();
-                    check_finexp->generate_r1cs_constraints();
-                }
-
-                template<typename CurveType>
-                void check_e_equals_ee_component<CurveType>::generate_r1cs_witness() {
-                    compute_ratio->generate_r1cs_witness();
-                    check_finexp->generate_r1cs_witness();
-                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // PAIRING_CHECKS_HPP_
+#endif    // CRYPTO3_ZK_PAIRING_CHECKS_HPP

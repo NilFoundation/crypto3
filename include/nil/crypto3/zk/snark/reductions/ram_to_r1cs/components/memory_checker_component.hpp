@@ -10,8 +10,8 @@
 // consistency of two accesses to memory that are adjacent in a "memory sort".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MEMORY_CHECKER_COMPONENT_HPP_
-#define CRYPTO3_ZK_MEMORY_CHECKER_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_CHECKER_COMPONENT_HPP
+#define CRYPTO3_ZK_MEMORY_CHECKER_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp>
 
@@ -165,4 +165,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MEMORY_CHECKER_COMPONENT_HPP_
+#endif    // CRYPTO3_ZK_MEMORY_CHECKER_COMPONENT_HPP

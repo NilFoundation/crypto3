@@ -9,8 +9,8 @@
 // @file Generic signature interface for ADSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SIGNATURE_HPP_
-#define CRYPTO3_ZK_SIGNATURE_HPP_
+#ifndef CRYPTO3_ZK_SIGNATURE_HPP
+#define CRYPTO3_ZK_SIGNATURE_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp>
 
@@ -47,4 +47,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // SIGNATURE_HPP_
+#endif    // CRYPTO3_ZK_SIGNATURE_HPP

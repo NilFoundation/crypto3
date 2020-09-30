@@ -35,8 +35,8 @@
 // Parallel Processing Letters 2002
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
-#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
+#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP
+#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP
 
 #include <cstddef>
 #include <map>
@@ -641,4 +641,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
+#endif    // CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP

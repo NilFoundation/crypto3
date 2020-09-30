@@ -34,8 +34,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP_
-#define CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP
+#define CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP
 
 #include <numeric>
 
@@ -868,4 +868,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_COMPLIANCE_PREDICATE_HPP_
+#endif    // CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP
