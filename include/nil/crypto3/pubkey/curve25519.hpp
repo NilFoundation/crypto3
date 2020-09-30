@@ -257,7 +257,7 @@ namespace nil {
                     t4 &= 0x7ffffffffffff;
 
                     store_le(out, combine_lower(t0, 0, t1, 51), combine_lower(t1, 13, t2, 38),
-                        combine_lower(t2, 26, t3, 25), combine_lower(t3, 39, t4, 12));
+                             combine_lower(t2, 26, t3, 25), combine_lower(t3, 39, t4, 12));
                 }
 
                 /* Input: Q, Q', Q-Q'
@@ -422,9 +422,9 @@ namespace nil {
                 }
 
                 /*
-             * The types above are just wrappers for curve25519_donna, plus defining
-             * encodings for public and private keys.
-             */
+                 * The types above are just wrappers for curve25519_donna, plus defining
+                 * encodings for public and private keys.
+                 */
                 void curve25519_donna(uint8_t mypublic[32], const uint8_t secret[32], const uint8_t basepoint[32]) {
                     ct::poison(secret, 32);
                     ct::poison(basepoint, 32);

@@ -92,10 +92,10 @@ namespace nil {
 
                     number_type k = NonceGenerator()(key, q, i);
 
-//                    const number<Backend, ExpressionTemplates> k = (m_x, q, i,
-//                                                                                              m_rfc6979_hash);
-//                    const number<Backend, ExpressionTemplates> k =
-//                        number<Backend, ExpressionTemplates>::random_integer(rng, 1, q);
+                    //                    const number<Backend, ExpressionTemplates> k = (m_x, q, i,
+                    //                                                                                              m_rfc6979_hash);
+                    //                    const number<Backend, ExpressionTemplates> k =
+                    //                        number<Backend, ExpressionTemplates>::random_integer(rng, 1, q);
 
                     number_type s = inverse_mod(k, q);
                     const number_type r = m_mod_q.reduce(m_group.power_g_p(k));
@@ -107,7 +107,8 @@ namespace nil {
                         throw internal_error("Computed zero r/s during DSA signature");
                     }
 
-//                    return number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s, q.bytes());
+                    //                    return number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r,
+                    //                    s, q.bytes());
                     res = std::make_tuple(r, s);
                 }
             };

@@ -66,14 +66,13 @@ namespace nil {
                     const dl_group m_group;
                     fixed_exponent_power_mod m_powermod_x_p;
                     blinder m_blinder;
-//---------
+                    //---------
                     m_group(key.get_group()), m_powermod_x_p(key.get_x(), m_group.get_p()),
                         m_blinder(
                             m_group.p(), rng, [](const number<Backend, ExpressionTemplates> &k) { return k; },
                             [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_x_p(k); }) {
-
                     }
-//---------
+                    //---------
                     m_y = m_group.power_g_p(m_x);
 
                     const size_t p_bytes = m_group.p_bytes();

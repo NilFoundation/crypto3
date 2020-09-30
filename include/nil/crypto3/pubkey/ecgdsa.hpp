@@ -40,7 +40,7 @@ namespace nil {
                         m_public_point(ecgdsa.public_point())
 
                         //----------------------------
-                    const ec_group m_group;
+                        const ec_group m_group;
                     const point_gfp &m_public_point;
 
                     //---------------------------
@@ -50,7 +50,7 @@ namespace nil {
                     }
 
                     const boost::multiprecision::number<Backend, ExpressionTemplates> e(msg, msg_len,
-                        m_group.get_order_bits());
+                                                                                        m_group.get_order_bits());
 
                     const boost::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
                     const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
@@ -103,9 +103,9 @@ namespace nil {
                     //-----------------------
                     pk_operations::signature_with_emsa(emsa), m_group(ecgdsa.domain()),
                         m_x(ecgdsa.private_value())
-                    //------------------------
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> m(msg, msg_len,
-                        m_group.get_order_bits());
+                        //------------------------
+                        const boost::multiprecision::number<Backend, ExpressionTemplates>
+                            m(msg, msg_len, m_group.get_order_bits());
 
                     const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 

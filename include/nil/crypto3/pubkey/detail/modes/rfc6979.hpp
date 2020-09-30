@@ -84,8 +84,8 @@ namespace nil {
                 template<typename Scheme, template<typename> class Padding>
                 struct rfc6979 {
                     BOOST_STATIC_ASSERT_MSG(std::is_same<Padding, emsa>::value,
-                                  "RFC6979 nonce initialization is only defined "
-                                  "for EMSA-compliant usage");
+                                            "RFC6979 nonce initialization is only defined "
+                                            "for EMSA-compliant usage");
                 };
 
                 template<typename Scheme, typename Hash>

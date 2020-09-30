@@ -25,7 +25,8 @@ namespace nil {
                  * @param h the message hash already reduced mod q
                  * @param m the hash function used to generate h
                  */
-                template<typename Hash, typename Backend,
+                template<typename Hash,
+                         typename Backend,
                          boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename MessageAuthenticationCode = mac::hmac<Hash>>
                 boost::multiprecision::number<Backend, ExpressionTemplates>
@@ -66,7 +67,6 @@ namespace nil {
 
                     template<typename T, typename S, typename Q>
                     inline result_type operator()(const T &t, const S &s, const Q &q) {
-
                     }
                 };
 

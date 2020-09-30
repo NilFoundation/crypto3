@@ -22,7 +22,7 @@ namespace nil {
                 struct emsa3;
                 template<typename Scheme, typename Hash>
                 struct emsa4;
-            }
+            }    // namespace padding
 
             template<typename NumberType>
             struct rsa_public_key {
@@ -58,8 +58,8 @@ namespace nil {
                 typedef rsa_private_key<CurveType> private_key_type;
 
                 template<typename Hash>
-                using padding_types = std::tuple<padding::emsa3<rsa<CurveType>, Hash>, padding::emsa4<rsa<CurveType>,
-                                                                                                      Hash>>;
+                using padding_types =
+                    std::tuple<padding::emsa3<rsa<CurveType>, Hash>, padding::emsa4<rsa<CurveType>, Hash>>;
             };
 
             /**

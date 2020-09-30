@@ -28,13 +28,11 @@ namespace nil {
             template<typename CurveType>
             struct ecies_private_key {
                 typedef CurveType curve_type;
-
             };
 
             template<typename CurveType>
             struct ecies_agreement_key {
                 typedef CurveType curve_type;
-
             };
 
             template<typename CurveType, typename KeyDerivationFunction, typename MessageAuthenticationCode>

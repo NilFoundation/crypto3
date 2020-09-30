@@ -56,8 +56,10 @@ namespace nil {
             private:
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t length_type_bits =
-                    length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
+                constexpr static const std::size_t length_type_bits = length_bits < input_block_bits ?
+                                                                                         input_block_bits :
+                                                                      length_bits > 64 ? 64 :
+                                                                                         length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);

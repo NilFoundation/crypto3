@@ -100,13 +100,9 @@ namespace nil {
                 }
             }    // namespace detail
 
-            struct mc_eliece_public_key {
+            struct mc_eliece_public_key { };
 
-            };
-
-            struct mc_eliece_private_key {
-
-            };
+            struct mc_eliece_private_key { };
 
             struct mc_eliece {
                 typedef mc_eliece_public_key public_key_type;

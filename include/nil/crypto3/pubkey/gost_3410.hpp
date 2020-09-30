@@ -35,7 +35,6 @@ namespace nil {
 
                 template<typename Hash>
                 using padding_types = std::tuple<padding::emsa1<gost_3410<CurveType>, Hash>>;
-
             };
             /**
              * GOST-34.10 Public Key

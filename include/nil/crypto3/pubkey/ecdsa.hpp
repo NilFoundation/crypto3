@@ -39,7 +39,7 @@ namespace nil {
                 typedef std::tuple<value_type, value_type> signature_type;
 
                 inline static bool verify(const signature_type &val, const key_schedule_type &key) {
-                    if(sig_len != m_group.get_order_bytes() * 2)
+                    if (sig_len != m_group.get_order_bytes() * 2)
                         return false;
 
                     const BigInt e(msg, msg_len, m_group.get_order_bits());
@@ -47,7 +47,7 @@ namespace nil {
                     const BigInt r(sig, sig_len / 2);
                     const BigInt s(sig + sig_len / 2, sig_len / 2);
 
-                    if(r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order())
+                    if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order())
                         return false;
 
                     const BigInt w = inverse_mod(s, m_group.get_order());
@@ -56,12 +56,11 @@ namespace nil {
                     const BigInt u2 = m_group.multiply_mod_order(r, w);
                     const PointGFp R = m_gy_mul.multi_exp(u1, u2);
 
-                    if(R.is_zero())
+                    if (R.is_zero())
                         return false;
 
                     const BigInt v = m_group.mod_order(R.get_affine_x());
                     return (v == r);
-
                 }
             };
 
@@ -88,17 +87,16 @@ namespace nil {
                     const BigInt k = NonceGenerator()(m_x, m_group.get_order(), m);
 
                     const BigInt k_inv = inverse_mod(k, m_group.get_order());
-                    const BigInt r = m_group.mod_order(
-                        m_group.blinded_base_point_multiply_x(k, rng, m_ws));
+                    const BigInt r = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
 
                     const BigInt xrm = m_group.mod_order(m_group.multiply_mod_order(m_x, r) + m);
                     const BigInt s = m_group.multiply_mod_order(k_inv, xrm);
 
                     // With overwhelming probability, a bug rather than actual zero r/s
-                    if(r.is_zero() || s.is_zero())
+                    if (r.is_zero() || s.is_zero())
                         throw Internal_Error("During ECDSA signature generated zero r/s");
 
-//                    return BigInt::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
+                    //                    return BigInt::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
                     res = std::make_tuple(r, s);
                 }
             };
