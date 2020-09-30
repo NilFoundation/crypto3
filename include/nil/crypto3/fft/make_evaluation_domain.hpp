@@ -122,6 +122,7 @@ namespace nil {
                         return result;
                     }
 
+                return ret_type();
             }
         }    // namespace fft
     }        // namespace crypto3
