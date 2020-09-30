@@ -8,29 +8,27 @@
 
 include(CMTest)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
+cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                       ${CMAKE_WORKSPACE_NAME}::algebra
-                       ${CMAKE_WORKSPACE_NAME}::fft
+    ${CMAKE_WORKSPACE_NAME}::algebra
+    ${CMAKE_WORKSPACE_NAME}::fft
 
-                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
-                       $<TARGET_NAME_IF_EXISTS:boost_math>
+    $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+    $<TARGET_NAME_IF_EXISTS:boost_math>
 
-                       ${Boost_LIBRARIES})
+    ${Boost_LIBRARIES})
 
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
     cm_test(NAME zk_${name}_test SOURCES ${test}.cpp)
 
     target_include_directories(zk_${name}_test PRIVATE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-                               ${Boost_INCLUDE_DIRS})
+        ${Boost_INCLUDE_DIRS})
 
     set_target_properties(zk_${name}_test PROPERTIES CXX_STANDARD 14)
 
