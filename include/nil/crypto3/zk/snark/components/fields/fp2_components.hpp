@@ -24,12 +24,13 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                /******************************** Fp2_variable ************************************/
+
                 /**
                  * Component that represents an Fp2 variable.
                  */
                 template<typename Fp2T>
-                class Fp2_variable : public component<typename Fp2T::underlying_field_type> {
-                public:
+                struct Fp2_variable : public component<typename Fp2T::underlying_field_type> {
                     using field_type = typename Fp2T::underlying_field_type;
 
                     blueprint_linear_combination<field_type> c0;
@@ -143,12 +144,13 @@ namespace nil {
                     }
                 };
 
+                /******************************** Fp2_mul_component ************************************/
+
                 /**
                  * Component that creates constraints for Fp2 by Fp2 multiplication.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_component : public component<typename Fp2T::underlying_field_type> {
-                public:
+                struct Fp2_mul_component : public component<typename Fp2T::underlying_field_type> {
                     using field_type = typename Fp2T::underlying_field_type;
 
                     Fp2_variable<Fp2T> A;
@@ -200,12 +202,13 @@ namespace nil {
                     }
                 };
 
+                /******************************** Fp2_mul_by_lc_component ************************************/
+
                 /**
                  * Component that creates constraints for Fp2 multiplication by a linear combination.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
-                public:
+                struct Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
                     using field_type = typename Fp2T::underlying_field_type;
 
                     Fp2_variable<Fp2T> A;
@@ -231,12 +234,13 @@ namespace nil {
                     }
                 };
 
+                /******************************** Fp2_sqr_component ************************************/
+
                 /**
                  * Component that creates constraints for Fp2 squaring.
                  */
                 template<typename Fp2T>
-                class Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
-                public:
+                struct Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
                     using field_type = typename Fp2T::underlying_field_type;
 
                     Fp2_variable<Fp2T> A;
@@ -268,13 +272,13 @@ namespace nil {
                         this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(
                             A.c0 + A.c1,
                             A.c0 + Fp2T::non_residue * A.c1,
-                            result.c0 + result.c1 * (field_type::value_type::zero() + Fp2T::non_residue) * typename field_type::value_type(2).inversed()));
+                            result.c0 + result.c1 * (field_type::value_type::zero() + Fp2T::non_residue) * typename field_type::value_type(0x02).inversed()));
                     }
 
                     void generate_r1cs_witness() {
                         const typename field_type::value_type a = this->pb.lc_val(A.c0);
                         const typename field_type::value_type b = this->pb.lc_val(A.c1);
-                        this->pb.lc_val(result.c1) = typename field_type::value_type(2) * a * b;
+                        this->pb.lc_val(result.c1) = typename field_type::value_type(0x02) * a * b;
                         this->pb.lc_val(result.c0) =
                             (a + b) * (a + Fp2T::non_residue * b) - a * b - Fp2T::non_residue * a * b;
                     }
