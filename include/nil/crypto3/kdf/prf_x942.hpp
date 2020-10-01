@@ -13,6 +13,8 @@
 
 #include <nil/crypto3/hash/sha1.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -31,8 +33,8 @@ namespace nil {
                 static void process() {
                     const OID kek_algo(m_key_wrap_oid);
 
-                    secure_vector<uint8_t> h;
-                    secure_vector<uint8_t> in;
+                    std::vector<uint8_t> h;
+                    std::vector<uint8_t> in;
                     size_t offset = 0;
                     uint32_t counter = 1;
 

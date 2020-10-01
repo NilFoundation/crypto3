@@ -11,6 +11,8 @@
 
 #include <nil/crypto3/kdf/detail/sp800_56c/sp800_56c_functions.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -39,7 +41,7 @@ namespace nil {
                 }
 
                 static void process(const key_type &key) {
-                    secure_vector<uint8_t> k_dk;
+                    std::vector<uint8_t> k_dk;
 
                     m_prf->set_key(salt, salt_len);
                     m_prf->update(secret, secret_len);

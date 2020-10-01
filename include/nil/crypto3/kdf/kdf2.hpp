@@ -10,6 +10,7 @@
 #define CRYPTO3_KDF_KDF2_HPP
 
 #include <nil/crypto3/kdf/detail/kdf2/kdf2_functions.hpp>
+#include <vector>
 
 namespace nil {
     namespace crypto3 {
@@ -37,7 +38,7 @@ namespace nil {
 
                 static void process() {
                     uint32_t counter = 1;
-                    secure_vector<uint8_t> h;
+                    std::vector<uint8_t> h;
 
                     size_t offset = 0;
                     while (offset != key_len && counter != 0) {

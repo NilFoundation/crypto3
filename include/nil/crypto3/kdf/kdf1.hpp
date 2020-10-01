@@ -10,6 +10,7 @@
 #define CRYPTO3_KDF_KDF1_HPP
 
 #include <nil/crypto3/kdf/detail/kdf1/kdf1_functions.hpp>
+#include <vector>
 
 namespace nil {
     namespace crypto3 {
@@ -50,7 +51,7 @@ namespace nil {
                     m_hash->update(salt, salt_len);
 
                     if (key_len < m_hash->output_length()) {
-                        secure_vector<uint8_t> v = m_hash->final();
+                        std::vector<uint8_t> v = m_hash->final();
                         copy_mem(key, v.data(), key_len);
                         return key_len;
                     }

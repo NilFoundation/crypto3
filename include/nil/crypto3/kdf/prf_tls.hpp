@@ -16,6 +16,8 @@
 
 #include <nil/crypto3/kdf/detail/prf_tls/prf_tls_functions.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -64,7 +66,7 @@ namespace nil {
                     const size_t S1_len = (secret_len + 1) / 2, S2_len = (secret_len + 1) / 2;
                     const uint8_t *S1 = secret;
                     const uint8_t *S2 = secret + (secret_len - S2_len);
-                    secure_vector<uint8_t> msg;
+                    std::vector<uint8_t> msg;
 
                     msg.reserve(label_len + salt_len);
                     msg += std::make_pair(label, label_len);
@@ -110,7 +112,7 @@ namespace nil {
                     const size_t S1_len = (secret_len + 1) / 2, S2_len = (secret_len + 1) / 2;
                     const uint8_t *S1 = secret;
                     const uint8_t *S2 = secret + (secret_len - S2_len);
-                    secure_vector<uint8_t> msg;
+                    std::vector<uint8_t> msg;
 
                     msg.reserve(label_len + salt_len);
                     msg += std::make_pair(label, label_len);
@@ -153,7 +155,7 @@ namespace nil {
                 }
 
                 static void process() {
-                    secure_vector<uint8_t> msg;
+                    std::vector<uint8_t> msg;
 
                     msg.reserve(label_len + salt_len);
                     msg += std::make_pair(label, label_len);

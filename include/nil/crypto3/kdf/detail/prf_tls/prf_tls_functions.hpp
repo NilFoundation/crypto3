@@ -11,6 +11,8 @@
 
 #include <nil/crypto3/kdf/detail/prf_tls/prf_tls_policy.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -27,8 +29,8 @@ namespace nil {
                     template<typename MessageAuthenticationCode>
                     static void p_hash(uint8_t out[], size_t out_len, MessageAuthenticationCode &mac,
                                        const uint8_t salt[], size_t salt_len) {
-                        secure_vector<uint8_t> A(salt, salt + salt_len);
-                        secure_vector<uint8_t> h;
+                        std::vector<uint8_t> A(salt, salt + salt_len);
+                        std::vector<uint8_t> h;
 
                         size_t offset = 0;
 

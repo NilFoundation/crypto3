@@ -11,6 +11,8 @@
 
 #include <nil/crypto3/kdf/detail/sp800_108/sp800_108_functions.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -47,7 +49,7 @@ namespace nil {
                         uint8_t *p = key;
                         uint32_t counter = 1;
                         uint8_t be_len[4] = {0};
-                        secure_vector<uint8_t> tmp;
+                        std::vector<uint8_t> tmp;
 
                         store_be(length, be_len);
                         m_prf->set_key(secret, secret_len);
@@ -105,8 +107,8 @@ namespace nil {
                         uint8_t *p = key;
                         uint32_t counter = 1;
                         uint8_t be_len[4] = {0};
-                        secure_vector<uint8_t> prev(salt, salt + iv_len);
-                        secure_vector<uint8_t> ctx(salt + iv_len, salt + salt_len);
+                        std::vector<uint8_t> prev(salt, salt + iv_len);
+                        std::vector<uint8_t> ctx(salt + iv_len, salt + salt_len);
 
                         store_be(length, be_len);
                         m_prf->set_key(secret, secret_len);
@@ -165,7 +167,7 @@ namespace nil {
                         uint8_t *p = key;
                         uint32_t counter = 1;
                         uint8_t be_len[4] = {0};
-                        secure_vector<uint8_t> ai, ki;
+                        std::vector<uint8_t> ai, ki;
 
                         store_be(length, be_len);
                         m_prf->set_key(secret, secret_len);

@@ -15,6 +15,8 @@
 
 #include <nil/crypto3/kdf/detail/sp800_56a/sp800_56a_policy.hpp>
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace kdf {
@@ -74,7 +76,7 @@ namespace nil {
                     }
 
                     uint32_t counter = 1;
-                    secure_vector<uint8_t> result;
+                    std::vector<uint8_t> result;
                     for (size_t i = 0; i < reps; i++) {
                         auxfunc.update_be(counter++);
                         auxfunc.update(secret, secret_len);
@@ -131,7 +133,7 @@ namespace nil {
                     }
 
                     uint32_t counter = 1;
-                    secure_vector<uint8_t> result;
+                    std::vector<uint8_t> result;
                     for (size_t i = 0; i < reps; i++) {
                         auxfunc.update_be(counter++);
                         auxfunc.update(secret, secret_len);

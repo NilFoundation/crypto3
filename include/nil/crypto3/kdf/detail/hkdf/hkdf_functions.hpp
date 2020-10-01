@@ -10,6 +10,7 @@
 #define CRYPTO3_KDF_HKDF_FUNCTIONS_HPP
 
 #include <nil/crypto3/kdf/detail/hkdf/hkdf_policy.hpp>
+#include <vector>
 
 namespace nil {
     namespace crypto3 {
@@ -37,17 +38,17 @@ namespace nil {
                      */
                     static void expand(digest_type &digest, const mac_type &mac) {
                         uint8_t counter = 1;
-                        secure_vector<uint8_t> h;
+                        std::vector<uint8_t> h;
                         size_t offset = 0;
 
-                        while (offset != key_len && counter != 0) {
+                        while (offset != digest_bits && counter != 0) {
                             m_prf->update(h);
                             m_prf->update(label, label_len);
                             m_prf->update(salt, salt_len);
                             m_prf->update(counter++);
                             m_prf->final(h);
 
-                            const size_t written = std::min(h.size(), key_len - offset);
+                            const size_t written = std::min(h.size(), digest_bits - offset);
                             copy_mem(&key[offset], h.data(), written);
                             offset += written;
                         }
@@ -61,12 +62,12 @@ namespace nil {
                      * @param key
                      */
                     static void extract(digest_type &digest, const mac_type &mac) {
-                        secure_vector<uint8_t> prk;
+                        std::vector<uint8_t> prk;
 
                         m_prf->update(secret, secret_len);
                         m_prf->final(prk);
 
-                        const size_t written = std::min(prk.size(), key_len);
+                        const size_t written = std::min(prk.size(), digest_bits);
                         copy_mem(&key[0], prk.data(), written);
                         return written;
                     }
