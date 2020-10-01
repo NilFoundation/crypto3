@@ -17,10 +17,10 @@
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-            template<typename FieldType, std::size_t t, bool strength>
+            template<typename FieldType, std::size_t t, std::size_t PartRounds>
             class poseidon_compressor {
             protected:
-                typedef detail::poseidon_functions<FieldType, t, strength> policy_type;
+                typedef detail::poseidon_functions<FieldType, t, PartRounds> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -49,10 +49,10 @@ namespace nil {
                 }
             };
 
-            template<typename FieldType, std::size_t Arity, bool strength>
+            template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
             struct poseidon {
             protected:
-                typedef detail::poseidon_policy<FieldType, Arity, strength> policy_type;
+                typedef detail::poseidon_policy<FieldType, Arity, PartRounds> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;

@@ -25,9 +25,9 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Arity, bool strength>
+                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
                 struct poseidon_mds_matrix {
-                    typedef poseidon_policy<FieldType, Arity, strength> policy_type;
+                    typedef poseidon_policy<FieldType, Arity, PartRounds> policy_type;
                     typedef typename FieldType::value_type element_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -76,19 +76,19 @@ namespace nil {
 
                     // private:
                     constexpr inline mds_matrix_type generate_mds_matrix() {
-                        mds_matrix_type mds_matrix;
+                        mds_matrix_type new_mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
-                                mds_matrix[i][j] = element_type(i + j + state_words).inversed();
+                                new_mds_matrix[i][j] = element_type(i + j + state_words).inversed();
                             }
                         }
-                        return mds_matrix;
+                        return new_mds_matrix;
                     }
 
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
-                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
+                        explicit constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
                             M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;

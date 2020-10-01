@@ -16,9 +16,9 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, std::size_t Arity, bool strength>
+                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
                 struct poseidon_lfsr {
-                    typedef poseidon_policy<FieldType, Arity, strength> policy_type;
+                    typedef poseidon_policy<FieldType, Arity, PartRounds> policy_type;
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     constexpr static const std::size_t full_rounds = policy_type::full_rounds;
@@ -44,7 +44,7 @@ namespace nil {
                         for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
                             while (true) {
                                 constant = 0;
-                                for (std::size_t i = 0; i < word_bits; i++) {
+                                for (std::size_t j = 0; j < word_bits; j++) {
                                     lfsr_state = update_lfsr_state(lfsr_state);
                                     constant = set_new_bit<modulus_type>(
                                         constant, get_lfsr_state_bit(lfsr_state, lfsr_state_bits - 1));
