@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -8,6 +9,8 @@
 
 #ifndef CRYPTO3_DIGEST_HPP
 #define CRYPTO3_DIGEST_HPP
+
+#include <iostream>
 
 #include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
@@ -50,11 +53,21 @@ namespace nil {
          */
 
         template<std::size_t DigestBits>
-        using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
+        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> { 
+
+            digest(): boost::container::small_vector<octet_type, DigestBits / octet_bits>(){};
+
+            digest(std::size_t sz, octet_type ot): boost::container::small_vector<octet_type, DigestBits / octet_bits>(sz, ot){};
+        };
+
+
+        //template<std::size_t DigestBits>
+        //using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
+
 
         namespace detail {
             template<std::size_t DigestBits, typename OutputIterator>
-            OutputIterator to_ascii(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d,
+            OutputIterator to_ascii(const digest<DigestBits> &d,
                                     OutputIterator it) {
                 for (std::size_t j = 0; j < d.size(); ++j) {
                     octet_type b = d[j];
@@ -66,7 +79,7 @@ namespace nil {
 
             template<std::size_t DigestBits>
             digest<DigestBits / 4 + 1>
-                c_str(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d) {
+                c_str(const digest<DigestBits> &d) {
                 digest<DigestBits / 4 + 1> s;
                 to_ascii<DigestBits>(d, std::back_inserter(s));
                 s.push_back('\0');
@@ -83,9 +96,31 @@ namespace nil {
          * (0, NewBits - OldBits) bits.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> resize(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
+        digest<NewBits> reserve(const digest< OldBits > &od) {
             digest<NewBits> nd;
             unsigned bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
+            std::memcpy(nd.data(), od.data(), bytes);
+            return nd;
+        }
+
+        /*!
+         *
+         * @tparam DigestBits
+         * @param od
+         * @param new_size
+         * @return Digest containing the first min(od.size(), new_size) octets of the argument digest followed by max
+         * (0, new_size - od.size()) zero octets.
+         */
+        template<std::size_t DigestBits>
+        digest<DigestBits> resize(const digest<DigestBits> &od, std::size_t new_size) {
+
+            std::size_t old_size = od.size();
+
+            if (new_size == old_size)
+                return od;
+
+            digest<DigestBits> nd(new_size, octet_type());
+            std::size_t bytes = sizeof(octet_type) * (old_size < new_size ? old_size : new_size);
             std::memcpy(nd.data(), od.data(), bytes);
             return nd;
         }
@@ -101,7 +136,7 @@ namespace nil {
          * amount necessitated by the shorted output size.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> truncate(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
+        digest<NewBits> truncate(const digest< OldBits > &od) {
             BOOST_STATIC_ASSERT(NewBits <= OldBits);
             return resize<NewBits>(od);
         }
@@ -186,7 +221,7 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::pack<stream_endian::big_bit, stream_endian::big_bit, 4, 8>(a.begin(), a.end(), d.begin());
             return source;
         }
     }    // namespace crypto3
@@ -200,4 +235,4 @@ namespace std {
     }
 }    // namespace std
 
-#endif    // CRYPTO3_CODEC_DIGEST_HPP
+#endif    // CRYPTO3_DIGEST_HPP

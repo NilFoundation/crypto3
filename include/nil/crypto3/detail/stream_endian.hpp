@@ -16,17 +16,16 @@
 namespace nil {
     namespace crypto3 {
         namespace stream_endian {
-
             // General versions; There should be no need to use these directly
 
             template<int UnitBits>
-            struct big_unit_big_bit {};
+            struct big_unit_big_bit { };
             template<int UnitBits>
-            struct little_unit_little_bit {};
+            struct little_unit_little_bit { };
             template<int UnitBits>
-            struct big_unit_little_bit {};
+            struct big_unit_little_bit { };
             template<int UnitBits>
-            struct little_unit_big_bit {};
+            struct little_unit_big_bit { };
             template<int UnitBits>
             struct host_unit {
                 BOOST_STATIC_ASSERT(UnitBits % CHAR_BIT == 0);
@@ -51,7 +50,7 @@ namespace nil {
             typedef host_unit<CHAR_BIT> host_byte;
 
         }    // namespace stream_endian
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_CODEC_STREAM_ENDIAN_HPP
+#endif    // CRYPTO3_STREAM_ENDIAN_HPP

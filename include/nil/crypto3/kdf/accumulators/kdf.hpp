@@ -53,7 +53,7 @@ namespace nil {
                     typedef boost::container::static_vector<word_type, block_words> cache_type;
 
                 public:
-                    typedef block::digest<block_bits> result_type;
+                    typedef digest<block_bits> result_type;
 
                     template<typename Args>
                     kdf_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
@@ -66,7 +66,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
+                        result_type res = dgst;
 
                         if (!cache.empty()) {
                             block_type ib = {0};
@@ -105,8 +105,8 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = digest.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                            block_type ob = dgst.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
+                            std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
 
                             cache.clear();
                         }
@@ -118,20 +118,20 @@ namespace nil {
                     inline void process(const block_type &block, std::size_t bits) {
                         block_type ob;
                         if (cache.empty()) {
-                            ob = digest.empty() ? cipher.begin_message(block) : cipher.process_block(block);
+                            ob = dgst.empty() ? cipher.begin_message(block) : cipher.process_block(block);
                         } else {
-                            block_type b = block::make_array<block_words>(cache.begin(), cache.end());
+                            block_type b = make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::copy(block.begin(), itr, b.end());
 
-                            ob = digest.empty() ? cipher.begin_message(b) : cipher.process_block(b);
+                            ob = dgst.empty() ? cipher.begin_message(b) : cipher.process_block(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
                         }
 
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                        std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
                         seen += bits;
                     }
 
@@ -139,7 +139,7 @@ namespace nil {
 
                     std::size_t seen;
                     cache_type cache;
-                    result_type digest;
+                    result_type dgst;
                 };
             }    // namespace impl
 
