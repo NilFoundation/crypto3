@@ -25,7 +25,7 @@ namespace nil {
                  * @tparam Arity arity of input block for Poseidon permutation in field elements
                  * @tparam Strength mode of Poseidon permutation
                  */
-                template<typename FieldType, std::size_t Arity>
+                template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
                 struct base_poseidon_policy {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type element_type;
@@ -46,6 +46,7 @@ namespace nil {
 
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
+                    constexpr static const std::size_t part_rounds = PartRounds;
 
                     struct iv_generator {
                         // TODO: maybe it would be done in constexpr way
@@ -66,135 +67,97 @@ namespace nil {
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 1, PartRounds,
                                        std::enable_if_t<PartRounds == 69 || PartRounds == 55>> :
-                    base_poseidon_policy<FieldType, 1> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 69 : 55;
-                };
+                    base_poseidon_policy<FieldType, 1, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 2, PartRounds,
                                        std::enable_if_t<PartRounds == 69 || PartRounds == 55>> :
-                    base_poseidon_policy<FieldType, 2> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 69 : 55;
-                };
+                    base_poseidon_policy<FieldType, 2, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 3, PartRounds,
                                        std::enable_if_t<PartRounds == 70 || PartRounds == 56>> :
-                    base_poseidon_policy<FieldType, 3> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 70 : 56;
-                };
+                    base_poseidon_policy<FieldType, 3, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 4, PartRounds,
                                        std::enable_if_t<PartRounds == 70 || PartRounds == 56>> :
-                    base_poseidon_policy<FieldType, 4> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 70 : 56;
-                };
+                    base_poseidon_policy<FieldType, 4, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 5, PartRounds,
                                        std::enable_if_t<PartRounds == 70 || PartRounds == 56>> :
-                    base_poseidon_policy<FieldType, 5> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 70 : 56;
-                };
+                    base_poseidon_policy<FieldType, 5, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 6, PartRounds,
                                        std::enable_if_t<PartRounds == 70 || PartRounds == 56>> :
-                    base_poseidon_policy<FieldType, 6> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 70 : 56;
-                };
+                    base_poseidon_policy<FieldType, 6, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 7, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 7> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 7, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 8, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 8> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 8, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 9, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 9> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 9, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 10, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 10> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 10, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 11, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 11> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 11, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 12, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 12> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 12, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 13, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 13> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 13, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 14, PartRounds,
                                        std::enable_if_t<PartRounds == 72 || PartRounds == 57>> :
-                    base_poseidon_policy<FieldType, 14> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 72 : 57;
-                };
+                    base_poseidon_policy<FieldType, 14, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 15, PartRounds,
                                        std::enable_if_t<PartRounds == 74 || PartRounds == 59>> :
-                    base_poseidon_policy<FieldType, 15> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 74 : 59;
-                };
+                    base_poseidon_policy<FieldType, 15, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 16, PartRounds,
                                        std::enable_if_t<PartRounds == 74 || PartRounds == 59>> :
-                    base_poseidon_policy<FieldType, 16> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 74 : 59;
-                };
+                    base_poseidon_policy<FieldType, 16, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 24, PartRounds,
                                        std::enable_if_t<PartRounds == 74 || PartRounds == 59>> :
-                    base_poseidon_policy<FieldType, 24> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 74 : 59;
-                };
+                    base_poseidon_policy<FieldType, 24, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 36, PartRounds,
                                        std::enable_if_t<PartRounds == 75 || PartRounds == 60>> :
-                    base_poseidon_policy<FieldType, 36> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 75 : 60;
-                };
+                    base_poseidon_policy<FieldType, 36, PartRounds> {};
 
                 template<typename FieldType, std::size_t PartRounds>
                 struct poseidon_policy<FieldType, 64, PartRounds,
                                        std::enable_if_t<PartRounds == 77 || PartRounds == 61>> :
-                    base_poseidon_policy<FieldType, 64> {
-                    constexpr static const std::size_t part_rounds = PartRounds;// Strength ? 77 : 61;
-                };
+                    base_poseidon_policy<FieldType, 64, PartRounds> {};
 
                 // continue define partial specialized template classes for each arity separately...
 
