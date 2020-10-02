@@ -17,6 +17,15 @@ namespace nil {
         struct agreement_key : public private_key<Scheme> {
             typedef typename private_key<Scheme>::scheme_type scheme_type;
             typedef typename Scheme::key_agreement_policy key_policy_type;
+
+            typedef typename private_key<Scheme>::key_type key_type;
+            typedef typename private_key<Scheme>::key_schedule_type key_schedule_type;
+
+            agreement_key(const key_type &key) : private_key<Scheme>(key) : agrkey(key) {
+
+            }
+
+            key_schedule_type agrkey;
         };
     }    // namespace crypto3
 }    // namespace nil

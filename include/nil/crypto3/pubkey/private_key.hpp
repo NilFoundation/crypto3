@@ -22,6 +22,7 @@ namespace nil {
             typedef typename public_key<Scheme>::key_schedule_type key_schedule_type;
 
             private_key(const key_type &key) : public_key<Scheme>(key), privkey(key) {
+
             }
 
             key_schedule_type privkey;
