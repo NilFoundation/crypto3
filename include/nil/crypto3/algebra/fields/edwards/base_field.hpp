@@ -48,8 +48,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x3D;
-
                     typedef typename detail::element_fp<params<edwards_base_field<183, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -67,9 +65,6 @@ namespace nil {
 
                 constexpr typename edwards_base_field<183, CHAR_BIT>::modulus_type const
                     edwards_base_field<183, CHAR_BIT>::modulus;
-
-                constexpr typename edwards_base_field<183, CHAR_BIT>::generator_type const
-                    edwards_base_field<183, CHAR_BIT>::mul_generator;
 
                 template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
                 using edwards_fq = edwards_base_field<ModulusBits, GeneratorBits>;

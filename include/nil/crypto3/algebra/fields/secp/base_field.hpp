@@ -53,8 +53,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<secp_k1_base_field<160, CHAR_BIT>>> value_type;
 
 constexpr static const std::size_t value_bits = modulus_bits;
@@ -75,8 +73,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<secp_r1_base_field<160, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -96,8 +92,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<secp_r2_base_field<160, CHAR_BIT>>> value_type;
 
@@ -120,8 +114,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<secp_k1_base_field<192, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -142,8 +134,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<secp_r1_base_field<192, CHAR_BIT>>> value_type;
 
@@ -166,8 +156,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<secp_k1_base_field<224, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -189,8 +177,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<secp_r1_base_field<224, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -211,8 +197,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<256, CHAR_BIT>>> value_type;
 
@@ -236,23 +220,6 @@ constexpr static const std::size_t value_bits = modulus_bits;
                     secp_r1_base_field<224, CHAR_BIT>::modulus;
                 constexpr typename secp_k1_base_field<256, CHAR_BIT>::modulus_type const
                     secp_k1_base_field<256, CHAR_BIT>::modulus;
-
-                constexpr typename secp_k1_base_field<160, CHAR_BIT>::generator_type const
-                    secp_k1_base_field<160, CHAR_BIT>::mul_generator;
-                constexpr typename secp_r1_base_field<160, CHAR_BIT>::generator_type const
-                    secp_r1_base_field<160, CHAR_BIT>::mul_generator;
-                constexpr typename secp_r2_base_field<160, CHAR_BIT>::generator_type const
-                    secp_r2_base_field<160, CHAR_BIT>::mul_generator;
-                constexpr typename secp_k1_base_field<192, CHAR_BIT>::generator_type const
-                    secp_k1_base_field<192, CHAR_BIT>::mul_generator;
-                constexpr typename secp_r1_base_field<192, CHAR_BIT>::generator_type const
-                    secp_r1_base_field<192, CHAR_BIT>::mul_generator;
-                constexpr typename secp_k1_base_field<224, CHAR_BIT>::generator_type const
-                    secp_k1_base_field<224, CHAR_BIT>::mul_generator;
-                constexpr typename secp_r1_base_field<224, CHAR_BIT>::generator_type const
-                    secp_r1_base_field<224, CHAR_BIT>::mul_generator;
-                constexpr typename secp_k1_base_field<256, CHAR_BIT>::generator_type const
-                    secp_k1_base_field<256, CHAR_BIT>::mul_generator;
 
                 template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
                 using secp_k1_fq = secp_k1_base_field<ModulusBits, GeneratorBits>;

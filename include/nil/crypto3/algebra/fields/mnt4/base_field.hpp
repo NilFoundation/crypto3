@@ -48,8 +48,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x11;
-
                     typedef typename detail::element_fp<params<mnt4_base_field<298, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -67,9 +65,6 @@ namespace nil {
 
                 constexpr
                     typename mnt4_base_field<298, CHAR_BIT>::modulus_type const mnt4_base_field<298, CHAR_BIT>::modulus;
-
-                constexpr typename mnt4_base_field<298, CHAR_BIT>::generator_type const
-                    mnt4_base_field<298, CHAR_BIT>::mul_generator;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 using mnt4_fq = mnt4_base_field<ModulusBits, GeneratorBits>;

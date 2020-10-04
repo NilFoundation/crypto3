@@ -47,8 +47,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<160, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -69,8 +67,6 @@ namespace nil {
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<192, CHAR_BIT>>> value_type;
 
@@ -93,8 +89,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<224, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -115,8 +109,6 @@ namespace nil {
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<256, CHAR_BIT>>> value_type;
 
@@ -139,8 +131,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<320, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -161,8 +151,6 @@ namespace nil {
 
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = 0x03;
 
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<384, CHAR_BIT>>> value_type;
 
@@ -185,8 +173,6 @@ namespace nil {
                     constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                     typedef typename policy_type::generator_type generator_type;
 
-                    constexpr static const generator_type mul_generator = 0x03;
-
                     typedef typename detail::element_fp<params<brainpool_r1_base_field<512, CHAR_BIT>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
@@ -207,21 +193,6 @@ namespace nil {
                     brainpool_r1_base_field<384, CHAR_BIT>::modulus;
                 constexpr typename brainpool_r1_base_field<512, CHAR_BIT>::modulus_type const
                     brainpool_r1_base_field<512, CHAR_BIT>::modulus;
-
-                constexpr typename brainpool_r1_base_field<160, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<160, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<192, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<192, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<224, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<224, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<256, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<256, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<320, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<320, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<384, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<384, CHAR_BIT>::mul_generator;
-                constexpr typename brainpool_r1_base_field<512, CHAR_BIT>::generator_type const
-                    brainpool_r1_base_field<512, CHAR_BIT>::mul_generator;
 
                 template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
                 using brainpool_r1_fq = brainpool_r1_base_field<ModulusBits, GeneratorBits>;
