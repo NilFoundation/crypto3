@@ -48,7 +48,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-    - 6-shanks-tonelli
+    - 33-extended-inverse
 
 env:
   matrix:
