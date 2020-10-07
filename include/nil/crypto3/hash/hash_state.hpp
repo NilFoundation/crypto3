@@ -16,6 +16,8 @@
 
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
+#include <nil/crypto3/detail/static_digest.hpp>
+
 namespace nil {
     namespace crypto3 {
         template<typename Hash, typename = typename std::enable_if<detail::is_hash<Hash>::value>::type>

@@ -9,10 +9,13 @@
 #ifndef CRYPTO3_HASH_STREAM_POSTPROCESSOR_HPP
 #define CRYPTO3_HASH_STREAM_POSTPROCESSOR_HPP
 
+#include <array>
+
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
 
 #include <boost/range/concepts.hpp>
+#include <boost/array.hpp>
 
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
