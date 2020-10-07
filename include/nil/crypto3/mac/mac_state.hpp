@@ -14,6 +14,8 @@
 
 #include <nil/crypto3/mac/accumulators/mac.hpp>
 
+#include <nil/crypto3/detail/static_digest.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace mac {

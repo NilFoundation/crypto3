@@ -9,11 +9,21 @@
 #ifndef CRYPTO3_MAC_VALUE_HPP
 #define CRYPTO3_MAC_VALUE_HPP
 
+#include <array>
 #include <type_traits>
 #include <iterator>
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
+
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/apply.hpp>
+#include <boost/array.hpp>
+
+#include <boost/accumulators/framework/accumulator_base.hpp>
+#include <boost/accumulators/framework/extractor.hpp>
+#include <boost/accumulators/framework/depends_on.hpp>
+#include <boost/accumulators/framework/parameters/sample.hpp>
 
 #include <boost/range/concepts.hpp>
 

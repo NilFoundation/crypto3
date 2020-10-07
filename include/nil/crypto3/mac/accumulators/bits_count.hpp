@@ -17,7 +17,7 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/mac/accumulators/parameters/bits.hpp>
 
 namespace nil {
     namespace crypto3 {
