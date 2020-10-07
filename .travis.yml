@@ -48,7 +48,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-    - 6-shanks-tonelli
+    - 36-constexpr-modular-adaptor
 
 env:
   matrix:
