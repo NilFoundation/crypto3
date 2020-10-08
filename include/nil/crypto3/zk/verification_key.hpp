@@ -25,7 +25,8 @@ namespace nil {
 
                 typedef typename scheme_type::curve_type curve_type;
             };
-        }
-    }
-}
+        }    // namespace zk
+    }        // namespace crypto3
+}    // namespace nil
 
+#endif

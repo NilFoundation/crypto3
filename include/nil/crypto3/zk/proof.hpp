@@ -24,8 +24,8 @@ namespace nil {
                 constexpr static const std::size_t g2_bits = curve_type::g2_bits;
                 typedef typename curve_type::g2_type g2_type;
             };
-        }
-    }
-}
+        }    // namespace zk
+    }        // namespace crypto3
+}    // namespace nil
 
-
+#endif
