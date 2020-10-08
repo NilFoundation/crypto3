@@ -50,8 +50,7 @@ namespace nil {
                  * A proving key for the TBCS ppzkSNARK.
                  */
                 template<typename CurveType>
-                class tbcs_ppzksnark_proving_key {
-                public:
+                struct tbcs_ppzksnark_proving_key {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     tbcs_ppzksnark_circuit circuit;

@@ -75,8 +75,7 @@ namespace nil {
                  * A proving key for the USCS ppzkSNARK.
                  */
                 template<typename CurveType>
-                class uscs_ppzksnark_proving_key {
-                public:
+                struct uscs_ppzksnark_proving_key {
                     typename CurveType::g1_vector V_g1_query;
                     typename CurveType::g1_vector alpha_V_g1_query;
                     typename CurveType::g1_vector H_g1_query;
