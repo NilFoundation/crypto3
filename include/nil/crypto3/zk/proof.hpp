@@ -6,26 +6,26 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_VERIFICATION_KEY_HPP
-#define CRYPTO3_ZK_VERIFICATION_KEY_HPP
+#ifndef CRYPTO3_ZK_PROOF_HPP
+#define CRYPTO3_ZK_PROOF_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             template<typename ZkScheme>
-            struct verification_key {
+            struct proof {
                 typedef ZkScheme scheme_type;
 
                 typedef typename scheme_type::curve_type curve_type;
-            };
 
-            template<typename ZkScheme>
-            struct processed_verification_key {
-                typedef ZkScheme scheme_type;
+                constexpr static const std::size_t g1_bits = curve_type::g1_bits;
+                typedef typename curve_type::g1_type g1_type;
 
-                typedef typename scheme_type::curve_type curve_type;
+                constexpr static const std::size_t g2_bits = curve_type::g2_bits;
+                typedef typename curve_type::g2_type g2_type;
             };
         }
     }
 }
+
 
