@@ -27,7 +27,7 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/scheme.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/pubkey/scheme.hpp>
+// #include <nil/crypto3/pubkey/scheme.hpp>
 
 namespace nil {
     namespace crypto3 {

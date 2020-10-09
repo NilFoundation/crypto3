@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_BITS_HPP
-#define CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_BITS_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_BITS_HPP
+#define CRYPTO3_ACCUMULATORS_PARAMETERS_BITS_HPP
 
 #include <boost/parameter/keyword.hpp>
 
@@ -22,4 +22,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BITS_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PARAMETERS_BITS_HPP

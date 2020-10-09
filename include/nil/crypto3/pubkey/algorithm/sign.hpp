@@ -14,7 +14,7 @@
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
-#include <nil/crypto3/pubkey/public_key.hpp>
+#include <nil/crypto3/pubkey/private_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -104,7 +104,7 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
-        OutputIterator sign(InputIterator first, InputIterator last, const public_key<Scheme> &key,
+        OutputIterator sign(InputIterator first, InputIterator last, const private_key<Scheme> &key,
                             OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
@@ -256,7 +256,7 @@ namespace nil {
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            sign(InputIterator first, InputIterator last, const public_key<Scheme> &key) {
+            sign(InputIterator first, InputIterator last, const private_key<Scheme> &key) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type SchemeMode;
@@ -312,7 +312,7 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator sign(const SinglePassRange &rng, const public_key<Scheme> &key, OutputIterator out) {
+        OutputIterator sign(const SinglePassRange &rng, const private_key<Scheme> &key, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type SchemeMode;
@@ -367,7 +367,7 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputRange>
-        OutputRange &sign(const SinglePassRange &rng, const public_key<Scheme> &key, OutputRange &out) {
+        OutputRange &sign(const SinglePassRange &rng, const private_key<Scheme> &key, OutputRange &out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type SchemeMode;
@@ -427,7 +427,7 @@ namespace nil {
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            sign(const SinglePassRange &r, const public_key<Scheme> &key) {
+            sign(const SinglePassRange &r, const private_key<Scheme> &key) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type SchemeMode;

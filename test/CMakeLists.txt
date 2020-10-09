@@ -25,7 +25,7 @@ macro(define_pubkey_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(pubkey_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(pubkey_${name}_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -35,7 +35,10 @@ macro(define_pubkey_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "ecdsa")
+set(TESTS_NAMES
+    "ecdsa"
+    "bls"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})

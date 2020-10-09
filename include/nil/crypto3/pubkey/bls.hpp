@@ -16,48 +16,14 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
+#include <cstdint>
+#include <array>
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
-            struct bls_public_key {
-                typedef CurveType curve_type;
-                typedef SignatureHash signature_hash_type;
-
-                typedef typename curve_type::value_type value_type;
-                typedef typename curve_type::number_type number_type;
-
-                constexpr static const std::size_t key_bits = curve_type::g2_type::modulus_bits;
-                typedef typename curve_type::g2_type::value_type key_type;
-
-                constexpr static const std::size_t key_schedule_bits = key_bits;
-                typedef key_type key_schedule_type;
-
-                constexpr static const std::size_t signature_bits = curve_type::g1_type::modulus_bits;
-                typedef typename curve_type::g1_type::value_type signature_type;
-
-                template<typename InputRange>
-                inline static bool verify(const InputRange &val, const signature_type &sign, const key_type &key) {
-                    if (!sign.is_well_formed()) {
-                        return false;
-                    }
-
-                    if (!key.is_well_formed()) {
-                        return false;
-                    }
-
-                    if (CurveType::modulus_r * sign != typename CurveType::g1_type::value_type::zero()) {
-                        return false;
-                    }
-
-                    signature_type hash = Hashing(val);
-
-                    return (algebra::reduced_pair<CurveType>(sign, key_type::value_type::one()) ==
-                            algebra::reduced_pair<CurveType>(hash, key));
-                }
-            };
-
-            template<typename CurveType>
             struct bls_private_key {
                 typedef CurveType curve_type;
 
@@ -73,9 +39,103 @@ namespace nil {
                 constexpr static const std::size_t signature_bits = curve_type::g1_type::modulus_bits;
                 typedef typename curve_type::g1_type::value_type signature_type;
 
-                inline static bool sign(signature_type &res, const signature_type &val, const key_type &key) {
-                    res = val * key;
+                inline static bool is_well_formed(const key_type &privkey) {
+                    // privkey < r is implicitly true due to scalar_field_type implementation
+                    return privkey != 0;
                 }
+
+                template<std::size_t N, typename = std::enable_if_t<N >= 32>>
+                inline static key_type key_gen(const std::array<uint8_t, N> &seed) {
+                    return key_gen_impl(seed);
+                }
+
+                inline static key_type key_gen(const std::vector<uint8_t> &seed) {
+                    assert(seed.size() < 32);
+                    return key_gen_impl(seed);
+                }
+
+                inline static bool sign(signature_type &res, const signature_type &val, const key_type &key) {
+                    // res = val * key;
+                }
+
+            private:
+                // TODO: temporary stub -- remove
+                inline static number_type hkdf_extract_expand() {
+                    return 1234;
+                }
+
+                template<typename SeedType>
+                inline static key_type key_gen_impl(const SeedType &seed) {
+                    // "BLS-SIG-KEYGEN-SALT-"
+                    std::array<uint8_t, 20> salt = {66, 76, 83, 45, 83, 73, 71, 45, 75, 69,
+                                        89, 71, 69, 78, 45, 83, 65, 76, 84, 45};
+                    number_type sk(0);
+                    // TODO: will work when hkdf finished
+                    while (sk != 0) {
+                        salt = hash<hashes::sha2<512>>(salt);
+                        sk = hkdf_extract_expand(salt, seed);
+                    }
+                    return key_type(sk);
+                }
+            };
+
+            template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
+            struct bls_public_key {
+                typedef CurveType curve_type;
+                typedef SignatureHash signature_hash_type;
+
+                typedef typename curve_type::value_type value_type;
+                typedef typename curve_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = curve_type::g2_type::modulus_bits;
+                constexpr static const number_type group_order = curve_type::q;
+                typedef typename curve_type::g2_type::value_type key_type;
+                typedef typename bls_private_key<CurveType>::key_type private_key_type;
+
+                constexpr static const std::size_t key_schedule_bits = key_bits;
+                typedef key_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = curve_type::g1_type::modulus_bits;
+                typedef typename curve_type::g1_type::value_type signature_type;
+
+                inline static bool is_well_formed(const key_type &pubkey) {
+                    bool status = true;
+                    status &= (pubkey != key_type::one());
+                    // TODO: will work after scalar multiplication finished
+                    status &= (pubkey * group_order == key_type::one());
+                    return status;
+                }
+
+                inline static key_type key_gen(const private_key_type &privkey) {
+                    // TODO: will work after scalar multiplication finished
+                    key_type pubkey = privkey * group_order;
+                    // This action is not necessary while key generation
+                    assert(is_well_formed(pubkey));
+                    return pubkey;
+                }
+
+                template<typename InputRange>
+                inline static bool verify(const InputRange &val, const signature_type &sign, const key_type &key) {
+                    // if (!sign.is_well_formed()) {
+                    //     return false;
+                    // }
+                    //
+                    // if (!key.is_well_formed()) {
+                    //     return false;
+                    // }
+                    //
+                    // if (CurveType::modulus_r * sign != typename CurveType::g1_type::value_type::zero()) {
+                    //     return false;
+                    // }
+                    //
+                    // signature_type hash = Hashing(val);
+                    //
+                    // return (algebra::reduced_pair<CurveType>(sign, key_type::value_type::one()) ==
+                    //         algebra::reduced_pair<CurveType>(hash, key));
+                }
+
+            private:
+
             };
 
             template<typename CurveType>
@@ -87,6 +147,8 @@ namespace nil {
 
                 constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
                 constexpr static const std::size_t private_key_bits = private_key_type::key_bits;
+
+                explicit bls() {}
             };
         }    // namespace pubkey
     }        // namespace crypto3

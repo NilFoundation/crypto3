@@ -12,18 +12,19 @@
 namespace nil {
     namespace crypto3 {
         template<typename Scheme>
-        class public_key {
+        struct public_key {
             typedef Scheme scheme_type;
-            typedef typename scheme_type::public_key_type key_policy_type;
+            typedef typename scheme_type::public_key_type public_key_policy_type;
 
-            typedef typename key_policy_type::key_type key_type;
-            typedef typename key_policy_type::key_schedule_type key_schedule_type;
+            typedef typename public_key_policy_type::key_type key_type;
+            // typedef typename key_policy_type::key_schedule_type key_schedule_type;
 
-            public_key(const key_type &key) : pubkey(key) {
-            }
+            public_key() = default;
+
+            explicit public_key(const key_type &key) : pubkey(key) {}
 
         protected:
-            key_schedule_type pubkey;
+            key_type pubkey;
         };
     }    // namespace crypto3
 }    // namespace nil

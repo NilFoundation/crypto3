@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_SCHEME_HPP
 #define CRYPTO3_SCHEME_HPP
 
-#include <nil/crypto3/pubkey/pk_keys.hpp>
+// #include <nil/crypto3/pubkey/pk_keys.hpp>
 
 namespace nil {
     namespace crypto3 {
