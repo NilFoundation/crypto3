@@ -108,7 +108,7 @@ namespace nil {
 
                 inline static key_type key_gen(const private_key_type &privkey) {
                     // TODO: will work after scalar multiplication finished
-                    key_type pubkey = privkey * group_order;
+                    key_type pubkey = key_type::one() * privkey;
                     // This action is not necessary while key generation
                     assert(is_well_formed(pubkey));
                     return pubkey;
