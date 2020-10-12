@@ -7,10 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#include <nil/crypto3/algebra/curves/bn128/bn128_pp.hpp>
-#include <nil/crypto3/algebra/curves/edwards/edwards_pp.hpp>
-#include <nil/crypto3/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <nil/crypto3/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+#define BOOST_TEST_MODULE knapsack_component_test
+
+#include <boost/test/unit_test.hpp>
+
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/hashes/knapsack/knapsack_component.hpp>
 
@@ -20,6 +24,9 @@ namespace nil {
             namespace snark {
 
                 using namespace nil::crypto3::algebra;
+
+                template<typename FieldT>
+                void test_knapsack_crh_with_bit_out_component();
 
                 template<typename FieldType>
                 void test_knapsack_crh_with_bit_out_component_internal(std::size_t dimension,
@@ -32,8 +39,7 @@ namespace nil {
                     block_variable<FieldType> input_block(pb, input_bits.size());
                     digest_variable<FieldType> output_digest(
                         pb, knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
-                    knapsack_crh_with_bit_out_component<FieldType> H(
-                        pb, input_bits.size(), input_block, output_digest);
+                    knapsack_crh_with_bit_out_component<FieldType> H(pb, input_bits.size(), input_block, output_digest);
 
                     input_block.generate_r1cs_witness(input_bits);
                     H.generate_r1cs_constraints();
@@ -53,8 +59,8 @@ namespace nil {
                  * generate_knapsack_tests.py) and contain hard-to-read constants. */
 
                 template<>
-                void test_knapsack_crh_with_bit_out_component<typename curves::bn128::scalar_field_type>() {
-                    typedef typename curves::bn128::scalar_field_type FieldType;
+                void test_knapsack_crh_with_bit_out_component<typename curves::bn128<>::scalar_field_type>() {
+                    typedef typename curves::bn128<>::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
@@ -112,8 +118,8 @@ namespace nil {
                 }
 
                 template<>
-                void test_knapsack_crh_with_bit_out_component<typename curves::edwards::scalar_field_type>() {
-                    typedef typename curves::edwards::scalar_field_type FieldType;
+                void test_knapsack_crh_with_bit_out_component<typename curves::edwards<>::scalar_field_type>() {
+                    typedef typename curves::edwards<>::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
@@ -159,8 +165,8 @@ namespace nil {
                 }
 
                 template<>
-                void test_knapsack_crh_with_bit_out_component<typename curves::mnt4::scalar_field_type>() {
-                    typedef typename curves::mnt4::scalar_field_type FieldType;
+                void test_knapsack_crh_with_bit_out_component<typename curves::mnt4<>::scalar_field_type>() {
+                    typedef typename curves::mnt4<>::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
@@ -225,8 +231,8 @@ namespace nil {
                 }
 
                 template<>
-                void test_knapsack_crh_with_bit_out_component<typename curves::mnt6::scalar_field_type>() {
-                    typedef typename curves::mnt6::scalar_field_type FieldType;
+                void test_knapsack_crh_with_bit_out_component<typename curves::mnt6<>::scalar_field_type>() {
+                    typedef typename curves::mnt6<>::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
@@ -298,9 +304,13 @@ namespace nil {
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
 
-int main(void) {
-    test_knapsack_crh_with_bit_out_component<typename curves::bn128::scalar_field_type>();
-    test_knapsack_crh_with_bit_out_component<typename curves::edwards::scalar_field_type>();
-    test_knapsack_crh_with_bit_out_component<typename curves::mnt4::scalar_field_type>();
-    test_knapsack_crh_with_bit_out_component<typename curves::mnt6::scalar_field_type>();
+BOOST_AUTO_TEST_SUITE(knapsack_component_test_suite)
+
+BOOST_AUTO_TEST_CASE(knapsack_component_test_case) {
+    test_knapsack_crh_with_bit_out_component<typename curves::bn128<>::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename curves::edwards<>::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename curves::mnt4<>::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename curves::mnt6<>::scalar_field_type>();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

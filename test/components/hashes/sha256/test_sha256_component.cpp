@@ -13,8 +13,8 @@
 
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 
-using namespace nil::crypto3::algebra;
 using namespace nil::crypto3;
+using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
@@ -53,7 +53,7 @@ void test_two_to_one() {
 BOOST_AUTO_TEST_SUITE(sha2_256_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(sha2_256_component_test_case) {
-    test_two_to_one<typename curves::bn128::scalar_field_type>();
+    test_two_to_one<typename curves::bn128<>::scalar_field_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

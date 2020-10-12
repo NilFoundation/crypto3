@@ -30,7 +30,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 struct G2_variable : public component<typename CurveType::scalar_field_type> {
-                    typename typename CurveType::pairing_policy::Fp_type field_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
 
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
@@ -47,7 +47,7 @@ namespace nil {
                         all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
-                    G2_variable(blueprint<field_type> &pb, const other_curve<CurveType>::g2_type &Q) :
+                    G2_variable(blueprint<field_type> &pb, const typename other_curve<CurveType>::g2_type &Q) :
                         component<field_type>(pb) {
                         other_curve<CurveType>::g2_type Q_copy = Q.to_affine_coordinates();
 
@@ -58,7 +58,7 @@ namespace nil {
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
 
-                    void generate_r1cs_witness(const other_curve<CurveType>::g2_type &Q) {
+                    void generate_r1cs_witness(const typename other_curve<CurveType>::g2_type &Q) {
                         other_curve<CurveType>::g2_type Qcopy = Q.to_affine_coordinates();
 
                         X->generate_r1cs_witness(Qcopy.X());

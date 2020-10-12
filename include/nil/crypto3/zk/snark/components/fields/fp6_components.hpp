@@ -29,7 +29,7 @@ namespace nil {
                 /**
                  * Component that represents an Fp6 variable.
                  */
-                template<typename Fp6T>//Fp6_2over3T
+                template<typename Fp6T>    // Fp6_2over3T
                 struct Fp6_variable : public component<typename Fp6T::base_field_type> {
                     typedef typename Fp6T::base_field_type FieldType;
                     typedef typename Fp6T::underlying_field_type Fp3T;
@@ -37,11 +37,14 @@ namespace nil {
                     Fp3_variable<Fp3T> c0;
                     Fp3_variable<Fp3T> c1;
 
-                    Fp6_variable(blueprint<FieldType> &pb) : component<FieldType>(pb), c0(pb), c1(pb) {}
+                    Fp6_variable(blueprint<FieldType> &pb) : component<FieldType>(pb), c0(pb), c1(pb) {
+                    }
                     Fp6_variable(blueprint<FieldType> &pb, const Fp6T &el) :
-                        component<FieldType>(pb), c0(pb, el.c0), c1(pb, el.c1) {}
+                        component<FieldType>(pb), c0(pb, el.c0), c1(pb, el.c1) {
+                    }
                     Fp6_variable(blueprint<FieldType> &pb, const Fp3_variable<Fp3T> &c0, const Fp3_variable<Fp3T> &c1) :
-                        component<FieldType>(pb), c0(c0), c1(c1) {}
+                        component<FieldType>(pb), c0(c0), c1(c1) {
+                    }
 
                     void generate_r1cs_equals_const_constraints(const Fp6T &el) {
                         c0.generate_r1cs_equals_const_constraints(el.c0);
@@ -61,17 +64,18 @@ namespace nil {
                     }
 
                     Fp6_variable<Fp6T> Frobenius_map(const std::size_t power) const {
-                        blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1, new_c1c2;
+                        blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1,
+                            new_c1c2;
                         new_c0c0.assign(this->pb, c0.c0);
                         new_c0c1.assign(this->pb, c0.c1 * Fp3T::Frobenius_coeffs_c1[power % 3]);
                         new_c0c2.assign(this->pb, c0.c2 * Fp3T::Frobenius_coeffs_c2[power % 3]);
                         new_c1c0.assign(this->pb, c1.c0 * Fp6T::Frobenius_coeffs_c1[power % 6]);
-                        new_c1c1.assign(this->pb,
-                                        c1.c1 *
-                                            (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c1[power % 3]));
-                        new_c1c2.assign(this->pb,
-                                        c1.c2 *
-                                            (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c2[power % 3]));
+                        new_c1c1.assign(
+                            this->pb,
+                            c1.c1 * (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c1[power % 3]));
+                        new_c1c2.assign(
+                            this->pb,
+                            c1.c2 * (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c2[power % 3]));
 
                         return Fp6_variable<Fp6T>(this->pb,
                                                   Fp3_variable<Fp3T>(this->pb, new_c0c0, new_c0c1, new_c0c2),
@@ -128,8 +132,8 @@ namespace nil {
                                       const Fp6_variable<Fp6T> &A,
                                       const Fp6_variable<Fp6T> &B,
                                       const Fp6_variable<Fp6T> &result) :
-                                      component<FieldType>(pb),
-                                      A(A), B(B), result(result) {
+                        component<FieldType>(pb),
+                        A(A), B(B), result(result) {
                         /*
                             Karatsuba multiplication for Fp6 as a quadratic extension of Fp3:
                                 v0 = A.c0 * B.c0
@@ -161,18 +165,22 @@ namespace nil {
                         Ac0_plus_Ac1_c0.assign(pb, A.c0.c0 + A.c1.c0);
                         Ac0_plus_Ac1_c1.assign(pb, A.c0.c1 + A.c1.c1);
                         Ac0_plus_Ac1_c2.assign(pb, A.c0.c2 + A.c1.c2);
-                        Ac0_plus_Ac1.reset(new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
+                        Ac0_plus_Ac1.reset(
+                            new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
 
                         Bc0_plus_Bc1_c0.assign(pb, B.c0.c0 + B.c1.c0);
                         Bc0_plus_Bc1_c1.assign(pb, B.c0.c1 + B.c1.c1);
                         Bc0_plus_Bc1_c2.assign(pb, B.c0.c2 + B.c1.c2);
-                        Bc0_plus_Bc1.reset(new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
+                        Bc0_plus_Bc1.reset(
+                            new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
 
                         result_c1_plus_v0_plus_v1_c0.assign(pb, result.c1.c0 + v0->c0 + v1->c0);
                         result_c1_plus_v0_plus_v1_c1.assign(pb, result.c1.c1 + v0->c1 + v1->c1);
                         result_c1_plus_v0_plus_v1_c2.assign(pb, result.c1.c2 + v0->c2 + v1->c2);
-                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(
-                            pb, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1, result_c1_plus_v0_plus_v1_c2));
+                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(pb,
+                                                                               result_c1_plus_v0_plus_v1_c0,
+                                                                               result_c1_plus_v0_plus_v1_c1,
+                                                                               result_c1_plus_v0_plus_v1_c2));
 
                         compute_result_c1.reset(
                             new Fp3_mul_component<Fp3T>(pb, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
@@ -215,8 +223,8 @@ namespace nil {
                 /******************************** Fp6_mul_by_2345_component ************************************/
 
                 /**
-                 * Component that creates constraints for Fp6 multiplication by a Fp6 element B for which B.c0.c0 = B.c0.c1
-                 * = 0.
+                 * Component that creates constraints for Fp6 multiplication by a Fp6 element B for which B.c0.c0 =
+                 * B.c0.c1 = 0.
                  */
                 template<typename Fp6T>
                 struct Fp6_mul_by_2345_component : public component<typename Fp6T::base_field_type> {
@@ -256,8 +264,8 @@ namespace nil {
                                               const Fp6_variable<Fp6T> &A,
                                               const Fp6_variable<Fp6T> &B,
                                               const Fp6_variable<Fp6T> &result) :
-                                              component<FieldType>(pb),
-                                              A(A), B(B), result(result) {
+                        component<FieldType>(pb),
+                        A(A), B(B), result(result) {
                         /*
                             Karatsuba multiplication for Fp6 as a quadratic extension of Fp3:
                                 v0 = A.c0 * B.c0
@@ -292,18 +300,22 @@ namespace nil {
                         Ac0_plus_Ac1_c0.assign(pb, A.c0.c0 + A.c1.c0);
                         Ac0_plus_Ac1_c1.assign(pb, A.c0.c1 + A.c1.c1);
                         Ac0_plus_Ac1_c2.assign(pb, A.c0.c2 + A.c1.c2);
-                        Ac0_plus_Ac1.reset(new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
+                        Ac0_plus_Ac1.reset(
+                            new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
 
                         Bc0_plus_Bc1_c0.assign(pb, B.c0.c0 + B.c1.c0);
                         Bc0_plus_Bc1_c1.assign(pb, B.c0.c1 + B.c1.c1);
                         Bc0_plus_Bc1_c2.assign(pb, B.c0.c2 + B.c1.c2);
-                        Bc0_plus_Bc1.reset(new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
+                        Bc0_plus_Bc1.reset(
+                            new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
 
                         result_c1_plus_v0_plus_v1_c0.assign(pb, result.c1.c0 + v0->c0 + v1->c0);
                         result_c1_plus_v0_plus_v1_c1.assign(pb, result.c1.c1 + v0->c1 + v1->c1);
                         result_c1_plus_v0_plus_v1_c2.assign(pb, result.c1.c2 + v0->c2 + v1->c2);
-                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(
-                            pb, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1, result_c1_plus_v0_plus_v1_c2));
+                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(pb,
+                                                                               result_c1_plus_v0_plus_v1_c0,
+                                                                               result_c1_plus_v0_plus_v1_c1,
+                                                                               result_c1_plus_v0_plus_v1_c2));
 
                         compute_result_c1.reset(
                             new Fp3_mul_component<Fp3T>(pb, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
@@ -315,7 +327,8 @@ namespace nil {
                             A.c0.c1, Fp3T::non_residue * B.c0.c2, result.c0.c0 - Fp6T::non_residue * v1->c2));
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(A.c0.c2, Fp3T::non_residue * B.c0.c2, result.c0.c1 - v1->c0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c0.c0, B.c0.c2, result.c0.c2 - v1->c1));
+                        this->pb.add_r1cs_constraint(
+                            r1cs_constraint<FieldType>(A.c0.c0, B.c0.c2, result.c0.c2 - v1->c1));
                         compute_result_c1->generate_r1cs_constraints();
                     }
 
@@ -422,8 +435,8 @@ namespace nil {
                     Fp6_cyclotomic_sqr_component(blueprint<FieldType> &pb,
                                                  const Fp6_variable<Fp6T> &A,
                                                  const Fp6_variable<Fp6T> &result) :
-                                                 component<FieldType>(pb),
-                                                 A(A), result(result) {
+                        component<FieldType>(pb),
+                        A(A), result(result) {
                         /*
                             underlying_field_type a = underlying_field_type(c0.c0, c1.c1);
                             underlying_field_type b = underlying_field_type(c1.c0, c0.c2);
