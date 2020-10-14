@@ -18,8 +18,10 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
-#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/mac/accumulators/parameters/mac.hpp>
+#include <nil/crypto3/mac/accumulators/parameters/bits.hpp>
+
+#include <nil/crypto3/hash/accumulators/parameters/hash.hpp>
 
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/digest.hpp>
@@ -28,12 +30,19 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace mac {
+            template<typename Hash>
+            struct hmac;
+        }
         namespace accumulators {
             namespace impl {
-                template<typename Mode>
-                struct mac_impl : boost::accumulators::accumulator_base {
+                template<typename MessageAuthenticationCode>
+                struct mac_impl;
+
+                template<typename Hash>
+                struct mac_impl<mac::hmac<Hash>> : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Mode mode_type;
+                    typedef Hash hash_type;
                     typedef typename Mode::cipher_type cipher_type;
                     typedef typename Mode::padding_type padding_type;
 
