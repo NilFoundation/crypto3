@@ -282,7 +282,7 @@ void pairing_test_G1_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pai
                           const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
     using value_type = typename pairing_policy::G1_type;
-    using modulus_type = typename value_type::underlying_field_type_value::modulus_type;
+    using modulus_type = typename value_type::underlying_field_value_type::modulus_type;
 
     std::array<modulus_type, 3> coordinates;
 
@@ -301,7 +301,7 @@ void pairing_test_G2_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pai
                           const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
     using value_type = typename pairing_policy::G2_type;
-    using underlying_type = typename value_type::underlying_field_type_value;
+    using underlying_type = typename value_type::underlying_field_value_type;
     using modulus_type = typename underlying_type::underlying_type::modulus_type;
 
     std::array<modulus_type, 6> coordinates;
@@ -462,8 +462,8 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
     // BOOST_AUTO_TEST_CASE(curves_manual_test1) {
     //     using PairingT = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
-    //     using g1_value_type = typename PairingT::G1_type::underlying_field_type_value;
-    //     using g2_value_type = typename PairingT::G2_type::underlying_field_type_value;
+    //     using g1_value_type = typename PairingT::G1_type::underlying_field_value_type;
+    //     using g2_value_type = typename PairingT::G2_type::underlying_field_value_type;
     //     using modulus_type_g1 = typename g1_value_type::modulus_type;
     //     using modulus_type_g2 = typename g2_value_type::underlying_type::modulus_type;
     //

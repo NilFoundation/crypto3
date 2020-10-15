@@ -26,22 +26,21 @@
 #ifndef ALGEBRA_CURVES_SCALAR_MUL_HPP
 #define ALGEBRA_CURVES_SCALAR_MUL_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupT>
-                    GroupT scalar_mul(const GroupT &base, const boost::multiprecision::cpp_int &scalar) {
-                        using boost::multiprecision::msb;
-                        using boost::multiprecision::bit_test;
+                    using namespace boost::multiprecision;
 
-                        GroupT result;
+                    template<typename GroupType, typename Backend, expression_template_option ExpressionTemplates>
+                    GroupType scalar_mul(const GroupType &base, const number<Backend, ExpressionTemplates> &scalar) {
+                        GroupType result;
 
                         bool found_one = false;
-                        for (long i = static_cast<long>(msb(scalar)); i >= 0; --i) {
+                        for (std::size_t i = static_cast<std::size_t>(msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }

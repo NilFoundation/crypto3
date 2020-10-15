@@ -62,7 +62,7 @@ void print_fp3_curve_group_element(Fp3CurveGroup e) {
 template<typename FpCurveGroup>
 void fp_curve_group_basic_math_examples() {
     using policy_type = FpCurveGroup;
-    using field_value_type = typename policy_type::underlying_field_type_value;
+    using field_value_type = typename policy_type::underlying_field_value_type;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
     policy_type c1(e1, e2, e3), c2(e4, e5, e6);
@@ -94,7 +94,7 @@ void fp_curve_group_basic_math_examples() {
 template<typename Fp2CurveGroup>
 void fp2_curve_group_basic_math_examples() {
     using policy_type = Fp2CurveGroup;
-    using field_value_type = typename policy_type::underlying_field_type_value;
+    using field_value_type = typename policy_type::underlying_field_value_type;
 
     policy_type c1 = policy_type::one(), c2 = policy_type::one().doubled();
 
@@ -125,7 +125,7 @@ void fp2_curve_group_basic_math_examples() {
 template<typename Fp3CurveGroup>
 void fp3_curve_group_basic_math_examples() {
     using policy_type = Fp3CurveGroup;
-    using field_value_type = typename policy_type::underlying_field_type_value;
+    using field_value_type = typename policy_type::underlying_field_value_type;
 
     policy_type c1 = policy_type::one(), c2 = policy_type::one().doubled();
 

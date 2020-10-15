@@ -229,7 +229,7 @@ template<typename FpCurveGroup, typename TestSet>
 void fp_curve_test_init(std::vector<FpCurveGroup> &points,
                         std::vector<std::size_t> &constants,
                         const TestSet &test_set) {
-    using field_value_type = typename FpCurveGroup::underlying_field_type_value;
+    using field_value_type = typename FpCurveGroup::underlying_field_value_type;
     std::array<field_value_type, 3> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
@@ -249,7 +249,7 @@ template<typename Fp2CurveGroup, typename TestSet>
 void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
-    using fp2_value_type = typename Fp2CurveGroup::underlying_field_type_value;
+    using fp2_value_type = typename Fp2CurveGroup::underlying_field_value_type;
     using modulus_type = typename fp2_value_type::underlying_type::modulus_type;
     std::array<modulus_type, 6> coordinates;
 
@@ -274,7 +274,7 @@ template<typename Fp3CurveGroup, typename TestSet>
 void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
-    using fp3_value_type = typename Fp3CurveGroup::underlying_field_type_value;
+    using fp3_value_type = typename Fp3CurveGroup::underlying_field_value_type;
     using modulus_type = typename fp3_value_type::underlying_type::modulus_type;
 
     std::array<modulus_type, 9> coordinates;

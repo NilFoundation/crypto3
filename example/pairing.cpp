@@ -81,8 +81,8 @@ void print_ate_g2_precomp_element(const typename curves::bls12<381, CHAR_BIT>::p
 
 template<typename PairingT>
 void pairing_example(){
-    using g1_value_type = typename PairingT::G1_type::underlying_field_type_value;
-    using g2_value_type = typename PairingT::G2_type::underlying_field_type_value;
+    using g1_value_type = typename PairingT::G1_type::underlying_field_value_type;
+    using g2_value_type = typename PairingT::G2_type::underlying_field_value_type;
 
     g1_value_type g1_X1(123), g1_Y1(234), g1_Z1(345);
 
