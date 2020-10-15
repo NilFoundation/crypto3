@@ -220,6 +220,9 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
     CurveGroup p2_copy = CurveGroup(points[p2]).to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
+    // BOOST_CHECK_EQUAL(points[p1] * constants[C1], points[p1_mul_C1]);
+    // BOOST_CHECK_EQUAL((points[p2] * constants[C1]) + (points[p2] * constants[C2]), points[p2_mul_C1_plus_p2_mul_C2]);
+    // BOOST_CHECK_EQUAL((points[p2] * constants[C1]) + (points[p2] * constants[C2]), points[p2] * (constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>

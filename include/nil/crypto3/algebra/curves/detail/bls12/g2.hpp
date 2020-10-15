@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -262,6 +264,10 @@ namespace nil {
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return bls12_g2(X3, Y3, Z3);
+                        }
+
+                        bls12_g2 operator*(const boost::multiprecision::cpp_int &other) const {
+                            return scalar_mul(*this, other);
                         }
 
                     private:
