@@ -27,6 +27,7 @@
 #define ALGEBRA_CURVES_SCALAR_MUL_HPP
 
 #include <boost/multiprecision/number.hpp>
+#include <cstdint>
 
 namespace nil {
     namespace crypto3 {
@@ -40,7 +41,7 @@ namespace nil {
                         GroupType result;
 
                         bool found_one = false;
-                        for (std::size_t i = static_cast<std::size_t>(msb(scalar)); i >= 0; --i) {
+                        for (auto i = static_cast<std::int64_t>(msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }

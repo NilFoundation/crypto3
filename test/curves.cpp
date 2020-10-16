@@ -54,6 +54,8 @@
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 using namespace nil::crypto3::algebra;
 
 template<typename FpCurveGroup>
@@ -212,6 +214,8 @@ enum curve_operation_test_points : std::size_t {
 
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<CurveGroup> &points, const std::vector<std::size_t> &constants) {
+    using boost::multiprecision::cpp_int;
+
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
@@ -220,9 +224,9 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
     CurveGroup p2_copy = CurveGroup(points[p2]).to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
-    // BOOST_CHECK_EQUAL(points[p1] * constants[C1], points[p1_mul_C1]);
-    // BOOST_CHECK_EQUAL((points[p2] * constants[C1]) + (points[p2] * constants[C2]), points[p2_mul_C1_plus_p2_mul_C2]);
-    // BOOST_CHECK_EQUAL((points[p2] * constants[C1]) + (points[p2] * constants[C2]), points[p2] * (constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) + (points[p2] * static_cast<cpp_int>(constants[C2])), points[p2_mul_C1_plus_p2_mul_C2]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) + (points[p2] * static_cast<cpp_int>(constants[C2])), points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>
