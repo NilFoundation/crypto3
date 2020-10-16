@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -56,32 +57,38 @@ namespace nil {
                 struct mac_impl;
 
                 template<typename Hash>
-                struct mac_impl<mac::hmac<Hash>> : boost::accumulators::accumulator_base {
+                struct mac_impl<nil::crypto3::mac::hmac<Hash>> : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
-                    typedef typename Mode::cipher_type cipher_type;
-                    typedef typename Mode::padding_type padding_type;
+                    typedef nil::crypto3::mac::hmac<hash_type> mac_type;
 
-                    typedef typename mode_type::finalizer_type finalizer_type;
+                    typedef typename hash_type::construction::type construction_type;
+                    typedef typename hash_type::construction::params_type params_type;
 
-                    constexpr static const std::size_t word_bits = mode_type::word_bits;
-                    typedef typename mode_type::word_type word_type;
+                    typedef typename params_type::digest_endian endian_type;
 
-                    constexpr static const std::size_t state_bits = mode_type::state_bits;
-                    constexpr static const std::size_t state_words = mode_type::state_words;
-                    typedef typename mode_type::state_type state_type;
+                    constexpr static const std::size_t word_bits = construction_type::word_bits;
+                    typedef typename construction_type::word_type word_type;
 
-                    constexpr static const std::size_t block_bits = mode_type::block_bits;
-                    constexpr static const std::size_t block_words = mode_type::block_words;
-                    typedef typename mode_type::block_type block_type;
+                    constexpr static const std::size_t block_bits = construction_type::block_bits;
+                    constexpr static const std::size_t block_words = construction_type::block_words;
+                    typedef typename construction_type::block_type block_type;
 
-                    typedef boost::container::static_vector<word_type, block_words> cache_type;
+                    constexpr static const std::size_t length_bits = params_type::length_bits;
+                    // FIXME: do something more intelligent than capping at 64
+                    constexpr static const std::size_t length_type_bits =
+                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                    typedef typename boost::uint_t<length_type_bits>::least length_type;
+                    constexpr static const std::size_t length_words = length_bits / word_bits;
+                    BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
+
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
+                        injector_type;
 
                 public:
-                    typedef block::digest<block_bits> result_type;
+                    typedef typename hash_type::digest_type result_type;
 
-                    template<typename Args>
-                    block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
+                    mac_impl(boost::accumulators::dont_care) : total_seen(0), filled(false) {
                     }
 
                     template<typename ArgumentPack>
@@ -163,20 +170,20 @@ namespace nil {
                     block::cipher<cipher_type, mode_type, padding_type> cipher;
 
                     std::size_t seen;
-                    cache_type cache;
+                    block_type cache;
                     result_type digest;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename MessageAuthenticationCode>
-                struct mac : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
+                struct mac : boost::accumulators::depends_on<hash> {
+                    typedef MessageAuthenticationCode mac_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::mac_impl<MessageAuthenticationCode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::mac_impl<mac_type>> impl;
                 };
             }    // namespace tag
 
