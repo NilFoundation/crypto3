@@ -60,6 +60,7 @@ namespace nil {
                 struct mac_impl<nil::crypto3::mac::hmac<Hash>> : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
+                    typedef accumulators::hash<hash_type> hash_accumulator;
                     typedef nil::crypto3::mac::hmac<hash_type> mac_type;
 
                     typedef typename hash_type::construction::type construction_type;
@@ -89,95 +90,28 @@ namespace nil {
                     typedef typename hash_type::digest_type result_type;
 
                     mac_impl(boost::accumulators::dont_care) : total_seen(0), filled(false) {
+                        hash_accumulator(nil::crypto3::detail::xor_buf(key, ipad));
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        return process(args[boost::accumulators::sample]);
+                        hash_accumulator(args[boost::accumulators::sample]);
                     }
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
+                        hash_type::digest_type step1_hash = hash_accumulator.result(args[boost::accumulators::sample]);
 
-                        if (!cache.empty()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = cipher.end_message(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
-                        }
+                        hash_type::digest_type step2_hash = hash<hash_type>(nil::crypto3::detail::concat_buf(nil::crypto3::detail::xor_buf(key, ipad), step1_hash));
 
-                        if (seen % block_bits) {
-                            finalizer_type(block_bits - seen % block_bits)(res);
-                        } else {
-                            finalizer_type(0)(res);
-                        }
-
-                        return res;
+                        return step2_hash;
                     }
-
-                protected:
-                    inline void resolve_type(const word_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, word_bits);
-                        } else {
-                            process(value, bits);
-                        }
-                    }
-
-                    inline void resolve_type(const block_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, block_bits);
-                        } else {
-                            process(value, bits);
-                        }
-                    }
-
-                    inline void process(const word_type &value, std::size_t bits) {
-                        if (cache.size() == cache.max_size()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = digest.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-
-                            cache.clear();
-                        }
-
-                        cache.push_back(value);
-                        seen += bits;
-                    }
-
-                    inline void process(const block_type &block, std::size_t bits) {
-                        block_type ob;
-                        if (cache.empty()) {
-                            ob = digest.empty() ? cipher.begin_message(block) : cipher.process_block(block);
-                        } else {
-                            block_type b = block::make_array<block_words>(cache.begin(), cache.end());
-                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
-
-                            std::copy(block.begin(), itr, b.end());
-
-                            ob = digest.empty() ? cipher.begin_message(b) : cipher.process_block(b);
-
-                            cache.clear();
-                            cache.insert(cache.end(), itr, block.end());
-                        }
-
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                        seen += bits;
-                    }
-
-                    block::cipher<cipher_type, mode_type, padding_type> cipher;
-
-                    std::size_t seen;
-                    block_type cache;
-                    result_type digest;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename MessageAuthenticationCode>
-                struct mac : boost::accumulators::depends_on<hash> {
+                struct mac : boost::accumulators::depends_on<hash<MessageAuthenticationCode::hash_type>> {
                     typedef MessageAuthenticationCode mac_type;
 
                     /// INTERNAL ONLY

@@ -75,28 +75,6 @@ namespace nil {
                     schedule_key(key);
                 }
 
-                virtual ~hmac() {
-                    ikey.fill(0);
-                    okey.fill(0);
-                }
-
-                void begin_message(const block_type &block) {
-                    process_block(block);
-                }
-
-                void process_block(const block_type &block) {
-                    m_hash->update(input, length);
-                }
-
-                void end_message(const block_type &block) {
-                    verify_key_set(!m_okey.empty());
-                    m_hash->final(mac);
-                    m_hash->update(m_okey);
-                    m_hash->update(mac, output_length());
-                    m_hash->final(mac);
-                    m_hash->update(m_ikey);
-                }
-
             protected:
                 void schedule_key(const key_type &key) {
                     m_hash->clear();
