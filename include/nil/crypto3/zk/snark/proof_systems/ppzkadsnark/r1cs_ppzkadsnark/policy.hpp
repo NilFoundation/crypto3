@@ -26,6 +26,7 @@
 #ifndef CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 #define CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 
+#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -36,9 +37,6 @@ namespace nil {
                 class r1cs_ppzkadsnark_proof_policy {
                     using policy_type = detail::r1cs_ppzkadsnark_functions<CurveType>;
                 public:
-
-                    using G1_precomp = typename policy_type::ate_g1_precomp;
-                    using G2_precomp = typename policy_type::ate_g2_precomp;
 
                     using policy_type::generator;
                     using policy_type::prover;
@@ -55,4 +53,5 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
+
 #endif    // CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
