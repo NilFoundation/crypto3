@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_SCALAR_MUL_HPP
-#define ALGEBRA_CURVES_SCALAR_MUL_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
+#define CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <cstdint>
@@ -59,4 +59,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_CURVES_SCALAR_MUL_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
