@@ -78,4 +78,4 @@ namespace nil {
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_FIELDS_DSA_BOTAN_ARITHMETIC_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_DSA_BOTAN_ARITHMETIC_PARAMS_HPP

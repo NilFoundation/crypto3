@@ -198,4 +198,4 @@ constexpr static const std::size_t value_bits = modulus_bits;
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_X962_P_BASE_FIELD_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_X962_P_BASE_FIELD_HPP

@@ -175,4 +175,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_MATRIX_OPERATORS_HPP
+#endif    // CRYPTO3_ALGEBRA_MATRIX_OPERATORS_HPP

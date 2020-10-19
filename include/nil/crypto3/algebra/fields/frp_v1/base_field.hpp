@@ -83,4 +83,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_FRP_V1_BASE_FIELD_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_FRP_V1_BASE_FIELD_HPP

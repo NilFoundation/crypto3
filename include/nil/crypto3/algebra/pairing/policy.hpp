@@ -36,4 +36,4 @@ namespace nil {
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_POLICY_HPP
