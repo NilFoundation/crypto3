@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_HPP
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
 
 #include <type_traits>
 
@@ -38,9 +39,12 @@ namespace nil {
                     template<typename GroupT>
                     struct ep_map {
                         typedef h2c_suite<GroupT> suite_type;
+                        static_assert(suite_type::m == 1, "field has wrong extension");
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
+                        typedef typename suite_type::expand_message expand_message;
+                        typedef typename suite_type::number_type number_type;
 
                         template<typename InputType,
                             typename = std::enable_if_t<std::is_same_v<std::uint8_t, typename InputType::value_type>>>
@@ -60,10 +64,24 @@ namespace nil {
                             return clear_cofactor(Q);
                         }
 
-                    private:
+                    // private:
                         template<std::size_t N, typename InputType>
                         static inline std::array<field_value_type, N> hash_to_field(InputType msg) {
+                            std::array<std::uint8_t, N * expand_message::bits_per_element> uniform_bytes{0};
+                            expand_message::template process<N>(msg, suite_type::suite_id, uniform_bytes);
 
+                            number_type e;
+                            auto m = suite_type::m;
+                            auto L = suite_type::L;
+                            std::array<field_value_type, N> result{0};
+                            for (std::size_t i = 0; i < N; i++) {
+                                auto elm_offset = L * i;
+                                auto uniform_bytes_iter = uniform_bytes.begin() + elm_offset;
+                                import_bits(e, uniform_bytes_iter, uniform_bytes_iter + L);
+                                result[i] = field_value_type(e);
+                            }
+
+                            return result;
                         }
 
                         static inline group_value_type map_to_curve(const group_value_type &p) {

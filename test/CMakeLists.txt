@@ -28,7 +28,7 @@ macro(define_runtime_algebra_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -65,6 +65,7 @@ set(RUNTIME_TESTS_NAMES
     "curves"
     "fields"
     "pairing"
+    "hash_to_curve"
     #    "groups"
     #    "bilinearity"
 )

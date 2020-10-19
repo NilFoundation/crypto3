@@ -62,8 +62,7 @@ namespace nil {
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;
 
-                        typedef expand_message_xmd<hash_policy_type, 2 * m * L> expand_message_h2c;
-                        typedef expand_message_xmd<hash_policy_type, m * L> expand_message_e2c;
+                        typedef expand_message_xmd<hash_policy_type, m * L> expand_message;
                     };
                 }    // namespace detail
             }        // namespace curves
