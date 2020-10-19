@@ -69,9 +69,7 @@ set(TESTS_NAMES
     "proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
     "proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
-    "proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
-
-    "proof_systems/zksnark/ram_zksnark/ram_zksnark")
+    "proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
