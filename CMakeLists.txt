@@ -67,6 +67,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+                      ${CMAKE_WORKSPACE_NAME}::hash
 
                       ${Boost_LIBRARIES})
 
