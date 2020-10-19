@@ -89,4 +89,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_EDWARDS_SCALAR_FIELD_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_EDWARDS_SCALAR_FIELD_HPP

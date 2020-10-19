@@ -231,4 +231,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_ALGEBRA_TYPE_TRAITS_HPP

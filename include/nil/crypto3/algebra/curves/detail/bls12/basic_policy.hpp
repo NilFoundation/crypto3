@@ -123,4 +123,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_CURVES_BLS12_BASIC_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_BLS12_BASIC_POLICY_HPP

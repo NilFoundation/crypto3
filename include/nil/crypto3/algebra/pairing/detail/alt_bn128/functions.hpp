@@ -473,4 +473,4 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP

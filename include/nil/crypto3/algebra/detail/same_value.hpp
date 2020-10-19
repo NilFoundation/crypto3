@@ -25,4 +25,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_DETAIL_SAME_VALUE_HPP
+#endif    // CRYPTO3_ALGEBRA_DETAIL_SAME_VALUE_HPP

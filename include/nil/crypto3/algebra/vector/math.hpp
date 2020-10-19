@@ -190,4 +190,4 @@ namespace nil {
         }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_VECTOR_MATH_HPP
+#endif    // CRYPTO3_ALGEBRA_VECTOR_MATH_HPP

@@ -82,4 +82,4 @@ namespace nil {
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_BLS12_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRING_BLS12_POLICY_HPP

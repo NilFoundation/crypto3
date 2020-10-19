@@ -83,4 +83,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_CURVES_MNT6_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_MNT6_HPP

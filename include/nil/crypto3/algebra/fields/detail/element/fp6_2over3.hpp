@@ -292,4 +292,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_ELEMENT_FP6_2OVER3_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP6_2OVER3_HPP
