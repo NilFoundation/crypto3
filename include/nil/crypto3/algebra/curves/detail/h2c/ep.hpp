@@ -71,7 +71,6 @@ namespace nil {
                             expand_message::template process<N>(msg, suite_type::suite_id, uniform_bytes);
 
                             number_type e;
-                            auto m = suite_type::m;
                             auto L = suite_type::L;
                             std::array<field_value_type, N> result{0};
                             for (std::size_t i = 0; i < N; i++) {

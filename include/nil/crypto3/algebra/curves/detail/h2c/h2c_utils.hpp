@@ -38,7 +38,8 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
-#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,10 +47,10 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     using namespace boost::multiprecision;
-                    using namespace nil::crypto3::detail;
+                    using namespace nil::crypto3::algebra::fields::detail;
 
                     template<typename ValueType>
-                    constexpr void strxor(const ValueType &in1, const ValueType &in2, ValueType &out) {
+                    constexpr inline void strxor(const ValueType &in1, const ValueType &in2, ValueType &out) {
                         BOOST_CONCEPT_ASSERT((boost::Container<ValueType>));
                         assert(in1.size() == in2.size());
                         assert(in1.size() == out.size());
@@ -61,6 +62,19 @@ namespace nil {
                         while (in1_iter != in1.end() && in2_iter != in2.end() && out_iter != out.end()) {
                             *out_iter++ = *in1_iter++ ^ *in2_iter++;
                         }
+                    }
+
+                    template<typename FieldParams>
+                    inline bool sgn0(const element_fp<FieldParams> &e) {
+                        return static_cast<bool>(e.data % 2);
+                    }
+
+                    template<typename FieldParams>
+                    inline bool sgn0(const element_fp2<FieldParams> &e) {
+                        auto sign_0 = e.data[0].data % 2;
+                        bool zero_0 = sign_0 == 0;
+                        auto sign_1 = e.data[1].data % 2;
+                        return static_cast<bool>(sign_0) || (zero_0 && static_cast<bool>(sign_1));
                     }
 
                     template<typename HashType, std::size_t m_mul_L>
@@ -105,7 +119,7 @@ namespace nil {
                             hash<HashType>(dst, b0_acc);
                             hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, b0_acc);
                             // TODO: here we assume that digest_type is uint8_t[]
-                            /// wrong in general case
+                            //  wrong in general case
                             typename HashType::digest_type b0 = accumulators::extract::hash<HashType>(b0_acc);
 
                             accumulator_set<HashType> bi_acc;
@@ -114,10 +128,10 @@ namespace nil {
                             hash<HashType>(dst, bi_acc);
                             hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, bi_acc);
                             // TODO: here we assume that digest_type is uint8_t[]
-                            /// wrong in general case
+                            //  wrong in general case
                             typename HashType::digest_type bi = accumulators::extract::hash<HashType>(bi_acc);
                             // TODO: here we assume that value type of bi and uniform_bytes elements identical - uint8_t
-                            /// wrong in general case
+                            //  wrong in general case
                             std::copy(bi.begin(), bi.end(), uniform_bytes.begin());
 
                             typename HashType::digest_type xored_b;
@@ -130,12 +144,55 @@ namespace nil {
                                 hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, bi_acc);
                                 bi = accumulators::extract::hash<HashType>(bi_acc);
                                 // TODO: here we assume that value type of bi and uniform_bytes elements identical - uint8_t
-                                /// wrong in general case
+                                //  wrong in general case
                                 std::copy(bi.begin(), bi.end(), uniform_bytes.begin() + (i - 1) * b_in_bytes);
                             }
                         }
                     };
 
+                    template<typename FieldValueType, typename CurveValueType>
+                    inline CurveValueType map_to_curve_simple_swu(
+                        const FieldValueType &u, const FieldValueType &A,
+                        const FieldValueType &B, const FieldValueType &Z) {
+                        // TODO: We assume that Z meets the following criteria -- correct for predefined suites,
+                        //  but wrong in general case
+                        // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-6.6.2
+                        // Preconditions:
+                        // 1.  Z is non-square in F,
+                        // 2.  Z != -1 in F,
+                        // 3.  the polynomial g(x) - Z is irreducible over F, and
+                        // 4.  g(B / (Z * A)) is square in F.
+                        FieldValueType tv1 = (Z.pow(2) * u.pow(4) + Z * u.pow(2)).inversed();
+                        FieldValueType x1 = (-B / A) * (1 + tv1);
+                        if (tv1 == 0) {
+                            x1 = B / (Z * A);
+                        }
+                        FieldValueType gx1 = x1.pow(3) + A * x1 + B;
+                        FieldValueType x2 = Z * u.pow(2) * x1;
+                        FieldValueType gx2 = x2.pow(3) + A * x2 + B;
+                        FieldValueType x, y;
+                        if (gx1.is_square()) {
+                            x = x1;
+                            y = gx1.sqrt();
+                        }
+                        else {
+                            x = x2;
+                            y = gx2.sqrt();
+                        }
+                        if (sgn0(u) != sgn0(y)) {
+                            y = -y;
+                        }
+                        CurveValueType(x, y, 1);
+                    }
+
+                    template<typename IsoMap, typename FieldValueType, typename CurveValueType>
+                    inline CurveValueType map_to_curve_simple_swu_zeroAB(
+                        const FieldValueType &u, const FieldValueType &Ai,
+                        const FieldValueType &Bi, const FieldValueType &Z) {
+                        FieldValueType xi, yi, x, y;
+                        CurveValueType ci = map_to_curve_simple_swu(u, Ai, Bi, Z);
+                        return IsoMap::process(ci);
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

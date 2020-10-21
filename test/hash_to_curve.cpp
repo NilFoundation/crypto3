@@ -39,6 +39,8 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
@@ -69,6 +71,23 @@ BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
             std::cout << c.data << ", ";
         }
         std::cout << std::endl;
+
+        using field_type = fields::bls12_fq<381>;
+        using field_value_type = field_type::value_type;
+        auto e1 = field_value_type(12341234);
+        auto e2 = field_value_type(23451345);
+        std::cout << sgn0(e1) << std::endl;
+        std::cout << sgn0(e2) << std::endl;
+
+        using fp2_type = fields::fp2<fields::bls12_fq<381>>;
+        using fp2_value_type = fp2_type::value_type;
+        auto fp2_e1 = fp2_value_type(e1, e2);
+        std::cout << sgn0(fp2_e1) << std::endl;
+
+        std::cout << e1.is_square() << std::endl;
+        std::cout << e1.squared().is_square() << std::endl;
+        std::cout << fp2_e1.is_square() << std::endl;
+        std::cout << fp2_e1.squared().is_square() << std::endl;
 
     }
 
