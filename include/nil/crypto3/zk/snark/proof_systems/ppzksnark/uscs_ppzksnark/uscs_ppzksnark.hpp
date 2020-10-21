@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_HPP
-#define CRYPTO3_R1CS_SE_PPZKSNARK_HPP
+#ifndef CRYPTO3_USCS_PPZKSNARK_HPP
+#define CRYPTO3_USCS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_se_ppzksnark/functions.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/uscs_ppzksnark/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -34,8 +34,8 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class r1cs_se_ppzksnark {
-                    using policy_type = detail::r1cs_se_ppzksnark_functions<CurveType>;
+                class uscs_ppzksnark {
+                    using policy_type = detail::uscs_ppzksnark_functions<CurveType>;
                 public:
 
                     using proving_key = typename policy_type::proving_key;
@@ -62,4 +62,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_SE_PPZKSNARK_HPP
+#endif    // CRYPTO3_USCS_PPZKSNARK_HPP

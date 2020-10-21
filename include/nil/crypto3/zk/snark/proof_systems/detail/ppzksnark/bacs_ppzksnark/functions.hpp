@@ -284,6 +284,7 @@ namespace nil {
 
                             return bit;
                         }
+                        
                     };
                 }    // namespace detail
             }    // namespace snark

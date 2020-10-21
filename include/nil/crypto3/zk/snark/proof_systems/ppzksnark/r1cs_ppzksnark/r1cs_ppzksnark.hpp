@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP
-#define CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP
+#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
+#define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_ppzksnark/functions.hpp>
 
@@ -64,4 +64,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP
+#endif    // CRYPTO3_ZK_BACS_PPZKSNARK_HPP
