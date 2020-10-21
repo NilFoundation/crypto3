@@ -61,8 +61,8 @@
 // <https://eprint.iacr.org/2017/540>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_HPP
-#define CRYPTO3_R1CS_SE_PPZKSNARK_HPP
+#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP
+#define CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP
 
 #include <memory>
 
@@ -728,4 +728,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_SE_PPZKSNARK_HPP
+#endif    // CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP

@@ -47,11 +47,11 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
-#define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
+#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_FUNCTIONS_HPP
+#define CRYPTO3_ZK_TBCS_PPZKSNARK_FUNCTIONS_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 
@@ -59,296 +59,253 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace detail {
 
-                /******************************** Proving key ********************************/
+                    template<typename CurveType>
+                    struct tbcs_ppzksnark_functions {
 
-                /**
-                 * A proving key for the TBCS ppzkSNARK.
-                 */
-                template<typename CurveType>
-                class tbcs_ppzksnark_proving_key {
-                public:
-                    typedef typename CurveType::scalar_field_type FieldType;
+                        /******************************** Proving key ********************************/
 
-                    tbcs_ppzksnark_circuit circuit;
-                    uscs_ppzksnark_proving_key<CurveType> uscs_pk;
+                        /**
+                         * A proving key for the TBCS ppzkSNARK.
+                         */
+                        struct proving_key {
+                            typedef typename CurveType::scalar_field_type FieldType;
 
-                    tbcs_ppzksnark_proving_key() {};
-                    tbcs_ppzksnark_proving_key(const tbcs_ppzksnark_proving_key<CurveType> &other) = default;
-                    tbcs_ppzksnark_proving_key(tbcs_ppzksnark_proving_key<CurveType> &&other) = default;
-                    tbcs_ppzksnark_proving_key(const tbcs_ppzksnark_circuit &circuit,
-                                               const uscs_ppzksnark_proving_key<CurveType> &uscs_pk) :
-                        circuit(circuit),
-                        uscs_pk(uscs_pk) {
-                    }
-                    tbcs_ppzksnark_proving_key(tbcs_ppzksnark_circuit &&circuit,
-                                               uscs_ppzksnark_proving_key<CurveType> &&uscs_pk) :
-                        circuit(std::move(circuit)),
-                        uscs_pk(std::move(uscs_pk)) {
-                    }
+                            circuit circuit;
+                            uscs_ppzksnark_proving_key<CurveType> uscs_pk;
 
-                    tbcs_ppzksnark_proving_key<CurveType> &operator=(const tbcs_ppzksnark_proving_key<CurveType> &other) = default;
+                            proving_key() {};
+                            proving_key(const proving_key<CurveType> &other) = default;
+                            proving_key(proving_key<CurveType> &&other) = default;
+                            proving_key(const circuit &circuit,
+                                                       const uscs_ppzksnark_proving_key<CurveType> &uscs_pk) :
+                                circuit(circuit),
+                                uscs_pk(uscs_pk) {
+                            }
+                            proving_key(circuit &&circuit,
+                                                       uscs_ppzksnark_proving_key<CurveType> &&uscs_pk) :
+                                circuit(std::move(circuit)),
+                                uscs_pk(std::move(uscs_pk)) {
+                            }
 
-                    std::size_t G1_size() const {
-                        return uscs_pk.G1_size();
-                    }
+                            proving_key<CurveType> &operator=(const proving_key<CurveType> &other) = default;
 
-                    std::size_t G2_size() const {
-                        return uscs_pk.G2_size();
-                    }
+                            std::size_t G1_size() const {
+                                return uscs_pk.G1_size();
+                            }
 
-                    std::size_t G1_sparse_size() const {
-                        return uscs_pk.G1_sparse_size();
-                    }
+                            std::size_t G2_size() const {
+                                return uscs_pk.G2_size();
+                            }
 
-                    std::size_t G2_sparse_size() const {
-                        return uscs_pk.G2_sparse_size();
-                    }
+                            std::size_t G1_sparse_size() const {
+                                return uscs_pk.G1_sparse_size();
+                            }
 
-                    std::size_t size_in_bits() const {
-                        return uscs_pk.size_in_bits();
-                    }
+                            std::size_t G2_sparse_size() const {
+                                return uscs_pk.G2_sparse_size();
+                            }
 
-                    bool operator==(const tbcs_ppzksnark_proving_key<CurveType> &other) const;
-                };
+                            std::size_t size_in_bits() const {
+                                return uscs_pk.size_in_bits();
+                            }
 
-                /******************************* Verification key ****************************/
+                            bool operator==(const proving_key<CurveType> &other) const {
+                                return (this->circuit == other.circuit && this->uscs_pk == other.uscs_pk);
+                            }
+                        };
 
-                /**
-                 * A verification key for the TBCS ppzkSNARK.
-                 */
-                template<typename CurveType>
-                using tbcs_ppzksnark_verification_key = uscs_ppzksnark_verification_key<CurveType>;
+                        /******************************* Verification key ****************************/
 
-                /************************ Processed verification key *************************/
+                        /**
+                         * A verification key for the TBCS ppzkSNARK.
+                         */
+                        using verification_key = uscs_ppzksnark_verification_key<CurveType>;
 
-                /**
-                 * A processed verification key for the TBCS ppzkSNARK.
-                 *
-                 * Compared to a (non-processed) verification key, a processed verification key
-                 * contains a small constant amount of additional pre-computed information that
-                 * enables a faster verification time.
-                 */
-                template<typename CurveType>
-                using tbcs_ppzksnark_processed_verification_key = uscs_ppzksnark_processed_verification_key<CurveType>;
+                        /************************ Processed verification key *************************/
 
-                /********************************** Key pair *********************************/
+                        /**
+                         * A processed verification key for the TBCS ppzkSNARK.
+                         *
+                         * Compared to a (non-processed) verification key, a processed verification key
+                         * contains a small constant amount of additional pre-computed information that
+                         * enables a faster verification time.
+                         */
+                        using processed_verification_key = uscs_ppzksnark_processed_verification_key<CurveType>;
 
-                /**
-                 * A key pair for the TBCS ppzkSNARK, which consists of a proving key and a verification key.
-                 */
-                template<typename CurveType>
-                class tbcs_ppzksnark_keypair {
-                public:
-                    tbcs_ppzksnark_proving_key<CurveType> pk;
-                    tbcs_ppzksnark_verification_key<CurveType> vk;
+                        /********************************** Key pair *********************************/
 
-                    tbcs_ppzksnark_keypair() {};
-                    tbcs_ppzksnark_keypair(tbcs_ppzksnark_keypair<CurveType> &&other) = default;
-                    tbcs_ppzksnark_keypair(const tbcs_ppzksnark_proving_key<CurveType> &pk,
-                                           const tbcs_ppzksnark_verification_key<CurveType> &vk) :
-                        pk(pk),
-                        vk(vk) {
-                    }
+                        /**
+                         * A key pair for the TBCS ppzkSNARK, which consists of a proving key and a verification key.
+                         */
+                        struct keypair {
+                            proving_key<CurveType> pk;
+                            verification_key<CurveType> vk;
 
-                    tbcs_ppzksnark_keypair(tbcs_ppzksnark_proving_key<CurveType> &&pk,
-                                           tbcs_ppzksnark_verification_key<CurveType> &&vk) :
-                        pk(std::move(pk)),
-                        vk(std::move(vk)) {
-                    }
-                };
+                            keypair() {};
+                            keypair(keypair<CurveType> &&other) = default;
+                            keypair(const proving_key<CurveType> &pk,
+                                                   const verification_key<CurveType> &vk) :
+                                pk(pk),
+                                vk(vk) {
+                            }
 
-                /*********************************** Proof ***********************************/
+                            keypair(proving_key<CurveType> &&pk,
+                                                   verification_key<CurveType> &&vk) :
+                                pk(std::move(pk)),
+                                vk(std::move(vk)) {
+                            }
+                        };
 
-                /**
-                 * A proof for the TBCS ppzkSNARK.
-                 */
-                template<typename CurveType>
-                using tbcs_ppzksnark_proof = uscs_ppzksnark_proof<CurveType>;
+                        /*********************************** Proof ***********************************/
 
-                /***************************** Main algorithms *******************************/
+                        /**
+                         * A proof for the TBCS ppzkSNARK.
+                         */
+                        using proof = uscs_ppzksnark_proof<CurveType>;
 
-                /**
-                 * A generator algorithm for the TBCS ppzkSNARK.
-                 *
-                 * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
-                 */
-                template<typename CurveType>
-                tbcs_ppzksnark_keypair<CurveType> tbcs_ppzksnark_generator(const tbcs_ppzksnark_circuit &circuit);
+                        /***************************** Main algorithms *******************************/
 
-                /**
-                 * A prover algorithm for the TBCS ppzkSNARK.
-                 *
-                 * Given a TBCS primary input X and a TBCS auxiliary input Y, this algorithm
-                 * produces a proof (of knowledge) that attests to the following statement:
-                 *               ``there exists Y such that C(X,Y)=0''.
-                 * Above, C is the TBCS circuit that was given as input to the generator algorithm.
-                 */
-                template<typename CurveType>
-                tbcs_ppzksnark_proof<CurveType> tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
-                                                                const tbcs_ppzksnark_primary_input &primary_input,
-                                                                const tbcs_ppzksnark_auxiliary_input &auxiliary_input);
+                        /*
+                         Below are four variants of verifier algorithm for the TBCS ppzkSNARK.
 
-                /*
-                 Below are four variants of verifier algorithm for the TBCS ppzkSNARK.
+                         These are the four cases that arise from the following two choices:
 
-                 These are the four cases that arise from the following two choices:
+                         (1) The verifier accepts a (non-processed) verification key or, instead, a processed verification key.
+                             In the latter case, we call the algorithm an "online verifier".
 
-                 (1) The verifier accepts a (non-processed) verification key or, instead, a processed verification key.
-                     In the latter case, we call the algorithm an "online verifier".
+                         (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
+                             Strong input consistency requires that |primary_input| = C.num_inputs, whereas
+                             weak input consistency requires that |primary_input| <= C.num_inputs (and
+                             the primary input is implicitly padded with zeros up to length C.num_inputs).
+                         */
 
-                 (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
-                     Strong input consistency requires that |primary_input| = C.num_inputs, whereas
-                     weak input consistency requires that |primary_input| <= C.num_inputs (and
-                     the primary input is implicitly padded with zeros up to length C.num_inputs).
-                 */
+                        /**
+                         * A generator algorithm for the TBCS ppzkSNARK.
+                         *
+                         * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
+                         */
+                        static keypair<CurveType> generator(const circuit &circuit) {
+                            typedef typename CurveType::scalar_field_type FieldType;
 
-                /**
-                 * A verifier algorithm for the TBCS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                bool tbcs_ppzksnark_verifier_weak_IC(const tbcs_ppzksnark_verification_key<CurveType> &vk,
-                                                     const tbcs_ppzksnark_primary_input &primary_input,
-                                                     const tbcs_ppzksnark_proof<CurveType> &proof);
+                            const uscs_constraint_system<FieldType> uscs_cs = tbcs_to_uscs_instance_map<FieldType>(circuit);
+                            const uscs_ppzksnark_keypair<CurveType> uscs_keypair = uscs_ppzksnark_generator<CurveType>(uscs_cs);
 
-                /**
-                 * A verifier algorithm for the TBCS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                bool tbcs_ppzksnark_verifier_strong_IC(const tbcs_ppzksnark_verification_key<CurveType> &vk,
-                                                       const tbcs_ppzksnark_primary_input &primary_input,
-                                                       const tbcs_ppzksnark_proof<CurveType> &proof);
+                            return keypair<CurveType>(proving_key<CurveType>(circuit, uscs_keypair.pk),
+                                                               uscs_keypair.vk);
+                        }
 
-                /**
-                 * Convert a (non-processed) verification key into a processed verification key.
-                 */
-                template<typename CurveType>
-                tbcs_ppzksnark_processed_verification_key<CurveType>
-                    tbcs_ppzksnark_verifier_process_vk(const tbcs_ppzksnark_verification_key<CurveType> &vk);
+                        /**
+                         * A prover algorithm for the TBCS ppzkSNARK.
+                         *
+                         * Given a TBCS primary input X and a TBCS auxiliary input Y, this algorithm
+                         * produces a proof (of knowledge) that attests to the following statement:
+                         *               ``there exists Y such that C(X,Y)=0''.
+                         * Above, C is the TBCS circuit that was given as input to the generator algorithm.
+                         */
+                        static proof<CurveType> prover(const proving_key<CurveType> &pk,
+                                                       const primary_input &primary_input,
+                                                       const auxiliary_input &auxiliary_input) {
+                            typedef typename CurveType::scalar_field_type FieldType;
 
-                /**
-                 * A verifier algorithm for the TBCS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_weak_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const tbcs_ppzksnark_primary_input &primary_input,
-                                                            const tbcs_ppzksnark_proof<CurveType> &proof);
+                            const uscs_variable_assignment<FieldType> uscs_va =
+                                tbcs_to_uscs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
+                            const uscs_primary_input<FieldType> uscs_pi =
+                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                            const uscs_auxiliary_input<FieldType> uscs_ai(
+                                uscs_va.begin() + primary_input.size(),
+                                uscs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
+                            const uscs_ppzksnark_proof<CurveType> uscs_proof =
+                                uscs_ppzksnark_prover<CurveType>(pk.uscs_pk, uscs_pi, uscs_ai);
 
-                /**
-                 * A verifier algorithm for the TBCS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_strong_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const tbcs_ppzksnark_primary_input &primary_input,
-                                                              const tbcs_ppzksnark_proof<CurveType> &proof);
+                            return uscs_proof;
+                        }
 
-                template<typename CurveType>
-                bool tbcs_ppzksnark_proving_key<CurveType>::operator==(const tbcs_ppzksnark_proving_key<CurveType> &other) const {
-                    return (this->circuit == other.circuit && this->uscs_pk == other.uscs_pk);
-                }
+                        /**
+                         * Convert a (non-processed) verification key into a processed verification key.
+                         */
+                        static processed_verification_key<CurveType>
+                            verifier_process_vk(const verification_key<CurveType> &vk) {
+                            const processed_verification_key<CurveType> pvk =
+                                uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
 
-                template<typename CurveType>
-                tbcs_ppzksnark_keypair<CurveType> tbcs_ppzksnark_generator(const tbcs_ppzksnark_circuit &circuit) {
-                    typedef typename CurveType::scalar_field_type FieldType;
+                            return pvk;
+                        }
 
-                    const uscs_constraint_system<FieldType> uscs_cs = tbcs_to_uscs_instance_map<FieldType>(circuit);
-                    const uscs_ppzksnark_keypair<CurveType> uscs_keypair = uscs_ppzksnark_generator<CurveType>(uscs_cs);
+                        /**
+                         * A verifier algorithm for the TBCS ppzkSNARK that:
+                         * (1) accepts a non-processed verification key, and
+                         * (2) has weak input consistency.
+                         */
+                        static bool verifier_weak_IC(const verification_key<CurveType> &vk,
+                                                     const primary_input &primary_input,
+                                                     const proof<CurveType> &proof) {
+                            typedef typename CurveType::scalar_field_type FieldType;
+                            const uscs_primary_input<FieldType> uscs_input =
+                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                            const processed_verification_key<CurveType> pvk =
+                                verifier_process_vk<CurveType>(vk);
+                            const bool bit = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, uscs_input, proof);
 
-                    return tbcs_ppzksnark_keypair<CurveType>(tbcs_ppzksnark_proving_key<CurveType>(circuit, uscs_keypair.pk),
-                                                       uscs_keypair.vk);
-                }
+                            return bit;
+                        }
 
-                template<typename CurveType>
-                tbcs_ppzksnark_proof<CurveType> tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
-                                                                const tbcs_ppzksnark_primary_input &primary_input,
-                                                                const tbcs_ppzksnark_auxiliary_input &auxiliary_input) {
-                    typedef typename CurveType::scalar_field_type FieldType;
+                        /**
+                         * A verifier algorithm for the TBCS ppzkSNARK that:
+                         * (1) accepts a non-processed verification key, and
+                         * (2) has strong input consistency.
+                         */
+                        static bool verifier_strong_IC(const verification_key<CurveType> &vk,
+                                                       const primary_input &primary_input,
+                                                       const proof<CurveType> &proof) {
+                            typedef typename CurveType::scalar_field_type FieldType;
+                            const processed_verification_key<CurveType> pvk =
+                                verifier_process_vk<CurveType>(vk);
+                            const uscs_primary_input<FieldType> uscs_input =
+                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                            const bool bit = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
 
-                    const uscs_variable_assignment<FieldType> uscs_va =
-                        tbcs_to_uscs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
-                    const uscs_primary_input<FieldType> uscs_pi =
-                        algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                    const uscs_auxiliary_input<FieldType> uscs_ai(
-                        uscs_va.begin() + primary_input.size(),
-                        uscs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                    const uscs_ppzksnark_proof<CurveType> uscs_proof =
-                        uscs_ppzksnark_prover<CurveType>(pk.uscs_pk, uscs_pi, uscs_ai);
+                            return bit;
+                        }
 
-                    return uscs_proof;
-                }
+                        /**
+                         * A verifier algorithm for the TBCS ppzkSNARK that:
+                         * (1) accepts a processed verification key, and
+                         * (2) has weak input consistency.
+                         */
+                        static bool online_verifier_weak_IC(const processed_verification_key<CurveType> &pvk,
+                                                            const primary_input &primary_input,
+                                                            const proof<CurveType> &proof) {
+                            typedef typename CurveType::scalar_field_type FieldType;
+                            const uscs_primary_input<FieldType> uscs_input =
+                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                            const bool bit = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, uscs_input, proof);
 
-                template<typename CurveType>
-                tbcs_ppzksnark_processed_verification_key<CurveType>
-                    tbcs_ppzksnark_verifier_process_vk(const tbcs_ppzksnark_verification_key<CurveType> &vk) {
-                    const tbcs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                            return bit;
+                        }
 
-                    return pvk;
-                }
+                        /**
+                         * A verifier algorithm for the TBCS ppzkSNARK that:
+                         * (1) accepts a processed verification key, and
+                         * (2) has strong input consistency.
+                         */
+                        static bool online_verifier_strong_IC(const processed_verification_key<CurveType> &pvk,
+                                                              const primary_input &primary_input,
+                                                              const proof<CurveType> &proof) {
+                            typedef typename CurveType::scalar_field_type FieldType;
+                            const uscs_primary_input<FieldType> uscs_input =
+                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                            const bool bit = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
 
-                template<typename CurveType>
-                bool tbcs_ppzksnark_verifier_weak_IC(const tbcs_ppzksnark_verification_key<CurveType> &vk,
-                                                     const tbcs_ppzksnark_primary_input &primary_input,
-                                                     const tbcs_ppzksnark_proof<CurveType> &proof) {
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    const uscs_primary_input<FieldType> uscs_input =
-                        algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                    const tbcs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        tbcs_ppzksnark_verifier_process_vk<CurveType>(vk);
-                    const bool bit = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, uscs_input, proof);
+                            return bit;
+                        }
 
-                    return bit;
-                }
-
-                template<typename CurveType>
-                bool tbcs_ppzksnark_verifier_strong_IC(const tbcs_ppzksnark_verification_key<CurveType> &vk,
-                                                       const tbcs_ppzksnark_primary_input &primary_input,
-                                                       const tbcs_ppzksnark_proof<CurveType> &proof) {
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    const tbcs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        tbcs_ppzksnark_verifier_process_vk<CurveType>(vk);
-                    const uscs_primary_input<FieldType> uscs_input =
-                        algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                    const bool bit = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
-
-                    return bit;
-                }
-
-                template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_weak_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const tbcs_ppzksnark_primary_input &primary_input,
-                                                            const tbcs_ppzksnark_proof<CurveType> &proof) {
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    const uscs_primary_input<FieldType> uscs_input =
-                        algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                    const bool bit = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, uscs_input, proof);
-
-                    return bit;
-                }
-
-                template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_strong_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const tbcs_ppzksnark_primary_input &primary_input,
-                                                              const tbcs_ppzksnark_proof<CurveType> &proof) {
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    const uscs_primary_input<FieldType> uscs_input =
-                        algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                    const bool bit = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
-
-                    return bit;
-                }
-
+                    };
+                }    // namespace detail
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
+#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_FUNCTIONS_HPP
