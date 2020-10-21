@@ -32,8 +32,8 @@
 // r1cs_ppzksnark_online_verifier_strong_IC. See r1cs_ppzksnark.hpp for description of the aforementioned functions.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_
-#define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
+#define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
@@ -744,4 +744,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP_
+#endif    // R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP

@@ -28,8 +28,8 @@
 // It relies on classes declared in components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_CP_HANDLER_HPP_
-#define CRYPTO3_ZK_CP_HANDLER_HPP_
+#ifndef CRYPTO3_ZK_CP_HANDLER_HPP
+#define CRYPTO3_ZK_CP_HANDLER_HPP
 
 #include <numeric>
 
@@ -297,4 +297,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CP_HANDLER_HPP_
+#endif    // CP_HANDLER_HPP

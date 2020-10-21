@@ -34,9 +34,21 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class r1cs_ppzkadsnark_proof_policy {
+                class r1cs_ppzkadsnark {
                     using policy_type = detail::r1cs_ppzkadsnark_functions<CurveType>;
                 public:
+
+                    using pub_auth_prms = typename policy_type::pub_auth_prms;
+                    using sec_auth_key = typename policy_type::sec_auth_key;
+                    using pub_auth_key = typename policy_type::pub_auth_key;
+                    using auth_data = typename policy_type::auth_data;
+
+                    using proving_key = typename policy_type::proving_key;
+                    using verification_key = typename policy_type::verification_key;
+                    using processed_verification_key = typename policy_type::processed_verification_key;
+
+                    using keypair = typename policy_type::keypair;
+                    using proof = typename policy_type::proof;
 
                     using policy_type::generator;
                     using policy_type::prover;

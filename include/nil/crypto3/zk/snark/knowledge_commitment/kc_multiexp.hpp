@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KC_MULTIEXP_HPP_
-#define CRYPTO3_ZK_KC_MULTIEXP_HPP_
+#ifndef CRYPTO3_ZK_KC_MULTIEXP_HPP
+#define CRYPTO3_ZK_KC_MULTIEXP_HPP
 
 /*
   Split out from multiexp to prevent cyclical
@@ -213,4 +213,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // KC_MULTIEXP_HPP_
+#endif    // KC_MULTIEXP_HPP

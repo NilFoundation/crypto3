@@ -25,8 +25,8 @@
 // @file Generic PRF interface for ADSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PRF_HPP_
-#define CRYPTO3_ZK_PRF_HPP_
+#ifndef CRYPTO3_ZK_PRF_HPP
+#define CRYPTO3_ZK_PRF_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp>
 
@@ -46,4 +46,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // PRF_HPP_
+#endif    // PRF_HPP

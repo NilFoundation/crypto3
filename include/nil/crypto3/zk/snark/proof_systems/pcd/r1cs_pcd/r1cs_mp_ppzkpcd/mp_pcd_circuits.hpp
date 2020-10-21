@@ -38,8 +38,8 @@
 // Alessandro Chiesa, Eran Tromer, Madars Virza
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MP_PCD_CIRCUITS_HPP_
-#define CRYPTO3_ZK_MP_PCD_CIRCUITS_HPP_
+#ifndef CRYPTO3_ZK_MP_PCD_CIRCUITS_HPP
+#define CRYPTO3_ZK_MP_PCD_CIRCUITS_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/component_from_r1cs.hpp>
@@ -771,4 +771,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MP_PCD_CIRCUITS_HPP_
+#endif    // MP_PCD_CIRCUITS_HPP

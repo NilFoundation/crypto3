@@ -28,8 +28,8 @@
 // by use of an AS-Waksman network.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP_
-#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP
+#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
 #include <nil/crypto3/zk/snark/routing/as_waksman.hpp>
@@ -320,4 +320,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // AS_WAKSMAN_ROUTING_COMPONENT_HPP_
+#endif    // AS_WAKSMAN_ROUTING_COMPONENT_HPP

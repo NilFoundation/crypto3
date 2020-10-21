@@ -29,8 +29,8 @@
 // value V as the A-th leaf in a Merkle tree with root R.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP_
-#define CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
+#define CRYPTO3_ZK_MERKLE_TREE_CHECK_READ_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/component.hpp>
@@ -185,4 +185,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MERKLE_TREE_CHECK_READ_COMPONENT_HPP_
+#endif    // MERKLE_TREE_CHECK_READ_COMPONENT_HPP

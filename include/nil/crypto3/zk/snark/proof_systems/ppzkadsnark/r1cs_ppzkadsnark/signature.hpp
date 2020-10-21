@@ -36,8 +36,7 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class kpT {
-                public:
+                struct kpT {
                     r1cs_ppzkadsnark_secret_key<CurveType> sk;
                     r1cs_ppzkadsnark_vkT<CurveType> vk;
                 };

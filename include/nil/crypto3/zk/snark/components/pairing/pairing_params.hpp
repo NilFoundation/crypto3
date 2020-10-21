@@ -25,8 +25,8 @@
 // @file Declaration of selector for the pairing component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PAIRING_PARAMS_HPP_
-#define CRYPTO3_ZK_PAIRING_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_PAIRING_PARAMS_HPP
+#define CRYPTO3_ZK_PAIRING_PARAMS_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -136,4 +136,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // PAIRING_PARAMS_HPP_
+#endif    // PAIRING_PARAMS_HPP

@@ -38,8 +38,8 @@
 // Academic Press 1965
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
-#define CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP
+#define CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP
 
 #include <vector>
 
@@ -398,4 +398,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BENES_ROUTING_ALGORITHM_HPP_
+#endif    // BENES_ROUTING_ALGORITHM_HPP

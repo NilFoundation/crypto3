@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
-#define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
+#ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
+#define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 
 #include <nil/crypto3/algebra/fields/field.hpp>
 
@@ -183,4 +183,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // KNOWLEDGE_COMMITMENT_HPP_
+#endif    // KNOWLEDGE_COMMITMENT_HPP

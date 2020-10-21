@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
@@ -22,41 +22,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Parameters for *single-predicate* ppzkPCD for R1CS.
-//---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_SP_PPZKPCD_PARAMS_HPP
-#define CRYPTO3_ZK_R1CS_SP_PPZKPCD_PARAMS_HPP
+#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP
+#define CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_pcd_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename PCD_ppT>
-                using r1cs_sp_ppzkpcd_compliance_predicate =
-                    r1cs_pcd_compliance_predicate<algebra::Fr<typename PCD_ppT::curve_A_pp>>;
+                template<typename CurveType>
+                class bacs_ppzksnark {
+                    using policy_type = detail::bacs_ppzksnark_functions<CurveType>;
+                public:
 
-                template<typename PCD_ppT>
-                using r1cs_sp_ppzkpcd_message = r1cs_pcd_message<algebra::Fr<typename PCD_ppT::curve_A_pp>>;
+                    using proving_key = typename policy_type::proving_key;
+                    using verification_key = typename policy_type::verification_key;
+                    using processed_verification_key = typename policy_type::processed_verification_key;
 
-                template<typename PCD_ppT>
-                using r1cs_sp_ppzkpcd_local_data = r1cs_pcd_local_data<algebra::Fr<typename PCD_ppT::curve_A_pp>>;
+                    using keypair = typename policy_type::keypair;
+                    using proof = typename policy_type::proof;
 
-                template<typename PCD_ppT>
-                using r1cs_sp_ppzkpcd_primary_input =
-                    r1cs_pcd_compliance_predicate_primary_input<algebra::Fr<typename PCD_ppT::curve_A_pp>>;
+                    using policy_type::generator;
+                    using policy_type::prover;
 
-                template<typename PCD_ppT>
-                using r1cs_sp_ppzkpcd_auxiliary_input =
-                    r1cs_pcd_compliance_predicate_auxiliary_input<algebra::Fr<typename PCD_ppT::curve_A_pp>>;
+                    using policy_type::verifier_process_vk;
+
+                    using policy_type::verifier_weak_IC;
+                    using policy_type::verifier_strong_IC;
+                    using policy_type::online_verifier_weak_IC;
+                    using policy_type::online_verifier_strong_IC;
+                    
+                };
 
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_SP_PPZKPCD_PARAMS_HPP
+#endif    // CRYPTO3_ZK_BACS_PPZKSNARK_POLICY_HPP

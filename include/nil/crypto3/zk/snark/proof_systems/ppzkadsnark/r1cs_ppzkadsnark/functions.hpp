@@ -56,8 +56,8 @@
 // <http://eprint.iacr.org/2014/617>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_PPZKADSNARK_HPP
-#define CRYPTO3_R1CS_PPZKADSNARK_HPP
+#ifndef CRYPTO3_R1CS_PPZKADSNARK_FUNCTIONS_HPP
+#define CRYPTO3_R1CS_PPZKADSNARK_FUNCTIONS_HPP
 
 #include <memory>
 
@@ -163,7 +163,6 @@ namespace nil {
                         };
 
                         /******************************** Authentication key material ********************************/
-
                         struct auth_keys {
                         
                             pub_auth_prms<CurveType> pap;
@@ -576,8 +575,7 @@ namespace nil {
                          *
                          * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for CS.
                          */
-                        static keypair<CurveType>
-                            generator(const constraint_system<CurveType> &cs,
+                        static keypair<CurveType> generator(const constraint_system<CurveType> &cs,
                                                        const pub_auth_prms<CurveType> &prms) {
 
                             /* make the B_query "lighter" if possible */
@@ -737,11 +735,10 @@ namespace nil {
                          *               ``there exists Y such that CS(X,Y)=0''.
                          * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                          */
-                        static proof<CurveType>
-                            prover(const proving_key<CurveType> &pk,
-                                                    const primary_input<CurveType> &primary_input,
-                                                    const auxiliary_input<CurveType> &auxiliary_input,
-                                                    const std::vector<auth_data<CurveType>> &auth_data) {
+                        static proof<CurveType> prover(const proving_key<CurveType> &pk,
+                                                const primary_input<CurveType> &primary_input,
+                                                const auxiliary_input<CurveType> &auxiliary_input,
+                                                const std::vector<auth_data<CurveType>> &auth_data) {
 
 
                             const CurveType d1 = random_element<CurveType::scalar_field_type>(),
@@ -867,8 +864,8 @@ namespace nil {
                         /**
                          * Convert a (non-processed) verification key into a processed verification key.
                          */
-                        static processed_verification_key<CurveType>
-                            verifier_process_vk(const verification_key<CurveType> &vk) {
+                        static processed_verification_key<CurveType> 
+                                verifier_process_vk(const verification_key<CurveType> &vk) {
 
                             using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
 
@@ -1224,4 +1221,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_PPZKADSNARK_HPP
+#endif    // CRYPTO3_R1CS_PPZKADSNARK_FUNCTIONS_HPP

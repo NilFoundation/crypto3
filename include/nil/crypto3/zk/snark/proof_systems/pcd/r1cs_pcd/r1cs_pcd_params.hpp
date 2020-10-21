@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_PCD_PARAMS_HPP_
-#define CRYPTO3_ZK_R1CS_PCD_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_R1CS_PCD_PARAMS_HPP
+#define CRYPTO3_ZK_R1CS_PCD_PARAMS_HPP
 
 #include <memory>
 #include <vector>
@@ -102,4 +102,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_PCD_PARAMS_HPP_
+#endif    // R1CS_PCD_PARAMS_HPP

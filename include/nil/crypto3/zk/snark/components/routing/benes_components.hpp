@@ -28,8 +28,8 @@
 // by use of a Benes network.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP_
-#define CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP
+#define CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
 #include <nil/crypto3/zk/snark/routing/benes_routing_algorithm.hpp>
@@ -274,4 +274,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BENES_ROUTING_COMPONENT_HPP_
+#endif    // BENES_ROUTING_COMPONENT_HPP

@@ -26,8 +26,8 @@
 // RAM examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_EXAMPLES_HPP_
-#define CRYPTO3_ZK_RAM_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_RAM_EXAMPLES_HPP
+#define CRYPTO3_ZK_RAM_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 
@@ -169,4 +169,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_EXAMPLES_HPP_
+#endif    // RAM_EXAMPLES_HPP

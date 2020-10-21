@@ -30,8 +30,8 @@
 // other auxiliary information), and then either accepts or rejects.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
-#define CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP
+#define CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP
 
 #include <memory>
 
@@ -281,4 +281,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // COMPLIANCE_PREDICATE_HPP_
+#endif    // COMPLIANCE_PREDICATE_HPP
