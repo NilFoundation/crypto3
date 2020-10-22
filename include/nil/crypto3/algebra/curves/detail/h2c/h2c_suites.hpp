@@ -41,7 +41,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupT>
+                    template<typename GroupType>
                     struct h2c_suite;
 
                     template<>
@@ -54,9 +54,9 @@ namespace nil {
                         typedef typename group_value_type::underlying_field_value_type field_value_type;
 
                         // BLS12381G1_XMD:SHA-256_SSWU_RO_
-                        constexpr static std::array<std::uint8_t, 31> suite_id = {66, 76, 83, 49, 50, 51, 56, 49, 71, 49,
-                                                                                  95, 88, 77, 68, 58, 83, 72, 65, 45, 50,
-                                                                                  53, 54, 95, 83, 83, 87, 85, 95, 82, 79, 95};
+                        constexpr static std::array<std::uint8_t, 31> suite_id = {
+                            66, 76, 83, 49, 50, 51, 56, 49, 71, 49, 95, 88, 77, 68, 58, 83,
+                            72, 65, 45, 50, 53, 54, 95, 83, 83, 87, 85, 95, 82, 79, 95};
                         constexpr static number_type p = group_policy_type::p;
                         constexpr static std::size_t m = 1;
                         constexpr static std::size_t k = 128;
@@ -70,4 +70,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_SUITES_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_SUITES_HPP

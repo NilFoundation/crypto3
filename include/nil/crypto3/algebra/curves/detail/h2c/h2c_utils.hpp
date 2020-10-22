@@ -52,8 +52,8 @@ namespace nil {
                     template<typename ValueType>
                     constexpr inline void strxor(const ValueType &in1, const ValueType &in2, ValueType &out) {
                         BOOST_CONCEPT_ASSERT((boost::Container<ValueType>));
-                        assert(in1.size() == in2.size());
-                        assert(in1.size() == out.size());
+                        BOOST_ASSERT(in1.size() == in2.size());
+                        BOOST_ASSERT(in1.size() == out.size());
 
                         auto in1_iter = in1.begin();
                         auto in2_iter = in2.begin();
@@ -90,19 +90,19 @@ namespace nil {
                         constexpr static std::size_t bits_per_element = m_mul_L;
 
                         template<std::size_t count, typename InputMsgType, typename InputDstType, typename OutputType,
-                            typename = std::enable_if_t<std::is_same_v<std::uint8_t, typename InputMsgType::value_type> &&
-                                std::is_same_v<std::uint8_t, typename InputDstType::value_type> &&
-                                std::is_same_v<std::uint8_t, typename OutputType::value_type>>>
-                        static inline void process(const InputMsgType &msg,
-                                                   const InputDstType &dst,
-                                                   OutputType &uniform_bytes) {
+                                 typename = typename std::enable_if<
+                                     std::is_same<std::uint8_t, typename InputMsgType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename InputDstType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename OutputType::value_type>::value>::type>
+                        static inline void
+                            process(const InputMsgType &msg, const InputDstType &dst, OutputType &uniform_bytes) {
                             static const std::size_t len_in_bytes = count * bits_per_element;
                             assert(len_in_bytes < 0x10000);
 
-                            static const std::array<std::uint8_t, r_in_bytes> Z_pad{0};
-                            static const std::array<std::uint8_t, 2> l_i_b_str =
-                                {static_cast<std::uint8_t>(len_in_bytes >> 8u),
-                                 static_cast<std::uint8_t>(len_in_bytes % 0x100)};
+                            static const std::array<std::uint8_t, r_in_bytes> Z_pad {0};
+                            static const std::array<std::uint8_t, 2> l_i_b_str = {
+                                static_cast<std::uint8_t>(len_in_bytes >> 8u),
+                                static_cast<std::uint8_t>(len_in_bytes % 0x100)};
                             static const std::size_t ell = static_cast<std::size_t>(len_in_bytes / b_in_bytes) +
                                                            static_cast<std::size_t>(len_in_bytes % b_in_bytes != 0);
 
@@ -115,18 +115,18 @@ namespace nil {
                             hash<HashType>(Z_pad, b0_acc);
                             hash<HashType>(msg, b0_acc);
                             hash<HashType>(l_i_b_str, b0_acc);
-                            hash<HashType>(std::array<std::uint8_t, 1>{0}, b0_acc);
+                            hash<HashType>(std::array<std::uint8_t, 1> {0}, b0_acc);
                             hash<HashType>(dst, b0_acc);
-                            hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, b0_acc);
+                            hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())}, b0_acc);
                             // TODO: here we assume that digest_type is uint8_t[]
                             //  wrong in general case
                             typename HashType::digest_type b0 = accumulators::extract::hash<HashType>(b0_acc);
 
                             accumulator_set<HashType> bi_acc;
                             hash<HashType>(b0, bi_acc);
-                            hash<HashType>(std::array<std::uint8_t, 1>{1}, bi_acc);
+                            hash<HashType>(std::array<std::uint8_t, 1> {1}, bi_acc);
                             hash<HashType>(dst, bi_acc);
-                            hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, bi_acc);
+                            hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())}, bi_acc);
                             // TODO: here we assume that digest_type is uint8_t[]
                             //  wrong in general case
                             typename HashType::digest_type bi = accumulators::extract::hash<HashType>(bi_acc);
@@ -139,11 +139,13 @@ namespace nil {
                                 accumulator_set<HashType> bi_acc;
                                 strxor(b0, bi, xored_b);
                                 hash<HashType>(xored_b, bi_acc);
-                                hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(i)}, bi_acc);
+                                hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(i)}, bi_acc);
                                 hash<HashType>(dst, bi_acc);
-                                hash<HashType>(std::array<std::uint8_t, 1>{static_cast<std::uint8_t>(dst.size())}, bi_acc);
+                                hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())},
+                                               bi_acc);
                                 bi = accumulators::extract::hash<HashType>(bi_acc);
-                                // TODO: here we assume that value type of bi and uniform_bytes elements identical - uint8_t
+                                // TODO: here we assume that value type of bi and uniform_bytes elements identical -
+                                // uint8_t
                                 //  wrong in general case
                                 std::copy(bi.begin(), bi.end(), uniform_bytes.begin() + (i - 1) * b_in_bytes);
                             }
@@ -151,9 +153,8 @@ namespace nil {
                     };
 
                     template<typename FieldValueType, typename CurveValueType>
-                    inline CurveValueType map_to_curve_simple_swu(
-                        const FieldValueType &u, const FieldValueType &A,
-                        const FieldValueType &B, const FieldValueType &Z) {
+                    inline CurveValueType map_to_curve_simple_swu(const FieldValueType &u, const FieldValueType &A,
+                                                                  const FieldValueType &B, const FieldValueType &Z) {
                         // TODO: We assume that Z meets the following criteria -- correct for predefined suites,
                         //  but wrong in general case
                         // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-6.6.2
@@ -174,8 +175,7 @@ namespace nil {
                         if (gx1.is_square()) {
                             x = x1;
                             y = gx1.sqrt();
-                        }
-                        else {
+                        } else {
                             x = x2;
                             y = gx2.sqrt();
                         }
@@ -186,9 +186,9 @@ namespace nil {
                     }
 
                     template<typename IsoMap, typename FieldValueType, typename CurveValueType>
-                    inline CurveValueType map_to_curve_simple_swu_zeroAB(
-                        const FieldValueType &u, const FieldValueType &Ai,
-                        const FieldValueType &Bi, const FieldValueType &Z) {
+                    inline CurveValueType
+                        map_to_curve_simple_swu_zeroAB(const FieldValueType &u, const FieldValueType &Ai,
+                                                       const FieldValueType &Bi, const FieldValueType &Z) {
                         FieldValueType xi, yi, x, y;
                         CurveValueType ci = map_to_curve_simple_swu(u, Ai, Bi, Z);
                         return IsoMap::process(ci);
@@ -199,4 +199,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_UTILS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_UTILS_HPP

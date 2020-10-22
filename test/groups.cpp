@@ -42,62 +42,62 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename GroupT>
+template<typename GroupType>
 void test_mixed_add() {
-    GroupT base, el, result;
+    GroupType base, el, result;
 
-    base = GroupT::zero();
-    el = GroupT::zero();
+    base = GroupType::zero();
+    el = GroupType::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::zero();
-    el = GroupT::random_element();
+    base = GroupType::zero();
+    el = GroupType::random_element();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
-    el = GroupT::zero();
+    base = GroupType::random_element();
+    el = GroupType::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
-    el = GroupT::random_element();
+    base = GroupType::random_element();
+    el = GroupType::random_element();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
+    base = GroupType::random_element();
     el = base;
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base.dbl());
 }
 
-template<typename GroupT, typename NumberType>
+template<typename GroupType, typename NumberType>
 void test_group() {
     NumberType rand1 = NumberType("76749407");
     NumberType rand2 = NumberType("44410867");
     NumberType randsum = NumberType("121160274");
 
-    GroupT zero = GroupT::zero();
+    GroupType zero = GroupType::zero();
     assert(zero == zero);
-    GroupT one = GroupT::one();
+    GroupType one = GroupType::one();
     assert(one == one);
-    GroupT two = number_type<1>(2l) * GroupT::one();
+    GroupType two = number_type<1>(2l) * GroupType::one();
     assert(two == two);
-    GroupT five = number_type<1>(5l) * GroupT::one();
+    GroupType five = number_type<1>(5l) * GroupType::one();
 
-    GroupT three = number_type<1>(3l) * GroupT::one();
-    GroupT four = number_type<1>(4l) * GroupT::one();
+    GroupType three = number_type<1>(3l) * GroupType::one();
+    GroupType four = number_type<1>(4l) * GroupType::one();
 
     assert(two + five == three + four);
 
-    GroupT a = GroupT::random_element();
-    GroupT b = GroupT::random_element();
+    GroupType a = GroupType::random_element();
+    GroupType b = GroupType::random_element();
 
     assert(one != zero);
     assert(a != zero);
@@ -127,32 +127,32 @@ void test_group() {
 
     assert((rand1 * a) + (rand2 * a) == (randsum * a));
 
-    assert(GroupT::order() * a == zero);
-    assert(GroupT::order() * one == zero);
-    assert((GroupT::order() * a) - a != zero);
-    assert((GroupT::order() * one) - one != zero);
+    assert(GroupType::order() * a == zero);
+    assert(GroupType::order() * one == zero);
+    assert((GroupType::order() * a) - a != zero);
+    assert((GroupType::order() * one) - one != zero);
 
-    test_mixed_add<GroupT>();
+    test_mixed_add<GroupType>();
 }
 
-template<typename GroupT>
+template<typename GroupType>
 void test_mul_by_q() {
-    GroupT a = GroupT::random_element();
-    assert((GroupT::base_field_char() * a) == a.mul_by_q());
+    GroupType a = GroupType::random_element();
+    assert((GroupType::base_field_char() * a) == a.mul_by_q());
 }
 
-template<typename GroupT>
+template<typename GroupType>
 void test_output() {
-    GroupT g = GroupT::zero();
+    GroupType g = GroupType::zero();
 
     for (size_t i = 0; i < 1000; ++i) {
         std::stringstream ss;
         ss << g;
-        GroupT gg;
+        GroupType gg;
         ss >> gg;
         assert(g == gg);
         /* use a random point in next iteration */
-        g = GroupT::random_element();
+        g = GroupType::random_element();
     }
 }
 

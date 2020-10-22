@@ -35,7 +35,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupT>
+                    template<typename GroupType>
                     struct iso_map;
 
                     // 11-isogeny map for BLS12-381 G1
@@ -60,8 +60,7 @@ namespace nil {
                             0x80d3cf1f9a78fc47b90b33563be990dc43b756ce79f5574a2c596c928c5d1de4fa295f296b74e956d71986a8497e317_cppui381,
                             0x169b1f8e1bcfa7c42e0c37515d138f22dd2ecb803a0c5c99676314baf4bb1b7fa3190b2edc0327797f241067be390c9e_cppui381,
                             0x10321da079ce07e272d8ec09d2565b0dfa7dccdde6787f96d50af36003b14866f69b771f8c285decca67df3f1605fb7b_cppui381,
-                            0x6e08c248e260e70bd1e962381edee3d31d79d7e22c837bc23c0bf1bc24c6b68c24b1b80b64d391fa9c8ba2e8ba2d229_cppui381
-                        };
+                            0x6e08c248e260e70bd1e962381edee3d31d79d7e22c837bc23c0bf1bc24c6b68c24b1b80b64d391fa9c8ba2e8ba2d229_cppui381};
 
                         constexpr static std::array<number_type, 10> k_x_den = {
                             0x8ca8d548cff19ae18b2e62f4bd3fa6f01d5ef4ba35b48ba9c9588617fc8ac62b558d681be343df8993cf9fa40d21b1c_cppui381,
@@ -73,8 +72,7 @@ namespace nil {
                             0x772caacf16936190f3e0c63e0596721570f5799af53a1894e2e073062aede9cea73b3538f0de06cec2574496ee84a3a_cppui381,
                             0x14a7ac2a9d64a8b230b3f5b074cf01996e7f63c21bca68a81996e1cdf9822c580fa5b9489d11e2d311f7d99bbdcc5a5e_cppui381,
                             0xa10ecf6ada54f825e920b3dafc7a3cce07f8d1d7161366b74100da67f39883503826692abba43704776ec3a79a1d641_cppui381,
-                            0x95fc13ab9e92ad4476d6e3eb3a56680f682b4ee96f7d03776df533978f31c1593174e4b4b7865002d6384d168ecdd0a_cppui381
-                        };
+                            0x95fc13ab9e92ad4476d6e3eb3a56680f682b4ee96f7d03776df533978f31c1593174e4b4b7865002d6384d168ecdd0a_cppui381};
 
                         constexpr static std::array<number_type, 16> k_y_num = {
                             0x90d97c81ba24ee0259d1f094980dcfa11ad138e48a869522b52af6c956543d3cd0c7aee9b3ba3c2be9845719707bb33_cppui381,
@@ -92,8 +90,7 @@ namespace nil {
                             0xb182cac101b9399d155096004f53f447aa7b12a3426b08ec02710e807b4633f06c851c1919211f20d4c04f00b971ef8_cppui381,
                             0x245a394ad1eca9b72fc00ae7be315dc757b3b080d4c158013e6632d3c40659cc6cf90ad1c232a6442d9d3f5db980133_cppui381,
                             0x5c129645e44cf1102a159f748c4a3fc5e673d81d7e86568d9ab0f5d396a7ce46ba1049b6579afb7866b1e715475224b_cppui381,
-                            0x15e6be4e990f03ce4ea50b3b42df2eb5cb181d8f84965a3957add4fa95af01b2b665027efec01c7704b456be69c8b604_cppui381
-                        };
+                            0x15e6be4e990f03ce4ea50b3b42df2eb5cb181d8f84965a3957add4fa95af01b2b665027efec01c7704b456be69c8b604_cppui381};
 
                         constexpr static std::array<number_type, 15> k_y_den = {
                             0x16112c4c3a9c98b252181140fad0eae9601a6de578980be6eec3232b5be72e7a07f3688ef60c206d01479253b03663c1_cppui381,
@@ -110,8 +107,7 @@ namespace nil {
                             0xaccbb67481d033ff5852c1e48c50c477f94ff8aefce42d28c0f9a88cea7913516f968986f7ebbea9684b529e2561092_cppui381,
                             0xad6b9514c767fe3c3613144b45f1496543346d98adf02267d5ceef9a00d9b8693000763e3b90ac11e99b138573345cc_cppui381,
                             0x2660400eb2e4f3b628bdd0d53cd76f2bf565b94e72927c1cb748df27942480e420517bd8714cc80d1fadc1326ed06f7_cppui381,
-                            0xe0fa1d816ddc03e6b24255e0d7819c171c40f65e273b853324efcd6356caa205ca2f570f13497804415473a1d634b8f_cppui381
-                        };
+                            0xe0fa1d816ddc03e6b24255e0d7819c171c40f65e273b853324efcd6356caa205ca2f570f13497804415473a1d634b8f_cppui381};
 
                     public:
                         static inline group_value_type process(const group_value_type &ci) {
@@ -132,8 +128,7 @@ namespace nil {
                                 y_mul *= ci.Y;
                             }
 
-                            if (x_den == field_value_type::zero() ||
-                                y_den == field_value_type::zero()) {
+                            if (x_den == field_value_type::zero() || y_den == field_value_type::zero()) {
                                 return group_value_type::one();
                             }
 
@@ -159,4 +154,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_ISO_MAP_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_ISO_MAP_HPP

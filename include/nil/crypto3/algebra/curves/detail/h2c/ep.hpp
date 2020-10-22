@@ -36,9 +36,9 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupT>
+                    template<typename GroupType>
                     struct ep_map {
-                        typedef h2c_suite<GroupT> suite_type;
+                        typedef h2c_suite<GroupType> suite_type;
                         static_assert(suite_type::m == 1, "field has wrong extension");
 
                         typedef typename suite_type::group_value_type group_value_type;
@@ -46,8 +46,8 @@ namespace nil {
                         typedef typename suite_type::expand_message expand_message;
                         typedef typename suite_type::number_type number_type;
 
-                        template<typename InputType,
-                            typename = std::enable_if_t<std::is_same_v<std::uint8_t, typename InputType::value_type>>>
+                        template<typename InputType, typename = typename std::enable_if<std::is_same<
+                                                         std::uint8_t, typename InputType::value_type>::value>::type>
                         static inline group_value_type hash_to_curve(const InputType &msg) {
                             auto u = hash_to_field<2>(msg);
                             group_value_type Q0 = map_to_curve(u[0]);
@@ -56,23 +56,23 @@ namespace nil {
                             return clear_cofactor(R);
                         }
 
-                        template<typename InputType,
-                            typename = std::enable_if_t<std::is_same_v<std::uint8_t, typename InputType::value_type>>>
+                        template<typename InputType, typename = typename std::enable_if<std::is_same<
+                                                         std::uint8_t, typename InputType::value_type>::value>::type>
                         static inline group_value_type encode_to_curve(const InputType &msg) {
                             auto u = hash_to_field<1>(msg);
                             group_value_type Q = map_to_curve(u[0]);
                             return clear_cofactor(Q);
                         }
 
-                    // private:
+                        // private:
                         template<std::size_t N, typename InputType>
                         static inline std::array<field_value_type, N> hash_to_field(InputType msg) {
-                            std::array<std::uint8_t, N * expand_message::bits_per_element> uniform_bytes{0};
+                            std::array<std::uint8_t, N * expand_message::bits_per_element> uniform_bytes {0};
                             expand_message::template process<N>(msg, suite_type::suite_id, uniform_bytes);
 
                             number_type e;
                             auto L = suite_type::L;
-                            std::array<field_value_type, N> result{0};
+                            std::array<field_value_type, N> result {0};
                             for (std::size_t i = 0; i < N; i++) {
                                 auto elm_offset = L * i;
                                 auto uniform_bytes_iter = uniform_bytes.begin() + elm_offset;
@@ -84,18 +84,15 @@ namespace nil {
                         }
 
                         static inline group_value_type map_to_curve(const group_value_type &p) {
-
                         }
 
                         static inline group_value_type clear_cofactor(const group_value_type &p) {
-
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_HPP
