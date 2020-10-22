@@ -132,7 +132,6 @@ namespace nil {
                         typedef ate_g2_precomp g2_precomp;
 
                     private:
-
                         /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                         static gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {
@@ -163,7 +162,6 @@ namespace nil {
                         }
 
                     public:
-
                         static gt final_exponentiation(const gt &elt) {
 
                             const gt elt_inv = elt.inversed();
@@ -259,9 +257,8 @@ namespace nil {
                         }
 
                     private:
-                        
                         static gt affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P,
-                                                  const affine_ate_g2_precomputation &prec_Q) {
+                                                         const affine_ate_g2_precomputation &prec_Q) {
 
                             gt f = gt::one();
 
@@ -313,7 +310,7 @@ namespace nil {
                         };
 
                         static void doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
-                                                                   ate_dbl_coeffs &dc) {
+                                                                          ate_dbl_coeffs &dc) {
                             const Fq2 X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
                             const Fq2 A = T.squared();                                  // A = T1^2
@@ -339,9 +336,9 @@ namespace nil {
                         }
 
                         static void mixed_addition_step_for_flipped_miller_loop(const Fq2 base_X, const Fq2 base_Y,
-                                                                         const Fq2 base_Y_squared,
-                                                                         extended_g2_projective &current,
-                                                                         ate_add_coeffs &ac) {
+                                                                                const Fq2 base_Y_squared,
+                                                                                extended_g2_projective &current,
+                                                                                ate_add_coeffs &ac) {
                             const Fq2 X1 = current.X, Y1 = current.Y, Z1 = current.Z, T1 = current.T;
                             const Fq2 &x2 = base_X, &y2 = base_Y, &y2_squared = base_Y_squared;
 
@@ -492,7 +489,7 @@ namespace nil {
                         }
 
                         static gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
-                                                  const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
+                                                         const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
 
                             Fq2 L1_coeff1 = Fq2(prec_P1.PX, Fq::zero()) - prec_Q1.QX_over_twist;
                             Fq2 L1_coeff2 = Fq2(prec_P2.PX, Fq::zero()) - prec_Q2.QX_over_twist;
@@ -576,7 +573,6 @@ namespace nil {
                         /*************************  CHOICE OF PAIRING ***********************************/
 
                     public:
-
                         static g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);
                         }
@@ -590,7 +586,7 @@ namespace nil {
                         }
 
                         static gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
-                                              const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
+                                                     const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
                             return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                         }
 

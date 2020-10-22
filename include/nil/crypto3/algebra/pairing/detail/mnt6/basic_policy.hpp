@@ -79,8 +79,8 @@ namespace nil {
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };
 
-                    constexpr typename mnt6_basic_policy<298, CHAR_BIT>::number_type 
-                        const mnt6_basic_policy<298, CHAR_BIT>::ate_loop_count;
+                    constexpr typename mnt6_basic_policy<298, CHAR_BIT>::number_type const
+                        mnt6_basic_policy<298, CHAR_BIT>::ate_loop_count;
 
                 }    // namespace detail
             }        // namespace pairing

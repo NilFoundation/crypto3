@@ -94,8 +94,8 @@ namespace nil {
                                      std::is_same<std::uint8_t, typename InputMsgType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename InputDstType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename OutputType::value_type>::value>::type>
-                        static inline void
-                            process(const InputMsgType &msg, const InputDstType &dst, OutputType &uniform_bytes) {
+                        static inline void process(const InputMsgType &msg, const InputDstType &dst,
+                                                   OutputType &uniform_bytes) {
                             static const std::size_t len_in_bytes = count * bits_per_element;
                             assert(len_in_bytes < 0x10000);
 

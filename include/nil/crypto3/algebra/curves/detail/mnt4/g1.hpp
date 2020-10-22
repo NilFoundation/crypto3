@@ -50,7 +50,7 @@ namespace nil {
 
                         using underlying_field_value_type = g1_field_type_value;
 
-                        constexpr static const std::size_t value_bits =  policy_type::g1_field_type::value_bits;
+                        constexpr static const std::size_t value_bits = policy_type::g1_field_type::value_bits;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -95,7 +95,7 @@ namespace nil {
                         }
 
                         /*************************  Comparison operations  ***********************************/
-                        
+
                         bool operator==(const mnt4_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
@@ -156,7 +156,7 @@ namespace nil {
                             if (*this == other) {
                                 return this->doubled();
                             }
-                            
+
                             return this->add(other);
                         }
 
@@ -176,15 +176,15 @@ namespace nil {
                                 // NOTE: does not handle O and pts of order 2,4
                                 // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
 
-                                const underlying_field_value_type XX = (this->X).squared();    // XX  = X1^2
-                                const underlying_field_value_type ZZ = (this->Z).squared();    // ZZ  = Z1^2
+                                const underlying_field_value_type XX = (this->X).squared();       // XX  = X1^2
+                                const underlying_field_value_type ZZ = (this->Z).squared();       // ZZ  = Z1^2
                                 const underlying_field_value_type w = a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
                                 const underlying_field_value_type Y1Z1 = (this->Y) * (this->Z);
-                                const underlying_field_value_type s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
-                                const underlying_field_value_type ss = s.squared();        // ss  = s^2
-                                const underlying_field_value_type sss = s * ss;            // sss = s*ss
+                                const underlying_field_value_type s = Y1Z1 + Y1Z1;      // s   = 2*Y1*Z1
+                                const underlying_field_value_type ss = s.squared();     // ss  = s^2
+                                const underlying_field_value_type sss = s * ss;         // sss = s*ss
                                 const underlying_field_value_type R = (this->Y) * s;    // R   = Y1*s
-                                const underlying_field_value_type RR = R.squared();        // RR  = R^2
+                                const underlying_field_value_type RR = R.squared();     // RR  = R^2
                                 const underlying_field_value_type B =
                                     ((this->X) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
                                 const underlying_field_value_type h = w.squared() - B.doubled();    // h   = w^2 - 2*B
@@ -225,13 +225,13 @@ namespace nil {
                             }
 
                             const underlying_field_value_type u = Y2Z1 - this->Y;                // u = Y2*Z1-Y1
-                            const underlying_field_value_type uu = u.squared();                     // uu = u2
+                            const underlying_field_value_type uu = u.squared();                  // uu = u2
                             const underlying_field_value_type v = X2Z1 - this->X;                // v = X2*Z1-X1
-                            const underlying_field_value_type vv = v.squared();                     // vv = v2
-                            const underlying_field_value_type vvv = v * vv;                         // vvv = v*vv
+                            const underlying_field_value_type vv = v.squared();                  // vv = v2
+                            const underlying_field_value_type vvv = v * vv;                      // vvv = v*vv
                             const underlying_field_value_type R = vv * this->X;                  // R = vv*X1
                             const underlying_field_value_type A = uu * this->Z - vvv - R - R;    // A = uu*Z1-vvv-2*R
-                            const underlying_field_value_type X3 = v * A;                           // X3 = v*A
+                            const underlying_field_value_type X3 = v * A;                        // X3 = v*A
                             const underlying_field_value_type Y3 =
                                 u * (R - A) - vvv * this->Y;                         // Y3 = u*(R-A)-vvv*Y1
                             const underlying_field_value_type Z3 = vvv * this->Z;    // Z3 = vvv*Z1
@@ -240,23 +240,20 @@ namespace nil {
                         }
 
                     private:
-
                         mnt4_g1 add(const mnt4_g1 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                            const underlying_field_value_type Y1Z2 = (this->Y) * (other.Z);    // Y1Z2 = Y1*Z2
-                            const underlying_field_value_type X1Z2 = (this->X) * (other.Z);    // X1Z2 = X1*Z2
-                            const underlying_field_value_type Z1Z2 = (this->Z) * (other.Z);    // Z1Z2 = Z1*Z2
-                            const underlying_field_value_type u =
-                                (other.Y) * (this->Z) - Y1Z2;                // u    = Y2*Z1-Y1Z2
-                            const underlying_field_value_type uu = u.squared();    // uu   = u^2
-                            const underlying_field_value_type v =
-                                (other.X) * (this->Z) - X1Z2;                // v    = X2*Z1-X1Z2
-                            const underlying_field_value_type vv = v.squared();    // vv   = v^2
-                            const underlying_field_value_type vvv = v * vv;        // vvv  = v*vv
-                            const underlying_field_value_type R = vv * X1Z2;       // R    = vv*X1Z2
+                            const underlying_field_value_type Y1Z2 = (this->Y) * (other.Z);        // Y1Z2 = Y1*Z2
+                            const underlying_field_value_type X1Z2 = (this->X) * (other.Z);        // X1Z2 = X1*Z2
+                            const underlying_field_value_type Z1Z2 = (this->Z) * (other.Z);        // Z1Z2 = Z1*Z2
+                            const underlying_field_value_type u = (other.Y) * (this->Z) - Y1Z2;    // u    = Y2*Z1-Y1Z2
+                            const underlying_field_value_type uu = u.squared();                    // uu   = u^2
+                            const underlying_field_value_type v = (other.X) * (this->Z) - X1Z2;    // v    = X2*Z1-X1Z2
+                            const underlying_field_value_type vv = v.squared();                    // vv   = v^2
+                            const underlying_field_value_type vvv = v * vv;                        // vvv  = v*vv
+                            const underlying_field_value_type R = vv * X1Z2;                       // R    = vv*X1Z2
                             const underlying_field_value_type A =
                                 uu * Z1Z2 - (vvv + R + R);                   // A    = uu*Z1Z2 - vvv - 2*R
                             const underlying_field_value_type X3 = v * A;    // X3   = v*A
@@ -268,7 +265,6 @@ namespace nil {
                         }
 
                     public:
-
                         /*************************  Reducing operations  ***********************************/
 
                         mnt4_g1 to_affine_coordinates() const {

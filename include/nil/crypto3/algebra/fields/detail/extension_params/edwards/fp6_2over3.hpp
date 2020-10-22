@@ -62,7 +62,7 @@ namespace nil {
                         typedef typename non_residue_field_type::value_type non_residue_type;
                         typedef fields::fp3<base_field_type> underlying_field_type;
                         typedef typename underlying_field_type::value_type underlying_type;
-                        //typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
+                        // typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
 
                         /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
@@ -94,8 +94,11 @@ namespace nil {
                         fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                         6> const fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp6_2over3_extension_params<
+                                             edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         6> const
+                        fp6_2over3_extension_params<
+                            edwards_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

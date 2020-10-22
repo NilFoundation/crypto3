@@ -70,8 +70,7 @@ namespace nil {
 
                     constexpr static const generator_type mul_generator = policy_type::mul_generator;
 
-                    typedef
-                        typename detail::element_fp12_2over3over2<extension_policy> value_type;
+                    typedef typename detail::element_fp12_2over3over2<extension_policy> value_type;
 
                     constexpr static const std::size_t arity = 12;
                     constexpr static const std::size_t value_bits = arity * modulus_bits;

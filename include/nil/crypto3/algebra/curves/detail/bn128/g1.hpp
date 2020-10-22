@@ -55,7 +55,7 @@ namespace nil {
 
                         using underlying_field_value_type = g1_field_type_value;
 
-                        //constexpr static const std::size_t value_bits =  policy_type::g1_field_type::value_bits;
+                        // constexpr static const std::size_t value_bits =  policy_type::g1_field_type::value_bits;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -271,9 +271,8 @@ namespace nil {
                         }
 
                     private:
+                        bn128_g1 add(const bn128_g1 &other) const {    // unfinished
 
-                        bn128_g1 add (const bn128_g1 &other) const { // unfinished
-                            
                             underlying_field_value_type Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
                             underlying_field_value_type X_out, Y_out, Z_out;
@@ -293,7 +292,6 @@ namespace nil {
                             J = H * I;
                             r = t3.doubled();
                             V = U1 * I;
-                            
 
                             X_out = r.squared() - J - V.doubled();
                             Y_out = r * (V - X_out) - (S1 * J).doubled();
@@ -303,7 +301,6 @@ namespace nil {
                         }
 
                     public:
-
                         /*************************  Reducing operations  ***********************************/
 
                         bn128_g1 to_affine_coordinates() const {

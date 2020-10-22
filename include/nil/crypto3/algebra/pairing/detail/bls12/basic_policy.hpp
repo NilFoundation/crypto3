@@ -112,21 +112,18 @@ namespace nil {
                         constexpr static const bool final_exponent_is_z_neg = false;
                     };
 
-                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type 
-                        const bls12_basic_policy<381, CHAR_BIT>::ate_loop_count;
-                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type 
-                        const bls12_basic_policy<377, CHAR_BIT>::ate_loop_count;
+                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type const
+                        bls12_basic_policy<381, CHAR_BIT>::ate_loop_count;
+                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type const
+                        bls12_basic_policy<377, CHAR_BIT>::ate_loop_count;
 
-                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type 
-                        const bls12_basic_policy<381, CHAR_BIT>::final_exponent_z;
-                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type 
-                        const bls12_basic_policy<377, CHAR_BIT>::final_exponent_z;
+                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type const
+                        bls12_basic_policy<381, CHAR_BIT>::final_exponent_z;
+                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type const
+                        bls12_basic_policy<377, CHAR_BIT>::final_exponent_z;
 
-                    constexpr bool 
-                        const bls12_basic_policy<381, CHAR_BIT>::final_exponent_is_z_neg;
-                    constexpr bool 
-                        const bls12_basic_policy<377, CHAR_BIT>::final_exponent_is_z_neg;
-
+                    constexpr bool const bls12_basic_policy<381, CHAR_BIT>::final_exponent_is_z_neg;
+                    constexpr bool const bls12_basic_policy<377, CHAR_BIT>::final_exponent_is_z_neg;
 
                 }    // namespace detail
             }        // namespace pairing

@@ -92,9 +92,8 @@ namespace nil {
 
                         typedef ate_g1_precomp g1_precomp;
                         typedef ate_g2_precomp g2_precomp;
-                    
-                    private:
 
+                    private:
                         /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                         static gt final_exponentiation_first_chunk(const gt &elt) {
@@ -165,7 +164,6 @@ namespace nil {
                         }
 
                     public:
-
                         static gt final_exponentiation(const gt &elt) {
                             /* OLD naive version:
                                 gt result = elt^final_exponent;
@@ -177,7 +175,6 @@ namespace nil {
                         }
 
                     private:
-
                         /*************************  ATE PAIRING ***********************************/
 
                         static void doubling_step_for_miller_loop(const Fq two_inv, g2 &current, ate_ell_coeffs &c) {
@@ -327,7 +324,7 @@ namespace nil {
                         }
 
                         static gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
-                                                  const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
+                                                         const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
 
                             gt f = gt::one();
 
@@ -403,7 +400,7 @@ namespace nil {
                         }
 
                         static gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
-                                              const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
+                                                     const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
                             return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                         }
 

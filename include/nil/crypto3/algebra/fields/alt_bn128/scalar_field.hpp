@@ -72,14 +72,11 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const
-                    alt_bn128_scalar_field<254, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const alt_bn128_scalar_field<254, CHAR_BIT>::modulus_bits;
 
-                constexpr typename std::size_t const
-                    alt_bn128_scalar_field<254, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const alt_bn128_scalar_field<254, CHAR_BIT>::number_bits;
 
-                constexpr typename std::size_t const
-                    alt_bn128_scalar_field<254, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const alt_bn128_scalar_field<254, CHAR_BIT>::value_bits;
 
                 constexpr typename alt_bn128_scalar_field<254, CHAR_BIT>::modulus_type const
                     alt_bn128_scalar_field<254, CHAR_BIT>::modulus;

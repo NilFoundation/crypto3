@@ -119,15 +119,23 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type, 2> const
+                    constexpr std::array<typename fp6_3over2_extension_params<
+                                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         2> const
                         fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                        6 *2> const fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp6_3over2_extension_params<
+                                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         6 * 2> const
+                        fp6_3over2_extension_params<
+                            alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                        6 *2> const fp6_3over2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c2;
+                    constexpr std::array<typename fp6_3over2_extension_params<
+                                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                         6 * 2> const
+                        fp6_3over2_extension_params<
+                            alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c2;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

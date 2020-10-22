@@ -296,7 +296,7 @@ namespace nil {
                             t4 = x0 * z4 + x4 * z0 + tmp2 * z2;
                             t5 = x0 * z5 + x4 * z1 + x5 * z0;
 
-                            return element_fp12_2over3over2(underlying_type(t0,t1,t2),underlying_type(t3,t4,t5));
+                            return element_fp12_2over3over2(underlying_type(t0, t1, t2), underlying_type(t3, t4, t5));
                         }
 
                         element_fp12_2over3over2

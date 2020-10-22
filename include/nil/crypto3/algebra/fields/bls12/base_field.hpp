@@ -94,20 +94,14 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const
-                    bls12_base_field<381, CHAR_BIT>::modulus_bits;
-                constexpr typename std::size_t const
-                    bls12_base_field<377, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const bls12_base_field<381, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const bls12_base_field<377, CHAR_BIT>::modulus_bits;
 
-                constexpr typename std::size_t const
-                    bls12_base_field<381, CHAR_BIT>::number_bits;
-                constexpr typename std::size_t const
-                    bls12_base_field<377, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const bls12_base_field<381, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const bls12_base_field<377, CHAR_BIT>::number_bits;
 
-                constexpr typename std::size_t const
-                    bls12_base_field<381, CHAR_BIT>::value_bits;
-                constexpr typename std::size_t const
-                    bls12_base_field<377, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const bls12_base_field<381, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const bls12_base_field<377, CHAR_BIT>::value_bits;
 
                 constexpr typename bls12_base_field<381, CHAR_BIT>::modulus_type const
                     bls12_base_field<381, CHAR_BIT>::modulus;

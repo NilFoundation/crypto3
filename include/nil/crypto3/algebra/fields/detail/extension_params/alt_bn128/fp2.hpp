@@ -122,8 +122,10 @@ namespace nil {
                         fp2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::group_order;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                         2> const fp2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                        2> const
+                        fp2_extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

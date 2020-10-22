@@ -70,14 +70,11 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const
-                    edwards_base_field<183, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::modulus_bits;
 
-                constexpr typename std::size_t const
-                    edwards_base_field<183, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::number_bits;
 
-                constexpr typename std::size_t const
-                    edwards_base_field<183, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::value_bits;
 
                 constexpr typename edwards_base_field<183, CHAR_BIT>::modulus_type const
                     edwards_base_field<183, CHAR_BIT>::modulus;

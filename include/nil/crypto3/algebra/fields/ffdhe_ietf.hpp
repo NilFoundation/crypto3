@@ -67,7 +67,7 @@ namespace nil {
                     constexpr static const generator_type mul_generator = 0x02;
 
                     typedef typename detail::element_fp<params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
-constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
 
                     constexpr static const std::size_t arity = 1;
                 };

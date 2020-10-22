@@ -62,7 +62,7 @@ namespace nil {
                         typedef typename non_residue_field_type::value_type non_residue_type;
                         typedef fields::fp2<base_field_type> underlying_field_type;
                         typedef typename underlying_field_type::value_type underlying_type;
-                        //typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
+                        // typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                         /*constexpr static const std::array<non_residue_type, 4> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
@@ -89,8 +89,9 @@ namespace nil {
                             fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                         4> const fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                        4> const fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

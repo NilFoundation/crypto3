@@ -93,8 +93,10 @@ namespace nil {
                         fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                         6> const fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                        6> const
+                        fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

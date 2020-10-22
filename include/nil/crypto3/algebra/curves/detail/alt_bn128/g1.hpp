@@ -50,14 +50,14 @@ namespace nil {
 
                         using underlying_field_value_type = g1_field_type_value;
 
-                        constexpr static const std::size_t value_bits =  policy_type::g1_field_type::value_bits;
-                        
+                        constexpr static const std::size_t value_bits = policy_type::g1_field_type::value_bits;
+
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
                         underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                        
+
                         alt_bn128_g1() :
                             alt_bn128_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
                                          underlying_field_value_type::zero()) {};
@@ -182,7 +182,7 @@ namespace nil {
 
                             underlying_field_value_type A = (this->X).squared();    // A = X1^2
                             underlying_field_value_type B = (this->Y).squared();    // B = Y1^2
-                            underlying_field_value_type C = B.squared();               // C = B^2
+                            underlying_field_value_type C = B.squared();            // C = B^2
                             underlying_field_value_type D = (this->X + B).squared() - A - C;
                             D = D + D;                                           // D = 2 * ((X1 + B)^2 - A - C)
                             underlying_field_value_type E = A.doubled() + A;     // E = 3 * A
@@ -239,15 +239,15 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-madd-2007-bl
                             underlying_field_value_type H = U2 - (this->X);    // H = U2-X1
-                            underlying_field_value_type HH = H.squared();         // HH = H&2
-                            underlying_field_value_type I = HH + HH;              // I = 4*HH
+                            underlying_field_value_type HH = H.squared();      // HH = H&2
+                            underlying_field_value_type I = HH + HH;           // I = 4*HH
                             I = I + I;
-                            underlying_field_value_type J = H * I;                // J = H*I
+                            underlying_field_value_type J = H * I;             // J = H*I
                             underlying_field_value_type r = S2 - (this->Y);    // r = 2*(S2-Y1)
                             r = r + r;
-                            underlying_field_value_type V = (this->X) * I;            // V = X1*I
+                            underlying_field_value_type V = (this->X) * I;               // V = X1*I
                             underlying_field_value_type X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
-                            underlying_field_value_type Y3 = (this->Y) * J;           // Y3 = r*(V-X3)-2*Y1*J
+                            underlying_field_value_type Y3 = (this->Y) * J;              // Y3 = r*(V-X3)-2*Y1*J
                             Y3 = r * (V - X3) - Y3 - Y3;
                             underlying_field_value_type Z3 =
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
@@ -256,21 +256,18 @@ namespace nil {
                         }
 
                     private:
-
                         alt_bn128_g1 add(const alt_bn128_g1 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
 
-                            underlying_field_value_type Z1Z1 = (this->Z).squared();    // Z1Z1 = Z1^2
-                            underlying_field_value_type Z2Z2 = (other.Z).squared();    // Z2Z2 = Z2^2
-                            underlying_field_value_type U1 = (this->X) * Z2Z2;         // U1 = X1 * Z2Z2
-                            underlying_field_value_type U2 = (other.X) * Z1Z1;         // U2 = X2 * Z1Z1
-                            underlying_field_value_type S1 =
-                                (this->Y) * (other.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
-                            underlying_field_value_type S2 =
-                                (other.Y) * (this->Z) * Z1Z1;     // S2 = Y2 * Z1 * Z1Z1
-                            underlying_field_value_type H = U2 - U1;    // H = U2-U1
+                            underlying_field_value_type Z1Z1 = (this->Z).squared();           // Z1Z1 = Z1^2
+                            underlying_field_value_type Z2Z2 = (other.Z).squared();           // Z2Z2 = Z2^2
+                            underlying_field_value_type U1 = (this->X) * Z2Z2;                // U1 = X1 * Z2Z2
+                            underlying_field_value_type U2 = (other.X) * Z1Z1;                // U2 = X2 * Z1Z1
+                            underlying_field_value_type S1 = (this->Y) * (other.Z) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
+                            underlying_field_value_type S2 = (other.Y) * (this->Z) * Z1Z1;    // S2 = Y2 * Z1 * Z1Z1
+                            underlying_field_value_type H = U2 - U1;                          // H = U2-U1
                             underlying_field_value_type S2_minus_S1 = S2 - S1;
                             underlying_field_value_type I = H.doubled().squared();             // I = (2 * H)^2
                             underlying_field_value_type J = H * I;                             // J = H * I
@@ -279,14 +276,13 @@ namespace nil {
                             underlying_field_value_type X3 = r.squared() - J - V.doubled();    // X3 = r^2 - J - 2 * V
                             underlying_field_value_type S1_J = S1 * J;
                             underlying_field_value_type Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
-                            underlying_field_value_type Z3 = ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) *
-                                                             H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                            underlying_field_value_type Z3 =
+                                ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
                             return alt_bn128_g1(X3, Y3, Z3);
                         }
 
                     public:
-
                         /*************************  Reducing operations  ***********************************/
 
                         alt_bn128_g1 to_affine_coordinates() {

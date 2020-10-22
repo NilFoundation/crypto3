@@ -62,7 +62,7 @@ namespace nil {
                         typedef typename non_residue_field_type::value_type non_residue_type;
                         typedef fields::fp2<base_field_type> underlying_field_type;
                         typedef typename underlying_field_type::value_type underlying_type;
-                        //typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
+                        // typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                         /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 =
                         {non_residue_type(0x01, 0x00), non_residue_type(0x00,
@@ -136,7 +136,7 @@ namespace nil {
                         typedef non_residue_field_type::value_type non_residue_type;
                         typedef fields::fp2<base_field_type> underlying_field_type;
                         typedef underlying_field_type::value_type underlying_type;
-                        //typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
+                        // typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                         /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 =
                         {non_residue_type(0x01, 0x00),
@@ -200,15 +200,19 @@ namespace nil {
                         typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
                         fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
-                                        6 *2> const fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c1;
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
-                                        6 *2> const fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c2;
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
+                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
+                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c2;
 
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
-                                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c1;
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
-                                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c2;
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
+                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
+                        6 * 2> const fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail
             }        // namespace fields

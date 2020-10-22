@@ -63,7 +63,7 @@ namespace nil {
                         typedef typename non_residue_field_type::value_type non_residue_type;
                         typedef fields::fp6_3over2<base_field_type> underlying_field_type;
                         typedef typename underlying_field_type::value_type underlying_type;
-                        //typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
+                        // typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                         /*constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01, 0x00),
@@ -204,11 +204,14 @@ namespace nil {
                         typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
                         2> const fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
-
-                    constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
-                                        12 *2> const fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c1;
-                    constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
-                                        12 *2> const fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
+                        12 * 2> const
+                        fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
+                        12 * 2> const
+                        fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

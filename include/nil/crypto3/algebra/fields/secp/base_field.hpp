@@ -71,7 +71,7 @@ namespace nil {
 
                     typedef typename detail::element_fp<params<secp_k1_base_field<160, CHAR_BIT>>> value_type;
 
-constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 

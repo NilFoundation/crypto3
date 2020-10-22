@@ -48,7 +48,6 @@ namespace nil {
                     class fp3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
                         : public params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> {
 
-
                         typedef fields::mnt6_base_field<ModulusBits, GeneratorBits> base_field_type;
                         typedef params<base_field_type> policy_type;
 
@@ -139,8 +138,9 @@ namespace nil {
                             fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr std::array<typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                                         3> const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                        3> const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields
