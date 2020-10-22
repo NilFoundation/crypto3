@@ -81,7 +81,20 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct r1cs_gg_ppzksnark_functions {
+                    struct r1cs_gg_ppzksnark_basic_policy {
+
+                        /**
+                         * Below are various template aliases (used for convenience).
+                         */
+
+                        template<typename CurveType>
+                        using constraint_system = r1cs_constraint_system<typename CurveType::scalar_field_type>;
+
+                        template<typename CurveType>
+                        using primary_input = r1cs_primary_input<typename CurveType::scalar_field_type>;
+
+                        template<typename CurveType>
+                        using auxiliary_input = r1cs_auxiliary_input<typename CurveType::scalar_field_type>;
 
                         /******************************** Proving key ********************************/
 

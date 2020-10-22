@@ -62,7 +62,17 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct tbcs_ppzksnark_functions {
+                    struct tbcs_ppzksnark_basic_policy {
+
+                        /**
+                         * Below are various typedefs aliases (used for uniformity with other proof systems).
+                         */
+
+                        using circuit = tbcs_circuit;
+
+                        using primary_input = tbcs_primary_input;
+
+                        using auxiliary_input = tbcs_auxiliary_input;
 
                         /******************************** Proving key ********************************/
 

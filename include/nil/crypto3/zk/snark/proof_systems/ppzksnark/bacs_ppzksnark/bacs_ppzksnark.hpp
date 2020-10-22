@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/functions.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,8 +35,12 @@ namespace nil {
 
                 template<typename CurveType>
                 class bacs_ppzksnark {
-                    using policy_type = detail::bacs_ppzksnark_functions<CurveType>;
+                    using policy_type = detail::bacs_ppzksnark_basic_policy<CurveType>;
                 public:
+
+                    using circuit = typename policy_type::circuit;
+                    using primary_input = typename policy_type::primary_input;
+                    using auxiliary_input = typename policy_type::auxiliary_input;
 
                     using proving_key = typename policy_type::proving_key;
                     using verification_key = typename policy_type::verification_key;

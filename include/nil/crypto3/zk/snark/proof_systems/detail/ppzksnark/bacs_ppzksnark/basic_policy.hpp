@@ -51,7 +51,6 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_FUNCTIONS_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {
@@ -61,7 +60,20 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct bacs_ppzksnark_functions {
+                    struct bacs_ppzksnark_basic_policy {
+
+                        /**
+                         * Below are various template aliases (used for convenience).
+                         */
+
+                        template<typename CurveType>
+                        using circuit = bacs_circuit<typename CurveType::scalar_field_type>;
+
+                        template<typename CurveType>
+                        using primary_input = bacs_primary_input<typename CurveType::scalar_field_type>;
+
+                        template<typename CurveType>
+                        using auxiliary_input = bacs_auxiliary_input<typename CurveType::scalar_field_type>;
 
                         /******************************** Proving key ********************************/
 

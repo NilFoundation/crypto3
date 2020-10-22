@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 #define CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/functions.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,8 +35,18 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_ppzkadsnark {
-                    using policy_type = detail::r1cs_ppzkadsnark_functions<CurveType>;
+                    using policy_type = detail::r1cs_ppzkadsnark_basic_policy<CurveType>;
                 public:
+
+                    using snark_pp = typename policy_type::snark_pp;
+                    using constraint_system = typename policy_type::constraint_system;
+                    using primary_input = typename policy_type::primary_input;
+                    using auxiliary_input = typename policy_type::auxiliary_input;
+
+                    using secret_key = typename policy_type::secret_key;
+                    using vkT = typename policy_type::vkT;
+                    using signature = typename policy_type::signature;
+                    using prf_key = typename policy_type::prf_key;
 
                     using pub_auth_prms = typename policy_type::pub_auth_prms;
                     using sec_auth_key = typename policy_type::sec_auth_key;

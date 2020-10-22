@@ -86,7 +86,42 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct r1cs_ppzkadsnark_functions {
+                    struct r1cs_ppzkadsnark_basic_policy {
+
+                        struct label_type {
+                            unsigned char label_bytes[16];
+                            label_type() {};
+                        };
+
+                        /**
+                         * Below are various template aliases (used for convenience).
+                         */
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using snark_pp = typename r1cs_ppzkadsnark_ppT::snark_pp;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using constraint_system =
+                            r1cs_constraint_system<algebra::Fr<snark_pp<r1cs_ppzkadsnark_ppT>>>;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using primary_input = r1cs_primary_input<algebra::Fr<snark_pp<r1cs_ppzkadsnark_ppT>>>;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using auxiliary_input =
+                            r1cs_auxiliary_input<algebra::Fr<snark_pp<r1cs_ppzkadsnark_ppT>>>;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using secret_key = typename r1cs_ppzkadsnark_ppT::skT;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using vkT = typename r1cs_ppzkadsnark_ppT::vkT;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using signature = typename r1cs_ppzkadsnark_ppT::sigT;
+
+                        template<typename r1cs_ppzkadsnark_ppT>
+                        using prf_key = typename r1cs_ppzkadsnark_ppT::prfKeyT;
 
                         /******************************** Public authentication parameters ********************************/
 
