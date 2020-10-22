@@ -72,6 +72,9 @@ namespace nil {
                         constexpr static const std::array<modulus_type, 3> nqr_to_t = {
                             0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui177, 0x00, 0x00};
 
+                        constexpr static const extended_modulus_type group_order =
+                            0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui546;
+
                         /*constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c1 =
                         {non_residue_type(0x01),
                             non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
@@ -121,6 +124,11 @@ namespace nil {
                     constexpr std::array<
                         typename fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type,
                         3> const fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::nqr_to_t;
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    constexpr typename fp3_extension_params<
+                        edwards_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
+                        fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::group_order;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr typename fp3_extension_params<

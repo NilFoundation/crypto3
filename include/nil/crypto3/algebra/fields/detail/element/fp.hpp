@@ -164,6 +164,10 @@ namespace nil {
                             return element_fp(data * data);    // maybe can be done more effective
                         }
 
+                        bool is_square() const {
+                            return (this->sqrt() != -1);    // maybe can be done more effective
+                        }
+
                         template<typename PowerType>
                         element_fp pow(const PowerType &pwr) const {
                             return element_fp(power(*this, pwr));

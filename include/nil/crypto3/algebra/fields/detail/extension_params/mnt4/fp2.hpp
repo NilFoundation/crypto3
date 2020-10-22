@@ -73,6 +73,9 @@ namespace nil {
                             0x00,
                             0x3B1F45391287A9CB585B8E5504C24BF1EC2010553885078C85899ACD708205080134A9BE6A_cppui294};
 
+                        constexpr static const extended_modulus_type group_order =
+                            0x6FCA59D085672643469AF74C5C58E6A2A78D1A6BEF46259B6308A20619652FE76EE42CF5090E067AAEE541DED7D53794C0321FFC39B6C85F1141FE5DFEF4D47501FA0040670AC71660000_cppui595;
+
                         /*constexpr static const std::array<non_residue_type, 2> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
                             non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298)};*/
@@ -112,6 +115,11 @@ namespace nil {
                     constexpr std::array<
                         typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type,
                         2> const fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::nqr_to_t;
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    constexpr typename fp2_extension_params<
+                        mnt4_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
+                        fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::group_order;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr

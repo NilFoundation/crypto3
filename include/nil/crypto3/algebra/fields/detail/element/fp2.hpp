@@ -234,6 +234,11 @@ namespace nil {
                             return (*this) * (*this);    // maybe can be done more effective
                         }
 
+                        bool is_square() const {
+                            element_fp2 tmp = this->pow((policy_type::group_order - 1)/2);
+                            return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
+                        }
+
                         template<typename PowerType>
                         element_fp2 pow(const PowerType &pwr) const {
                             return element_fp2(power(*this, pwr));

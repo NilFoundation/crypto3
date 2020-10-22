@@ -111,6 +111,12 @@ void fields_fp_basic_math_examples() {
     std::cout << "e1 square sqrt value: ";
     print_field_element(e1sqrsqrt);
 
+    std::cout << "Is e1 square: ";
+    std::cout << e1.is_square() << std::endl;
+
+    std::cout << "Is e1square square: ";
+    std::cout << e1sqr.is_square() << std::endl;
+
     std::cout << "e1 square square value: ";
 
     print_field_element(e1.squared().squared());
