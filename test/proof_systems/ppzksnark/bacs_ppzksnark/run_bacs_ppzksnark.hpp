@@ -57,22 +57,22 @@ namespace nil {
                     std::cout << "Call to run_bacs_ppzksnark" std::endl;
 
                     std::cout << "BACS ppzkSNARK Generator" << std::endl;
-                    bacs_ppzksnark_keypair<CurveType> keypair = bacs_ppzksnark_generator<CurveType>(example.circuit);
+                    typename bacs_ppzksnark<CurveType>::keypair keypair = bacs_ppzksnark<CurveType>::generator(example.circuit);
 
                     std::cout << "Preprocess verification key" << std::endl;
-                    bacs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        bacs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename bacs_ppzksnark<CurveType>::processed_verification_key pvk =
+                        bacs_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
                     std::cout << "BACS ppzkSNARK Prover" << std::endl;
-                    bacs_ppzksnark_proof<CurveType> proof =
-                        bacs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename bacs_ppzksnark<CurveType>::proof proof =
+                        bacs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "BACS ppzkSNARK Verifier" << std::endl;
-                    bool ans = bacs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    bool ans = bacs_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "BACS ppzkSNARK Online Verifier" <<std::endl;
-                    bool ans2 = bacs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    bool ans2 = bacs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

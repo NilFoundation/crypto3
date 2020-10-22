@@ -42,20 +42,20 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                test_affine_verifier(const r1cs_ppzksnark_verification_key<CurveType> &vk,
-                                     const r1cs_ppzksnark_primary_input<CurveType> &primary_input,
-                                     const r1cs_ppzksnark_proof<CurveType> &proof,
+                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key &vk,
+                                     const typename r1cs_ppzksnark<CurveType>::primary_input &primary_input,
+                                     const typename r1cs_ppzksnark<CurveType>::proof &proof,
                                      const bool expected_answer) {
                     std::cout << "R1CS ppzkSNARK Affine Verifier" << std::endl;
-                    const bool answer = r1cs_ppzksnark_affine_verifier_weak_IC<CurveType>(vk, primary_input, proof);
+                    const bool answer = r1cs_ppzksnark<CurveType>::affine_verifier_weak_IC(vk, primary_input, proof);
                     assert(answer == expected_answer);
                 }
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                test_affine_verifier(const r1cs_ppzksnark_verification_key<CurveType> &vk,
-                                     const r1cs_ppzksnark_primary_input<CurveType> &primary_input,
-                                     const r1cs_ppzksnark_proof<CurveType> &proof,
+                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key &vk,
+                                     const typename r1cs_ppzksnark<CurveType>::primary_input &primary_input,
+                                     const typename r1cs_ppzksnark<CurveType>::proof &proof,
                                      const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                     std::cout << "R1CS ppzkSNARK Affine Verifier" << std::endl;
@@ -79,22 +79,22 @@ namespace nil {
                     std::cout << "Call to run_r1cs_ppzksnark" << std::endl;
 
                     std::cout << "R1CS ppzkSNARK Generator" << std::endl;
-                    r1cs_ppzksnark_keypair<CurveType> keypair = r1cs_ppzksnark_generator<CurveType>(example.constraint_system);
+                    typename r1cs_ppzksnark<CurveType>::keypair keypair = r1cs_ppzksnark<CurveType>::generator(example.constraint_system);
 
                     std::cout << "Preprocess verification key" << std::endl;
-                    r1cs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        r1cs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename r1cs_ppzksnark<CurveType>::processed_verification_key pvk =
+                        r1cs_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
                     std::cout << "R1CS ppzkSNARK Prover" << std::endl;
-                    r1cs_ppzksnark_proof<CurveType> proof =
-                        r1cs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_ppzksnark<CurveType>::proof proof =
+                        r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "R1CS ppzkSNARK Verifier" << std::endl;
-                    const bool ans = r1cs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "R1CS ppzkSNARK Online Verifier" << std::endl;
-                    const bool ans2 = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    const bool ans2 = r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);

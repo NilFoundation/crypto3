@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for the the R1CS ppzkSNARK verifier component.
 //
-// The component r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark_verifier_strong_IC.
+// The component r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark::verifier_strong_IC.
 // The component is built from two main sub-components:
 // - r1cs_ppzksnark_verifier_process_vk_component, which verifies correct computation of
 // r1cs_ppzksnark_verifier_process_vk, and
@@ -102,7 +102,7 @@ namespace nil {
 
                         G2_checker->generate_r1cs_constraints();
                     }
-                    void generate_r1cs_witness(const r1cs_ppzksnark_proof<other_curve<CurveType>> &proof) {
+                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::proof &proof) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
@@ -222,7 +222,7 @@ namespace nil {
                     void generate_r1cs_constraints(const bool enforce_bitness) {
                         packer->generate_r1cs_constraints(enforce_bitness);
                     }
-                    void generate_r1cs_witness(const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &vk) {
+                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key &vk) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
@@ -256,7 +256,7 @@ namespace nil {
                     std::vector<bool> get_bits() const;
                     static std::size_t __attribute__((noinline)) size_in_bits(const std::size_t input_size);
                     static std::vector<bool> get_verification_key_bits(
-                        const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk);
+                        const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk);
                 };
 
                 template<typename CurveType>

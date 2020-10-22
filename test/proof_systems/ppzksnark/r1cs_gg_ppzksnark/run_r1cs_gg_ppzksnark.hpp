@@ -48,19 +48,19 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                         const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                         const r1cs_gg_ppzksnark_proof<CurveType> &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof &proof,
                                          const bool expected_answer) {
-                    const bool answer = r1cs_gg_ppzksnark_affine_verifier_weak_IC<CurveType>(vk, primary_input, proof);
+                    const bool answer = r1cs_gg_ppzksnark<CurveType>::affine_verifier_weak_IC(vk, primary_input, proof);
                     BOOST_CHECK(answer == expected_answer);
                 }
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                         const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                         const r1cs_gg_ppzksnark_proof<CurveType> &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof &proof,
                                          const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                 }
@@ -79,20 +79,20 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    r1cs_gg_ppzksnark_keypair<CurveType> keypair =
-                        r1cs_gg_ppzksnark_generator<CurveType>(example.constraint_system);
+                    typename r1cs_gg_ppzksnark<CurveType>::keypair keypair =
+                        r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
 
-                    r1cs_gg_ppzksnark_processed_verification_key<CurveType> pvk =
-                        r1cs_gg_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key pvk =
+                        r1cs_gg_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
-                    r1cs_gg_ppzksnark_proof<CurveType> proof =
-                        r1cs_gg_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_gg_ppzksnark<CurveType>::proof proof =
+                        r1cs_gg_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     const bool ans =
-                        r1cs_gg_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
 
                     const bool ans2 =
-                        r1cs_gg_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);
