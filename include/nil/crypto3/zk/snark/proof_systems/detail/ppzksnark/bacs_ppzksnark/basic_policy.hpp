@@ -62,6 +62,8 @@ namespace nil {
                     template<typename CurveType>
                     struct bacs_ppzksnark_basic_policy {
 
+                        /******************************** Params ********************************/
+                        
                         /**
                          * Below are various template aliases (used for convenience).
                          */
@@ -199,7 +201,7 @@ namespace nil {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const r1cs_constraint_system<FieldType> r1cs_cs = bacs_to_r1cs_instance_map<FieldType>(circuit);
-                            const typename r1cs_ppzksnark<CurveType>::keypair r1cs_keypair = typename r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
+                            const typename r1cs_ppzksnark<CurveType>::keypair r1cs_keypair = r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
 
                             return keypair<CurveType>(proving_key<CurveType>(circuit, r1cs_keypair.pk),
                                                                r1cs_keypair.vk);
@@ -225,7 +227,7 @@ namespace nil {
                                 r1cs_va.begin() + primary_input.size(),
                                 r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
                             const typename r1cs_ppzksnark<CurveType>::proof r1cs_proof =
-                                typename r1cs_ppzksnark<CurveType>::prover(pk.r1cs_pk, primary_input, r1cs_ai);
+                                r1cs_ppzksnark<CurveType>::prover(pk.r1cs_pk, primary_input, r1cs_ai);
 
                             return r1cs_proof;
                         }
@@ -236,7 +238,7 @@ namespace nil {
                         static processed_verification_key<CurveType>
                             verifier_process_vk(const verification_key<CurveType> &vk) {
                             const processed_verification_key<CurveType> pvk =
-                                typename r1cs_ppzksnark<CurveType>::verifier_process_vk(vk);
+                                r1cs_ppzksnark<CurveType>::verifier_process_vk(vk);
 
                             return pvk;
                         }

@@ -61,7 +61,6 @@
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/params.hpp>
 
 ////#include <nil/crypto3/algebra/multiexp/default.hpp>
 
@@ -83,6 +82,8 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy {
 
+                        /******************************** Params ********************************/
+                        
                         /**
                          * Below are various template aliases (used for convenience).
                          */

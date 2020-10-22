@@ -88,6 +88,8 @@ namespace nil {
                     template<typename CurveType>
                     struct r1cs_ppzkadsnark_basic_policy {
 
+                        /******************************** Params ********************************/
+                        
                         struct label_type {
                             unsigned char label_bytes[16];
                             label_type() {};
