@@ -48,17 +48,17 @@ namespace nil {
                     using signature = typename policy_type::signature;
                     using prf_key = typename policy_type::prf_key;
 
-                    using pub_auth_prms = typename policy_type::pub_auth_prms;
-                    using sec_auth_key = typename policy_type::sec_auth_key;
-                    using pub_auth_key = typename policy_type::pub_auth_key;
-                    using auth_data = typename policy_type::auth_data;
+                    using pub_auth_prms_type = typename policy_type::pub_auth_prms;
+                    using sec_auth_key_type = typename policy_type::sec_auth_key;
+                    using pub_auth_key_type = typename policy_type::pub_auth_key;
+                    using auth_data_type = typename policy_type::auth_data;
 
-                    using proving_key = typename policy_type::proving_key;
-                    using verification_key = typename policy_type::verification_key;
-                    using processed_verification_key = typename policy_type::processed_verification_key;
+                    using proving_key_type = typename policy_type::proving_key;
+                    using verification_key_type = typename policy_type::verification_key;
+                    using processed_verification_key_type = typename policy_type::processed_verification_key;
 
-                    using keypair = typename policy_type::keypair;
-                    using proof = typename policy_type::proof;
+                    using keypair_type = typename policy_type::keypair;
+                    using proof_type = typename policy_type::proof;
 
                     using policy_type::generator;
                     using policy_type::prover;

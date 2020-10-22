@@ -48,9 +48,9 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
                     const bool answer = r1cs_gg_ppzksnark<CurveType>::affine_verifier_weak_IC(vk, primary_input, proof);
                     BOOST_CHECK(answer == expected_answer);
@@ -58,9 +58,9 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                 }
@@ -79,13 +79,13 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    typename r1cs_gg_ppzksnark<CurveType>::keypair keypair =
+                    typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
                         r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
 
-                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key pvk =
+                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
                         r1cs_gg_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
-                    typename r1cs_gg_ppzksnark<CurveType>::proof proof =
+                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof =
                         r1cs_gg_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     const bool ans =

@@ -42,12 +42,12 @@ namespace nil {
                     using primary_input = typename policy_type::primary_input;
                     using auxiliary_input = typename policy_type::auxiliary_input;
 
-                    using proving_key = typename policy_type::proving_key;
-                    using verification_key = typename policy_type::verification_key;
-                    using processed_verification_key = typename policy_type::processed_verification_key;
+                    using proving_key_type = typename policy_type::proving_key;
+                    using verification_key_type = typename policy_type::verification_key;
+                    using processed_verification_key_type = typename policy_type::processed_verification_key;
 
-                    using keypair = typename policy_type::keypair;
-                    using proof = typename policy_type::proof;
+                    using keypair_type = typename policy_type::keypair;
+                    using proof_type = typename policy_type::proof;
 
                     using policy_type::generator;
                     using policy_type::prover;

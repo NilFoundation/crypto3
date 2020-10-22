@@ -42,9 +42,9 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key &vk,
-                                     const typename r1cs_ppzksnark<CurveType>::primary_input &primary_input,
-                                     const typename r1cs_ppzksnark<CurveType>::proof &proof,
+                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key_type &vk,
+                                     const typename r1cs_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                     const typename r1cs_ppzksnark<CurveType>::proof_type &proof,
                                      const bool expected_answer) {
                     std::cout << "R1CS ppzkSNARK Affine Verifier" << std::endl;
                     const bool answer = r1cs_ppzksnark<CurveType>::affine_verifier_weak_IC(vk, primary_input, proof);
@@ -53,9 +53,9 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key &vk,
-                                     const typename r1cs_ppzksnark<CurveType>::primary_input &primary_input,
-                                     const typename r1cs_ppzksnark<CurveType>::proof &proof,
+                test_affine_verifier(const typename r1cs_ppzksnark<CurveType>::verification_key_type &vk,
+                                     const typename r1cs_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                     const typename r1cs_ppzksnark<CurveType>::proof_type &proof,
                                      const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                     std::cout << "R1CS ppzkSNARK Affine Verifier" << std::endl;
@@ -79,14 +79,14 @@ namespace nil {
                     std::cout << "Call to run_r1cs_ppzksnark" << std::endl;
 
                     std::cout << "R1CS ppzkSNARK Generator" << std::endl;
-                    typename r1cs_ppzksnark<CurveType>::keypair keypair = r1cs_ppzksnark<CurveType>::generator(example.constraint_system);
+                    typename r1cs_ppzksnark<CurveType>::keypair_type keypair = r1cs_ppzksnark<CurveType>::generator(example.constraint_system);
 
                     std::cout << "Preprocess verification key" << std::endl;
-                    typename r1cs_ppzksnark<CurveType>::processed_verification_key pvk =
+                    typename r1cs_ppzksnark<CurveType>::processed_verification_key_type pvk =
                         r1cs_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
                     std::cout << "R1CS ppzkSNARK Prover" << std::endl;
-                    typename r1cs_ppzksnark<CurveType>::proof proof =
+                    typename r1cs_ppzksnark<CurveType>::proof_type_type proof =
                         r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "R1CS ppzkSNARK Verifier" << std::endl;

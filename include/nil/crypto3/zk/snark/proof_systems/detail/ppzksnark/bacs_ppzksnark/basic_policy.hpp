@@ -84,18 +84,18 @@ namespace nil {
                          */
                         struct proving_key {
                             circuit<CurveType> circuit;
-                            typename r1cs_ppzksnark<CurveType>::proving_key r1cs_pk;
+                            typename r1cs_ppzksnark<CurveType>::proving_key_type r1cs_pk;
 
                             proving_key() {};
                             proving_key(const proving_key<CurveType> &other) = default;
                             proving_key(proving_key<CurveType> &&other) = default;
                             proving_key(const circuit<CurveType> &circuit,
-                                                       const typename r1cs_ppzksnark<CurveType>::proving_key &r1cs_pk) :
+                                                       const typename r1cs_ppzksnark<CurveType>::proving_key_type &r1cs_pk) :
                                 circuit(circuit),
                                 r1cs_pk(r1cs_pk) {
                             }
                             proving_key(circuit<CurveType> &&circuit,
-                                                       typename r1cs_ppzksnark<CurveType>::proving_key &&r1cs_pk) :
+                                                       typename r1cs_ppzksnark<CurveType>::proving_key_type &&r1cs_pk) :
                                 circuit(std::move(circuit)),
                                 r1cs_pk(std::move(r1cs_pk)) {
                             }
@@ -145,7 +145,7 @@ namespace nil {
                         /**
                          * A verification key for the BACS ppzkSNARK.
                          */
-                        using verification_key = typename r1cs_ppzksnark<CurveType>::verification_key;
+                        using verification_key = typename r1cs_ppzksnark<CurveType>::verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -156,7 +156,7 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        using processed_verification_key = typename r1cs_ppzksnark<CurveType>::processed_verification_key;
+                        using processed_verification_key = typename r1cs_ppzksnark<CurveType>::processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
@@ -188,7 +188,7 @@ namespace nil {
                         /**
                          * A proof for the BACS ppzkSNARK.
                          */
-                        using proof = typename r1cs_ppzksnark<CurveType>::proof;
+                        using proof = typename r1cs_ppzksnark<CurveType>::proof_type;
 
                         /***************************** Main algorithms *******************************/
 
@@ -201,7 +201,7 @@ namespace nil {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const r1cs_constraint_system<FieldType> r1cs_cs = bacs_to_r1cs_instance_map<FieldType>(circuit);
-                            const typename r1cs_ppzksnark<CurveType>::keypair r1cs_keypair = r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
+                            const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair = r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
 
                             return keypair<CurveType>(proving_key<CurveType>(circuit, r1cs_keypair.pk),
                                                                r1cs_keypair.vk);
@@ -226,7 +226,7 @@ namespace nil {
                             const r1cs_auxiliary_input<FieldType> r1cs_ai(
                                 r1cs_va.begin() + primary_input.size(),
                                 r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                            const typename r1cs_ppzksnark<CurveType>::proof r1cs_proof =
+                            const typename r1cs_ppzksnark<CurveType>::proof_type r1cs_proof =
                                 r1cs_ppzksnark<CurveType>::prover(pk.r1cs_pk, primary_input, r1cs_ai);
 
                             return r1cs_proof;

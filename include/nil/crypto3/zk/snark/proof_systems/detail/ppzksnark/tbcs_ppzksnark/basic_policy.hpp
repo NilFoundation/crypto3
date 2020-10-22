@@ -84,18 +84,18 @@ namespace nil {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             circuit circuit;
-                            typename uscs_ppzksnark<CurveType>::proving_key uscs_pk;
+                            typename uscs_ppzksnark<CurveType>::proving_key_type uscs_pk;
 
                             proving_key() {};
                             proving_key(const proving_key<CurveType> &other) = default;
                             proving_key(proving_key<CurveType> &&other) = default;
                             proving_key(const circuit &circuit,
-                                                       typename const uscs_ppzksnark<CurveType>::proving_key &uscs_pk) :
+                                                       typename const uscs_ppzksnark<CurveType>::proving_key_type &uscs_pk) :
                                 circuit(circuit),
                                 uscs_pk(uscs_pk) {
                             }
                             proving_key(circuit &&circuit,
-                                                       typename uscs_ppzksnark<CurveType>::proving_key &&uscs_pk) :
+                                                       typename uscs_ppzksnark<CurveType>::proving_key_type &&uscs_pk) :
                                 circuit(std::move(circuit)),
                                 uscs_pk(std::move(uscs_pk)) {
                             }
@@ -132,7 +132,7 @@ namespace nil {
                         /**
                          * A verification key for the TBCS ppzkSNARK.
                          */
-                        using verification_key = typename uscs_ppzksnark<CurveType>::verification_key;
+                        using verification_key = typename uscs_ppzksnark<CurveType>::verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -143,7 +143,7 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        using processed_verification_key = typename uscs_ppzksnark<CurveType>::processed_verification_key;
+                        using processed_verification_key = typename uscs_ppzksnark<CurveType>::processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
@@ -174,7 +174,7 @@ namespace nil {
                         /**
                          * A proof for the TBCS ppzkSNARK.
                          */
-                        using proof = typename uscs_ppzksnark<CurveType>::proof;
+                        using proof = typename uscs_ppzksnark<CurveType>::proof_type;
 
                         /***************************** Main algorithms *******************************/
 
@@ -201,7 +201,7 @@ namespace nil {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const uscs_constraint_system<FieldType> uscs_cs = tbcs_to_uscs_instance_map<FieldType>(circuit);
-                            const typename uscs_ppzksnark<CurveType>::keypair uscs_keypair = uscs_ppzksnark<CurveType>::generator(uscs_cs);
+                            const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair = uscs_ppzksnark<CurveType>::generator(uscs_cs);
 
                             return keypair<CurveType>(proving_key<CurveType>(circuit, uscs_keypair.pk),
                                                                uscs_keypair.vk);
@@ -227,7 +227,7 @@ namespace nil {
                             const uscs_auxiliary_input<FieldType> uscs_ai(
                                 uscs_va.begin() + primary_input.size(),
                                 uscs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                            const typename uscs_ppzksnark<CurveType>::proof uscs_proof =
+                            const typename uscs_ppzksnark<CurveType>::proof_type uscs_proof =
                                 uscs_ppzksnark<CurveType>::prover(pk.uscs_pk, uscs_pi, uscs_ai);
 
                             return uscs_proof;

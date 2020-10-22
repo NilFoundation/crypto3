@@ -102,7 +102,7 @@ namespace nil {
 
                         G2_checker->generate_r1cs_constraints();
                     }
-                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::proof &proof) {
+                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::proof_type &proof) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
@@ -222,7 +222,7 @@ namespace nil {
                     void generate_r1cs_constraints(const bool enforce_bitness) {
                         packer->generate_r1cs_constraints(enforce_bitness);
                     }
-                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key &vk) {
+                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &vk) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
@@ -256,7 +256,7 @@ namespace nil {
                     std::vector<bool> get_bits() const;
                     static std::size_t __attribute__((noinline)) size_in_bits(const std::size_t input_size);
                     static std::vector<bool> get_verification_key_bits(
-                        const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk);
+                        const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &r1cs_vk);
                 };
 
                 template<typename CurveType>
