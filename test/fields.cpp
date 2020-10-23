@@ -184,23 +184,23 @@ void field_operation_test(const TestSet &test_set) {
 
 template<typename FieldType>
 void field_not_square_test(const std::vector<const char *> &test_set) {
-    using policy_type = fields::bls12_fq<381>;
-    using value_type = typename policy_type::value_type;
+    using value_type = typename FieldType::value_type;
     using modulus_type = typename value_type::modulus_type;
 
     for (auto &not_square : test_set) {
         BOOST_CHECK_EQUAL(value_type(modulus_type(not_square)).is_square(), false);
+        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square)).pow(2).is_square(), true);
     }
 }
 
 template<typename FieldType>
 void field_not_square_test(const std::vector<std::array<const char *, 2>> &test_set) {
-    using policy_type = fields::fp2<fields::bls12_fq<381>>;
-    using value_type = typename policy_type::value_type;
+    using value_type = typename FieldType::value_type;
     using modulus_type = typename value_type::underlying_type::modulus_type;
 
     for (auto &not_square : test_set) {
         BOOST_CHECK_EQUAL(value_type(modulus_type(not_square[0]), modulus_type(not_square[1])).is_square(), false);
+        BOOST_CHECK_EQUAL(value_type(modulus_type(not_square[0]), modulus_type(not_square[1])).pow(2).is_square(), true);
     }
 }
 
