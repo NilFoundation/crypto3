@@ -114,6 +114,7 @@ namespace nil {
                         typename fp2_extension_params<bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
                         2> const fp2_extension_params<bn128_base_field<ModulusBits, GeneratorBits>>::nqr_to_t;
 
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr typename fp2_extension_params<
                         bn128_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
                         fp2_extension_params<bn128_base_field<ModulusBits, GeneratorBits>>::group_order;
