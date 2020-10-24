@@ -40,7 +40,7 @@
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -280,7 +280,7 @@ namespace nil {
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable();
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable(
                         blueprint<FieldType> &pb,
-                        const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk);
+                        const r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk);
                 };
 
                 template<typename CurveType>
@@ -420,7 +420,7 @@ namespace nil {
 
                 template<typename CurveType>
                 std::vector<bool> r1cs_ppzksnark_verification_key_variable<CurveType>::get_verification_key_bits(
-                    const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk) {
+                    const r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     const std::size_t input_size_in_elts =
@@ -449,7 +449,7 @@ namespace nil {
                 r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>::
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable(
                         blueprint<FieldType> &pb,
-                        const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk) {
+                        const r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk) {
                     encoded_IC_base.reset(new G1_variable<CurveType>(pb, r1cs_vk.encoded_IC_query.first));
                     encoded_IC_query.resize(r1cs_vk.encoded_IC_query.rest.indices.size());
                     for (std::size_t i = 0; i < r1cs_vk.encoded_IC_query.rest.indices.size(); ++i) {

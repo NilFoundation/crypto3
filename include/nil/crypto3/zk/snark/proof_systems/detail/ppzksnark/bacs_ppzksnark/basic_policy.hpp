@@ -51,7 +51,7 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_FUNCTIONS_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {

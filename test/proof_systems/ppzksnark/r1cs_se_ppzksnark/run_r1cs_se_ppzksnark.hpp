@@ -29,8 +29,7 @@
 #ifndef CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp>
 
 #include "r1cs_examples.hpp"
 
@@ -60,20 +59,20 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    r1cs_se_ppzksnark_keypair<CurveType> keypair =
-                        r1cs_se_ppzksnark_generator<CurveType>(example.constraint_system);
+                    typename r1cs_se_ppzksnark<CurveType>::keypair_type keypair =
+                        r1cs_se_ppzksnark<CurveType>::generator(example.constraint_system);
 
-                    r1cs_se_ppzksnark_processed_verification_key<CurveType> pvk =
-                        r1cs_se_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename r1cs_se_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                        r1cs_se_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
-                    r1cs_se_ppzksnark_proof<CurveType> proof =
-                        r1cs_se_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof =
+                        r1cs_se_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     const bool ans =
-                        r1cs_se_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                        r1cs_se_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
 
                     const bool ans2 =
-                        r1cs_se_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                        r1cs_se_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

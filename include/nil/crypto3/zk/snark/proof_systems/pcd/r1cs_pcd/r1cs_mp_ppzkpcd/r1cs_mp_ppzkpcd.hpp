@@ -60,7 +60,7 @@
 #include <nil/crypto3/zk/snark/set_commitment.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/ppzkpcd_compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd_params.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -80,11 +80,11 @@ namespace nil {
 
                     std::vector<r1cs_mp_ppzkpcd_compliance_predicate<PCD_ppT>> compliance_predicates;
 
-                    std::vector<r1cs_ppzksnark_proving_key<A_pp>> compliance_step_r1cs_pks;
-                    std::vector<r1cs_ppzksnark_proving_key<B_pp>> translation_step_r1cs_pks;
+                    std::vector<typename r1cs_ppzksnark<A_pp>::proving_key_type> compliance_step_r1cs_pks;
+                    std::vector<typename r1cs_ppzksnark<B_pp>::proving_key_type> translation_step_r1cs_pks;
 
-                    std::vector<r1cs_ppzksnark_verification_key<A_pp>> compliance_step_r1cs_vks;
-                    std::vector<r1cs_ppzksnark_verification_key<B_pp>> translation_step_r1cs_vks;
+                    std::vector<typename r1cs_ppzksnark<A_pp>::verification_key_type> compliance_step_r1cs_vks;
+                    std::vector<typename r1cs_ppzksnark<B_pp>::verification_key_type> translation_step_r1cs_vks;
 
                     set_commitment commitment_to_translation_step_r1cs_vks;
                     std::vector<set_membership_proof> compliance_step_r1cs_vk_membership_proofs;
@@ -96,10 +96,10 @@ namespace nil {
                     r1cs_mp_ppzkpcd_proving_key(r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &&other) = default;
                     r1cs_mp_ppzkpcd_proving_key(
                         const std::vector<r1cs_mp_ppzkpcd_compliance_predicate<PCD_ppT>> &compliance_predicates,
-                        const std::vector<r1cs_ppzksnark_proving_key<A_pp>> &compliance_step_r1cs_pk,
-                        const std::vector<r1cs_ppzksnark_proving_key<B_pp>> &translation_step_r1cs_pk,
-                        const std::vector<r1cs_ppzksnark_verification_key<A_pp>> &compliance_step_r1cs_vk,
-                        const std::vector<r1cs_ppzksnark_verification_key<B_pp>> &translation_step_r1cs_vk,
+                        const std::vector<typename r1cs_ppzksnark<A_pp>::proving_key_type> &compliance_step_r1cs_pk,
+                        const std::vector<typename r1cs_ppzksnark<B_pp>::proving_key_type> &translation_step_r1cs_pk,
+                        const std::vector<typename r1cs_ppzksnark<A_pp>::verification_key_type> &compliance_step_r1cs_vk,
+                        const std::vector<typename r1cs_ppzksnark<B_pp>::verification_key_type> &translation_step_r1cs_vk,
                         const set_commitment &commitment_to_translation_step_r1cs_vks,
                         const std::vector<set_membership_proof> &compliance_step_r1cs_vk_membership_proofs,
                         const std::map<std::size_t, std::size_t> &compliance_predicate_name_to_idx) :
@@ -135,16 +135,16 @@ namespace nil {
                     typedef typename PCD_ppT::curve_A_pp A_pp;
                     typedef typename PCD_ppT::curve_B_pp B_pp;
 
-                    std::vector<r1cs_ppzksnark_verification_key<A_pp>> compliance_step_r1cs_vks;
-                    std::vector<r1cs_ppzksnark_verification_key<B_pp>> translation_step_r1cs_vks;
+                    std::vector<typename r1cs_ppzksnark<A_pp>::verification_key_type> compliance_step_r1cs_vks;
+                    std::vector<typename r1cs_ppzksnark<B_pp>::verification_key_type> translation_step_r1cs_vks;
                     set_commitment commitment_to_translation_step_r1cs_vks;
 
                     r1cs_mp_ppzkpcd_verification_key() = default;
                     r1cs_mp_ppzkpcd_verification_key(const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &other) = default;
                     r1cs_mp_ppzkpcd_verification_key(r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &&other) = default;
                     r1cs_mp_ppzkpcd_verification_key(
-                        const std::vector<r1cs_ppzksnark_verification_key<A_pp>> &compliance_step_r1cs_vks,
-                        const std::vector<r1cs_ppzksnark_verification_key<B_pp>> &translation_step_r1cs_vks,
+                        const std::vector<typename r1cs_ppzksnark<A_pp>::verification_key_type> &compliance_step_r1cs_vks,
+                        const std::vector<typename r1cs_ppzksnark<B_pp>::verification_key_type> &translation_step_r1cs_vks,
                         const set_commitment &commitment_to_translation_step_r1cs_vks) :
                         compliance_step_r1cs_vks(compliance_step_r1cs_vks),
                         translation_step_r1cs_vks(translation_step_r1cs_vks),
@@ -174,8 +174,8 @@ namespace nil {
                     typedef typename PCD_ppT::curve_A_pp A_pp;
                     typedef typename PCD_ppT::curve_B_pp B_pp;
 
-                    std::vector<r1cs_ppzksnark_processed_verification_key<A_pp>> compliance_step_r1cs_pvks;
-                    std::vector<r1cs_ppzksnark_processed_verification_key<B_pp>> translation_step_r1cs_pvks;
+                    std::vector<typename r1cs_ppzksnark<A_pp>::processed_verification_key_type> compliance_step_r1cs_pvks;
+                    std::vector<typename r1cs_ppzksnark<B_pp>::processed_verification_key_type> translation_step_r1cs_pvks;
                     set_commitment commitment_to_translation_step_r1cs_vks;
 
                     r1cs_mp_ppzkpcd_processed_verification_key() = default;
@@ -184,8 +184,8 @@ namespace nil {
                     r1cs_mp_ppzkpcd_processed_verification_key(
                         r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &&other) = default;
                     r1cs_mp_ppzkpcd_processed_verification_key(
-                        std::vector<r1cs_ppzksnark_processed_verification_key<A_pp>> &&compliance_step_r1cs_pvks,
-                        std::vector<r1cs_ppzksnark_processed_verification_key<B_pp>> &&translation_step_r1cs_pvks,
+                        std::vector<typename r1cs_ppzksnark<A_pp>::processed_verification_key_type> &&compliance_step_r1cs_pvks,
+                        std::vector<typename r1cs_ppzksnark<B_pp>::processed_verification_key_type> &&translation_step_r1cs_pvks,
                         const set_commitment &commitment_to_translation_step_r1cs_vks) :
                         compliance_step_r1cs_pvks(std::move(compliance_step_r1cs_pvks)),
                         translation_step_r1cs_pvks(std::move(translation_step_r1cs_pvks)),
@@ -229,11 +229,11 @@ namespace nil {
                 class r1cs_mp_ppzkpcd_proof {
                 public:
                     std::size_t compliance_predicate_idx;
-                    r1cs_ppzksnark_proof<typename PCD_ppT::curve_B_pp> r1cs_proof;
+                    typename r1cs_ppzksnark<typename PCD_ppT::curve_B_pp>::proof_type r1cs_proof;
 
                     r1cs_mp_ppzkpcd_proof() = default;
                     r1cs_mp_ppzkpcd_proof(const std::size_t compliance_predicate_idx,
-                                          const r1cs_ppzksnark_proof<typename PCD_ppT::curve_B_pp> &r1cs_proof) :
+                                          const typename r1cs_ppzksnark<typename PCD_ppT::curve_B_pp>::proof_type &r1cs_proof) :
                         compliance_predicate_idx(compliance_predicate_idx),
                         r1cs_proof(r1cs_proof) {
                     }
@@ -464,8 +464,8 @@ namespace nil {
                             mp_compliance_step_pcd_circuit.get_circuit();
 
                         std::cout << "Generate key pair for compliance step PCD circuit" << std::endl;
-                        r1cs_ppzksnark_keypair<curve_A_pp> mp_compliance_step_keypair =
-                            r1cs_ppzksnark_generator<curve_A_pp>(mp_compliance_step_pcd_circuit_cs);
+                        typename r1cs_ppzksnark<curve_A_pp>::keypair_type mp_compliance_step_keypair =
+                            r1cs_ppzksnark<curve_A_pp>::generator(mp_compliance_step_pcd_circuit_cs);
 
                         std::cout << "Construct translation step PCD circuit" << std::endl;
                         mp_translation_step_pcd_circuit_maker<curve_B_pp> mp_translation_step_pcd_circuit(
@@ -475,8 +475,8 @@ namespace nil {
                             mp_translation_step_pcd_circuit.get_circuit();
 
                         std::cout << "Generate key pair for translation step PCD circuit" << std::endl;
-                        r1cs_ppzksnark_keypair<curve_B_pp> mp_translation_step_keypair =
-                            r1cs_ppzksnark_generator<curve_B_pp>(mp_translation_step_pcd_circuit_cs);
+                        typename r1cs_ppzksnark<curve_B_pp>::keypair_type mp_translation_step_keypair =
+                            r1cs_ppzksnark<curve_B_pp>::generator(mp_translation_step_pcd_circuit_cs);
 
                         std::cout << "Augment set of translation step verification keys" << std::endl;
                         const std::vector<bool> vk_bits =
@@ -549,12 +549,12 @@ namespace nil {
                         }
                     }
 
-                    std::vector<r1cs_ppzksnark_proof<curve_B_pp>> padded_proofs(max_arity);
+                    std::vector<typename r1cs_ppzksnark<curve_B_pp>::proof_type> padded_proofs(max_arity);
                     for (std::size_t i = 0; i < arity; ++i) {
                         padded_proofs[i] = prev_proofs[i].r1cs_proof;
                     }
 
-                    std::vector<r1cs_ppzksnark_verification_key<curve_B_pp>> translation_step_vks;
+                    std::vector<typename r1cs_ppzksnark<curve_B_pp>::verification_key_type> translation_step_vks;
                     std::vector<set_membership_proof> membership_proofs;
 
                     for (std::size_t i = 0; i < arity; ++i) {
@@ -569,7 +569,7 @@ namespace nil {
                             const r1cs_primary_input<FieldT_B> translated_msg =
                                 get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                                     pk.commitment_to_translation_step_r1cs_vks, auxiliary_input.incoming_messages[i]);
-                            const bool bit = r1cs_ppzksnark_verifier_strong_IC<curve_B_pp>(
+                            const bool bit = r1cs_ppzksnark<curve_B_pp>::verifier_strong_IC(
                                 translation_step_vks[i], translated_msg, padded_proofs[i]);
                             assert(bit);
                         } else {
@@ -599,8 +599,8 @@ namespace nil {
                         mp_compliance_step_pcd_circuit.get_primary_input();
                     const r1cs_auxiliary_input<FieldT_A> compliance_step_auxiliary_input =
                         mp_compliance_step_pcd_circuit.get_auxiliary_input();
-                    const r1cs_ppzksnark_proof<curve_A_pp> compliance_step_proof =
-                        r1cs_ppzksnark_prover<curve_A_pp>(pk.compliance_step_r1cs_pks[compliance_predicate_idx],
+                    const typename r1cs_ppzksnark<curve_A_pp>::proof_type compliance_step_proof =
+                        r1cs_ppzksnark<curve_A_pp>::prover(pk.compliance_step_r1cs_pks[compliance_predicate_idx],
                                                           compliance_step_primary_input,
                                                           compliance_step_auxiliary_input);
 
@@ -608,7 +608,7 @@ namespace nil {
                     const r1cs_primary_input<FieldT_A> compliance_step_input =
                         get_mp_compliance_step_pcd_circuit_input<curve_A_pp>(pk.commitment_to_translation_step_r1cs_vks,
                                                                              primary_input.outgoing_message);
-                    const bool compliance_step_ok = r1cs_ppzksnark_verifier_strong_IC<curve_A_pp>(
+                    const bool compliance_step_ok = r1cs_ppzksnark<curve_A_pp>::verifier_strong_IC(
                         pk.compliance_step_r1cs_vks[compliance_predicate_idx],
                         compliance_step_input,
                         compliance_step_proof);
@@ -627,14 +627,14 @@ namespace nil {
                     const r1cs_auxiliary_input<FieldT_B> translation_step_auxiliary_input =
                         mp_translation_step_pcd_circuit.get_auxiliary_input();
 
-                    const r1cs_ppzksnark_proof<curve_B_pp> translation_step_proof =
-                        r1cs_ppzksnark_prover<curve_B_pp>(pk.translation_step_r1cs_pks[compliance_predicate_idx],
+                    const typename r1cs_ppzksnark<curve_B_pp>::proof_type translation_step_proof =
+                        r1cs_ppzksnark<curve_B_pp>::prover(pk.translation_step_r1cs_pks[compliance_predicate_idx],
                                                           translation_step_primary_input,
                                                           translation_step_auxiliary_input);
 
 
 #ifdef DEBUG
-                    const bool translation_step_ok = r1cs_ppzksnark_verifier_strong_IC<curve_B_pp>(
+                    const bool translation_step_ok = r1cs_ppzksnark<curve_B_pp>::verifier_strong_IC(
                         pk.translation_step_r1cs_vks[compliance_predicate_idx],
                         translation_step_primary_input,
                         translation_step_proof);
@@ -657,7 +657,7 @@ namespace nil {
                     const r1cs_primary_input<typename curve_B_pp::scalar_field_type> r1cs_input =
                         get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                             pvk.commitment_to_translation_step_r1cs_vks, primary_input);
-                    const bool result = r1cs_ppzksnark_online_verifier_strong_IC(
+                    const bool result = r1cs_ppzksnark::online_verifier_strong_IC(
                         pvk.translation_step_r1cs_pvks[proof.compliance_predicate_idx], r1cs_input, proof.r1cs_proof);
 
                     return result;
@@ -675,10 +675,10 @@ namespace nil {
                     result.commitment_to_translation_step_r1cs_vks = vk.commitment_to_translation_step_r1cs_vks;
 
                     for (std::size_t i = 0; i < vk.compliance_step_r1cs_vks.size(); ++i) {
-                        const r1cs_ppzksnark_processed_verification_key<curve_A_pp> compliance_step_r1cs_pvk =
-                            r1cs_ppzksnark_verifier_process_vk<curve_A_pp>(vk.compliance_step_r1cs_vks[i]);
-                        const r1cs_ppzksnark_processed_verification_key<curve_B_pp> translation_step_r1cs_pvk =
-                            r1cs_ppzksnark_verifier_process_vk<curve_B_pp>(vk.translation_step_r1cs_vks[i]);
+                        const typename r1cs_ppzksnark<curve_A_pp>::processed_verification_key_type compliance_step_r1cs_pvk =
+                            r1cs_ppzksnark<curve_A_pp>::verifier_process_vk(vk.compliance_step_r1cs_vks[i]);
+                        const typename r1cs_ppzksnark<curve_B_pp>::processed_verification_key translation_step_r1cs_pvk =
+                            r1cs_ppzksnark<curve_B_pp>::verifier_process_vk(vk.translation_step_r1cs_vks[i]);
 
                         result.compliance_step_r1cs_pvks.emplace_back(compliance_step_r1cs_pvk);
                         result.translation_step_r1cs_pvks.emplace_back(translation_step_r1cs_pvk);

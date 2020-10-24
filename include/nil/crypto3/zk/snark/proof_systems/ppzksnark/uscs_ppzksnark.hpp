@@ -34,7 +34,7 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class uscs_ppzksnark {
+                class uscs_ppzksnark : private detail::uscs_ppzksnark_basic_policy<CurveType>{
                     using policy_type = detail::uscs_ppzksnark_basic_policy<CurveType>;
                 public:
 

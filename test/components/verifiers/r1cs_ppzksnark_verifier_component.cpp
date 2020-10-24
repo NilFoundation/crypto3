@@ -33,7 +33,7 @@
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp6_components.hpp>
 #include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;

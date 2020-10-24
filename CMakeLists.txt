@@ -131,34 +131,27 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_pcd_params.hpp
 
      include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/prf.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/signature.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzkadsnark/r1cs_ppzkadsnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_ppzksnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_se_ppzksnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/basic_policy.hpp
 
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark_params.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark_params.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_compliance_predicate.hpp
-     include/nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_zksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_zksnark_params.hpp
+     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp
+     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/uscs_ppzksnark/basic_policy.hpp
 
      include/nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp
 
