@@ -68,13 +68,10 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        template<typename CurveType>
                         using circuit = bacs_circuit<typename CurveType::scalar_field_type>;
 
-                        template<typename CurveType>
                         using primary_input = bacs_primary_input<typename CurveType::scalar_field_type>;
 
-                        template<typename CurveType>
                         using auxiliary_input = bacs_auxiliary_input<typename CurveType::scalar_field_type>;
 
                         /******************************** Proving key ********************************/
@@ -83,24 +80,24 @@ namespace nil {
                          * A proving key for the BACS ppzkSNARK.
                          */
                         struct proving_key {
-                            circuit<CurveType> circuit;
+                            circuit crct;
                             typename r1cs_ppzksnark<CurveType>::proving_key_type r1cs_pk;
 
                             proving_key() {};
-                            proving_key(const proving_key<CurveType> &other) = default;
-                            proving_key(proving_key<CurveType> &&other) = default;
-                            proving_key(const circuit<CurveType> &circuit,
+                            proving_key(const proving_key &other) = default;
+                            proving_key(proving_key &&other) = default;
+                            proving_key(const circuit &crct,
                                                        const typename r1cs_ppzksnark<CurveType>::proving_key_type &r1cs_pk) :
-                                circuit(circuit),
+                                circuit(crct),
                                 r1cs_pk(r1cs_pk) {
                             }
-                            proving_key(circuit<CurveType> &&circuit,
+                            proving_key(circuit &&crct,
                                                        typename r1cs_ppzksnark<CurveType>::proving_key_type &&r1cs_pk) :
-                                circuit(std::move(circuit)),
+                                circuit(std::move(crct)),
                                 r1cs_pk(std::move(r1cs_pk)) {
                             }
 
-                            proving_key<CurveType> &operator=(const proving_key<CurveType> &other) = default;
+                            proving_key &operator=(const proving_key &other) = default;
 
                             std::size_t G1_size() const {
                                 return r1cs_pk.G1_size();
@@ -135,8 +132,8 @@ namespace nil {
                                  weak input consistency requires that |primary_input| <= C.num_inputs (and
                                  the primary input is implicitly padded with zeros up to length C.num_inputs).
                              */
-                            bool operator==(const proving_key<CurveType> &other) const {
-                                return (this->circuit == other.circuit && this->r1cs_pk == other.r1cs_pk);
+                            bool operator==(const proving_key &other) const {
+                                return (this->crct == other.crct && this->r1cs_pk == other.r1cs_pk);
                             }
                         };
 
@@ -165,19 +162,19 @@ namespace nil {
                          */
                         class keypair {
                         public:
-                            proving_key<CurveType> pk;
-                            verification_key<CurveType> vk;
+                            proving_key pk;
+                            verification_key vk;
 
                             keypair() {};
-                            keypair(keypair<CurveType> &&other) = default;
-                            keypair(const proving_key<CurveType> &pk,
-                                                   const verification_key<CurveType> &vk) :
+                            keypair(keypair &&other) = default;
+                            keypair(const proving_key &pk,
+                                                   const verification_key &vk) :
                                 pk(pk),
                                 vk(vk) {
                             }
 
-                            keypair(proving_key<CurveType> &&pk,
-                                                   verification_key<CurveType> &&vk) :
+                            keypair(proving_key &&pk,
+                                                   verification_key &&vk) :
                                 pk(std::move(pk)),
                                 vk(std::move(vk)) {
                             }
@@ -197,13 +194,13 @@ namespace nil {
                          *
                          * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
                          */
-                        static keypair<CurveType> generator(const circuit<CurveType> &circuit) {
+                        static keypair generator(const circuit &circuit) {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const r1cs_constraint_system<FieldType> r1cs_cs = bacs_to_r1cs_instance_map<FieldType>(circuit);
                             const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair = r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
 
-                            return keypair<CurveType>(proving_key<CurveType>(circuit, r1cs_keypair.pk),
+                            return keypair(proving_key(circuit, r1cs_keypair.pk),
                                                                r1cs_keypair.vk);
                         }
 
@@ -215,9 +212,9 @@ namespace nil {
                          *               ``there exists Y such that C(X,Y)=0''.
                          * Above, C is the BACS circuit that was given as input to the generator algorithm.
                          */
-                        static proof<CurveType> prover(const proving_key<CurveType> &pk,
-                                                       const primary_input<CurveType> &primary_input,
-                                                       const auxiliary_input<CurveType> &auxiliary_input) {
+                        static proof prover(const proving_key &pk,
+                                                       const primary_input &primary_input,
+                                                       const auxiliary_input &auxiliary_input) {
 
                             typedef typename CurveType::scalar_field_type FieldType;
 
@@ -235,9 +232,9 @@ namespace nil {
                         /**
                          * Convert a (non-processed) verification key into a processed verification key.
                          */
-                        static processed_verification_key<CurveType>
-                            verifier_process_vk(const verification_key<CurveType> &vk) {
-                            const processed_verification_key<CurveType> pvk =
+                        static processed_verification_key
+                            verifier_process_vk(const verification_key &vk) {
+                            const processed_verification_key pvk =
                                 r1cs_ppzksnark<CurveType>::verifier_process_vk(vk);
 
                             return pvk;
@@ -248,11 +245,11 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool verifier_weak_IC(const verification_key<CurveType> &vk,
-                                                             const primary_input<CurveType> &primary_input,
-                                                             const proof<CurveType> &proof) {
-                            const processed_verification_key<CurveType> pvk =
-                                verifier_process_vk<CurveType>(vk);
+                        static bool verifier_weak_IC(const verification_key &vk,
+                                                             const primary_input &primary_input,
+                                                             const proof &proof) {
+                            const processed_verification_key pvk =
+                                verifier_process_vk(vk);
                             const bool bit = r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
 
                             return bit;
@@ -263,11 +260,11 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool verifier_strong_IC(const verification_key<CurveType> &vk,
-                                                               const primary_input<CurveType> &primary_input,
-                                                               const proof<CurveType> &proof) {
-                            const processed_verification_key<CurveType> pvk =
-                                verifier_process_vk<CurveType>(vk);
+                        static bool verifier_strong_IC(const verification_key &vk,
+                                                               const primary_input &primary_input,
+                                                               const proof &proof) {
+                            const processed_verification_key pvk =
+                                verifier_process_vk(vk);
                             const bool bit = r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
 
                             return bit;
@@ -278,9 +275,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool online_verifier_weak_IC(const processed_verification_key<CurveType> &pvk,
-                                                                    const primary_input<CurveType> &primary_input,
-                                                                    const proof<CurveType> &proof) {
+                        static bool online_verifier_weak_IC(const processed_verification_key &pvk,
+                                                                    const primary_input &primary_input,
+                                                                    const proof &proof) {
                             const bool bit = r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
 
                             return bit;
@@ -291,9 +288,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool online_verifier_strong_IC(const processed_verification_key<CurveType> &pvk,
-                                                                      const primary_input<CurveType> &primary_input,
-                                                                      const proof<CurveType> &proof) {
+                        static bool online_verifier_strong_IC(const processed_verification_key &pvk,
+                                                                      const primary_input &primary_input,
+                                                                      const proof &proof) {
                             const bool bit = r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
 
                             return bit;

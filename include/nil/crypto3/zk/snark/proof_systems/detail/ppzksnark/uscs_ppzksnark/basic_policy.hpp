@@ -94,13 +94,10 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        template<typename CurveType>
                         using constraint_system = uscs_constraint_system<typename CurveType::scalar_field_type>;
 
-                        template<typename CurveType>
                         using primary_input = uscs_primary_input<typename CurveType::scalar_field_type>;
 
-                        template<typename CurveType>
                         using auxiliary_input = uscs_auxiliary_input<typename CurveType::scalar_field_type>;
 
                         /******************************** Proving key ********************************/
@@ -114,20 +111,20 @@ namespace nil {
                             typename CurveType::g1_vector H_g1_query;
                             typename CurveType::g2_vector V_g2_query;
 
-                            constraint_system<CurveType> constraint_system;
+                            constraint_system cs;
 
                             proving_key() {};
-                            proving_key<CurveType> &operator=(const proving_key<CurveType> &other) = default;
-                            proving_key(const proving_key<CurveType> &other) = default;
-                            proving_key(proving_key<CurveType> &&other) = default;
+                            proving_key &operator=(const proving_key &other) = default;
+                            proving_key(const proving_key &other) = default;
+                            proving_key(proving_key &&other) = default;
                             proving_key(typename CurveType::g1_vector &&V_g1_query,
                                                        typename CurveType::g1_vector &&alpha_V_g1_query,
                                                        typename CurveType::g1_vector &&H_g1_query,
                                                        typename CurveType::g2_vector &&V_g2_query,
-                                                       constraint_system<CurveType> &&constraint_system) :
+                                                       constraint_system &&cs) :
                                 V_g1_query(std::move(V_g1_query)),
                                 alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
-                                V_g2_query(std::move(V_g2_query)), constraint_system(std::move(constraint_system)) {};
+                                V_g2_query(std::move(V_g2_query)), cs(std::move(cs)) {};
 
                             std::size_t G1_size() const {
                                 return V_g1_query.size() + alpha_V_g1_query.size() + H_g1_query.size();
@@ -150,10 +147,10 @@ namespace nil {
                                        CurveType::g2_type::value_bits * G2_size();
                             }
 
-                            bool operator==(const proving_key<CurveType> &other) const {
+                            bool operator==(const proving_key &other) const {
                                 return (this->V_g1_query == other.V_g1_query && this->alpha_V_g1_query == other.alpha_V_g1_query &&
                                         this->H_g1_query == other.H_g1_query && this->V_g2_query == other.V_g2_query &&
-                                        this->constraint_system == other.constraint_system);
+                                        this->cs == other.cs);
                             }
                         };
 
@@ -189,13 +186,13 @@ namespace nil {
                                 return encoded_IC_query.size_in_bits() + 3 * CurveType::g2_type::value_bits;
                             }
 
-                            bool operator==(const verification_key<CurveType> &other) const {
+                            bool operator==(const verification_key &other) const {
                                 return (this->tilde_g2 == other.tilde_g2 && this->alpha_tilde_g2 == other.alpha_tilde_g2 &&
                                         this->Z_g2 == other.Z_g2 && this->encoded_IC_query == other.encoded_IC_query);
                             }
 
-                            /*static verification_key<CurveType> dummy_verification_key(const std::size_t input_size) {
-                                verification_key<CurveType> result;
+                            /*static verification_key dummy_verification_key(const std::size_t input_size) {
+                                verification_key result;
                                 result.tilde_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
                                 result.alpha_tilde_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
                                 result.Z_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
@@ -248,17 +245,17 @@ namespace nil {
                          * A key pair for the USCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
                         struct keypair {
-                            proving_key<CurveType> pk;
-                            verification_key<CurveType> vk;
+                            proving_key pk;
+                            verification_key vk;
 
                             keypair() {};
-                            keypair(proving_key<CurveType> &&pk,
-                                                   verification_key<CurveType> &&vk) :
+                            keypair(proving_key &&pk,
+                                                   verification_key &&vk) :
                                 pk(std::move(pk)),
                                 vk(std::move(vk)) {
                             }
 
-                            keypair(keypair<CurveType> &&other) = default;
+                            keypair(keypair &&other) = default;
                         };
 
                         /*********************************** Proof ***********************************/
@@ -308,7 +305,7 @@ namespace nil {
                                         V_g2.is_well_formed());
                             }
 
-                            bool operator==(const proof<CurveType> &other) const {
+                            bool operator==(const proof &other) const {
                                 return (this->V_g1 == other.V_g1 && this->alpha_V_g1 == other.alpha_V_g1 &&
                                         this->H_g1 == other.H_g1 && this->V_g2 == other.V_g2);
                             }
@@ -335,7 +332,7 @@ namespace nil {
                          *
                          * Given a USCS constraint system CS, this algorithm produces proving and verification keys for CS.
                          */
-                        static keypair<CurveType> generator(const constraint_system<CurveType> &cs) {
+                        static keypair generator(const constraint_system &cs) {
 
                             /* draw random element at which the SSP is evaluated */
 
@@ -420,11 +417,11 @@ namespace nil {
                             accumulation_vector<typename CurveType::g1_type> encoded_IC_query(std::move(encoded_IC_base),
                                                                                    std::move(encoded_IC_values));
 
-                            verification_key<CurveType> vk =
-                                verification_key<CurveType>(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
+                            verification_key vk =
+                                verification_key(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
 
-                            constraint_system<CurveType> cs_copy = cs;
-                            proving_key<CurveType> pk = proving_key<CurveType>(std::move(V_g1_query),
+                            constraint_system cs_copy = cs;
+                            proving_key pk = proving_key(std::move(V_g1_query),
                                                                                                  std::move(alpha_V_g1_query),
                                                                                                  std::move(H_g1_query),
                                                                                                  std::move(V_g2_query),
@@ -433,7 +430,7 @@ namespace nil {
                             pk.print_size();
                             vk.print_size();
 
-                            return keypair<CurveType>(std::move(pk), std::move(vk));
+                            return keypair(std::move(pk), std::move(vk));
                         }
 
                         /**
@@ -444,9 +441,9 @@ namespace nil {
                          *               ``there exists Y such that CS(X,Y)=0''.
                          * Above, CS is the USCS constraint system that was given as input to the generator algorithm.
                          */
-                        static proof<CurveType> prover(const proving_key<CurveType> &pk,
-                                                       const primary_input<CurveType> &primary_input,
-                                                       const auxiliary_input<CurveType> &auxiliary_input) {
+                        static proof prover(const proving_key &pk,
+                                                       const primary_input &primary_input,
+                                                       const auxiliary_input &auxiliary_input) {
 
                             const typename CurveType::scalar_field_type d = random_element<typename CurveType::scalar_field_type>();
 
@@ -501,19 +498,18 @@ namespace nil {
                                            ssp_wit.coefficients_for_Vs.begin(),
                                            ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                            proof<CurveType> proof = proof<CurveType>(std::move(V_g1), std::move(alpha_V_g1),
-                                                                                        std::move(H_g1), std::move(V_g2));
+                            proof prf = proof(std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));
 
-                            return proof;
+                            return prf;
                         }
 
                         /**
                          * Convert a (non-processed) verification key into a processed verification key.
                          */
-                        static processed_verification_key<CurveType>
-                            verifier_process_vk(const verification_key<CurveType> &vk) {
+                        static processed_verification_key
+                            verifier_process_vk(const verification_key &vk) {
                             
-                            processed_verification_key<CurveType> pvk;
+                            processed_verification_key pvk;
 
                             pvk.pp_G1_one_precomp = CurveType::precompute_g1(typename CurveType::g1_type::one());
                             pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::one());
@@ -534,9 +530,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool online_verifier_weak_IC(const processed_verification_key<CurveType> &pvk,
-                                                            const primary_input<CurveType> &primary_input,
-                                                            const proof<CurveType> &proof) {
+                        static bool online_verifier_weak_IC(const processed_verification_key &pvk,
+                                                            const primary_input &primary_input,
+                                                            const proof &proof) {
 
                             assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
@@ -557,6 +553,7 @@ namespace nil {
                             algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                             algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
                             typename CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inversed());
+                            
                             if (V != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -566,6 +563,7 @@ namespace nil {
                             algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
                             typename CurveType::gt_type SSP =
                                 final_exponentiation<CurveType>(SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
+
                             if (SSP != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -575,6 +573,7 @@ namespace nil {
                             algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
                             algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
                             typename CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inversed());
+
                             if (alpha_V != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -587,12 +586,12 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool verifier_weak_IC(const verification_key<CurveType> &vk,
-                                                     const primary_input<CurveType> &primary_input,
-                                                     const proof<CurveType> &proof) {
+                        static bool verifier_weak_IC(const verification_key &vk,
+                                                     const primary_input &primary_input,
+                                                     const proof &proof) {
 
-                            processed_verification_key<CurveType> pvk = verifier_process_vk<CurveType>(vk);
-                            bool result = online_verifier_weak_IC<CurveType>(pvk, primary_input, proof);
+                            processed_verification_key pvk = verifier_process_vk(vk);
+                            bool result = online_verifier_weak_IC(pvk, primary_input, proof);
                             return result;
                         }
 
@@ -601,9 +600,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool online_verifier_strong_IC(const processed_verification_key<CurveType> &pvk,
-                                                              const primary_input<CurveType> &primary_input,
-                                                              const proof<CurveType> &proof) {
+                        static bool online_verifier_strong_IC(const processed_verification_key &pvk,
+                                                              const primary_input &primary_input,
+                                                              const proof &proof) {
 
                             bool result = true;
 
@@ -621,12 +620,12 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool verifier_strong_IC(const verification_key<CurveType> &vk,
-                                                       const primary_input<CurveType> &primary_input,
-                                                       const proof<CurveType> &proof) {
+                        static bool verifier_strong_IC(const verification_key &vk,
+                                                       const primary_input &primary_input,
+                                                       const proof &proof) {
 
-                            processed_verification_key<CurveType> pvk = verifier_process_vk<CurveType>(vk);
-                            bool result = online_verifier_strong_IC<CurveType>(pvk, primary_input, proof);
+                            processed_verification_key pvk = verifier_process_vk(vk);
+                            bool result = online_verifier_strong_IC(pvk, primary_input, proof);
                             return result;
                         }
 

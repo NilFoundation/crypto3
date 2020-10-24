@@ -29,8 +29,7 @@
 #ifndef CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
 #include "r1cs_examples.hpp"
 

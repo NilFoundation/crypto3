@@ -83,24 +83,24 @@ namespace nil {
                         struct proving_key {
                             typedef typename CurveType::scalar_field_type FieldType;
 
-                            circuit circuit;
+                            circuit crct;
                             typename uscs_ppzksnark<CurveType>::proving_key_type uscs_pk;
 
                             proving_key() {};
-                            proving_key(const proving_key<CurveType> &other) = default;
-                            proving_key(proving_key<CurveType> &&other) = default;
-                            proving_key(const circuit &circuit,
+                            proving_key(const proving_key &other) = default;
+                            proving_key(proving_key &&other) = default;
+                            proving_key(const circuit &crct,
                                                        typename const uscs_ppzksnark<CurveType>::proving_key_type &uscs_pk) :
-                                circuit(circuit),
+                                circuit(crct),
                                 uscs_pk(uscs_pk) {
                             }
-                            proving_key(circuit &&circuit,
+                            proving_key(circuit &&crct,
                                                        typename uscs_ppzksnark<CurveType>::proving_key_type &&uscs_pk) :
-                                circuit(std::move(circuit)),
+                                crct(std::move(crct)),
                                 uscs_pk(std::move(uscs_pk)) {
                             }
 
-                            proving_key<CurveType> &operator=(const proving_key<CurveType> &other) = default;
+                            proving_key &operator=(const proving_key &other) = default;
 
                             std::size_t G1_size() const {
                                 return uscs_pk.G1_size();
@@ -122,8 +122,8 @@ namespace nil {
                                 return uscs_pk.size_in_bits();
                             }
 
-                            bool operator==(const proving_key<CurveType> &other) const {
-                                return (this->circuit == other.circuit && this->uscs_pk == other.uscs_pk);
+                            bool operator==(const proving_key &other) const {
+                                return (this->crct == other.crct && this->uscs_pk == other.uscs_pk);
                             }
                         };
 
@@ -151,19 +151,19 @@ namespace nil {
                          * A key pair for the TBCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
                         struct keypair {
-                            proving_key<CurveType> pk;
-                            verification_key<CurveType> vk;
+                            proving_key pk;
+                            verification_key vk;
 
                             keypair() {};
-                            keypair(keypair<CurveType> &&other) = default;
-                            keypair(const proving_key<CurveType> &pk,
-                                                   const verification_key<CurveType> &vk) :
+                            keypair(keypair &&other) = default;
+                            keypair(const proving_key &pk,
+                                                   const verification_key &vk) :
                                 pk(pk),
                                 vk(vk) {
                             }
 
-                            keypair(proving_key<CurveType> &&pk,
-                                                   verification_key<CurveType> &&vk) :
+                            keypair(proving_key &&pk,
+                                                   verification_key &&vk) :
                                 pk(std::move(pk)),
                                 vk(std::move(vk)) {
                             }
@@ -197,13 +197,13 @@ namespace nil {
                          *
                          * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
                          */
-                        static keypair<CurveType> generator(const circuit &circuit) {
+                        static keypair generator(const circuit &circuit) {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const uscs_constraint_system<FieldType> uscs_cs = tbcs_to_uscs_instance_map<FieldType>(circuit);
                             const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair = uscs_ppzksnark<CurveType>::generator(uscs_cs);
 
-                            return keypair<CurveType>(proving_key<CurveType>(circuit, uscs_keypair.pk),
+                            return keypair(proving_key(circuit, uscs_keypair.pk),
                                                                uscs_keypair.vk);
                         }
 
@@ -215,7 +215,7 @@ namespace nil {
                          *               ``there exists Y such that C(X,Y)=0''.
                          * Above, C is the TBCS circuit that was given as input to the generator algorithm.
                          */
-                        static proof<CurveType> prover(const proving_key<CurveType> &pk,
+                        static proof prover(const proving_key &pk,
                                                        const primary_input &primary_input,
                                                        const auxiliary_input &auxiliary_input) {
                             typedef typename CurveType::scalar_field_type FieldType;
@@ -236,9 +236,9 @@ namespace nil {
                         /**
                          * Convert a (non-processed) verification key into a processed verification key.
                          */
-                        static processed_verification_key<CurveType>
-                            verifier_process_vk(const verification_key<CurveType> &vk) {
-                            const processed_verification_key<CurveType> pvk =
+                        static processed_verification_key
+                            verifier_process_vk(const verification_key &vk) {
+                            const processed_verification_key pvk =
                                 uscs_ppzksnark<CurveType>::verifier_process_vk(vk);
 
                             return pvk;
@@ -249,14 +249,14 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool verifier_weak_IC(const verification_key<CurveType> &vk,
+                        static bool verifier_weak_IC(const verification_key &vk,
                                                      const primary_input &primary_input,
-                                                     const proof<CurveType> &proof) {
+                                                     const proof &proof) {
                             typedef typename CurveType::scalar_field_type FieldType;
                             const uscs_primary_input<FieldType> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                            const processed_verification_key<CurveType> pvk =
-                                verifier_process_vk<CurveType>(vk);
+                            const processed_verification_key pvk =
+                                verifier_process_vk(vk);
                             const bool bit = uscs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, uscs_input, proof);
 
                             return bit;
@@ -267,12 +267,12 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool verifier_strong_IC(const verification_key<CurveType> &vk,
+                        static bool verifier_strong_IC(const verification_key &vk,
                                                        const primary_input &primary_input,
-                                                       const proof<CurveType> &proof) {
+                                                       const proof &proof) {
                             typedef typename CurveType::scalar_field_type FieldType;
-                            const processed_verification_key<CurveType> pvk =
-                                verifier_process_vk<CurveType>(vk);
+                            const processed_verification_key pvk =
+                                verifier_process_vk(vk);
                             const uscs_primary_input<FieldType> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
                             const bool bit = uscs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, uscs_input, proof);
@@ -285,9 +285,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool online_verifier_weak_IC(const processed_verification_key<CurveType> &pvk,
+                        static bool online_verifier_weak_IC(const processed_verification_key &pvk,
                                                             const primary_input &primary_input,
-                                                            const proof<CurveType> &proof) {
+                                                            const proof &proof) {
                             typedef typename CurveType::scalar_field_type FieldType;
                             const uscs_primary_input<FieldType> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
@@ -301,9 +301,9 @@ namespace nil {
                          * (1) accepts a processed verification key, and
                          * (2) has strong input consistency.
                          */
-                        static bool online_verifier_strong_IC(const processed_verification_key<CurveType> &pvk,
+                        static bool online_verifier_strong_IC(const processed_verification_key &pvk,
                                                               const primary_input &primary_input,
-                                                              const proof<CurveType> &proof) {
+                                                              const proof &proof) {
                             typedef typename CurveType::scalar_field_type FieldType;
                             const uscs_primary_input<FieldType> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);

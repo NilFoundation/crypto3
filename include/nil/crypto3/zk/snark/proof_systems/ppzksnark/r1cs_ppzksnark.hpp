@@ -38,9 +38,9 @@ namespace nil {
                     using policy_type = detail::r1cs_ppzksnark_basic_policy<CurveType>;
                 public:
 
-                    using circuit = typename policy_type::circuit;
-                    using primary_input = typename policy_type::primary_input;
-                    using auxiliary_input = typename policy_type::auxiliary_input;
+                    using constraint_system_type = typename policy_type::constraint_system;
+                    using primary_input_type = typename policy_type::primary_input;
+                    using auxiliary_input_type = typename policy_type::auxiliary_input;
                     
                     using proving_key_type = typename policy_type::proving_key;
                     using verification_key_type = typename policy_type::verification_key;

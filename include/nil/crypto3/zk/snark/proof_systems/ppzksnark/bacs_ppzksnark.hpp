@@ -23,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
-#define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
+#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
+#define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -34,14 +34,14 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class tbcs_ppzksnark {
-                    using policy_type = detail::tbcs_ppzksnark_basic_policy<CurveType>;
+                class bacs_ppzksnark {
+                    using policy_type = detail::bacs_ppzksnark_basic_policy<CurveType>;
                 public:
 
-                    using circuit = typename policy_type::circuit;
-                    using primary_input = typename policy_type::primary_input;
-                    using auxiliary_input = typename policy_type::auxiliary_input;
-                    
+                    using circuit_type = typename policy_type::circuit;
+                    using primary_input_type = typename policy_type::primary_input;
+                    using auxiliary_input_type = typename policy_type::auxiliary_input;
+
                     using proving_key_type = typename policy_type::proving_key;
                     using verification_key_type = typename policy_type::verification_key;
                     using processed_verification_key_type = typename policy_type::processed_verification_key;
@@ -66,4 +66,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
+#endif    // CRYPTO3_ZK_BACS_PPZKSNARK_HPP
