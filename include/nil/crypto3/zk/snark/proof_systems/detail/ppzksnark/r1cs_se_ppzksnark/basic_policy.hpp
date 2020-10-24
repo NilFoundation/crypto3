@@ -372,14 +372,14 @@ namespace nil {
                              * it should be the case that Z(t) != 0
                              */
                             const std::shared_ptr<fft::evaluation_domain<typename CurveType::scalar_field_type>> domain =
-                                r1cs_to_sap_get_domain(cs);
+                                r1cs_to_sap::get_domain(cs);
                             typename CurveType::scalar_field_type t;
                             do {
                                 t = random_element<typename CurveType::scalar_field_type>();
                             } while (domain->compute_vanishing_polynomial(t).is_zero());
 
                             sap_instance_evaluation<typename CurveType::scalar_field_type> sap_inst =
-                                r1cs_to_sap_instance_map_with_evaluation(cs, t);
+                                r1cs_to_sap::instance_map_with_evaluation(cs, t);
 
                             std::size_t non_zero_At = 0;
                             for (std::size_t i = 0; i < sap_inst.num_variables() + 1; ++i) {
@@ -523,7 +523,7 @@ namespace nil {
                                                    d2 = random_element<typename CurveType::scalar_field_type>();
 
                             const sap_witness<typename CurveType::scalar_field_type> sap_wit =
-                                r1cs_to_sap_witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2);
+                                r1cs_to_sap::witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call

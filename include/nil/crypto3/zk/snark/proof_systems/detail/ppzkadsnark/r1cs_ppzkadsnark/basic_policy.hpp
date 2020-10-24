@@ -622,7 +622,7 @@ namespace nil {
                             const CurveType t = random_element<CurveType::scalar_field_type>();
 
                             qap_instance_evaluation<CurveType::scalar_field_type::value_type> qap_inst =
-                                r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);
+                                r1cs_to_qap::instance_map_with_evaluation(cs_copy, t);
 
                             printf("* QAP number of variables: %zu\n", qap_inst.num_variables());
                             printf("* QAP pre degree: %zu\n", cs_copy.constraints.size());
@@ -782,7 +782,7 @@ namespace nil {
                                             d3 = random_element<CurveType::scalar_field_type>(),
                                             dauth = random_element<CurveType::scalar_field_type>();
 
-                            const qap_witness<CurveType::scalar_field_type::value_type> qap_wit = r1cs_to_qap_witness_map(
+                            const qap_witness<CurveType::scalar_field_type::value_type> qap_wit = r1cs_to_qap::witness_map(
                                 pk.constraint_system, primary_input, auxiliary_input, d1 + dauth, d2, d3);
 
 

@@ -367,7 +367,7 @@ namespace nil {
 
                             /* A quadratic arithmetic program evaluated at t. */
                             qap_instance_evaluation<typename CurveType::scalar_field_type> qap =
-                                r1cs_to_qap_instance_map_with_evaluation(r1cs_copy, t);
+                                r1cs_to_qap::instance_map_with_evaluation(r1cs_copy, t);
 
                             std::size_t non_zero_At = 0;
                             std::size_t non_zero_Bt = 0;
@@ -545,7 +545,7 @@ namespace nil {
                                                 const primary_input &pi,
                                                 const auxiliary_input &ai) {
 
-                            const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap_witness_map(
+                            const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap::witness_map(
                                 pk.cs, pi, ai, CurveType::scalar_field_type::value_type::zero(),
                                 CurveType::scalar_field_type::value_type::zero(), CurveType::scalar_field_type::value_type::zero());
 

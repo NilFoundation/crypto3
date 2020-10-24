@@ -58,13 +58,13 @@ void test_ssp(const std::size_t num_constraints, const std::size_t num_inputs, c
 
     const typename FieldType::value_type t = field_random_element<FieldType>(), d = field_random_element<FieldType>();
 
-    ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp_instance_map(example.constraint_system);
+    ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp::instance_map(example.constraint_system);
 
     ssp_instance_evaluation<FieldType> ssp_inst_2 =
-        uscs_to_ssp_instance_map_with_evaluation(example.constraint_system, t);
+        uscs_to_ssp::instance_map_with_evaluation(example.constraint_system, t);
 
     ssp_witness<FieldType> ssp_wit =
-        uscs_to_ssp_witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
+        uscs_to_ssp::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
 
     BOOST_CHECK(ssp_inst_1.is_satisfied(ssp_wit));
     BOOST_CHECK(ssp_inst_2.is_satisfied(ssp_wit));

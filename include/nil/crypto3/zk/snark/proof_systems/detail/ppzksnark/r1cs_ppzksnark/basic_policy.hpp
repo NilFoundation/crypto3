@@ -374,7 +374,7 @@ namespace nil {
                             const typename CurveType::scalar_field_type t = random_element<typename CurveType::scalar_field_type>();
 
                             qap_instance_evaluation<typename CurveType::scalar_field_type> qap_inst =
-                                r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);
+                                r1cs_to_qap::instance_map_with_evaluation(cs_copy, t);
 
                             std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
                             for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
@@ -534,7 +534,7 @@ namespace nil {
                                                    d3 = random_element<typename CurveType::scalar_field_type>();
 
                             const qap_witness<typename CurveType::scalar_field_type> qap_wit =
-                                r1cs_to_qap_witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
+                                r1cs_to_qap::witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A =
                                 pk.A_query[0] + qap_wit.d1 * pk.A_query[qap_wit.num_variables() + 1];

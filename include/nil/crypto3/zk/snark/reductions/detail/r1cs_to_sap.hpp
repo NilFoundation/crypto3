@@ -71,6 +71,8 @@ namespace nil {
                             return times_two + times_two;
                         }
 
+                    public:
+                        
                         /**
                          * Helper function to find evaluation domain that will be used by the reduction
                          * for a given R1CS instance.
@@ -88,8 +90,6 @@ namespace nil {
                             return fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
                                                                                    2 * cs.num_inputs() + 1);
                         }
-
-                    public:
 
                         /**
                          * Instance map for the R1CS-to-SAP reduction.

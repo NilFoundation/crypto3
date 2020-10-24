@@ -341,7 +341,7 @@ namespace nil {
                             /* perform USCS-to-SSP reduction */
 
                             ssp_instance_evaluation<typename CurveType::scalar_field_type> ssp_inst =
-                                uscs_to_ssp_instance_map_with_evaluation(cs, t);
+                                uscs_to_ssp::instance_map_with_evaluation(cs, t);
 
                             /* construct various tables of typename FieldType::value_type elements */
 
@@ -448,7 +448,7 @@ namespace nil {
                             const typename CurveType::scalar_field_type d = random_element<typename CurveType::scalar_field_type>();
 
                             const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
-                                uscs_to_ssp_witness_map(pk.constraint_system, primary_input, auxiliary_input, d);
+                                uscs_to_ssp::witness_map(pk.constraint_system, primary_input, auxiliary_input, d);
 
                             /* sanity checks */
                             assert(pk.constraint_system.is_satisfied(primary_input, auxiliary_input));
