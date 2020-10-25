@@ -315,7 +315,8 @@ namespace nil {
                         auto it1 = this->terms.begin();
                         auto it2 = other.terms.begin();
 
-                        /* invariant: it1 and it2 always point to unprocessed items in the corresponding linear combinations
+                        /* invariant: it1 and it2 always point to unprocessed items in the corresponding linear
+                         * combinations
                          */
                         while (it1 != this->terms.end() && it2 != other.terms.end()) {
                             if (it1->index < it2->index) {

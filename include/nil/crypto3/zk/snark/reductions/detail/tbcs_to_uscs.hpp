@@ -167,8 +167,8 @@ namespace nil {
 
                             for (auto &g : circuit.gates) {
                                 if (g.is_circuit_output) {
-                                    /* require that output + 1 \in {-1,1}, this together with output binary (above) enforces
-                                     * output = 0 */
+                                    /* require that output + 1 \in {-1,1}, this together with output binary (above)
+                                     * enforces output = 0 */
                                     result.add_constraint(variable<FieldType>(g.output) + 1);
                                 }
                             }
@@ -179,20 +179,22 @@ namespace nil {
                         /**
                          * Witness map for the TBCS-to-USCS reduction.
                          */
-                        static uscs_variable_assignment<FieldType> witness_map(const tbcs_circuit &circuit,
-                                                                        const tbcs_primary_input &primary_input,
-                                                                        const tbcs_auxiliary_input &auxiliary_input) {
+                        static uscs_variable_assignment<FieldType>
+                            witness_map(const tbcs_circuit &circuit,
+                                        const tbcs_primary_input &primary_input,
+                                        const tbcs_auxiliary_input &auxiliary_input) {
 
-                            const tbcs_variable_assignment all_wires = circuit.get_all_wires(primary_input, auxiliary_input);
+                            const tbcs_variable_assignment all_wires =
+                                circuit.get_all_wires(primary_input, auxiliary_input);
                             const uscs_variable_assignment<FieldType> result =
                                 algebra::convert_bit_vector_to_field_element_vector<FieldType>(all_wires);
                             return result;
                         }
                     };
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_TBCS_TO_USCS_BASIC_POLICY_HPP

@@ -58,8 +58,8 @@ namespace nil {
                     blueprint_variable_vector<FieldType> M;
                     blueprint_variable_vector<FieldType> packed_W;
                     sha256_message_schedule_component(blueprint<FieldType> &pb,
-                                                   const blueprint_variable_vector<FieldType> &M,
-                                                   const blueprint_variable_vector<FieldType> &packed_W);
+                                                      const blueprint_variable_vector<FieldType> &M,
+                                                      const blueprint_variable_vector<FieldType> &packed_W);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -101,18 +101,18 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> new_e;
 
                     sha256_round_function_component(blueprint<FieldType> &pb,
-                                                 const blueprint_linear_combination_vector<FieldType> &a,
-                                                 const blueprint_linear_combination_vector<FieldType> &b,
-                                                 const blueprint_linear_combination_vector<FieldType> &c,
-                                                 const blueprint_linear_combination_vector<FieldType> &d,
-                                                 const blueprint_linear_combination_vector<FieldType> &e,
-                                                 const blueprint_linear_combination_vector<FieldType> &f,
-                                                 const blueprint_linear_combination_vector<FieldType> &g,
-                                                 const blueprint_linear_combination_vector<FieldType> &h,
-                                                 const variable<FieldType> &W,
-                                                 const long &K,
-                                                 const blueprint_linear_combination_vector<FieldType> &new_a,
-                                                 const blueprint_linear_combination_vector<FieldType> &new_e);
+                                                    const blueprint_linear_combination_vector<FieldType> &a,
+                                                    const blueprint_linear_combination_vector<FieldType> &b,
+                                                    const blueprint_linear_combination_vector<FieldType> &c,
+                                                    const blueprint_linear_combination_vector<FieldType> &d,
+                                                    const blueprint_linear_combination_vector<FieldType> &e,
+                                                    const blueprint_linear_combination_vector<FieldType> &f,
+                                                    const blueprint_linear_combination_vector<FieldType> &g,
+                                                    const blueprint_linear_combination_vector<FieldType> &h,
+                                                    const variable<FieldType> &W,
+                                                    const long &K,
+                                                    const blueprint_linear_combination_vector<FieldType> &new_a,
+                                                    const blueprint_linear_combination_vector<FieldType> &new_e);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -153,7 +153,8 @@ namespace nil {
                     pack_W.resize(16);
                     for (std::size_t i = 0; i < 16; ++i) {
                         W_bits[i] =
-                            blueprint_variable_vector<FieldType>(M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits, M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
+                            blueprint_variable_vector<FieldType>(M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits,
+                                                                 M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
                         pack_W[i].reset(new packing_component<FieldType>(pb, W_bits[i], packed_W[i]));
                     }
 
@@ -183,8 +184,8 @@ namespace nil {
                         W_bits[i].allocate(pb, hashes::sha2<256>::word_bits);
 
                         /* and finally reduce this into packed and bit representations */
-                        mod_reduce_W[i].reset(
-                            new lastbits_component<FieldType>(pb, unreduced_W[i], hashes::sha2<256>::word_bits + 2, packed_W[i], W_bits[i]));
+                        mod_reduce_W[i].reset(new lastbits_component<FieldType>(
+                            pb, unreduced_W[i], hashes::sha2<256>::word_bits + 2, packed_W[i], W_bits[i]));
                     }
                 }
 
@@ -267,10 +268,10 @@ namespace nil {
                     packed_new_a.allocate(pb);
                     packed_new_e.allocate(pb);
 
-                    mod_reduce_new_a.reset(
-                        new lastbits_component<FieldType>(pb, unreduced_new_a, hashes::sha2<256>::word_bits + 3, packed_new_a, new_a));
-                    mod_reduce_new_e.reset(
-                        new lastbits_component<FieldType>(pb, unreduced_new_e, hashes::sha2<256>::word_bits + 3, packed_new_e, new_e));
+                    mod_reduce_new_a.reset(new lastbits_component<FieldType>(
+                        pb, unreduced_new_a, hashes::sha2<256>::word_bits + 3, packed_new_a, new_a));
+                    mod_reduce_new_e.reset(new lastbits_component<FieldType>(
+                        pb, unreduced_new_e, hashes::sha2<256>::word_bits + 3, packed_new_e, new_e));
                 }
 
                 template<typename FieldType>
@@ -306,11 +307,11 @@ namespace nil {
                     pack_h->generate_r1cs_witness_from_bits();
 
                     this->pb.val(unreduced_new_a) = this->pb.val(packed_h) + this->pb.val(sigma1) +
-                                                    this->pb.val(choice) + typename FieldType::value_type(K) + this->pb.val(W) +
-                                                    this->pb.val(sigma0) + this->pb.val(majority);
+                                                    this->pb.val(choice) + typename FieldType::value_type(K) +
+                                                    this->pb.val(W) + this->pb.val(sigma0) + this->pb.val(majority);
                     this->pb.val(unreduced_new_e) = this->pb.val(packed_d) + this->pb.val(packed_h) +
-                                                    this->pb.val(sigma1) + this->pb.val(choice) + typename FieldType::value_type(K) +
-                                                    this->pb.val(W);
+                                                    this->pb.val(sigma1) + this->pb.val(choice) +
+                                                    typename FieldType::value_type(K) + this->pb.val(W);
 
                     mod_reduce_new_a->generate_r1cs_witness();
                     mod_reduce_new_e->generate_r1cs_witness();

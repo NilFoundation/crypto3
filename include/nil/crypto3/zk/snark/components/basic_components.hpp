@@ -39,7 +39,7 @@ namespace nil {
                 /* forces lc to take value 0 or 1 by adding constraint lc * (1-lc) = 0 */
                 template<typename FieldType>
                 void generate_boolean_r1cs_constraint(blueprint<FieldType> &pb,
-                                                      const blueprint_linear_combination<FieldType> &lc){
+                                                      const blueprint_linear_combination<FieldType> &lc) {
                     pb.add_r1cs_constraint(r1cs_constraint<FieldType>(lc, 1 - lc, 0));
                 }
 
@@ -738,7 +738,6 @@ namespace nil {
                     compute_result->generate_r1cs_witness();
                 }
 
-                
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

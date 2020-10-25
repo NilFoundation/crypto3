@@ -71,28 +71,29 @@ namespace nil {
                                                   const G1_precomputation<CurveType> &prec_P,
                                                   const precompute_G2_component_coeffs<CurveType> &c,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RR_at_P) :
-                                                  component<field_type>(pb), prec_P(prec_P), 
-                                                  c(c), g_RR_at_P(g_RR_at_P) 
-                    {
+                        component<field_type>(pb),
+                        prec_P(prec_P), c(c), g_RR_at_P(g_RR_at_P) {
 
                         gamma_twist.reset(new Fqe_variable<CurveType>(c.gamma->mul_by_X()));
                         // prec_P.PX * c.gamma_twist = c.gamma_X - c.old_RY - g_RR_at_P_c1
                         if (gamma_twist->is_constant()) {
                             gamma_twist->evaluate();
                             const fqe_type gamma_twist_const = gamma_twist->get_element();
-                            g_RR_at_P_c1.reset(
-                                new Fqe_variable<CurveType>(Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) +
-                                                      *(c.gamma_X) + *(c.RY) * (-field_type::value_type::zero())));
+                            g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(
+                                Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
+                                *(c.RY) * (-field_type::value_type::zero())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(pb);
                             const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
-                            g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                                     *(c.RY) * (-field_type::value_type::zero())));
+                            g_RR_at_P_c1.reset(
+                                new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
+                                                            *(c.RY) * (-field_type::value_type::zero())));
                         } else {
                             g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
                             compute_g_RR_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                                 pb, *gamma_twist, prec_P.P->X,
-                                *(c.gamma_X) + *(c.RY) * (-field_type::value_type::zero()) + (*g_RR_at_P_c1) * (-field_type::value_type::zero())));
+                                *(c.gamma_X) + *(c.RY) * (-field_type::value_type::zero()) +
+                                    (*g_RR_at_P_c1) * (-field_type::value_type::zero())));
                         }
                         g_RR_at_P.reset(new Fqk_variable<CurveType>(pb, *(prec_P.PY_twist_squared), *g_RR_at_P_c1));
                     }
@@ -154,9 +155,8 @@ namespace nil {
                                                   const precompute_G2_component_coeffs<CurveType> &c,
                                                   const G2_variable<CurveType> &Q,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RQ_at_P) :
-                                                  component<field_type>(pb), invert_Q(invert_Q), 
-                                                  prec_P(prec_P), c(c), Q(Q), g_RQ_at_P(g_RQ_at_P) 
-                    {
+                        component<field_type>(pb),
+                        invert_Q(invert_Q), prec_P(prec_P), c(c), Q(Q), g_RQ_at_P(g_RQ_at_P) {
                         gamma_twist.reset(new Fqe_variable<CurveType>(c.gamma->mul_by_X()));
                         // prec_P.PX * c.gamma_twist = c.gamma_X - prec_Q.QY - g_RQ_at_P_c1
                         if (gamma_twist->is_constant()) {
@@ -164,18 +164,22 @@ namespace nil {
                             const fqe_type gamma_twist_const = gamma_twist->get_element();
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
                                 Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
-                                *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero())));
+                                *(Q.Y) *
+                                    (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(pb);
                             const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
                             g_RQ_at_P_c1.reset(
                                 new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                      *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero())));
+                                                            *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() :
+                                                                                  field_type::value_type::zero())));
                         } else {
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
                             compute_g_RQ_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                                 pb, *gamma_twist, prec_P.P->X,
-                                *(c.gamma_X) + *(Q.Y) * (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero()) +
+                                *(c.gamma_X) +
+                                    *(Q.Y) *
+                                        (!invert_Q ? -field_type::value_type::zero() : field_type::value_type::zero()) +
                                     (*g_RQ_at_P_c1) * (-field_type::value_type::zero())));
                         }
                         g_RQ_at_P.reset(new Fqk_variable<CurveType>(pb, *(prec_P.PY_twist_squared), *g_RQ_at_P_c1));
@@ -232,12 +236,11 @@ namespace nil {
                     Fqk_variable<CurveType> result;
 
                     mnt_miller_loop_component(blueprint<field_type> &pb,
-                                           const G1_precomputation<CurveType> &prec_P,
-                                           const G2_precomputation<CurveType> &prec_Q,
-                                           const Fqk_variable<CurveType> &result) :
-                                           component<field_type>(pb), prec_P(prec_P), 
-                                           prec_Q(prec_Q), result(result) 
-                     {
+                                              const G1_precomputation<CurveType> &prec_P,
+                                              const G2_precomputation<CurveType> &prec_Q,
+                                              const Fqk_variable<CurveType> &result) :
+                        component<field_type>(pb),
+                        prec_P(prec_P), prec_Q(prec_Q), result(result) {
                         const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
@@ -302,7 +305,8 @@ namespace nil {
                                     pb, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q, g_RQ_at_Ps[add_id]));
                                 ++prec_id;
                                 add_muls[add_id].reset(new Fqk_special_mul_component<CurveType>(
-                                    pb, *fs[f_id], *g_RQ_at_Ps[add_id], (f_id + 1 == f_count ? result : *fs[f_id + 1])));
+                                    pb, *fs[f_id], *g_RQ_at_Ps[add_id],
+                                    (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                                 ++f_id;
                                 ++add_id;
                             }
@@ -391,15 +395,13 @@ namespace nil {
                     Fqk_variable<CurveType> result;
 
                     mnt_e_over_e_miller_loop_component(blueprint<field_type> &pb,
-                                                    const G1_precomputation<CurveType> &prec_P1,
-                                                    const G2_precomputation<CurveType> &prec_Q1,
-                                                    const G1_precomputation<CurveType> &prec_P2,
-                                                    const G2_precomputation<CurveType> &prec_Q2,
-                                                    const Fqk_variable<CurveType> &result) :
-                                                    component<field_type>(pb), prec_P1(prec_P1), 
-                                                    prec_Q1(prec_Q1), prec_P2(prec_P2), 
-                                                    prec_Q2(prec_Q2), result(result) 
-                    {
+                                                       const G1_precomputation<CurveType> &prec_P1,
+                                                       const G2_precomputation<CurveType> &prec_Q1,
+                                                       const G1_precomputation<CurveType> &prec_P2,
+                                                       const G2_precomputation<CurveType> &prec_Q2,
+                                                       const Fqk_variable<CurveType> &result) :
+                        component<field_type>(pb),
+                        prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), result(result) {
                         const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
@@ -463,8 +465,8 @@ namespace nil {
 
                             dbl_sqrs[dbl_id].reset(new Fqk_sqr_component<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
                             ++f_id;
-                            dbl_muls1[dbl_id].reset(
-                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
+                            dbl_muls1[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
+                                pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls2[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
                                 pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id], *fs[f_id]));
@@ -473,15 +475,18 @@ namespace nil {
 
                             if (NAF[i] != 0) {
                                 addition_steps1[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    pb, NAF[i] < 0, prec_P1, *prec_Q1.coeffs[prec_id], *prec_Q1.Q, g_RQ_at_P1s[add_id]));
+                                    pb, NAF[i] < 0, prec_P1, *prec_Q1.coeffs[prec_id], *prec_Q1.Q,
+                                    g_RQ_at_P1s[add_id]));
                                 addition_steps2[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    pb, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q, g_RQ_at_P2s[add_id]));
+                                    pb, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q,
+                                    g_RQ_at_P2s[add_id]));
                                 ++prec_id;
-                                add_muls1[add_id].reset(
-                                    new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                add_muls1[add_id].reset(new Fqk_special_mul_component<CurveType>(
+                                    pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                 ++f_id;
                                 add_muls2[add_id].reset(new Fqk_special_mul_component<CurveType>(
-                                    pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P2s[add_id], *fs[f_id]));
+                                    pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P2s[add_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++add_id;
                             }
@@ -556,7 +561,8 @@ namespace nil {
                  * Gadget for verifying a triple Miller loop (where the third is inverted).
                  */
                 template<typename CurveType>
-                class mnt_e_times_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
+                class mnt_e_times_e_over_e_miller_loop_component
+                    : public component<typename CurveType::scalar_field_type> {
                 public:
                     using field_type = typename CurveType::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
@@ -598,18 +604,16 @@ namespace nil {
                     Fqk_variable<CurveType> result;
 
                     mnt_e_times_e_over_e_miller_loop_component(blueprint<field_type> &pb,
-                                                            const G1_precomputation<CurveType> &prec_P1,
-                                                            const G2_precomputation<CurveType> &prec_Q1,
-                                                            const G1_precomputation<CurveType> &prec_P2,
-                                                            const G2_precomputation<CurveType> &prec_Q2,
-                                                            const G1_precomputation<CurveType> &prec_P3,
-                                                            const G2_precomputation<CurveType> &prec_Q3,
-                                                            const Fqk_variable<CurveType> &result) :
-                                                            component<field_type>(pb),
-                                                            prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), 
-                                                            prec_Q2(prec_Q2), prec_P3(prec_P3), prec_Q3(prec_Q3), 
-                                                            result(result) 
-                    {
+                                                               const G1_precomputation<CurveType> &prec_P1,
+                                                               const G2_precomputation<CurveType> &prec_Q1,
+                                                               const G1_precomputation<CurveType> &prec_P2,
+                                                               const G2_precomputation<CurveType> &prec_Q2,
+                                                               const G1_precomputation<CurveType> &prec_P3,
+                                                               const G2_precomputation<CurveType> &prec_Q3,
+                                                               const Fqk_variable<CurveType> &result) :
+                        component<field_type>(pb),
+                        prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), prec_P3(prec_P3),
+                        prec_Q3(prec_Q3), result(result) {
                         const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
@@ -681,11 +685,11 @@ namespace nil {
 
                             dbl_sqrs[dbl_id].reset(new Fqk_sqr_component<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
                             ++f_id;
-                            dbl_muls1[dbl_id].reset(
-                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
+                            dbl_muls1[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
+                                pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                             ++f_id;
-                            dbl_muls2[dbl_id].reset(
-                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
+                            dbl_muls2[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
+                                pb, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls3[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
                                 pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id], *fs[f_id]));
@@ -694,20 +698,24 @@ namespace nil {
 
                             if (NAF[i] != 0) {
                                 addition_steps1[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    pb, NAF[i] < 0, prec_P1, *prec_Q1.coeffs[prec_id], *prec_Q1.Q, g_RQ_at_P1s[add_id]));
+                                    pb, NAF[i] < 0, prec_P1, *prec_Q1.coeffs[prec_id], *prec_Q1.Q,
+                                    g_RQ_at_P1s[add_id]));
                                 addition_steps2[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    pb, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q, g_RQ_at_P2s[add_id]));
+                                    pb, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q,
+                                    g_RQ_at_P2s[add_id]));
                                 addition_steps3[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    pb, NAF[i] < 0, prec_P3, *prec_Q3.coeffs[prec_id], *prec_Q3.Q, g_RQ_at_P3s[add_id]));
+                                    pb, NAF[i] < 0, prec_P3, *prec_Q3.coeffs[prec_id], *prec_Q3.Q,
+                                    g_RQ_at_P3s[add_id]));
                                 ++prec_id;
-                                add_muls1[add_id].reset(
-                                    new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                add_muls1[add_id].reset(new Fqk_special_mul_component<CurveType>(
+                                    pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                 ++f_id;
-                                add_muls2[add_id].reset(
-                                    new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
+                                add_muls2[add_id].reset(new Fqk_special_mul_component<CurveType>(
+                                    pb, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
                                 ++f_id;
                                 add_muls3[add_id].reset(new Fqk_special_mul_component<CurveType>(
-                                    pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P3s[add_id], *fs[f_id]));
+                                    pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P3s[add_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++add_id;
                             }

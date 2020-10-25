@@ -34,10 +34,10 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class bacs_ppzksnark : private detail::bacs_ppzksnark_basic_policy<CurveType>{
+                class bacs_ppzksnark : private detail::bacs_ppzksnark_basic_policy<CurveType> {
                     using policy_type = detail::bacs_ppzksnark_basic_policy<CurveType>;
-                public:
 
+                public:
                     using circuit_type = typename policy_type::circuit;
                     using primary_input_type = typename policy_type::primary_input;
                     using auxiliary_input_type = typename policy_type::auxiliary_input;
@@ -54,11 +54,10 @@ namespace nil {
 
                     using policy_type::verifier_process_vk;
 
-                    using policy_type::verifier_weak_IC;
-                    using policy_type::verifier_strong_IC;
-                    using policy_type::online_verifier_weak_IC;
                     using policy_type::online_verifier_strong_IC;
-                    
+                    using policy_type::online_verifier_weak_IC;
+                    using policy_type::verifier_strong_IC;
+                    using policy_type::verifier_weak_IC;
                 };
 
             }    // namespace snark

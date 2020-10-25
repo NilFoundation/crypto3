@@ -107,7 +107,8 @@ namespace nil {
                     blueprint_variable_vector<FieldType> padded_translation_step_vk_and_outgoing_message_digest;
                     std::vector<blueprint_variable_vector<FieldType>> padded_commitment_and_incoming_messages_digest;
 
-                    std::shared_ptr<set_commitment_variable<FieldType, crh_with_bit_out_component<FieldType>>> commitment;
+                    std::shared_ptr<set_commitment_variable<FieldType, crh_with_bit_out_component<FieldType>>>
+                        commitment;
                     std::vector<set_membership_proof_variable<FieldType, crh_with_bit_out_component<FieldType>>>
                         membership_proofs;
                     std::vector<set_commitment_component<FieldType, crh_with_bit_out_component<FieldType>>>
@@ -176,7 +177,8 @@ namespace nil {
                     void generate_r1cs_constraints();
                     r1cs_constraint_system<FieldType> get_circuit() const;
 
-                    void generate_r1cs_witness(const r1cs_primary_input<typename CurveType::scalar_field_type> translation_step_input,
+                    void generate_r1cs_witness(const r1cs_primary_input<typename CurveType::scalar_field_type>
+                                                   translation_step_input,
                                                const r1cs_ppzksnark_proof<other_curve<CurveType>> &prev_proof);
                     r1cs_primary_input<FieldType> get_primary_input() const;
                     r1cs_auxiliary_input<FieldType> get_auxiliary_input() const;
@@ -196,7 +198,8 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_compliance_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<typename CurveType::scalar_field_type> &primary_input);
+                    const r1cs_pcd_compliance_predicate_primary_input<typename CurveType::scalar_field_type>
+                        &primary_input);
 
                 /**
                  * Obtain the primary input for a translation-step PCD circuit.
@@ -204,7 +207,9 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_translation_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<other_curve<CurveType>::scalar_field_type::value_type &primary_input);
+                    const r1cs_pcd_compliance_predicate_primary_input <
+                            other_curve<CurveType>::scalar_field_type::value_type &
+                        primary_input);
 
                 template<typename CurveType>
                 mp_compliance_step_pcd_circuit_maker<CurveType>::mp_compliance_step_pcd_circuit_maker(
@@ -272,11 +277,11 @@ namespace nil {
                                                         incoming_message_vars[i].end());
                     }
 
-                    compliance_predicate_as_component.reset(
-                        new component_from_r1cs<FieldType>(pb,
-                                                        {outgoing_message_vars, blueprint_variable_vector<FieldType>(1, arity),
-                                                         incoming_messages_concat, local_data, cp_witness},
-                                                        compliance_predicate.constraint_system));
+                    compliance_predicate_as_component.reset(new component_from_r1cs<FieldType>(
+                        pb,
+                        {outgoing_message_vars, blueprint_variable_vector<FieldType>(1, arity),
+                         incoming_messages_concat, local_data, cp_witness},
+                        compliance_predicate.constraint_system));
 
                     /* unpack messages to bits */
                     outgoing_message_bits.allocate(pb, outgoing_msg_size_in_bits);
@@ -356,9 +361,9 @@ namespace nil {
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         const std::size_t input_block_size = commitment_size + incoming_messages_bits[i].size();
-                        hash_incoming_messages.emplace_back(
-                            crh_with_field_out_component<FieldType>(pb, input_block_size, block_for_incoming_messages[i],
-                                                                 commitment_and_incoming_message_digests[i]));
+                        hash_incoming_messages.emplace_back(crh_with_field_out_component<FieldType>(
+                            pb, input_block_size, block_for_incoming_messages[i],
+                            commitment_and_incoming_message_digests[i]));
                     }
 
                     /* allocate useful zero variable */
@@ -384,9 +389,9 @@ namespace nil {
                         commitment_and_incoming_messages_digest_bits[i].allocate(pb, digest_size * field_logsize());
                         unpack_commitment_and_incoming_message_digests.emplace_back(
                             multipacking_component<FieldType>(pb,
-                                                           commitment_and_incoming_messages_digest_bits[i],
-                                                           commitment_and_incoming_message_digests[i],
-                                                           field_logsize()));
+                                                              commitment_and_incoming_messages_digest_bits[i],
+                                                              commitment_and_incoming_message_digests[i],
+                                                              field_logsize()));
 
                         verifier_input.emplace_back(commitment_and_incoming_messages_digest_bits[i]);
                         while (verifier_input[i].size() < padded_verifier_input_size) {
@@ -488,8 +493,8 @@ namespace nil {
                                                                               1 - membership_check_results[i], 0));
                         }
                     }
-                    pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(1, outgoing_message_type, typename FieldType::value_type(compliance_predicate.type)));
+                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        1, outgoing_message_type, typename FieldType::value_type(compliance_predicate.type)));
                 }
 
                 template<typename CurveType>
@@ -558,7 +563,8 @@ namespace nil {
                         }
 
                         this->pb.val(membership_check_results[0]) =
-                            (this->pb.val(common_type).is_zero() ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                            (this->pb.val(common_type).is_zero() ? FieldType::value_type::zero() :
+                                                                   FieldType::value_type::zero());
                         membership_proofs[0].generate_r1cs_witness(vk_membership_proofs[nonzero_type_idx]);
                         membership_checkers[0].generate_r1cs_witness();
 
@@ -568,7 +574,7 @@ namespace nil {
                                 ((i == 0 ? pb.val(common_type) : pb.val(common_type_check_aux[i - 1])) *
                                  (pb.val(common_type) - typename FieldType::value_type(*it)));
                         }
-                        
+
                     } else {
                         for (std::size_t i = 0; i < membership_checkers.size(); ++i) {
                             this->pb.val(membership_check_results[i]) =
@@ -628,7 +634,7 @@ namespace nil {
                         pb, mp_compliance_step_pcd_circuit_maker<other_curve<CurveType>>::input_size_in_bits());
                     unpack_mp_translation_step_pcd_circuit_input.reset(
                         new multipacking_component<FieldType>(pb, unpacked_mp_translation_step_pcd_circuit_input,
-                                                           mp_translation_step_pcd_circuit_input, field_capacity()));
+                                                              mp_translation_step_pcd_circuit_input, field_capacity()));
 
                     /* prepare arguments for the verifier */
                     hardcoded_compliance_step_vk.reset(
@@ -664,9 +670,10 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mp_translation_step_pcd_circuit_maker<
-                    CurveType>::generate_r1cs_witness(const r1cs_primary_input<typename CurveType::scalar_field_type> translation_step_input,
-                                                const r1cs_ppzksnark_proof<other_curve<CurveType>> &prev_proof) {
+                void mp_translation_step_pcd_circuit_maker<CurveType>::generate_r1cs_witness(
+                    const r1cs_primary_input<typename CurveType::scalar_field_type>
+                        translation_step_input,
+                    const r1cs_ppzksnark_proof<other_curve<CurveType>> &prev_proof) {
                     this->pb.clear_values();
                     mp_translation_step_pcd_circuit_input.fill_with_field_elements(pb, translation_step_input);
                     unpack_mp_translation_step_pcd_circuit_input->generate_r1cs_witness_from_packed();
@@ -717,7 +724,8 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_compliance_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<typename CurveType::scalar_field_type> &primary_input) {
+                    const r1cs_pcd_compliance_predicate_primary_input<typename CurveType::scalar_field_type>
+                        &primary_input) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     const r1cs_variable_assignment<FieldType> outgoing_message_as_va =
@@ -735,7 +743,8 @@ namespace nil {
 
                     crh_with_field_out_component<FieldType>::sample_randomness(block.size());
 
-                    const std::vector<typename FieldType::value_type> digest = crh_with_field_out_component<FieldType>::get_hash(block);
+                    const std::vector<typename FieldType::value_type> digest =
+                        crh_with_field_out_component<FieldType>::get_hash(block);
 
                     return digest;
                 }
@@ -743,16 +752,20 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_translation_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<other_curve<CurveType>::scalar_field_type::value_type &primary_input) {
+                    const r1cs_pcd_compliance_predicate_primary_input <
+                            other_curve<CurveType>::scalar_field_type::value_type &
+                        primary_input) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
-                    const std::vector<other_curve<CurveType>::scalar_field_type::value_type mp_compliance_step_pcd_circuit_input =
+                    const std::vector <
+                        other_curve<CurveType>::scalar_field_type::value_type mp_compliance_step_pcd_circuit_input =
                         get_mp_compliance_step_pcd_circuit_input<other_curve<CurveType>>(
                             commitment_to_translation_step_r1cs_vks, primary_input);
                     std::vector<bool> mp_compliance_step_pcd_circuit_input_bits;
-                    for (const other_curve<CurveType>::scalar_field_type::value_type &elt : mp_compliance_step_pcd_circuit_input) {
-                        const std::vector<bool> elt_bits =
-                            algebra::convert_field_element_to_bit_vector<other_curve<CurveType>::scalar_field_type::value_type(elt);
+                    for (const other_curve<CurveType>::scalar_field_type::value_type &elt :
+                         mp_compliance_step_pcd_circuit_input) {
+                        const std::vector<bool> elt_bits = algebra::convert_field_element_to_bit_vector <
+                                                           other_curve<CurveType>::scalar_field_type::value_type(elt);
                         mp_compliance_step_pcd_circuit_input_bits.insert(
                             mp_compliance_step_pcd_circuit_input_bits.end(), elt_bits.begin(), elt_bits.end());
                     }

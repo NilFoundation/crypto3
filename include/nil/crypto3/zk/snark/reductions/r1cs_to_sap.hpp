@@ -57,10 +57,10 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class r1cs_to_sap : private detail::r1cs_to_sap_basic_policy<FieldType>{
+                class r1cs_to_sap : private detail::r1cs_to_sap_basic_policy<FieldType> {
                     using policy_type = typename detail::r1cs_to_sap_basic_policy<FieldType>;
-                public:
 
+                public:
                     using policy_type::get_domain;
 
                     using policy_type::instance_map;

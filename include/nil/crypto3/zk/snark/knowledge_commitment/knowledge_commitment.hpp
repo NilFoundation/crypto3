@@ -156,7 +156,9 @@ namespace nil {
                     }
                 };
 
-                template<typename T1, typename T2, typename Backend,
+                template<typename T1,
+                         typename T2,
+                         typename Backend,
                          boost::multiprecision::expression_template_option ExpressionTemplates>
                 knowledge_commitment<T1, T2>
                     operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &lhs,

@@ -112,7 +112,8 @@ namespace nil {
                         return result;
                     }
 
-                    integer_permutation slice(const std::size_t slice_min_element, const std::size_t slice_max_element) const {
+                    integer_permutation slice(const std::size_t slice_min_element,
+                                              const std::size_t slice_max_element) const {
                         assert(min_element <= slice_min_element && slice_min_element <= slice_max_element &&
                                slice_max_element <= max_element);
                         integer_permutation result(slice_min_element, slice_max_element);

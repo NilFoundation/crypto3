@@ -140,16 +140,17 @@ namespace nil {
                     r1cs_pcd_compliance_predicate() = default;
                     r1cs_pcd_compliance_predicate(r1cs_pcd_compliance_predicate<FieldType> &&other) = default;
                     r1cs_pcd_compliance_predicate(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;
-                    r1cs_pcd_compliance_predicate(std::size_t name,
-                                                  std::size_t type,
-                                                  const r1cs_constraint_system<FieldType> &constraint_system,
-                                                  std::size_t outgoing_message_payload_length,
-                                                  std::size_t max_arity,
-                                                  const std::vector<std::size_t> &incoming_message_payload_lengths,
-                                                  std::size_t local_data_length,
-                                                  std::size_t witness_length,
-                                                  bool relies_on_same_type_inputs,
-                                                  const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
+                    r1cs_pcd_compliance_predicate(
+                        std::size_t name,
+                        std::size_t type,
+                        const r1cs_constraint_system<FieldType> &constraint_system,
+                        std::size_t outgoing_message_payload_length,
+                        std::size_t max_arity,
+                        const std::vector<std::size_t> &incoming_message_payload_lengths,
+                        std::size_t local_data_length,
+                        std::size_t witness_length,
+                        bool relies_on_same_type_inputs,
+                        const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
 
                     r1cs_pcd_compliance_predicate<FieldType> &
                         operator=(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;

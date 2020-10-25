@@ -51,8 +51,7 @@ namespace nil {
                     sparse_vector() = default;
                     sparse_vector(const sparse_vector<T> &other) = default;
                     sparse_vector(sparse_vector<T> &&other) = default;
-                    sparse_vector(std::vector<T> &&v) :
-                        values(std::move(v)), domain_size_(values.size()) {
+                    sparse_vector(std::vector<T> &&v) : values(std::move(v)), domain_size_(values.size()) {
                         indices.resize(domain_size_);
                         std::iota(indices.begin(), indices.end(), 0);
                     }
@@ -168,11 +167,11 @@ namespace nil {
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
                     template<typename InputIterator>
-                    std::pair<T, sparse_vector<T>>
-                        accumulate(InputIterator it_begin, InputIterator it_end, std::size_t offset) const {
+                    std::pair<T, sparse_vector<T>> accumulate(InputIterator it_begin, InputIterator it_end,
+                                                              std::size_t offset) const {
 #ifdef MULTICORE
-                        const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or
-                                                                             // call omp_set_num_threads()
+                        const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
+                                                                             // or call omp_set_num_threads()
 #else
                         const std::size_t chunks = 1;
 #endif
@@ -183,14 +182,14 @@ namespace nil {
 
                         const std::size_t range_len = it_end - it_begin;
                         bool in_block = false;
-                        std::size_t
-                            first_pos = -1,
-                            last_pos =
-                                -1;    // g++ -flto emits unitialized warning, even though in_block guards for such cases.
+                        std::size_t first_pos = -1,
+                                    last_pos = -1;    // g++ -flto emits unitialized warning, even though in_block
+                                                      // guards for such cases.
 
                         for (std::size_t i = 0; i < indices.size(); ++i) {
                             const bool matching_pos = (offset <= indices[i] && indices[i] < offset + range_len);
-                            // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset, w_size);
+                            // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset,
+                            // w_size);
                             bool copy_over;
 
                             if (in_block) {
@@ -210,10 +209,9 @@ namespace nil {
                                             typename std::iterator_traits<InputIterator>::value_type::field_type,
                                             algebra::multi_exp_method_bos_coster>(values.begin() + first_pos,
                                                                                   values.begin() + last_pos + 1,
-                                                                                  it_begin + (indices[first_pos] - offset),
-                                                                                  it_begin + (indices[last_pos] - offset) +
-                                                                                      1,
-                                                                                  chunks)*/;
+                                                                                  it_begin + (indices[first_pos] -
+                                        offset), it_begin + (indices[last_pos] - offset) + 1, chunks)*/
+                                        ;
                                     // uncomment when multiexp
                                     // will be ready
                                 }
@@ -245,14 +243,14 @@ namespace nil {
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks)*/;
+                                    chunks)*/
+                                ;
                             // uncomment when multiexp
                             // will be ready
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);
                     }
-
                 };
 
             }    // namespace snark

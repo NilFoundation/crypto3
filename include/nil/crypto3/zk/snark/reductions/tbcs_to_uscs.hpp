@@ -53,10 +53,10 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class tbcs_to_uscs : private detail::tbcs_to_uscs_basic_policy<FieldType>{
+                class tbcs_to_uscs : private detail::tbcs_to_uscs_basic_policy<FieldType> {
                     using policy_type = typename detail::tbcs_to_uscs_basic_policy<FieldType>;
-                public:
 
+                public:
                     using policy_type::instance_map;
                     using policy_type::witness_map;
                 }

@@ -46,11 +46,11 @@ namespace nil {
                     digest_variable<FieldType> right;
 
                     digest_selector_component(blueprint<FieldType> &pb,
-                                           const std::size_t digest_size,
-                                           const digest_variable<FieldType> &input,
-                                           const blueprint_linear_combination<FieldType> &is_right,
-                                           const digest_variable<FieldType> &left,
-                                           const digest_variable<FieldType> &right) :
+                                              const std::size_t digest_size,
+                                              const digest_variable<FieldType> &input,
+                                              const blueprint_linear_combination<FieldType> &is_right,
+                                              const digest_variable<FieldType> &left,
+                                              const digest_variable<FieldType> &right) :
                         component<FieldType>(pb),
                         digest_size(digest_size), input(input), is_right(is_right), left(left), right(right) {
                     }

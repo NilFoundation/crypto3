@@ -108,12 +108,13 @@ namespace nil {
                     const bool relies_on_same_type_inputs;
                     const std::set<std::size_t> accepted_input_types;
 
-                    compliance_predicate_handler(const BlueprintType &pb,
-                                                 const std::size_t name,
-                                                 const std::size_t type,
-                                                 const std::size_t max_arity,
-                                                 const bool relies_on_same_type_inputs,
-                                                 const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
+                    compliance_predicate_handler(
+                        const BlueprintType &pb,
+                        const std::size_t name,
+                        const std::size_t type,
+                        const std::size_t max_arity,
+                        const bool relies_on_same_type_inputs,
+                        const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
                     virtual void generate_r1cs_constraints() = 0;
                     virtual void generate_r1cs_witness(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
@@ -124,7 +125,8 @@ namespace nil {
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_outgoing_message() const;
                     std::size_t get_arity() const;
-                    std::shared_ptr<r1cs_pcd_message<FieldType>> get_incoming_message(const std::size_t message_idx) const;
+                    std::shared_ptr<r1cs_pcd_message<FieldType>>
+                        get_incoming_message(const std::size_t message_idx) const;
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> get_local_data() const;
                     r1cs_variable_assignment<FieldType> get_witness() const;
                 };
@@ -278,7 +280,8 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename BlueprintType>
-                r1cs_pcd_witness<FieldType> compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
+                r1cs_pcd_witness<FieldType>
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
                     const r1cs_variable_assignment<FieldType> va = pb.full_variable_assignment();
                     // outgoing_message + arity + incoming_messages + local_data
                     const std::size_t witness_pos =

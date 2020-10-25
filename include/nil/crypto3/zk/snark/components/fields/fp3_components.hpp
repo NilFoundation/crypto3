@@ -247,12 +247,12 @@ namespace nil {
 
                         const typename field_type::value_type beta = Fp3T::non_residue;
 
-                        this->pb.add_r1cs_constraint(
-                            r1cs_constraint<field_type>(A.c0 + A.c1 + A.c2,
-                                                       B.c0 + B.c1 + B.c2,
-                                                       result.c1 + result.c2 + result.c0 * beta.inversed() +
-                                                           v0 * (typename field_type::value_type(1) - beta.inversed()) +
-                                                           v4 * (typename field_type::value_type(1) - beta)));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(
+                            A.c0 + A.c1 + A.c2,
+                            B.c0 + B.c1 + B.c2,
+                            result.c1 + result.c2 + result.c0 * beta.inversed() +
+                                v0 * (typename field_type::value_type(1) - beta.inversed()) +
+                                v4 * (typename field_type::value_type(1) - beta)));
                         this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(
                             A.c0 - A.c1 + A.c2,
                             B.c0 - B.c1 + B.c2,
@@ -265,7 +265,8 @@ namespace nil {
                                 result.c0 * (typename field_type::value_type(8) * beta.inversed()) +
                                 v0 * (typename field_type::value_type(1) -
                                       typename field_type::value_type(8) * beta.inversed()) +
-                                v4 * (typename field_type::value_type(16) - typename field_type::value_type(2) * beta)));
+                                v4 *
+                                    (typename field_type::value_type(16) - typename field_type::value_type(2) * beta)));
                     }
 
                     void generate_r1cs_witness() {

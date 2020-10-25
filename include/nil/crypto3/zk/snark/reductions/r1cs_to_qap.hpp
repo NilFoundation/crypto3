@@ -56,10 +56,10 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class r1cs_to_qap : private detail::r1cs_to_qap_basic_policy<FieldType>{
+                class r1cs_to_qap : private detail::r1cs_to_qap_basic_policy<FieldType> {
                     using policy_type = typename detail::r1cs_to_qap_basic_policy<FieldType>;
-                public:
 
+                public:
                     using policy_type::instance_map;
                     using policy_type::instance_map_with_evaluation;
                     using policy_type::witness_map;

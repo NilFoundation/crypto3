@@ -62,7 +62,8 @@ namespace nil {
 
                     block_variable(blueprint<FieldType> &pb, std::size_t block_size);
 
-                    block_variable(blueprint<FieldType> &pb, const std::vector<blueprint_variable_vector<FieldType>> &parts);
+                    block_variable(blueprint<FieldType> &pb,
+                                   const std::vector<blueprint_variable_vector<FieldType>> &parts);
 
                     block_variable(blueprint<FieldType> &pb,
                                    const digest_variable<FieldType> &left,
@@ -117,8 +118,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                block_variable<FieldType>::block_variable(blueprint<FieldType> &pb,
-                                                          const std::vector<blueprint_variable_vector<FieldType>> &parts) :
+                block_variable<FieldType>::block_variable(
+                    blueprint<FieldType> &pb,
+                    const std::vector<blueprint_variable_vector<FieldType>> &parts) :
                     component<FieldType>(pb) {
                     for (auto &part : parts) {
                         bits.insert(bits.end(), part.begin(), part.end());

@@ -55,7 +55,6 @@ namespace nil {
 
                 using namespace nil::crypto3::fft;
 
-
                 template<typename FieldType>
                 struct ssp_witness;
 
@@ -85,20 +84,23 @@ namespace nil {
 
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> V_in_Lagrange_basis;
 
-                    ssp_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &V_in_Lagrange_basis) :
+                    ssp_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &V_in_Lagrange_basis) :
                         num_variables(num_variables),
-                        degree(degree), num_inputs(num_inputs), domain(domain), V_in_Lagrange_basis(V_in_Lagrange_basis) {
+                        degree(degree), num_inputs(num_inputs), domain(domain),
+                        V_in_Lagrange_basis(V_in_Lagrange_basis) {
                     }
 
-                    ssp_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&V_in_Lagrange_basis) :
+                    ssp_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&V_in_Lagrange_basis) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain),
                         V_in_Lagrange_basis(std::move(V_in_Lagrange_basis)) {
@@ -111,12 +113,14 @@ namespace nil {
 
                     bool is_satisfied(const ssp_witness<FieldType> &witness) const {
                         const typename FieldType::value_type t = field_random_element<FieldType>();
-                        std::vector<typename FieldType::value_type> Vt(this->num_variables + 1, FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> Vt(this->num_variables + 1,
+                                                                       FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
                         const typename FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
 
-                        const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
+                        const std::vector<typename FieldType::value_type> u =
+                            this->domain->evaluate_all_lagrange_polynomials(t);
 
                         for (std::size_t i = 0; i < this->num_variables + 1; ++i) {
                             for (auto &el : V_in_Lagrange_basis[i]) {
@@ -240,11 +244,11 @@ namespace nil {
                                                                           witness.coefficients_for_Vs.begin(),
                                                                           witness.coefficients_for_Vs.begin() +
                                                                               this->num_variables);
-                        ans_H = ans_H +
-                                algebra::inner_product<FieldType>(this->Ht.begin(),
-                                                                  this->Ht.begin() + this->degree + 1,
-                                                                  witness.coefficients_for_H.begin(),
-                                                                  witness.coefficients_for_H.begin() + this->degree + 1);
+                        ans_H = ans_H + algebra::inner_product<FieldType>(this->Ht.begin(),
+                                                                          this->Ht.begin() + this->degree + 1,
+                                                                          witness.coefficients_for_H.begin(),
+                                                                          witness.coefficients_for_H.begin() +
+                                                                              this->degree + 1);
 
                         if (ans_V.squared() - typename FieldType::value_type::one() != ans_H * this->Zt) {
                             return false;
@@ -296,7 +300,6 @@ namespace nil {
                     ssp_witness(ssp_witness<FieldType> &&other) = default;
                     ssp_witness &operator=(const ssp_witness<FieldType> &other) = default;
                     ssp_witness &operator=(ssp_witness<FieldType> &&other) = default;
-
                 };
 
             }    // namespace snark

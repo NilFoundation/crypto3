@@ -42,10 +42,10 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class bacs_to_r1cs : private detail::bacs_to_r1cs_basic_policy<FieldType>{
+                class bacs_to_r1cs : private detail::bacs_to_r1cs_basic_policy<FieldType> {
                     using policy_type = typename detail::bacs_to_r1cs_basic_policy<FieldType>;
-                public:
 
+                public:
                     using policy_type::instance_map;
                     using policy_type::witness_map;
                 }

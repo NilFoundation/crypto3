@@ -66,8 +66,8 @@ namespace nil {
                     template<typename FieldType>
                     class r1cs_to_qap_basic_policy {
                         using namespace nil::crypto3::fft;
-                    public:
 
+                    public:
                         /**
                          * Instance map for the R1CS-to-QAP reduction.
                          *
@@ -115,15 +115,14 @@ namespace nil {
                                 }
                             }
 
-                            return qap_instance<FieldType>(domain, cs.num_variables(),
-                                                           domain->m, cs.num_inputs(),
-                                                           std::move(A_in_Lagrange_basis),
-                                                           std::move(B_in_Lagrange_basis),
-                                                           std::move(C_in_Lagrange_basis));
+                            return qap_instance<FieldType>(
+                                domain, cs.num_variables(), domain->m, cs.num_inputs(), std::move(A_in_Lagrange_basis),
+                                std::move(B_in_Lagrange_basis), std::move(C_in_Lagrange_basis));
                         }
 
                         /**
-                         * Instance map for the R1CS-to-QAP reduction followed by evaluation of the resulting QAP instance.
+                         * Instance map for the R1CS-to-QAP reduction followed by evaluation of the resulting QAP
+                         * instance.
                          *
                          * Namely, given a R1CS constraint system cs and a field element t, construct
                          * a QAP instance (evaluated at t) for which:
@@ -151,7 +150,8 @@ namespace nil {
 
                             const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
-                            const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
+                            const std::vector<typename FieldType::value_type> u =
+                                domain->evaluate_all_lagrange_polynomials(t);
                             /**
                              * add and process the constraints
                              *     input_i * 0 = 0
@@ -181,9 +181,8 @@ namespace nil {
                                 ti *= t;
                             }
 
-                            return qap_instance_evaluation<FieldType>(domain, cs.num_variables(),
-                                                                      domain->m, cs.num_inputs(),
-                                                                      t, std::move(At), std::move(Bt),
+                            return qap_instance_evaluation<FieldType>(domain, cs.num_variables(), domain->m,
+                                                                      cs.num_inputs(), t, std::move(At), std::move(Bt),
                                                                       std::move(Ct), std::move(Ht), Zt);
                         }
 
@@ -211,18 +210,19 @@ namespace nil {
                          *  (3) compute evaluations of A,B,C on T = "coset of S"
                          *  (4) compute evaluation of H on T
                          *  (5) compute coefficients of H
-                         *  (6) patch H to account for d1,d2,d3 (i.e., add coefficients of the polynomial (A d2 + B d1 - d3) +
-                         * d1*d2*Z )
+                         *  (6) patch H to account for d1,d2,d3 (i.e., add coefficients of the polynomial (A d2 + B d1 -
+                         * d3) + d1*d2*Z )
                          *
                          * The code below is not as simple as the above high-level description due to
                          * some reshuffling to save space.
                          */
-                        static qap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
-                                                           const r1cs_primary_input<FieldType> &primary_input,
-                                                           const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                           const typename FieldType::value_type &d1,
-                                                           const typename FieldType::value_type &d2,
-                                                           const typename FieldType::value_type &d3) {
+                        static qap_witness<FieldType>
+                            witness_map(const r1cs_constraint_system<FieldType> &cs,
+                                        const r1cs_primary_input<FieldType> &primary_input,
+                                        const r1cs_auxiliary_input<FieldType> &auxiliary_input,
+                                        const typename FieldType::value_type &d1,
+                                        const typename FieldType::value_type &d2,
+                                        const typename FieldType::value_type &d3) {
                             /* sanity check */
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
 
@@ -230,8 +230,8 @@ namespace nil {
                                 make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
-                            full_variable_assignment.insert(
-                                full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
+                            full_variable_assignment.insert(full_variable_assignment.end(), auxiliary_input.begin(),
+                                                            auxiliary_input.end());
 
                             std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()),
                                 aB(domain->m, FieldType::value_type::zero());
@@ -251,8 +251,8 @@ namespace nil {
 
                             domain->iFFT(aB);
 
-                            std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1,
-                                                                                           FieldType::value_type::zero());
+                            std::vector<typename FieldType::value_type> coefficients_for_H(
+                                domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -263,8 +263,9 @@ namespace nil {
                             coefficients_for_H[0] -= d3;
                             domain->add_poly_Z(d1 * d2, coefficients_for_H);
 
-                            /*fft::multiply_by_coset(aA, fields::arithmetic_params<FieldType>::multiplicative_generator);
-                            domain->FFT(aA, fields::arithmetic_params<FieldType>::multiplicative_generator);
+                            /*fft::multiply_by_coset(aA,
+                            fields::arithmetic_params<FieldType>::multiplicative_generator); domain->FFT(aA,
+                            fields::arithmetic_params<FieldType>::multiplicative_generator);
 
                             fft::multiply_by_coset(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);
                             domain->FFT(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);*/
@@ -289,8 +290,9 @@ namespace nil {
 
                             domain->iFFT(aC);
 
-                            /*fft::multiply_by_coset(aC, fields::arithmetic_params<FieldType>::multiplicative_generator);
-                            domain->FFT(aC, fields::arithmetic_params<FieldType>::multiplicative_generator);*/
+                            /*fft::multiply_by_coset(aC,
+                            fields::arithmetic_params<FieldType>::multiplicative_generator); domain->FFT(aC,
+                            fields::arithmetic_params<FieldType>::multiplicative_generator);*/
 
                             // uncomment
                             // when fft ready
@@ -305,7 +307,8 @@ namespace nil {
                             domain->divide_by_Z_on_coset(H_tmp);
 
                             /*domain->iFFT(H_tmp, fields::arithmetic_params<FieldType>::multiplicative_generator);
-                            multiply_by_coset(H_tmp, fields::arithmetic_params<FieldType>::multiplicative_generator.inversed());*/
+                            multiply_by_coset(H_tmp,
+                            fields::arithmetic_params<FieldType>::multiplicative_generator.inversed());*/
                             // uncomment
                             // when fft ready
 
@@ -316,17 +319,14 @@ namespace nil {
                                 coefficients_for_H[i] += H_tmp[i];
                             }
 
-                            return qap_witness<FieldType>(cs.num_variables(), domain->m,
-                                                          cs.num_inputs(), d1, d2, d3,
-                                                          full_variable_assignment,
-                                                          std::move(coefficients_for_H));
+                            return qap_witness<FieldType>(cs.num_variables(), domain->m, cs.num_inputs(), d1, d2, d3,
+                                                          full_variable_assignment, std::move(coefficients_for_H));
                         }
-
                     };
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_R1CS_TO_QAP_BASIC_POLICY_HPP

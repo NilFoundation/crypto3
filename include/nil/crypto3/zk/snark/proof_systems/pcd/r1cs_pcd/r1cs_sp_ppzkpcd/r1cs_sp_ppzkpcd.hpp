@@ -91,7 +91,7 @@ namespace nil {
                     r1cs_sp_ppzkpcd_proving_key(
                         const r1cs_sp_ppzkpcd_compliance_predicate<PCD_ppT> &compliance_predicate,
                         typename r1cs_ppzksnark<A_pp>::proving_key_type &&compliance_step_r1cs_pk,
-                        typename r1cs_ppzksnark<B_pp>::proving_key &_type&translation_step_r1cs_pk,
+                        typename r1cs_ppzksnark<B_pp>::proving_key &_type &translation_step_r1cs_pk,
                         const typename r1cs_ppzksnark<A_pp>::verification_key_type &compliance_step_r1cs_vk,
                         const typename r1cs_ppzksnark<B_pp>::verification_key_type &translation_step_r1cs_vk) :
                         compliance_predicate(compliance_predicate),
@@ -210,8 +210,10 @@ namespace nil {
                                             r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &&vk) :
                         pk(std::move(pk)),
                         vk(std::move(vk)) {};
-                    r1cs_sp_ppzkpcd_keypair(typename r1cs_ppzksnark<A_pp>::keypair_type &&kp_A, typename r1cs_ppzksnark<B_pp>::keypair_type &&kp_B) :
-                        pk(std::move(kp_A.pk), std::move(kp_B.pk)), vk(std::move(kp_A.vk), std::move(kp_B.vk)) {};
+                    r1cs_sp_ppzkpcd_keypair(typename r1cs_ppzksnark<A_pp>::keypair_type &&kp_A,
+                                            typename r1cs_ppzksnark<B_pp>::keypair_type &&kp_B) :
+                        pk(std::move(kp_A.pk), std::move(kp_B.pk)),
+                        vk(std::move(kp_A.vk), std::move(kp_B.vk)) {};
                 };
 
                 /*********************************** Proof ***********************************/
@@ -306,7 +308,8 @@ namespace nil {
 
                     r1cs_sp_ppzkpcd_verification_key<PCD_ppT> result;
                     result.compliance_step_r1cs_vk =
-                        typename r1cs_ppzksnark<typename PCD_ppT::curve_A_pp>::verification_key_type::dummy_verification_key(
+                        typename r1cs_ppzksnark<typename
+                PCD_ppT::curve_A_pp>::verification_key_type::dummy_verification_key(
                             sp_compliance_step_pcd_circuit_maker<curve_A_pp>::input_size_in_elts());
                     result.translation_step_r1cs_vk =
                         typename r1cs_ppzksnark<typename PCD_ppT::curve_B_pp>::verification_key::dummy_verification_key(
@@ -392,9 +395,9 @@ namespace nil {
                     const r1cs_auxiliary_input<FieldT_A> compliance_step_auxiliary_input =
                         compliance_step_pcd_circuit.get_auxiliary_input();
 
-                    const typename r1cs_ppzksnark<curve_A_pp>::proof_type compliance_step_proof = r1cs_ppzksnark<curve_A_pp>::prover(
-                        pk.compliance_step_r1cs_pk, compliance_step_primary_input, compliance_step_auxiliary_input);
-
+                    const typename r1cs_ppzksnark<curve_A_pp>::proof_type compliance_step_proof =
+                        r1cs_ppzksnark<curve_A_pp>::prover(
+                            pk.compliance_step_r1cs_pk, compliance_step_primary_input, compliance_step_auxiliary_input);
 
                     sp_translation_step_pcd_circuit_maker<curve_B_pp> translation_step_pcd_circuit(
                         pk.compliance_step_r1cs_vk);
@@ -407,8 +410,10 @@ namespace nil {
 
                     const r1cs_auxiliary_input<FieldT_B> translation_step_auxiliary_input =
                         translation_step_pcd_circuit.get_auxiliary_input();
-                    const typename r1cs_ppzksnark<curve_B_pp>::proof_type translation_step_proof = r1cs_ppzksnark<curve_B_pp>::prover(
-                        pk.translation_step_r1cs_pk, translation_step_primary_input, translation_step_auxiliary_input);
+                    const typename r1cs_ppzksnark<curve_B_pp>::proof_type translation_step_proof =
+                        r1cs_ppzksnark<curve_B_pp>::prover(pk.translation_step_r1cs_pk,
+                                                           translation_step_primary_input,
+                                                           translation_step_auxiliary_input);
 
                     return translation_step_proof;
                 }

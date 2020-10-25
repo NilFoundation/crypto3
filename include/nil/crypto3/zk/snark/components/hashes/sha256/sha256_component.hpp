@@ -66,10 +66,11 @@ namespace nil {
                     blueprint_variable_vector<FieldType> new_block;
                     digest_variable<FieldType> output;
 
-                    sha256_compression_function_component(blueprint<FieldType> &pb,
-                                                       const blueprint_linear_combination_vector<FieldType> &prev_output,
-                                                       const blueprint_variable_vector<FieldType> &new_block,
-                                                       const digest_variable<FieldType> &output);
+                    sha256_compression_function_component(
+                        blueprint<FieldType> &pb,
+                        const blueprint_linear_combination_vector<FieldType> &prev_output,
+                        const blueprint_variable_vector<FieldType> &new_block,
+                        const digest_variable<FieldType> &output);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -90,13 +91,13 @@ namespace nil {
                     std::shared_ptr<sha256_compression_function_component<FieldType>> f;
 
                     sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
-                                                  const digest_variable<FieldType> &left,
-                                                  const digest_variable<FieldType> &right,
-                                                  const digest_variable<FieldType> &output);
+                                                     const digest_variable<FieldType> &left,
+                                                     const digest_variable<FieldType> &right,
+                                                     const digest_variable<FieldType> &output);
                     sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
-                                                  size_t block_length,
-                                                  const block_variable<FieldType> &input_block,
-                                                  const digest_variable<FieldType> &output);
+                                                     size_t block_length,
+                                                     const block_variable<FieldType> &input_block,
+                                                     const digest_variable<FieldType> &output);
 
                     void generate_r1cs_constraints(bool ensure_output_bitness = true);    // TODO: ignored for now
                     void generate_r1cs_witness();
@@ -179,9 +180,9 @@ namespace nil {
                             unreduced_output[i],
                             hashes::sha2<256>::word_bits + 1,
                             reduced_output[i],
-                            blueprint_variable_vector<FieldType>(output.bits.rbegin() + (7 - i) * hashes::sha2<256>::word_bits,
-                                                         output.bits.rbegin() +
-                                                             (8 - i) * hashes::sha2<256>::word_bits)));
+                            blueprint_variable_vector<FieldType>(
+                                output.bits.rbegin() + (7 - i) * hashes::sha2<256>::word_bits,
+                                output.bits.rbegin() + (8 - i) * hashes::sha2<256>::word_bits)));
                     }
                 }
 

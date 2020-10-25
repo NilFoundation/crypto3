@@ -59,7 +59,7 @@ namespace nil {
 
                 template<typename FieldType>
                 struct qap_instance_evaluation;
-                
+
                 /*************************  INSTATNCE  ***********************************/
 
                 /**
@@ -289,7 +289,8 @@ namespace nil {
                                 algebra::inner_product<FieldType>(this->Ht.begin(),
                                                                 this->Ht.begin() + this->degree + 1,
                                                                 witness.coefficients_for_H.begin(),
-                                                                witness.coefficients_for_H.begin() + this->degree + 1);*/
+                                                                witness.coefficients_for_H.begin() + this->degree +
+                        1);*/
 
                         // uncomment
                         // when inner_product ready

@@ -56,10 +56,10 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class uscs_to_ssp : private detail::uscs_to_ssp_basic_policy<FieldType>{
+                class uscs_to_ssp : private detail::uscs_to_ssp_basic_policy<FieldType> {
                     using policy_type = typename detail::uscs_to_ssp_basic_policy<FieldType>;
-                public:
 
+                public:
                     using policy_type::instance_map;
                     using policy_type::instance_map_with_evaluation;
                     using policy_type::witness_map;

@@ -141,7 +141,8 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx+1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_lhs_packet_destination(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
+                std::size_t benes_lhs_packet_destination(size_t dimension, size_t column_idx, size_t row_idx,
+                                                         bool use_top) {
                     const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return (use_top ? row_idx & ~mask : row_idx | mask);
                 }
@@ -161,8 +162,7 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx-1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_rhs_packet_source(size_t dimension, size_t column_idx, size_t row_idx,
-                                               bool use_top) {
+                std::size_t benes_rhs_packet_source(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
                     return benes_lhs_packet_destination(dimension, column_idx - 1, row_idx, use_top); /* by symmetry */
                 }
 
@@ -171,7 +171,8 @@ namespace nil {
                  * return the switch setting that would route its packet using the top
                  * subnetwork.
                  */
-                bool benes_get_switch_setting_from_subnetwork(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
+                bool benes_get_switch_setting_from_subnetwork(size_t dimension, size_t column_idx, size_t row_idx,
+                                                              bool use_top) {
                     return (row_idx != benes_lhs_packet_destination(dimension, column_idx, row_idx, use_top));
                 }
 

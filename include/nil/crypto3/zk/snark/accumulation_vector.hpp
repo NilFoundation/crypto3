@@ -81,14 +81,13 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    accumulation_vector<T>
-                        accumulate_chunk(InputIterator it_begin, InputIterator it_end, std::size_t offset) const {
+                    accumulation_vector<T> accumulate_chunk(InputIterator it_begin, InputIterator it_end,
+                                                            std::size_t offset) const {
                         std::pair<T, sparse_vector<T>> acc_result =
                             rest.template accumulate<InputIterator>(it_begin, it_end, offset);
                         T new_first = first + acc_result.first;
                         return accumulation_vector<T>(std::move(new_first), std::move(acc_result.second));
                     }
-
                 };
 
             }    // namespace snark

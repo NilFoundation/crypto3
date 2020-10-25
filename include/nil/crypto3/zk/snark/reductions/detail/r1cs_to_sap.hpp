@@ -72,7 +72,6 @@ namespace nil {
                         }
 
                     public:
-                        
                         /**
                          * Helper function to find evaluation domain that will be used by the reduction
                          * for a given R1CS instance.
@@ -88,15 +87,14 @@ namespace nil {
                              * constraints come from.
                              */
                             return fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
-                                                                                   2 * cs.num_inputs() + 1);
+                                                                          2 * cs.num_inputs() + 1);
                         }
 
                         /**
                          * Instance map for the R1CS-to-SAP reduction.
                          */
                         static sap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
-                            const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                                get_domain(cs);
+                            const std::shared_ptr<fft::evaluation_domain<FieldType>> domain = get_domain(cs);
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
@@ -174,8 +172,10 @@ namespace nil {
                             C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::zero();
 
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
-                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
-                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
+                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
+                                    FieldType::value_type::zero();
+                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] +=
+                                    FieldType::value_type::zero();
                                 C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
                                     times_four(FieldType::value_type::zero());
                                 C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] +=
@@ -199,9 +199,9 @@ namespace nil {
                          * Instance map for the R1CS-to-SAP reduction followed by evaluation
                          * of the resulting QAP instance.
                          */
-                        static sap_instance_evaluation<FieldType> 
+                        static sap_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                                     const typename FieldType::value_type &t) {
+                                                         const typename FieldType::value_type &t) {
 
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain = get_domain(cs);
 
@@ -215,20 +215,25 @@ namespace nil {
 
                             const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
-                            const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
+                            const std::vector<typename FieldType::value_type> u =
+                                domain->evaluate_all_lagrange_polynomials(t);
                             /**
                              * add and process all constraints as in instance_map
                              */
                             std::size_t extra_var_offset = cs.num_variables() + 1;
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                                 for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
-                                    At[cs.constraints[i].a.terms[j].index] += u[2 * i] * cs.constraints[i].a.terms[j].coeff;
-                                    At[cs.constraints[i].a.terms[j].index] += u[2 * i + 1] * cs.constraints[i].a.terms[j].coeff;
+                                    At[cs.constraints[i].a.terms[j].index] +=
+                                        u[2 * i] * cs.constraints[i].a.terms[j].coeff;
+                                    At[cs.constraints[i].a.terms[j].index] +=
+                                        u[2 * i + 1] * cs.constraints[i].a.terms[j].coeff;
                                 }
 
                                 for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
-                                    At[cs.constraints[i].b.terms[j].index] += u[2 * i] * cs.constraints[i].b.terms[j].coeff;
-                                    At[cs.constraints[i].b.terms[j].index] -= u[2 * i + 1] * cs.constraints[i].b.terms[j].coeff;
+                                    At[cs.constraints[i].b.terms[j].index] +=
+                                        u[2 * i] * cs.constraints[i].b.terms[j].coeff;
+                                    At[cs.constraints[i].b.terms[j].index] -=
+                                        u[2 * i + 1] * cs.constraints[i].b.terms[j].coeff;
                                 }
 
                                 for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
@@ -303,11 +308,12 @@ namespace nil {
                          * The code below is not as simple as the above high-level description due to
                          * some reshuffling to save space.
                          */
-                        static sap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
-                                                                       const r1cs_primary_input<FieldType> &primary_input,
-                                                                       const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                                       const typename FieldType::value_type &d1,
-                                                                       const typename FieldType::value_type &d2) {
+                        static sap_witness<FieldType>
+                            witness_map(const r1cs_constraint_system<FieldType> &cs,
+                                        const r1cs_primary_input<FieldType> &primary_input,
+                                        const r1cs_auxiliary_input<FieldType> &auxiliary_input,
+                                        const typename FieldType::value_type &d1,
+                                        const typename FieldType::value_type &d2) {
                             /* sanity check */
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
 
@@ -376,8 +382,8 @@ namespace nil {
 
                             domain->iFFT(aA);
 
-                            std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1,
-                                                                                           FieldType::value_type::zero());
+                            std::vector<typename FieldType::value_type> coefficients_for_H(
+                                domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -416,7 +422,8 @@ namespace nil {
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                                 aC[extra_constr_offset + 2 * i - 1] += times_four(full_variable_assignment[i - 1]);
 
-                                aC[extra_constr_offset + 2 * i - 1] += full_variable_assignment[extra_var_offset2 + i - 1];
+                                aC[extra_constr_offset + 2 * i - 1] +=
+                                    full_variable_assignment[extra_var_offset2 + i - 1];
                                 aC[extra_constr_offset + 2 * i] += full_variable_assignment[extra_var_offset2 + i - 1];
                             }
 
@@ -452,12 +459,11 @@ namespace nil {
                                                           full_variable_assignment,
                                                           std::move(coefficients_for_H));
                         }
-
                     };
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_R1CS_TO_SAP_BASIC_POLICY_HPP

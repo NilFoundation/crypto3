@@ -102,7 +102,8 @@ namespace nil {
 
                         G2_checker->generate_r1cs_constraints();
                     }
-                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::proof_type &proof) {
+                    void generate_r1cs_witness(
+                        const typename r1cs_ppzksnark<other_curve<CurveType>>::proof_type &proof) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
@@ -222,7 +223,8 @@ namespace nil {
                     void generate_r1cs_constraints(const bool enforce_bitness) {
                         packer->generate_r1cs_constraints(enforce_bitness);
                     }
-                    void generate_r1cs_witness(const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &vk) {
+                    void generate_r1cs_witness(
+                        const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &vk) {
                         std::vector<other_curve<CurveType>::g1_type> G1_elems;
                         std::vector<other_curve<CurveType>::g2_type> G2_elems;
 

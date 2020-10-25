@@ -48,10 +48,10 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
                     lastbits_component(blueprint<FieldType> &pb,
-                                    const variable<FieldType> &X,
-                                    std::size_t X_bits,
-                                    const variable<FieldType> &result,
-                                    const blueprint_linear_combination_vector<FieldType> &result_bits);
+                                       const variable<FieldType> &X,
+                                       std::size_t X_bits,
+                                       const variable<FieldType> &result,
+                                       const blueprint_linear_combination_vector<FieldType> &result_bits);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -70,11 +70,11 @@ namespace nil {
                     blueprint_linear_combination<FieldType> out;
 
                     XOR3_component(blueprint<FieldType> &pb,
-                                const blueprint_linear_combination<FieldType> &A,
-                                const blueprint_linear_combination<FieldType> &B,
-                                const blueprint_linear_combination<FieldType> &C,
-                                bool assume_C_is_zero,
-                                const blueprint_linear_combination<FieldType> &out);
+                                   const blueprint_linear_combination<FieldType> &A,
+                                   const blueprint_linear_combination<FieldType> &B,
+                                   const blueprint_linear_combination<FieldType> &C,
+                                   bool assume_C_is_zero,
+                                   const blueprint_linear_combination<FieldType> &out);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -93,11 +93,11 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
                     small_sigma_component(blueprint<FieldType> &pb,
-                                       const blueprint_variable_vector<FieldType> &W,
-                                       const variable<FieldType> &result,
-                                       std::size_t rot1,
-                                       std::size_t rot2,
-                                       std::size_t shift);
+                                          const blueprint_variable_vector<FieldType> &W,
+                                          const variable<FieldType> &result,
+                                          std::size_t rot1,
+                                          std::size_t rot2,
+                                          std::size_t shift);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -116,11 +116,11 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
                     big_sigma_component(blueprint<FieldType> &pb,
-                                     const blueprint_linear_combination_vector<FieldType> &W,
-                                     const variable<FieldType> &result,
-                                     std::size_t rot1,
-                                     std::size_t rot2,
-                                     std::size_t rot3);
+                                        const blueprint_linear_combination_vector<FieldType> &W,
+                                        const variable<FieldType> &result,
+                                        std::size_t rot1,
+                                        std::size_t rot2,
+                                        std::size_t rot3);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -140,9 +140,9 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
                     choice_component(blueprint<FieldType> &pb, const blueprint_linear_combination_vector<FieldType> &X,
-                                  const blueprint_linear_combination_vector<FieldType> &Y,
-                                  const blueprint_linear_combination_vector<FieldType> &Z,
-                                  const variable<FieldType> &result);
+                                     const blueprint_linear_combination_vector<FieldType> &Y,
+                                     const blueprint_linear_combination_vector<FieldType> &Z,
+                                     const variable<FieldType> &result);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -162,21 +162,22 @@ namespace nil {
                     variable<FieldType> result;
 
                     majority_component(blueprint<FieldType> &pb,
-                                    const blueprint_linear_combination_vector<FieldType> &X,
-                                    const blueprint_linear_combination_vector<FieldType> &Y,
-                                    const blueprint_linear_combination_vector<FieldType> &Z,
-                                    const variable<FieldType> &result);
+                                       const blueprint_linear_combination_vector<FieldType> &X,
+                                       const blueprint_linear_combination_vector<FieldType> &Y,
+                                       const blueprint_linear_combination_vector<FieldType> &Z,
+                                       const variable<FieldType> &result);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
                 template<typename FieldType>
-                lastbits_component<FieldType>::lastbits_component(blueprint<FieldType> &pb,
-                                                            const variable<FieldType> &X,
-                                                            std::size_t X_bits,
-                                                            const variable<FieldType> &result,
-                                                            const blueprint_linear_combination_vector<FieldType> &result_bits) :
+                lastbits_component<FieldType>::lastbits_component(
+                    blueprint<FieldType> &pb,
+                    const variable<FieldType> &X,
+                    std::size_t X_bits,
+                    const variable<FieldType> &result,
+                    const blueprint_linear_combination_vector<FieldType> &result_bits) :
                     component<FieldType>(pb),
                     X(X), X_bits(X_bits), result(result), result_bits(result_bits) {
                     full_bits = result_bits;
@@ -204,11 +205,11 @@ namespace nil {
 
                 template<typename FieldType>
                 XOR3_component<FieldType>::XOR3_component(blueprint<FieldType> &pb,
-                                                    const blueprint_linear_combination<FieldType> &A,
-                                                    const blueprint_linear_combination<FieldType> &B,
-                                                    const blueprint_linear_combination<FieldType> &C,
-                                                    bool assume_C_is_zero,
-                                                    const blueprint_linear_combination<FieldType> &out) :
+                                                          const blueprint_linear_combination<FieldType> &A,
+                                                          const blueprint_linear_combination<FieldType> &B,
+                                                          const blueprint_linear_combination<FieldType> &C,
+                                                          bool assume_C_is_zero,
+                                                          const blueprint_linear_combination<FieldType> &out) :
                     component<FieldType>(pb),
                     A(A), B(B), C(C), assume_C_is_zero(assume_C_is_zero), out(out) {
                     if (!assume_C_is_zero) {
@@ -233,13 +234,16 @@ namespace nil {
                 template<typename FieldType>
                 void XOR3_component<FieldType>::generate_r1cs_witness() {
                     if (assume_C_is_zero) {
-                        this->pb.lc_val(out) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                               typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                        this->pb.lc_val(out) =
+                            this->pb.lc_val(A) + this->pb.lc_val(B) -
+                            typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
                     } else {
-                        this->pb.val(tmp) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                            typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
-                        this->pb.lc_val(out) = this->pb.val(tmp) + this->pb.lc_val(C) -
-                                               typename FieldType::value_type(0x02) * this->pb.val(tmp) * this->pb.lc_val(C);
+                        this->pb.val(tmp) =
+                            this->pb.lc_val(A) + this->pb.lc_val(B) -
+                            typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                        this->pb.lc_val(out) =
+                            this->pb.val(tmp) + this->pb.lc_val(C) -
+                            typename FieldType::value_type(0x02) * this->pb.val(tmp) * this->pb.lc_val(C);
                     }
                 }
 
@@ -248,11 +252,11 @@ namespace nil {
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
                 small_sigma_component<FieldType>::small_sigma_component(blueprint<FieldType> &pb,
-                                                                  const blueprint_variable_vector<FieldType> &W,
-                                                                  const variable<FieldType> &result,
-                                                                  std::size_t rot1,
-                                                                  std::size_t rot2,
-                                                                  std::size_t shift) :
+                                                                        const blueprint_variable_vector<FieldType> &W,
+                                                                        const variable<FieldType> &result,
+                                                                        std::size_t rot1,
+                                                                        std::size_t rot2,
+                                                                        std::size_t shift) :
                     component<FieldType>(pb),
                     W(W), result(result) {
                     result_bits.allocate(pb, 32);
@@ -260,7 +264,8 @@ namespace nil {
                     for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i].reset(new XOR3_component<FieldType>(
                             pb, SHA256_COMPONENT_ROTR(W, i, rot1), SHA256_COMPONENT_ROTR(W, i, rot2),
-                            (i + shift < 32 ? W[i + shift] : variable<FieldType>(0)), (i + shift >= 32), result_bits[i]));
+                            (i + shift < 32 ? W[i + shift] : variable<FieldType>(0)), (i + shift >= 32),
+                            result_bits[i]));
                     }
                     pack_result.reset(new packing_component<FieldType>(pb, result_bits, result));
                 }
@@ -284,12 +289,13 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                big_sigma_component<FieldType>::big_sigma_component(blueprint<FieldType> &pb,
-                                                              const blueprint_linear_combination_vector<FieldType> &W,
-                                                              const variable<FieldType> &result,
-                                                              std::size_t rot1,
-                                                              std::size_t rot2,
-                                                              std::size_t rot3) :
+                big_sigma_component<FieldType>::big_sigma_component(
+                    blueprint<FieldType> &pb,
+                    const blueprint_linear_combination_vector<FieldType> &W,
+                    const variable<FieldType> &result,
+                    std::size_t rot1,
+                    std::size_t rot2,
+                    std::size_t rot3) :
                     component<FieldType>(pb),
                     W(W), result(result) {
                     result_bits.allocate(pb, 32);
@@ -324,10 +330,10 @@ namespace nil {
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
                 choice_component<FieldType>::choice_component(blueprint<FieldType> &pb,
-                                                        const blueprint_linear_combination_vector<FieldType> &X,
-                                                        const blueprint_linear_combination_vector<FieldType> &Y,
-                                                        const blueprint_linear_combination_vector<FieldType> &Z,
-                                                        const variable<FieldType> &result) :
+                                                              const blueprint_linear_combination_vector<FieldType> &X,
+                                                              const blueprint_linear_combination_vector<FieldType> &Y,
+                                                              const blueprint_linear_combination_vector<FieldType> &Z,
+                                                              const variable<FieldType> &result) :
                     component<FieldType>(pb),
                     X(X), Y(Y), Z(Z), result(result) {
                     result_bits.allocate(pb, 32);
@@ -359,11 +365,12 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                majority_component<FieldType>::majority_component(blueprint<FieldType> &pb,
-                                                            const blueprint_linear_combination_vector<FieldType> &X,
-                                                            const blueprint_linear_combination_vector<FieldType> &Y,
-                                                            const blueprint_linear_combination_vector<FieldType> &Z,
-                                                            const variable<FieldType> &result) :
+                majority_component<FieldType>::majority_component(
+                    blueprint<FieldType> &pb,
+                    const blueprint_linear_combination_vector<FieldType> &X,
+                    const blueprint_linear_combination_vector<FieldType> &Y,
+                    const blueprint_linear_combination_vector<FieldType> &Z,
+                    const variable<FieldType> &result) :
                     component<FieldType>(pb),
                     X(X), Y(Y), Z(Z), result(result) {
                     result_bits.allocate(pb, 32);

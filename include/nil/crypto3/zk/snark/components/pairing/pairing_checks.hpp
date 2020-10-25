@@ -45,7 +45,7 @@ namespace nil {
 
                 template<typename CurveType>
                 struct check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
-                
+
                     using field_type = typename CurveType::scalar_field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
@@ -60,11 +60,11 @@ namespace nil {
                     variable<field_type> result;
 
                     check_e_equals_e_component(blueprint<field_type> &pb,
-                                            const G1_precomputation<CurveType> &lhs_G1,
-                                            const G2_precomputation<CurveType> &lhs_G2,
-                                            const G1_precomputation<CurveType> &rhs_G1,
-                                            const G2_precomputation<CurveType> &rhs_G2,
-                                            const variable<field_type> &result) :
+                                               const G1_precomputation<CurveType> &lhs_G1,
+                                               const G2_precomputation<CurveType> &lhs_G2,
+                                               const G1_precomputation<CurveType> &rhs_G1,
+                                               const G2_precomputation<CurveType> &rhs_G2,
+                                               const variable<field_type> &result) :
                         component<field_type>(pb),
                         lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
                         ratio.reset(new Fqk_variable<CurveType>(pb));
@@ -86,7 +86,7 @@ namespace nil {
 
                 template<typename CurveType>
                 struct check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
-                
+
                     using field_type = typename CurveType::scalar_field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
@@ -103,13 +103,13 @@ namespace nil {
                     variable<field_type> result;
 
                     check_e_equals_ee_component(blueprint<field_type> &pb,
-                                             const G1_precomputation<CurveType> &lhs_G1,
-                                             const G2_precomputation<CurveType> &lhs_G2,
-                                             const G1_precomputation<CurveType> &rhs1_G1,
-                                             const G2_precomputation<CurveType> &rhs1_G2,
-                                             const G1_precomputation<CurveType> &rhs2_G1,
-                                             const G2_precomputation<CurveType> &rhs2_G2,
-                                             const variable<field_type> &result) :
+                                                const G1_precomputation<CurveType> &lhs_G1,
+                                                const G2_precomputation<CurveType> &lhs_G2,
+                                                const G1_precomputation<CurveType> &rhs1_G1,
+                                                const G2_precomputation<CurveType> &rhs1_G2,
+                                                const G1_precomputation<CurveType> &rhs2_G1,
+                                                const G2_precomputation<CurveType> &rhs2_G2,
+                                                const variable<field_type> &result) :
                         component<field_type>(pb),
                         lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
                         rhs2_G2(rhs2_G2), result(result) {

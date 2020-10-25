@@ -36,8 +36,8 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark {
                     using policy_type = detail::r1cs_ppzkadsnark_basic_policy<CurveType>;
-                public:
 
+                public:
                     using snark_pp = typename policy_type::snark_pp;
                     using constraint_system = typename policy_type::constraint_system;
                     using primary_input = typename policy_type::primary_input;
@@ -61,14 +61,13 @@ namespace nil {
                     using proof_type = typename policy_type::proof;
 
                     using policy_type::generator;
+                    using policy_type::online_verifier;
                     using policy_type::prover;
                     using policy_type::verifier;
-                    using policy_type::online_verifier;
 
                     using policy_type::auth_generator;
                     using policy_type::auth_sign;
                     using policy_type::auth_verify;
-                    
                 };
 
             }    // namespace snark

@@ -63,8 +63,8 @@ namespace nil {
                     template<typename FieldType>
                     class uscs_to_ssp_basic_policy {
                         using namespace nil::crypto3::fft;
-                    public:
 
+                    public:
                         /**
                          * Instance map for the USCS-to-SSP reduction.
                          *
@@ -94,7 +94,8 @@ namespace nil {
                         }
 
                         /**
-                         * Instance map for the USCS-to-SSP reduction followed by evaluation of the resulting SSP instance.
+                         * Instance map for the USCS-to-SSP reduction followed by evaluation of the resulting SSP
+                         * instance.
                          *
                          * Namely, given a USCS constraint system cs and a field element t, construct
                          * a SSP instance (evaluated at t) for which:
@@ -107,7 +108,7 @@ namespace nil {
                          */
                         ssp_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
-                                                                     const typename FieldType::value_type &t) {
+                                                         const typename FieldType::value_type &t) {
                             const std::shared_ptr<evaluation_domain<FieldType>> domain =
                                 make_evaluation_domain<FieldType>(cs.num_constraints());
 
@@ -117,7 +118,8 @@ namespace nil {
 
                             const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
-                            const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
+                            const std::vector<typename FieldType::value_type> u =
+                                domain->evaluate_all_lagrange_polynomials(t);
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                                 for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
                                     Vt[cs.constraints[i].terms[j].index] += u[i] * cs.constraints[i].terms[j].coeff;
@@ -132,8 +134,14 @@ namespace nil {
                                 ti *= t;
                             }
 
-                            return ssp_instance_evaluation<FieldType>(
-                                domain, cs.num_variables(), domain->m, cs.num_inputs(), t, std::move(Vt), std::move(Ht), Zt);
+                            return ssp_instance_evaluation<FieldType>(domain,
+                                                                      cs.num_variables(),
+                                                                      domain->m,
+                                                                      cs.num_inputs(),
+                                                                      t,
+                                                                      std::move(Vt),
+                                                                      std::move(Ht),
+                                                                      Zt);
                         }
 
                         /**
@@ -164,9 +172,9 @@ namespace nil {
                          * some reshuffling to save space.
                          */
                         ssp_witness<FieldType> witness_map(const uscs_constraint_system<FieldType> &cs,
-                                                                       const uscs_primary_input<FieldType> &primary_input,
-                                                                       const uscs_auxiliary_input<FieldType> &auxiliary_input,
-                                                                       const typename FieldType::value_type &d) {
+                                                           const uscs_primary_input<FieldType> &primary_input,
+                                                           const uscs_auxiliary_input<FieldType> &auxiliary_input,
+                                                           const typename FieldType::value_type &d) {
                             /* sanity check */
 
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
@@ -189,8 +197,8 @@ namespace nil {
 
                             domain->iFFT(aA);
 
-                            std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1,
-                                                                                           FieldType::value_type::zero());
+                            std::vector<typename FieldType::value_type> coefficients_for_H(
+                                domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -231,12 +239,11 @@ namespace nil {
                                                           full_variable_assignment,
                                                           std::move(coefficients_for_H));
                         }
-
                     };
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_USCS_TO_SSP_BASIC_POLICY_HPP

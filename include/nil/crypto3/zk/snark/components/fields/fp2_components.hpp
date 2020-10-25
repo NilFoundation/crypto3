@@ -176,9 +176,9 @@ namespace nil {
                     variable<field_type> v1;
 
                     Fp2_mul_component(blueprint<field_type> &pb,
-                                   const Fp2_variable<Fp2T> &A,
-                                   const Fp2_variable<Fp2T> &B,
-                                   const Fp2_variable<Fp2T> &result) :
+                                      const Fp2_variable<Fp2T> &A,
+                                      const Fp2_variable<Fp2T> &B,
+                                      const Fp2_variable<Fp2T> &result) :
                         component<field_type>(pb),
                         A(A), B(B), result(result) {
                         v1.allocate(pb);
@@ -205,7 +205,9 @@ namespace nil {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<field_type>(A.c0, B.c0, result.c0 + v1 * (-Fp2T::non_residue)));
                         this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(
-                            A.c0 + A.c1, B.c0 + B.c1, result.c1 + result.c0 + v1 * (field_type::value_type::zero() - Fp2T::non_residue)));
+                            A.c0 + A.c1,
+                            B.c0 + B.c1,
+                            result.c1 + result.c0 + v1 * (field_type::value_type::zero() - Fp2T::non_residue)));
                     }
 
                     void generate_r1cs_witness() {
@@ -232,9 +234,9 @@ namespace nil {
                     Fp2_variable<Fp2T> result;
 
                     Fp2_mul_by_lc_component(blueprint<field_type> &pb,
-                                         const Fp2_variable<Fp2T> &A,
-                                         const blueprint_linear_combination<field_type> &lc,
-                                         const Fp2_variable<Fp2T> &result) :
+                                            const Fp2_variable<Fp2T> &A,
+                                            const blueprint_linear_combination<field_type> &lc,
+                                            const Fp2_variable<Fp2T> &result) :
                         component<field_type>(pb),
                         A(A), lc(lc), result(result) {
                     }
@@ -263,8 +265,8 @@ namespace nil {
                     Fp2_variable<Fp2T> result;
 
                     Fp2_sqr_component(blueprint<field_type> &pb,
-                                   const Fp2_variable<Fp2T> &A,
-                                   const Fp2_variable<Fp2T> &result) :
+                                      const Fp2_variable<Fp2T> &A,
+                                      const Fp2_variable<Fp2T> &result) :
                         component<field_type>(pb),
                         A(A), result(result) {
                     }
@@ -278,7 +280,8 @@ namespace nil {
 
                             Enforced with 2 constraints:
                                 (2*A.c0) * A.c1 = result.c1
-                                (A.c0 + A.c1) * (A.c0 + non_residue * A.c1) = result.c0 + result.c1 * (1 + non_residue)/2
+                                (A.c0 + A.c1) * (A.c0 + non_residue * A.c1) = result.c0 + result.c1 * (1 +
+                           non_residue)/2
 
                             Reference:
                                 "Multiplication and Squaring on Pairing-Friendly Fields"
@@ -288,7 +291,8 @@ namespace nil {
                         this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(
                             A.c0 + A.c1,
                             A.c0 + Fp2T::non_residue * A.c1,
-                            result.c0 + result.c1 * (field_type::value_type::zero() + Fp2T::non_residue) * typename field_type::value_type(0x02).inversed()));
+                            result.c0 + result.c1 * (field_type::value_type::zero() + Fp2T::non_residue) *
+                                            typename field_type::value_type(0x02).inversed()));
                     }
 
                     void generate_r1cs_witness() {

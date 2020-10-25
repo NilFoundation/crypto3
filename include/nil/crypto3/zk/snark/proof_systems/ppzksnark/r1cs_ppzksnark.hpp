@@ -34,14 +34,14 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class r1cs_ppzksnark : private detail::r1cs_ppzksnark_basic_policy<CurveType>{
+                class r1cs_ppzksnark : private detail::r1cs_ppzksnark_basic_policy<CurveType> {
                     using policy_type = detail::r1cs_ppzksnark_basic_policy<CurveType>;
-                public:
 
+                public:
                     using constraint_system_type = typename policy_type::constraint_system;
                     using primary_input_type = typename policy_type::primary_input;
                     using auxiliary_input_type = typename policy_type::auxiliary_input;
-                    
+
                     using proving_key_type = typename policy_type::proving_key;
                     using verification_key_type = typename policy_type::verification_key;
                     using processed_verification_key_type = typename policy_type::processed_verification_key;
@@ -54,13 +54,12 @@ namespace nil {
 
                     using policy_type::verifier_process_vk;
 
-                    using policy_type::verifier_weak_IC;
-                    using policy_type::verifier_strong_IC;
-                    using policy_type::online_verifier_weak_IC;
                     using policy_type::online_verifier_strong_IC;
+                    using policy_type::online_verifier_weak_IC;
+                    using policy_type::verifier_strong_IC;
+                    using policy_type::verifier_weak_IC;
 
                     using policy_type::affine_verifier_weak_IC;
-                    
                 };
 
             }    // namespace snark

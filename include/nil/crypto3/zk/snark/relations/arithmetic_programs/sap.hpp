@@ -85,23 +85,25 @@ namespace nil {
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis;
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
-                    sap_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
+                    sap_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
                         num_variables(num_variables),
-                        degree(degree), num_inputs(num_inputs), domain(domain), A_in_Lagrange_basis(A_in_Lagrange_basis),
-                        C_in_Lagrange_basis(C_in_Lagrange_basis) {
+                        degree(degree), num_inputs(num_inputs), domain(domain),
+                        A_in_Lagrange_basis(A_in_Lagrange_basis), C_in_Lagrange_basis(C_in_Lagrange_basis) {
                     }
 
-                    sap_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
+                    sap_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)),
@@ -124,7 +126,8 @@ namespace nil {
 
                         const typename FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
 
-                        const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
+                        const std::vector<typename FieldType::value_type> u =
+                            this->domain->evaluate_all_lagrange_polynomials(t);
 
                         for (std::size_t i = 0; i < this->num_variables + 1; ++i) {
                             for (auto &el : A_in_Lagrange_basis[i]) {
@@ -156,7 +159,7 @@ namespace nil {
                 };
 
                 /*************************  INSTATNCE  EVALUATION ***********************************/
-                
+
                 /**
                  * A SAP instance evaluation is a SAP instance that is evaluated at a field element t.
                  *
@@ -261,11 +264,11 @@ namespace nil {
                                                                           witness.coefficients_for_ACs.begin(),
                                                                           witness.coefficients_for_ACs.begin() +
                                                                               this->num_variables);
-                        ans_H = ans_H +
-                                algebra::inner_product<FieldType>(this->Ht.begin(),
-                                                                  this->Ht.begin() + this->degree + 1,
-                                                                  witness.coefficients_for_H.begin(),
-                                                                  witness.coefficients_for_H.begin() + this->degree + 1);
+                        ans_H = ans_H + algebra::inner_product<FieldType>(this->Ht.begin(),
+                                                                          this->Ht.begin() + this->degree + 1,
+                                                                          witness.coefficients_for_H.begin(),
+                                                                          witness.coefficients_for_H.begin() +
+                                                                              this->degree + 1);
 
                         if (ans_A * ans_A - ans_C != ans_H * this->Zt) {
                             return false;

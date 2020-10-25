@@ -81,9 +81,9 @@ namespace nil {
                  *       typedef my_Fqk_sqr_component_type Fqk_sqr_component_type;
                  *       typedef my_other_curve_type other_curve_type;
                  *       typedef my_e_over_e_miller_loop_component_type e_over_e_miller_loop_component_type;
-                 *       typedef my_e_times_e_over_e_miller_loop_component_type e_times_e_over_e_miller_loop_component_type;
-                 *       typedef my_final_exp_component_type final_exp_component_type;
-                 *       static const constexpr algebra::bigint<...> &pairing_loop_count = ...;
+                 *       typedef my_e_times_e_over_e_miller_loop_component_type
+                 * e_times_e_over_e_miller_loop_component_type; typedef my_final_exp_component_type
+                 * final_exp_component_type; static const constexpr algebra::bigint<...> &pairing_loop_count = ...;
                  *   };
                  *
                  * Having done the above, my_ec_pp can be used as a template parameter.
@@ -124,7 +124,8 @@ namespace nil {
                 using other_curve = typename pairing_selector<CurveType>::other_curve_type;
 
                 template<typename CurveType>
-                using e_over_e_miller_loop_component = typename pairing_selector<CurveType>::e_over_e_miller_loop_component_type;
+                using e_over_e_miller_loop_component =
+                    typename pairing_selector<CurveType>::e_over_e_miller_loop_component_type;
                 template<typename CurveType>
                 using e_times_e_over_e_miller_loop_component =
                     typename pairing_selector<CurveType>::e_times_e_over_e_miller_loop_component_type;

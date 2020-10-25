@@ -39,7 +39,8 @@ namespace nil {
                 r1cs_ppzkadsnark_prf_key<CurveType> prfGen();
 
                 template<typename CurveType>
-                CurveType::scalar_field_type::value_type prfCompute(const r1cs_ppzkadsnark_prf_key<CurveType> &key, const label_type &label);
+                CurveType::scalar_field_type::value_type prfCompute(const r1cs_ppzkadsnark_prf_key<CurveType> &key,
+                                                                    const label_type &label);
 
             }    // namespace snark
         }        // namespace zk

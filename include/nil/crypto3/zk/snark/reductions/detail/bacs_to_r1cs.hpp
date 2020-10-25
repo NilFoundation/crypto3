@@ -72,19 +72,19 @@ namespace nil {
                         /**
                          * Witness map for the BACS-to-R1CS reduction.
                          */
-                        static r1cs_variable_assignment<FieldType> witness_map(const bacs_circuit<FieldType> &circuit,
-                                                                        const bacs_primary_input<FieldType> &primary_input,
-                                                                        const bacs_auxiliary_input<FieldType> &auxiliary_input) {
+                        static r1cs_variable_assignment<FieldType>
+                            witness_map(const bacs_circuit<FieldType> &circuit,
+                                        const bacs_primary_input<FieldType> &primary_input,
+                                        const bacs_auxiliary_input<FieldType> &auxiliary_input) {
                             const r1cs_variable_assignment<FieldType> result =
                                 circuit.get_all_wires(primary_input, auxiliary_input);
                             return result;
                         }
-
                     };
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP

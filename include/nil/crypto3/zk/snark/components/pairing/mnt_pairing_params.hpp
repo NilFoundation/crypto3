@@ -61,9 +61,9 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class pairing_selector<curves::mnt4<ModulusBits, GeneratorBits>> {
                     using curve_type = typename curves::mnt4<ModulusBits, GeneratorBits>;
+
                 public:
-                    
-                    using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt6
+                    using other_curve_type = typename curve_type::pairing_policy::other_curve;    // mnt6
 
                     using field_type = typename curve_type::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve::pairing_policy::Fqe_type;
@@ -84,7 +84,7 @@ namespace nil {
                         e_times_e_over_e_miller_loop_component_type;
                     typedef mnt4_final_exp_component<curve_type> final_exp_component_type;
 
-                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count = 
+                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count =
                         curve_type::pairing_policy::pairing_loop_count;
                 };
 
@@ -94,9 +94,9 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class pairing_selector<curves::mnt6<ModulusBits, GeneratorBits>> {
                     using curve_type = typename curves::mnt6<ModulusBits, GeneratorBits>;
-                public:
 
-                    using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt4
+                public:
+                    using other_curve_type = typename curve_type::pairing_policy::other_curve;    // mnt4
 
                     using field_type = typename curve_type::pairing_policy::Fp_type;
                     using fqe_type = typename other_curve::pairing_policy::Fqe_type;
@@ -117,7 +117,7 @@ namespace nil {
                         e_times_e_over_e_miller_loop_component_type;
                     typedef mnt6_final_exp_component<curve_type> final_exp_component_type;
 
-                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count = 
+                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count =
                         curve_type::pairing_policy::pairing_loop_count;
                 };
 

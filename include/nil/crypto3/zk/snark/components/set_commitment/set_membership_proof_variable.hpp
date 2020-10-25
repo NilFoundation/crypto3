@@ -49,9 +49,8 @@ namespace nil {
                     const std::size_t tree_depth;
 
                     set_membership_proof_variable(blueprint<FieldType> &pb, const std::size_t max_entries) :
-                                                            component<FieldType>(pb), max_entries(max_entries), 
-                                                            tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) 
-                    {
+                        component<FieldType>(pb), max_entries(max_entries),
+                        tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) {
                         if (tree_depth > 0) {
                             address_bits.allocate(pb, tree_depth);
                             merkle_path.reset(new merkle_authentication_path_variable<FieldType, Hash>(pb, tree_depth));
@@ -68,7 +67,8 @@ namespace nil {
                     }
                     void generate_r1cs_witness(const set_membership_proof &proof) {
                         if (tree_depth > 0) {
-                            address_bits.fill_with_bits_of_field_element(this->pb, typename FieldType::value_type(proof.address));
+                            address_bits.fill_with_bits_of_field_element(this->pb,
+                                                                         typename FieldType::value_type(proof.address));
                             merkle_path->generate_r1cs_witness(proof.address, proof.merkle_path);
                         }
                     }
@@ -91,7 +91,8 @@ namespace nil {
 
                         blueprint<FieldType> pb;
                         const std::size_t max_entries = (1ul << (proof.merkle_path.size()));
-                        set_membership_proof_variable<FieldType, Hash> proof_variable(pb, max_entries, "proof_variable");
+                        set_membership_proof_variable<FieldType, Hash> proof_variable(pb, max_entries,
+                                                                                      "proof_variable");
                         proof_variable.generate_r1cs_witness(proof);
 
                         return pb.full_variable_assignment();

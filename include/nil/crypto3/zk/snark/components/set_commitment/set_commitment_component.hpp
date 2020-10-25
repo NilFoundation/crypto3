@@ -56,16 +56,15 @@ namespace nil {
                     blueprint_linear_combination<FieldType> check_successful;
 
                     set_commitment_component(blueprint<FieldType> &pb,
-                                          const std::size_t max_entries,
-                                          const blueprint_variable_vector<FieldType> &element_bits,
-                                          const set_commitment_variable<FieldType, Hash> &root_digest,
-                                          const set_membership_proof_variable<FieldType, Hash> &proof,
-                                          const blueprint_linear_combination<FieldType> &check_successful) :
-                                          component<FieldType>(pb), 
-                                          tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))), 
-                                          element_bits(element_bits), root_digest(root_digest), proof(proof), 
-                                          check_successful(check_successful) 
-                    {
+                                             const std::size_t max_entries,
+                                             const blueprint_variable_vector<FieldType> &element_bits,
+                                             const set_commitment_variable<FieldType, Hash> &root_digest,
+                                             const set_membership_proof_variable<FieldType, Hash> &proof,
+                                             const blueprint_linear_combination<FieldType> &check_successful) :
+                        component<FieldType>(pb),
+                        tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))),
+                        element_bits(element_bits), root_digest(root_digest), proof(proof),
+                        check_successful(check_successful) {
                         element_block.reset(new block_variable<FieldType>(pb, {element_bits}));
 
                         if (tree_depth == 0) {
@@ -73,13 +72,14 @@ namespace nil {
                         } else {
                             element_digest.reset(new digest_variable<FieldType>(pb, Hash::get_digest_len()));
                             hash_element.reset(new Hash(pb, element_bits.size(), *element_block, *element_digest));
-                            check_membership.reset(new merkle_tree_check_read_component<FieldType, Hash>(pb,
-                                                                                                       tree_depth,
-                                                                                                       proof.address_bits,
-                                                                                                       *element_digest,
-                                                                                                       root_digest,
-                                                                                                       *proof.merkle_path,
-                                                                                                       check_successful));
+                            check_membership.reset(
+                                new merkle_tree_check_read_component<FieldType, Hash>(pb,
+                                                                                      tree_depth,
+                                                                                      proof.address_bits,
+                                                                                      *element_digest,
+                                                                                      root_digest,
+                                                                                      *proof.merkle_path,
+                                                                                      check_successful));
                         }
                     }
 

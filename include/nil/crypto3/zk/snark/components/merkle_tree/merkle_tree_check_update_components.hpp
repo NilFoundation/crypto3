@@ -105,28 +105,34 @@ namespace nil {
                         computed_next_root.reset(new digest_variable<FieldType>(pb, digest_size));
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            block_variable<FieldType> prev_inp(pb, prev_path.left_digests[i], prev_path.right_digests[i]);
+                            block_variable<FieldType> prev_inp(pb, prev_path.left_digests[i],
+                                                               prev_path.right_digests[i]);
                             prev_hasher_inputs.emplace_back(prev_inp);
                             prev_hashers.emplace_back(Hash(pb, 2 * digest_size, prev_inp,
                                                            (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
 
-                            block_variable<FieldType> next_inp(pb, next_path.left_digests[i], next_path.right_digests[i]);
+                            block_variable<FieldType> next_inp(pb, next_path.left_digests[i],
+                                                               next_path.right_digests[i]);
                             next_hasher_inputs.emplace_back(next_inp);
-                            next_hashers.emplace_back(Hash(pb, 2 * digest_size, next_inp,
-                                                           (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
+                            next_hashers.emplace_back(
+                                Hash(pb, 2 * digest_size, next_inp,
+                                     (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                         }
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             prev_propagators.emplace_back(digest_selector_component<FieldType>(
                                 pb, digest_size, i < tree_depth - 1 ? prev_internal_output[i] : prev_leaf_digest,
-                                address_bits[tree_depth - 1 - i], prev_path.left_digests[i], prev_path.right_digests[i]));
+                                address_bits[tree_depth - 1 - i], prev_path.left_digests[i],
+                                prev_path.right_digests[i]));
                             next_propagators.emplace_back(digest_selector_component<FieldType>(
                                 pb, digest_size, i < tree_depth - 1 ? next_internal_output[i] : next_leaf_digest,
-                                address_bits[tree_depth - 1 - i], next_path.left_digests[i], next_path.right_digests[i]));
+                                address_bits[tree_depth - 1 - i], next_path.left_digests[i],
+                                next_path.right_digests[i]));
                         }
 
                         check_next_root.reset(new bit_vector_copy_component<FieldType>(
-                            pb, computed_next_root->bits, next_root_digest.bits, update_successful, FieldType::capacity()));
+                            pb, computed_next_root->bits, next_root_digest.bits, update_successful,
+                            FieldType::capacity()));
                     }
 
                     void generate_r1cs_constraints() {
@@ -134,7 +140,8 @@ namespace nil {
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             prev_hashers[i].generate_r1cs_constraints(
                                 false);    // we check root outside and prev_left/prev_right above
-                            next_hashers[i].generate_r1cs_constraints(true);    // however we must check right side hashes
+                            next_hashers[i].generate_r1cs_constraints(
+                                true);    // however we must check right side hashes
                         }
 
                         /* ensure consistency of internal_left/internal_right with internal_output */
@@ -181,7 +188,8 @@ namespace nil {
                             if (this->pb.val(address_bits[tree_depth - 1 - i]) == FieldType::value_type::zero()) {
                                 next_path.left_digests[i].generate_r1cs_witness(prev_path.left_digests[i].get_digest());
                             } else {
-                                next_path.right_digests[i].generate_r1cs_witness(prev_path.right_digests[i].get_digest());
+                                next_path.right_digests[i].generate_r1cs_witness(
+                                    prev_path.right_digests[i].get_digest());
                             }
 
                             /* propagate previous input */
@@ -204,16 +212,17 @@ namespace nil {
                         /* NB: this includes path constraints */
                         const std::size_t prev_hasher_constraints = tree_depth * Hash::expected_constraints(false);
                         const std::size_t next_hasher_constraints = tree_depth * Hash::expected_constraints(true);
-                        const std::size_t prev_authentication_path_constraints = 2 * tree_depth * Hash::get_digest_len();
+                        const std::size_t prev_authentication_path_constraints =
+                            2 * tree_depth * Hash::get_digest_len();
                         const std::size_t prev_propagator_constraints = tree_depth * Hash::get_digest_len();
                         const std::size_t next_propagator_constraints = tree_depth * Hash::get_digest_len();
                         const std::size_t check_next_root_constraints =
                             3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
                         const std::size_t aux_equality_constraints = tree_depth * Hash::get_digest_len();
 
-                        return (prev_hasher_constraints + next_hasher_constraints + prev_authentication_path_constraints +
-                                prev_propagator_constraints + next_propagator_constraints + check_next_root_constraints +
-                                aux_equality_constraints);
+                        return (prev_hasher_constraints + next_hasher_constraints +
+                                prev_authentication_path_constraints + prev_propagator_constraints +
+                                next_propagator_constraints + check_next_root_constraints + aux_equality_constraints);
                     }
                 };
 

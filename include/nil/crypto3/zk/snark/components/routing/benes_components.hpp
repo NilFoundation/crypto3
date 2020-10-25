@@ -79,11 +79,12 @@ namespace nil {
 
                     const std::size_t packet_size, num_subpackets;
 
-                    benes_routing_component(blueprint<FieldType> &pb,
-                                         const std::size_t num_packets,
-                                         const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
-                                         const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits,
-                                         const std::size_t lines_to_unpack);
+                    benes_routing_component(
+                        blueprint<FieldType> &pb,
+                        const std::size_t num_packets,
+                        const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
+                        const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits,
+                        const std::size_t lines_to_unpack);
 
                     void generate_r1cs_constraints();
 
@@ -126,14 +127,14 @@ namespace nil {
                         pack_inputs.emplace_back(multipacking_component<FieldType>(
                             pb,
                             blueprint_variable_vector<FieldType>(routing_input_bits[packet_idx].begin(),
-                                                         routing_input_bits[packet_idx].end()),
+                                                                 routing_input_bits[packet_idx].end()),
                             routed_packets[0][packet_idx],
                             FieldType::capacity()));
                         if (packet_idx < lines_to_unpack) {
                             unpack_outputs.emplace_back(multipacking_component<FieldType>(
                                 pb,
                                 blueprint_variable_vector<FieldType>(routing_output_bits[packet_idx].begin(),
-                                                             routing_output_bits[packet_idx].end()),
+                                                                     routing_output_bits[packet_idx].end()),
                                 routed_packets[num_columns][packet_idx],
                                 FieldType::capacity()));
                         }
@@ -250,7 +251,8 @@ namespace nil {
                         outbits[packet_idx].allocate(pb, packet_size);
 
                         for (std::size_t bit_idx = 0; bit_idx < packet_size; ++bit_idx) {
-                            pb.val(randbits[packet_idx][bit_idx]) = (rand() % 2) ? FieldType::value_type::zero() : FieldType::value_type::zero();
+                            pb.val(randbits[packet_idx][bit_idx]) =
+                                (rand() % 2) ? FieldType::value_type::zero() : FieldType::value_type::zero();
                         }
                     }
 

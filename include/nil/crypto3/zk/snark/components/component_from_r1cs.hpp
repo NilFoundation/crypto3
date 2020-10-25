@@ -47,11 +47,10 @@ namespace nil {
 
                 public:
                     component_from_r1cs(blueprint<FieldType> &pb,
-                                     const std::vector<blueprint_variable_vector<FieldType>> &vars,
-                                     const r1cs_constraint_system<FieldType> &cs) :
-                                                            component<FieldType>(pb),
-                                                            vars(vars), cs(cs) 
-                    {
+                                        const std::vector<blueprint_variable_vector<FieldType>> &vars,
+                                        const r1cs_constraint_system<FieldType> &cs) :
+                        component<FieldType>(pb),
+                        vars(vars), cs(cs) {
                         cs_to_vars[0] = 0; /* constant term maps to constant term */
 
                         std::size_t cs_var_idx = 1;

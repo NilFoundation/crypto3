@@ -65,8 +65,8 @@ namespace nil {
                         local_data(local_data), witness(witness) {
                     }
 
-                    r1cs_auxiliary_input<FieldType>
-                        as_r1cs_auxiliary_input(const std::vector<std::size_t> &incoming_message_payload_lengths) const {
+                    r1cs_auxiliary_input<FieldType> as_r1cs_auxiliary_input(
+                        const std::vector<std::size_t> &incoming_message_payload_lengths) const {
 
                         const std::size_t arity = incoming_messages.size();
 
@@ -85,7 +85,8 @@ namespace nil {
 
                         /* pad with dummy messages of appropriate size */
                         for (std::size_t i = arity; i < max_arity; ++i) {
-                            result.resize(result.size() + (1 + incoming_message_payload_lengths[i]), FieldType::value_type::zero());
+                            result.resize(result.size() + (1 + incoming_message_payload_lengths[i]),
+                                          FieldType::value_type::zero());
                         }
 
                         const r1cs_variable_assignment<FieldType> local_data_as_r1cs_va =
@@ -96,7 +97,7 @@ namespace nil {
                         return result;
                     }
                 };
-                
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

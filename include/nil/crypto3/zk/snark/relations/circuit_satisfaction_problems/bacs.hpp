@@ -192,7 +192,8 @@ namespace nil {
                     bacs_variable_assignment<FieldType>
                         get_all_outputs(const bacs_primary_input<FieldType> &primary_input,
                                         const bacs_auxiliary_input<FieldType> &auxiliary_input) const {
-                        const bacs_variable_assignment<FieldType> all_wires = get_all_wires(primary_input, auxiliary_input);
+                        const bacs_variable_assignment<FieldType> all_wires =
+                            get_all_wires(primary_input, auxiliary_input);
 
                         bacs_variable_assignment<FieldType> all_outputs;
 
