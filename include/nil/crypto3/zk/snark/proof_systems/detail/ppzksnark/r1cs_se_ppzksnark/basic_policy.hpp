@@ -61,8 +61,8 @@
 // <https://eprint.iacr.org/2017/540>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP
-#define CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP
+#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_BASIC_POLICY_HPP
+#define CRYPTO3_R1CS_SE_PPZKSNARK_BASIC_POLICY_HPP
 
 #include <memory>
 
@@ -264,13 +264,15 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        struct processed_verification_key {
+                        class processed_verification_key {
+                            using pairing_policy = typename CurveType::pairing_policy;
+                        public:
                             typename CurveType::g1_type G_alpha;
                             typename CurveType::g2_type H_beta;
-                            algebra::Fqk<CurveType> G_alpha_H_beta_ml;
-                            algebra::G1_precomp<CurveType> G_gamma_pc;
-                            algebra::G2_precomp<CurveType> H_gamma_pc;
-                            algebra::G2_precomp<CurveType> H_pc;
+                            typename pairing_policy::Fqk_type G_alpha_H_beta_ml;
+                            typename pairing_policy::G1_precomp G_gamma_pc;
+                            typename pairing_policy::G2_precomp H_gamma_pc;
+                            typename pairing_policy::G2_precomp H_pc;
 
                             typename CurveType::g1_vector query;
 
@@ -605,19 +607,19 @@ namespace nil {
                         /**
                          * Convert a (non-processed) verification key into a processed verification key.
                          */
-                        static processed_verification_key
-                            verifier_process_vk(const verification_key &vk) {
+                        static processed_verification_key verifier_process_vk(const verification_key &vk) {
+                            using pairing_policy = typename CurveType::pairing_policy;
 
-                            algebra::G1_precomp<CurveType> G_alpha_pc = CurveType::precompute_g1(vk.G_alpha);
-                            algebra::G2_precomp<CurveType> H_beta_pc = CurveType::precompute_g2(vk.H_beta);
+                            typename pairing_policy::G1_precomp G_alpha_pc = pairing_policy::precompute_g1(vk.G_alpha);
+                            typename pairing_policy::G2_precomp H_beta_pc = pairing_policy::precompute_g2(vk.H_beta);
 
                             processed_verification_key pvk;
                             pvk.G_alpha = vk.G_alpha;
                             pvk.H_beta = vk.H_beta;
-                            pvk.G_alpha_H_beta_ml = miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
-                            pvk.G_gamma_pc = CurveType::precompute_g1(vk.G_gamma);
-                            pvk.H_gamma_pc = CurveType::precompute_g2(vk.H_gamma);
-                            pvk.H_pc = CurveType::precompute_g2(vk.H);
+                            pvk.G_alpha_H_beta_ml = pairing_policy::miller_loop(G_alpha_pc, H_beta_pc);
+                            pvk.G_gamma_pc = pairing_policy::precompute_g1(vk.G_gamma);
+                            pvk.H_gamma_pc = pairing_policy::precompute_g2(vk.H_gamma);
+                            pvk.H_pc = pairing_policy::precompute_g2(vk.H);
 
                             pvk.query = vk.query;
 
@@ -630,6 +632,8 @@ namespace nil {
                          * (2) has weak input consistency.
                          */
                         static bool online_verifier_weak_IC(
+                            using pairing_policy = typename CurveType::pairing_policy;
+
                             const processed_verification_key &pvk,
                             const primary_input &primary_input,
                             const proof &proof) {
@@ -657,13 +661,13 @@ namespace nil {
                                 algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type, algebra::multi_exp_method_bos_coster>(
                                     pvk.query.begin() + 1, pvk.query.end(), primary_input.begin(), primary_input.end(), chunks);
 
-                            algebra::Fqk<CurveType> test1_l = miller_loop<CurveType>(CurveType::precompute_g1(proof.A + pvk.G_alpha),
-                                                                         CurveType::precompute_g2(proof.B + pvk.H_beta)),
+                            typename pairing_policy::Fqk_type test1_l = pairing_policy::miller_loop(pairing_policy::precompute_g1(proof.A + pvk.G_alpha),
+                                                                         pairing_policy::precompute_g2(proof.B + pvk.H_beta)),
                                               test1_r1 = pvk.G_alpha_H_beta_ml,
-                                              test1_r2 = miller_loop<CurveType>(CurveType::precompute_g1(G_psi), pvk.H_gamma_pc),
-                                              test1_r3 = miller_loop<CurveType>(CurveType::precompute_g1(proof.C), pvk.H_pc);
+                                              test1_r2 = pairing_policy::miller_loop(pairing_policy::precompute_g1(G_psi), pvk.H_gamma_pc),
+                                              test1_r3 = pairing_policy::miller_loop(pairing_policy::precompute_g1(proof.C), pvk.H_pc);
                             typename CurveType::gt_type test1 =
-                                final_exponentiation<CurveType>(test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
+                                pairing_policy::final_exponentiation(test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
 
                             if (test1 != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -672,9 +676,9 @@ namespace nil {
                             /**
                              * e(A, H^{gamma}) = e(G^{gamma}, B)
                              */
-                            algebra::Fqk<CurveType> test2_l = miller_loop<CurveType>(CurveType::precompute_g1(proof.A), pvk.H_gamma_pc),
-                                              test2_r = miller_loop<CurveType>(pvk.G_gamma_pc, CurveType::precompute_g2(proof.B));
-                            typename CurveType::gt_type test2 = final_exponentiation<CurveType>(test2_l * test2_r.unitary_inversed());
+                            typename pairing_policy::Fqk_type test2_l = pairing_policy::miller_loop(pairing_policy::precompute_g1(proof.A), pvk.H_gamma_pc),
+                                              test2_r = pairing_policy::miller_loop(pvk.G_gamma_pc, pairing_policy::precompute_g2(proof.B));
+                            typename CurveType::gt_type test2 = pairing_policy::final_exponentiation(test2_l * test2_r.unitary_inversed());
 
                             if (test2 != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -738,4 +742,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_SE_PPZKSNARK_FUNCTIONS_HPP
+#endif    // CRYPTO3_R1CS_SE_PPZKSNARK_BASIC_POLICY_HPP

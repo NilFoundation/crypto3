@@ -60,7 +60,7 @@ namespace nil {
                         /**
                          * Instance map for the TBCS-to-USCS reduction.
                          */
-                        uscs_constraint_system<FieldType> instance_map(const tbcs_circuit &circuit) {
+                        static uscs_constraint_system<FieldType> instance_map(const tbcs_circuit &circuit) {
                             assert(circuit.is_valid());
                             uscs_constraint_system<FieldType> result;
 
@@ -179,7 +179,7 @@ namespace nil {
                         /**
                          * Witness map for the TBCS-to-USCS reduction.
                          */
-                        uscs_variable_assignment<FieldType> witness_map(const tbcs_circuit &circuit,
+                        static uscs_variable_assignment<FieldType> witness_map(const tbcs_circuit &circuit,
                                                                         const tbcs_primary_input &primary_input,
                                                                         const tbcs_auxiliary_input &auxiliary_input) {
 

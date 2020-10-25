@@ -66,7 +66,7 @@ namespace nil {
                         /**
                          * Helper function to multiply a field element by 4 efficiently
                          */
-                        typename FieldType::value_type times_four(typename FieldType::value_type x) {
+                        static typename FieldType::value_type times_four(typename FieldType::value_type x) {
                             typename FieldType::value_type times_two = x + x;
                             return times_two + times_two;
                         }
@@ -77,7 +77,7 @@ namespace nil {
                          * Helper function to find evaluation domain that will be used by the reduction
                          * for a given R1CS instance.
                          */
-                        std::shared_ptr<fft::evaluation_domain<FieldType>>
+                        static std::shared_ptr<fft::evaluation_domain<FieldType>>
                             get_domain(const r1cs_constraint_system<FieldType> &cs) {
                             /*
                              * the SAP instance will have:
@@ -94,7 +94,7 @@ namespace nil {
                         /**
                          * Instance map for the R1CS-to-SAP reduction.
                          */
-                        sap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
+                        static sap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
                                 get_domain(cs);
 
@@ -199,7 +199,7 @@ namespace nil {
                          * Instance map for the R1CS-to-SAP reduction followed by evaluation
                          * of the resulting QAP instance.
                          */
-                        sap_instance_evaluation<FieldType> 
+                        static sap_instance_evaluation<FieldType> 
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                                      const typename FieldType::value_type &t) {
 
@@ -303,7 +303,7 @@ namespace nil {
                          * The code below is not as simple as the above high-level description due to
                          * some reshuffling to save space.
                          */
-                        sap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
+                        static sap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                        const r1cs_primary_input<FieldType> &primary_input,
                                                                        const r1cs_auxiliary_input<FieldType> &auxiliary_input,
                                                                        const typename FieldType::value_type &d1,

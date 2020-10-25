@@ -80,7 +80,7 @@ namespace nil {
                          * and
                          *   each A_i,B_i,C_i is expressed in the Lagrange basis.
                          */
-                        qap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
+                        static qap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
 
                             const std::shared_ptr<evaluation_domain<FieldType>> domain =
                                 make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
@@ -136,7 +136,7 @@ namespace nil {
                          *   m = number of variables of the QAP
                          *   n = degree of the QAP
                          */
-                        qap_instance_evaluation<FieldType>
+                        static qap_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
                             const std::shared_ptr<evaluation_domain<FieldType>> domain =
@@ -217,7 +217,7 @@ namespace nil {
                          * The code below is not as simple as the above high-level description due to
                          * some reshuffling to save space.
                          */
-                        qap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
+                        static qap_witness<FieldType> witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                            const r1cs_primary_input<FieldType> &primary_input,
                                                            const r1cs_auxiliary_input<FieldType> &auxiliary_input,
                                                            const typename FieldType::value_type &d1,
