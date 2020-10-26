@@ -34,18 +34,18 @@ namespace nil {
         namespace algebra {
 
             //TODO: Implement not only for vectors
-            template<typename NumberType, typename FieldT, typename detail::multi_exp_method Method>
+            template<typename NumberType, typename FieldType, typename detail::multi_exp_method Method>
             NumberType multi_exp(typename std::vector<NumberType>::const_iterator vec_start,
                         typename std::vector<NumberType>::const_iterator vec_end,
-                        typename std::vector<FieldT>::const_iterator scalar_start,
-                        typename std::vector<FieldT>::const_iterator scalar_end,
+                        typename std::vector<FieldType>::const_iterator scalar_start,
+                        typename std::vector<FieldType>::const_iterator scalar_end,
                         const std::size_t chunks_count) {
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
-                    return detail::multi_exp_inner<T, FieldT, Method>(
+                    return detail::multi_exp_inner<T, FieldType, Method>(
                         vec_start, vec_end, scalar_start, scalar_end);
                 }
 
@@ -54,7 +54,7 @@ namespace nil {
                 NumberType result = NumberType::zero();
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
-                    result = result + detail::multi_exp_inner<T, FieldT, Method>(
+                    result = result + detail::multi_exp_inner<T, FieldType, Method>(
                          vec_start + i*one,
                          (i == chunks_count-1 ? vec_end : vec_start + (i+1)*one),
                          scalar_start + i*one,
@@ -62,6 +62,16 @@ namespace nil {
                 }
 
                 return result;
+            }
+
+            template <typename FieldType>
+            FieldType inner_product(typename std::vector<FieldType>::const_iterator a_start,
+                            typename std::vector<FieldType>::const_iterator a_end,
+                            typename std::vector<FieldType>::const_iterator b_start,
+                            typename std::vector<FieldType>::const_iterator b_end) {
+                return multi_exp<FieldType, FieldType, detail::multi_exp_method_naive_plain>(
+                    a_start, a_end,
+                    b_start, b_end, 1);
             }
 
         }        // namespace algebra
