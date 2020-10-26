@@ -39,12 +39,16 @@ namespace nil {
                     template<typename GroupType>
                     struct ep_map {
                         typedef h2c_suite<GroupType> suite_type;
-                        static_assert(suite_type::m == 1, "field has wrong extension");
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::expand_message expand_message;
                         typedef typename suite_type::number_type number_type;
+
+                        constexpr static std::size_t m = suite_type::m;
+                        constexpr static std::size_t L = suite_type::L;
+
+                        static_assert(suite_type::m == 1, "field has wrong extension");
 
                         template<typename InputType, typename = typename std::enable_if<std::is_same<
                                                          std::uint8_t, typename InputType::value_type>::value>::type>
@@ -67,8 +71,8 @@ namespace nil {
                         // private:
                         template<std::size_t N, typename InputType>
                         static inline std::array<field_value_type, N> hash_to_field(InputType msg) {
-                            std::array<std::uint8_t, N * expand_message::bits_per_element> uniform_bytes {0};
-                            expand_message::template process<N>(msg, suite_type::suite_id, uniform_bytes);
+                            std::array<std::uint8_t, N * m * L> uniform_bytes {0};
+                            expand_message::template process<N * m * L>(msg, suite_type::suite_id, uniform_bytes);
 
                             number_type e;
                             auto L = suite_type::L;

@@ -27,6 +27,8 @@
 
 #include <iostream>
 #include <cstdint>
+#include <vector>
+#include <string>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -52,44 +54,84 @@ using namespace nil::crypto3::algebra::curves;
 
 BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
 
-    BOOST_AUTO_TEST_CASE(i2osp_manual_test) {
+    // BOOST_AUTO_TEST_CASE(i2osp_manual_test) {
+    //     constexpr std::size_t len_in_bytes = 128;
+    //     std::array<std::uint8_t, 10> msg{12};
+    //     std::array<std::uint8_t, 10> dst{15};
+    //     std::array<std::uint8_t, len_in_bytes> output{0};
+    //     expand_message_xmd<hashes::sha2<256>>::process<len_in_bytes>(msg, dst, output);
+    //
+    //     for (auto &c : output) {
+    //         std::cout << static_cast<int>(c) << ", ";
+    //     }
+    //     std::cout << std::endl;
+    //
+    //     using ep_map_bls12_g1 = ep_map<typename bls12_381::g1_type>;
+    //     auto ret = ep_map_bls12_g1::hash_to_field<2>(msg);
+    //     for (auto &c : ret) {
+    //         std::cout << c.data << ", ";
+    //     }
+    //     std::cout << std::endl;
+    //
+    //     using field_type = fields::bls12_fq<381>;
+    //     using field_value_type = field_type::value_type;
+    //     auto e1 = field_value_type(12341234);
+    //     auto e2 = field_value_type(23451345);
+    //     std::cout << sgn0(e1) << std::endl;
+    //     std::cout << sgn0(e2) << std::endl;
+    //
+    //     using fp2_type = fields::fp2<fields::bls12_fq<381>>;
+    //     using fp2_value_type = fp2_type::value_type;
+    //     auto fp2_e1 = fp2_value_type(e1, e2);
+    //     std::cout << sgn0(fp2_e1) << std::endl;
+    // }
 
-        constexpr std::size_t len_in_bytes = 128;
-        std::array<std::uint8_t, 10> msg{12};
-        std::array<std::uint8_t, 10> dst{15};
-        std::array<std::uint8_t, len_in_bytes> output{0};
-        expand_message_xmd<hashes::sha2<256>, len_in_bytes>::process<1>(msg, dst, output);
+    BOOST_AUTO_TEST_CASE(expand_message_xmd_sha256) {
+        // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-K.1
+        using hash_policy_type = hashes::sha2<256>;
+        using expand_message = expand_message_xmd<hash_policy_type>;
 
-        for (auto &c : output) {
-            std::cout << static_cast<int>(c) << ", ";
+        std::string DST_str("QUUX-V01-CS02-with-expander");
+        std::vector<std::uint8_t> DST(DST_str.begin(), DST_str.end());
+
+        // msg     = abc
+        // len_in_bytes = 0x20
+        // DST_prime = 515555582d5630312d435330322d776974682d657870616e6465
+        // 721b
+        // msg_prime = 0000000000000000000000000000000000000000000000000000
+        // 000000000000000000000000000000000000000000000000000000
+        // 0000000000000000000000616263002000515555582d5630312d43
+        // 5330322d776974682d657870616e6465721b
+        // uniform_bytes = 1c38f7c211ef233367b2420d04798fa4698080a8901021a7
+        // 95a1151775fe4da7
+        {
+            std::string msg_str("");
+            std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
+
+            constexpr std::size_t len_in_bytes = 0x20;
+            std::array<std::uint8_t, len_in_bytes> uniform_bytes {0};
+
+            expand_message::process<len_in_bytes>(msg, DST, uniform_bytes);
+            for (auto &c : uniform_bytes) {
+                std::cout << std::hex << int(c) << ", ";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
+        {
+            std::string msg_str("abc");
+            std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
 
-        using ep_map_bls12_g1 = ep_map<typename bls12_381::g1_type>;
-        auto ret = ep_map_bls12_g1::hash_to_field<2>(msg);
-        for (auto &c : ret) {
-            std::cout << c.data << ", ";
+            constexpr std::size_t len_in_bytes = 0x20;
+            std::array<std::uint8_t, len_in_bytes> uniform_bytes {0};
+
+            expand_message::process<len_in_bytes>(msg, DST, uniform_bytes);
+            for (auto &c : uniform_bytes) {
+                std::cout << std::hex << int(c) << ", ";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
 
-        using field_type = fields::bls12_fq<381>;
-        using field_value_type = field_type::value_type;
-        auto e1 = field_value_type(12341234);
-        auto e2 = field_value_type(23451345);
-        std::cout << sgn0(e1) << std::endl;
-        std::cout << sgn0(e2) << std::endl;
-
-        using fp2_type = fields::fp2<fields::bls12_fq<381>>;
-        using fp2_value_type = fp2_type::value_type;
-        auto fp2_e1 = fp2_value_type(e1, e2);
-        std::cout << sgn0(fp2_e1) << std::endl;
-
-        std::cout << e1.is_square() << std::endl;
-        std::cout << e1.squared().is_square() << std::endl;
-        std::cout << fp2_e1.is_square() << std::endl;
-        std::cout << fp2_e1.squared().is_square() << std::endl;
 
     }
 
 BOOST_AUTO_TEST_SUITE_END()
-
