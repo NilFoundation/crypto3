@@ -56,10 +56,8 @@ namespace nil {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<OutputType>));
                         BOOST_CONCEPT_ASSERT((boost::WriteableRangeConcept<OutputType>));
 
-                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) ==
-                                     std::distance(in2.begin(), in2.end()));
-                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) ==
-                                     std::distance(out.begin(), out.end()));
+                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()));
+                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
 
                         auto in1_iter = in1.begin();
                         auto in2_iter = in2.begin();
@@ -107,8 +105,8 @@ namespace nil {
                         constexpr static std::size_t r_in_bytes = HashType::block_bits / 8;
 
                     public:
-                        template<typename InputMsgType, typename InputDstType,
-                                 typename OutputType, typename = typename std::enable_if<
+                        template<typename InputMsgType, typename InputDstType, typename OutputType,
+                                 typename = typename std::enable_if<
                                      std::is_same<std::uint8_t, typename InputMsgType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename InputDstType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename OutputType::value_type>::value>::type>
@@ -142,8 +140,9 @@ namespace nil {
                             // hash<HashType>(l_i_b_str, b0_acc);
                             // hash<HashType>(std::array<std::uint8_t, 1> {0}, b0_acc);
                             // hash<HashType>(dst, b0_acc);
-                            // hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())}, b0_acc);
-                            // typename HashType::digest_type b0 = accumulators::extract::hash<HashType>(b0_acc);
+                            // hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())},
+                            // b0_acc); typename HashType::digest_type b0 =
+                            // accumulators::extract::hash<HashType>(b0_acc);
                             std::vector<std::uint8_t> msg_prime;
                             msg_prime.insert(msg_prime.end(), Z_pad.begin(), Z_pad.end());
                             msg_prime.insert(msg_prime.end(), msg.begin(), msg.end());
@@ -159,9 +158,10 @@ namespace nil {
                             // hash<HashType>(b0, bi_acc);
                             // hash<HashType>(std::array<std::uint8_t, 1> {1}, bi_acc);
                             // hash<HashType>(dst, bi_acc);
-                            // hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())}, bi_acc);
-                            // typename HashType::digest_type bi = accumulators::extract::hash<HashType>(bi_acc);
-                            // std::copy(bi.begin(), bi.end(), uniform_bytes.begin());
+                            // hash<HashType>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst.size())},
+                            // bi_acc); typename HashType::digest_type bi =
+                            // accumulators::extract::hash<HashType>(bi_acc); std::copy(bi.begin(), bi.end(),
+                            // uniform_bytes.begin());
                             std::vector<std::uint8_t> b_i_str;
                             b_i_str.insert(b_i_str.end(), b0.begin(), b0.end());
                             b_i_str.insert(b_i_str.end(), static_cast<std::uint8_t>(1));

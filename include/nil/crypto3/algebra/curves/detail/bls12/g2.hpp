@@ -571,7 +571,7 @@ namespace nil {
                         bls12_g2 operator*(const NumberType &other) const {
                             return scalar_mul(*this, other);
                         }
-                        
+
                     private:
                         bls12_g2 add(const bls12_g2 &other) const {
 
