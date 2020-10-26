@@ -47,11 +47,12 @@ namespace nil {
                     template<>
                     struct h2c_suite<typename bls12_381::g1_type> {
                         typedef bls12_381 group_policy_type;
+                        typedef typename bls12_381::g1_type group_type;
                         typedef hashes::sha2<256> hash_policy_type;
 
-                        typedef typename group_policy_type::g1_type group_value_type;
+                        typedef typename group_type::value_type group_value_type;
                         typedef typename group_policy_type::number_type number_type;
-                        typedef typename group_value_type::underlying_field_value_type field_value_type;
+                        typedef typename group_type::underlying_field_type::value_type field_value_type;
 
                         // BLS12381G1_XMD:SHA-256_SSWU_RO_
                         constexpr static std::array<std::uint8_t, 31> suite_id = {
