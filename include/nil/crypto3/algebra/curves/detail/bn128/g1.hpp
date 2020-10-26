@@ -35,6 +35,8 @@
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -254,20 +256,9 @@ namespace nil {
                             return result;
                         }
 
-                        /*
-                            out = in * m
-                            @param out [out] Jacobi coord (out[0], out[1], out[2])
-                            @param in [in] Jacobi coord (in[0], in[1], in[2])
-                            @param m [in] scalar
-                            @note MSB first binary method.
-
-                            @note don't use Fp as INT
-                            the inner format of Fp is not compatible with mie::Vuint
-                        */
                         template<typename NumberType>
-                        bn128_g1 operator*(const NumberType N) const {
-                            // return multi_exp(*this, N);
-                            return *this;
+                        bn128_g1 operator*(const NumberType &other) const {
+                            return scalar_mul(*this, other);
                         }
 
                     private:

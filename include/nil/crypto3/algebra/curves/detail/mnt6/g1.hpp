@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -234,6 +236,11 @@ namespace nil {
                             underlying_field_value_type Z3 = vvv * this->Z;                  // Z3 = vvv*Z1
 
                             return mnt6_g1(X3, Y3, Z3);
+                        }
+
+                        template<typename NumberType>
+                        mnt6_g1 operator*(const NumberType &other) const {
+                            return scalar_mul(*this, other);
                         }
 
                     private:

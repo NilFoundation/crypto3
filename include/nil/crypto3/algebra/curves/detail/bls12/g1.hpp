@@ -269,8 +269,8 @@ namespace nil {
                             return bls12_g1(X3, Y3, Z3);
                         }
 
-                        template<typename Backend, expression_template_option ExpressionTemplates>
-                        bls12_g1 operator*(const number<Backend, ExpressionTemplates> &other) const {
+                        template<typename NumberType>
+                        bls12_g1 operator*(const NumberType &other) const {
                             return scalar_mul(*this, other);
                         }
 
@@ -562,6 +562,11 @@ namespace nil {
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return bls12_g1(X3, Y3, Z3);
+                        }
+
+                        template<typename NumberType>
+                        bls12_g1 operator*(const NumberType &other) const {
+                            return scalar_mul(*this, other);
                         }
 
                     private:

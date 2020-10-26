@@ -267,8 +267,8 @@ namespace nil {
                             return bls12_g2(X3, Y3, Z3);
                         }
 
-                        template<typename Backend, expression_template_option ExpressionTemplates>
-                        bls12_g2 operator*(const number<Backend, ExpressionTemplates> &other) const {
+                        template<typename NumberType>
+                        bls12_g2 operator*(const NumberType &other) const {
                             return scalar_mul(*this, other);
                         }
 
@@ -567,6 +567,11 @@ namespace nil {
                             return bls12_g2(X3, Y3, Z3);
                         }
 
+                        template<typename NumberType>
+                        bls12_g2 operator*(const NumberType &other) const {
+                            return scalar_mul(*this, other);
+                        }
+                        
                     private:
                         bls12_g2 add(const bls12_g2 &other) const {
 

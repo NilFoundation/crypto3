@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -253,6 +255,11 @@ namespace nil {
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return alt_bn128_g1(X3, Y3, Z3);
+                        }
+
+                        template<typename NumberType>
+                        alt_bn128_g1 operator*(const NumberType &other) const {
+                            return scalar_mul(*this, other);
                         }
 
                     private:
