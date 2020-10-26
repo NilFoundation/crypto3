@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/bn128.hpp>
+//#include <nil/crypto3/algebra/curves/bn128.hpp>
 // #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 // #include <nil/crypto3/algebra/curves/frp_v1.hpp>
@@ -58,19 +58,19 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FpCurveGroup>
-void print_fp_curve_group_element(std::ostream &os, const FpCurveGroup &e) {
+template<typename FpCurveGroupElement>
+void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
     os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
 }
 
-template<typename Fp2CurveGroup>
-void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroup &e) {
+template<typename Fp2CurveGroupElement>
+void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
     os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
        << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
 }
 
-template<typename Fp3CurveGroup>
-void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroup &e) {
+template<typename Fp3CurveGroupElement>
+void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroupElement &e) {
     os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << " , " << e.X.data[2].data << ") : ("
        << e.Y.data[0].data << " , " << e.Y.data[1].data << " , " << e.Y.data[2].data << ") : ("
        << e.Z.data[0].data << " , " << e.Z.data[1].data << " , " << e.Z.data[2].data << ")" << std::endl;
@@ -79,100 +79,100 @@ void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroup &e) {
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
+            /*template<>
+            struct print_log_value<typename curves::bn128<254>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bn128<254>::g1_type::value_type const &e) {
+                    print_fp_curve_group_element(os, e);
+                }
+            };*/
+
             template<>
-            struct print_log_value<typename curves::bn128<254>::g1_type> {
-                void operator()(std::ostream &os, typename curves::bn128<254>::g1_type const &e) {
+            struct print_log_value<typename curves::edwards<183>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::edwards<183>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::edwards<183>::g1_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g1_type const &e) {
+            struct print_log_value<typename curves::mnt4<298>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt4<298>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt4<298>::g1_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g1_type const &e) {
+            struct print_log_value<typename curves::mnt6<298>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt6<298>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt6<298>::g1_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g1_type const &e) {
+            struct print_log_value<typename curves::alt_bn128<254>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::alt_bn128<254>::g1_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type const &e) {
+            struct print_log_value<typename curves::bls12<377>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<377>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<377>::g1_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g1_type const &e) {
-                    print_fp_curve_group_element(os, e);
+            struct print_log_value<typename curves::mnt4<298>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type::value_type const &e) {
+                    print_fp2_curve_group_element(os, e);
                 }
             };
 
+            /*template<>
+            struct print_log_value<typename curves::bn128<254>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bn128<254>::g2_type::value_type const &e) {
+                    print_fp2_curve_group_element(os, e);
+                }
+            };*/
+
             template<>
-            struct print_log_value<typename curves::mnt4<298>::g2_type> {
-                void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type const &e) {
+            struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bn128<254>::g2_type> {
-                void operator()(std::ostream &os, typename curves::bn128<254>::g2_type const &e) {
+            struct print_log_value<typename curves::bls12<377>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<377>::g2_type::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type const &e) {
+            struct print_log_value<typename curves::alt_bn128<254>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type::value_type const &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::bls12<377>::g2_type> {
-                void operator()(std::ostream &os, typename curves::bls12<377>::g2_type const &e) {
-                    print_fp2_curve_group_element(os, e);
-                }
-            };
-
-            template<>
-            struct print_log_value<typename curves::alt_bn128<254>::g2_type> {
-                void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type const &e) {
-                    print_fp2_curve_group_element(os, e);
-                }
-            };
-
-            template<>
-            struct print_log_value<typename curves::edwards<183>::g2_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g2_type const &e) {
+            struct print_log_value<typename curves::edwards<183>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::edwards<183>::g2_type::value_type const &e) {
                     print_fp3_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<typename curves::mnt6<298>::g2_type> {
-                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type const &e) {
+            struct print_log_value<typename curves::mnt6<298>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type::value_type const &e) {
                     print_fp3_curve_group_element(os, e);
                 }
             };
@@ -213,16 +213,16 @@ enum curve_operation_test_points : std::size_t {
 };
 
 template<typename CurveGroup>
-void check_curve_operations(const std::vector<CurveGroup> &points, const std::vector<std::size_t> &constants) {
+void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points, const std::vector<std::size_t> &constants) {
     using boost::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
     BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
-    CurveGroup p1_copy = CurveGroup(points[p1]).to_affine_coordinates();
+    typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine_coordinates();
     BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
-    CurveGroup p2_copy = CurveGroup(points[p2]).to_special();
+    typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
     BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
     BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) + (points[p2] * static_cast<cpp_int>(constants[C2])), points[p2_mul_C1_plus_p2_mul_C2]);
@@ -230,10 +230,10 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
 }
 
 template<typename FpCurveGroup, typename TestSet>
-void fp_curve_test_init(std::vector<FpCurveGroup> &points,
+void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
                         std::vector<std::size_t> &constants,
                         const TestSet &test_set) {
-    using field_value_type = typename FpCurveGroup::underlying_field_value_type;
+    using field_value_type = typename FpCurveGroup::underlying_field_type::value_type;
     std::array<field_value_type, 3> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
@@ -241,7 +241,7 @@ void fp_curve_test_init(std::vector<FpCurveGroup> &points,
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
         }
-        points.emplace_back(FpCurveGroup(coordinates[0], coordinates[1], coordinates[2]));
+        points.emplace_back(typename FpCurveGroup::value_type(coordinates[0], coordinates[1], coordinates[2]));
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -250,10 +250,10 @@ void fp_curve_test_init(std::vector<FpCurveGroup> &points,
 }
 
 template<typename Fp2CurveGroup, typename TestSet>
-void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
+void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points,
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
-    using fp2_value_type = typename Fp2CurveGroup::underlying_field_value_type;
+    using fp2_value_type = typename Fp2CurveGroup::underlying_field_type::value_type;
     using modulus_type = typename fp2_value_type::underlying_type::modulus_type;
     std::array<modulus_type, 6> coordinates;
 
@@ -264,7 +264,7 @@ void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
                 coordinates[i++] = modulus_type(coordinate.second.data());
             }
         }
-        points.emplace_back(Fp2CurveGroup(fp2_value_type(coordinates[0], coordinates[1]),
+        points.emplace_back(typename Fp2CurveGroup::value_type(fp2_value_type(coordinates[0], coordinates[1]),
                                           fp2_value_type(coordinates[2], coordinates[3]),
                                           fp2_value_type(coordinates[4], coordinates[5])));
     }
@@ -275,10 +275,10 @@ void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
 }
 
 template<typename Fp3CurveGroup, typename TestSet>
-void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
+void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points,
                          std::vector<std::size_t> &constants,
                          const TestSet &test_set) {
-    using fp3_value_type = typename Fp3CurveGroup::underlying_field_value_type;
+    using fp3_value_type = typename Fp3CurveGroup::underlying_field_type::value_type;
     using modulus_type = typename fp3_value_type::underlying_type::modulus_type;
 
     std::array<modulus_type, 9> coordinates;
@@ -290,7 +290,7 @@ void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
                 coordinates[i++] = modulus_type(coordinate.second.data());
             }
         }
-        points.emplace_back(Fp3CurveGroup(fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
+        points.emplace_back(typename Fp3CurveGroup::value_type(fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
                                           fp3_value_type(coordinates[3], coordinates[4], coordinates[5]),
                                           fp3_value_type(coordinates[6], coordinates[7], coordinates[8])));
     }
@@ -302,8 +302,11 @@ void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
 
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test(const TestSet &test_set,
-                          void (&test_init)(std::vector<CurveGroup> &, std::vector<std::size_t> &, const TestSet &)) {
-    std::vector<CurveGroup> points;
+                          void (&test_init)(std::vector<typename CurveGroup::value_type> &, 
+                          std::vector<std::size_t> &, 
+                          const TestSet &)) {
+    
+    std::vector<typename CurveGroup::value_type> points;
     std::vector<std::size_t> constants;
 
     test_init(points, constants, test_set);
@@ -313,11 +316,11 @@ void curve_operation_test(const TestSet &test_set,
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g1, string_data("curve_operation_test_bn128_g1"), data_set) {
+/*BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g1, string_data("curve_operation_test_bn128_g1"), data_set) {
     using policy_type = curves::bn128<254>::g1_type;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
-}
+}*/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
@@ -343,11 +346,11 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g2, string_data("curve_operation_test_bn128_g2"), data_set) {
+/*BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g2, string_data("curve_operation_test_bn128_g2"), data_set) {
     using policy_type = curves::bn128<254>::g2_type;
 
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
-}
+}*/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;

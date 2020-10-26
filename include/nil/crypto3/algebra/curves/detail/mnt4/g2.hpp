@@ -41,7 +41,7 @@ namespace nil {
 
                         using policy_type = mnt4_basic_policy<ModulusBits, GeneratorBits>;
 
-                        using underlying_field_type = policy_type::g2_field_type;
+                        using underlying_field_type = typename policy_type::g2_field_type;
 
                         constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;
 
