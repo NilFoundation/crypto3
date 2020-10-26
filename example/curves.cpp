@@ -32,26 +32,26 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/bn128.hpp>
+//#include <nil/crypto3/algebra/curves/bn128.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 using namespace nil::crypto3::algebra;
 
-template<typename FpCurveGroup>
-void print_fp_curve_group_element(FpCurveGroup e) {
+template<typename FpCurveGroupElement>
+void print_fp_curve_group_element(FpCurveGroupElement e) {
     std::cout << e.X.data << " " << e.Y.data << " " << e.Z.data << std::endl;
 }
 
-template<typename Fp2CurveGroup>
-void print_fp2_curve_group_element(Fp2CurveGroup e) {
+template<typename Fp2CurveGroupElement>
+void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
     std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << ") (" << e.Y.data[0].data << " "
               << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
 }
 
-template<typename Fp3CurveGroup>
-void print_fp3_curve_group_element(Fp3CurveGroup e) {
+template<typename Fp3CurveGroupElement>
+void print_fp3_curve_group_element(Fp3CurveGroupElement e) {
     std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << e.X.data[2].data << ") (" << e.Y.data[0].data
               << " " << e.Y.data[1].data << e.Y.data[2].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data
               << e.Z.data[2].data << ")" << std::endl;
@@ -61,11 +61,11 @@ void print_fp3_curve_group_element(Fp3CurveGroup e) {
 
 template<typename FpCurveGroup>
 void fp_curve_group_basic_math_examples() {
-    using policy_type = FpCurveGroup;
-    using field_value_type = typename policy_type::underlying_field_value_type;
+    using group_value_type = typename FpCurveGroup::value_type;
+    using field_value_type = typename FpCurveGroup::underlying_field_type::value_type;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
-    policy_type c1(e1, e2, e3), c2(e4, e5, e6);
+    group_value_type c1(e1, e2, e3), c2(e4, e5, e6);
 
     std::cout << "Curve element values: " << std::endl;
     std::cout << "c1 value: ";
@@ -83,9 +83,9 @@ void fp_curve_group_basic_math_examples() {
     std::cout << "Doubled c1 value: ";
     print_fp_curve_group_element(c1.doubled());
 
-    policy_type cd = c1.doubled();
+    group_value_type cd = c1.doubled();
 
-    // policy_type cn = c1.normalize();
+    // group_value_type cn = c1.normalize();
 
     // std::cout << "c1 normalized value: ";
     // print_fp_curve_group_element(cn);
@@ -93,10 +93,10 @@ void fp_curve_group_basic_math_examples() {
 
 template<typename Fp2CurveGroup>
 void fp2_curve_group_basic_math_examples() {
-    using policy_type = Fp2CurveGroup;
-    using field_value_type = typename policy_type::underlying_field_value_type;
+    using group_value_type = typename Fp2CurveGroup::value_type;
+    using field_value_type = typename Fp2CurveGroup::underlying_field_type::value_type;
 
-    policy_type c1 = policy_type::one(), c2 = policy_type::one().doubled();
+    group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
     std::cout << "Curve element values: " << std::endl;
     std::cout << "c1 value: ";
@@ -114,9 +114,9 @@ void fp2_curve_group_basic_math_examples() {
     std::cout << "Doubled c1 value: ";
     print_fp2_curve_group_element(c1.doubled());
 
-    policy_type cd = c1.doubled();
+    group_value_type cd = c1.doubled();
 
-    // policy_type cn = c1.normalize();
+    // group_value_type cn = c1.normalize();
 
     // std::cout << "c1 normalized value: ";
     // print_fp2_curve_group_element(cn);
@@ -124,10 +124,10 @@ void fp2_curve_group_basic_math_examples() {
 
 template<typename Fp3CurveGroup>
 void fp3_curve_group_basic_math_examples() {
-    using policy_type = Fp3CurveGroup;
-    using field_value_type = typename policy_type::underlying_field_value_type;
+    using group_value_type = typename Fp3CurveGroup::value_type;
+    using field_value_type = typename Fp3CurveGroup::underlying_field_type::value_type;
 
-    policy_type c1 = policy_type::one(), c2 = policy_type::one().doubled();
+    group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
     std::cout << "Curve element values: " << std::endl;
     std::cout << "c1 value: ";
@@ -145,9 +145,9 @@ void fp3_curve_group_basic_math_examples() {
     std::cout << "Doubled c1 value: ";
     print_fp3_curve_group_element(c1.doubled());
 
-    policy_type cd = c1.doubled();
+    group_value_type cd = c1.doubled();
 
-    // policy_type cn = c1.normalize();
+    // group_value_type cn = c1.normalize();
 
     // std::cout << "c1 normalized value: ";
     // print_fp3_curve_group_element(cn);
@@ -184,7 +184,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
+    /*std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bn128<254>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
@@ -192,7 +192,7 @@ int main() {
     std::cout << "BN128-254 curve g2 group basic math:" << std::endl;
     fp2_curve_group_basic_math_examples<curves::bn128<254>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
