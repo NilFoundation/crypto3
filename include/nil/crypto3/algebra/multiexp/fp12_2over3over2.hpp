@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MULTIEXP_HPP
-#define BOOST_MULTIPRECISION_MULTIEXP_HPP
+#ifndef BOOST_MULTIPRECISION_MULTIEXP_FP12_2OVER3OVER2_HPP
+#define BOOST_MULTIPRECISION_MULTIEXP_FP12_2OVER3OVER2_HPP
 
 #include <cstdint>
 
@@ -175,4 +175,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BOOST_MULTIPRECISION_MULTIEXP_HPP
+#endif    // BOOST_MULTIPRECISION_MULTIEXP_FP12_2OVER3OVER2_HPP
