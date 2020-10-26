@@ -24,10 +24,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MULTIEXP_HPP
-#define BOOST_MULTIPRECISION_MULTIEXP_HPP
+#ifndef CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
+#define CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
 
-#include <boost/algebra/fields/detail/fp.hpp>
+#include <vector>
 
 namespace nil {
     namespace crypto3 {
@@ -85,41 +85,9 @@ namespace nil {
                     return result;
                 }
 
-                //TODO: Implement not only for vectors
-                template<typename NumberType, typename FieldT, multi_exp_method Method>
-                NumberType multi_exp(typename std::vector<NumberType>::const_iterator vec_start,
-                            typename std::vector<NumberType>::const_iterator vec_end,
-                            typename std::vector<FieldT>::const_iterator scalar_start,
-                            typename std::vector<FieldT>::const_iterator scalar_end,
-                            const std::size_t chunks_count) {
-
-                    const std::size_t total_size = std::distance(vec_start, vec_end);
-
-                    if ((total_size < chunks_count) || (chunks_count == 1)) {
-                        // no need to split into "chunks_count", can call implementation directly
-                        return multi_exp_inner<T, FieldT, Method>(
-                            vec_start, vec_end, scalar_start, scalar_end);
-                    }
-
-                    const std::size_t one_chunk_size = total_size/chunks_count;
-
-
-                    NumberType result = NumberType::zero();
-
-                    for (std::size_t i = 0; i < chunks_count; ++i) {
-                        result = result + multi_exp_inner<T, FieldT, Method>(
-                             vec_start + i*one,
-                             (i == chunks_count-1 ? vec_end : vec_start + (i+1)*one),
-                             scalar_start + i*one,
-                             (i == chunks_count-1 ? scalar_end : scalar_start + (i+1)*one));
-                    }
-
-                    return result;
-                }
-
             }    // namespace detail
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BOOST_MULTIPRECISION_MULTIEXP_HPP
+#endif    // CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
