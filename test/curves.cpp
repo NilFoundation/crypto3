@@ -303,15 +303,15 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test(const TestSet &test_set,
                           void (&test_init)(std::vector<typename CurveGroup::value_type> &, 
-                          std::vector<std::size_t> &, 
-                          const TestSet &)) {
+                                            std::vector<std::size_t> &, 
+                                            const TestSet &)) {
     
     std::vector<typename CurveGroup::value_type> points;
     std::vector<std::size_t> constants;
 
     test_init(points, constants, test_set);
 
-    check_curve_operations(points, constants);
+    check_curve_operations<CurveGroup>(points, constants);
 }
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
@@ -325,25 +325,25 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g1, string_data("curve_operation_test_mnt4_g1"), data_set) {
     using policy_type = curves::mnt4<298>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g1, string_data("curve_operation_test_mnt6_g1"), data_set) {
     using policy_type = curves::mnt6<298>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_test_mnt4_g2"), data_set) {
     using policy_type = curves::mnt4<298>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
 /*BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g2, string_data("curve_operation_test_bn128_g2"), data_set) {
@@ -355,49 +355,49 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp3_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g2, string_data("curve_operation_test_mnt6_g2"), data_set) {
     using policy_type = curves::mnt6<298>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp3_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_bls12_381_g1, string_data("curve_operation_test_bls12_381_g1"), data_set) {
     using policy_type = curves::bls12<381>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_bls12_377_g1, string_data("curve_operation_test_bls12_377_g1"), data_set) {
     using policy_type = curves::bls12<377>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_bls12_381_g2, string_data("curve_operation_test_bls12_381_g2"), data_set) {
     using policy_type = curves::bls12<381>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_bls12_377_g2, string_data("curve_operation_test_bls12_377_g2"), data_set) {
     using policy_type = curves::bls12<377>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_alt_bn128_g1, string_data("curve_operation_test_alt_bn128_g1"), data_set) {
     using policy_type = curves::alt_bn128<254>::g1_type;
 
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_alt_bn128_g2, string_data("curve_operation_test_alt_bn128_g2"), data_set) {
     using policy_type = curves::alt_bn128<254>::g2_type;
 
-    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
