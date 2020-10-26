@@ -61,7 +61,7 @@ namespace nil {
 
                     typedef typename pairing::pairing_policy<edwards<ModulusBits, GeneratorBits>> pairing_policy;
 
-                    typedef typename policy_type::gt_field_type::value_type gt_type;
+                    typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
 
