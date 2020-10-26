@@ -65,17 +65,17 @@ namespace nil {
                 };
 
 
-                template<typename NumberType, typename FieldValueType, multi_exp_method Method,
+                template<typename BaseValueType, typename FieldValueType, multi_exp_method Method,
                     typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
-                 NumberType multi_exp_inner(
-                    typename std::vector<NumberType>::const_iterator vec_start,
-                    typename std::vector<NumberType>::const_iterator vec_end,
+                 BaseValueType multi_exp_inner(
+                    typename std::vector<BaseValueType>::const_iterator vec_start,
+                    typename std::vector<BaseValueType>::const_iterator vec_end,
                     typename std::vector<FieldValueType>::const_iterator scalar_start,
                     typename std::vector<FieldValueType>::const_iterator scalar_end) {
                     
-                    NumberType result(NumberType::zero());
+                    BaseValueType result(BaseValueType::zero());
 
-                    typename std::vector<NumberType>::const_iterator vec_it;
+                    typename std::vector<BaseValueType>::const_iterator vec_it;
                     typename std::vector<FieldValueType>::const_iterator scalar_it;
 
                     for (vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it) {
