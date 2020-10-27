@@ -23,8 +23,12 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_BN128_WNAF_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_BN128_WNAF_PARAMS_HPP
+
+#include <nil/crypto3/algebra/curves/params.hpp>
+
+#include <nil/crypto3/algebra/curves/bn128.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -32,14 +36,34 @@ namespace nil {
             namespace curves {
 
                 template<typename GroupType>
-                struct multi_exp_params;
-
-                template<typename GroupType>
                 struct wnaf_params;
+
+                /************************* BN128-254 ***********************************/
+
+                template<>
+                struct wnaf_params<typename bn128<254, CHAR_BIT>::g1_type> {
+                    
+                    constexpr static const std::array<std::size_t, 4> 
+                        wnaf_window_table  = {10, 24, 40, 132};
+                };
+
+                template<>
+                struct wnaf_params<typename bn128<254, CHAR_BIT>::g2_type> {
+                    
+                    constexpr static const std::array<std::size_t, 4> 
+                        wnaf_window_table  = {7, 18, 35, 116};
+                };
+
+                /************************* BN128-254 definitions ***********************************/
+
+                constexpr std::array<std::size_t, 4> const 
+                    wnaf_params<typename bn128<254, CHAR_BIT>::g1_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const 
+                    wnaf_params<typename bn128<254, CHAR_BIT>::g2_type>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_BN128_WNAF_PARAMS_HPP
