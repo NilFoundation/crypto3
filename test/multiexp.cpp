@@ -77,13 +77,14 @@ test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
 }
 
 template<typename GroupType, typename FieldType, multi_exp_method Method>
-run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements, test_instances_t<FieldType> scalars) {
+run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
+                                         test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<GroupType> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
         answers.push_back(multi_exp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
-                                                               scalars[i].cbegin(), scalars[i].cend(), 1));
+                                                                  scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
     long long time_delta = get_nsec_time() - start_time;

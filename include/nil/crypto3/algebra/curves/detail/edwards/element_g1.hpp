@@ -60,14 +60,14 @@ namespace nil {
 
                         element_edwards_g1() :
                             element_edwards_g1(underlying_field_value_type::zero(),
-                                       underlying_field_value_type::one(),
-                                       underlying_field_value_type::zero()) {};
+                                               underlying_field_value_type::one(),
+                                               underlying_field_value_type::zero()) {};
                         // must be
                         // element_edwards_g1() : element_edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                   underlying_field_value_type in_Z) {
+                                           underlying_field_value_type in_Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;

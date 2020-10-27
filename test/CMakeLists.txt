@@ -68,7 +68,7 @@ set(RUNTIME_TESTS_NAMES
     "hash_to_curve"
     #    "groups"
     #    "bilinearity"
-)
+    )
 
 set(COMPILE_TIME_TESTS_NAMES
     "matrix"

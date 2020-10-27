@@ -64,14 +64,14 @@ namespace nil {
 
                         element_mnt6_g1() :
                             element_mnt6_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                    underlying_field_value_type::zero()) {};
+                                            underlying_field_value_type::zero()) {};
                         // must be
                         // element_mnt6_g1() : element_mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_mnt6_g1(underlying_field_value_type X,
-                                underlying_field_value_type Y,
-                                underlying_field_value_type Z) {
+                                        underlying_field_value_type Y,
+                                        underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -306,8 +306,8 @@ namespace nil {
                             element_mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_a_c1 =
                             element_mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_a_c2 = element_mnt6_g1<ModulusBits, GeneratorBits>::a;
-                        static const g1_field_type_value twist_mul_by_b_c0 =
+                        static const g1_field_type_value twist_mul_by_a_c2 = element_mnt6_g1<ModulusBits,
+                        GeneratorBits>::a; static const g1_field_type_value twist_mul_by_b_c0 =
                             element_mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_b_c1 =
                             element_mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;

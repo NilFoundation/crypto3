@@ -63,14 +63,14 @@ namespace nil {
 
                         element_bls12_g2() :
                             element_bls12_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                     underlying_field_value_type::zero()) {};
+                                             underlying_field_value_type::zero()) {};
                         // must be
                         // element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_bls12_g2(underlying_field_value_type X,
-                                 underlying_field_value_type Y,
-                                 underlying_field_value_type Z) {
+                                         underlying_field_value_type Y,
+                                         underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -361,14 +361,14 @@ namespace nil {
 
                         element_bls12_g2() :
                             element_bls12_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                     underlying_field_value_type::zero()) {};
+                                             underlying_field_value_type::zero()) {};
                         // must be
                         // element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_bls12_g2(underlying_field_value_type X,
-                                 underlying_field_value_type Y,
-                                 underlying_field_value_type Z) {
+                                         underlying_field_value_type Y,
+                                         underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -567,7 +567,7 @@ namespace nil {
                         element_bls12_g2 operator*(const NumberType &other) const {
                             return scalar_mul(*this, other);
                         }
-                        
+
                     private:
                         element_bls12_g2 add(const element_bls12_g2 &other) const {
 
