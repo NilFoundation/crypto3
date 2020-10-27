@@ -30,29 +30,43 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-#include <nil/crypto3/algebra/fields/fp2.hpp>
-#include <nil/crypto3/algebra/fields/fp3.hpp>
-#include <nil/crypto3/algebra/fields/alt_bn128/base_field.hpp>
-#include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
-#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/bn128/base_field.hpp>
-#include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/edwards/base_field.hpp>
-#include <nil/crypto3/algebra/fields/edwards/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
-#include <nil/crypto3/algebra/fields/dsa_botan.hpp>
-#include <nil/crypto3/algebra/fields/dsa_jce.hpp>
-//#include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
-//#include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
-//#include <nil/crypto3/algebra/fields/modp_ietf.hpp>
-//#include <nil/crypto3/algebra/fields/modp_srp.hpp>
+#include <nil/crypto3/algebra/multi_exp/multi_exp.hpp>
 
-#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
-#include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/p192.hpp>
+// #include <nil/crypto3/algebra/curves/p224.hpp>
+// #include <nil/crypto3/algebra/curves/p256.hpp>
+// #include <nil/crypto3/algebra/curves/p384.hpp>
+// #include <nil/crypto3/algebra/curves/p521.hpp>
+// #include <nil/crypto3/algebra/curves/secp.hpp>
+// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/x962_p.hpp>
+
+#include <nil/crypto3/algebra/curves/params/multi_exp/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/params/multi_exp/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p192.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p224.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p256.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p384.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p521.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/secp.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/x962_p.hpp>
 
 using namespace nil::crypto3::algebra;
 

@@ -58,7 +58,7 @@ namespace nil {
                 * "Faster batch forgery identification", INDOCRYPT 2012
                 * (https://eprint.iacr.org/2012/549.pdf)
                 * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
-                * Requires that BaseValueType implements .dbl() (and, if USE_MIXED_ADDITION is defined,
+                * Requires that typename BaseType::value implements .dbl() (and, if USE_MIXED_ADDITION is defined,
                 * .to_special(), .mixed_add(), and batch_to_special()).
                 */
             multi_exp_method_BDLO12
@@ -66,18 +66,18 @@ namespace nil {
             
             namespace detail {
 
-                template<typename BaseValueType, typename FieldValueType, multi_exp_method Method,
+                template<typename BaseType, typename FieldType, multi_exp_method Method,
                     typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
-                 BaseValueType multi_exp_inner(
-                    typename std::vector<BaseValueType>::const_iterator vec_start,
-                    typename std::vector<BaseValueType>::const_iterator vec_end,
-                    typename std::vector<FieldValueType>::const_iterator scalar_start,
-                    typename std::vector<FieldValueType>::const_iterator scalar_end) {
+                 typename BaseType::value multi_exp_inner(
+                    typename std::vector<typename BaseType::value>::const_iterator vec_start,
+                    typename std::vector<typename BaseType::value>::const_iterator vec_end,
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
                     
-                    BaseValueType result(BaseValueType::zero());
+                    typename BaseType::value result(typename BaseType::value::zero());
 
-                    typename std::vector<BaseValueType>::const_iterator vec_it;
-                    typename std::vector<FieldValueType>::const_iterator scalar_it;
+                    typename std::vector<typename BaseType::value>::const_iterator vec_it;
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_it;
 
                     for (vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it) {
                         result = result + (*scalar_it) * (*vec_it);
@@ -88,13 +88,13 @@ namespace nil {
                     return result;
                 }
 
-                template<typename NumberType, typename BaseValueType, typename FieldValueType, multi_exp_method Method,
+                template<typename NumberType, typename BaseType, typename FieldType, multi_exp_method Method,
                     typename std::enable_if<(Method == multi_exp_method_BDLO12), int>::type = 0>
-                BaseValueType multi_exp_inner(
-                    typename std::vector<BaseValueType>::const_iterator bases,
-                    typename std::vector<BaseValueType>::const_iterator bases_end,
-                    typename std::vector<FieldValueType>::const_iterator exponents,
-                    typename std::vector<FieldValueType>::const_iterator exponents_end) {
+                typename BaseType::value multi_exp_inner(
+                    typename std::vector<typename BaseType::value>::const_iterator bases,
+                    typename std::vector<typename BaseType::value>::const_iterator bases_end,
+                    typename std::vector<typename FieldType::value_type>::const_iterator exponents,
+                    typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
 
                     std::size_t length = std::distance(bases, bases_end);
 
@@ -106,13 +106,13 @@ namespace nil {
                     std::size_t num_bits = 0;
 
                     for (std::size_t i = 0; i < length; i++) {
-                        bn_exponents[i] = exponents[i].as_bigint();
+                        bn_exponents[i] = exponents[i].data;
                         num_bits = std::max(num_bits, boost::multiprecision::msb(bn_exponents[i]));
                     }
 
                     std::size_t num_groups = (num_bits + c - 1) / c;
 
-                    BaseValueType result;
+                    typename BaseType::value result;
                     bool result_nonzero = false;
 
                     for (std::size_t k = num_groups - 1; k <= num_groups; k--) {
@@ -122,7 +122,7 @@ namespace nil {
                             }
                         }
 
-                        std::vector<BaseValueType> buckets(1 << c);
+                        std::vector<typename BaseType::value> buckets(1 << c);
                         std::vector<bool> bucket_nonzero(1 << c);
 
                         for (std::size_t i = 0; i < length; i++) {
@@ -154,7 +154,7 @@ namespace nil {
                         batch_to_special(buckets);
 #endif
 
-                        BaseValueType running_sum;
+                        typename BaseType::value running_sum;
                         bool running_sum_nonzero = false;
 
                         for (std::size_t i = (1u << c) - 1; i > 0; i--) {
@@ -187,15 +187,15 @@ namespace nil {
                     return result;
                 }
 
-                template<typename NumberType, typename BaseValueType, typename FieldValueType, multi_exp_method Method,
+                template<typename NumberType, typename BaseType, typename FieldType, multi_exp_method Method,
                     typename std::enable_if<(Method == multi_exp_method_bos_coster), int>::type = 0>
-                BaseValueType multi_exp_inner( typename std::vector<BaseValueType>::const_iterator vec_start,
-                                          typename std::vector<BaseValueType>::const_iterator vec_end,
-                                          typename std::vector<FieldValueType>::const_iterator scalar_start,
-                                          typename std::vector<FieldValueType>::const_iterator scalar_end) {
+                typename BaseType::value multi_exp_inner( typename std::vector<typename BaseType::value>::const_iterator vec_start,
+                                          typename std::vector<typename BaseType::value>::const_iterator vec_end,
+                                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
                     if (vec_start == vec_end) {
-                        return BaseValueType::zero();
+                        return typename BaseType::value::zero();
                     }
 
                     if (vec_start + 1 == vec_end) {
@@ -206,11 +206,11 @@ namespace nil {
                     const std::size_t vec_len = scalar_end - scalar_start;
                     const std::size_t odd_vec_len = (vec_len % 2 == 1 ? vec_len : vec_len + 1);
                     opt_q.reserve(odd_vec_len);
-                    std::vector<BaseValueType> g;
+                    std::vector<typename BaseType::value> g;
                     g.reserve(odd_vec_len);
 
-                    typename std::vector<BaseValueType>::const_iterator vec_it;
-                    typename std::vector<FieldValueType>::const_iterator scalar_it;
+                    typename std::vector<typename BaseType::value>::const_iterator vec_it;
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_it;
                     std::size_t i;
                     for (i=0, vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it, ++i) {
                         g.emplace_back(*vec_it);
@@ -221,13 +221,13 @@ namespace nil {
                     assert(scalar_it == scalar_end);
 
                     if (vec_len != odd_vec_len) {
-                        g.emplace_back(BaseValueType::zero());
+                        g.emplace_back(typename BaseType::value::zero());
                         opt_q.emplace_back(NumberType(0ul));
                     }
                     assert(g.size() % 2 == 1);
                     assert(opt_q.size() == g.size());
 
-                    BaseValueType opt_result = BaseValueType::zero();
+                    typename BaseType::value opt_result = typename BaseType::value::zero();
 
                     while (true) {
                         NumberType &a = opt_q[0];
@@ -256,7 +256,7 @@ namespace nil {
                         }
                         else {
                             // x A + y B => (x-y) A + y (B+A)
-                            mpn_sub_n(a.r.data, a.r.data, b.r.data, n);
+                            a.r.data = a.r.data - b.r.data;
                             g[b.idx] = g[b.idx] + g[a.idx];
                         }
 
