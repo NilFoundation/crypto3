@@ -36,10 +36,6 @@ macro(define_runtime_algebra_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
-
-    cm_test(NAME algebra_${name}_examples_test SOURCES ../example/${name}.cpp)
-    target_link_libraries(algebra_${name}_examples_test)
-
 endmacro()
 
 macro(define_compile_time_algebra_test name)
@@ -66,6 +62,7 @@ set(RUNTIME_TESTS_NAMES
     "fields"
     "pairing"
     "hash_to_curve"
+    "wnaf"
     #    "groups"
     #    "bilinearity"
 )
