@@ -31,19 +31,24 @@
 
 #include <type_traits>
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupType>
+                    using namespace boost::multiprecision;
+
+                    template<typename GroupType,
+                             typename DstCreator = DefaultDstCreator<typename h2c_suite<GroupType>::hash_type>>
                     struct ep_map {
                         typedef h2c_suite<GroupType> suite_type;
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::expand_message expand_message;
-                        typedef typename suite_type::number_type number_type;
+                        typedef typename suite_type::modular_type modular_type;
 
                         constexpr static std::size_t m = suite_type::m;
                         constexpr static std::size_t L = suite_type::L;
@@ -51,37 +56,43 @@ namespace nil {
                         static_assert(suite_type::m == 1, "field has wrong extension");
 
                         template<typename InputType, typename = typename std::enable_if<std::is_same<
-                                                         std::uint8_t, typename InputType::value_type>::value>::type>
-                        static inline group_value_type hash_to_curve(const InputType &msg) {
-                            auto u = hash_to_field<2>(msg);
+                            std::uint8_t, typename InputType::value_type>::value>::type>
+                        static inline group_value_type hash_to_curve(const InputType &msg,
+                                                                     DstCreator &&dst_creator = DstCreator()) {
+                            auto u = hash_to_field<2>(msg, dst_creator);
                             group_value_type Q0 = map_to_curve(u[0]);
                             group_value_type Q1 = map_to_curve(u[1]);
                             group_value_type R = Q0 + Q1;
                             return clear_cofactor(R);
                         }
 
-                        template<typename InputType, typename = typename std::enable_if<std::is_same<
-                                                         std::uint8_t, typename InputType::value_type>::value>::type>
-                        static inline group_value_type encode_to_curve(const InputType &msg) {
-                            auto u = hash_to_field<1>(msg);
-                            group_value_type Q = map_to_curve(u[0]);
-                            return clear_cofactor(Q);
-                        }
+                        // template<typename InputType, typename = typename std::enable_if<std::is_same<
+                        //                                  std::uint8_t, typename InputType::value_type>::value>::type>
+                        // static inline group_value_type encode_to_curve(const InputType &msg) {
+                        //     auto u = hash_to_field<1>(msg);
+                        //     group_value_type Q = map_to_curve(u[0]);
+                        //     return clear_cofactor(Q);
+                        // }
 
                         // private:
-                        template<std::size_t N, typename InputType>
-                        static inline std::array<field_value_type, N> hash_to_field(InputType msg) {
-                            std::array<std::uint8_t, N * m * L> uniform_bytes {0};
-                            expand_message::template process<N * m * L>(msg, suite_type::suite_id, uniform_bytes);
+                        template<std::size_t N, typename InputType,
+                                 typename = typename std::enable_if<std::is_same<
+                                     std::uint8_t, typename InputType::value_type>::value>::type>
+                        static inline std::array<field_value_type, N> hash_to_field(
+                            const InputType &msg,
+                            DstCreator &&dst_creator = DstCreator()) {
+                            auto dst = dst_creator.get_dst(suite_type::suite_id);
 
-                            number_type e;
-                            auto L = suite_type::L;
+                            std::array<std::uint8_t, N * m * L> uniform_bytes {0};
+                            expand_message::process(N * m * L, msg, dst, uniform_bytes);
+
+                            cpp_int e;
                             std::array<field_value_type, N> result {0};
                             for (std::size_t i = 0; i < N; i++) {
                                 auto elm_offset = L * i;
-                                auto uniform_bytes_iter = uniform_bytes.begin() + elm_offset;
-                                import_bits(e, uniform_bytes_iter, uniform_bytes_iter + L);
-                                result[i] = field_value_type(e);
+                                import_bits(e, uniform_bytes.begin() + elm_offset,
+                                            uniform_bytes.begin() + elm_offset + L);
+                                result[i] = field_value_type(modular_type(e, suite_type::p));
                             }
 
                             return result;

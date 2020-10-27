@@ -54,6 +54,26 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::algebra::curves::detail;
 using namespace nil::crypto3::algebra::curves;
 
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
+    os << e.data << std::endl;
+}
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<typename FieldParams>
+            struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
+                void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
+                    print_field_element(os, e);
+                }
+            };
+
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
+
+
 template<typename Expander, typename DstType, typename MsgType, typename ResultType,
     typename = typename std::enable_if<std::is_same<std::uint8_t, typename DstType::value_type>::value &&
         std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
@@ -73,6 +93,17 @@ void check_expand_message(std::size_t len_in_bytes, const DstType &dst, const Ms
     Expander::template process(len_in_bytes, msg, dst, uniform_bytes);
     BOOST_CHECK(result_compare(uniform_bytes));
 }
+
+template<std::size_t N, typename GroupType, typename FieldParams>
+void check_hash_to_field(const std::string &msg_str, const std::array<element_fp<FieldParams>, N> &result) {
+    using h2c_type = ep_map<GroupType>;
+    std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
+    auto u = h2c_type::template hash_to_field<N>(msg);
+    for (std::size_t i = 0; i < N; i++) {
+        BOOST_CHECK_EQUAL(u[i], result[i]);
+    }
+}
+
 
 BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
 
@@ -108,7 +139,7 @@ BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
     //     std::cout << sgn0(fp2_e1) << std::endl;
     // }
 
-    BOOST_AUTO_TEST_CASE(expand_message_xmd_sha256) {
+    BOOST_AUTO_TEST_CASE(expand_message_xmd_sha256_test) {
         // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-K.1
         using hash_policy_type = hashes::sha2<256>;
         using expand_message = expand_message_xmd<128, hash_policy_type>;
@@ -133,6 +164,27 @@ BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
 
         for (const auto &s : samples) {
             check_expand_message<expand_message>(std::get<0>(s), DST, std::get<1>(s), std::get<2>(s));
+        }
+    }
+
+    BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_sha256_test) {
+        // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.9.1
+        using group_type = typename bls12_381::g1_type;
+        using field_value_type = typename group_type::underlying_field_type::value_type;
+        using modulus_type = typename field_value_type::modulus_type;
+
+        using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+        samples_type samples = {
+            {"", {field_value_type(modulus_type("1790030616568561980207134218344899338736900885118493183248255875682123737756800213955590674957414534085508415116879")), field_value_type(modulus_type("247470258331762152370823329280394074170045058453263356372873997375166908584899100434893060702108665825589810322121"))}},
+            {"abc", {field_value_type(modulus_type("2088728490498894818688784437928579501848367107744050576780266498473771518428420173373487118890161663886009635645777")), field_value_type(modulus_type("32138924938310862093169606408734331410171587925844216752733293543601988453843327878077294514665889481436558332217"))}},
+            {"abcdef0123456789", {field_value_type(modulus_type("950597030816464821778971015673486129641410344078861474750527508537804549386058612983484048401731236595379325781716")), field_value_type(modulus_type("1979385000937648348925653198641340374887185657649818450486460034420643425685140133042050299078521896600910613745210"))}},
+            {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", {field_value_type(modulus_type("156598384884054652954707150757138355079410210785113857376825014810441188545548595465313883035731540725116276838022")), field_value_type(modulus_type("1709027689043323463259398100486189187238532958310276339146988040422594808842792053521671901476006506290292962489454"))}},
+            {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", {field_value_type(modulus_type("1625704516324785166230868561544190006281306318060308039760768255839116494270087378351796462565313509233883467016390")), field_value_type(modulus_type("897347619044039892426123073051050824113615337090860431730602102178645855045832565883684732229117125155988066429111"))}}
+            // {"", {field_value_type(modulus_type("")), field_value_type(modulus_type(""))}}
+        };
+
+        for (auto s : samples) {
+            check_hash_to_field<2, group_type>(std::get<0>(s), std::get<1>(s));
         }
     }
 
