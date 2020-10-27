@@ -46,13 +46,15 @@ namespace nil {
                         using extended_number_type =
                             curves::detail::alt_bn128_basic_policy<254, CHAR_BIT>::extended_number_type;
 
+                        using g1_group = curves::detail::alt_bn128_g1<254, CHAR_BIT>;
+                        using g2_group = curves::detail::alt_bn128_g2<254, CHAR_BIT>;
                         using Fp_field = typename policy_type::scalar_field_type;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
                         using Fqk_field = typename policy_type::gt_field_type;
 
-                        using g1 = curves::detail::alt_bn128_g1<254, CHAR_BIT>;
-                        using g2 = curves::detail::alt_bn128_g2<254, CHAR_BIT>;
+                        using g1 = typename g1_group::value_type;
+                        using g2 = typename g2_group::value_type;
                         using Fq = typename Fq_field::value_type;
                         using Fq2 = typename Fqe_field::value_type;
                         using gt = typename Fqk_field::value_type;

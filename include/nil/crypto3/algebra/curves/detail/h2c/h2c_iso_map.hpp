@@ -43,10 +43,11 @@ namespace nil {
                     template<>
                     class iso_map<typename bls12_381::g1_type> {
                         typedef bls12_381 group_policy_type;
+                        typedef typename bls12_381::g1_type group_type;
 
-                        typedef typename group_policy_type::g1_type group_value_type;
-                        typedef typename group_value_type::underlying_field_value_type field_value_type;
+                        typedef typename group_type::value_type group_value_type;
                         typedef typename group_policy_type::number_type number_type;
+                        typedef typename group_type::underlying_field_type::value_type field_value_type;
 
                         constexpr static std::array<number_type, 12> k_x_num = {
                             0x11a05f2b1e833340b809101dd99815856b303e88a2d7005ff2627b56cdb4e2c85610c2d5f2e62d6eaeac1662734649b7_cppui381,
