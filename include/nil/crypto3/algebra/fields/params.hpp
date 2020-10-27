@@ -69,4 +69,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_PARAMS_HPP
