@@ -30,40 +30,41 @@
 #include <vector>
 
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
+
+            enum multi_exp_method {
+                /**
+                * Naive multi-exponentiation individually multiplies each base by the
+                * corresponding scalar and adds up the results.
+                * multi_exp_method_naive uses opt_window_wnaf_exp for exponentiation,
+                * while multi_exp_method_plain uses operator *.
+                */
+            multi_exp_method_naive_plain,
+                /**
+                * A variant of the Bos-Coster algorithm [1],
+                * with implementation suggestions from [2].
+                *
+                * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
+                * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
+                */
+            multi_exp_method_bos_coster,
+                /**
+                * A special case of Pippenger's algorithm from Page 15 of
+                * Bernstein, Doumen, Lange, Oosterwijk,
+                * "Faster batch forgery identification", INDOCRYPT 2012
+                * (https://eprint.iacr.org/2012/549.pdf)
+                * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
+                * Requires that BaseValueType implements .dbl() (and, if USE_MIXED_ADDITION is defined,
+                * .to_special(), .mixed_add(), and batch_to_special()).
+                */
+            multi_exp_method_BDLO12
+            };
+            
             namespace detail {
-
-                enum multi_exp_method {
-                    /**
-                    * Naive multi-exponentiation individually multiplies each base by the
-                    * corresponding scalar and adds up the results.
-                    * multi_exp_method_naive uses opt_window_wnaf_exp for exponentiation,
-                    * while multi_exp_method_plain uses operator *.
-                    */
-                multi_exp_method_naive_plain,
-                    /**
-                    * A variant of the Bos-Coster algorithm [1],
-                    * with implementation suggestions from [2].
-                    *
-                    * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
-                    * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
-                    */
-                multi_exp_method_bos_coster,
-                    /**
-                    * A special case of Pippenger's algorithm from Page 15 of
-                    * Bernstein, Doumen, Lange, Oosterwijk,
-                    * "Faster batch forgery identification", INDOCRYPT 2012
-                    * (https://eprint.iacr.org/2012/549.pdf)
-                    * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
-                    * Requires that BaseValueType implements .dbl() (and, if USE_MIXED_ADDITION is defined,
-                    * .to_special(), .mixed_add(), and batch_to_special()).
-                    */
-                multi_exp_method_BDLO12
-                };
-
 
                 template<typename BaseValueType, typename FieldValueType, multi_exp_method Method,
                     typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
@@ -102,7 +103,7 @@ namespace nil {
                     std::size_t c = log2_length - (log2_length / 3 - 2);
 
                     std::vector<NumberType> bn_exponents(length);
-                    stf::size_t num_bits = 0;
+                    std::size_t num_bits = 0;
 
                     for (std::size_t i = 0; i < length; i++) {
                         bn_exponents[i] = exponents[i].as_bigint();

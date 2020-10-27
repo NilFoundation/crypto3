@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE multiexpr_test
+#define BOOST_TEST_MODULE multi_expr_test
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -32,13 +32,50 @@
 #include <cstdio>
 #include <vector>
 
-#include <nil/crypto3/algebra/curves/bn128.hpp>
-#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/crypto3/algebra/multi_exp/multi_exp.hpp>
+
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/p192.hpp>
+// #include <nil/crypto3/algebra/curves/p224.hpp>
+// #include <nil/crypto3/algebra/curves/p256.hpp>
+// #include <nil/crypto3/algebra/curves/p384.hpp>
+// #include <nil/crypto3/algebra/curves/p521.hpp>
+// #include <nil/crypto3/algebra/curves/secp.hpp>
+// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/x962_p.hpp>
+
+#include <nil/crypto3/algebra/curves/params/multi_exp/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/params/multi_exp/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multi_exp/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p192.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p224.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p256.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p384.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/p521.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/secp.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multi_exp/x962_p.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 
 using namespace nil::crypto3::algebra;
 
 template<typename GroupType>
-using run_result_t = std::pair<long long, std::vector<GroupType>>;
+using run_result_t = std::pair<long long, std::vector<typename GroupType::value_type>>;
 
 template<typename T>
 using test_instances_t = std::vector<std::vector<T>>;
@@ -50,11 +87,12 @@ test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
     test_instances_t<GroupType> result(count);
 
     for (size_t i = 0; i < count; i++) {
-        GroupType x = GroupType::random_element();
-        x.to_special();    // djb requires input to be in special form
+
+        typename GroupType::value_type x = curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
-            // result[i].push_back(GroupType::random_element());
+            // result[i].push_back(curve_random_element<GroupType>());
         }
     }
 
@@ -69,7 +107,7 @@ test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(SHA512_rng<FieldType>(i * size + j));
+            result[i].push_back(field_random_element<FieldType>(i * size + j));
         }
     }
 
@@ -77,11 +115,11 @@ test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
 }
 
 template<typename GroupType, typename FieldType, multi_exp_method Method>
-run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
+run_result_t<GroupType> profile_multi_exp(test_instances_t<GroupType> group_elements,
                                          test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
-    std::vector<GroupType> answers;
+    std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
         answers.push_back(multi_exp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
                                                                   scalars[i].cbegin(), scalars[i].cend(), 1));
@@ -102,12 +140,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
         test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
         run_result_t<GroupType> result_bos_coster =
-            profile_multiexp<GroupType, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
+            profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_bos_coster>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
         run_result_t<GroupType> result_djb =
-            profile_multiexp<GroupType, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
+            profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_BDLO12>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -117,7 +155,7 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 
         if (expn <= expn_end_naive) {
             run_result_t<GroupType> result_naive =
-                profile_multiexp<GroupType, FieldType, multi_exp_method_naive>(group_elements, scalars);
+                profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_naive_plain>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 
@@ -131,14 +169,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 }
 
 int main(void) {
-    print_compilation_info();
 
-    printf("Profiling BN128_G1\n");
-    bn128_pp::init_public_params();
-    print_performance_csv<G1<bn128_pp>, Fr<bn128_pp>>(2, 20, 14, true);
+    std::cout << "Testing BLS12-381 G1" << std::endl;
+    print_performance_csv<curves::bls12<381>::g1_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
-    printf("Profiling BN128_G2\n");
-    print_performance_csv<G2<bn128_pp>, Fr<bn128_pp>>(2, 20, 14, true);
+    std::cout << "Testing BLS12-381 G2" << std::endl;
+    print_performance_csv<curves::bls12<381>::g2_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
     return 0;
 }

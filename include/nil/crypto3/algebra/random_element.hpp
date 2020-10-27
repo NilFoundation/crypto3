@@ -30,9 +30,9 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<typename CurveGType>    // use curve croup element type_trait
-            CurveGType curve_random_element() {
-                return CurveGType::one();
+            template<typename CurveGroupType>    // use curve group element type_trait
+            typename CurveGroupType::value_type curve_random_element() {
+                return CurveGroupType::value_type::one();
             };
 
             template<typename FieldType>    // use field element type_trait

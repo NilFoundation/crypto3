@@ -31,14 +31,14 @@
 
 #include <boost/multiprecision/number.hpp>
 
-#include <boost/algebra/multi_exp/detail/multi_exp.hpp>
+#include <nil/crypto3/algebra/multi_exp/detail/multi_exp.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
 
             //TODO: Implement not only for vectors
-            template<typename BaseValueType, typename FieldValueType, typename detail::multi_exp_method Method>
+            template<typename BaseValueType, typename FieldValueType, typename multi_exp_method Method>
             BaseValueType multi_exp(typename std::vector<BaseValueType>::const_iterator vec_start,
                         typename std::vector<BaseValueType>::const_iterator vec_end,
                         typename std::vector<FieldValueType>::const_iterator scalar_start,
@@ -112,7 +112,7 @@ namespace nil {
                     typename std::vector<FieldValueType>::const_iterator b_start,
                     typename std::vector<FieldValueType>::const_iterator b_end) {
 
-                return multi_exp<FieldValueType, FieldValueType, detail::multi_exp_method_naive_plain>(
+                return multi_exp<FieldValueType, FieldValueType, multi_exp_method_naive_plain>(
                     a_start, a_end,
                     b_start, b_end, 1);
             }
