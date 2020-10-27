@@ -125,7 +125,7 @@ namespace nil {
 
             template<typename GroupType>
             std::size_t get_exp_window_size(const std::size_t num_scalars) {
-                if (GroupType::fixed_base_exp_window_table.empty()) {
+                if (multi_exp_params<GroupType>::fixed_base_exp_window_table.empty()) {
  #ifdef LOWMEM
                     return 14;
  #else
@@ -135,8 +135,9 @@ namespace nil {
 
                 std::size_t window = 1;
                 
-                for (long i = GroupType::fixed_base_exp_window_table.size()-1; i >= 0; --i) {
-                    if (GroupType::fixed_base_exp_window_table[i] != 0 && num_scalars >= GroupType::fixed_base_exp_window_table[i]) {
+                for (long i = multi_exp_params<GroupType>::fixed_base_exp_window_table.size()-1; i >= 0; --i) {
+                    if (multi_exp_params<GroupType>::fixed_base_exp_window_table[i] != 0 
+                        && num_scalars >= multi_exp_params<GroupType>::fixed_base_exp_window_table[i]) {
                         window = i+1;
                         break;
                     }
