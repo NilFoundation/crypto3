@@ -72,7 +72,7 @@ namespace nil {
                         // when constexpr fields will be finished
 
                         element_edwards_g2(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                   underlying_field_value_type in_Z) {
+                                           underlying_field_value_type in_Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -87,8 +87,8 @@ namespace nil {
 
                         static element_edwards_g2 zero() {
                             return element_edwards_g2(underlying_field_value_type::zero(),
-                                              underlying_field_value_type::one(),
-                                              underlying_field_value_type::zero());
+                                                      underlying_field_value_type::one(),
+                                                      underlying_field_value_type::zero());
                             // must be
                             // return element_edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
                             // when constexpr fields will be finished

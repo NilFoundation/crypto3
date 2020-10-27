@@ -60,14 +60,15 @@ namespace nil {
                         /*************************  Constructors and zero/one  ***********************************/
 
                         element_alt_bn128_g2() :
-                            element_alt_bn128_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                         underlying_field_value_type::zero()) {};
+                            element_alt_bn128_g2(underlying_field_value_type::zero(),
+                                                 underlying_field_value_type::one(),
+                                                 underlying_field_value_type::zero()) {};
                         // must be
                         // element_alt_bn128_g2() : element_alt_bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_alt_bn128_g2(underlying_field_value_type X, underlying_field_value_type Y,
-                                     underlying_field_value_type Z) {
+                                             underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -295,8 +296,8 @@ namespace nil {
                     private:    // probably shoould be public for pairing
                         element_alt_bn128_g2 mul_by_q() const {
                             return element_alt_bn128_g2(twist_mul_by_q_X * (this->X).Frobenius_map(1),
-                                                twist_mul_by_q_Y * (this->Y).Frobenius_map(1),
-                                                (this->Z).Frobenius_map(1));
+                                                        twist_mul_by_q_Y * (this->Y).Frobenius_map(1),
+                                                        (this->Z).Frobenius_map(1));
                         }
 
                     public:
