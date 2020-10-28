@@ -59,6 +59,11 @@ void print_field_element(std::ostream &os, const typename fields::detail::elemen
     os << e.data << std::endl;
 }
 
+template<typename FpCurveGroupElement>
+void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
+    os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
+}
+
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
@@ -66,6 +71,19 @@ namespace boost {
             struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
                 void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
                     print_field_element(os, e);
+                }
+            };
+
+            template<>
+            struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
+                    print_fp_curve_group_element(os, e);
+                }
+            };
+
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream &, P<K, V> const &) {
                 }
             };
 
@@ -102,6 +120,14 @@ void check_hash_to_field(const std::string &msg_str, const std::array<element_fp
     for (std::size_t i = 0; i < N; i++) {
         BOOST_CHECK_EQUAL(u[i], result[i]);
     }
+}
+
+template<typename GroupType, typename GroupValueType>
+void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected) {
+    using h2c_type = ep_map<GroupType>;
+    std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
+    GroupValueType result = h2c_type::hash_to_curve(msg);
+    BOOST_CHECK_EQUAL(result.to_affine_coordinates(), expected);
 }
 
 
@@ -285,8 +311,53 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_sha256_test) {
         // {"", {field_value_type(modulus_type("")), field_value_type(modulus_type(""))}}
     };
 
-    for (auto s : samples) {
+    for (auto &s : samples) {
         check_hash_to_field<2, group_type>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_sha256_test) {
+    using group_type = typename bls12_381::g1_type;
+    using group_value_type = typename group_type::value_type;
+    using field_value_type = typename group_type::underlying_field_type::value_type;
+    using modulus_type = typename field_value_type::modulus_type;
+
+    using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
+    samples_type samples {
+        {"",
+         group_value_type(
+             modulus_type("794311575721400831362957049303781044852006323422624111893352859557450008308620925451441746926395141598720928151969"),
+             modulus_type("1343412193624222137939591894701031123123641958980729764240763391191550653712890272928110356903136085217047453540965"),
+             1)},
+        {"abc",
+         group_value_type(
+             modulus_type("513738460217615943921285247703448567647875874745567372796164155472383127756567780059136521508428662765965997467907"),
+             modulus_type("1786897908129645780825838873875416513994655004408749907941296449131605892957529391590865627492442562626458913769565"),
+             1)},
+        {"abcdef0123456789",
+         group_value_type(
+             modulus_type("2751628761372137084683207295437105268166375184027748372156952770986741873369176463286511518644061904904607431667096"),
+             modulus_type("563036982304416203921640398061260377444881693369806087719971277317609936727208012968659302318886963927918562170633"),
+             1)},
+        {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+         group_value_type(
+             modulus_type("3380432694887674439773082418192083720584748080704959172978586229921475315220434165460350679208315690319508336723080"),
+             modulus_type("3698526739072864408749571082270628561764415577445404115596990919801523793138348254443092179877354467167123794222392"),
+             1)},
+        {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         group_value_type(
+             modulus_type("1256967425542823069694513550918025689490036478501181600525944653952846100887848729514132077573887342346961531624702"),
+             modulus_type("880372082403694543476959909256504267215588055450016885103797700856746532134585942561958795215862304181527267736264"),
+             1)},
+        // {"",
+        //  group_value_type(
+        //      modulus_type(""),
+        //      modulus_type(""),
+        //      1)},
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_curve<group_type>(std::get<0>(s), std::get<1>(s));
     }
 }
 

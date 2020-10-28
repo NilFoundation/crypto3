@@ -32,6 +32,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_iso_map.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -65,6 +66,12 @@ namespace nil {
                         constexpr static std::size_t L = 64;
 
                         typedef expand_message_xmd<k, hash_type> expand_message;
+                        typedef m2c_simple_swu_zeroAB<iso_map<group_type>, field_value_type, group_value_type>
+                            map_to_curve;
+                        constexpr static number_type iso_Ai = 0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381;
+                        constexpr static number_type iso_Bi = 0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381;
+                        constexpr static std::size_t Z = 11;
+                        constexpr static number_type h_eff = 0xd201000000010001_cppui381;
                     };
                 }    // namespace detail
             }        // namespace curves

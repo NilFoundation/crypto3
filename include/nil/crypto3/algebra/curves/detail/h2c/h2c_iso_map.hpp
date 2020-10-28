@@ -112,40 +112,114 @@ namespace nil {
 
                     public:
                         static inline group_value_type process(const group_value_type &ci) {
+                            // field_value_type x_den =
+                            //     ci.X.pow(10) +
+                            //     ci.X.pow(9) * field_value_type(k_x_den[9]) +
+                            //     ci.X.pow(8) * field_value_type(k_x_den[8]) +
+                            //     ci.X.pow(7) * field_value_type(k_x_den[7]) +
+                            //     ci.X.pow(6) * field_value_type(k_x_den[6]) +
+                            //     ci.X.pow(5) * field_value_type(k_x_den[5]) +
+                            //     ci.X.pow(4) * field_value_type(k_x_den[4]) +
+                            //     ci.X.pow(3) * field_value_type(k_x_den[3]) +
+                            //     ci.X.pow(2) * field_value_type(k_x_den[2]) +
+                            //     ci.X * field_value_type(k_x_den[1]) +
+                            //     field_value_type(k_x_den[0]);
+                            // field_value_type y_den =
+                            //     ci.X.pow(15) +
+                            //     ci.X.pow(14) * field_value_type(k_y_den[14]) +
+                            //     ci.X.pow(13) * field_value_type(k_y_den[13]) +
+                            //     ci.X.pow(12) * field_value_type(k_y_den[12]) +
+                            //     ci.X.pow(11) * field_value_type(k_y_den[11]) +
+                            //     ci.X.pow(10) * field_value_type(k_y_den[10]) +
+                            //     ci.X.pow(9) * field_value_type(k_y_den[9]) +
+                            //     ci.X.pow(8) * field_value_type(k_y_den[8]) +
+                            //     ci.X.pow(7) * field_value_type(k_y_den[7]) +
+                            //     ci.X.pow(6) * field_value_type(k_y_den[6]) +
+                            //     ci.X.pow(5) * field_value_type(k_y_den[5]) +
+                            //     ci.X.pow(4) * field_value_type(k_y_den[4]) +
+                            //     ci.X.pow(3) * field_value_type(k_y_den[3]) +
+                            //     ci.X.pow(2) * field_value_type(k_y_den[2]) +
+                            //     ci.X * field_value_type(k_y_den[1]) +
+                            //     field_value_type(k_y_den[0]);
+                            // if (x_den.is_zero() || y_den.is_zero() ) {
+                            //     return group_value_type::one();
+                            // }
+                            // field_value_type x_num =
+                            //     ci.X.pow(11) * field_value_type(k_x_num[11]) +
+                            //     ci.X.pow(10) * field_value_type(k_x_num[10]) +
+                            //     ci.X.pow(9) * field_value_type(k_x_num[9]) +
+                            //     ci.X.pow(8) * field_value_type(k_x_num[8]) +
+                            //     ci.X.pow(7) * field_value_type(k_x_num[7]) +
+                            //     ci.X.pow(6) * field_value_type(k_x_num[6]) +
+                            //     ci.X.pow(5) * field_value_type(k_x_num[5]) +
+                            //     ci.X.pow(4) * field_value_type(k_x_num[4]) +
+                            //     ci.X.pow(3) * field_value_type(k_x_num[3]) +
+                            //     ci.X.pow(2) * field_value_type(k_x_num[2]) +
+                            //     ci.X * field_value_type(k_x_num[1]) +
+                            //     field_value_type(k_x_num[0]);
+                            // field_value_type y_num =
+                            //     ci.X.pow(15) * field_value_type(k_y_num[15]) +
+                            //     ci.X.pow(14) * field_value_type(k_y_num[14]) +
+                            //     ci.X.pow(13) * field_value_type(k_y_num[13]) +
+                            //     ci.X.pow(12) * field_value_type(k_y_num[12]) +
+                            //     ci.X.pow(11) * field_value_type(k_y_num[11]) +
+                            //     ci.X.pow(10) * field_value_type(k_y_num[10]) +
+                            //     ci.X.pow(9) * field_value_type(k_y_num[9]) +
+                            //     ci.X.pow(8) * field_value_type(k_y_num[8]) +
+                            //     ci.X.pow(7) * field_value_type(k_y_num[7]) +
+                            //     ci.X.pow(6) * field_value_type(k_y_num[6]) +
+                            //     ci.X.pow(5) * field_value_type(k_y_num[5]) +
+                            //     ci.X.pow(4) * field_value_type(k_y_num[4]) +
+                            //     ci.X.pow(3) * field_value_type(k_y_num[3]) +
+                            //     ci.X.pow(2) * field_value_type(k_y_num[2]) +
+                            //     ci.X * field_value_type(k_y_num[1]) +
+                            //     field_value_type(k_y_num[0]);
+
+
                             field_value_type x_num = 0;
                             field_value_type x_den = 0;
                             field_value_type y_num = 0;
                             field_value_type y_den = 0;
 
+                            std::vector<field_value_type> xi_powers = [&ci](){
+                                std::vector<field_value_type> xi_powers {1};
+                                for (std::size_t i = 0; i < 15; i++) {
+                                    xi_powers.emplace_back(xi_powers.back() * ci.X);
+                                }
+                                return xi_powers;
+                            }();
+
                             field_value_type x_mul = 1;
-                            for (auto &k : k_x_den) {
-                                x_den += field_value_type(k) * x_mul;
+                            for (std::size_t i = 0; i < k_x_den.size(); i++) {
+                                x_den += field_value_type(k_x_den[i]) * xi_powers[i];
                                 x_mul *= ci.X;
                             }
+                            x_den += xi_powers[k_x_den.size()];
 
                             field_value_type y_mul = 1;
-                            for (auto &k : k_y_den) {
-                                y_den += field_value_type(k) * y_mul;
-                                y_mul *= ci.Y;
+                            for (std::size_t i = 0; i < k_y_den.size(); i++) {
+                                y_den += field_value_type(k_y_den[i]) * xi_powers[i];
+                                y_mul *= ci.X;
                             }
+                            y_den += xi_powers[k_y_den.size()];
 
-                            if (x_den == field_value_type::zero() || y_den == field_value_type::zero()) {
+                            if (x_den.is_zero() || y_den.is_zero()) {
                                 return group_value_type::one();
                             }
 
                             x_mul = 1;
-                            for (auto &k : k_x_num) {
-                                x_num += field_value_type(k) * x_mul;
+                            for (std::size_t i = 0; i < k_x_num.size(); i++) {
+                                x_num += field_value_type(k_x_num[i]) * xi_powers[i];
                                 x_mul *= ci.X;
                             }
 
                             y_mul = 1;
-                            for (auto &k : k_y_num) {
-                                y_num += field_value_type(k) * y_mul;
-                                y_mul *= ci.Y;
+                            for (std::size_t i = 0; i < k_y_num.size(); i++) {
+                                y_num += field_value_type(k_y_num[i]) * xi_powers[i];
+                                y_mul *= ci.X;
                             }
 
-                            return group_value_type(x_num / x_den, y_num / y_den, 1);
+                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, 1);
                         }
                     };
 

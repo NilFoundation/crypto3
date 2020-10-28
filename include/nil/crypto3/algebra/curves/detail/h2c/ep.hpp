@@ -47,8 +47,9 @@ namespace nil {
 
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
-                        typedef typename suite_type::expand_message expand_message;
                         typedef typename suite_type::modular_type modular_type;
+                        typedef typename suite_type::expand_message expand_message;
+                        typedef typename suite_type::map_to_curve map_to_curve;
 
                         constexpr static std::size_t m = suite_type::m;
                         constexpr static std::size_t L = suite_type::L;
@@ -59,11 +60,12 @@ namespace nil {
                             std::uint8_t, typename InputType::value_type>::value>::type>
                         static inline group_value_type hash_to_curve(const InputType &msg,
                                                                      DstCreator &&dst_creator = DstCreator()) {
-                            auto u = hash_to_field<2>(msg, dst_creator);
-                            group_value_type Q0 = map_to_curve(u[0]);
-                            group_value_type Q1 = map_to_curve(u[1]);
-                            group_value_type R = Q0 + Q1;
-                            return clear_cofactor(R);
+                            auto u = hash_to_field<2>(msg, std::forward<DstCreator>(dst_creator));
+                            group_value_type Q0 =
+                                map_to_curve::process(u[0], suite_type::iso_Ai, suite_type::iso_Bi, suite_type::Z);
+                            group_value_type Q1 =
+                                map_to_curve::process(u[1], suite_type::iso_Ai, suite_type::iso_Bi, suite_type::Z);
+                            return clear_cofactor(Q0 + Q1);
                         }
 
                         // template<typename InputType, typename = typename std::enable_if<std::is_same<
@@ -79,8 +81,7 @@ namespace nil {
                                  typename = typename std::enable_if<std::is_same<
                                      std::uint8_t, typename InputType::value_type>::value>::type>
                         static inline std::array<field_value_type, N> hash_to_field(
-                            const InputType &msg,
-                            DstCreator &&dst_creator = DstCreator()) {
+                            const InputType &msg, DstCreator &&dst_creator = DstCreator()) {
                             auto dst = dst_creator.get_dst(suite_type::suite_id);
 
                             std::array<std::uint8_t, N * m * L> uniform_bytes {0};
@@ -98,10 +99,8 @@ namespace nil {
                             return result;
                         }
 
-                        static inline group_value_type map_to_curve(const group_value_type &p) {
-                        }
-
-                        static inline group_value_type clear_cofactor(const group_value_type &p) {
+                        static inline group_value_type clear_cofactor(const group_value_type &R) {
+                            return R * suite_type::h_eff;
                         }
                     };
                 }    // namespace detail

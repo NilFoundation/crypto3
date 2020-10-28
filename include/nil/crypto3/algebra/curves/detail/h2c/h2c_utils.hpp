@@ -105,7 +105,7 @@ namespace nil {
                         template<typename InputType,
                                  typename = typename std::enable_if<
                                      std::is_same<std::uint8_t, typename InputType::value_type>::value>::type>
-                        dst_type get_dst(const InputType &suite_id) {
+                        inline dst_type get_dst(const InputType &suite_id) {
                             BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputType>));
 
                             std::string tag_str = "QUUX-V01-CS02-with-";
@@ -235,47 +235,51 @@ namespace nil {
                         }
                     };
 
-                    template<typename FieldValueType, typename CurveValueType>
-                    inline CurveValueType map_to_curve_simple_swu(const FieldValueType &u, const FieldValueType &A,
-                                                                  const FieldValueType &B, const FieldValueType &Z) {
-                        // TODO: We assume that Z meets the following criteria -- correct for predefined suites,
-                        //  but wrong in general case
-                        // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-6.6.2
-                        // Preconditions:
-                        // 1.  Z is non-square in F,
-                        // 2.  Z != -1 in F,
-                        // 3.  the polynomial g(x) - Z is irreducible over F, and
-                        // 4.  g(B / (Z * A)) is square in F.
-                        FieldValueType tv1 = (Z.pow(2) * u.pow(4) + Z * u.pow(2)).inversed();
-                        FieldValueType x1 = (-B / A) * (1 + tv1);
-                        if (tv1 == 0) {
-                            x1 = B / (Z * A);
-                        }
-                        FieldValueType gx1 = x1.pow(3) + A * x1 + B;
-                        FieldValueType x2 = Z * u.pow(2) * x1;
-                        FieldValueType gx2 = x2.pow(3) + A * x2 + B;
-                        FieldValueType x, y;
-                        if (gx1.is_square()) {
-                            x = x1;
-                            y = gx1.sqrt();
-                        } else {
-                            x = x2;
-                            y = gx2.sqrt();
-                        }
-                        if (sgn0(u) != sgn0(y)) {
-                            y = -y;
-                        }
-                        return CurveValueType(x, y, 1);
-                    }
+                    template<typename FieldValueType, typename GroupValueType>
+                    struct m2c_simple_swu {
+                        static inline GroupValueType process(const FieldValueType &u, const FieldValueType &A,
+                                                             const FieldValueType &B, const FieldValueType &Z) {
+                            // TODO: We assume that Z meets the following criteria -- correct for predefined suites,
+                            //  but wrong in general case
+                            // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-6.6.2
+                            // Preconditions:
+                            // 1.  Z is non-square in F,
+                            // 2.  Z != -1 in F,
+                            // 3.  the polynomial g(x) - Z is irreducible over F, and
+                            // 4.  g(B / (Z * A)) is square in F.
+                            static FieldValueType one = FieldValueType::one();
 
-                    template<typename IsoMap, typename FieldValueType, typename CurveValueType>
-                    inline CurveValueType
-                        map_to_curve_simple_swu_zeroAB(const FieldValueType &u, const FieldValueType &Ai,
-                                                       const FieldValueType &Bi, const FieldValueType &Z) {
-                        FieldValueType xi, yi, x, y;
-                        CurveValueType ci = map_to_curve_simple_swu(u, Ai, Bi, Z);
-                        return IsoMap::process(ci);
-                    }
+                            FieldValueType tv1 = (Z.pow(2) * u.pow(4) + Z * u.pow(2)).inversed();
+                            FieldValueType x1 = (-B / A) * (one + tv1);
+                            if (tv1.is_zero()) {
+                                x1 = B / (Z * A);
+                            }
+                            FieldValueType gx1 = x1.pow(3) + A * x1 + B;
+                            FieldValueType x2 = Z * u.pow(2) * x1;
+                            FieldValueType gx2 = x2.pow(3) + A * x2 + B;
+                            FieldValueType x, y;
+                            if (gx1.is_square()) {
+                                x = x1;
+                                y = gx1.sqrt();
+                            } else {
+                                x = x2;
+                                y = gx2.sqrt();
+                            }
+                            if (sgn0(u) != sgn0(y)) {
+                                y = -y;
+                            }
+                            return GroupValueType(x, y, 1);
+                        }
+                    };
+
+                    template<typename IsoMap, typename FieldValueType, typename GroupValueType>
+                    struct m2c_simple_swu_zeroAB {
+                        static inline GroupValueType process(const FieldValueType &u, const FieldValueType &Ai,
+                                                             const FieldValueType &Bi, const FieldValueType &Z) {
+                            GroupValueType ci = m2c_simple_swu<FieldValueType, GroupValueType>::process(u, Ai, Bi, Z);
+                            return IsoMap::process(ci);
+                        }
+                    };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
