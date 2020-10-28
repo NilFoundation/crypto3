@@ -31,6 +31,8 @@
 
 #include <cstdio>
 #include <vector>
+#include <chrono>
+#include <ctime>
 
 #include <nil/crypto3/algebra/multi_exp/multi_exp.hpp>
 
@@ -114,6 +116,12 @@ test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
     return result;
 }
 
+long long get_nsec_time()
+{
+    auto timepoint = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
+}
+
 template<typename GroupType, typename FieldType, multi_exp_method Method>
 run_result_t<GroupType> profile_multi_exp(test_instances_t<GroupType> group_elements,
                                          test_instances_t<FieldType> scalars) {
@@ -140,12 +148,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
         test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
         run_result_t<GroupType> result_bos_coster =
-            profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_bos_coster>(group_elements, scalars);
+            profile_multi_exp<GroupType, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
         run_result_t<GroupType> result_djb =
-            profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_BDLO12>(group_elements, scalars);
+            profile_multi_exp<GroupType, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -155,7 +163,7 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 
         if (expn <= expn_end_naive) {
             run_result_t<GroupType> result_naive =
-                profile_multi_exp<GroupType, FieldType, detail::multi_exp_method_naive_plain>(group_elements, scalars);
+                profile_multi_exp<GroupType, FieldType, multi_exp_method_naive_plain>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 

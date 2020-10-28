@@ -25,10 +25,10 @@
 
 #include <iostream>
 
-#include <boost/multiprecision/cpp_modular.hpp>
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <cstdio>
+#include <vector>
+#include <chrono>
+#include <ctime>
 
 #include <nil/crypto3/algebra/multi_exp/multi_exp.hpp>
 
@@ -68,428 +68,117 @@
 // #include <nil/crypto3/algebra/curves/params/multi_exp/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/params/multi_exp/x962_p.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 using namespace nil::crypto3::algebra;
 
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp<FieldParams> e) {
-    std::cout << e.data << std::endl;
+template<typename GroupType>
+using run_result_t = std::pair<long long, std::vector<typename GroupType::value_type>>;
+
+template<typename BaseType>
+using test_instances_t = std::vector<std::vector<typename BaseType::value_type>>;
+
+template<typename GroupType>
+test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
+    // generating a random group element is expensive,
+    // so for now we only generate a single one and repeat it
+    test_instances_t<GroupType> result(count);
+
+    for (size_t i = 0; i < count; i++) {
+
+        typename GroupType::value_type x = curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+
+        for (size_t j = 0; j < size; j++) {
+            result[i].push_back(x);
+            // result[i].push_back(curve_random_element<GroupType>());
+        }
+    }
+
+    return result;
 }
 
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp2<FieldParams> e) {
-    std::cout << e.data[0].data << " " << e.data[1].data << std::endl;
+template<typename FieldType>
+test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
+    // we use SHA512_rng because it is much faster than
+    // FieldType::random_element()
+    test_instances_t<FieldType> result(count);
+
+    for (size_t i = 0; i < count; i++) {
+        for (size_t j = 0; j < size; j++) {
+            result[i].push_back(field_random_element<FieldType>());
+        }
+    }
+
+    return result;
 }
 
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
-    std::cout << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
+long long get_nsec_time()
+{
+    auto timepoint = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
 }
 
-template<typename FpField>
-void fields_fp_basic_math_examples() {
-    using policy_type = FpField;
-    using value_type = typename policy_type::value_type;
+template<typename GroupType, typename FieldType, multi_exp_method Method>
+run_result_t<GroupType> profile_multi_exp(test_instances_t<GroupType> group_elements,
+                                         test_instances_t<FieldType> scalars) {
+    long long start_time = get_nsec_time();
 
-    std::cout << "Field module value: " << policy_type::modulus << std::endl;
+    std::vector<typename GroupType::value_type> answers;
+    for (size_t i = 0; i < group_elements.size(); i++) {
+        answers.push_back(multi_exp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
+                                                                  scalars[i].cbegin(), scalars[i].cend(), 1));
+    }
 
-    value_type e1 = value_type(76749407), e2(44410867), e3 = value_type::one(), e4(121160274);
+    long long time_delta = get_nsec_time() - start_time;
 
-    std::cout << "Field element values: " << std::endl;
-    std::cout << "e1 value: ";
-    print_field_element(e1);
-
-    std::cout << "e2 value: ";
-    print_field_element(e2);
-
-    std::cout << "e3 value: ";
-    print_field_element(e3);
-
-    value_type e1inv = e1.inversed();
-
-    std::cout << "e1 inversed value: ";
-    print_field_element(e1inv);
-
-    std::cout << "e1 * e1^(-1) \n";
-    print_field_element(e1 * e1inv);
-
-    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
-
-    std::cout << "e1 * e2 value: ";
-    print_field_element(e1e2);
-
-    value_type e1sqrsqrt = e1sqr.sqrt();
-
-    std::cout << "e1 square value: ";
-    print_field_element(e1sqr);
-
-    std::cout << "e1 square sqrt value: ";
-    print_field_element(e1sqrsqrt);
-
-    std::cout << "Is e1 square: ";
-    std::cout << e1.is_square() << std::endl;
-
-    std::cout << "Is e1square square: ";
-    std::cout << e1sqr.is_square() << std::endl;
-
-    std::cout << "e1 square square value: ";
-
-    print_field_element(e1.squared().squared());
-
-    std::cout << "e1 pow 4 value: ";
-
-    print_field_element(e1.pow(4));
-
-    std::cout << "e1 pow 11 value: ";
-
-    print_field_element(e1.pow(11));
-
-    std::cout << "e1 pow 44410867 value: ";
-
-    print_field_element(e1.pow(44410867));
-
-    value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
-    value_type complex_eq1 = (e1 + e2) * (e3 + e4);
-
-    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: ";
-
-    print_field_element(complex_eq);
-
-    std::cout << "(e1 + e2) * (e3 + e4) value: ";
-
-    print_field_element(complex_eq1);
-
-    std::cout << "Doubled e1 value: ";
-
-    print_field_element(e1.doubled());
-
-    e1 += e2;
-
-    std::cout << "e1 += e2 value: ";
-
-    print_field_element(e1);
+    return run_result_t<GroupType>(time_delta, answers);
 }
 
-template<typename Fp2Field>
-void fields_fp2_basic_math_examples() {
-    using policy_type = Fp2Field;
-    using value_type = typename policy_type::value_type;
-
-    std::cout << "Field module value: " << policy_type::modulus << std::endl;
-
-    value_type e1 = value_type(76749407, 44410867), e2(44410867, 1), e3 = value_type::one(), e4(121160274, 7);
-
-    value_type ee(e1);
-
-    std::cout << "ee value: ";
-    print_field_element(ee);
-
-    std::cout << "Non residue: " << e1.non_residue.data << std::endl;
-
-    std::cout << "Field element values: " << std::endl;
-    std::cout << "e1 value: ";
-    print_field_element(e1);
-
-    e1 += e2;
-
-    std::cout << "e1 value: ";
-    print_field_element(e1);
-    std::cout << "ee value: ";
-    print_field_element(ee);
-
-    std::cout << "e2 value: ";
-    print_field_element(e2);
-
-    std::cout << "e3 value: ";
-    print_field_element(e3);
-
-    value_type e1inv = e1.inversed();
-
-    std::cout << "e1 inversed value: ";
-    print_field_element(e1inv);
-
-    std::cout << "e1 * e1^(-1) \n";
-    print_field_element(e1 * e1inv);
-
-    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
-
-    std::cout << "e1 * e2 value: ";
-    print_field_element(e1e2);
-
-    value_type e1sqrsqrt = e1sqr.sqrt();
-
-    std::cout << "e1 square value: ";
-    print_field_element(e1sqr);
-
-    std::cout << "e1 square sqrt value: ";
-    print_field_element(e1sqrsqrt);
-
-    std::cout << "e1 square square value: ";
-
-    print_field_element(e1.squared().squared());
-
-    std::cout << "e1 pow 4 value: ";
-
-    print_field_element(e1.pow(4));
-
-    std::cout << "e1 pow 11 value: ";
-
-    print_field_element(e1.pow(11));
-
-    std::cout << "e1 pow 44410867 value: ";
-
-    print_field_element(e1.pow(44410867));
-
-    value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
-    value_type complex_eq1 = (e1 + e2) * (e3 + e4);
-
-    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: ";
-
-    print_field_element(complex_eq);
-
-    std::cout << "(e1 + e2) * (e3 + e4) value: ";
-
-    print_field_element(complex_eq1);
-
-    std::cout << "Doubled e1 value: ";
-
-    print_field_element(e1.doubled());
-
-    e1 += e2;
-
-    std::cout << "e1 += e2 value: ";
-
-    print_field_element(e1);
-
-    // std::cout << "e1 inversed value: " ;
-
-    // print_field_element(e1.inversed());
-}
-
-template<typename Fp3Field>
-void fields_fp3_basic_math_examples() {
-    using policy_type = Fp3Field;
-    using value_type = typename policy_type::value_type;
-
-    std::cout << "Field module value: " << policy_type::modulus << std::endl;
-
-    value_type e1 = value_type(76749407, 44410867, 44410867), e2(44410867, 44410867, 1), e3 = value_type::one(),
-               e4(121160274, 7, 121160274);
-
-    value_type ee(e1);
-
-    std::cout << "ee value: ";
-    print_field_element(ee);
-
-    std::cout << "Non residue: " << e1.non_residue.data << std::endl;
-
-    std::cout << "Field element values: " << std::endl;
-    std::cout << "e1 value: ";
-    print_field_element(e1);
-
-    e1 += e2;
-
-    std::cout << "e1 value: ";
-    print_field_element(e1);
-    std::cout << "ee value: ";
-    print_field_element(ee);
-
-    std::cout << "e2 value: ";
-    print_field_element(e2);
-
-    std::cout << "e3 value: ";
-    print_field_element(e3);
-
-    value_type e1inv = e1.inversed();
-
-    std::cout << "e1 inversed value: ";
-    print_field_element(e1inv);
-
-    std::cout << "e1 * e1^(-1) \n";
-    print_field_element(e1 * e1inv);
-
-    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
-
-    std::cout << "e1 * e2 value: ";
-    print_field_element(e1e2);
-
-    // value_type e1sqrsqrt = e1sqr.sqrt();
-
-    std::cout << "e1 square value: ";
-    print_field_element(e1sqr);
-
-    // std::cout << "e1 square sqrt value: ";
-    // print_field_element(e1sqrsqrt);
-
-    std::cout << "e1 square square value: ";
-
-    print_field_element(e1.squared().squared());
-
-    std::cout << "e1 pow 4 value: ";
-
-    print_field_element(e1.pow(4));
-
-    std::cout << "e1 pow 11 value: ";
-
-    print_field_element(e1.pow(11));
-
-    std::cout << "e1 pow 44410867 value: ";
-
-    print_field_element(e1.pow(44410867));
-
-    value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
-    value_type complex_eq1 = (e1 + e2) * (e3 + e4);
-
-    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: ";
-
-    print_field_element(complex_eq);
-
-    std::cout << "(e1 + e2) * (e3 + e4) value: ";
-
-    print_field_element(complex_eq1);
-
-    std::cout << "Doubled e1 value: ";
-
-    print_field_element(e1.doubled());
-
-    e1 += e2;
-
-    std::cout << "e1 += e2 value: ";
-
-    print_field_element(e1);
-
-    // std::cout << "e1 inversed value: " ;
-
-    // print_field_element(e1.inversed());
+template<typename GroupType, typename FieldType>
+void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_end_naive, bool compare_answers) {
+    for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
+        printf("%ld", expn);
+        fflush(stdout);
+
+        test_instances_t<GroupType> group_elements = generate_group_elements<GroupType>(10, 1 << expn);
+        test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
+
+        run_result_t<GroupType> result_bos_coster =
+            profile_multi_exp<GroupType, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
+        printf("\t%lld", result_bos_coster.first);
+        fflush(stdout);
+
+        run_result_t<GroupType> result_djb =
+            profile_multi_exp<GroupType, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
+        printf("\t%lld", result_djb.first);
+        fflush(stdout);
+
+        if (compare_answers && (result_bos_coster.second != result_djb.second)) {
+            fprintf(stderr, "Answers NOT MATCHING (bos coster != djb)\n");
+        }
+
+        if (expn <= expn_end_naive) {
+            run_result_t<GroupType> result_naive =
+                profile_multi_exp<GroupType, FieldType, multi_exp_method_naive_plain>(group_elements, scalars);
+            printf("\t%lld", result_naive.first);
+            fflush(stdout);
+
+            if (compare_answers && (result_bos_coster.second != result_naive.second)) {
+                fprintf(stderr, "Answers NOT MATCHING (bos coster != naive)\n");
+            }
+        }
+
+        printf("\n");
+    }
 }
 
 int main() {
-    std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::alt_bn128_fq<254>>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "Testing BLS12-381 G1" << std::endl;
+    print_performance_csv<curves::bls12<381>::g1_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
-    std::cout << "ALT_BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::alt_bn128_fq<254>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "ALT_BN128-254 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::alt_bn128_fr<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bls12_fq<381>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bls12_fq<381>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bls12_fr<381>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bls12_fq<377>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bls12_fq<377>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bls12_fr<377>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bn128_fq<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bn128_fq<254>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bn128_fr<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::edwards_fq<183>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fq3 basic math:" << std::endl;
-    fields_fp3_basic_math_examples<fields::fp3<fields::edwards_fq<183>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::edwards_fr<183>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::mnt4_fq<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::mnt4_fq<298>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::mnt4_fr<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fq basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::mnt6_fq<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fq3 basic math:" << std::endl;
-    fields_fp3_basic_math_examples<fields::fp3<fields::mnt6_fq<298>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::mnt6_fr<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "DSA Botan 2048 basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::dsa_botan<2048>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "DSA JCE 1024 basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();
-
-    /*    std::cout << "----------------------------" << std::endl;
-
-        std::cout << "FFDHE IETF 2048 basic math:" << std::endl;
-        fields_fp_basic_math_examples<fields::ffdhe_ietf<2048>>();
-
-        std::cout << "----------------------------" << std::endl;
-
-        std::cout << "MODP IETF 1024 basic math:" << std::endl;
-        fields_fp_basic_math_examples<fields::modp_ietf<1024>>();
-
-        std::cout << "----------------------------" << std::endl;
-
-        std::cout << "MODP SRP 1024 basic math:" << std::endl;
-        fields_fp_basic_math_examples<fields::modp_srp<1024>>();*/
+    std::cout << "Testing BLS12-381 G2" << std::endl;
+    print_performance_csv<curves::bls12<381>::g2_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
     return 0;
 }

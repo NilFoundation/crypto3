@@ -32,13 +32,14 @@
 #include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/multi_exp/detail/multi_exp.hpp>
+#include <nil/crypto3/algebra/curves/params.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
 
             //TODO: Implement not only for vectors
-            template<typename BaseType, typename FieldType, typename multi_exp_method Method>
+            template<typename BaseType, typename FieldType, multi_exp_method Method>
             typename BaseType::value_type multi_exp(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                         typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
                         typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
@@ -49,7 +50,7 @@ namespace nil {
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
-                    return detail::multi_exp_inner<typename BaseType::value_type, FieldType, Method>(
+                    return detail::multi_exp_inner<BaseType, FieldType, Method>(
                         vec_start, vec_end, scalar_start, scalar_end);
                 }
 
@@ -58,11 +59,11 @@ namespace nil {
                 typename BaseType::value_type result = BaseType::value_type::zero();
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
-                    result = result + detail::multi_exp_inner<, FieldType, Method>(
-                         vec_start + i*one,
-                         (i == chunks_count-1 ? vec_end : vec_start + (i+1)*one),
-                         scalar_start + i*one,
-                         (i == chunks_count-1 ? scalar_end : scalar_start + (i+1)*one));
+                    result = result + detail::multi_exp_inner<BaseType, FieldType, Method>(
+                         vec_start + i*one_chunk_size,
+                         (i == chunks_count-1 ? vec_end : vec_start + (i+1)*one_chunk_size),
+                         scalar_start + i*one_chunk_size,
+                         (i == chunks_count-1 ? scalar_end : scalar_start + (i+1)*one_chunk_size));
                 }
 
                 return result;
@@ -88,22 +89,22 @@ namespace nil {
 
                 typename BaseType::value_type acc = BaseType::value_type::zero();
 
-                for (; scalar_it != scalar_end; ++scalar_it, ++value_it) {
+                for (; scalar_it != scalar_end; ++scalar_it, ++vec_it) {
                     if (*scalar_it == one) {
 #ifdef USE_MIXED_ADDITION
-                        acc = acc.mixed_add(*value_it);
+                        acc = acc.mixed_add(*vec_it);
 #else
-                        acc = acc + (*value_it);
+                        acc = acc + (*vec_it);
 #endif
                     }
                     else if (*scalar_it != zero){
                         p.emplace_back(*scalar_it);
-                        g.emplace_back(*value_it);
+                        g.emplace_back(*vec_it);
                     }
-                
+                }
 
                 return acc + multi_exp<typename BaseType::value_type, 
-                    typename FieldType::value_type, Method>(g.begin(), g.end(), p.begin(), p.end(), chunks);
+                    typename FieldType::value_type, Method>(g.begin(), g.end(), p.begin(), p.end(), chunks_count);
             }
 
             template <typename BaseType>
@@ -126,7 +127,7 @@ namespace nil {
 
             template<typename GroupType>
             std::size_t get_exp_window_size(const std::size_t num_scalars) {
-                if (multi_exp_params<GroupType>::fixed_base_exp_window_table.empty()) {
+                if (curves::multi_exp_params<GroupType>::fixed_base_exp_window_table.empty()) {
  #ifdef LOWMEM
                     return 14;
  #else
@@ -136,9 +137,9 @@ namespace nil {
 
                 std::size_t window = 1;
                 
-                for (long i = multi_exp_params<GroupType>::fixed_base_exp_window_table.size()-1; i >= 0; --i) {
-                    if (multi_exp_params<GroupType>::fixed_base_exp_window_table[i] != 0 
-                        && num_scalars >= multi_exp_params<GroupType>::fixed_base_exp_window_table[i]) {
+                for (long i = curves::multi_exp_params<GroupType>::fixed_base_exp_window_table.size()-1; i >= 0; --i) {
+                    if (curves::multi_exp_params<GroupType>::fixed_base_exp_window_table[i] != 0 
+                        && num_scalars >= curves::multi_exp_params<GroupType>::fixed_base_exp_window_table[i]) {
                         window = i+1;
                         break;
                     }
@@ -183,7 +184,7 @@ namespace nil {
             typename GroupType::value_type windowed_exp(const std::size_t scalar_size,
                            const std::size_t window,
                            const window_table<GroupType> &powers_of_g,
-                           const FieldType::value_type &pow) {
+                           const typename FieldType::value_type &pow) {
 
                 using number_type = typename FieldType::number_type;
 
