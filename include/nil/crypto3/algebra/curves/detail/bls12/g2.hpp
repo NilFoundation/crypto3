@@ -35,6 +35,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
+                    
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     struct bls12_g2 {
                         using policy_type = bls12_basic_policy<ModulusBits, GeneratorBits>;

@@ -33,6 +33,7 @@
 #include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>

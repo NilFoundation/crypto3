@@ -183,6 +183,7 @@ namespace nil {
         namespace algebra {
             namespace detail {
 
+                GENERATE_HAS_MEMBER_TYPE(underlying_field_type)
                 GENERATE_HAS_MEMBER_TYPE(value_type)
                 GENERATE_HAS_MEMBER_TYPE(modulus_type)
                 GENERATE_HAS_MEMBER_TYPE(base_field_type)
@@ -192,6 +193,7 @@ namespace nil {
                 GENERATE_HAS_MEMBER_TYPE(g2_type)
                 GENERATE_HAS_MEMBER_TYPE(gt_type)
 
+                GENERATE_HAS_MEMBER(value_bits)
                 GENERATE_HAS_MEMBER(modulus_bits)
                 GENERATE_HAS_MEMBER(base_field_bits)
                 GENERATE_HAS_MEMBER(base_field_modulus)
@@ -212,19 +214,27 @@ namespace nil {
                     typedef T type;
                 };
 
+                template<typename T> //TODO: we should add some other params to curve group policy to identify it more clearly
+                struct is_curve_group {
+                    static const bool value = has_value_type<T>::value && has_underlying_field_type<T>::value && 
+                                              has_value_bits<T>::value;
+                    typedef T type;
+                };
+
                 template<typename T>
                 struct is_field {
-                    static const bool value = has_value_type<T>::value && has_modulus_bits<T>::value && 
-                                              has_modulus_type<T>::value && has_number_type<T>::value && 
-                                              has_arity<T>::value;
+                    static const bool value = has_value_type<T>::value && has_value_bits<T>::value && 
+                                              has_modulus_type<T>::value && has_modulus_bits<T>::value && 
+                                              has_number_type<T>::value && has_arity<T>::value;
                     typedef T type;
                 };
 
                 template<typename T>
                 struct is_fp_field {
-                    static const bool value = has_value_type<T>::value && has_modulus_bits<T>::value && 
-                                              has_modulus_type<T>::value && has_number_type<T>::value && 
-                                              has_arity<T>::value && T::arity == 1;
+                    static const bool value = has_value_type<T>::value && has_value_bits<T>::value && 
+                                              has_modulus_type<T>::value && has_modulus_bits<T>::value && 
+                                              has_number_type<T>::value && has_arity<T>::value && 
+                                              T::arity == 1;
                     typedef T type;
                 };
 
