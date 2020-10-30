@@ -29,10 +29,10 @@
 
 #include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
-
-#include <nil/crypto3/algebra/detail/literals.hpp>
-
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -65,14 +65,14 @@ namespace nil {
 
                         element_mnt4_g1() :
                             element_mnt4_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                    underlying_field_value_type::zero()) {};
+                                            underlying_field_value_type::zero()) {};
                         // must be
                         // element_mnt4_g1() : element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
                         element_mnt4_g1(underlying_field_value_type X,
-                                underlying_field_value_type Y,
-                                underlying_field_value_type Z) {
+                                        underlying_field_value_type Y,
+                                        underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -239,11 +239,6 @@ namespace nil {
                             return element_mnt4_g1(X3, Y3, Z3);
                         }
 
-                        template<typename NumberType>
-                        element_mnt4_g1 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
-                        }
-
                     private:
                         element_mnt4_g1 add(const element_mnt4_g1 &other) const {
 
@@ -328,6 +323,36 @@ namespace nil {
                                 0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
                             underlying_field_value_type::one()};*/
                     };
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_mnt4_g1<ModulusBits, GeneratorBits> operator*(const element_mnt4_g1<ModulusBits, GeneratorBits> &left, 
+                        const NumberType &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_mnt4_g1<ModulusBits, GeneratorBits> operator*(const NumberType &left,
+                        const element_mnt4_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_mnt4_g1<ModulusBits, GeneratorBits> operator*(const element_mnt4_g1<ModulusBits, GeneratorBits> &left, 
+                        const typename FieldType::value_type &right) {
+
+                        return left * right.data;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_mnt4_g1<ModulusBits, GeneratorBits> operator*(const typename FieldType::value_type &left, 
+                        const element_mnt4_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
 
                 }    // namespace detail
             }        // namespace curves

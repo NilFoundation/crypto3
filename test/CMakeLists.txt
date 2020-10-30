@@ -63,9 +63,10 @@ set(RUNTIME_TESTS_NAMES
     "pairing"
     "hash_to_curve"
     "wnaf"
+    "multi_exp"
     #    "groups"
     #    "bilinearity"
-)
+    )
 
 set(COMPILE_TIME_TESTS_NAMES
     "matrix"

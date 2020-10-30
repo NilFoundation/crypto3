@@ -72,8 +72,8 @@ void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement 
 template<typename Fp3CurveGroupElement>
 void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroupElement &e) {
     os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << " , " << e.X.data[2].data << ") : ("
-       << e.Y.data[0].data << " , " << e.Y.data[1].data << " , " << e.Y.data[2].data << ") : ("
-       << e.Z.data[0].data << " , " << e.Z.data[1].data << " , " << e.Z.data[2].data << ")" << std::endl;
+       << e.Y.data[0].data << " , " << e.Y.data[1].data << " , " << e.Y.data[2].data << ") : (" << e.Z.data[0].data
+       << " , " << e.Z.data[1].data << " , " << e.Z.data[2].data << ")" << std::endl;
 }
 
 namespace boost {
@@ -213,7 +213,8 @@ enum curve_operation_test_points : std::size_t {
 };
 
 template<typename CurveGroup>
-void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points, const std::vector<std::size_t> &constants) {
+void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
+                            const std::vector<std::size_t> &constants) {
     using boost::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
@@ -225,8 +226,12 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
     BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) + (points[p2] * static_cast<cpp_int>(constants[C2])), points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) + (points[p2] * static_cast<cpp_int>(constants[C2])), points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      points[p2_mul_C1_plus_p2_mul_C2]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>
@@ -265,8 +270,8 @@ void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points
             }
         }
         points.emplace_back(typename Fp2CurveGroup::value_type(fp2_value_type(coordinates[0], coordinates[1]),
-                                          fp2_value_type(coordinates[2], coordinates[3]),
-                                          fp2_value_type(coordinates[4], coordinates[5])));
+                                                               fp2_value_type(coordinates[2], coordinates[3]),
+                                                               fp2_value_type(coordinates[4], coordinates[5])));
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -290,9 +295,10 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
                 coordinates[i++] = modulus_type(coordinate.second.data());
             }
         }
-        points.emplace_back(typename Fp3CurveGroup::value_type(fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
-                                          fp3_value_type(coordinates[3], coordinates[4], coordinates[5]),
-                                          fp3_value_type(coordinates[6], coordinates[7], coordinates[8])));
+        points.emplace_back(
+            typename Fp3CurveGroup::value_type(fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
+                                               fp3_value_type(coordinates[3], coordinates[4], coordinates[5]),
+                                               fp3_value_type(coordinates[6], coordinates[7], coordinates[8])));
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -302,10 +308,10 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
 
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test(const TestSet &test_set,
-                          void (&test_init)(std::vector<typename CurveGroup::value_type> &, 
-                                            std::vector<std::size_t> &, 
+                          void (&test_init)(std::vector<typename CurveGroup::value_type> &,
+                                            std::vector<std::size_t> &,
                                             const TestSet &)) {
-    
+
     std::vector<typename CurveGroup::value_type> points;
     std::vector<std::size_t> constants;
 

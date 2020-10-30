@@ -29,10 +29,10 @@
 
 #include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
-
-#include <nil/crypto3/algebra/detail/literals.hpp>
-
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -72,7 +72,7 @@ namespace nil {
                         // when constexpr fields will be finished
 
                         element_edwards_g2(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                   underlying_field_value_type in_Z) {
+                                           underlying_field_value_type in_Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -87,8 +87,8 @@ namespace nil {
 
                         static element_edwards_g2 zero() {
                             return element_edwards_g2(underlying_field_value_type::zero(),
-                                              underlying_field_value_type::one(),
-                                              underlying_field_value_type::zero());
+                                                      underlying_field_value_type::one(),
+                                                      underlying_field_value_type::zero());
                             // must be
                             // return element_edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
                             // when constexpr fields will be finished
@@ -237,11 +237,6 @@ namespace nil {
                             return element_edwards_g2(X3, Y3, Z3);
                         }
 
-                        template<typename NumberType>
-                        element_edwards_g2 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
-                        }
-
                     private:
                         element_edwards_g2 add(const element_edwards_g2 &other) const {
                             // NOTE: does not handle O and pts of order 2,4
@@ -353,6 +348,35 @@ namespace nil {
                                                         0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)};*/
                     };
 
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_edwards_g2<ModulusBits, GeneratorBits> operator*(const element_edwards_g2<ModulusBits, GeneratorBits> &left, 
+                        const NumberType &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_edwards_g2<ModulusBits, GeneratorBits> operator*(const NumberType &left,
+                        const element_edwards_g2<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_edwards_g2<ModulusBits, GeneratorBits> operator*(const element_edwards_g2<ModulusBits, GeneratorBits> &left, 
+                        const typename FieldType::value_type &right) {
+
+                        return left * right.data;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_edwards_g2<ModulusBits, GeneratorBits> operator*(const typename FieldType::value_type &left, 
+                        const element_edwards_g2<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
