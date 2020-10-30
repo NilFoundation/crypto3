@@ -28,10 +28,10 @@
 #define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_G1_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/detail/literals.hpp>
-
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -256,11 +256,6 @@ namespace nil {
                             return element_alt_bn128_g1(X3, Y3, Z3);
                         }
 
-                        template<typename NumberType>
-                        element_alt_bn128_g1 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
-                        }
-
                     private:
                         element_alt_bn128_g1 add(const element_alt_bn128_g1 &other) const {
 
@@ -323,6 +318,36 @@ namespace nil {
                             underlying_field_value_type(1), underlying_field_value_type(2),
                         underlying_field_value_type(1)};*/
                     };
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_alt_bn128_g1<ModulusBits, GeneratorBits> operator*(const element_alt_bn128_g1<ModulusBits, GeneratorBits> &left, 
+                        const NumberType &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_alt_bn128_g1<ModulusBits, GeneratorBits> operator*(const NumberType &left,
+                        const element_alt_bn128_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_alt_bn128_g1<ModulusBits, GeneratorBits> operator*(const element_alt_bn128_g1<ModulusBits, GeneratorBits> &left, 
+                        const typename FieldType::value_type &right) {
+
+                        return left * right.data;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_alt_bn128_g1<ModulusBits, GeneratorBits> operator*(const typename FieldType::value_type &left, 
+                        const element_alt_bn128_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
 
                 }    // namespace detail
             }        // namespace curves

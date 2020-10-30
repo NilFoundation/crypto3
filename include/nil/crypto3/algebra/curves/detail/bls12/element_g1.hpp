@@ -30,8 +30,8 @@
 #include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 
-#include <nil/crypto3/algebra/detail/literals.hpp>
 #include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -553,11 +553,6 @@ namespace nil {
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return element_bls12_g1(X3, Y3, Z3);
-                        }
-
-                        template<typename NumberType>
-                        element_bls12_g1 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
                         }
 
                     private:
