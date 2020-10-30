@@ -32,6 +32,8 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -96,7 +98,7 @@ namespace nil {
                     typename std::vector<typename FieldType::value_type>::const_iterator exponents,
                     typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
 
-                    using number_type = typename FieldType::number_type;
+                    using number_type = typename FieldType::modulus_type;
 
                     std::size_t length = std::distance(bases, bases_end);
 
@@ -189,14 +191,15 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType, typename FieldType, multi_exp_method Method,
-                    typename std::enable_if<(Method == multi_exp_method_bos_coster), int>::type = 0>
+                template<typename BaseType, typename FieldType, multi_exp_method Method, typename = 
+                        typename std::enable_if<(Method == multi_exp_method_bos_coster) && 
+                                                ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
                 typename BaseType::value_type multi_exp_inner( typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                                           typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
                                           typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                                           typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
-                    using number_type = typename FieldType::number_type;
+                    using number_type = typename FieldType::modulus_type;
 
                     if (vec_start == vec_end) {
                         return BaseType::value_type::zero();
@@ -219,7 +222,7 @@ namespace nil {
                     for (i=0, vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it, ++i) {
                         g.emplace_back(*vec_it);
 
-                        opt_q.emplace_back(number_type(*scalar_it));
+                        opt_q.emplace_back(number_type(scalar_it->data));
                     }
                     std::make_heap(opt_q.begin(),opt_q.end());
                     assert(scalar_it == scalar_end);
