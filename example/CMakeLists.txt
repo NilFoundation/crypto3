@@ -20,7 +20,8 @@ endmacro()
 set(EXAMPLES_NAMES
     "curves"
     "fields"
-    "pairing")
+    "pairing"
+    "hash_to_curve")
 
 foreach(EXAMPLE_NAME ${EXAMPLES_NAMES})
     define_algebra_example(${EXAMPLE_NAME})
