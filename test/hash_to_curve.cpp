@@ -40,6 +40,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -59,9 +60,20 @@ void print_field_element(std::ostream &os, const typename fields::detail::elemen
     os << e.data << std::endl;
 }
 
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
+    os << e.data[0].data << " " << e.data[1].data << std::endl;
+}
+
 template<typename FpCurveGroupElement>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
     os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
+}
+
+template<typename Fp2CurveGroupElement>
+void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
+    os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
+       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
 }
 
 namespace boost {
@@ -74,12 +86,27 @@ namespace boost {
                 }
             };
 
+            template<typename FieldParams>
+            struct print_log_value<typename fields::detail::element_fp2<FieldParams>> {
+                void operator()(std::ostream &os, typename fields::detail::element_fp2<FieldParams> const &e) {
+                    print_field_element(os, e);
+                }
+            };
+
             template<>
             struct print_log_value<typename curves::bls12<381>::g1_type::value_type> {
                 void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
+
+            template<>
+            struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
+                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
+                    print_fp2_curve_group_element(os, e);
+                }
+            };
+
 
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
@@ -112,21 +139,20 @@ void check_expand_message(std::size_t len_in_bytes, const DstType &dst, const Ms
     BOOST_CHECK(result_compare(uniform_bytes));
 }
 
-template<std::size_t N, typename GroupType, typename FieldParams>
-void check_hash_to_field(const std::string &msg_str, const std::array<element_fp<FieldParams>, N> &result) {
-    using h2c_type = ep_map<GroupType>;
+template<std::size_t N, typename H2CType, typename FieldValueType>
+void check_hash_to_field(const std::string &msg_str, const std::array<FieldValueType, N> &result) {
+    // using h2c_type = ep_map<GroupType>;
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    auto u = h2c_type::template hash_to_field<N>(msg);
+    auto u = H2CType::template hash_to_field<N>(msg);
     for (std::size_t i = 0; i < N; i++) {
         BOOST_CHECK_EQUAL(u[i], result[i]);
     }
 }
 
-template<typename GroupType, typename GroupValueType>
+template<typename H2CType, typename GroupValueType>
 void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected) {
-    using h2c_type = ep_map<GroupType>;
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    GroupValueType result = h2c_type::hash_to_curve(msg);
+    GroupValueType result = H2CType::hash_to_curve(msg);
     BOOST_CHECK_EQUAL(result.to_affine_coordinates(), expected);
 }
 
@@ -285,79 +311,188 @@ BOOST_AUTO_TEST_CASE(expand_message_xmd_sha256_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_sha256_test) {
+BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.9.1
-    using group_type = typename bls12_381::g1_type;
+    using curve_type = bls12_381;
+    using group_type = typename curve_type::g1_type;
     using field_value_type = typename group_type::underlying_field_type::value_type;
-    using modulus_type = typename field_value_type::modulus_type;
+    using number_type = typename curve_type::number_type;
 
     using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
     samples_type samples = {
         {"",
-         {field_value_type(modulus_type("1790030616568561980207134218344899338736900885118493183248255875682123737756800213955590674957414534085508415116879")),
-          field_value_type(modulus_type("247470258331762152370823329280394074170045058453263356372873997375166908584899100434893060702108665825589810322121"))}},
+         {field_value_type(number_type("1790030616568561980207134218344899338736900885118493183248255875682123737756800213955590674957414534085508415116879")),
+          field_value_type(number_type("247470258331762152370823329280394074170045058453263356372873997375166908584899100434893060702108665825589810322121"))}},
         {"abc",
-         {field_value_type(modulus_type("2088728490498894818688784437928579501848367107744050576780266498473771518428420173373487118890161663886009635645777")),
-          field_value_type(modulus_type("32138924938310862093169606408734331410171587925844216752733293543601988453843327878077294514665889481436558332217"))}},
+         {field_value_type(number_type("2088728490498894818688784437928579501848367107744050576780266498473771518428420173373487118890161663886009635645777")),
+          field_value_type(number_type("32138924938310862093169606408734331410171587925844216752733293543601988453843327878077294514665889481436558332217"))}},
         {"abcdef0123456789",
-         {field_value_type(modulus_type("950597030816464821778971015673486129641410344078861474750527508537804549386058612983484048401731236595379325781716")),
-          field_value_type(modulus_type("1979385000937648348925653198641340374887185657649818450486460034420643425685140133042050299078521896600910613745210"))}},
+         {field_value_type(number_type("950597030816464821778971015673486129641410344078861474750527508537804549386058612983484048401731236595379325781716")),
+          field_value_type(number_type("1979385000937648348925653198641340374887185657649818450486460034420643425685140133042050299078521896600910613745210"))}},
         {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
-         {field_value_type(modulus_type("156598384884054652954707150757138355079410210785113857376825014810441188545548595465313883035731540725116276838022")),
-          field_value_type(modulus_type("1709027689043323463259398100486189187238532958310276339146988040422594808842792053521671901476006506290292962489454"))}},
+         {field_value_type(number_type("156598384884054652954707150757138355079410210785113857376825014810441188545548595465313883035731540725116276838022")),
+          field_value_type(number_type("1709027689043323463259398100486189187238532958310276339146988040422594808842792053521671901476006506290292962489454"))}},
         {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-         {field_value_type(modulus_type("1625704516324785166230868561544190006281306318060308039760768255839116494270087378351796462565313509233883467016390")),
-          field_value_type(modulus_type("897347619044039892426123073051050824113615337090860431730602102178645855045832565883684732229117125155988066429111"))}}
-        // {"", {field_value_type(modulus_type("")), field_value_type(modulus_type(""))}}
+         {field_value_type(number_type("1625704516324785166230868561544190006281306318060308039760768255839116494270087378351796462565313509233883467016390")),
+          field_value_type(number_type("897347619044039892426123073051050824113615337090860431730602102178645855045832565883684732229117125155988066429111"))}}
+        // {"", {field_value_type(number_type("")), field_value_type(number_type(""))}}
     };
 
     for (auto &s : samples) {
-        check_hash_to_field<2, group_type>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_field<2, ep_map<group_type>>(std::get<0>(s), std::get<1>(s));
     }
 }
 
-BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_sha256_test) {
-    using group_type = typename bls12_381::g1_type;
+BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
+    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
+    using curve_type = bls12_381;
+    using group_type = typename curve_type::g2_type;
+    using field_value_type = typename group_type::underlying_field_type::value_type;
+    using number_type = typename curve_type::number_type;
+
+    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    samples_type samples = {
+        {"",
+         {field_value_type(number_type("593868448310005448561172252387029516360409945786457439875974315031640021389835649561235021338510064922970633805048"),
+                           number_type("867375309489067512797459860887365951877054038763818448057326190302701649888849997836339069389536967202878289851290")),
+          field_value_type(number_type("457889704519948843474026022562641969443315715595459159112874498082953431971323809145630315884223143822925947137684"),
+                           number_type("3132697209754082586339430915081913810572071485832539443682634025529375380328136128542015469873094481703191673087029"))}},
+        {"abc",
+         {field_value_type(number_type("3381151350286428005095780827831774583653641216459357823974407145557165174365389989442078766443621078367363453769585"),
+                           number_type("274174695370444263853418070745339731640467919355184108253716879519695397069963034977795744692362177212201505728989")),
+          field_value_type(number_type("3761918608077574755256083960277010506684793456226386707192711779006489497410866269311252402421709839991039401264868"),
+                           number_type("1342131492846344403298252211066711749849099599627623100864413228392326132610002371925674088601653350525231531947366"))}},
+        {"abcdef0123456789",
+         {field_value_type(number_type("473675666561824532624430085786519186022432661190411421300774903722488254154373895989233527517731907580580706354657"),
+                           number_type("952054055741569191636251086712730713168379169215995952659453378797733761324494587640793580119096894387397115436943")),
+          field_value_type(number_type("3574336717567028224405133950386477048284620456829914449302272757384276784667241972055005113408837488328262928878231"),
+                           number_type("236560234570779724493776347038280372672357707388331177592141885473069234541795826215789679703490403053611203549557"))}},
+        {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+         {field_value_type(number_type("360813192967721750300518886199139144998048338798825614283933488104229200738975219634991234987258997592645316502099"),
+                           number_type("500990438531178609604960653858613389740198594452593804998108691726565882501777715476408413735192405455364595747963")),
+          field_value_type(number_type("1414201600433038156752401103621159164529164806638579329495300394501933973057103319123042671630779248244072674138005"),
+                           number_type("2580989994757912640015815541704972436791025324967858519264081257257405036397177981572950833626047365407639272235247"))}},
+        {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         {field_value_type(number_type("3854656460966118202185202795415969034444473478700041637108073179423449626727403291696647010132509133525205314259253"),
+                           number_type("2873494353363126311409085895530381085174075451844000378947122252646711114869905923958066527312260237781765269081913")),
+          field_value_type(number_type("2218682278840147973132952196327912255143646871258838127959845658885016361690895544274403462155614933990666846598837"),
+                           number_type("2692054640040186323570630735219910885988179020142391687801930252786130591827501100656577702624784849458500251540952"))}},
+
+        // {"",
+        //  {field_value_type(number_type(""),
+        //                    number_type("")),
+        //   field_value_type(number_type(""),
+        //                    number_type(""))}},
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_field<2, ep2_map<group_type>>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
+    using curve_type = bls12_381;
+    using group_type = typename curve_type::g1_type;
     using group_value_type = typename group_type::value_type;
     using field_value_type = typename group_type::underlying_field_type::value_type;
-    using modulus_type = typename field_value_type::modulus_type;
+    using number_type = typename curve_type::number_type;
 
     using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
     samples_type samples {
         {"",
          group_value_type(
-             modulus_type("794311575721400831362957049303781044852006323422624111893352859557450008308620925451441746926395141598720928151969"),
-             modulus_type("1343412193624222137939591894701031123123641958980729764240763391191550653712890272928110356903136085217047453540965"),
+             number_type("794311575721400831362957049303781044852006323422624111893352859557450008308620925451441746926395141598720928151969"),
+             number_type("1343412193624222137939591894701031123123641958980729764240763391191550653712890272928110356903136085217047453540965"),
              1)},
         {"abc",
          group_value_type(
-             modulus_type("513738460217615943921285247703448567647875874745567372796164155472383127756567780059136521508428662765965997467907"),
-             modulus_type("1786897908129645780825838873875416513994655004408749907941296449131605892957529391590865627492442562626458913769565"),
+             number_type("513738460217615943921285247703448567647875874745567372796164155472383127756567780059136521508428662765965997467907"),
+             number_type("1786897908129645780825838873875416513994655004408749907941296449131605892957529391590865627492442562626458913769565"),
              1)},
         {"abcdef0123456789",
          group_value_type(
-             modulus_type("2751628761372137084683207295437105268166375184027748372156952770986741873369176463286511518644061904904607431667096"),
-             modulus_type("563036982304416203921640398061260377444881693369806087719971277317609936727208012968659302318886963927918562170633"),
+             number_type("2751628761372137084683207295437105268166375184027748372156952770986741873369176463286511518644061904904607431667096"),
+             number_type("563036982304416203921640398061260377444881693369806087719971277317609936727208012968659302318886963927918562170633"),
              1)},
         {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
          group_value_type(
-             modulus_type("3380432694887674439773082418192083720584748080704959172978586229921475315220434165460350679208315690319508336723080"),
-             modulus_type("3698526739072864408749571082270628561764415577445404115596990919801523793138348254443092179877354467167123794222392"),
+             number_type("3380432694887674439773082418192083720584748080704959172978586229921475315220434165460350679208315690319508336723080"),
+             number_type("3698526739072864408749571082270628561764415577445404115596990919801523793138348254443092179877354467167123794222392"),
              1)},
         {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
          group_value_type(
-             modulus_type("1256967425542823069694513550918025689490036478501181600525944653952846100887848729514132077573887342346961531624702"),
-             modulus_type("880372082403694543476959909256504267215588055450016885103797700856746532134585942561958795215862304181527267736264"),
+             number_type("1256967425542823069694513550918025689490036478501181600525944653952846100887848729514132077573887342346961531624702"),
+             number_type("880372082403694543476959909256504267215588055450016885103797700856746532134585942561958795215862304181527267736264"),
              1)},
         // {"",
         //  group_value_type(
-        //      modulus_type(""),
-        //      modulus_type(""),
+        //      number_type(""),
+        //      number_type(""),
         //      1)},
     };
 
     for (auto &s : samples) {
-        check_hash_to_curve<group_type>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_curve<ep_map<group_type>>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
+    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
+    using curve_type = bls12_381;
+    using group_type = typename curve_type::g2_type;
+    using group_value_type = typename group_type::value_type;
+    using field_value_type = typename group_type::underlying_field_type::value_type;
+    using number_type = typename curve_type::number_type;
+
+    using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
+
+    samples_type samples {
+        {"",
+         group_value_type(
+             field_value_type(number_type("193548053368451749411421515628510806626565736652086807419354395577367693778571452628423727082668900187036482254730"),
+                              number_type("891930009643099423308102777951250899694559203647724988361022851024990473423938537113948850338098230396747396259901")),
+             field_value_type(number_type("771717272055834152378281705972671257005357145478800908373659404991537354153455452961747174765859335819766715637138"),
+                              number_type("2810310118582126634041133454180705304393079139103252956502404531123692847658283858246402311867775854528543237781718")),
+             field_value_type::one())},
+        {"abc",
+         group_value_type(
+             field_value_type(number_type("424958340463073975547762735517193206833255107941790909009827635556634414746056077714431786321247871628515967727334"),
+                              number_type("3018679803970127877262826393814472528557413504329194740495363852840690589001358162447917674089074634504498585239512")),
+             field_value_type(number_type("3621308185128395459888995526527127556614768604472132176060423302734876099689739385100475320409412954617897892887112"),
+                              number_type("102447784096837908713257069727879782642075240724579670654226801345708452018676587771714457671432122751958633012502")),
+             field_value_type::one())},
+        {"abcdef0123456789",
+         group_value_type(
+             field_value_type(number_type("2785790728239146617702443308248535381016035748520698399690132325213972292102741627498014391457605127656937478044880"),
+                              number_type("3855709393631831880910167818276435187147963371126198799654803099743427431977934703201153169947378798970358200024876")),
+             field_value_type(number_type("821938378705205565995357931232097952117504537366318395539093959918654729488074273868834599496909844419980823111624"),
+                              number_type("1802420335575779950982935580421454302087567926385222707947527353462942499437987207287862072369052390195154530059198")),
+             field_value_type::one())},
+        {"q128_qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+         group_value_type(
+             field_value_type(number_type("3949041098513688455491231180749724794697192943196730030853285011755806989731870696216017360514887069032515603535834"),
+                              number_type("1416893694506131976809002935212216317132941942570763849323065381335907430566747765697423320407614734575486820936593")),
+             field_value_type(number_type("3227453710863835032992962605851449401391399355135442728893790186263669279022343042444878900124369614767241382891922"),
+                              number_type("1498738834073759871886466122933996764471889514532827927202777922460876335493588931070034160657995151627624577390178")),
+             field_value_type::one())},
+        {"a512_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         group_value_type(
+             field_value_type(number_type("254155017921606149907129844368549510385368618440139550318910532874259603395336903946742408725761795820224536519988"),
+                              number_type("2768431459296730426779166218544149791601585986233130583011501727704972362141149700714785450629498506208393873593705")),
+             field_value_type(number_type("1755339344744337457318565116062025669984750617937721245220711425551575490663761638802010265668157125441634554205566"),
+                              number_type("560643043433789571968941329642646582974304556331567393300563909451776257854214387388500126524984624222885267024722")),
+             field_value_type::one())},
+        // {"",
+        //  group_value_type(
+        //      field_value_type(number_type(""),
+        //                       number_type("")),
+        //      field_value_type(number_type(""),
+        //                       number_type("")),
+        //      field_value_type::one())},
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_curve<ep2_map<group_type>>(std::get<0>(s), std::get<1>(s));
     }
 }
 

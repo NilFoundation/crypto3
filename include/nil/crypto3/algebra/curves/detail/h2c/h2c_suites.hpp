@@ -73,6 +73,35 @@ namespace nil {
                         constexpr static std::size_t Z = 11;
                         constexpr static number_type h_eff = 0xd201000000010001_cppui381;
                     };
+
+                    template<>
+                    struct h2c_suite<typename bls12_381::g2_type> {
+                        typedef bls12_381 curve_type;
+                        typedef typename bls12_381::g2_type group_type;
+                        typedef hashes::sha2<256> hash_type;
+
+                        typedef typename group_type::value_type group_value_type;
+                        typedef typename curve_type::number_type number_type;
+                        typedef typename group_type::underlying_field_type::number_type modular_type;
+                        typedef typename group_type::underlying_field_type::value_type field_value_type;
+
+                        // BLS12381G2_XMD:SHA-256_SSWU_RO_
+                        constexpr static std::array<std::uint8_t, 31> suite_id = {
+                            0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f, 0x58, 0x4d, 0x44, 0x3a, 0x53,
+                            0x48, 0x41, 0x2d, 0x32, 0x35, 0x36, 0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
+                        constexpr static number_type p = curve_type::p;
+                        constexpr static std::size_t m = 2;
+                        constexpr static std::size_t k = 128;
+                        constexpr static std::size_t L = 64;
+
+                        typedef expand_message_xmd<k, hash_type> expand_message;
+                        typedef m2c_simple_swu_zeroAB<iso_map<group_type>, field_value_type, group_value_type>
+                            map_to_curve;
+                        /*constexpr*/ static inline field_value_type iso_Ai = field_value_type(0, 240);
+                        /*constexpr*/ static inline field_value_type iso_Bi = field_value_type(1012, 1012);
+                        /*constexpr*/ static inline field_value_type Z = -field_value_type(2, 1);
+                        constexpr static inline auto h_eff = 0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui636;
+                    };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

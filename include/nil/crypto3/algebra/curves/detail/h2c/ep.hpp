@@ -54,7 +54,7 @@ namespace nil {
                         constexpr static std::size_t m = suite_type::m;
                         constexpr static std::size_t L = suite_type::L;
 
-                        static_assert(suite_type::m == 1, "field has wrong extension");
+                        static_assert(m == 1, "underlying field has wrong extension");
 
                         template<typename InputType, typename = typename std::enable_if<std::is_same<
                             std::uint8_t, typename InputType::value_type>::value>::type>
@@ -88,12 +88,16 @@ namespace nil {
                             expand_message::process(N * m * L, msg, dst, uniform_bytes);
 
                             cpp_int e;
-                            std::array<field_value_type, N> result {0};
+                            std::array<modular_type, m> coordinates;
+                            std::array<field_value_type, N> result;
                             for (std::size_t i = 0; i < N; i++) {
-                                auto elm_offset = L * i;
-                                import_bits(e, uniform_bytes.begin() + elm_offset,
-                                            uniform_bytes.begin() + elm_offset + L);
-                                result[i] = field_value_type(modular_type(e, suite_type::p));
+                                for (std::size_t j = 0; j < m; j++) {
+                                    auto elm_offset = L * (j + i * m);
+                                    import_bits(e, uniform_bytes.begin() + elm_offset,
+                                                uniform_bytes.begin() + elm_offset + L);
+                                    coordinates[j] = modular_type(e, suite_type::p);
+                                }
+                                result[i] = field_value_type(coordinates[0]);
                             }
 
                             return result;

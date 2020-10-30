@@ -49,6 +49,7 @@ namespace nil {
                         typedef typename group_policy_type::number_type number_type;
                         typedef typename group_type::underlying_field_type::value_type field_value_type;
 
+                        // TODO: change number_type on field_value_type when constexpr will be finished
                         constexpr static std::array<number_type, 12> k_x_num = {
                             0x11a05f2b1e833340b809101dd99815856b303e88a2d7005ff2627b56cdb4e2c85610c2d5f2e62d6eaeac1662734649b7_cppui381,
                             0x17294ed3e943ab2f0588bab22147a81c7c17e75b2f6a8417f565e33c70d1e86b4838f2a6f318c356e834eef1b3cb83bb_cppui381,
@@ -112,94 +113,26 @@ namespace nil {
 
                     public:
                         static inline group_value_type process(const group_value_type &ci) {
-                            // field_value_type x_den =
-                            //     ci.X.pow(10) +
-                            //     ci.X.pow(9) * field_value_type(k_x_den[9]) +
-                            //     ci.X.pow(8) * field_value_type(k_x_den[8]) +
-                            //     ci.X.pow(7) * field_value_type(k_x_den[7]) +
-                            //     ci.X.pow(6) * field_value_type(k_x_den[6]) +
-                            //     ci.X.pow(5) * field_value_type(k_x_den[5]) +
-                            //     ci.X.pow(4) * field_value_type(k_x_den[4]) +
-                            //     ci.X.pow(3) * field_value_type(k_x_den[3]) +
-                            //     ci.X.pow(2) * field_value_type(k_x_den[2]) +
-                            //     ci.X * field_value_type(k_x_den[1]) +
-                            //     field_value_type(k_x_den[0]);
-                            // field_value_type y_den =
-                            //     ci.X.pow(15) +
-                            //     ci.X.pow(14) * field_value_type(k_y_den[14]) +
-                            //     ci.X.pow(13) * field_value_type(k_y_den[13]) +
-                            //     ci.X.pow(12) * field_value_type(k_y_den[12]) +
-                            //     ci.X.pow(11) * field_value_type(k_y_den[11]) +
-                            //     ci.X.pow(10) * field_value_type(k_y_den[10]) +
-                            //     ci.X.pow(9) * field_value_type(k_y_den[9]) +
-                            //     ci.X.pow(8) * field_value_type(k_y_den[8]) +
-                            //     ci.X.pow(7) * field_value_type(k_y_den[7]) +
-                            //     ci.X.pow(6) * field_value_type(k_y_den[6]) +
-                            //     ci.X.pow(5) * field_value_type(k_y_den[5]) +
-                            //     ci.X.pow(4) * field_value_type(k_y_den[4]) +
-                            //     ci.X.pow(3) * field_value_type(k_y_den[3]) +
-                            //     ci.X.pow(2) * field_value_type(k_y_den[2]) +
-                            //     ci.X * field_value_type(k_y_den[1]) +
-                            //     field_value_type(k_y_den[0]);
-                            // if (x_den.is_zero() || y_den.is_zero() ) {
-                            //     return group_value_type::one();
-                            // }
-                            // field_value_type x_num =
-                            //     ci.X.pow(11) * field_value_type(k_x_num[11]) +
-                            //     ci.X.pow(10) * field_value_type(k_x_num[10]) +
-                            //     ci.X.pow(9) * field_value_type(k_x_num[9]) +
-                            //     ci.X.pow(8) * field_value_type(k_x_num[8]) +
-                            //     ci.X.pow(7) * field_value_type(k_x_num[7]) +
-                            //     ci.X.pow(6) * field_value_type(k_x_num[6]) +
-                            //     ci.X.pow(5) * field_value_type(k_x_num[5]) +
-                            //     ci.X.pow(4) * field_value_type(k_x_num[4]) +
-                            //     ci.X.pow(3) * field_value_type(k_x_num[3]) +
-                            //     ci.X.pow(2) * field_value_type(k_x_num[2]) +
-                            //     ci.X * field_value_type(k_x_num[1]) +
-                            //     field_value_type(k_x_num[0]);
-                            // field_value_type y_num =
-                            //     ci.X.pow(15) * field_value_type(k_y_num[15]) +
-                            //     ci.X.pow(14) * field_value_type(k_y_num[14]) +
-                            //     ci.X.pow(13) * field_value_type(k_y_num[13]) +
-                            //     ci.X.pow(12) * field_value_type(k_y_num[12]) +
-                            //     ci.X.pow(11) * field_value_type(k_y_num[11]) +
-                            //     ci.X.pow(10) * field_value_type(k_y_num[10]) +
-                            //     ci.X.pow(9) * field_value_type(k_y_num[9]) +
-                            //     ci.X.pow(8) * field_value_type(k_y_num[8]) +
-                            //     ci.X.pow(7) * field_value_type(k_y_num[7]) +
-                            //     ci.X.pow(6) * field_value_type(k_y_num[6]) +
-                            //     ci.X.pow(5) * field_value_type(k_y_num[5]) +
-                            //     ci.X.pow(4) * field_value_type(k_y_num[4]) +
-                            //     ci.X.pow(3) * field_value_type(k_y_num[3]) +
-                            //     ci.X.pow(2) * field_value_type(k_y_num[2]) +
-                            //     ci.X * field_value_type(k_y_num[1]) +
-                            //     field_value_type(k_y_num[0]);
-
-
-                            field_value_type x_num = 0;
-                            field_value_type x_den = 0;
-                            field_value_type y_num = 0;
-                            field_value_type y_den = 0;
+                            field_value_type x_num = field_value_type::zero();
+                            field_value_type x_den = field_value_type::zero();
+                            field_value_type y_num = field_value_type::zero();
+                            field_value_type y_den = field_value_type::zero();
 
                             std::vector<field_value_type> xi_powers = [&ci](){
-                                std::vector<field_value_type> xi_powers {1};
+                                std::vector<field_value_type> xi_powers {field_value_type::one()};
                                 for (std::size_t i = 0; i < 15; i++) {
                                     xi_powers.emplace_back(xi_powers.back() * ci.X);
                                 }
                                 return xi_powers;
                             }();
 
-                            field_value_type x_mul = 1;
                             for (std::size_t i = 0; i < k_x_den.size(); i++) {
                                 x_den += field_value_type(k_x_den[i]) * xi_powers[i];
-                                x_mul *= ci.X;
                             }
                             x_den += xi_powers[k_x_den.size()];
 
-                            field_value_type y_mul = 1;
                             for (std::size_t i = 0; i < k_y_den.size(); i++) {
                                 y_den += field_value_type(k_y_den[i]) * xi_powers[i];
-                                y_mul *= ci.X;
                             }
                             y_den += xi_powers[k_y_den.size()];
 
@@ -207,21 +140,115 @@ namespace nil {
                                 return group_value_type::one();
                             }
 
-                            x_mul = 1;
                             for (std::size_t i = 0; i < k_x_num.size(); i++) {
                                 x_num += field_value_type(k_x_num[i]) * xi_powers[i];
-                                x_mul *= ci.X;
                             }
 
-                            y_mul = 1;
                             for (std::size_t i = 0; i < k_y_num.size(); i++) {
                                 y_num += field_value_type(k_y_num[i]) * xi_powers[i];
-                                y_mul *= ci.X;
                             }
 
-                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, 1);
+                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
                         }
                     };
+                    template<typename Fp2CurveGroupElement>
+                    void _print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
+                        os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
+                           << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
+                    }
+
+                    // 3-isogeny map for BLS12-381 G2
+                    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.3
+                    template<>
+                    class iso_map<typename bls12_381::g2_type> {
+                        typedef bls12_381 group_policy_type;
+                        typedef typename bls12_381::g2_type group_type;
+
+                        typedef typename group_type::value_type group_value_type;
+                        typedef typename group_policy_type::number_type number_type;
+                        typedef typename group_type::underlying_field_type::value_type field_value_type;
+
+                        // TODO: change number_type on field_value_type when constexpr will be finished
+                        constexpr static std::array<std::array<number_type, 2>, 4> k_x_num = {
+                            {{{0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6_cppui381,
+                               0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6_cppui381}},
+                             {{0,
+                               0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71a_cppui381}},
+                             {{0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71e_cppui381,
+                               0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38d_cppui381}},
+                             {{0x171d6541fa38ccfaed6dea691f5fb614cb14b4e7f4e810aa22d6108f142b85757098e38d0f671c7188e2aaaaaaaa5ed1_cppui381,
+                               0}}
+                            }};
+
+                        constexpr static std::array<std::array<number_type, 2>, 2> k_x_den = {
+                            {{{0,
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa63_cppui381}},
+                             {{0xc,
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa9f_cppui381}}
+                            }};
+
+                        constexpr static std::array<std::array<number_type, 2>, 4> k_y_num = {
+                            {{{0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706_cppui381,
+                               0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706_cppui381}},
+                             {{0,
+                               0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97be_cppui381}},
+                             {{0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71c_cppui381,
+                               0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38f_cppui381}},
+                             {{0x124c9ad43b6cf79bfbf7043de3811ad0761b0f37a1e26286b0e977c69aa274524e79097a56dc4bd9e1b371c71c718b10_cppui381,
+                               0}}
+                            }};
+
+                        constexpr static std::array<std::array<number_type, 2>, 3> k_y_den = {
+                            {{{0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb_cppui381,
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb_cppui381}},
+                             {{0,
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa9d3_cppui381}},
+                             {{0x12,
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa99_cppui381}}
+                            }};
+
+                    public:
+                        static inline group_value_type process(const group_value_type &ci) {
+                            field_value_type x_num = field_value_type::zero();
+                            field_value_type x_den = field_value_type::zero();
+                            field_value_type y_num = field_value_type::zero();
+                            field_value_type y_den = field_value_type::zero();
+
+                            std::vector<field_value_type> xi_powers = [&ci](){
+                                std::vector<field_value_type> xi_powers {field_value_type::one()};
+                                for (std::size_t i = 0; i < 3; i++) {
+                                    auto v = xi_powers.back();
+                                    xi_powers.emplace_back(xi_powers.back() * ci.X);
+                                }
+                                return xi_powers;
+                            }();
+
+                            for (std::size_t i = 0; i < k_x_den.size(); i++) {
+                                x_den += field_value_type(k_x_den[i][0], k_x_den[i][1]) * xi_powers[i];
+                           }
+                            x_den += xi_powers[k_x_den.size()];
+
+                            for (std::size_t i = 0; i < k_y_den.size(); i++) {
+                                y_den += field_value_type(k_y_den[i][0], k_y_den[i][1]) * xi_powers[i];
+                            }
+                            y_den += xi_powers[k_y_den.size()];
+
+                            if (x_den.is_zero() || y_den.is_zero()) {
+                                return group_value_type::one();
+                            }
+
+                            for (std::size_t i = 0; i < k_x_num.size(); i++) {
+                                x_num += field_value_type(k_x_num[i][0], k_x_num[i][1]) * xi_powers[i];
+                            }
+
+                            for (std::size_t i = 0; i < k_y_num.size(); i++) {
+                                y_num += field_value_type(k_y_num[i][0], k_y_num[i][1]) * xi_powers[i];
+                            }
+
+                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
+                        }
+                    };
+
 
                 }    // namespace detail
             }        // namespace curves

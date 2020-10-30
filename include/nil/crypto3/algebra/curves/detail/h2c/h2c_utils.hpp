@@ -74,7 +74,7 @@ namespace nil {
                     inline bool sgn0(const element_fp<FieldParams> &e) {
                         using number_type = typename element_fp<FieldParams>::number_type;
 
-                        static number_type two = number_type(2, element_fp<FieldParams>::modulus);
+                        static const number_type two = number_type(2, element_fp<FieldParams>::modulus);
 
                         return static_cast<bool>(e.data % two);
                     }
@@ -84,11 +84,11 @@ namespace nil {
                         using underlying_type = typename element_fp2<FieldParams>::underlying_type;
                         using number_type = typename underlying_type::number_type;
 
-                        static number_type two = number_type(2, underlying_type::modulus);
-                        static number_type zero = number_type(0, underlying_type::modulus);
+                        static const number_type two = number_type(2, underlying_type::modulus);
+                        static const number_type zero = number_type(0, underlying_type::modulus);
 
                         number_type sign_0 = e.data[0].data % two;
-                        bool zero_0 = sign_0 == zero;
+                        bool zero_0 = e.data[0].data.is_zero();
                         number_type sign_1 = e.data[1].data % two;
                         return static_cast<bool>(sign_0) || (zero_0 && static_cast<bool>(sign_1));
                     }
@@ -247,7 +247,7 @@ namespace nil {
                             // 2.  Z != -1 in F,
                             // 3.  the polynomial g(x) - Z is irreducible over F, and
                             // 4.  g(B / (Z * A)) is square in F.
-                            static FieldValueType one = FieldValueType::one();
+                            static const FieldValueType one = FieldValueType::one();
 
                             FieldValueType tv1 = (Z.pow(2) * u.pow(4) + Z * u.pow(2)).inversed();
                             FieldValueType x1 = (-B / A) * (one + tv1);
@@ -268,7 +268,7 @@ namespace nil {
                             if (sgn0(u) != sgn0(y)) {
                                 y = -y;
                             }
-                            return GroupValueType(x, y, 1);
+                            return GroupValueType(x, y, one);
                         }
                     };
 
