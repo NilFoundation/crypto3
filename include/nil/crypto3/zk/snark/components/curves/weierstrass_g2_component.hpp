@@ -63,9 +63,9 @@ namespace nil {
                         all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
-                    G2_variable(blueprint<field_type> &pb, const other_curve<CurveType>::g2_type &Q) :
+                    G2_variable(blueprint<field_type> &pb, const typename other_curve<CurveType>::g2_type::value_type &Q) :
                         component<field_type>(pb) {
-                        other_curve<CurveType>::g2_type Q_copy = Q.to_affine_coordinates();
+                        typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
 
                         X.reset(new Fqe_variable<CurveType>(pb, Q_copy.X()));
                         Y.reset(new Fqe_variable<CurveType>(pb, Q_copy.Y()));
@@ -74,8 +74,8 @@ namespace nil {
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
 
-                    void generate_r1cs_witness(const other_curve<CurveType>::g2_type &Q) {
-                        other_curve<CurveType>::g2_type Qcopy = Q.to_affine_coordinates();
+                    void generate_r1cs_witness(const typename other_curve<CurveType>::g2_type::value_type &Q) {
+                        typename other_curve<CurveType>::g2_type::value_type Qcopy = Q.to_affine_coordinates();
 
                         X->generate_r1cs_witness(Qcopy.X());
                         Y->generate_r1cs_witness(Qcopy.Y());
