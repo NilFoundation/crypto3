@@ -138,6 +138,16 @@ namespace nil {
                                                 (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
                         }
 
+                        element_fp2 &operator*=(const element_fp2 &B) {
+                            *this = *this * B;
+
+                            return *this;
+                        }
+
+                        element_fp2 operator/(const element_fp2 &B) const {
+                            return *this * B.inversed();
+                        }
+
                         /*
                             For pairing bn128
                             XITAG
