@@ -49,7 +49,7 @@ namespace nil {
                     struct edwards_basic_policy<183, CHAR_BIT> {
                         constexpr static const std::size_t base_field_bits = 183;
                         typedef fields::edwards_fq<base_field_bits, CHAR_BIT> g1_field_type;
-                        using base_field_type = g1_field_type;
+                        typedef g1_field_type base_field_type;
                         typedef typename fields::fp3<base_field_type> g2_field_type;
                         typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
 

@@ -118,9 +118,7 @@ namespace nil {
                                 w0_part = elt.cyclotomic_exp(policy_type::final_exponent_last_chunk_abs_of_w0);
                             }
 
-                            gt result = w1_part * w0_part;
-
-                            return result;
+                            return w1_part * w0_part;
                         }
 
                         static gt final_exponentiation_first_chunk(const gt &elt, const gt &elt_inv) {
@@ -144,9 +142,7 @@ namespace nil {
                             const gt elt_inv = elt.inversed();
                             const gt elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
                             const gt elt_inv_to_first_chunk = final_exponentiation_first_chunk(elt_inv, elt);
-                            gt result = final_exponentiation_last_chunk(elt_to_first_chunk, elt_inv_to_first_chunk);
-
-                            return result;
+                            return final_exponentiation_last_chunk(elt_to_first_chunk, elt_inv_to_first_chunk);
                         }
 
                     private:

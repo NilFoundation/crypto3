@@ -27,7 +27,7 @@
 #define CRYPTO3_ALGEBRA_PAIRING_MNT4_POLICY_HPP
 
 #include <nil/crypto3/algebra/pairing/detail/mnt4/functions.hpp>
-#include <nil/crypto3/algebra/pairing/policy.hpp>
+#include <nil/crypto3/algebra/pairing/basic_policy.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 

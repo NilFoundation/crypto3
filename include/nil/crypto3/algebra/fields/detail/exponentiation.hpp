@@ -37,9 +37,9 @@ namespace nil {
         namespace algebra {
             namespace fields {
                 namespace detail {
-                    template<typename FieldTypeValue, typename PowerType>
-                    FieldTypeValue power(const FieldTypeValue &base, const PowerType &exponent) {
-                        FieldTypeValue result = FieldTypeValue::one();
+                    template<typename FieldValueType, typename NumberType>
+                    FieldValueType power(const FieldValueType &base, const NumberType &exponent) {
+                        FieldValueType result = FieldValueType::one();
 
                         bool found_one = false;
 

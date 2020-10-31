@@ -158,9 +158,7 @@ namespace nil {
                                 V * M;    // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) *
                                           // (elt^(z^4-2z^3+2z) * elt^(-1))^q * elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
 
-                            const gt result = W;
-
-                            return result;
+                            return W;
                         }
 
                     public:
@@ -177,7 +175,7 @@ namespace nil {
                     private:
                         /*************************  ATE PAIRING ***********************************/
 
-                        static void doubling_step_for_miller_loop(const Fq two_inv, g2 &current, ate_ell_coeffs &c) {
+                        static void doubling_step_for_miller_loop(const Fq &two_inv, g2 &current, ate_ell_coeffs &c) {
 
                             const Fq2 X = current.X, Y = current.Y, Z = current.Z;
 

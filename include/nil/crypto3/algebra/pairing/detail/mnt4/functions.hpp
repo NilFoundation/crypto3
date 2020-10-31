@@ -27,10 +27,10 @@
 #define CRYPTO3_ALGEBRA_PAIRING_MNT4_FUNCTIONS_HPP
 
 #include <nil/crypto3/algebra/pairing/detail/mnt4/basic_policy.hpp>
-#include <nil/crypto3/algebra/pairing/detail/wnaf.hpp>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/wnaf.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -203,7 +203,7 @@ namespace nil {
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
                             bool found_nonzero = false;
 
-                            std::vector<long> NAF = find_wnaf(1, loop_count);
+                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
                             for (long i = NAF.size() - 1; i >= 0; --i) {
                                 if (!found_nonzero) {
                                     /* this skips the MSB itself */

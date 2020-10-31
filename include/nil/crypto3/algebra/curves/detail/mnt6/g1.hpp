@@ -35,7 +35,6 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     struct mnt6_g1 {
 
@@ -47,7 +46,6 @@ namespace nil {
 
                         using value_type = element_mnt6_g1<ModulusBits, GeneratorBits>;
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

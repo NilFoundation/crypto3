@@ -27,7 +27,7 @@
 #define CRYPTO3_ALGEBRA_PAIRING_MNT6_POLICY_HPP
 
 #include <nil/crypto3/algebra/pairing/detail/mnt6/functions.hpp>
-#include <nil/crypto3/algebra/pairing/policy.hpp>
+#include <nil/crypto3/algebra/pairing/basic_policy.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 

@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/pairing/detail/bls12/basic_policy.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/functions.hpp>
-#include <nil/crypto3/algebra/pairing/policy.hpp>
+#include <nil/crypto3/algebra/pairing/basic_policy.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
