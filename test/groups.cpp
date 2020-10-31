@@ -46,31 +46,31 @@ template<typename GroupType>
 void test_mixed_add() {
     GroupType base, el, result;
 
-    base = GroupType::zero();
-    el = GroupType::zero();
+    base = GroupType::value_type::zero();
+    el = GroupType::value_type::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupType::zero();
-    el = GroupType::random_element();
+    base = GroupType::value_type::zero();
+    el = random_element<GroupType>();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupType::random_element();
-    el = GroupType::zero();
+    base = random_element<GroupType>();
+    el = GroupType::value_type::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupType::random_element();
-    el = GroupType::random_element();
+    base = random_element<GroupType>();
+    el = random_element<GroupType>();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupType::random_element();
+    base = random_element<GroupType>();
     el = base;
     el.to_special();
     result = base.mixed_add(el);
@@ -83,21 +83,21 @@ void test_group() {
     NumberType rand2 = NumberType("44410867");
     NumberType randsum = NumberType("121160274");
 
-    GroupType zero = GroupType::zero();
+    GroupType zero = GroupType::value_type::zero();
     assert(zero == zero);
-    GroupType one = GroupType::one();
+    GroupType one = GroupType::value_type::one();
     assert(one == one);
-    GroupType two = number_type<1>(2l) * GroupType::one();
+    GroupType two = number_type<1>(2l) * GroupType::value_type::one();
     assert(two == two);
-    GroupType five = number_type<1>(5l) * GroupType::one();
+    GroupType five = number_type<1>(5l) * GroupType::value_type::one();
 
-    GroupType three = number_type<1>(3l) * GroupType::one();
-    GroupType four = number_type<1>(4l) * GroupType::one();
+    GroupType three = number_type<1>(3l) * GroupType::value_type::one();
+    GroupType four = number_type<1>(4l) * GroupType::value_type::one();
 
     assert(two + five == three + four);
 
-    GroupType a = GroupType::random_element();
-    GroupType b = GroupType::random_element();
+    GroupType a = random_element<GroupType>();
+    GroupType b = random_element<GroupType>();
 
     assert(one != zero);
     assert(a != zero);
@@ -137,13 +137,13 @@ void test_group() {
 
 template<typename GroupType>
 void test_mul_by_q() {
-    GroupType a = GroupType::random_element();
+    GroupType a = random_element<GroupType>();
     assert((GroupType::base_field_char() * a) == a.mul_by_q());
 }
 
 template<typename GroupType>
 void test_output() {
-    GroupType g = GroupType::zero();
+    GroupType g = GroupType::value_type::zero();
 
     for (size_t i = 0; i < 1000; ++i) {
         std::stringstream ss;
@@ -152,7 +152,7 @@ void test_output() {
         ss >> gg;
         assert(g == gg);
         /* use a random point in next iteration */
-        g = GroupType::random_element();
+        g = random_element<GroupType>();
     }
 }
 

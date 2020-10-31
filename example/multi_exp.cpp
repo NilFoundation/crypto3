@@ -86,11 +86,11 @@ test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
 
     for (size_t i = 0; i < count; i++) {
 
-        typename GroupType::value_type x = curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+        typename GroupType::value_type x = random_element<GroupType>().to_special();    // djb requires input to be in special form
 
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
-            // result[i].push_back(curve_random_element<GroupType>());
+            // result[i].push_back(random_element<GroupType>());
         }
     }
 
@@ -99,13 +99,11 @@ test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
 
 template<typename FieldType>
 test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
-    // we use SHA512_rng because it is much faster than
-    // FieldType::random_element()
     test_instances_t<FieldType> result(count);
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(field_random_element<FieldType>());
+            result[i].push_back(random_element<FieldType>());
         }
     }
 
