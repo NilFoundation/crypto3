@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -93,8 +95,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    field_value_type a = random_element <FieldType> ();
-                    field_value_type b = random_element <FieldType> ();
+                    field_value_type a = algebra::random_element<FieldType> ();
+                    field_value_type b = algebra::random_element<FieldType> ();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 

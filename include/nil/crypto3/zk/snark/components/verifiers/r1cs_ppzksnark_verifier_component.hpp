@@ -464,7 +464,7 @@ namespace nil {
                     vk_gamma_beta_g1_precomp.reset(new G1_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g1));
 
                     pp_G2_one_precomp.reset(
-                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
+                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::value_type::one()));
                     vk_alphaA_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaA_g2));
                     vk_alphaC_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaC_g2));
                     vk_gamma_beta_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g2));
@@ -498,7 +498,7 @@ namespace nil {
                         new precompute_G1_component<CurveType>(pb, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
                     pvk.pp_G2_one_precomp.reset(
-                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
+                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::value_type::one()));
                     compute_vk_alphaA_g2_precomp.reset(
                         new precompute_G2_component<CurveType>(pb, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                     compute_vk_alphaC_g2_precomp.reset(

@@ -94,7 +94,7 @@ namespace nil {
                     linear_combination<FieldType> result;
 
                     for (std::size_t i = 0; i < terms; ++i) {
-                        const field_value_type coeff = field_random_element<FieldType>();
+                        const field_value_type coeff = algebra::random_element<FieldType>();
                         result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
                     }
 
@@ -112,11 +112,11 @@ namespace nil {
 
                     bacs_example<FieldType> example;
                     for (std::size_t i = 0; i < primary_input_size; ++i) {
-                        example.primary_input.emplace_back(field_random_element<FieldType>());
+                        example.primary_input.emplace_back(algebra::random_element<FieldType>());
                     }
 
                     for (std::size_t i = 0; i < auxiliary_input_size; ++i) {
-                        example.auxiliary_input.emplace_back(field_random_element<FieldType>());
+                        example.auxiliary_input.emplace_back(algebra::random_element<FieldType>());
                     }
 
                     example.circuit.primary_input_size = primary_input_size;

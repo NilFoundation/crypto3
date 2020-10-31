@@ -196,8 +196,8 @@ void test_mul(const std::string &annotation) {
     mul.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        const typename FpExtT::value_type x_val = random_element<FpExtT>();
-        const typename FpExtT::value_type y_val = random_element<FpExtT>();
+        const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
+        const typename FpExtT::value_type y_val = algebra::random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         y.generate_r1cs_witness(y_val);
         mul.generate_r1cs_witness();
@@ -219,7 +219,7 @@ void test_sqr(const std::string &annotation) {
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        const typename FpExtT::value_type x_val = random_element<FpExtT>();
+        const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();
         const typename FpExtT::value_type res = xsq.get_element();
@@ -241,7 +241,7 @@ void test_cyclotomic_sqr(const std::string &annotation) {
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        FpExtT x_val = random_element<FpExtT>();
+        FpExtT::value_type x_val = algebra::random_element<FpExtT>();
         x_val = final_exponentiation<CurveType>(x_val);
 
         x.generate_r1cs_witness(x_val);
@@ -262,7 +262,7 @@ void test_Frobenius(const std::string &annotation) {
         VarT<FpExtT> x(pb);
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
-        const typename FpExtT::value_type x_val = random_element<FpExtT>();
+        const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         x_frob.evaluate();
         const typename FpExtT::value_type res = x_frob.get_element();
@@ -279,10 +279,10 @@ void test_full_pairing(const std::string &annotation) {
     using pairing_policy = typename CurveType::pairing_policy::other_curve::pairing_policy;
 
     blueprint<FieldType> pb;
-    other_curve<CurveType>::g1_type P_val =
-        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-    other_curve<CurveType>::g2_type Q_val =
-        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
+    other_curve<CurveType>::g1_type::value_type P_val =
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::value_type::one();
+    other_curve<CurveType>::g2_type::value_type Q_val =
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::value_type::one();
 
     G1_variable<CurveType> P(pb);
     G2_variable<CurveType> Q(pb);
@@ -335,10 +335,10 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     using pairing_policy = typename CurveType::pairing_policy::other_curve::pairing_policy;
 
     blueprint<FieldType> pb;
-    other_curve<CurveType>::g1_type P_val =
-        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-    other_curve<CurveType>::g2_type Q_val =
-        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
+    other_curve<CurveType>::g1_type::value_type P_val =
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::value_type::one();
+    other_curve<CurveType>::g2_type::value_type Q_val =
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::value_type::one();
 
     G1_precomputation<CurveType> prec_P(pb, P_val);
     G2_precomputation<CurveType> prec_Q(pb, Q_val);
@@ -379,19 +379,19 @@ template<typename ppT>
 void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> pb;
     other_curve<ppT>::g1_type P1_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q1_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P2_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q2_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P3_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q3_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P1(pb, "P1");
     G2_variable<ppT> Q1(pb, "Q1");
@@ -473,9 +473,9 @@ template<typename ppT>
 void test_mnt_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> pb;
     other_curve<ppT>::g1_type P_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P(pb, "P");
     G2_variable<ppT> Q(pb, "Q");
@@ -520,14 +520,14 @@ template<typename ppT>
 void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> pb;
     other_curve<ppT>::g1_type P1_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q1_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P2_val =
-        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
     <other_curve<ppT>::g2_type Q2_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::one();
+        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P1(pb, "P1");
     G2_variable<ppT> Q1(pb, "Q1");

@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -110,8 +112,8 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const field_value_type x_coeff = random_element <FieldType> ();
-                        const field_value_type y_coeff = random_element <FieldType> ();
+                        const field_value_type x_coeff = algebra::random_element<FieldType> ();
+                        const field_value_type y_coeff = algebra::random_element<FieldType> ();
                         const field_value_type val = (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
                         const field_value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *

@@ -195,16 +195,16 @@ namespace nil {
 
                             /*static verification_key dummy_verification_key(const std::size_t input_size) {
                                 verification_key result;
-                                result.tilde_g2 = random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::one(); result.alpha_tilde_g2 = random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g2_type::one(); result.Z_g2 =
-                            random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::one();
+                                result.tilde_g2 = algenra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::g2_type::value_type::one(); result.alpha_tilde_g2 = algenra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one(); result.Z_g2 =
+                            algenra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::g2_type::value_type::one();
 
-                                typename CurveType::g1_type::value_type base = random_element<typename
+                                typename CurveType::g1_type::value_type base = algenra::random_element<typename
                             CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); typename
                             CurveType::g1_vector v; for (std::size_t i = 0; i < input_size; ++i) {
-                                    v.emplace_back(random_element<typename CurveType::scalar_field_type>() * typename
+                                    v.emplace_back(algenra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one());
                                 }
 
@@ -283,7 +283,7 @@ namespace nil {
                                 this->V_g1 = typename CurveType::g1_type::value_type::one();
                                 this->alpha_V_g1 = typename CurveType::g1_type::value_type::one();
                                 this->H_g1 = typename CurveType::g1_type::value_type::one();
-                                this->V_g2 = typename CurveType::g2_type::one();
+                                this->V_g2 = typename CurveType::g2_type::value_type::one();
                             }
                             proof(typename CurveType::g1_type::value_type &&V_g1,
                                   typename CurveType::g1_type::value_type &&alpha_V_g1,
@@ -342,8 +342,8 @@ namespace nil {
 
                             /* draw random element at which the SSP is evaluated */
 
-                            const typename CurveType::scalar_field_type t =
-                                random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type t =
+                                algebra::random_element<typename CurveType::scalar_field_type>();
 
                             /* perform USCS-to-SSP reduction */
 
@@ -377,8 +377,8 @@ namespace nil {
                                 assert(!Xt_table[i].is_zero());
                             }
 
-                            const typename CurveType::scalar_field_type alpha =
-                                random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type alpha =
+                                algebra::random_element<typename CurveType::scalar_field_type>();
 
                             const std::size_t g1_exp_count =
                                 Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
@@ -395,7 +395,7 @@ namespace nil {
 
                             algebra::window_table<typename CurveType::g2_type> g2_table =
                                 get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window,
-                                                 typename CurveType::g2_type::one());
+                                                 typename CurveType::g2_type::value_type::one());
 
                             typename CurveType::g1_vector V_g1_query =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
@@ -422,12 +422,12 @@ namespace nil {
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g2_type>(V_g2_query);
 #endif
-                            const typename CurveType::scalar_field_type tilde =
-                                random_element<typename CurveType::scalar_field_type>();
-                            typename CurveType::g2_type::value_type tilde_g2 = tilde * typename CurveType::g2_type::one();
+                            const typename CurveType::scalar_field_type::value_type tilde =
+                                algebra::random_element<typename CurveType::scalar_field_type>();
+                            typename CurveType::g2_type::value_type tilde_g2 = tilde * typename CurveType::g2_type::value_type::one();
                             typename CurveType::g2_type::value_type alpha_tilde_g2 =
-                                (alpha * tilde) * typename CurveType::g2_type::one();
-                            typename CurveType::g2_type::value_type Z_g2 = ssp_inst.Zt * typename CurveType::g2_type::one();
+                                (alpha * tilde) * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g2_type::value_type Z_g2 = ssp_inst.Zt * typename CurveType::g2_type::value_type::one();
 
                             typename CurveType::g1_type::value_type encoded_IC_base =
                                 Xt_table[0] * typename CurveType::g1_type::value_type::one();
@@ -466,8 +466,8 @@ namespace nil {
                                             const primary_input &primary_input,
                                             const auxiliary_input &auxiliary_input) {
 
-                            const typename CurveType::scalar_field_type d =
-                                random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type d =
+                                algebra::random_element<typename CurveType::scalar_field_type>();
 
                             const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
                                 uscs_to_ssp::witness_map(pk.constraint_system, primary_input, auxiliary_input, d);
@@ -543,7 +543,7 @@ namespace nil {
                             processed_verification_key pvk;
 
                             pvk.pp_G1_one_precomp = CurveType::precompute_g1(typename CurveType::g1_type::value_type::one());
-                            pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::one());
+                            pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
 
                             pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
                             pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);

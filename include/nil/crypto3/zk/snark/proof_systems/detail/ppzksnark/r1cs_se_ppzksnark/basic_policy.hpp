@@ -238,18 +238,18 @@ namespace nil {
 
                             /*static verification_key dummy_verification_key(const std::size_t input_size) {
                                 verification_key result;
-                                result.H = random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::one(); result.G_alpha = random_element<typename
+                                result.H = algebra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::g2_type::value_type::one(); result.G_alpha = algebra::random_element<typename
                             CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.H_beta =
-                            random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::one(); result.G_gamma = random_element<typename
+                            algebra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::g2_type::value_type::one(); result.G_gamma = algebra::random_element<typename
                             CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.H_gamma =
-                            random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::one();
+                            algebra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::g2_type::value_type::one();
 
                                 typename CurveType::g1_vector v;
                                 for (std::size_t i = 0; i < input_size + 1; ++i) {
-                                    v.emplace_back(random_element<typename CurveType::scalar_field_type>() * typename
+                                    v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one());
                                 }
                                 result.query = std::move(v);
@@ -379,9 +379,9 @@ namespace nil {
                              */
                             const std::shared_ptr<fft::evaluation_domain<typename CurveType::scalar_field_type>>
                                 domain = r1cs_to_sap::get_domain(cs);
-                            typename CurveType::scalar_field_type t;
+                            typename CurveType::scalar_field_type::value_type t;
                             do {
-                                t = random_element<typename CurveType::scalar_field_type>();
+                                t = algebra::random_element<typename CurveType::scalar_field_type>();
                             } while (domain->compute_vanishing_polynomial(t).is_zero());
 
                             sap_instance_evaluation<typename CurveType::scalar_field_type> sap_inst =
@@ -402,12 +402,12 @@ namespace nil {
                              * but we do not use them below
                              */
 
-                            const typename CurveType::scalar_field_type
-                                alpha = random_element<typename CurveType::scalar_field_type>(),
-                                beta = random_element<typename CurveType::scalar_field_type>(),
-                                gamma = random_element<typename CurveType::scalar_field_type>();
-                            const typename CurveType::g1_type::value_type G = random_element<typename CurveType::g1_type>();
-                            const typename CurveType::g2_type::value_type H = random_element<typename CurveType::g2_type>();
+                            const typename CurveType::scalar_field_type::value_type
+                                alpha = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                beta = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                gamma = algebra::random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::g1_type::value_type G = algebra::random_element<typename CurveType::g1_type>();
+                            const typename CurveType::g2_type::value_type H = algebra::random_element<typename CurveType::g2_type>();
 
                             std::size_t G_exp_count = sap_inst.num_inputs() + 1    // verifier_query
                                                       + non_zero_At                // A_query
@@ -539,9 +539,9 @@ namespace nil {
                                             const primary_input &primary_input,
                                             const auxiliary_input &auxiliary_input) {
 
-                            const typename CurveType::scalar_field_type
-                                d1 = random_element<typename CurveType::scalar_field_type>(),
-                                d2 = random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type
+                                d1 = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                d2 = algebra::random_element<typename CurveType::scalar_field_type>();
 
                             const sap_witness<typename CurveType::scalar_field_type> sap_wit =
                                 r1cs_to_sap::witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2);
@@ -553,8 +553,8 @@ namespace nil {
                             const std::size_t chunks = 1;
 #endif
 
-                            const typename CurveType::scalar_field_type r =
-                                random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type r =
+                                algebra::random_element<typename CurveType::scalar_field_type>();
 
                             /**
                              * compute A = G^{gamma * (\sum_{i=0}^m input_i * A_i(t) + r * Z(t))}

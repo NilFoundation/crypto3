@@ -159,7 +159,7 @@ namespace nil {
                             sec_auth_key<CurveType> &operator=(const sec_auth_key<CurveType> &other) = default;
                             sec_auth_key(const sec_auth_key<CurveType> &other) = default;
                             sec_auth_key(sec_auth_key<CurveType> &&other) = default;
-                            sec_auth_key(CurveType::scalar_field_type::value_type &&i,
+                            sec_auth_key(typename CurveType::scalar_field_type::value_type &&i,
                                          secret_key<CurveType> &&skp,
                                          prf_key<CurveType> &&S) :
                                 i(std::move(i)),
@@ -369,23 +369,23 @@ namespace nil {
 
                                 verification_key<CurveType> result;
                                 result.alphaA_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.alphaB_g1 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.alphaC_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_beta_g1 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.gamma_beta_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.rC_Z_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
 
-                                result.A0 = random_element<CurveType::scalar_field_type>() * typename
+                                result.A0 = algebra::random_element<CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one(); for (std::size_t i = 0; i < input_size; ++i) {
-                                    result.Ain.emplace_back(random_element<CurveType::scalar_field_type>() *
+                                    result.Ain.emplace_back(algebra::random_element<CurveType::scalar_field_type>() *
                                                             typename CurveType::g1_type::value_type::one());
                                 }
 
@@ -540,7 +540,7 @@ namespace nil {
                         static auth_keys<CurveType> auth_generator(void) {
                             kpT<CurveType> sigkp = sigGen<CurveType>();
                             prf_key<CurveType> prfseed = prfGen<CurveType>();
-                            CurveType i = random_element<CurveType::scalar_field_type>();
+                            CurveType i = algebra::random_element<CurveType::scalar_field_type>();
                             typename CurveType::g1_type::value_type I1 = i * typename CurveType::g1_type::value_type::one();
                             typename CurveType::g2_type::value_type minusI2 =
                                 typename CurveType::g2_type::value_type::zero() - i * typename CurveType::g2_type::value_type::one();
@@ -554,7 +554,7 @@ namespace nil {
                          * R1CS ppZKADSNARK authentication algorithm.
                          */
                         static std::vector<auth_data<CurveType>>
-                            auth_sign(const std::vector<CurveType::scalar_field_type::value_type> &ins,
+                            auth_sign(const std::vector<typename CurveType::scalar_field_type::value_type> &ins,
                                       const sec_auth_key<CurveType> &sk,
                                       const std::vector<label_type>
                                           labels) {
@@ -562,7 +562,7 @@ namespace nil {
                             std::vector<auth_data<CurveType>> res;
                             res.reserve(ins.size());
                             for (std::size_t i = 0; i < ins.size(); i++) {
-                                CurveType::scalar_field_type::value_type lambda =
+                                typename CurveType::scalar_field_type::value_type lambda =
                                     prfCompute<CurveType>(sk.S, labels[i]);
                                 typename CurveType::g2_type::value_type Lambda = lambda * typename CurveType::g2_type::value_type::one();
                                 signature<CurveType> sig = sigSign<CurveType>(sk.skp, labels[i], Lambda);
@@ -577,23 +577,23 @@ namespace nil {
                          * R1CS ppZKADSNARK authentication verification algorithms.
                          */
                         // symmetric
-                        static bool auth_verify(const std::vector<CurveType::scalar_field_type::value_type> &data,
+                        static bool auth_verify(const std::vector<typename CurveType::scalar_field_type::value_type> &data,
                                                 const std::vector<auth_data<CurveType>> &auth_data,
                                                 const sec_auth_key<CurveType> &sak,
                                                 const std::vector<label_type> &labels) {
                             assert((data.size() == labels.size()) && (auth_data.size() == labels.size()));
                             bool res = true;
                             for (std::size_t i = 0; i < data.size(); i++) {
-                                CurveType::scalar_field_type::value_type lambda =
+                                typename CurveType::scalar_field_type::value_type lambda =
                                     prfCompute<CurveType>(sak.S, labels[i]);
-                                CurveType::scalar_field_type::value_type mup = lambda + sak.i * data[i];
+                                typename CurveType::scalar_field_type::value_type mup = lambda + sak.i * data[i];
                                 res = res && (auth_data[i].mu == mup);
                             }
                             return res;
                         }
 
                         // public
-                        static bool auth_verify(const std::vector<CurveType::scalar_field_type::value_type> &data,
+                        static bool auth_verify(const std::vector<typename CurveType::scalar_field_type::value_type> &data,
                                                 const std::vector<auth_data<CurveType>> &auth_data,
                                                 const pub_auth_key<CurveType> &pak,
                                                 const std::vector<label_type> &labels) {
@@ -622,9 +622,9 @@ namespace nil {
                             cs_copy.swap_AB_if_beneficial();
 
                             /* draw random element at which the QAP is evaluated */
-                            const CurveType t = random_element<CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type t = algebra::random_element<typename CurveType::scalar_field_type>();
 
-                            qap_instance_evaluation<CurveType::scalar_field_type::value_type> qap_inst =
+                            qap_instance_evaluation<typename CurveType::scalar_field_type::value_type> qap_inst =
                                 r1cs_to_qap::instance_map_with_evaluation(cs_copy, t);
 
                             printf("* QAP number of variables: %zu\n", qap_inst.num_variables());
@@ -664,15 +664,15 @@ namespace nil {
                             Bt.emplace_back(qap_inst.Zt);
                             Ct.emplace_back(qap_inst.Zt);
 
-                            const CurveType::scalar_field_type::value_type
-                                alphaA = random_element<CurveType::scalar_field_type::value_type>(),
-                                alphaB = random_element<CurveType::scalar_field_type::value_type>,
-                                alphaC = random_element<CurveType::scalar_field_type::value_type>,
-                                rA = random_element<CurveType::scalar_field_type::value_type>,
-                                rB = random_element<CurveType::scalar_field_type::value_type>,
-                                beta = random_element<CurveType::scalar_field_type::value_type>,
-                                gamma = random_element<CurveType::scalar_field_type::value_type>;
-                            const CurveType::scalar_field_type::value_type rC = rA * rB;
+                            const typename CurveType::scalar_field_type::value_type
+                                alphaA = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                alphaB = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                alphaC = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                rA = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                rB = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                beta = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                gamma = algebra::random_element<typename CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type rC = rA * rB;
 
                             // construct the same-coefficient-check query (must happen before zeroing out the prefix of
                             // At)
@@ -704,36 +704,36 @@ namespace nil {
 #endif
 
                             algebra::window_table<typename CurveType::g1_type> g1_table =
-                                get_window_table(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window,
+                                get_window_table(CurveType::scalar_field_type::value_bits, g1_window,
                                                  typename CurveType::g1_type::value_type::one());
 
-                            algebra::window_table<typename CurveType::g2_type> g2_table =
-                                get_window_table(CurveType::scalar_field_type::value_type::size_in_bits(), g2_window,
+                            algebra::window_table<typename algebra::CurveType::g2_type> g2_table =
+                                get_window_table(CurveType::scalar_field_type::value_bits, g2_window,
                                                  typename CurveType::g2_type::value_type::one());
 
                             knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
                                 A_query =
-                                    kc_batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window,
+                                    kc_batch_exp(CurveType::scalar_field_type::value_bits, g1_window,
                                                  g1_window, g1_table, g1_table, rA, rA * alphaA, At, chunks);
 
                             knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
                                 B_query =
-                                    kc_batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g2_window,
+                                    kc_batch_exp(CurveType::scalar_field_type::value_bits, g2_window,
                                                  g1_window, g2_table, g1_table, rB, rB * alphaB, Bt, chunks);
 
                             knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
                                 C_query =
-                                    kc_batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window,
+                                    kc_batch_exp(CurveType::scalar_field_type::value_bits, g1_window,
                                                  g1_window, g1_table, g1_table, rC, rC * alphaC, Ct, chunks);
 
                             typename CurveType::g1_vector H_query = batch_exp(
-                                CurveType::scalar_field_type::value_type::size_in_bits(), g1_window, g1_table, Ht);
+                                CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(H_query);
 #endif
 
                             typename CurveType::g1_vector K_query = batch_exp(
-                                CurveType::scalar_field_type::value_type::size_in_bits(), g1_window, g1_table, Kt);
+                                CurveType::scalar_field_type::value_bits, g1_window, g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(K_query);
 #endif
@@ -788,12 +788,12 @@ namespace nil {
                                                        const auxiliary_input<CurveType> &auxiliary_input,
                                                        const std::vector<auth_data<CurveType>> &auth_data) {
 
-                            const CurveType d1 = random_element<CurveType::scalar_field_type>(),
-                                            d2 = random_element<CurveType::scalar_field_type>(),
-                                            d3 = random_element<CurveType::scalar_field_type>(),
-                                            dauth = random_element<CurveType::scalar_field_type>();
+                            const CurveType d1 = algebra::random_element<CurveType::scalar_field_type>(),
+                                            d2 = algebra::random_element<CurveType::scalar_field_type>(),
+                                            d3 = algebra::random_element<CurveType::scalar_field_type>(),
+                                            dauth = algebra::random_element<CurveType::scalar_field_type>();
 
-                            const qap_witness<CurveType::scalar_field_type::value_type> qap_wit =
+                            const qap_witness<typename CurveType::scalar_field_type::value_type> qap_wit =
                                 r1cs_to_qap::witness_map(pk.constraint_system, primary_input, auxiliary_input,
                                                          d1 + dauth, d2, d3);
 
@@ -866,7 +866,7 @@ namespace nil {
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(),
                                             chunks);
 
-                            std::vector<CurveType::scalar_field_type::value_type> mus;
+                            std::vector<typename CurveType::scalar_field_type::value_type> mus;
                             std::vector<typename CurveType::g1_type::value_type> Ains;
                             mus.reserve(qap_wit.num_inputs());
                             Ains.reserve(qap_wit.num_inputs());
@@ -957,7 +957,7 @@ namespace nil {
                                 result = false;
                             }
 
-                            std::vector<CurveType::scalar_field_type::value_type> lambdas;
+                            std::vector<typename CurveType::scalar_field_type::value_type> lambdas;
                             lambdas.reserve(labels.size());
                             for (std::size_t i = 0; i < labels.size(); i++) {
                                 lambdas.emplace_back(prfCompute<CurveType>(sak.S, labels[i]));

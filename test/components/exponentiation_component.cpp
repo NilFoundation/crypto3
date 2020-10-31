@@ -48,7 +48,7 @@ void test_exponentiation_component(const boost::multiprecision::number<Backend, 
     exp_component.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 10; ++i) {
-        const FpkT x_val = random_element<FpkT>();
+        const FpkT x_val = algebra::random_element<FpkT>();
         x.generate_r1cs_witness(x_val);
         exp_component.generate_r1cs_witness();
         const FpkT res = x_to_power.get_element();

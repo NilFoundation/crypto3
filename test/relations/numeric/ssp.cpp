@@ -56,7 +56,7 @@ void test_ssp(const std::size_t num_constraints, const std::size_t num_inputs, c
 
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = field_random_element<FieldType>(), d = field_random_element<FieldType>();
+    const typename FieldType::value_type t = algebra::random_element<FieldType>(), d = algebra::random_element<FieldType>();
 
     ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp::instance_map(example.constraint_system);
 

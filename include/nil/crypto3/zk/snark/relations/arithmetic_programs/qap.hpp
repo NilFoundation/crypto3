@@ -120,7 +120,7 @@ namespace nil {
                     qap_instance &operator=(qap_instance<FieldType> &&other) = default;
 
                     bool is_satisfied(const qap_witness<FieldType> &witness) const {
-                        const typename FieldType::value_type t = field_random_element<FieldType>();
+                        const typename FieldType::value_type t = algebra::random_element<FieldType>();
 
                         std::vector<typename FieldType::value_type> At(this->num_variables + 1,
                                                                        FieldType::value_type::zero());
