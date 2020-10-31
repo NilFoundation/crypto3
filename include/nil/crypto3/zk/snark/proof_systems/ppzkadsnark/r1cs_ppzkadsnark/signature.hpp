@@ -47,16 +47,16 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_ppzkadsnark_signature<CurveType> sigSign(const r1cs_ppzkadsnark_secret_key<CurveType> &sk,
                                                               const label_type &label,
-                                                              const typename CurveType::g2_type &Lambda);
+                                                              const typename CurveType::g2_type::value_type &Lambda);
 
                 template<typename CurveType>
                 bool sigVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const label_type &label,
-                              const typename CurveType::g2_type &Lambda,
+                              const typename CurveType::g2_type::value_type &Lambda,
                               const r1cs_ppzkadsnark_signature<CurveType> &sig);
 
                 template<typename CurveType>
                 bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const std::vector<label_type> &labels,
-                                   const std::vector<typename CurveType::g2_type> &Lambdas,
+                                   const std::vector<typename CurveType::g2_type::value_type> &Lambdas,
                                    const std::vector<r1cs_ppzkadsnark_signature<CurveType>> &sigs);
 
             }    // namespace snark

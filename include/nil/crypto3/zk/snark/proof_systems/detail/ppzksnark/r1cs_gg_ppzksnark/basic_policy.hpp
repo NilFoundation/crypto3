@@ -101,11 +101,11 @@ namespace nil {
                          */
                         struct proving_key {
 
-                            typename CurveType::g1_type alpha_g1;
-                            typename CurveType::g1_type beta_g1;
-                            typename CurveType::g2_type beta_g2;
-                            typename CurveType::g1_type delta_g1;
-                            typename CurveType::g2_type delta_g2;
+                            typename CurveType::g1_type::value_type alpha_g1;
+                            typename CurveType::g1_type::value_type beta_g1;
+                            typename CurveType::g2_type::value_type beta_g2;
+                            typename CurveType::g1_type::value_type delta_g1;
+                            typename CurveType::g2_type::value_type delta_g2;
 
                             typename CurveType::g1_vector
                                 A_query;    // this could be a sparse vector if we had multiexp for those
@@ -120,11 +120,11 @@ namespace nil {
                             proving_key &operator=(const proving_key &other) = default;
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
-                            proving_key(typename CurveType::g1_type &&alpha_g1,
-                                        typename CurveType::g1_type &&beta_g1,
-                                        typename CurveType::g2_type &&beta_g2,
-                                        typename CurveType::g1_type &&delta_g1,
-                                        typename CurveType::g2_type &&delta_g2,
+                            proving_key(typename CurveType::g1_type::value_type &&alpha_g1,
+                                        typename CurveType::g1_type::value_type &&beta_g1,
+                                        typename CurveType::g2_type::value_type &&beta_g2,
+                                        typename CurveType::g1_type::value_type &&delta_g1,
+                                        typename CurveType::g2_type::value_type &&delta_g2,
                                         typename CurveType::g1_vector &&A_query,
                                         knowledge_commitment_vector<typename CurveType::g2_type,
                                                                     typename CurveType::g1_type> &&B_query,
@@ -176,15 +176,15 @@ namespace nil {
                         struct verification_key {
 
                             typename CurveType::gt_type alpha_g1_beta_g2;
-                            typename CurveType::g2_type gamma_g2;
-                            typename CurveType::g2_type delta_g2;
+                            typename CurveType::g2_type::value_type gamma_g2;
+                            typename CurveType::g2_type::value_type delta_g2;
 
                             accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
                             verification_key() = default;
                             verification_key(const typename CurveType::gt_type &alpha_g1_beta_g2,
-                                             const typename CurveType::g2_type &gamma_g2,
-                                             const typename CurveType::g2_type &delta_g2,
+                                             const typename CurveType::g2_type::value_type &gamma_g2,
+                                             const typename CurveType::g2_type::value_type &delta_g2,
                                              const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
                                 alpha_g1_beta_g2(alpha_g1_beta_g2),
                                 gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
@@ -220,7 +220,7 @@ namespace nil {
                                 result.gamma_g2 = curve_random_element<typename CurveType::g2_type>();
                                 result.delta_g2 = curve_random_element<typename CurveType::g2_type>();
 
-                                typename CurveType::g1_type base = curve_random_element<typename CurveType::g1_type>();
+                                typename CurveType::g1_type::value_type base = curve_random_element<typename CurveType::g1_type>();
                                 typename CurveType::g1_vector v;
                                 for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(curve_random_element<typename CurveType::g1_type>());
@@ -289,18 +289,18 @@ namespace nil {
                          */
                         struct proof {
 
-                            typename CurveType::g1_type g_A;
-                            typename CurveType::g2_type g_B;
-                            typename CurveType::g1_type g_C;
+                            typename CurveType::g1_type::value_type g_A;
+                            typename CurveType::g2_type::value_type g_B;
+                            typename CurveType::g1_type::value_type g_C;
 
                             proof() {
                                 // invalid proof with valid curve points
-                                this->g_A = typename CurveType::g1_type::one();
-                                this->g_B = typename CurveType::g2_type::one();
-                                this->g_C = typename CurveType::g1_type::one();
+                                this->g_A = typename CurveType::g1_type::value_type::one();
+                                this->g_B = typename CurveType::g2_type::value_type::one();
+                                this->g_C = typename CurveType::g1_type::value_type::one();
                             }
-                            proof(typename CurveType::g1_type &&g_A, typename CurveType::g2_type &&g_B,
-                                  typename CurveType::g1_type &&g_C) :
+                            proof(typename CurveType::g1_type::value_type &&g_A, typename CurveType::g2_type::value_type &&g_B,
+                                  typename CurveType::g1_type::value_type &&g_C) :
                                 g_A(std::move(g_A)),
                                 g_B(std::move(g_B)), g_C(std::move(g_C)) {};
 
@@ -417,7 +417,7 @@ namespace nil {
                             const std::size_t chunks = 1;
 #endif
 
-                            const typename CurveType::g1_type g1_generator =
+                            const typename CurveType::g1_type::value_type g1_generator =
                                 curve_random_element<typename CurveType::g1_type>();
                             const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables;
                             const std::size_t g1_scalar_size = CurveType::scalar_field_type::value_bits;
@@ -426,13 +426,13 @@ namespace nil {
                             // uncomment
                             // when get_exp_window_size ready
 
-                            std::vector<std::vector<typename CurveType::g1_type>> g1_table;
+                            std::vector<std::vector<typename CurveType::g1_type::value_type>> g1_table;
                             /*algebra::window_table<typename CurveType::g1_type> g1_table =
                                 algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);*/
                             // uncomment
                             // when get_window_table ready
 
-                            const typename CurveType::g2_type G2_gen =
+                            const typename CurveType::g2_type::value_type G2_gen =
                                 curve_random_element<typename CurveType::g2_type>();
                             const std::size_t g2_scalar_count = non_zero_Bt;
                             const std::size_t g2_scalar_size = CurveType::scalar_field_type::value_bits;
@@ -447,17 +447,17 @@ namespace nil {
                             // uncomment
                             // when get_window_table ready
 
-                            typename CurveType::g1_type alpha_g1 = g1_generator;
-                            typename CurveType::g1_type beta_g1 = g1_generator;
-                            typename CurveType::g2_type beta_g2 = G2_gen;
-                            typename CurveType::g1_type delta_g1 = g1_generator;
-                            typename CurveType::g2_type delta_g2 = G2_gen;
+                            typename CurveType::g1_type::value_type alpha_g1 = g1_generator;
+                            typename CurveType::g1_type::value_type beta_g1 = g1_generator;
+                            typename CurveType::g2_type::value_type beta_g2 = G2_gen;
+                            typename CurveType::g1_type::value_type delta_g1 = g1_generator;
+                            typename CurveType::g2_type::value_type delta_g2 = G2_gen;
 
-                            /*typename CurveType::g1_type alpha_g1 = alpha * g1_generator;
-                            typename CurveType::g1_type beta_g1 = beta * g1_generator;
-                            typename CurveType::g2_type beta_g2 = beta * G2_gen;
-                            typename CurveType::g1_type delta_g1 = delta * g1_generator;
-                            typename CurveType::g2_type delta_g2 = delta * G2_gen;*/
+                            /*typename CurveType::g1_type::value_type alpha_g1 = alpha * g1_generator;
+                            typename CurveType::g1_type::value_type beta_g1 = beta * g1_generator;
+                            typename CurveType::g2_type::value_type beta_g2 = beta * G2_gen;
+                            typename CurveType::g1_type::value_type delta_g1 = delta * g1_generator;
+                            typename CurveType::g2_type::value_type delta_g2 = delta * G2_gen;*/
                             // uncomment
                             // when multiplication ready
 
@@ -501,13 +501,13 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
 
                             typename CurveType::gt_type alpha_g1_beta_g2 =
                                 pairing_policy::reduced_pairing(alpha_g1, beta_g2);
-                            typename CurveType::g2_type gamma_g2 = G2_gen;
-                            // typename CurveType::g2_type gamma_g2 = gamma * G2_gen;
+                            typename CurveType::g2_type::value_type gamma_g2 = G2_gen;
+                            // typename CurveType::g2_type::value_type gamma_g2 = gamma * G2_gen;
                             // uncomment
                             // when multiplication ready
 
-                            typename CurveType::g1_type gamma_ABC_g1_0 = g1_generator;
-                            // typename CurveType::g1_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
+                            typename CurveType::g1_type::value_type gamma_ABC_g1_0 = g1_generator;
+                            // typename CurveType::g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
                             // uncomment
                             // when multiplication ready
                             typename CurveType::g1_vector gamma_ABC_g1_values;
@@ -575,7 +575,7 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
                                                            qap_wit.coefficients_for_ABCs.begin(),
                                                            qap_wit.coefficients_for_ABCs.end());
 
-                            typename CurveType::g1_type evaluation_At = CurveType::g1_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_At = CurveType::g1_type::value_type::zero();
                             /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
                                                                    algebra::multi_exp_method_BDLO12>(
@@ -603,7 +603,7 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
 
                             // uncomment
                             // when kc_multi_exp_with_mixed_addition ready
-                            typename CurveType::g1_type evaluation_Ht = CurveType::g1_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_Ht = CurveType::g1_type::value_type::zero();
                             /*algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                algebra::multi_exp_method_BDLO12>(
                                 pk.H_query.begin(),
@@ -614,7 +614,7 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
 
                             // uncomment
                             // when multi_exp ready
-                            typename CurveType::g1_type evaluation_Lt = CurveType::g1_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_Lt = CurveType::g1_type::value_type::zero();
                             /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
                                                                    algebra::multi_exp_method_BDLO12>(
@@ -628,23 +628,23 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
                             // when multi_exp_with_mixed_addition ready
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
-                            typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At;
-                            // typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
+                            typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At;
+                            // typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
                             // uncomment
                             // when multiplication ready
 
                             /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
-                            typename CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h;
-                            typename CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g;
-                            // typename CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
-                            // typename CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
+                            typename CurveType::g1_type::value_type g1_B = pk.beta_g1 + evaluation_Bt.h;
+                            typename CurveType::g2_type::value_type g2_B = pk.beta_g2 + evaluation_Bt.g;
+                            // typename CurveType::g1_type::value_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
+                            // typename CurveType::g2_type::value_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
                             // uncomment
                             // when multiplication ready
 
                             /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b -
                              * r*s*delta
                              */
-                            typename CurveType::g1_type g1_C;
+                            typename CurveType::g1_type::value_type g1_C;
                             //     = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * pk.delta_g1;
                             // uncomment
                             // when multiplication ready
@@ -706,7 +706,7 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
                                 pi.begin(), pi.end(), 0);*/
                             // uncomment
                             // when accumulate_chunk ready
-                            const typename CurveType::g1_type &acc = accumulated_IC.first;
+                            const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
 
@@ -804,7 +804,7 @@ CurveType::scalar_field_type::value_type::one(), Bt, chunks)*/
                             const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
                                 vk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
                                     pi.begin(), pi.end(), 0);
-                            const typename CurveType::g1_type &acc = accumulated_IC.first;
+                            const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
 

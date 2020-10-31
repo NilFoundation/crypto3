@@ -177,14 +177,14 @@ namespace nil {
                          */
                         struct pub_auth_key {
 
-                            typename CurveType::g2_type minusI2;
+                            typename CurveType::g2_type::value_type minusI2;
                             vkT<CurveType> vkp;
 
                             pub_auth_key() {};
                             pub_auth_key<CurveType> &operator=(const pub_auth_key<CurveType> &other) = default;
                             pub_auth_key(const pub_auth_key<CurveType> &other) = default;
                             pub_auth_key(pub_auth_key<CurveType> &&other) = default;
-                            pub_auth_key(typename CurveType::g2_type &&minusI2, vkT<CurveType> &&vkp) :
+                            pub_auth_key(typename CurveType::g2_type::value_type &&minusI2, vkT<CurveType> &&vkp) :
                                 minusI2(std::move(minusI2)), vkp(std::move(vkp)) {};
 
                             bool operator==(const pub_auth_key<CurveType> &other) const {
@@ -217,7 +217,7 @@ namespace nil {
                         struct auth_data {
 
                             typename CurveType::scalar_field_type::value_type mu;
-                            typename CurveType::g2_type Lambda;
+                            typename CurveType::g2_type::value_type Lambda;
 
                             signature<CurveType> sigma;
 
@@ -227,7 +227,7 @@ namespace nil {
                             auth_data(auth_data<CurveType> &&other) = default;
 
                             auth_data(typename CurveType::scalar_field_type::value_type &&mu,
-                                      typename CurveType::g2_type &&Lambda,
+                                      typename CurveType::g2_type::value_type &&Lambda,
 
                                       signature<CurveType> &&sigma) :
                                 mu(std::move(mu)),
@@ -369,24 +369,24 @@ namespace nil {
 
                                 verification_key<CurveType> result;
                                 result.alphaA_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.alphaB_g1 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.alphaC_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_beta_g1 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.gamma_beta_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.rC_Z_g2 =
-                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                                    random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
 
                                 result.A0 = random_element<CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::one(); for (std::size_t i = 0; i < input_size; ++i) {
+                            CurveType::g1_type::value_type::one(); for (std::size_t i = 0; i < input_size; ++i) {
                                     result.Ain.emplace_back(random_element<CurveType::scalar_field_type>() *
-                                                            typename CurveType::g1_type::one());
+                                                            typename CurveType::g1_type::value_type::one());
                                 }
 
                                 return result;
@@ -916,7 +916,7 @@ namespace nil {
                             using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
 
                             processed_verification_key<CurveType> pvk;
-                            pvk.pp_G2_one_precomp = pairing_policy::precompute_g2(typename CurveType::g2_type::one());
+                            pvk.pp_G2_one_precomp = pairing_policy::precompute_g2(typename CurveType::g2_type::value_type::one());
                             pvk.vk_alphaA_g2_precomp = pairing_policy::precompute_g2(vk.alphaA_g2);
                             pvk.vk_alphaB_g1_precomp = pairing_policy::precompute_g1(vk.alphaB_g1);
                             pvk.vk_alphaC_g2_precomp = pairing_policy::precompute_g2(vk.alphaC_g2);

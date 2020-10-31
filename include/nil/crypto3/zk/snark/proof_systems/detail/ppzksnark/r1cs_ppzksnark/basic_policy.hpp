@@ -173,24 +173,24 @@ namespace nil {
                          * A verification key for the R1CS ppzkSNARK.
                          */
                         struct verification_key {
-                            typename CurveType::g2_type alphaA_g2;
-                            typename CurveType::g1_type alphaB_g1;
-                            typename CurveType::g2_type alphaC_g2;
-                            typename CurveType::g2_type gamma_g2;
-                            typename CurveType::g1_type gamma_beta_g1;
-                            typename CurveType::g2_type gamma_beta_g2;
-                            typename CurveType::g2_type rC_Z_g2;
+                            typename CurveType::g2_type::value_type alphaA_g2;
+                            typename CurveType::g1_type::value_type alphaB_g1;
+                            typename CurveType::g2_type::value_type alphaC_g2;
+                            typename CurveType::g2_type::value_type gamma_g2;
+                            typename CurveType::g1_type::value_type gamma_beta_g1;
+                            typename CurveType::g2_type::value_type gamma_beta_g2;
+                            typename CurveType::g2_type::value_type rC_Z_g2;
 
                             accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
 
                             verification_key() = default;
-                            verification_key(const typename CurveType::g2_type &alphaA_g2,
-                                             const typename CurveType::g1_type &alphaB_g1,
-                                             const typename CurveType::g2_type &alphaC_g2,
-                                             const typename CurveType::g2_type &gamma_g2,
-                                             const typename CurveType::g1_type &gamma_beta_g1,
-                                             const typename CurveType::g2_type &gamma_beta_g2,
-                                             const typename CurveType::g2_type &rC_Z_g2,
+                            verification_key(const typename CurveType::g2_type::value_type &alphaA_g2,
+                                             const typename CurveType::g1_type::value_type &alphaB_g1,
+                                             const typename CurveType::g2_type::value_type &alphaC_g2,
+                                             const typename CurveType::g2_type::value_type &gamma_g2,
+                                             const typename CurveType::g1_type::value_type &gamma_beta_g1,
+                                             const typename CurveType::g2_type::value_type &gamma_beta_g2,
+                                             const typename CurveType::g2_type::value_type &rC_Z_g2,
                                              const accumulation_vector<typename CurveType::g1_type> &eIC) :
                                 alphaA_g2(alphaA_g2),
                                 alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2),
@@ -222,21 +222,21 @@ namespace nil {
                                 verification_key result;
                                 result.alphaA_g2 = random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::one(); result.alphaB_g1 = random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::one(); result.alphaC_g2 =
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.alphaC_g2 =
                             random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::one(); result.gamma_g2 = random_element<typename
                             CurveType::scalar_field_type>() * typename CurveType::g2_type::one(); result.gamma_beta_g1 =
                             random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::one(); result.gamma_beta_g2 = random_element<typename
+                            CurveType::g1_type::value_type::one(); result.gamma_beta_g2 = random_element<typename
                             CurveType::scalar_field_type>() * typename CurveType::g2_type::one(); result.rC_Z_g2 =
                             random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::one();
 
-                                typename CurveType::g1_type base = random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::one(); typename
+                                typename CurveType::g1_type::value_type base = random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); typename
                             CurveType::g1_vector v; for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::one());
+                            CurveType::g1_type::value_type::one());
                                 }
 
                                 result.encoded_IC_query = accumulation_vector<typename
@@ -313,25 +313,25 @@ namespace nil {
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A;
                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> g_B;
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C;
-                            typename CurveType::g1_type g_H;
-                            typename CurveType::g1_type g_K;
+                            typename CurveType::g1_type::value_type g_H;
+                            typename CurveType::g1_type::value_type g_K;
 
                             proof() {
                                 // invalid proof with valid curve points
-                                this->g_A.g = typename CurveType::g1_type::one();
-                                this->g_A.h = typename CurveType::g1_type::one();
+                                this->g_A.g = typename CurveType::g1_type::value_type::one();
+                                this->g_A.h = typename CurveType::g1_type::value_type::one();
                                 this->g_B.g = typename CurveType::g2_type::one();
-                                this->g_B.h = typename CurveType::g1_type::one();
-                                this->g_C.g = typename CurveType::g1_type::one();
-                                this->g_C.h = typename CurveType::g1_type::one();
-                                this->g_H = typename CurveType::g1_type::one();
-                                this->g_K = typename CurveType::g1_type::one();
+                                this->g_B.h = typename CurveType::g1_type::value_type::one();
+                                this->g_C.g = typename CurveType::g1_type::value_type::one();
+                                this->g_C.h = typename CurveType::g1_type::value_type::one();
+                                this->g_H = typename CurveType::g1_type::value_type::one();
+                                this->g_K = typename CurveType::g1_type::value_type::one();
                             }
                             proof(knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> &&g_A,
                                   knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> &&g_B,
                                   knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> &&g_C,
-                                  typename CurveType::g1_type &&g_H,
-                                  typename CurveType::g1_type &&g_K) :
+                                  typename CurveType::g1_type::value_type &&g_H,
+                                  typename CurveType::g1_type::value_type &&g_K) :
                                 g_A(std::move(g_A)),
                                 g_B(std::move(g_B)), g_C(std::move(g_C)), g_H(std::move(g_H)), g_K(std::move(g_K)) {};
 
@@ -471,7 +471,7 @@ namespace nil {
 
                             algebra::window_table<typename CurveType::g1_type> g1_table =
                                 get_window_table(typename CurveType::scalar_field_type::value_bits, g1_window,
-                                                 typename CurveType::g1_type::one());
+                                                 typename CurveType::g1_type::value_type::one());
 
                             algebra::window_table<typename CurveType::g2_type> g2_table =
                                 get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window,
@@ -501,19 +501,19 @@ namespace nil {
                             algebra::batch_to_special<typename CurveType::g1_type>(K_query);
 #endif
 
-                            typename CurveType::g2_type alphaA_g2 = alphaA * typename CurveType::g2_type::one();
-                            typename CurveType::g1_type alphaB_g1 = alphaB * typename CurveType::g1_type::one();
-                            typename CurveType::g2_type alphaC_g2 = alphaC * typename CurveType::g2_type::one();
-                            typename CurveType::g2_type gamma_g2 = gamma * typename CurveType::g2_type::one();
-                            typename CurveType::g1_type gamma_beta_g1 =
-                                (gamma * beta) * typename CurveType::g1_type::one();
-                            typename CurveType::g2_type gamma_beta_g2 =
+                            typename CurveType::g2_type::value_type alphaA_g2 = alphaA * typename CurveType::g2_type::one();
+                            typename CurveType::g1_type::value_type alphaB_g1 = alphaB * typename CurveType::g1_type::value_type::one();
+                            typename CurveType::g2_type::value_type alphaC_g2 = alphaC * typename CurveType::g2_type::one();
+                            typename CurveType::g2_type::value_type gamma_g2 = gamma * typename CurveType::g2_type::one();
+                            typename CurveType::g1_type::value_type gamma_beta_g1 =
+                                (gamma * beta) * typename CurveType::g1_type::value_type::one();
+                            typename CurveType::g2_type::value_type gamma_beta_g2 =
                                 (gamma * beta) * typename CurveType::g2_type::one();
-                            typename CurveType::g2_type rC_Z_g2 =
+                            typename CurveType::g2_type::value_type rC_Z_g2 =
                                 (rC * qap_inst.Zt) * typename CurveType::g2_type::one();
 
-                            typename CurveType::g1_type encoded_IC_base =
-                                (rA * IC_coefficients[0]) * typename CurveType::g1_type::one();
+                            typename CurveType::g1_type::value_type encoded_IC_base =
+                                (rA * IC_coefficients[0]) * typename CurveType::g1_type::value_type::one();
                             std::vector<typename CurveType::scalar_field_type::value_type> multiplied_IC_coefficients;
                             multiplied_IC_coefficients.reserve(qap_inst.num_inputs());
                             for (std::size_t i = 1; i < qap_inst.num_inputs() + 1; ++i) {
@@ -569,8 +569,8 @@ namespace nil {
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C =
                                 pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables() + 1];
 
-                            typename CurveType::g1_type g_H = typename CurveType::g1_type::zero();
-                            typename CurveType::g1_type g_K =
+                            typename CurveType::g1_type::value_type g_H = typename CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type g_K =
                                 (pk.K_query[0] + qap_wit.d1 * pk.K_query[qap_wit.num_variables() + 1] +
                                  qap_wit.d2 * pk.K_query[qap_wit.num_variables() + 2] +
                                  qap_wit.d3 * pk.K_query[qap_wit.num_variables() + 3]);
@@ -658,7 +658,7 @@ namespace nil {
                             const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
                                 pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
                                     primary_input.begin(), primary_input.end(), 0);
-                            const typename CurveType::g1_type &acc = accumulated_IC.first;
+                            const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
 
@@ -820,7 +820,7 @@ namespace nil {
                                 vk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
                                     primary_input.begin(), primary_input.end(), 0);
                             assert(accumulated_IC.is_fully_accumulated());
-                            const typename CurveType::g1_type &acc = accumulated_IC.first;
+                            const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
                             typename pairing_policy::affine_ate_G1_precomp proof_g_A_g_precomp =
