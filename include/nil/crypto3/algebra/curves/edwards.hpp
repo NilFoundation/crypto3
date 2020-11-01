@@ -64,9 +64,6 @@ namespace nil {
                     typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
-
-                    typedef std::vector<g1_type> g1_vector;
-                    typedef std::vector<g2_type> g2_vector;
                 };
 
                 template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>

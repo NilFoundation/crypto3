@@ -82,9 +82,6 @@ namespace nil {
 
                     typedef typename fields::fp12_2over3over2<base_field_type> gt_type;
 
-                    typedef std::vector<g1_type> g1_vector;
-                    typedef std::vector<g2_type> g2_vector;
-
                     constexpr static const number_type p = base_field_modulus;
                     constexpr static const number_type q = scalar_field_modulus;
 

@@ -62,9 +62,6 @@ namespace nil {
                     typedef typename detail::bls12_g1<ModulusBits, GeneratorBits> g1_type;
                     typedef typename detail::bls12_g2<ModulusBits, GeneratorBits> g2_type;
 
-                    typedef std::vector<g1_type> g1_vector;
-                    typedef std::vector<g2_type> g2_vector;
-
                     constexpr static const bool has_affine_pairing = false;
 
                     typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;

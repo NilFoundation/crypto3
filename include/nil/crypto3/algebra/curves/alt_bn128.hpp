@@ -62,9 +62,6 @@ namespace nil {
                     // typedef typename pairing::pairing_policy<alt_bn128<ModulusBits, GeneratorBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
-
-                    typedef std::vector<g1_type> g1_vector;
-                    typedef std::vector<g2_type> g2_vector;
                 };
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
