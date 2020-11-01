@@ -112,8 +112,8 @@ namespace nil {
                                 B_query;
                             knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
                                 C_query;
-                            typename CurveType::g1_vector H_query;
-                            typename CurveType::g1_vector K_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> K_query;
 
                             constraint_system constraint_system;
 
@@ -128,8 +128,8 @@ namespace nil {
                                     &&B_query,
                                 knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
                                     &&C_query,
-                                typename CurveType::g1_vector &&H_query,
-                                typename CurveType::g1_vector &&K_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&K_query,
                                 constraint_system &&constraint_system) :
                                 A_query(std::move(A_query)),
                                 B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
@@ -233,8 +233,8 @@ namespace nil {
                             CurveType::g2_type::value_type::one();
 
                                 typename CurveType::g1_type::value_type base = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); typename
-                            CurveType::g1_vector v; for (std::size_t i = 0; i < input_size; ++i) {
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); 
+                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one());
                                 }
@@ -489,13 +489,13 @@ namespace nil {
                                 C_query = kc_batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window,
                                                        g1_window, g1_table, g1_table, rC, rC * alphaC, Ct, chunks);
 
-                            typename CurveType::g1_vector H_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(H_query);
 #endif
 
-                            typename CurveType::g1_vector K_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> K_query =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(K_query);
@@ -519,7 +519,7 @@ namespace nil {
                             for (std::size_t i = 1; i < qap_inst.num_inputs() + 1; ++i) {
                                 multiplied_IC_coefficients.emplace_back(rA * IC_coefficients[i]);
                             }
-                            typename CurveType::g1_vector encoded_IC_values =
+                            typename std::vector<typename CurveType::g1_type::value_type> encoded_IC_values =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                           multiplied_IC_coefficients);
 

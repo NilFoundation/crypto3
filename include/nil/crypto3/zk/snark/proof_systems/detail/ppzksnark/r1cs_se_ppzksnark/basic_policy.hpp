@@ -109,17 +109,17 @@ namespace nil {
                          */
                         struct proving_key {
                             // G^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename CurveType::g1_vector A_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> A_query;
 
                             // H^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename CurveType::g2_vector B_query;
+                            typename std::vector<typename CurveType::g2_type::value_type> B_query;
 
                             // G^{gamma^2 * C_i(t) + (alpha + beta) * gamma * A_i(t)}
                             // for sap.num_inputs() + 1 < i <= sap.num_variables()
-                            typename CurveType::g1_vector C_query_1;
+                            typename std::vector<typename CurveType::g1_type::value_type> C_query_1;
 
                             // G^{2 * gamma^2 * Z(t) * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename CurveType::g1_vector C_query_2;
+                            typename std::vector<typename CurveType::g1_type::value_type> C_query_2;
 
                             // G^{gamma * Z(t)}
                             typename CurveType::g1_type::value_type G_gamma_Z;
@@ -134,7 +134,7 @@ namespace nil {
                             typename CurveType::g1_type::value_type G_gamma2_Z2;
 
                             // G^{gamma^2 * Z(t) * t^i} for 0 <= i < sap.degree
-                            typename CurveType::g1_vector G_gamma2_Z_t;
+                            typename std::vector<typename CurveType::g1_type::value_type> G_gamma2_Z_t;
 
                             constraint_system cs;
 
@@ -142,15 +142,15 @@ namespace nil {
                             proving_key &operator=(const proving_key &other) = default;
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
-                            proving_key(typename CurveType::g1_vector &&A_query,
-                                        typename CurveType::g2_vector &&B_query,
-                                        typename CurveType::g1_vector &&C_query_1,
-                                        typename CurveType::g1_vector &&C_query_2,
+                            proving_key(typename std::vector<typename CurveType::g1_type::value_type> &&A_query,
+                                        typename std::vector<typename CurveType::g2_type::value_type> &&B_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&C_query_1,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&C_query_2,
                                         typename CurveType::g1_type::value_type &G_gamma_Z,
                                         typename CurveType::g2_type::value_type &H_gamma_Z,
                                         typename CurveType::g1_type::value_type &G_ab_gamma_Z,
                                         typename CurveType::g1_type::value_type &G_gamma2_Z2,
-                                        typename CurveType::g1_vector &&G_gamma2_Z_t,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&G_gamma2_Z_t,
                                         constraint_system &&cs) :
                                 A_query(std::move(A_query)),
                                 B_query(std::move(B_query)), C_query_1(std::move(C_query_1)),
@@ -204,7 +204,7 @@ namespace nil {
 
                             // G^{gamma * A_i(t) + (alpha + beta) * A_i(t)}
                             // for 0 <= i <= sap.num_inputs()
-                            typename CurveType::g1_vector query;
+                            typename std::vector<typename CurveType::g1_type::value_type> query;
 
                             verification_key() = default;
                             verification_key(const typename CurveType::g2_type::value_type &H,
@@ -212,7 +212,7 @@ namespace nil {
                                              const typename CurveType::g2_type::value_type &H_beta,
                                              const typename CurveType::g1_type::value_type &G_gamma,
                                              const typename CurveType::g2_type::value_type &H_gamma,
-                                             typename CurveType::g1_vector &&query) :
+                                             typename std::vector<typename CurveType::g1_type::value_type> &&query) :
                                 H(H),
                                 G_alpha(G_alpha), H_beta(H_beta), G_gamma(G_gamma), H_gamma(H_gamma),
                                 query(std::move(query)) {};
@@ -247,7 +247,7 @@ namespace nil {
                             algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::value_type::one();
 
-                                typename CurveType::g1_vector v;
+                                typename std::vector<typename CurveType::g1_type::value_type> v;
                                 for (std::size_t i = 0; i < input_size + 1; ++i) {
                                     v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one());
@@ -278,7 +278,7 @@ namespace nil {
                             typename pairing_policy::G2_precomp H_gamma_pc;
                             typename pairing_policy::G2_precomp H_pc;
 
-                            typename CurveType::g1_vector query;
+                            typename std::vector<typename CurveType::g1_type::value_type> query;
 
                             bool operator==(const processed_verification_key &other) const {
                                 return (this->G_alpha == other.G_alpha && this->H_beta == other.H_beta &&
@@ -436,7 +436,7 @@ namespace nil {
                             for (std::size_t i = 0; i <= sap_inst.num_inputs(); ++i) {
                                 tmp_exponents.emplace_back(gamma * Ct[i] + (alpha + beta) * At[i]);
                             }
-                            typename CurveType::g1_vector verifier_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> verifier_query =
                                 algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, G_window, G_table,
                                     tmp_exponents);
@@ -447,7 +447,7 @@ namespace nil {
                                 tmp_exponents.emplace_back(gamma * At[i]);
                             }
 
-                            typename CurveType::g1_vector A_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> A_query =
                                 algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, G_window, G_table,
                                     tmp_exponents);
@@ -455,7 +455,7 @@ namespace nil {
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(A_query);
 #endif
-                            typename CurveType::g2_vector B_query =
+                            typename std::vector<typename CurveType::g2_type::value_type> B_query =
                                 algebra::batch_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma_table,
                                     At);
@@ -476,7 +476,7 @@ namespace nil {
                                 tmp_exponents.emplace_back(gamma2_Z_t);
                                 gamma2_Z_t *= t;
                             }
-                            typename CurveType::g1_vector G_gamma2_Z_t =
+                            typename std::vector<typename CurveType::g1_type::value_type> G_gamma2_Z_t =
                                 algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, G_window, G_table,
                                     tmp_exponents);
@@ -488,7 +488,7 @@ namespace nil {
                             for (std::size_t i = sap_inst.num_inputs() + 1; i <= sap_inst.num_variables(); ++i) {
                                 tmp_exponents.emplace_back(gamma * (gamma * Ct[i] + (alpha + beta) * At[i]));
                             }
-                            typename CurveType::g1_vector C_query_1 =
+                            typename std::vector<typename CurveType::g1_type::value_type> C_query_1 =
                                 algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, G_window, G_table,
                                     tmp_exponents);
@@ -503,7 +503,7 @@ namespace nil {
                             for (std::size_t i = 0; i <= sap_inst.num_variables(); ++i) {
                                 tmp_exponents.emplace_back(double_gamma2_Z * At[i]);
                             }
-                            typename CurveType::g1_vector C_query_2 =
+                            typename std::vector<typename CurveType::g1_type::value_type> C_query_2 =
                                 algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                                     typename CurveType::scalar_field_type::value_bits, G_window, G_table,
                                     tmp_exponents);

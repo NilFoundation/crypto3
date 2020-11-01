@@ -252,8 +252,9 @@ namespace nil {
                                 B_query;
                             knowledge_commitment_vector<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>
                                 C_query;
-                            typename CurveType::g1_vector H_query;    // t powers
-                            typename CurveType::g1_vector K_query;
+                            
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query;    // t powers
+                            typename std::vector<typename CurveType::g1_type::value_type> K_query;
                             /* Now come the additional elements for ad */
                             typename CurveType::g1_type::value_type rA_i_Z_g1;
 
@@ -270,8 +271,8 @@ namespace nil {
                                     &&B_query,
                                 knowledge_commitment_vector<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>
                                     &&C_query,
-                                typename CurveType::g1_vector &&H_query,
-                                typename CurveType::g1_vector &&K_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&K_query,
                                 typename CurveType::g1_type::value_type &&rA_i_Z_g1,
                                 constraint_system<CurveType> &&constraint_system) :
                                 A_query(std::move(A_query)),
@@ -327,7 +328,7 @@ namespace nil {
                             typename CurveType::g2_type::value_type rC_Z_g2;
 
                             typename CurveType::g1_type::value_type A0;
-                            typename CurveType::g1_vector Ain;
+                            typename std::vector<typename CurveType::g1_type::value_type> Ain;
 
                             verification_key() = default;
                             verification_key(const typename CurveType::g2_type::value_type &alphaA_g2,
@@ -338,7 +339,7 @@ namespace nil {
                                              const typename CurveType::g2_type::value_type &gamma_beta_g2,
                                              const typename CurveType::g2_type::value_type &rC_Z_g2,
                                              const typename CurveType::g1_type::value_type A0,
-                                             const typename CurveType::g1_vector Ain) :
+                                             const typename std::vector<typename CurveType::g1_type::value_type> Ain) :
                                 alphaA_g2(alphaA_g2),
                                 alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2),
                                 gamma_beta_g1(gamma_beta_g1), gamma_beta_g2(gamma_beta_g2), rC_Z_g2(rC_Z_g2), A0(A0),
@@ -369,23 +370,23 @@ namespace nil {
 
                                 verification_key<CurveType> result;
                                 result.alphaA_g2 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.alphaB_g1 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.alphaC_g2 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_g2 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.gamma_beta_g1 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
                                 result.gamma_beta_g2 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
                                 result.rC_Z_g2 =
-                                    algebra::random_element<CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                                    algebra::random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
 
-                                result.A0 = algebra::random_element<CurveType::scalar_field_type>() * typename
+                                result.A0 = algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one(); for (std::size_t i = 0; i < input_size; ++i) {
-                                    result.Ain.emplace_back(algebra::random_element<CurveType::scalar_field_type>() *
+                                    result.Ain.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() *
                                                             typename CurveType::g1_type::value_type::one());
                                 }
 
@@ -417,7 +418,7 @@ namespace nil {
                             typename pairing_policy::G2_precomp::value_type vk_rC_i_g2_precomp;
 
                             typename CurveType::g1_type::value_type A0;
-                            typename CurveType::g1_vector Ain;
+                            typename std::vector<typename CurveType::g1_type::value_type> Ain;
 
                             std::vector<pairing_policy::G1_precomp::value_type> proof_g_vki_precomp;
 
@@ -540,7 +541,7 @@ namespace nil {
                         static auth_keys<CurveType> auth_generator(void) {
                             kpT<CurveType> sigkp = sigGen<CurveType>();
                             prf_key<CurveType> prfseed = prfGen<CurveType>();
-                            CurveType i = algebra::random_element<CurveType::scalar_field_type>();
+                            CurveType i = algebra::random_element<typename CurveType::scalar_field_type>();
                             typename CurveType::g1_type::value_type I1 = i * typename CurveType::g1_type::value_type::one();
                             typename CurveType::g2_type::value_type minusI2 =
                                 typename CurveType::g2_type::value_type::zero() - i * typename CurveType::g2_type::value_type::one();
@@ -726,13 +727,13 @@ namespace nil {
                                     kc_batch_exp(CurveType::scalar_field_type::value_bits, g1_window,
                                                  g1_window, g1_table, g1_table, rC, rC * alphaC, Ct, chunks);
 
-                            typename CurveType::g1_vector H_query = batch_exp(
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query = batch_exp(
                                 CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(H_query);
 #endif
 
-                            typename CurveType::g1_vector K_query = batch_exp(
+                            typename std::vector<typename CurveType::g1_type::value_type> K_query = batch_exp(
                                 CurveType::scalar_field_type::value_bits, g1_window, g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(K_query);
@@ -752,7 +753,7 @@ namespace nil {
                             typename CurveType::g1_type::value_type rA_i_Z_g1 = (rA * qap_inst.Zt) * prms.I1;
 
                             typename CurveType::g1_type::value_type A0 = A_query[0].g;
-                            typename CurveType::g1_vector Ain;
+                            typename std::vector<typename CurveType::g1_type::value_type> Ain;
                             Ain.reserve(qap_inst.num_inputs());
                             for (std::size_t i = 0; i < qap_inst.num_inputs(); ++i) {
                                 Ain.emplace_back(A_query[1 + i].g);
@@ -788,12 +789,13 @@ namespace nil {
                                                        const auxiliary_input<CurveType> &auxiliary_input,
                                                        const std::vector<auth_data<CurveType>> &auth_data) {
 
-                            const CurveType d1 = algebra::random_element<CurveType::scalar_field_type>(),
-                                            d2 = algebra::random_element<CurveType::scalar_field_type>(),
-                                            d3 = algebra::random_element<CurveType::scalar_field_type>(),
-                                            dauth = algebra::random_element<CurveType::scalar_field_type>();
+                            const typename CurveType::scalar_field_type::value_type 
+                                            d1 = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                            d2 = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                            d3 = algebra::random_element<typename CurveType::scalar_field_type>(),
+                                            dauth = algebra::random_element<typename CurveType::scalar_field_type>();
 
-                            const qap_witness<typename CurveType::scalar_field_type::value_type> qap_wit =
+                            const qap_witness<typename CurveType::scalar_field_type> qap_wit =
                                 r1cs_to_qap::witness_map(pk.constraint_system, primary_input, auxiliary_input,
                                                          d1 + dauth, d2, d3);
 
@@ -929,7 +931,7 @@ namespace nil {
                                 pairing_policy::precompute_g2(vk.rC_Z_g2);
 
                             pvk.A0 = typename CurveType::g1_type::value_type(vk.A0);
-                            pvk.Ain = typename CurveType::g1_vector(vk.Ain);
+                            pvk.Ain = typename std::vector<typename CurveType::g1_type::value_type>(vk.Ain);
 
                             pvk.proof_g_vki_precomp.reserve(pvk.Ain.size());
                             for (std::size_t i = 0; i < pvk.Ain.size(); i++) {

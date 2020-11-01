@@ -106,10 +106,10 @@ namespace nil {
                          * A proving key for the USCS ppzkSNARK.
                          */
                         struct proving_key {
-                            typename CurveType::g1_vector V_g1_query;
-                            typename CurveType::g1_vector alpha_V_g1_query;
-                            typename CurveType::g1_vector H_g1_query;
-                            typename CurveType::g2_vector V_g2_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> V_g1_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> alpha_V_g1_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> H_g1_query;
+                            typename std::vector<typename CurveType::g2_type::value_type> V_g2_query;
 
                             constraint_system cs;
 
@@ -117,10 +117,10 @@ namespace nil {
                             proving_key &operator=(const proving_key &other) = default;
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
-                            proving_key(typename CurveType::g1_vector &&V_g1_query,
-                                        typename CurveType::g1_vector &&alpha_V_g1_query,
-                                        typename CurveType::g1_vector &&H_g1_query,
-                                        typename CurveType::g2_vector &&V_g2_query,
+                            proving_key(typename std::vector<typename CurveType::g1_type::value_type> &&V_g1_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
+                                        typename std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
                                         constraint_system &&cs) :
                                 V_g1_query(std::move(V_g1_query)),
                                 alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
@@ -202,8 +202,8 @@ namespace nil {
                             CurveType::g2_type::value_type::one();
 
                                 typename CurveType::g1_type::value_type base = algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); typename
-                            CurveType::g1_vector v; for (std::size_t i = 0; i < input_size; ++i) {
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); 
+                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(algenra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g1_type::value_type::one());
                                 }
@@ -397,27 +397,27 @@ namespace nil {
                                 get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window,
                                                  typename CurveType::g2_type::value_type::one());
 
-                            typename CurveType::g1_vector V_g1_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> V_g1_query =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                           Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(V_g1_query);
 #endif
 
-                            typename CurveType::g1_vector alpha_V_g1_query =
+                            typename std::vector<typename CurveType::g1_type::value_type> alpha_V_g1_query =
                                 batch_exp_with_coeff(typename CurveType::scalar_field_type::value_bits, g1_window,
                                                      g1_table, alpha, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(alpha_V_g1_query);
 #endif
 
-                            typename CurveType::g1_vector H_g1_query = batch_exp(
+                            typename std::vector<typename CurveType::g1_type::value_type> H_g1_query = batch_exp(
                                 typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht_table);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g1_type>(H_g1_query);
 #endif
 
-                            typename CurveType::g2_vector V_g2_query = batch_exp(
+                            typename std::vector<typename CurveType::g2_type::value_type> V_g2_query = batch_exp(
                                 typename CurveType::scalar_field_type::value_bits, g2_window, g2_table, Vt_table);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<typename CurveType::g2_type>(V_g2_query);
@@ -431,7 +431,7 @@ namespace nil {
 
                             typename CurveType::g1_type::value_type encoded_IC_base =
                                 Xt_table[0] * typename CurveType::g1_type::value_type::one();
-                            typename CurveType::g1_vector encoded_IC_values =
+                            typename std::vector<typename CurveType::g1_type::value_type> encoded_IC_values =
                                 batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                           std::vector<typename CurveType::scalar_field_type::value_type>(
                                               Xt_table.begin() + 1, Xt_table.end()));

@@ -107,12 +107,12 @@ namespace nil {
                             typename CurveType::g1_type::value_type delta_g1;
                             typename CurveType::g2_type::value_type delta_g2;
 
-                            typename CurveType::g1_vector
+                            typename std::vector<typename CurveType::g1_type::value_type>
                                 A_query;    // this could be a sparse vector if we had multiexp for those
                             knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
                                 B_query;
-                            typename CurveType::g1_vector H_query;
-                            typename CurveType::g1_vector L_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> L_query;
 
                             constraint_system cs;
 
@@ -125,11 +125,11 @@ namespace nil {
                                         typename CurveType::g2_type::value_type &&beta_g2,
                                         typename CurveType::g1_type::value_type &&delta_g1,
                                         typename CurveType::g2_type::value_type &&delta_g2,
-                                        typename CurveType::g1_vector &&A_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&A_query,
                                         knowledge_commitment_vector<typename CurveType::g2_type,
                                                                     typename CurveType::g1_type> &&B_query,
-                                        typename CurveType::g1_vector &&H_query,
-                                        typename CurveType::g1_vector &&L_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
+                                        typename std::vector<typename CurveType::g1_type::value_type> &&L_query,
                                         constraint_system &&cs) :
                                 alpha_g1(std::move(alpha_g1)),
                                 beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
@@ -221,7 +221,7 @@ namespace nil {
                                 result.delta_g2 = algebra::random_element<typename CurveType::g2_type>();
 
                                 typename CurveType::g1_type::value_type base = algebra::random_element<typename CurveType::g1_type>();
-                                typename CurveType::g1_vector v;
+                                typename std::vector<typename CurveType::g1_type::value_type> v;
                                 for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(algebra::random_element<typename CurveType::g1_type>());
                                 }
@@ -461,7 +461,7 @@ namespace nil {
                             // uncomment
                             // when multiplication ready
 
-                            typename CurveType::g1_vector A_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> A_query;
                             //= batch_exp(g1_scalar_size, g1_window_size, g1_table, At);
                             // uncomment
                             // when batch_exp ready
@@ -482,7 +482,7 @@ namespace nil {
                             // NOTE: if USE_MIXED_ADDITION is defined,
                             // kc_batch_exp will convert its output to special form internally
 
-                            typename CurveType::g1_vector H_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> H_query;
                             //= batch_exp_with_coeff(g1_scalar_size, g1_window_size, g1_table, qap.Zt * delta_inverse,
                             //Ht);
                             // uncomment
@@ -491,7 +491,7 @@ namespace nil {
                             algebra::batch_to_special<typename CurveType::g1_type>(H_query);
 #endif
 
-                            typename CurveType::g1_vector L_query;
+                            typename std::vector<typename CurveType::g1_type::value_type> L_query;
                             //= batch_exp(g1_scalar_size, g1_window_size, g1_table, Lt);
                             // uncomment
                             // when batch_exp ready
@@ -510,7 +510,7 @@ namespace nil {
                             // typename CurveType::g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
                             // uncomment
                             // when multiplication ready
-                            typename CurveType::g1_vector gamma_ABC_g1_values;
+                            typename std::vector<typename CurveType::g1_type::value_type> gamma_ABC_g1_values;
                             //= batch_exp(g1_scalar_size, g1_window_size, g1_table, gamma_ABC);
                             // uncomment
                             // when batch_exp ready

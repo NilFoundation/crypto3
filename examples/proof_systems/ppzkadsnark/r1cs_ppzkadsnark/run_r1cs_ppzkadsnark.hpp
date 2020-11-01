@@ -41,7 +41,7 @@ namespace nil {
                  * R1CS example (specified by a constraint system, input, and witness).
                  */
                 template<typename CurveType>
-                bool run_r1cs_ppzkadsnark(const r1cs_example<CurveType::scalar_field_type> &example);
+                bool run_r1cs_ppzkadsnark(const r1cs_example<typename CurveType::scalar_field_type> &example);
 
                 /**
                  * The code below provides an example of all stages of running a R1CS ppzkADSNARK.
@@ -56,7 +56,7 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_r1cs_ppzkadsnark(const r1cs_example<CurveType::scalar_field_type> &example) {
+                bool run_r1cs_ppzkadsnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
                     r1cs_ppzkadsnark_auth_keys<CurveType> auth_keys = r1cs_ppzkadsnark_auth_generator<CurveType>();
 
@@ -66,7 +66,7 @@ namespace nil {
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
                         r1cs_ppzkadsnark_verifier_process_vk<CurveType>(keypair.vk);
 
-                    std::vector<algebra::Fr<snark_pp<CurveType>>> data;
+                    std::vector<typename CurveType::scalar_field_type::value_type> data;
                     data.reserve(example.constraint_system.num_inputs());
                     std::vector<label_type> labels;
                     labels.reserve(example.constraint_system.num_inputs());
