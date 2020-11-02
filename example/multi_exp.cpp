@@ -52,21 +52,21 @@
 
 #include <nil/crypto3/algebra/curves/params/multi_exp/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/params/multi_exp/bls12.hpp>
-//#include <nil/crypto3/algebra/curves/params/multi_exp/bn128.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/brainpool_r1.hpp>
+//#include <nil/crypto3/algebra/curves/params/multiexp/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/params/multi_exp/edwards.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/frp_v1.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/gost_A.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/params/multi_exp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/multi_exp/mnt6.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/p192.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/p224.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/p256.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/p384.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/p521.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/secp.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/sm2p_v1.hpp>
-// #include <nil/crypto3/algebra/curves/params/multi_exp/x962_p.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p192.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p224.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p256.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p384.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p521.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/secp.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/x962_p.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
