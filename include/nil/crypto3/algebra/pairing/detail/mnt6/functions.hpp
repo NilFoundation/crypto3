@@ -30,7 +30,7 @@
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/wnaf.hpp>
+//#include <boost/multiprecision/wnaf.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -202,7 +202,10 @@ namespace nil {
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
                             bool found_nonzero = false;
 
-                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
+                            //std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
+                            std::vector<long> NAF;
+                            // uncomment, when wnaf is ready
+
                             for (long i = NAF.size() - 1; i >= 0; --i) {
                                 if (!found_nonzero) {
                                     /* this skips the MSB itself */
@@ -265,7 +268,10 @@ namespace nil {
                             bool found_nonzero = false;
                             size_t idx = 0;
 
-                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
+                            //std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
+                            std::vector<long> NAF;
+                            // uncomment, when wnaf is ready
+
                             for (long i = NAF.size() - 1; i >= 0; --i) {
                                 if (!found_nonzero) {
                                     /* this skips the MSB itself */
