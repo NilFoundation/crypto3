@@ -32,7 +32,7 @@ namespace nil {
             namespace curves {
 
                 template<typename GroupType>
-                struct multi_exp_params;
+                struct multiexp_params;
 
                 template<typename GroupType>
                 struct wnaf_params;

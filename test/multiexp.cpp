@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE multi_expr_test
+#define BOOST_TEST_MODULE multiexpr_test
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -34,7 +34,7 @@
 #include <chrono>
 #include <ctime>
 
-#include <nil/crypto3/algebra/multi_exp/multi_exp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
@@ -54,15 +54,15 @@
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
-#include <nil/crypto3/algebra/curves/params/multi_exp/alt_bn128.hpp>
-#include <nil/crypto3/algebra/curves/params/multi_exp/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 //#include <nil/crypto3/algebra/curves/params/multiexp/bn128.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/brainpool_r1.hpp>
-#include <nil/crypto3/algebra/curves/params/multi_exp/edwards.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/edwards.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/frp_v1.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/gost_A.hpp>
-#include <nil/crypto3/algebra/curves/params/multi_exp/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/params/multi_exp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/p192.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/p224.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/p256.hpp>
@@ -122,14 +122,14 @@ long long get_nsec_time()
     return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
 }
 
-template<typename GroupType, typename FieldType, multi_exp_method Method>
-run_result_t<GroupType> profile_multi_exp(test_instances_t<GroupType> group_elements,
+template<typename GroupType, typename FieldType, multiexp_method Method>
+run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
                                          test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multi_exp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
+        answers.push_back(multiexp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
                                                                   scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
@@ -148,12 +148,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
         test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
         run_result_t<GroupType> result_bos_coster =
-            profile_multi_exp<GroupType, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
+            profile_multiexp<GroupType, FieldType, multiexp_method_bos_coster>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
         run_result_t<GroupType> result_djb =
-            profile_multi_exp<GroupType, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
+            profile_multiexp<GroupType, FieldType, multiexp_method_BDLO12>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -163,7 +163,7 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 
         if (expn <= expn_end_naive) {
             run_result_t<GroupType> result_naive =
-                profile_multi_exp<GroupType, FieldType, multi_exp_method_naive_plain>(group_elements, scalars);
+                profile_multiexp<GroupType, FieldType, multiexp_method_naive_plain>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 

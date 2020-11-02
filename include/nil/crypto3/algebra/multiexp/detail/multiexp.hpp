@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
-#define CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
+#ifndef CRYPTO3_ALGEBRA_MULTIEXP_DETAIL_HPP
+#define CRYPTO3_ALGEBRA_MULTIEXP_DETAIL_HPP
 
 #include <vector>
 
@@ -38,14 +38,14 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            enum multi_exp_method {
+            enum multiexp_method {
                 /**
                  * Naive multi-exponentiation individually multiplies each base by the
                  * corresponding scalar and adds up the results.
-                 * multi_exp_method_naive uses opt_window_wnaf_exp for exponentiation,
-                 * while multi_exp_method_plain uses operator *.
+                 * multiexp_method_naive uses opt_window_wnaf_exp for exponentiation,
+                 * while multiexp_method_plain uses operator *.
                  */
-                multi_exp_method_naive_plain,
+                multiexp_method_naive_plain,
                 /**
                  * A variant of the Bos-Coster algorithm [1],
                  * with implementation suggestions from [2].
@@ -53,7 +53,7 @@ namespace nil {
                  * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
                  * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
                  */
-                multi_exp_method_bos_coster,
+                multiexp_method_bos_coster,
                 /**
                  * A special case of Pippenger's algorithm from Page 15 of
                  * Bernstein, Doumen, Lange, Oosterwijk,
@@ -63,17 +63,17 @@ namespace nil {
                  * Requires that typename BaseType::value_type implements .dbl() (and, if USE_MIXED_ADDITION is defined,
                  * .to_special(), .mixed_add(), and batch_to_special()).
                  */
-                multi_exp_method_BDLO12
+                multiexp_method_BDLO12
             };
 
             namespace detail {
 
                 template<typename BaseType,
                          typename FieldType,
-                         multi_exp_method Method,
-                         typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
+                         multiexp_method Method,
+                         typename std::enable_if<(Method == multiexp_method_naive_plain), int>::type = 0>
                 typename BaseType::value_type
-                    multi_exp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
+                    multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                                     typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
@@ -94,9 +94,9 @@ namespace nil {
 
                 template<typename BaseType,
                          typename FieldType,
-                         multi_exp_method Method,
-                         typename std::enable_if<(Method == multi_exp_method_BDLO12), int>::type = 0>
-                typename BaseType::value_type multi_exp_inner(
+                         multiexp_method Method,
+                         typename std::enable_if<(Method == multiexp_method_BDLO12), int>::type = 0>
+                typename BaseType::value_type multiexp_inner(
                     typename std::vector<typename BaseType::value_type>::const_iterator bases,
                     typename std::vector<typename BaseType::value_type>::const_iterator bases_end,
                     typename std::vector<typename FieldType::value_type>::const_iterator exponents,
@@ -194,12 +194,12 @@ namespace nil {
 
                 template<typename BaseType,
                          typename FieldType,
-                         multi_exp_method Method,
+                         multiexp_method Method,
                          typename = typename std::enable_if<
-                             (Method == multi_exp_method_bos_coster) &&
+                             (Method == multiexp_method_bos_coster) &&
                              ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
                 typename BaseType::value_type
-                    multi_exp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
+                    multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                                     typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
@@ -301,4 +301,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_MULTI_EXP_DETAIL_HPP
+#endif    // CRYPTO3_ALGEBRA_MULTIEXP_DETAIL_HPP

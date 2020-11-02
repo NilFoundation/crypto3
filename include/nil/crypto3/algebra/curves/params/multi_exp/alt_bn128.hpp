@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTI_EXP_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTI_EXP_PARAMS_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTIEXP_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTIEXP_PARAMS_HPP
 
 #include <nil/crypto3/algebra/curves/params.hpp>
 
@@ -36,12 +36,12 @@ namespace nil {
             namespace curves {
 
                 template<typename GroupType>
-                struct multi_exp_params;
+                struct multiexp_params;
 
                 /************************* ALT_BN128-254 ***********************************/
 
                 template<>
-                struct multi_exp_params<typename alt_bn128<254, CHAR_BIT>::g1_type> {
+                struct multiexp_params<typename alt_bn128<254, CHAR_BIT>::g1_type> {
                     
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                     // window 1 is unbeaten in [-inf, 4.99]
@@ -91,7 +91,7 @@ namespace nil {
                 };
 
                 template<>
-                struct multi_exp_params<typename alt_bn128<254, CHAR_BIT>::g2_type> {
+                struct multiexp_params<typename alt_bn128<254, CHAR_BIT>::g2_type> {
                     
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                     // window 1 is unbeaten in [-inf, 5.10]
@@ -143,13 +143,13 @@ namespace nil {
                 /************************* ALT_BN128-254 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 22> const 
-                    multi_exp_params<typename alt_bn128<254, CHAR_BIT>::g1_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename alt_bn128<254, CHAR_BIT>::g1_type>::fixed_base_exp_window_table;
                 constexpr std::array<std::size_t, 22> const 
-                    multi_exp_params<typename alt_bn128<254, CHAR_BIT>::g2_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename alt_bn128<254, CHAR_BIT>::g2_type>::fixed_base_exp_window_table;
 
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTI_EXP_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_ALT_BN128_MULTIEXP_PARAMS_HPP
