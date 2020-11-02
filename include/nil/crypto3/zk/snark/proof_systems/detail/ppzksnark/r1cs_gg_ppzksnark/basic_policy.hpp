@@ -604,7 +604,7 @@ namespace nil {
                             // uncomment
                             // when kc_multi_exp_with_mixed_addition ready
                             typename CurveType::g1_type::value_type evaluation_Ht = CurveType::g1_type::value_type::zero();
-                            /*algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                            /*algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                algebra::multi_exp_method_BDLO12>(
                                 pk.H_query.begin(),
                                 pk.H_query.begin() + (qap_wit.degree - 1),
@@ -613,7 +613,7 @@ namespace nil {
                                 chunks);*/
 
                             // uncomment
-                            // when multi_exp ready
+                            // when multiexp ready
                             typename CurveType::g1_type::value_type evaluation_Lt = CurveType::g1_type::value_type::zero();
                             /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
