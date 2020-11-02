@@ -62,6 +62,8 @@ set(RUNTIME_TESTS_NAMES
     "fields"
     "pairing"
     "hash_to_curve"
+    "wnaf"
+    "multi_exp"
     #    "groups"
     #    "bilinearity"
     )

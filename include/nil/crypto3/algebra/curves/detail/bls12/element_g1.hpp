@@ -28,10 +28,10 @@
 #define CRYPTO3_ALGEBRA_CURVES_BLS12_G1_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/detail/literals.hpp>
-
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -265,11 +265,6 @@ namespace nil {
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                             return element_bls12_g1(X3, Y3, Z3);
-                        }
-
-                        template<typename NumberType>
-                        element_bls12_g1 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
                         }
 
                     private:
@@ -560,11 +555,6 @@ namespace nil {
                             return element_bls12_g1(X3, Y3, Z3);
                         }
 
-                        template<typename NumberType>
-                        element_bls12_g1 operator*(const NumberType &other) const {
-                            return scalar_mul(*this, other);
-                        }
-
                     private:
                         element_bls12_g1 add(const element_bls12_g1 &other) const {
 
@@ -631,6 +621,36 @@ namespace nil {
                             underlying_field_value_type(0x1914A69C5102EFF1F674F5D30AFEEC4BD7FB348CA3E52D96D182AD44FB82305C2FE3D3634A9591AFD82DE55559C8EA6_cppui377),
                             underlying_field_value_type::one()};*/
                     };
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
+                        const NumberType &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const NumberType &left,
+                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
+                        const typename FieldType::value_type &right) {
+
+                        return left * right.data;
+                    }
+
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const typename FieldType::value_type &left, 
+                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
+
+                        return right * left;
+                    }
 
                 }    // namespace detail
             }        // namespace curves

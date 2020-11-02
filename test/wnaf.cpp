@@ -1,7 +1,5 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,32 +22,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
-#define CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
+#define BOOST_TEST_MODULE wnaf_algebra_test
 
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/element_g2.hpp>
+#include <iostream>
+#include <cstdint>
+#include <vector>
+#include <string>
+#include <type_traits>
+#include <tuple>
 
-namespace nil {
-    namespace crypto3 {
-        namespace algebra {
-            namespace curves {
-                namespace detail {
-                    
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    struct bls12_g2 {
-                        using policy_type = bls12_basic_policy<ModulusBits, GeneratorBits>;
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
 
-                        using underlying_field_type = typename policy_type::g2_field_type;
+#include <nil/crypto3/algebra/wnaf.hpp>
 
-                        constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;
+using namespace nil::crypto3::algebra;
 
-                        using value_type = element_bls12_g2<ModulusBits, GeneratorBits>;
-                    };
+BOOST_AUTO_TEST_SUITE(wnaf_test_suite)
 
-                }    // namespace detail
-            }        // namespace curves
-        }            // namespace algebra
-    }                // namespace crypto3
-}    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
+BOOST_AUTO_TEST_SUITE_END()

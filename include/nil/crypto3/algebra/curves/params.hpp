@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,32 +23,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
-#define CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
-
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/element_g2.hpp>
+#ifndef CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                namespace detail {
-                    
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    struct bls12_g2 {
-                        using policy_type = bls12_basic_policy<ModulusBits, GeneratorBits>;
 
-                        using underlying_field_type = typename policy_type::g2_field_type;
+                template<typename GroupType>
+                struct multi_exp_params;
 
-                        constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;
+                template<typename GroupType>
+                struct wnaf_params;
 
-                        using value_type = element_bls12_g2<ModulusBits, GeneratorBits>;
-                    };
-
-                }    // namespace detail
-            }        // namespace curves
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace curves
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_PARAMS_HPP
