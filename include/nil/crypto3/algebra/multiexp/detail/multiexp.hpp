@@ -40,42 +40,44 @@ namespace nil {
 
             enum multi_exp_method {
                 /**
-                * Naive multi-exponentiation individually multiplies each base by the
-                * corresponding scalar and adds up the results.
-                * multi_exp_method_naive uses opt_window_wnaf_exp for exponentiation,
-                * while multi_exp_method_plain uses operator *.
-                */
-            multi_exp_method_naive_plain,
+                 * Naive multi-exponentiation individually multiplies each base by the
+                 * corresponding scalar and adds up the results.
+                 * multi_exp_method_naive uses opt_window_wnaf_exp for exponentiation,
+                 * while multi_exp_method_plain uses operator *.
+                 */
+                multi_exp_method_naive_plain,
                 /**
-                * A variant of the Bos-Coster algorithm [1],
-                * with implementation suggestions from [2].
-                *
-                * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
-                * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
-                */
-            multi_exp_method_bos_coster,
+                 * A variant of the Bos-Coster algorithm [1],
+                 * with implementation suggestions from [2].
+                 *
+                 * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
+                 * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
+                 */
+                multi_exp_method_bos_coster,
                 /**
-                * A special case of Pippenger's algorithm from Page 15 of
-                * Bernstein, Doumen, Lange, Oosterwijk,
-                * "Faster batch forgery identification", INDOCRYPT 2012
-                * (https://eprint.iacr.org/2012/549.pdf)
-                * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
-                * Requires that typename BaseType::value_type implements .dbl() (and, if USE_MIXED_ADDITION is defined,
-                * .to_special(), .mixed_add(), and batch_to_special()).
-                */
-            multi_exp_method_BDLO12
+                 * A special case of Pippenger's algorithm from Page 15 of
+                 * Bernstein, Doumen, Lange, Oosterwijk,
+                 * "Faster batch forgery identification", INDOCRYPT 2012
+                 * (https://eprint.iacr.org/2012/549.pdf)
+                 * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
+                 * Requires that typename BaseType::value_type implements .dbl() (and, if USE_MIXED_ADDITION is defined,
+                 * .to_special(), .mixed_add(), and batch_to_special()).
+                 */
+                multi_exp_method_BDLO12
             };
-            
+
             namespace detail {
 
-                template<typename BaseType, typename FieldType, multi_exp_method Method,
-                    typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
-                 typename BaseType::value_type multi_exp_inner(
-                    typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
-                    
+                template<typename BaseType,
+                         typename FieldType,
+                         multi_exp_method Method,
+                         typename std::enable_if<(Method == multi_exp_method_naive_plain), int>::type = 0>
+                typename BaseType::value_type
+                    multi_exp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
+                                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
+                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
+
                     typename BaseType::value_type result(BaseType::value_type::zero());
 
                     typename std::vector<typename BaseType::value_type>::const_iterator vec_it;
@@ -90,8 +92,10 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType, typename FieldType, multi_exp_method Method,
-                    typename std::enable_if<(Method == multi_exp_method_BDLO12), int>::type = 0>
+                template<typename BaseType,
+                         typename FieldType,
+                         multi_exp_method Method,
+                         typename std::enable_if<(Method == multi_exp_method_BDLO12), int>::type = 0>
                 typename BaseType::value_type multi_exp_inner(
                     typename std::vector<typename BaseType::value_type>::const_iterator bases,
                     typename std::vector<typename BaseType::value_type>::const_iterator bases_end,
@@ -132,7 +136,7 @@ namespace nil {
                         for (std::size_t i = 0; i < length; i++) {
                             std::size_t id = 0;
                             for (std::size_t j = 0; j < c; j++) {
-                                if (boost::multiprecision::bit_test(bn_exponents[i], k*c + j)) {
+                                if (boost::multiprecision::bit_test(bn_exponents[i], k * c + j)) {
                                     id |= 1 << j;
                                 }
                             }
@@ -147,8 +151,7 @@ namespace nil {
 #else
                                 buckets[id] = buckets[id] + bases[i];
 #endif
-                            }
-                            else {
+                            } else {
                                 buckets[id] = bases[i];
                                 bucket_nonzero[id] = true;
                             }
@@ -169,8 +172,7 @@ namespace nil {
 #else
                                     running_sum = running_sum + buckets[i];
 #endif
-                                }
-                                else {
+                                } else {
                                     running_sum = buckets[i];
                                     running_sum_nonzero = true;
                                 }
@@ -179,8 +181,7 @@ namespace nil {
                             if (running_sum_nonzero) {
                                 if (result_nonzero) {
                                     result = result + running_sum;
-                                }
-                                else {
+                                } else {
                                     result = running_sum;
                                     result_nonzero = true;
                                 }
@@ -191,13 +192,17 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType, typename FieldType, multi_exp_method Method, typename = 
-                        typename std::enable_if<(Method == multi_exp_method_bos_coster) && 
-                                                ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
-                typename BaseType::value_type multi_exp_inner( typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                                          typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
+                template<typename BaseType,
+                         typename FieldType,
+                         multi_exp_method Method,
+                         typename = typename std::enable_if<
+                             (Method == multi_exp_method_bos_coster) &&
+                             ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                typename BaseType::value_type
+                    multi_exp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
+                                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
+                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
                     using number_type = typename FieldType::modulus_type;
 
@@ -206,7 +211,7 @@ namespace nil {
                     }
 
                     if (vec_start + 1 == vec_end) {
-                        return (*scalar_start)*(*vec_start);
+                        return (*scalar_start) * (*vec_start);
                     }
 
                     std::vector<number_type> opt_q;
@@ -219,12 +224,13 @@ namespace nil {
                     typename std::vector<typename BaseType::value_type>::const_iterator vec_it;
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_it;
                     std::size_t i;
-                    for (i=0, vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it, ++i) {
+                    for (i = 0, vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end;
+                         ++vec_it, ++scalar_it, ++i) {
                         g.emplace_back(*vec_it);
 
                         opt_q.emplace_back(number_type(scalar_it->data));
                     }
-                    std::make_heap(opt_q.begin(),opt_q.end());
+                    std::make_heap(opt_q.begin(), opt_q.end());
                     assert(scalar_it == scalar_end);
 
                     if (vec_len != odd_vec_len) {
@@ -249,9 +255,9 @@ namespace nil {
                         }
 
                         const std::size_t bbits = boost::multiprecision::msb(b.r);
-                        const std::size_t limit = (abits-bbits >= 20 ? 20 : abits-bbits);
+                        const std::size_t limit = (abits - bbits >= 20 ? 20 : abits - bbits);
 
-                        if (bbits < 1ul<<limit) {
+                        if (bbits < 1ul << limit) {
                             /*
                               In this case, exponentiating to the power of a is cheaper than
                               subtracting b from a multiple times, so let's do it directly
@@ -260,8 +266,7 @@ namespace nil {
                             opt_result = opt_result + opt_window_wnaf_exp(g[a.idx], a.r, abits);
 
                             a.r.clear();
-                        }
-                        else {
+                        } else {
                             // x A + y B => (x-y) A + y (B+A)
                             a.r.data = a.r.data - b.r.data;
                             g[b.idx] = g[b.idx] + g[a.idx];
@@ -271,28 +276,26 @@ namespace nil {
 
                         /* heapify A down */
                         std::size_t a_pos = 0;
-                        while (2*a_pos + 2< odd_vec_len) {
+                        while (2 * a_pos + 2 < odd_vec_len) {
                             // this is a max-heap so to maintain a heap property we swap with the largest of the two
-                            if (opt_q[2*a_pos+1] < opt_q[2*a_pos+2]) {
-                                std::swap(opt_q[a_pos], opt_q[2*a_pos+2]);
-                                a_pos = 2*a_pos+2;
-                            }
-                            else {
-                                std::swap(opt_q[a_pos], opt_q[2*a_pos+1]);
-                                a_pos = 2*a_pos+1;
+                            if (opt_q[2 * a_pos + 1] < opt_q[2 * a_pos + 2]) {
+                                std::swap(opt_q[a_pos], opt_q[2 * a_pos + 2]);
+                                a_pos = 2 * a_pos + 2;
+                            } else {
+                                std::swap(opt_q[a_pos], opt_q[2 * a_pos + 1]);
+                                a_pos = 2 * a_pos + 1;
                             }
                         }
 
                         /* now heapify A up appropriate amount of times */
-                        while (a_pos > 0 && opt_q[(a_pos-1)/2] < opt_q[a_pos]) {
-                            std::swap(opt_q[a_pos], opt_q[(a_pos-1)/2]);
-                            a_pos = (a_pos-1) / 2;
+                        while (a_pos > 0 && opt_q[(a_pos - 1) / 2] < opt_q[a_pos]) {
+                            std::swap(opt_q[a_pos], opt_q[(a_pos - 1) / 2]);
+                            a_pos = (a_pos - 1) / 2;
                         }
                     }
 
                     return opt_result;
                 }
-
             }    // namespace detail
         }        // namespace algebra
     }            // namespace crypto3
