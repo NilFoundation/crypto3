@@ -496,9 +496,9 @@ namespace nil {
 
                             // MAYBE LATER: do queries 1,2,4 at once for slightly better speed
 
-                            V_g1 = V_g1 + algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                            V_g1 = V_g1 + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                                  typename CurveType::scalar_field_type,
-                                                                                 algebra::multi_exp_method_BDLO12>(
+                                                                                 algebra::multiexp_method_BDLO12>(
                                               pk.V_g1_query.begin(),
                                               pk.V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                               ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
@@ -506,9 +506,9 @@ namespace nil {
 
                             alpha_V_g1 =
                                 alpha_V_g1 +
-                                algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                                algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                        typename CurveType::scalar_field_type,
-                                                                       algebra::multi_exp_method_BDLO12>(
+                                                                       algebra::multiexp_method_BDLO12>(
                                     pk.alpha_V_g1_query.begin(),
                                     pk.alpha_V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                     ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
@@ -516,16 +516,16 @@ namespace nil {
 
                             H_g1 =
                                 H_g1 +
-                                algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(
+                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(
                                     pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
                                     ssp_wit.coefficients_for_H.begin(),
                                     ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
 
                             V_g2 =
                                 V_g2 +
-                                algebra::multi_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(
+                                algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(
                                     pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
                                     ssp_wit.coefficients_for_Vs.begin(),
                                     ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);

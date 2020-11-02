@@ -204,10 +204,10 @@ namespace nil {
 
                                     accumulated_value =
                                         accumulated_value /*+
-                                        algebra::multi_exp<
+                                        algebra::multiexp<
                                             T,
                                             typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                            algebra::multi_exp_method_bos_coster>(values.begin() + first_pos,
+                                            algebra::multiexp_method_bos_coster>(values.begin() + first_pos,
                                                                                   values.begin() + last_pos + 1,
                                                                                   it_begin + (indices[first_pos] -
                                         offset), it_begin + (indices[last_pos] - offset) + 1, chunks)*/
@@ -236,9 +236,9 @@ namespace nil {
                         if (in_block) {
                             accumulated_value =
                                 accumulated_value /*+
-                                algebra::multi_exp<T,
+                                algebra::multiexp<T,
                                                    typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                                   algebra::multi_exp_method_bos_coster>(
+                                                   algebra::multiexp_method_bos_coster>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),

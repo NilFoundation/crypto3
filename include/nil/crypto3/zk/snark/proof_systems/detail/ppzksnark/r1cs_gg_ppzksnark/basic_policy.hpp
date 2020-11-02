@@ -576,9 +576,9 @@ namespace nil {
                                                            qap_wit.coefficients_for_ABCs.end());
 
                             typename CurveType::g1_type::value_type evaluation_At = CurveType::g1_type::value_type::zero();
-                            /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                            /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
-                                                                   algebra::multi_exp_method_BDLO12>(
+                                                                   algebra::multiexp_method_BDLO12>(
                                 pk.A_query.begin(),
                                 pk.A_query.begin() + qap_wit.num_variables() + 1,
                                 const_padded_assignment.begin(),
@@ -586,14 +586,14 @@ namespace nil {
                                 chunks);*/
 
                             // uncomment
-                            // when multi_exp_with_mixed_addition ready
+                            // when multiexp_with_mixed_addition ready
 
                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type>
                                 evaluation_Bt;
 
-                            /*kc_multi_exp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
+                            /*kc_multiexp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
                                                              typename CurveType::scalar_field_type,
-                                                             algebra::multi_exp_method_BDLO12>(
+                                                             algebra::multiexp_method_BDLO12>(
                                 pk.B_query,
                                 0,
                                 qap_wit.num_variables() + 1,
@@ -602,10 +602,10 @@ namespace nil {
                                 chunks);*/
 
                             // uncomment
-                            // when kc_multi_exp_with_mixed_addition ready
+                            // when kc_multiexp_with_mixed_addition ready
                             typename CurveType::g1_type::value_type evaluation_Ht = CurveType::g1_type::value_type::zero();
-                            /*algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                               algebra::multi_exp_method_BDLO12>(
+                            /*algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                               algebra::multiexp_method_BDLO12>(
                                 pk.H_query.begin(),
                                 pk.H_query.begin() + (qap_wit.degree - 1),
                                 qap_wit.coefficients_for_H.begin(),
@@ -613,11 +613,11 @@ namespace nil {
                                 chunks);*/
 
                             // uncomment
-                            // when multi_exp ready
+                            // when multiexp ready
                             typename CurveType::g1_type::value_type evaluation_Lt = CurveType::g1_type::value_type::zero();
-                            /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                            /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
-                                                                   algebra::multi_exp_method_BDLO12>(
+                                                                   algebra::multiexp_method_BDLO12>(
                                 pk.L_query.begin(),
                                 pk.L_query.end(),
                                 const_padded_assignment.begin() + qap_wit.num_inputs() + 1,
@@ -625,7 +625,7 @@ namespace nil {
                                 chunks);*/
 
                             // uncomment
-                            // when multi_exp_with_mixed_addition ready
+                            // when multiexp_with_mixed_addition ready
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
                             typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At;
