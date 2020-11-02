@@ -139,23 +139,23 @@ void check_expand_message(std::size_t len_in_bytes, const DstType &dst, const Ms
     BOOST_CHECK(result_compare(uniform_bytes));
 }
 
-template<std::size_t N, typename H2CType, typename FieldValueType>
-void check_hash_to_field(const std::string &msg_str, const std::array<FieldValueType, N> &result) {
-    // using h2c_type = ep_map<GroupType>;
+template<std::size_t N, typename H2CType, typename FieldValueType, typename DstType,
+         typename = typename std::enable_if<std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+void check_hash_to_field(const std::string &msg_str, const std::array<FieldValueType, N> &result, const DstType &dst) {
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    auto u = H2CType::template hash_to_field<N>(msg);
+    auto u = H2CType::template hash_to_field<N>(msg, dst);
     for (std::size_t i = 0; i < N; i++) {
         BOOST_CHECK_EQUAL(u[i], result[i]);
     }
 }
 
-template<typename H2CType, typename GroupValueType>
-void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected) {
+template<typename H2CType, typename GroupValueType, typename DstType,
+         typename = typename std::enable_if<std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected, const DstType &dst) {
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    GroupValueType result = H2CType::hash_to_curve(msg);
+    GroupValueType result = H2CType::hash_to_curve(msg, dst);
     BOOST_CHECK_EQUAL(result.to_affine_coordinates(), expected);
 }
-
 
 BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
 
@@ -315,10 +315,15 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.9.1
     using curve_type = bls12_381;
     using group_type = typename curve_type::g1_type;
+    using h2c_type = ep_map<group_type>;
     using field_value_type = typename group_type::underlying_field_type::value_type;
     using number_type = typename curve_type::number_type;
 
-    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    std::string default_tag_str = "QUUX-V01-CS02-with-";
+    std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
+    dst.insert(dst.end(), h2c_type::suite_type::suite_id.begin(), h2c_type::suite_type::suite_id.end());
+
+        using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
     samples_type samples = {
         {"",
          {field_value_type(number_type("1790030616568561980207134218344899338736900885118493183248255875682123737756800213955590674957414534085508415116879")),
@@ -339,7 +344,7 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_field<2, ep_map<group_type>>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_field<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
@@ -347,8 +352,13 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
     using curve_type = bls12_381;
     using group_type = typename curve_type::g2_type;
+    using h2c_type = ep2_map<group_type>;
     using field_value_type = typename group_type::underlying_field_type::value_type;
     using number_type = typename curve_type::number_type;
+
+    std::string default_tag_str = "QUUX-V01-CS02-with-";
+    std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
+    dst.insert(dst.end(), h2c_type::suite_type::suite_id.begin(), h2c_type::suite_type::suite_id.end());
 
     using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
     samples_type samples = {
@@ -386,16 +396,21 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_field<2, ep2_map<group_type>>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_field<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
 BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g1_type;
+    using h2c_type = ep_map<group_type>;
     using group_value_type = typename group_type::value_type;
     using field_value_type = typename group_type::underlying_field_type::value_type;
     using number_type = typename curve_type::number_type;
+
+    std::string default_tag_str = "QUUX-V01-CS02-with-";
+    std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
+    dst.insert(dst.end(), h2c_type::suite_type::suite_id.begin(), h2c_type::suite_type::suite_id.end());
 
     using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
     samples_type samples {
@@ -432,7 +447,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_curve<ep_map<group_type>>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_curve<h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
@@ -440,12 +455,16 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
     using curve_type = bls12_381;
     using group_type = typename curve_type::g2_type;
+    using h2c_type = ep2_map<group_type>;
     using group_value_type = typename group_type::value_type;
     using field_value_type = typename group_type::underlying_field_type::value_type;
     using number_type = typename curve_type::number_type;
 
-    using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
+    std::string default_tag_str = "QUUX-V01-CS02-with-";
+    std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
+    dst.insert(dst.end(), h2c_type::suite_type::suite_id.begin(), h2c_type::suite_type::suite_id.end());
 
+    using samples_type = std::vector<std::tuple<std::string, group_value_type>>;
     samples_type samples {
         {"",
          group_value_type(
@@ -492,7 +511,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_curve<ep2_map<group_type>>(std::get<0>(s), std::get<1>(s));
+        check_hash_to_curve<h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
