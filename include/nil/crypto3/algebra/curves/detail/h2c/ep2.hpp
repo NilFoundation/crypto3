@@ -27,7 +27,8 @@
 #define CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE2_HPP
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
-#include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_m2c.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_expand.hpp>
 
 #include <type_traits>
 
@@ -47,11 +48,14 @@ namespace nil {
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::modular_type modular_type;
-                        typedef typename suite_type::expand_message expand_message;
-                        typedef typename suite_type::map_to_curve map_to_curve;
+                        typedef typename suite_type::hash_type hash_type;
 
                         constexpr static std::size_t m = suite_type::m;
                         constexpr static std::size_t L = suite_type::L;
+                        constexpr static std::size_t k = suite_type::k;
+
+                        typedef expand_message_xmd<k, hash_type> expand_message_ro;
+                        // typedef expand_message_xof<k, hash_type> expand_message_nu;
 
                         static_assert(m == 2, "underlying field has wrong extension");
 
@@ -60,22 +64,20 @@ namespace nil {
                                      std::is_same<std::uint8_t, typename InputType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                         static inline group_value_type hash_to_curve(const InputType &msg, const DstType &dst) {
-                            auto u = hash_to_field<2>(msg, dst);
-                            group_value_type Q0 =
-                                map_to_curve::process(u[0], suite_type::iso_Ai, suite_type::iso_Bi, suite_type::Z);
-                            group_value_type Q1 =
-                                map_to_curve::process(u[1], suite_type::iso_Ai, suite_type::iso_Bi, suite_type::Z);
+                            auto u = hash_to_field<2, expand_message_ro>(msg, dst);
+                            group_value_type Q0 = map_to_curve<GroupType>::process(u[0]);
+                            group_value_type Q1 = map_to_curve<GroupType>::process(u[1]);
                             return clear_cofactor(Q0 + Q1);
                         }
                         // private:
-                        template<std::size_t N, typename InputType, typename DstType,
+                        template<std::size_t N, typename expand_message_type, typename InputType, typename DstType,
                                  typename = typename std::enable_if<
                                      std::is_same<std::uint8_t, typename InputType::value_type>::value &&
                                      std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                         static inline std::array<field_value_type, N> hash_to_field(const InputType &msg,
                                                                                     const DstType &dst) {
                             std::array<std::uint8_t, N * m * L> uniform_bytes {0};
-                            expand_message::process(N * m * L, msg, dst, uniform_bytes);
+                            expand_message_type::process(N * m * L, msg, dst, uniform_bytes);
 
                             cpp_int e;
                             std::array<modular_type, m> coordinates;

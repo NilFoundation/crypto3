@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
+
 #include <array>
 
 namespace nil {
@@ -42,12 +44,12 @@ namespace nil {
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.2
                     template<>
                     class iso_map<typename bls12_381::g1_type> {
-                        typedef bls12_381 group_policy_type;
                         typedef typename bls12_381::g1_type group_type;
+                        typedef h2c_suite<group_type> suite_type;
 
-                        typedef typename group_type::value_type group_value_type;
-                        typedef typename group_policy_type::number_type number_type;
-                        typedef typename group_type::underlying_field_type::value_type field_value_type;
+                        typedef typename suite_type::group_value_type group_value_type;
+                        typedef typename suite_type::field_value_type field_value_type;
+                        typedef typename suite_type::number_type number_type;
 
                         // TODO: change number_type on field_value_type when constexpr will be finished
                         constexpr static std::array<number_type, 12> k_x_num = {
@@ -151,23 +153,17 @@ namespace nil {
                             return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
                         }
                     };
-                    template<typename Fp2CurveGroupElement>
-                    void _print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-                        os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data
-                           << " , " << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data
-                           << ")" << std::endl;
-                    }
 
                     // 3-isogeny map for BLS12-381 G2
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.3
                     template<>
                     class iso_map<typename bls12_381::g2_type> {
-                        typedef bls12_381 group_policy_type;
                         typedef typename bls12_381::g2_type group_type;
+                        typedef h2c_suite<group_type> suite_type;
 
-                        typedef typename group_type::value_type group_value_type;
-                        typedef typename group_policy_type::number_type number_type;
-                        typedef typename group_type::underlying_field_type::value_type field_value_type;
+                        typedef typename suite_type::group_value_type group_value_type;
+                        typedef typename suite_type::field_value_type field_value_type;
+                        typedef typename suite_type::number_type number_type;
 
                         // TODO: change number_type on field_value_type when constexpr will be finished
                         constexpr static std::array<std::array<number_type, 2>, 4> k_x_num = {

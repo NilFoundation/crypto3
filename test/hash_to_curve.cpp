@@ -38,9 +38,9 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_expand.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -141,9 +141,9 @@ void check_expand_message(std::size_t len_in_bytes, const DstType &dst, const Ms
 
 template<std::size_t N, typename H2CType, typename FieldValueType, typename DstType,
          typename = typename std::enable_if<std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-void check_hash_to_field(const std::string &msg_str, const std::array<FieldValueType, N> &result, const DstType &dst) {
+void check_hash_to_field_ro(const std::string &msg_str, const std::array<FieldValueType, N> &result, const DstType &dst) {
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-    auto u = H2CType::template hash_to_field<N>(msg, dst);
+    auto u = H2CType::template hash_to_field<N, typename H2CType::expand_message_ro>(msg, dst);
     for (std::size_t i = 0; i < N; i++) {
         BOOST_CHECK_EQUAL(u[i], result[i]);
     }
@@ -161,8 +161,8 @@ BOOST_AUTO_TEST_SUITE(h2c_manual_tests)
 
 BOOST_AUTO_TEST_CASE(expand_message_xmd_sha256_test) {
     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-K.1
-    using hash_policy_type = hashes::sha2<256>;
-    using expand_message = expand_message_xmd<128, hash_policy_type>;
+    using hash_type = hashes::sha2<256>;
+    using expand_message = expand_message_xmd<128, hash_type>;
 
     std::string DST_str("QUUX-V01-CS02-with-expander");
     std::vector<std::uint8_t> DST(DST_str.begin(), DST_str.end());
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
     dst.insert(dst.end(), h2c_type::suite_type::suite_id.begin(), h2c_type::suite_type::suite_id.end());
 
-        using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
     samples_type samples = {
         {"",
          {field_value_type(number_type("1790030616568561980207134218344899338736900885118493183248255875682123737756800213955590674957414534085508415116879")),
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_field<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
+        check_hash_to_field_ro<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
     };
 
     for (auto &s : samples) {
-        check_hash_to_field<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
+        check_hash_to_field_ro<2, h2c_type>(std::get<0>(s), std::get<1>(s), dst);
     }
 }
 
