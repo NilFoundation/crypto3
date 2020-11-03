@@ -41,6 +41,9 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
+
+                        using field_type = typename policy_type::field_type;
+                        
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::modulus_type modulus_type;
 

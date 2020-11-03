@@ -35,11 +35,15 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
+
+                    template<typename BaseField>
+                    struct fp3;
+                    
                 namespace detail {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<typename FieldType>
+                    template<typename BaseField>
                     struct fp3_extension_params;
 
                     /************************* EDWARDS ***********************************/
