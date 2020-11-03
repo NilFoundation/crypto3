@@ -565,8 +565,8 @@ namespace nil {
                             typename CurveType::g1_type::value_type A =
                                 r * pk.G_gamma_Z + pk.A_query[0] +    // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * pk.G_gamma_Z +           // ZK-patch
-                                algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(
+                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(
                                     pk.A_query.begin() + 1,
                                     pk.A_query.end(),
                                     sap_wit.coefficients_for_ACs.begin(),
@@ -579,8 +579,8 @@ namespace nil {
                             typename CurveType::g2_type::value_type B =
                                 r * pk.H_gamma_Z + pk.B_query[0] +    // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * pk.H_gamma_Z +           // ZK-patch
-                                algebra::multi_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(
+                                algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(
                                     pk.B_query.begin() + 1,
                                     pk.B_query.end(),
                                     sap_wit.coefficients_for_ACs.begin(),
@@ -597,8 +597,8 @@ namespace nil {
                              *              = \prod_{i=0}^m C_query_2 * input_i
                              */
                             typename CurveType::g1_type::value_type C =
-                                algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(
+                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(
                                     pk.C_query_1.begin(),
                                     pk.C_query_1.end(),
                                     sap_wit.coefficients_for_ACs.begin() + sap_wit.num_inputs(),
@@ -608,17 +608,17 @@ namespace nil {
                                 sap_wit.d1 * pk.G_ab_gamma_Z +             // ZK-patch
                                 r * pk.C_query_2[0] +                      // i = 0 is a special case for C_query_2
                                 (r + r) * sap_wit.d1 * pk.G_gamma2_Z2 +    // ZK-patch for C_query_2
-                                r * algebra::multi_exp<typename CurveType::g1_type,
+                                r * algebra::multiexp<typename CurveType::g1_type,
                                                        typename CurveType::scalar_field_type,
-                                                       algebra::multi_exp_method_BDLO12>(
+                                                       algebra::multiexp_method_BDLO12>(
                                         pk.C_query_2.begin() + 1,
                                         pk.C_query_2.end(),
                                         sap_wit.coefficients_for_ACs.begin(),
                                         sap_wit.coefficients_for_ACs.end(),
                                         chunks) +
                                 sap_wit.d2 * pk.G_gamma2_Z_t[0] +    // ZK-patch
-                                algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_BDLO12>(pk.G_gamma2_Z_t.begin(),
+                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_BDLO12>(pk.G_gamma2_Z_t.begin(),
                                                                                      pk.G_gamma2_Z_t.end(),
                                                                                      sap_wit.coefficients_for_H.begin(),
                                                                                      sap_wit.coefficients_for_H.end(),
@@ -683,8 +683,8 @@ namespace nil {
                              */
                             typename CurveType::g1_type::value_type G_psi =
                                 pvk.query[0] +
-                                algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multi_exp_method_bos_coster>(
+                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                   algebra::multiexp_method_bos_coster>(
                                     pvk.query.begin() + 1, pvk.query.end(), primary_input.begin(), primary_input.end(),
                                     chunks);
 
