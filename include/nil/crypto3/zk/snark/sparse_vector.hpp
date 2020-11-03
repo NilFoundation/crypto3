@@ -32,6 +32,8 @@
 #include <vector>
 #include <numeric>
 
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -203,15 +205,13 @@ namespace nil {
                                     copy_over = true;
 
                                     accumulated_value =
-                                        accumulated_value /*+
+                                        accumulated_value +
                                         algebra::multiexp<
-                                            T,
-                                            typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                            algebra::multi_exp_method_bos_coster>(values.begin() + first_pos,
-                                                                                  values.begin() + last_pos + 1,
-                                                                                  it_begin + (indices[first_pos] -
-                                        offset), it_begin + (indices[last_pos] - offset) + 1, chunks)*/
-                                        ;
+                                            T, typename std::iterator_traits<InputIterator>::value_type::field_type,
+                                            algebra::multiexp_method_bos_coster>(
+                                            values.begin() + first_pos, values.begin() + last_pos + 1,
+                                            it_begin + (indices[first_pos] - offset),
+                                            it_begin + (indices[last_pos] - offset) + 1, chunks);
                                     // uncomment when multiexp
                                     // will be ready
                                 }
@@ -235,16 +235,15 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value /*+
+                                accumulated_value +
                                 algebra::multiexp<T,
-                                                   typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                                   algebra::multi_exp_method_bos_coster>(
+                                                  typename std::iterator_traits<InputIterator>::value_type::field_type,
+                                                  algebra::multiexp_method_bos_coster>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks)*/
-                                ;
+                                    chunks);
                             // uncomment when multiexp
                             // will be ready
                         }
@@ -252,7 +251,6 @@ namespace nil {
                         return std::make_pair(accumulated_value, resulting_vector);
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
