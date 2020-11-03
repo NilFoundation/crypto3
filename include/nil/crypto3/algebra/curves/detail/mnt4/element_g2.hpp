@@ -359,7 +359,7 @@ namespace nil {
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
                              typename = typename std::enable_if<
-                                 ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
                     element_mnt4_g2<ModulusBits, GeneratorBits>
                         operator*(const element_mnt4_g2<ModulusBits, GeneratorBits> &left,
                                   const typename FieldType::value_type &right) {
@@ -369,7 +369,7 @@ namespace nil {
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
                              typename = typename std::enable_if<
-                                 ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
+                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
                     element_mnt4_g2<ModulusBits, GeneratorBits>
                         operator*(const typename FieldType::value_type &left,
                                   const element_mnt4_g2<ModulusBits, GeneratorBits> &right) {
