@@ -33,6 +33,8 @@
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/literals.hpp>
 
+#include <boost/multiprecision/number.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -622,36 +624,33 @@ namespace nil {
                             underlying_field_value_type::one()};*/
                     };
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
-                    element_bls12_g1<ModulusBits, GeneratorBits>
-                        operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, const NumberType &right) {
-
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType, typename = 
+                        typename std::enable_if<boost::is_number<NumberType>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
+                        const NumberType &right) {
                         return scalar_mul(left, right);
                     }
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
-                    element_bls12_g1<ModulusBits, GeneratorBits>
-                        operator*(const NumberType &left, const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType, typename = 
+                        typename std::enable_if<boost::is_number<NumberType>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const NumberType &left,
+                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
 
                         return right * left;
                     }
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
-                             typename = typename std::enable_if<
-                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
-                    element_bls12_g1<ModulusBits, GeneratorBits>
-                        operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left,
-                                  const typename FieldType::value_type &right) {
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
+                        const FieldValueType &right) {
 
-                        return left * right.data;
+                        return left;// * right.data;
                     }
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
-                             typename = typename std::enable_if<
-                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
-                    element_bls12_g1<ModulusBits, GeneratorBits>
-                        operator*(const typename FieldType::value_type &left,
-                                  const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
+                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::algebra::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const FieldValueType &left, 
+                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
 
                         return right * left;
                     }

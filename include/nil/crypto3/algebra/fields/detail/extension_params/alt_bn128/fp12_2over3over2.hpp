@@ -41,8 +41,11 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<typename FieldType>
+                    template<typename BaseField>
                     struct fp12_2over3over2_extension_params;
+
+                    template<typename BaseField>
+                    struct fp12_2over3over2;
 
                     /************************* ALT_BN128 ***********************************/
 
@@ -54,6 +57,9 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
+
+
+
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::modulus_type modulus_type;
 
