@@ -319,42 +319,6 @@ namespace nil {
                         underlying_field_value_type(1)};*/
                     };
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
-                    element_alt_bn128_g1<ModulusBits, GeneratorBits>
-                        operator*(const element_alt_bn128_g1<ModulusBits, GeneratorBits> &left,
-                                  const NumberType &right) {
-
-                        return scalar_mul(left, right);
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename NumberType>
-                    element_alt_bn128_g1<ModulusBits, GeneratorBits>
-                        operator*(const NumberType &left,
-                                  const element_alt_bn128_g1<ModulusBits, GeneratorBits> &right) {
-
-                        return right * left;
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
-                             typename = typename std::enable_if<
-                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
-                    element_alt_bn128_g1<ModulusBits, GeneratorBits>
-                        operator*(const element_alt_bn128_g1<ModulusBits, GeneratorBits> &left,
-                                  const typename FieldType::value_type &right) {
-
-                        return left * right.data;
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldType,
-                             typename = typename std::enable_if<
-                                 ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
-                    element_alt_bn128_g1<ModulusBits, GeneratorBits>
-                        operator*(const typename FieldType::value_type &left,
-                                  const element_alt_bn128_g1<ModulusBits, GeneratorBits> &right) {
-
-                        return right * left;
-                    }
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

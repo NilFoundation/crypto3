@@ -41,6 +41,9 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
+                    template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                    struct bls12_g1;
+
                     using namespace nil::crypto3::algebra;
                     using namespace boost::multiprecision;
 
@@ -50,14 +53,16 @@ namespace nil {
                     template<>
                     struct element_bls12_g1<381, CHAR_BIT> {
 
+                        using group_type = bls12_g1<381, CHAR_BIT>;
+
                         using policy_type = bls12_basic_policy<381, CHAR_BIT>;
-                        using number_type = typename policy_type::number_type;
 
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
-                        using underlying_field_value_type = g1_field_type_value;
+                        using underlying_field_type = typename policy_type::g1_field_type;
+                        using underlying_field_value_type = underlying_field_type::value_type;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -340,12 +345,15 @@ namespace nil {
                     template<>
                     struct element_bls12_g1<377, CHAR_BIT> {
 
+                        using group_type = bls12_g1<377, CHAR_BIT>;
+
                         using policy_type = bls12_basic_policy<377, CHAR_BIT>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
-                        using underlying_field_value_type = g1_field_type_value;
+                        using underlying_field_type = typename policy_type::g1_field_type;
+                        using underlying_field_value_type = underlying_field_type::value_type;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -626,37 +634,7 @@ namespace nil {
                             underlying_field_value_type::one()};*/
                     };
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(
-                        const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
-                        const typename element_bls12_g1<ModulusBits, GeneratorBits>::underlying_field_value_type::number_type &right) {
-
-                        return scalar_mul(left, right);
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(
-                        const typename element_bls12_g1<ModulusBits, GeneratorBits>::underlying_field_value_type::number_type &left,
-                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
-
-                        return right * left;
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
-                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
-                        const FieldValueType &right) {
-
-                        return left * right.data;
-                    }
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
-                    element_bls12_g1<ModulusBits, GeneratorBits> operator*(const FieldValueType &left, 
-                        const element_bls12_g1<ModulusBits, GeneratorBits> &right) {
-
-                        return right * left;
-                    }
+                    
 
                 }    // namespace detail
             }        // namespace curves

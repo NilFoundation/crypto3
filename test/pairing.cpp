@@ -204,23 +204,23 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     // TODO: activate when scalar multiplication done
      BOOST_CHECK_EQUAL(Fr_elements[VKx_poly] * G1_value_type::one(),
                        G1_elements[VKx]);
-    // BOOST_CHECK_EQUAL(Fr_elements[VKy_poly] * G2_value_type::one(),
-    //                   G1_elements[VKy]);
-    // BOOST_CHECK_EQUAL(Fr_elements[VKz_poly] * G2_value_type::one(),
-    //                   G1_elements[VKz]);
-    // BOOST_CHECK_EQUAL(Fr_elements[A1_poly] * G1_value_type::one(),
-    //                   G1_elements[A1]);
-    // BOOST_CHECK_EQUAL(Fr_elements[C1_poly] * G1_value_type::one(),
-    //                   G1_elements[C1]);
-    // BOOST_CHECK_EQUAL(Fr_elements[A2_poly] * G1_value_type::one(),
-    //                   G1_elements[A2]);
-    // BOOST_CHECK_EQUAL(Fr_elements[C2_poly] * G1_value_type::one(),
-    //                   G1_elements[C2]);
-    // BOOST_CHECK_EQUAL(Fr_elements[B1_poly] * G2_value_type::one(),
-    //                   G2_elements[B1]);
-    // BOOST_CHECK_EQUAL(Fr_elements[B2_poly] * G2_value_type::one(),
-    //                   G2_elements[B2]);
-    //
+     //BOOST_CHECK_EQUAL(Fr_elements[VKy_poly] * G2_value_type::one(),
+     //                  G1_elements[VKy]);
+     //BOOST_CHECK_EQUAL(Fr_elements[VKz_poly] * G2_value_type::one(),
+     //                  G1_elements[VKz]);
+     BOOST_CHECK_EQUAL(Fr_elements[A1_poly] * G1_value_type::one(),
+                       G1_elements[A1]);
+     BOOST_CHECK_EQUAL(Fr_elements[C1_poly] * G1_value_type::one(),
+                       G1_elements[C1]);
+     BOOST_CHECK_EQUAL(Fr_elements[A2_poly] * G1_value_type::one(),
+                       G1_elements[A2]);
+     BOOST_CHECK_EQUAL(Fr_elements[C2_poly] * G1_value_type::one(),
+                       G1_elements[C2]);
+     BOOST_CHECK_EQUAL(Fr_elements[B1_poly] * G2_value_type::one(),
+                       G2_elements[B1]);
+     BOOST_CHECK_EQUAL(Fr_elements[B2_poly] * G2_value_type::one(),
+                       G2_elements[B2]);
+    
     BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A1]), G1_prec_elements[prec_A1]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A2]), G1_prec_elements[prec_A2]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B1]), G2_prec_elements[prec_B1]);

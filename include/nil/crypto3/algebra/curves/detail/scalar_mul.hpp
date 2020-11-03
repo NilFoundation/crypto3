@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
 
+#include <nil/crypto3/detail/type_traits.hpp>
+
 #include <boost/multiprecision/number.hpp>
 #include <cstdint>
 
@@ -41,7 +43,7 @@ namespace nil {
                                               const number<Backend, ExpressionTemplates> &scalar) {
                         GroupValueType result;
 
-                        bool found_one = false;
+                        /*bool found_one = false;
                         for (auto i = static_cast<std::int64_t>(msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
@@ -51,9 +53,47 @@ namespace nil {
                                 found_one = true;
                                 result = result + base;
                             }
-                        }
+                        }*/
 
                         return result;
+                    }
+                    
+                    template<typename GroupValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
+                                                !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
+                    GroupValueType operator*(
+                        const GroupValueType &left, 
+                        const typename GroupValueType::underlying_field_type::number_type &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<typename GroupValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
+                                                !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
+                    GroupValueType operator*(
+                        const typename GroupValueType::underlying_field_type::number_type &left,
+                        const GroupValueType &right) {
+
+                        return right * left;
+                    }
+
+                    template<typename GroupValueType, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
+                                               !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value   &&
+                                                ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    GroupValueType operator*(const GroupValueType &left, const FieldValueType &right) {
+
+                        return left * right.data;
+                    }
+
+                    template<typename GroupValueType, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
+                                               !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value   &&
+                                                ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    GroupValueType operator*(const FieldValueType &left, const GroupValueType &right) {
+
+                        return right * left;
                     }
                 }    // namespace detail
             }        // namespace curves
