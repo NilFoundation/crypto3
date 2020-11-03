@@ -26,10 +26,10 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_NIST_P256_HPP
 #define CRYPTO3_ALGEBRA_CURVES_NIST_P256_HPP
 
-#include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
+#include <nil/crypto3/algebra/curves/curve_nist.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/p256.hpp>
 
-#include <nil/crypto3/algebra/detail/literals.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

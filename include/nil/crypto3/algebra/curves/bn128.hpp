@@ -36,7 +36,7 @@
 
 //#include <nil/crypto3/algebra/pairing/bn128.hpp>
 
-#include <nil/crypto3/algebra/detail/literals.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

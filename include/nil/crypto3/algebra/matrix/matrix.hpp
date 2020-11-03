@@ -30,7 +30,7 @@
 #include <array>
 #include <tuple>
 
-#include <nil/crypto3/algebra/detail/assert.hpp>
+#include <nil/crypto3/detail/assert.hpp>
 
 #include <nil/crypto3/algebra/vector/utility.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>

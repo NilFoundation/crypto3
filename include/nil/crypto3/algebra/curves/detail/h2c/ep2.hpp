@@ -56,9 +56,9 @@ namespace nil {
                         static_assert(m == 2, "underlying field has wrong extension");
 
                         template<typename InputType, typename DstType,
-                            typename = typename std::enable_if<
-                                std::is_same<std::uint8_t, typename InputType::value_type>::value &&
-                                std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                                 typename = typename std::enable_if<
+                                     std::is_same<std::uint8_t, typename InputType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                         static inline group_value_type hash_to_curve(const InputType &msg, const DstType &dst) {
                             auto u = hash_to_field<2>(msg, dst);
                             group_value_type Q0 =
@@ -69,9 +69,9 @@ namespace nil {
                         }
                         // private:
                         template<std::size_t N, typename InputType, typename DstType,
-                            typename = typename std::enable_if<
-                                std::is_same<std::uint8_t, typename InputType::value_type>::value &&
-                                std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                                 typename = typename std::enable_if<
+                                     std::is_same<std::uint8_t, typename InputType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                         static inline std::array<field_value_type, N> hash_to_field(const InputType &msg,
                                                                                     const DstType &dst) {
                             std::array<std::uint8_t, N * m * L> uniform_bytes {0};
@@ -102,6 +102,5 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-
 
 #endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE2_HPP

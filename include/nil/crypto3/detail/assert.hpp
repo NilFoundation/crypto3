@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_DETAIL_ASSERT_HPP
 #define CRYPTO3_DETAIL_ASSERT_HPP
 
-#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
 #define CRYPTO3_DETAIL_ASSERT_FLOATING_POINT(T)                                                     \
     static_assert(std::is_floating_point<typename algebra::detail::remove_complex<T>::type>::value, \

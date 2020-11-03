@@ -32,7 +32,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,15 +68,13 @@ namespace nil {
 
             namespace detail {
 
-                template<typename BaseType,
-                         typename FieldType,
-                         multiexp_method Method,
+                template<typename BaseType, typename FieldType, multiexp_method Method,
                          typename std::enable_if<(Method == multiexp_method_naive_plain), int>::type = 0>
                 typename BaseType::value_type
                     multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
+                                   typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
                     typename BaseType::value_type result(BaseType::value_type::zero());
 
@@ -92,15 +90,13 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType,
-                         typename FieldType,
-                         multiexp_method Method,
+                template<typename BaseType, typename FieldType, multiexp_method Method,
                          typename std::enable_if<(Method == multiexp_method_BDLO12), int>::type = 0>
-                typename BaseType::value_type multiexp_inner(
-                    typename std::vector<typename BaseType::value_type>::const_iterator bases,
-                    typename std::vector<typename BaseType::value_type>::const_iterator bases_end,
-                    typename std::vector<typename FieldType::value_type>::const_iterator exponents,
-                    typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
+                typename BaseType::value_type
+                    multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator bases,
+                                   typename std::vector<typename BaseType::value_type>::const_iterator bases_end,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator exponents,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
 
                     using number_type = typename FieldType::modulus_type;
 
@@ -192,17 +188,15 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType,
-                         typename FieldType,
-                         multiexp_method Method,
+                template<typename BaseType, typename FieldType, multiexp_method Method,
                          typename = typename std::enable_if<
                              (Method == multiexp_method_bos_coster) &&
                              ::nil::crypto3::algebra::detail::is_fp_field<FieldType>::value>::type>
                 typename BaseType::value_type
                     multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
+                                   typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                   typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
                     using number_type = typename FieldType::modulus_type;
 

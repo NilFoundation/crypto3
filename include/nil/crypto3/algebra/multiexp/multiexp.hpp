@@ -42,17 +42,17 @@ namespace nil {
             template<typename BaseType, typename FieldType, multiexp_method Method>
             typename BaseType::value_type
                 multiexp(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                          typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
-                          const std::size_t chunks_count) {
+                         typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
+                         typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                         typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
+                         const std::size_t chunks_count) {
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
                     return detail::multiexp_inner<BaseType, FieldType, Method>(vec_start, vec_end, scalar_start,
-                                                                                scalar_end);
+                                                                               scalar_end);
                 }
 
                 const std::size_t one_chunk_size = total_size / chunks_count;
@@ -116,7 +116,7 @@ namespace nil {
                               typename std::vector<typename BaseType::value_type>::const_iterator b_end) {
 
                 return multiexp<typename BaseType::value_type, typename BaseType::value_type,
-                                 multiexp_method_naive_plain>(a_start, a_end, b_start, b_end, 1);
+                                multiexp_method_naive_plain>(a_start, a_end, b_start, b_end, 1);
             }
 
             /**
@@ -138,8 +138,7 @@ namespace nil {
 
                 std::size_t window = 1;
 
-                for (long i = curves::multiexp_params<GroupType>::fixed_base_exp_window_table.size() - 1; i >= 0;
-                     --i) {
+                for (long i = curves::multiexp_params<GroupType>::fixed_base_exp_window_table.size() - 1; i >= 0; --i) {
                     if (curves::multiexp_params<GroupType>::fixed_base_exp_window_table[i] != 0 &&
                         num_scalars >= curves::multiexp_params<GroupType>::fixed_base_exp_window_table[i]) {
                         window = i + 1;
