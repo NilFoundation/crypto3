@@ -68,8 +68,10 @@ namespace nil {
                         typedef expand_message_xmd<k, hash_type> expand_message;
                         typedef m2c_simple_swu_zeroAB<iso_map<group_type>, field_value_type, group_value_type>
                             map_to_curve;
-                        constexpr static number_type iso_Ai = 0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381;
-                        constexpr static number_type iso_Bi = 0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381;
+                        constexpr static number_type iso_Ai =
+                            0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381;
+                        constexpr static number_type iso_Bi =
+                            0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381;
                         constexpr static std::size_t Z = 11;
                         constexpr static number_type h_eff = 0xd201000000010001_cppui381;
                     };
@@ -87,8 +89,9 @@ namespace nil {
 
                         // BLS12381G2_XMD:SHA-256_SSWU_RO_
                         constexpr static std::array<std::uint8_t, 31> suite_id = {
-                            0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f, 0x58, 0x4d, 0x44, 0x3a, 0x53,
-                            0x48, 0x41, 0x2d, 0x32, 0x35, 0x36, 0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
+                            0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f,
+                            0x58, 0x4d, 0x44, 0x3a, 0x53, 0x48, 0x41, 0x2d, 0x32, 0x35, 0x36,
+                            0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
                         constexpr static number_type p = curve_type::p;
                         constexpr static std::size_t m = 2;
                         constexpr static std::size_t k = 128;
@@ -100,7 +103,8 @@ namespace nil {
                         /*constexpr*/ static inline field_value_type iso_Ai = field_value_type(0, 240);
                         /*constexpr*/ static inline field_value_type iso_Bi = field_value_type(1012, 1012);
                         /*constexpr*/ static inline field_value_type Z = -field_value_type(2, 1);
-                        constexpr static inline auto h_eff = 0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui636;
+                        constexpr static inline auto h_eff =
+                            0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui636;
                     };
                 }    // namespace detail
             }        // namespace curves

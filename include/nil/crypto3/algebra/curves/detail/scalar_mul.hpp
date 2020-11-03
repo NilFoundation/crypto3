@@ -37,7 +37,8 @@ namespace nil {
                     using namespace boost::multiprecision;
 
                     template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
-                    GroupValueType scalar_mul(const GroupValueType &base, const number<Backend, ExpressionTemplates> &scalar) {
+                    GroupValueType scalar_mul(const GroupValueType &base,
+                                              const number<Backend, ExpressionTemplates> &scalar) {
                         GroupValueType result;
 
                         bool found_one = false;

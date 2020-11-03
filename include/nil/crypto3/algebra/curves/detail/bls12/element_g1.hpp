@@ -30,8 +30,8 @@
 #include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 
-#include <nil/crypto3/algebra/detail/type_traits.hpp>
-#include <nil/crypto3/algebra/detail/literals.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 #include <boost/multiprecision/number.hpp>
 
@@ -628,7 +628,6 @@ namespace nil {
                         typename std::enable_if<boost::is_number<NumberType>::value>::type>
                     element_bls12_g1<ModulusBits, GeneratorBits> operator*(const element_bls12_g1<ModulusBits, GeneratorBits> &left, 
                         const NumberType &right) {
-
                         return scalar_mul(left, right);
                     }
 

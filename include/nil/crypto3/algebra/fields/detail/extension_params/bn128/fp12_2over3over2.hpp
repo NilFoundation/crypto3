@@ -31,7 +31,7 @@
 #include <nil/crypto3/algebra/fields/fp6_3over2.hpp>
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 
-#include <nil/crypto3/algebra/detail/literals.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

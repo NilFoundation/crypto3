@@ -188,7 +188,7 @@ namespace boost {
 }    // namespace boost
 
 // if target == check-algebra just data/curves.json
-const char *test_data = "libs/algebra/test/data/curves.json";
+const char *test_data = "../../../../libs/algebra/test/data/curves.json";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;

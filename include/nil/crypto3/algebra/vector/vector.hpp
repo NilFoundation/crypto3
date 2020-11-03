@@ -27,8 +27,8 @@
 #ifndef CRYPTO3_ALGEBRA_VECTOR_CLASS_HPP
 #define CRYPTO3_ALGEBRA_VECTOR_CLASS_HPP
 
-#include <nil/crypto3/algebra/detail/same_value.hpp>
-#include <nil/crypto3/algebra/detail/assert.hpp>
+#include <nil/crypto3/detail/same_value.hpp>
+#include <nil/crypto3/detail/assert.hpp>
 
 #include <array>
 #include <cstddef>

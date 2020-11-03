@@ -42,23 +42,21 @@ namespace nil {
 
                 template<>
                 struct wnaf_params<typename bn128<254, CHAR_BIT>::g1_type> {
-                    
-                    constexpr static const std::array<std::size_t, 4> 
-                        wnaf_window_table  = {10, 24, 40, 132};
+
+                    constexpr static const std::array<std::size_t, 4> wnaf_window_table = {10, 24, 40, 132};
                 };
 
                 template<>
                 struct wnaf_params<typename bn128<254, CHAR_BIT>::g2_type> {
-                    
-                    constexpr static const std::array<std::size_t, 4> 
-                        wnaf_window_table  = {7, 18, 35, 116};
+
+                    constexpr static const std::array<std::size_t, 4> wnaf_window_table = {7, 18, 35, 116};
                 };
 
                 /************************* BN128-254 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const 
+                constexpr std::array<std::size_t, 4> const
                     wnaf_params<typename bn128<254, CHAR_BIT>::g1_type>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const 
+                constexpr std::array<std::size_t, 4> const
                     wnaf_params<typename bn128<254, CHAR_BIT>::g2_type>::wnaf_window_table;
 
             }    // namespace curves

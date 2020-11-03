@@ -40,8 +40,7 @@ namespace nil {
                 namespace detail {
                     using namespace boost::multiprecision;
 
-                    template<typename GroupType,
-                             typename DstCreator = DefaultDstCreator<typename h2c_suite<GroupType>::hash_type>>
+                    template<typename GroupType>
                     struct ep2_map {
                         typedef h2c_suite<GroupType> suite_type;
 
@@ -56,11 +55,12 @@ namespace nil {
 
                         static_assert(m == 2, "underlying field has wrong extension");
 
-                        template<typename InputType, typename = typename std::enable_if<std::is_same<
-                            std::uint8_t, typename InputType::value_type>::value>::type>
-                        static inline group_value_type hash_to_curve(const InputType &msg,
-                                                                     DstCreator &&dst_creator = DstCreator()) {
-                            auto u = hash_to_field<2>(msg, std::forward<DstCreator>(dst_creator));
+                        template<typename InputType, typename DstType,
+                                 typename = typename std::enable_if<
+                                     std::is_same<std::uint8_t, typename InputType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                        static inline group_value_type hash_to_curve(const InputType &msg, const DstType &dst) {
+                            auto u = hash_to_field<2>(msg, dst);
                             group_value_type Q0 =
                                 map_to_curve::process(u[0], suite_type::iso_Ai, suite_type::iso_Bi, suite_type::Z);
                             group_value_type Q1 =
@@ -68,13 +68,12 @@ namespace nil {
                             return clear_cofactor(Q0 + Q1);
                         }
                         // private:
-                        template<std::size_t N, typename InputType,
-                            typename = typename std::enable_if<std::is_same<
-                                std::uint8_t, typename InputType::value_type>::value>::type>
-                        static inline std::array<field_value_type, N> hash_to_field(
-                            const InputType &msg, DstCreator &&dst_creator = DstCreator()) {
-                            auto dst = dst_creator.get_dst(suite_type::suite_id);
-
+                        template<std::size_t N, typename InputType, typename DstType,
+                                 typename = typename std::enable_if<
+                                     std::is_same<std::uint8_t, typename InputType::value_type>::value &&
+                                     std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                        static inline std::array<field_value_type, N> hash_to_field(const InputType &msg,
+                                                                                    const DstType &dst) {
                             std::array<std::uint8_t, N * m * L> uniform_bytes {0};
                             expand_message::process(N * m * L, msg, dst, uniform_bytes);
 
@@ -103,6 +102,5 @@ namespace nil {
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-
 
 #endif    // CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE2_HPP

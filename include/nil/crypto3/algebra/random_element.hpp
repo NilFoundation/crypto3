@@ -30,16 +30,17 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<typename CurveGroupType, typename = 
-                     typename std::enable_if<::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value && 
-                                             !(::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value)>::type>>
-            typename CurveGroupType::value_type random_element() {
+            template<typename CurveGroupType,
+                     typename = typename std::enable_if<
+                         ::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value &&
+                         !(::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value)>::type>
+                > typename CurveGroupType::value_type random_element() {
                 return CurveGroupType::value_type::one();
             };
 
-            template<typename FieldType, typename = 
-                     typename std::enable_if<::nil::crypto3::algebra::detail::is_field<FieldType>::value>::type>>
-            typename FieldType::value_type random_element() {
+            template<typename FieldType, typename = typename std::enable_if<
+                                             ::nil::crypto3::algebra::detail::is_field<FieldType>::value>::type>
+                > typename FieldType::value_type random_element() {
                 return FieldType::value_type::one();
             };
 

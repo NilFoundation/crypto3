@@ -32,7 +32,7 @@
 #include <nil/crypto3/algebra/fields/bn128/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
 
-#include <nil/crypto3/algebra/detail/literals.hpp>
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

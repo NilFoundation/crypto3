@@ -27,8 +27,8 @@
 #ifndef CRYPTO3_ALGEBRA_SCALAR_MATH_HPP
 #define CRYPTO3_ALGEBRA_SCALAR_MATH_HPP
 
-#include <nil/crypto3/algebra/detail/type_traits.hpp>
-#include <nil/crypto3/algebra/detail/assert.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/detail/assert.hpp>
 
 namespace nil {
     namespace crypto3 {

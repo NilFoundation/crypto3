@@ -85,51 +85,12 @@ namespace nil {
                         using number_type = typename underlying_type::number_type;
 
                         static const number_type two = number_type(2, underlying_type::modulus);
-                        static const number_type zero = number_type(0, underlying_type::modulus);
 
                         number_type sign_0 = e.data[0].data % two;
                         bool zero_0 = e.data[0].data.is_zero();
                         number_type sign_1 = e.data[1].data % two;
                         return static_cast<bool>(sign_0) || (zero_0 && static_cast<bool>(sign_1));
                     }
-
-                    template<typename HashType,
-                             /// HashType::digest_type is required to be uint8_t[]
-                             typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename HashType::digest_type::value_type>::value>::type>
-                    struct DefaultDstCreator {
-                        static_assert((HashType::digest_bits / 8) <= 255, "too long output size of hash function");
-
-                        typedef std::vector<std::uint8_t> dst_type;
-
-                        template<typename InputType,
-                                 typename = typename std::enable_if<
-                                     std::is_same<std::uint8_t, typename InputType::value_type>::value>::type>
-                        inline dst_type get_dst(const InputType &suite_id) {
-                            BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputType>));
-
-                            std::string tag_str = "QUUX-V01-CS02-with-";
-                            std::vector<std::uint8_t> tag(tag_str.begin(), tag_str.end());
-
-                            std::vector<std::uint8_t> dst_raw;
-                            dst_raw.insert(dst_raw.end(), tag.begin(), tag.end());
-                            dst_raw.insert(dst_raw.end(), suite_id.begin(), suite_id.end());
-
-                            std::vector<std::uint8_t> dst;
-                            if (dst_raw.size() > 255) {
-                                std::string large_dst_tag_str = "H2C-OVERSIZE-DST-";
-                                std::vector<std::uint8_t> large_dst_tag(large_dst_tag_str.begin(), large_dst_tag_str.end());
-                                dst_raw.insert(dst_raw.begin(), large_dst_tag.begin(), large_dst_tag.end());
-                                typename HashType::digest_type hashed_dst = hash<HashType>(dst_raw);
-                                std::copy(hashed_dst.begin(), hashed_dst.end(), dst.begin());
-                                dst.insert(dst.end(), hashed_dst.begin(), hashed_dst.end());
-                            }
-                            else {
-                                dst.insert(dst.end(), dst_raw.begin(), dst_raw.end());
-                            }
-                            return dst;
-                        }
-                    };
 
                     template<std::size_t k, typename HashType,
                              /// HashType::digest_type is required to be uint8_t[]
@@ -143,6 +104,8 @@ namespace nil {
 
                         constexpr static std::size_t b_in_bytes = HashType::digest_bits / 8;
                         constexpr static std::size_t r_in_bytes = HashType::block_bits / 8;
+
+                        constexpr static std::array<std::uint8_t, r_in_bytes> Z_pad {0};
 
                     public:
                         template<typename InputMsgType, typename InputDstType, typename OutputType,
@@ -159,10 +122,10 @@ namespace nil {
 
                             // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
                             assert(len_in_bytes < 0x10000);
-                            assert(std::distance(dst.begin(), dst.end()) <= 255);
+                            assert(std::distance(dst.begin(), dst.end()) >= 16 &&
+                                   std::distance(dst.begin(), dst.end()) <= 255);
                             assert(std::distance(uniform_bytes.begin(), uniform_bytes.end()) >= len_in_bytes);
 
-                            static const std::array<std::uint8_t, r_in_bytes> Z_pad {0};
                             const std::array<std::uint8_t, 2> l_i_b_str = {
                                 static_cast<std::uint8_t>(len_in_bytes >> 8u),
                                 static_cast<std::uint8_t>(len_in_bytes % 0x100)};

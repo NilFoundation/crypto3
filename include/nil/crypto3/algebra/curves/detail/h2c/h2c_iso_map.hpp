@@ -118,7 +118,7 @@ namespace nil {
                             field_value_type y_num = field_value_type::zero();
                             field_value_type y_den = field_value_type::zero();
 
-                            std::vector<field_value_type> xi_powers = [&ci](){
+                            std::vector<field_value_type> xi_powers = [&ci]() {
                                 std::vector<field_value_type> xi_powers {field_value_type::one()};
                                 for (std::size_t i = 0; i < 15; i++) {
                                     xi_powers.emplace_back(xi_powers.back() * ci.X);
@@ -153,8 +153,9 @@ namespace nil {
                     };
                     template<typename Fp2CurveGroupElement>
                     void _print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-                        os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
-                           << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
+                        os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data
+                           << " , " << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data
+                           << ")" << std::endl;
                     }
 
                     // 3-isogeny map for BLS12-381 G2
@@ -177,15 +178,13 @@ namespace nil {
                              {{0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71e_cppui381,
                                0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38d_cppui381}},
                              {{0x171d6541fa38ccfaed6dea691f5fb614cb14b4e7f4e810aa22d6108f142b85757098e38d0f671c7188e2aaaaaaaa5ed1_cppui381,
-                               0}}
-                            }};
+                               0}}}};
 
                         constexpr static std::array<std::array<number_type, 2>, 2> k_x_den = {
                             {{{0,
                                0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa63_cppui381}},
                              {{0xc,
-                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa9f_cppui381}}
-                            }};
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa9f_cppui381}}}};
 
                         constexpr static std::array<std::array<number_type, 2>, 4> k_y_num = {
                             {{{0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706_cppui381,
@@ -195,8 +194,7 @@ namespace nil {
                              {{0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71c_cppui381,
                                0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38f_cppui381}},
                              {{0x124c9ad43b6cf79bfbf7043de3811ad0761b0f37a1e26286b0e977c69aa274524e79097a56dc4bd9e1b371c71c718b10_cppui381,
-                               0}}
-                            }};
+                               0}}}};
 
                         constexpr static std::array<std::array<number_type, 2>, 3> k_y_den = {
                             {{{0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb_cppui381,
@@ -204,8 +202,7 @@ namespace nil {
                              {{0,
                                0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa9d3_cppui381}},
                              {{0x12,
-                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa99_cppui381}}
-                            }};
+                               0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa99_cppui381}}}};
 
                     public:
                         static inline group_value_type process(const group_value_type &ci) {
@@ -214,7 +211,7 @@ namespace nil {
                             field_value_type y_num = field_value_type::zero();
                             field_value_type y_den = field_value_type::zero();
 
-                            std::vector<field_value_type> xi_powers = [&ci](){
+                            std::vector<field_value_type> xi_powers = [&ci]() {
                                 std::vector<field_value_type> xi_powers {field_value_type::one()};
                                 for (std::size_t i = 0; i < 3; i++) {
                                     auto v = xi_powers.back();
@@ -225,7 +222,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < k_x_den.size(); i++) {
                                 x_den += field_value_type(k_x_den[i][0], k_x_den[i][1]) * xi_powers[i];
-                           }
+                            }
                             x_den += xi_powers[k_x_den.size()];
 
                             for (std::size_t i = 0; i < k_y_den.size(); i++) {
@@ -248,7 +245,6 @@ namespace nil {
                             return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
                         }
                     };
-
 
                 }    // namespace detail
             }        // namespace curves
