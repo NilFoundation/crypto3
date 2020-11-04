@@ -104,6 +104,8 @@ namespace nil {
                 }
                 ///@}
 
+            private:
+                
                 T arrays[N][M];    ///< @private
             };
 

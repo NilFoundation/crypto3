@@ -38,8 +38,6 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                using namespace algebra;
-
                 template<std::size_t ModulusBits>
                 struct alt_bn128 {
 

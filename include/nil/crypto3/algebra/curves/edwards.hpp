@@ -31,14 +31,12 @@
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/edwards.hpp>
+//#include <nil/crypto3/algebra/pairing/edwards.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-
-                using namespace algebra;
 
                 template<std::size_t ModulusBits>
                 struct edwards {
@@ -59,7 +57,7 @@ namespace nil {
                     typedef typename detail::edwards_g1<ModulusBits> g1_type;
                     typedef typename detail::edwards_g2<ModulusBits> g2_type;
 
-                    typedef typename pairing::pairing_policy<edwards<ModulusBits>> pairing_policy;
+                    //typedef typename pairing::pairing_policy<edwards<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
 

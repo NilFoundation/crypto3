@@ -43,8 +43,6 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                using namespace nil::crypto3::algebra;
-
                 /*
                     The curve equation for a BN curve is:
 

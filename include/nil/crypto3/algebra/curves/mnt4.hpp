@@ -31,14 +31,12 @@
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
 
-#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+//#include <nil/crypto3/algebra/pairing/mnt4.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-
-                using namespace nil::crypto3::algebra;
 
                 template<std::size_t ModulusBits>
                 struct mnt4 {
@@ -59,7 +57,7 @@ namespace nil {
                     typedef typename detail::mnt4_g1<ModulusBits> g1_type;
                     typedef typename detail::mnt4_g2<ModulusBits> g2_type;
 
-                    typedef typename pairing::pairing_policy<mnt4<ModulusBits>> pairing_policy;
+                    //typedef typename pairing::pairing_policy<mnt4<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
 
