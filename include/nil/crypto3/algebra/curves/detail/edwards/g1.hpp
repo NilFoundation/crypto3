@@ -34,12 +34,18 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+
+                template<std::size_t ModulusBits>
+                struct edwards;
+
                 namespace detail {
 
                     template<std::size_t ModulusBits>
                     struct edwards_g1 {
 
                         using policy_type = edwards_basic_policy<ModulusBits>;
+
+                        using curve_type = edwards<ModulusBits>;
 
                         using underlying_field_type = typename policy_type::g1_field_type;
 

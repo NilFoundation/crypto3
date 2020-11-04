@@ -40,7 +40,7 @@ namespace nil {
 
                 using namespace algebra;
 
-                template<std::size_t ModulusBits = 254>
+                template<std::size_t ModulusBits>
                 struct alt_bn128 {
 
                     using policy_type = detail::alt_bn128_basic_policy<ModulusBits>;
@@ -64,14 +64,7 @@ namespace nil {
                     typedef typename policy_type::gt_field_type gt_type;
                 };
 
-                template<std::size_t ModulusBits = 254>
-                using alt_bn128_g1 = typename alt_bn128<ModulusBits>::g1_type;
-
-                template<std::size_t ModulusBits = 254>
-                using alt_bn128_g2 = typename alt_bn128<ModulusBits>::g2_type;
-
-                template<std::size_t ModulusBits = 254>
-                using alt_bn128_gt = typename alt_bn128<ModulusBits>::gt_type;
+                typedef alt_bn128<254> alt_bn128_254;
 
             }    // namespace curves
         }        // namespace algebra
