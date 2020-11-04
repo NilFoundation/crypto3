@@ -26,44 +26,37 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_POLICY_HPP
 
-#include <nil/crypto3/algebra/pairing/detail/bls12/basic_policy.hpp>
-#include <nil/crypto3/algebra/pairing/detail/bls12/functions.hpp>
-#include <nil/crypto3/algebra/pairing/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
+                
                 template<std::size_t ModulusBits>
                 struct bls12;
+
             }    // namespace curves
             namespace pairing {
 
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy;
 
-                using namespace nil::crypto3::algebra;
-
                 template<std::size_t ModulusBits, typename PairingFunctions>
                 class pairing_policy<curves::bls12<ModulusBits>, PairingFunctions>{
                     using policy_type = PairingFunctions;
-                    using basic_policy = detail::bls12_basic_policy<ModulusBits>;
 
                 public:
-                    using number_type = typename basic_policy::number_type;
+                    using number_type = typename policy_type::number_type;
 
-                    constexpr static const typename basic_policy::number_type pairing_loop_count =
-                        basic_policy::ate_loop_count;
+                    constexpr static const typename policy_type::number_type pairing_loop_count =
+                        policy_type::ate_loop_count;
 
-                    using Fp_type = typename basic_policy::Fp_field;
-                    using G1_type = typename basic_policy::g1;
-                    using G2_type = typename basic_policy::g2;
-                    using Fq_type = typename basic_policy::Fq_field;
-                    using Fqe_type = typename basic_policy::Fqe_field;
-                    using Fqk_type = typename basic_policy::Fqk_field;
-                    using GT_type = typename basic_policy::gt;
+                    using Fp_type = typename policy_type::Fp_field;
+                    using G1_type = typename policy_type::g1;
+                    using G2_type = typename policy_type::g2;
+                    using Fq_type = typename policy_type::Fq_field;
+                    using Fqe_type = typename policy_type::Fqe_field;
+                    using Fqk_type = typename policy_type::Fqk_field;
+                    using GT_type = typename policy_type::gt;
 
                     using G1_precomp = typename policy_type::g1_precomp;
                     using G2_precomp = typename policy_type::g2_precomp;

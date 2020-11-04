@@ -31,7 +31,8 @@
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g2.hpp>
 
-//#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/detail/mnt4/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -57,7 +58,8 @@ namespace nil {
                     typedef typename detail::mnt4_g1<ModulusBits> g1_type;
                     typedef typename detail::mnt4_g2<ModulusBits> g2_type;
 
-                    //typedef typename pairing::pairing_policy<mnt4<ModulusBits>> pairing_policy;
+                    typedef typename pairing::pairing_policy<mnt4<ModulusBits>, 
+                        pairing::detail::mnt4_pairing_functions<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
 

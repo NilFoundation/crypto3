@@ -40,6 +40,7 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 using namespace nil::crypto3::algebra::pairing;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {

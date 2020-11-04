@@ -38,8 +38,6 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
-
                     template<std::size_t ModulusBits = 298>
                     class mnt6_pairing_functions;
 
@@ -54,6 +52,14 @@ namespace nil {
                         using g1 = typename policy_type::g1;
                         using g2 = typename policy_type::g2;
 
+                        using Fp_field = typename policy_type::Fp_field;
+                        using Fq_field = typename policy_type::Fq_field;
+                        using Fqe_field = typename policy_type::Fqe_field;
+                        using Fqk_field = typename policy_type::Fqk_field;
+
+                        constexpr static const typename policy_type::number_type ate_loop_count =
+                        policy_type::ate_loop_count;
+                        
                         struct affine_ate_g1_precomputation {
                             Fq PX;
                             Fq PY;
