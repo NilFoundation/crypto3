@@ -144,16 +144,11 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename x962_p_v2_scalar_field<192>::modulus_type const
-                    x962_p_v2_scalar_field<192>::modulus;
-                constexpr typename x962_p_v3_scalar_field<192>::modulus_type const
-                    x962_p_v3_scalar_field<192>::modulus;
-                constexpr typename x962_p_v1_scalar_field<239>::modulus_type const
-                    x962_p_v1_scalar_field<239>::modulus;
-                constexpr typename x962_p_v2_scalar_field<239>::modulus_type const
-                    x962_p_v2_scalar_field<239>::modulus;
-                constexpr typename x962_p_v3_scalar_field<239>::modulus_type const
-                    x962_p_v3_scalar_field<239>::modulus;
+                constexpr typename x962_p_v2_scalar_field<192>::modulus_type const x962_p_v2_scalar_field<192>::modulus;
+                constexpr typename x962_p_v3_scalar_field<192>::modulus_type const x962_p_v3_scalar_field<192>::modulus;
+                constexpr typename x962_p_v1_scalar_field<239>::modulus_type const x962_p_v1_scalar_field<239>::modulus;
+                constexpr typename x962_p_v2_scalar_field<239>::modulus_type const x962_p_v2_scalar_field<239>::modulus;
+                constexpr typename x962_p_v3_scalar_field<239>::modulus_type const x962_p_v3_scalar_field<239>::modulus;
 
                 template<std::size_t ModulusBits = 192>
                 using x962_p_v2_fr = x962_p_v2_scalar_field_field<ModulusBits>;

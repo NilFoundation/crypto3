@@ -134,17 +134,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<edwards_base_field<183>>::modulus_type const
                     arithmetic_params<edwards_base_field<183>>::t;
-                constexpr
-                    typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
-                        arithmetic_params<fp3<edwards_base_field<183>>>::t;
+                constexpr typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
+                    arithmetic_params<fp3<edwards_base_field<183>>>::t;
                 constexpr typename arithmetic_params<edwards_scalar_field<183>>::modulus_type const
                     arithmetic_params<edwards_scalar_field<183>>::t;
 
                 constexpr typename arithmetic_params<edwards_base_field<183>>::modulus_type const
                     arithmetic_params<edwards_base_field<183>>::t_minus_1_over_2;
-                constexpr
-                    typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
-                        arithmetic_params<fp3<edwards_base_field<183>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
+                    arithmetic_params<fp3<edwards_base_field<183>>>::t_minus_1_over_2;
                 constexpr typename arithmetic_params<edwards_scalar_field<183>>::modulus_type const
                     arithmetic_params<edwards_scalar_field<183>>::t_minus_1_over_2;
 
@@ -170,15 +168,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<edwards_base_field<183>>::modulus_type const
                     arithmetic_params<edwards_base_field<183>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp3<edwards_base_field<183>>>::modulus_type,
-                                     3> const arithmetic_params<fp3<edwards_base_field<183>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp3<edwards_base_field<183>>>::modulus_type, 3> const
+                    arithmetic_params<fp3<edwards_base_field<183>>>::nqr;
                 constexpr typename arithmetic_params<edwards_scalar_field<183>>::modulus_type const
                     arithmetic_params<edwards_scalar_field<183>>::nqr;
 
                 constexpr typename arithmetic_params<edwards_base_field<183>>::modulus_type const
                     arithmetic_params<edwards_base_field<183>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp3<edwards_base_field<183>>>::modulus_type,
-                                     3> const arithmetic_params<fp3<edwards_base_field<183>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp3<edwards_base_field<183>>>::modulus_type, 3> const
+                    arithmetic_params<fp3<edwards_base_field<183>>>::nqr_to_t;
                 constexpr typename arithmetic_params<edwards_scalar_field<183>>::modulus_type const
                     arithmetic_params<edwards_scalar_field<183>>::nqr_to_t;
 
@@ -201,9 +199,8 @@ namespace nil {
 
                 constexpr typename arithmetic_params<edwards_base_field<183>>::modulus_type const
                     arithmetic_params<edwards_base_field<183>>::group_order;
-                constexpr
-                    typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
-                        arithmetic_params<fp3<edwards_base_field<183>>>::group_order;
+                constexpr typename arithmetic_params<fp3<edwards_base_field<183>>>::extended_modulus_type const
+                    arithmetic_params<fp3<edwards_base_field<183>>>::group_order;
                 constexpr typename arithmetic_params<edwards_scalar_field<183>>::modulus_type const
                     arithmetic_params<edwards_scalar_field<183>>::group_order;
 

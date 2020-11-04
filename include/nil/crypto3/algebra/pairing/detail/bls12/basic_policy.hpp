@@ -116,15 +116,15 @@ namespace nil {
                         constexpr static const bool final_exponent_is_z_neg = false;
                     };
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::ate_loop_count;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::ate_loop_count;
+                    constexpr
+                        typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::ate_loop_count;
+                    constexpr
+                        typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::ate_loop_count;
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::final_exponent_z;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::final_exponent_z;
+                    constexpr
+                        typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::final_exponent_z;
+                    constexpr
+                        typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::final_exponent_z;
 
                     constexpr bool const bls12_basic_policy<381>::final_exponent_is_z_neg;
                     constexpr bool const bls12_basic_policy<377>::final_exponent_is_z_neg;

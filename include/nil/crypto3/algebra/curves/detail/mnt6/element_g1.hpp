@@ -301,7 +301,7 @@ namespace nil {
                             element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_a_c1 =
                             element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_a_c2 = 
+                        static const g1_field_type_value twist_mul_by_a_c2 =
                             element_mnt6_g1<ModulusBits>::a; static const g1_field_type_value twist_mul_by_b_c0 =
                             element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_b_c1 =

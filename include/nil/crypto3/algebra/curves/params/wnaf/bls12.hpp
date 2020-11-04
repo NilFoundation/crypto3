@@ -68,17 +68,13 @@ namespace nil {
 
                 /************************* BLS12-381 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<381>::g1_type>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<381>::g2_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bls12<381>::g1_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bls12<381>::g2_type>::wnaf_window_table;
 
                 /************************* BLS12-377 definitions ***********************************/
 
-                constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<377>::g1_type>::wnaf_window_table;
-                constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<377>::g2_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bls12<377>::g1_type>::wnaf_window_table;
+                constexpr std::array<std::size_t, 4> const wnaf_params<typename bls12<377>::g2_type>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

@@ -70,21 +70,17 @@ namespace nil {
                             0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
                     };
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const
-                        mnt6_basic_policy<298>::a;
+                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::a;
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const
-                        mnt6_basic_policy<298>::b;
+                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::b;
 
                     constexpr typename std::size_t const mnt6_basic_policy<298>::base_field_bits;
 
                     constexpr typename std::size_t const mnt6_basic_policy<298>::scalar_field_bits;
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const
-                        mnt6_basic_policy<298>::p;
+                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::p;
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const
-                        mnt6_basic_policy<298>::q;
+                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::q;
 
                 }    // namespace detail
             }        // namespace curves

@@ -79,19 +79,17 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr
-                        typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
-                            fp4_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
+                    constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
+                        fp4_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
-                    constexpr
-                        typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
-                            fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus;
+                    constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
+                        fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
-                        4> const fp4_extension_params<mnt4_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
+                                         4> const
+                        fp4_extension_params<mnt4_base_field<ModulusBits>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

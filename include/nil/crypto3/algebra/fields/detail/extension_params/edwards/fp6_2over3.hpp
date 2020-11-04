@@ -84,21 +84,17 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp6_2over3_extension_params<
-                        edwards_base_field<ModulusBits>>::modulus_type const
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type const
                         fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp6_2over3_extension_params<
-                        edwards_base_field<ModulusBits>>::modulus_type const
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type const
                         fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp6_2over3_extension_params<
-                                             edwards_base_field<ModulusBits>>::modulus_type,
-                                         6> const
-                        fp6_2over3_extension_params<
-                            edwards_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type, 6> const
+                        fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

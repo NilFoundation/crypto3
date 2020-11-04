@@ -66,8 +66,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename frp_v1_scalar_field<256>::modulus_type const
-                    frp_v1_scalar_field<256>::modulus;
+                constexpr typename frp_v1_scalar_field<256>::modulus_type const frp_v1_scalar_field<256>::modulus;
 
                 template<std::size_t ModulusBits = 256>
                 using frp_v1_fr = frp_v1_scalar_field<ModulusBits>;

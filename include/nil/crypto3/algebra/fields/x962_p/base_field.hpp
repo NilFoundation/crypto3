@@ -144,16 +144,11 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename x962_p_v2_base_field<192>::modulus_type const
-                    x962_p_v2_base_field<192>::modulus;
-                constexpr typename x962_p_v3_base_field<192>::modulus_type const
-                    x962_p_v3_base_field<192>::modulus;
-                constexpr typename x962_p_v1_base_field<239>::modulus_type const
-                    x962_p_v1_base_field<239>::modulus;
-                constexpr typename x962_p_v2_base_field<239>::modulus_type const
-                    x962_p_v2_base_field<239>::modulus;
-                constexpr typename x962_p_v3_base_field<239>::modulus_type const
-                    x962_p_v3_base_field<239>::modulus;
+                constexpr typename x962_p_v2_base_field<192>::modulus_type const x962_p_v2_base_field<192>::modulus;
+                constexpr typename x962_p_v3_base_field<192>::modulus_type const x962_p_v3_base_field<192>::modulus;
+                constexpr typename x962_p_v1_base_field<239>::modulus_type const x962_p_v1_base_field<239>::modulus;
+                constexpr typename x962_p_v2_base_field<239>::modulus_type const x962_p_v2_base_field<239>::modulus;
+                constexpr typename x962_p_v3_base_field<239>::modulus_type const x962_p_v3_base_field<239>::modulus;
 
                 template<std::size_t ModulusBits = 192>
                 using x962_p_v2_fq = x962_p_v2_base_field<ModulusBits>;

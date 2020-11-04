@@ -173,20 +173,20 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename brainpool_r1_base_field<160>::modulus_type const
-                    brainpool_r1_base_field<160>::modulus;
-                constexpr typename brainpool_r1_base_field<192>::modulus_type const
-                    brainpool_r1_base_field<192>::modulus;
-                constexpr typename brainpool_r1_base_field<224>::modulus_type const
-                    brainpool_r1_base_field<224>::modulus;
-                constexpr typename brainpool_r1_base_field<256>::modulus_type const
-                    brainpool_r1_base_field<256>::modulus;
-                constexpr typename brainpool_r1_base_field<320>::modulus_type const
-                    brainpool_r1_base_field<320>::modulus;
-                constexpr typename brainpool_r1_base_field<384>::modulus_type const
-                    brainpool_r1_base_field<384>::modulus;
-                constexpr typename brainpool_r1_base_field<512>::modulus_type const
-                    brainpool_r1_base_field<512>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<160>::modulus_type const brainpool_r1_base_field<160>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<192>::modulus_type const brainpool_r1_base_field<192>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<224>::modulus_type const brainpool_r1_base_field<224>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<256>::modulus_type const brainpool_r1_base_field<256>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<320>::modulus_type const brainpool_r1_base_field<320>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<384>::modulus_type const brainpool_r1_base_field<384>::modulus;
+                constexpr
+                    typename brainpool_r1_base_field<512>::modulus_type const brainpool_r1_base_field<512>::modulus;
 
                 template<std::size_t ModulusBits = 160>
                 using brainpool_r1_fq = brainpool_r1_base_field<ModulusBits>;

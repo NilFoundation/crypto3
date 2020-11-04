@@ -72,8 +72,7 @@ namespace nil {
 
                 constexpr typename std::size_t const mnt4_scalar_field<298>::value_bits;
 
-                constexpr typename mnt4_scalar_field<298>::modulus_type const
-                    mnt4_scalar_field<298>::modulus;
+                constexpr typename mnt4_scalar_field<298>::modulus_type const mnt4_scalar_field<298>::modulus;
 
                 template<std::size_t ModulusBits = 298>
                 using mnt4_fr = mnt4_scalar_field<ModulusBits>;

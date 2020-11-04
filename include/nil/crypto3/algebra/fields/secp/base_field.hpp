@@ -195,22 +195,14 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename secp_k1_base_field<160>::modulus_type const
-                    secp_k1_base_field<160>::modulus;
-                constexpr typename secp_r1_base_field<160>::modulus_type const
-                    secp_r1_base_field<160>::modulus;
-                constexpr typename secp_r2_base_field<160>::modulus_type const
-                    secp_r2_base_field<160>::modulus;
-                constexpr typename secp_k1_base_field<192>::modulus_type const
-                    secp_k1_base_field<192>::modulus;
-                constexpr typename secp_r1_base_field<192>::modulus_type const
-                    secp_r1_base_field<192>::modulus;
-                constexpr typename secp_k1_base_field<224>::modulus_type const
-                    secp_k1_base_field<224>::modulus;
-                constexpr typename secp_r1_base_field<224>::modulus_type const
-                    secp_r1_base_field<224>::modulus;
-                constexpr typename secp_k1_base_field<256>::modulus_type const
-                    secp_k1_base_field<256>::modulus;
+                constexpr typename secp_k1_base_field<160>::modulus_type const secp_k1_base_field<160>::modulus;
+                constexpr typename secp_r1_base_field<160>::modulus_type const secp_r1_base_field<160>::modulus;
+                constexpr typename secp_r2_base_field<160>::modulus_type const secp_r2_base_field<160>::modulus;
+                constexpr typename secp_k1_base_field<192>::modulus_type const secp_k1_base_field<192>::modulus;
+                constexpr typename secp_r1_base_field<192>::modulus_type const secp_r1_base_field<192>::modulus;
+                constexpr typename secp_k1_base_field<224>::modulus_type const secp_k1_base_field<224>::modulus;
+                constexpr typename secp_r1_base_field<224>::modulus_type const secp_r1_base_field<224>::modulus;
+                constexpr typename secp_k1_base_field<256>::modulus_type const secp_k1_base_field<256>::modulus;
 
                 template<std::size_t ModulusBits = 160>
                 using secp_k1_fq = secp_k1_base_field<ModulusBits>;

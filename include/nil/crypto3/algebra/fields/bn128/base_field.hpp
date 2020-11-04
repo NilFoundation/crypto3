@@ -72,8 +72,7 @@ namespace nil {
 
                 constexpr typename std::size_t const bn128_base_field<254>::value_bits;
 
-                constexpr typename bn128_base_field<254>::modulus_type const
-                    bn128_base_field<254>::modulus;
+                constexpr typename bn128_base_field<254>::modulus_type const bn128_base_field<254>::modulus;
 
                 template<std::size_t ModulusBits = 254>
                 using bn128_fq = bn128_base_field<ModulusBits>;

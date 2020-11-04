@@ -177,12 +177,10 @@ namespace nil {
                 };
 
                 template<std::size_t ModulusBits>
-                constexpr typename modp_ietf<ModulusBits>::modulus_type const
-                    modp_ietf<ModulusBits>::modulus;
+                constexpr typename modp_ietf<ModulusBits>::modulus_type const modp_ietf<ModulusBits>::modulus;
 
                 template<std::size_t ModulusBits>
-                constexpr typename modp_ietf<ModulusBits>::modulus_type const
-                    modp_ietf<ModulusBits>::mul_generator;
+                constexpr typename modp_ietf<ModulusBits>::modulus_type const modp_ietf<ModulusBits>::mul_generator;
 
                 constexpr typename modp_ietf<1024>::modulus_type const modp_ietf<1024>::modulus;
                 constexpr typename modp_ietf<1536>::modulus_type const modp_ietf<1536>::modulus;
@@ -192,20 +190,13 @@ namespace nil {
                 constexpr typename modp_ietf<6144>::modulus_type const modp_ietf<6144>::modulus;
                 constexpr typename modp_ietf<8192>::modulus_type const modp_ietf<8192>::modulus;
 
-                constexpr
-                    typename modp_ietf<1024>::modulus_type const modp_ietf<1024>::mul_generator;
-                constexpr
-                    typename modp_ietf<1536>::modulus_type const modp_ietf<1536>::mul_generator;
-                constexpr
-                    typename modp_ietf<2048>::modulus_type const modp_ietf<2048>::mul_generator;
-                constexpr
-                    typename modp_ietf<3072>::modulus_type const modp_ietf<3072>::mul_generator;
-                constexpr
-                    typename modp_ietf<4096>::modulus_type const modp_ietf<4096>::mul_generator;
-                constexpr
-                    typename modp_ietf<6144>::modulus_type const modp_ietf<6144>::mul_generator;
-                constexpr
-                    typename modp_ietf<8192>::modulus_type const modp_ietf<8192>::mul_generator;
+                constexpr typename modp_ietf<1024>::modulus_type const modp_ietf<1024>::mul_generator;
+                constexpr typename modp_ietf<1536>::modulus_type const modp_ietf<1536>::mul_generator;
+                constexpr typename modp_ietf<2048>::modulus_type const modp_ietf<2048>::mul_generator;
+                constexpr typename modp_ietf<3072>::modulus_type const modp_ietf<3072>::mul_generator;
+                constexpr typename modp_ietf<4096>::modulus_type const modp_ietf<4096>::mul_generator;
+                constexpr typename modp_ietf<6144>::modulus_type const modp_ietf<6144>::mul_generator;
+                constexpr typename modp_ietf<8192>::modulus_type const modp_ietf<8192>::mul_generator;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

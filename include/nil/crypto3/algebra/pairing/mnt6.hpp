@@ -46,8 +46,7 @@ namespace nil {
                 using namespace nil::crypto3::algebra;
 
                 template<std::size_t ModulusBits>
-                class pairing_policy<curves::mnt6<ModulusBits>>
-                    : public detail::mnt6_pairing_functions<ModulusBits> {
+                class pairing_policy<curves::mnt6<ModulusBits>> : public detail::mnt6_pairing_functions<ModulusBits> {
                     using policy_type = detail::mnt6_pairing_functions<ModulusBits>;
                     using basic_policy = detail::mnt6_basic_policy<ModulusBits>;
 

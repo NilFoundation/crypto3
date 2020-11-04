@@ -37,7 +37,7 @@ namespace nil {
 
                 template<std::size_t ModulusBits>
                 struct edwards;
-                
+
                 namespace detail {
 
                     template<std::size_t ModulusBits>

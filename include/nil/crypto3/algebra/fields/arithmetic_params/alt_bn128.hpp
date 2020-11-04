@@ -40,8 +40,7 @@ namespace nil {
             namespace fields {
 
                 template<>
-                struct arithmetic_params<alt_bn128_base_field<254>>
-                    : public params<alt_bn128_base_field<254>> {
+                struct arithmetic_params<alt_bn128_base_field<254>> : public params<alt_bn128_base_field<254>> {
                 private:
                     typedef params<alt_bn128_base_field<254>> policy_type;
 
@@ -73,8 +72,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<fp2<alt_bn128_base_field<254>>>
-                    : public params<alt_bn128_base_field<254>> {
+                struct arithmetic_params<fp2<alt_bn128_base_field<254>>> : public params<alt_bn128_base_field<254>> {
                 private:
                     typedef params<alt_bn128_base_field<254>> policy_type;
 
@@ -99,8 +97,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<alt_bn128_scalar_field<254>>
-                    : public params<alt_bn128_scalar_field<254>> {
+                struct arithmetic_params<alt_bn128_scalar_field<254>> : public params<alt_bn128_scalar_field<254>> {
                 private:
                     typedef params<alt_bn128_scalar_field<254>> policy_type;
 
@@ -137,17 +134,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<alt_bn128_base_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_base_field<254>>::t;
-                constexpr
-                    typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
-                        arithmetic_params<fp2<alt_bn128_base_field<254>>>::t;
+                constexpr typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
+                    arithmetic_params<fp2<alt_bn128_base_field<254>>>::t;
                 constexpr typename arithmetic_params<alt_bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_scalar_field<254>>::t;
 
                 constexpr typename arithmetic_params<alt_bn128_base_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_base_field<254>>::t_minus_1_over_2;
-                constexpr
-                    typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
-                        arithmetic_params<fp2<alt_bn128_base_field<254>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
+                    arithmetic_params<fp2<alt_bn128_base_field<254>>>::t_minus_1_over_2;
                 constexpr typename arithmetic_params<alt_bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_scalar_field<254>>::t_minus_1_over_2;
 
@@ -173,15 +168,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<alt_bn128_base_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_base_field<254>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<alt_bn128_base_field<254>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<alt_bn128_base_field<254>>>::nqr;
                 constexpr typename arithmetic_params<alt_bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_scalar_field<254>>::nqr;
 
                 constexpr typename arithmetic_params<alt_bn128_base_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_base_field<254>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<alt_bn128_base_field<254>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<alt_bn128_base_field<254>>>::nqr_to_t;
                 constexpr typename arithmetic_params<alt_bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_scalar_field<254>>::nqr_to_t;
 
@@ -204,9 +199,8 @@ namespace nil {
 
                 constexpr typename arithmetic_params<alt_bn128_base_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_base_field<254>>::group_order;
-                constexpr
-                    typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
-                        arithmetic_params<fp2<alt_bn128_base_field<254>>>::group_order;
+                constexpr typename arithmetic_params<fp2<alt_bn128_base_field<254>>>::extended_modulus_type const
+                    arithmetic_params<fp2<alt_bn128_base_field<254>>>::group_order;
                 constexpr typename arithmetic_params<alt_bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<alt_bn128_scalar_field<254>>::group_order;
 

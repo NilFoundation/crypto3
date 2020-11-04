@@ -47,8 +47,7 @@ namespace nil {
                     /************************* BLS12-381 ***********************************/
 
                     template<>
-                    class fp12_2over3over2_extension_params<fields::bls12<381>>
-                        : public params<fields::bls12<381>> {
+                    class fp12_2over3over2_extension_params<fields::bls12<381>> : public params<fields::bls12<381>> {
 
                         typedef fields::bls12<381> base_field_type;
                         typedef params<base_field_type> policy_type;
@@ -124,8 +123,7 @@ namespace nil {
                     /************************* BLS12-377 ***********************************/
 
                     template<>
-                    class fp12_2over3over2_extension_params<fields::bls12<377>>
-                        : public params<fields::bls12<377>> {
+                    class fp12_2over3over2_extension_params<fields::bls12<377>> : public params<fields::bls12<377>> {
 
                         typedef fields::bls12<377> base_field_type;
                         typedef params<base_field_type> policy_type;
@@ -198,19 +196,17 @@ namespace nil {
                     };
 
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type,
-                        2> const fp12_2over3over2_extension_params<bls12_base_field<381>>::non_residue;
+                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type, 2> const
+                        fp12_2over3over2_extension_params<bls12_base_field<381>>::non_residue;
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type,
-                        2> const fp12_2over3over2_extension_params<bls12_base_field<377>>::non_residue;
+                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type, 2> const
+                        fp12_2over3over2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type,
-                        12 * 2> const
+                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type, 12 * 2> const
                         fp12_2over3over2_extension_params<bls12_base_field<381>>::Frobenius_coeffs_c1;
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type,
-                        12 * 2> const
+                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type, 12 * 2> const
                         fp12_2over3over2_extension_params<bls12_base_field<377>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields

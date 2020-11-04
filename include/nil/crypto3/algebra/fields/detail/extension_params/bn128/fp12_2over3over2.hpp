@@ -84,17 +84,15 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp12_2over3over2_extension_params<
-                                             bn128_base_field<ModulusBits>>::modulus_type,
-                                         2> const
-                        fp12_2over3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue;
+                    constexpr std::array<
+                        typename fp12_2over3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type,
+                        2> const fp12_2over3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp12_2over3over2_extension_params<
-                                             bn128_base_field<ModulusBits>>::modulus_type,
-                                         12 * 2> const
-                        fp12_2over3over2_extension_params<
-                            bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<
+                        typename fp12_2over3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type,
+                        12 * 2> const
+                        fp12_2over3over2_extension_params<bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

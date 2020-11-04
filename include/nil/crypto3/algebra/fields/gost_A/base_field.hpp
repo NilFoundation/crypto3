@@ -66,8 +66,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename gost_A_base_field<256>::modulus_type const
-                    gost_A_base_field<256>::modulus;
+                constexpr typename gost_A_base_field<256>::modulus_type const gost_A_base_field<256>::modulus;
 
                 template<std::size_t ModulusBits = 256>
                 using gost_A_fq = gost_A_base_field<ModulusBits>;

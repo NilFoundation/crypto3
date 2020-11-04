@@ -44,9 +44,8 @@ namespace nil {
                         constexpr static const modulus_type modulus = policy_type::modulus;
 
                     public:
-
                         using field_type = typename policy_type::field_type;
-                        
+
                         /*constexpr static*/ typename policy_type::non_residue_type non_residue =
                             typename policy_type::non_residue_type(policy_type::non_residue);
 

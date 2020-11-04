@@ -92,15 +92,11 @@ namespace nil {
                         constexpr static const number_type b = number_type(0x01);
                     };
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::a;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::a;
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::a;
+                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::a;
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::b;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::b;
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::b;
+                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::b;
 
                     constexpr typename std::size_t const bls12_basic_policy<381>::base_field_bits;
                     constexpr typename std::size_t const bls12_basic_policy<377>::base_field_bits;
@@ -108,15 +104,11 @@ namespace nil {
                     constexpr typename std::size_t const bls12_basic_policy<381>::scalar_field_bits;
                     constexpr typename std::size_t const bls12_basic_policy<377>::scalar_field_bits;
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::p;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::p;
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::p;
+                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::p;
 
-                    constexpr typename bls12_basic_policy<381>::number_type const
-                        bls12_basic_policy<381>::q;
-                    constexpr typename bls12_basic_policy<377>::number_type const
-                        bls12_basic_policy<377>::q;
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::q;
+                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::q;
 
                 }    // namespace detail
             }        // namespace curves
