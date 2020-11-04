@@ -38,7 +38,6 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-//#include <nil/crypto3/algebra/curves/bn128.hpp>
 // #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 // #include <nil/crypto3/algebra/curves/frp_v1.hpp>
@@ -79,12 +78,6 @@ void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroupElement 
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            /*template<>
-            struct print_log_value<typename curves::bn128<254>::g1_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bn128<254>::g1_type::value_type const &e) {
-                    print_fp_curve_group_element(os, e);
-                }
-            };*/
 
             template<>
             struct print_log_value<typename curves::edwards<183>::g1_type::value_type> {
@@ -134,13 +127,6 @@ namespace boost {
                     print_fp2_curve_group_element(os, e);
                 }
             };
-
-            /*template<>
-            struct print_log_value<typename curves::bn128<254>::g2_type::value_type> {
-                void operator()(std::ostream &os, typename curves::bn128<254>::g2_type::value_type const &e) {
-                    print_fp2_curve_group_element(os, e);
-                }
-            };*/
 
             template<>
             struct print_log_value<typename curves::bls12<381>::g2_type::value_type> {
@@ -322,12 +308,6 @@ void curve_operation_test(const TestSet &test_set,
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-/*BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g1, string_data("curve_operation_test_bn128_g1"), data_set) {
-    using policy_type = curves::bn128<254>::g1_type;
-
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
-}*/
-
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
 
@@ -351,12 +331,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_
 
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
-
-/*BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g2, string_data("curve_operation_test_bn128_g2"), data_set) {
-    using policy_type = curves::bn128<254>::g2_type;
-
-    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
-}*/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;
