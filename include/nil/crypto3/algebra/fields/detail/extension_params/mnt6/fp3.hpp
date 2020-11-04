@@ -37,9 +37,7 @@ namespace nil {
             namespace fields {
 
                     template<typename BaseField>
-                    struct fp3;
-                    
-                namespace detail {
+                    struct fp3;                namespace detail {
 
                     using namespace nil::crypto3::algebra;
 
@@ -48,11 +46,11 @@ namespace nil {
 
                     /************************* MNT6 ***********************************/
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    class fp3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
-                        : public params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> {
+                    template<std::size_t ModulusBits>
+                    class fp3_extension_params<fields::mnt6_base_field<ModulusBits>>
+                        : public params<fields::mnt6_base_field<ModulusBits>> {
 
-                        typedef fields::mnt6_base_field<ModulusBits, GeneratorBits> base_field_type;
+                        typedef fields::mnt6_base_field<ModulusBits> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -102,49 +100,49 @@ namespace nil {
                         constexpr static const modulus_type non_residue = modulus_type(0x05);
                     };
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr
-                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                            fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::non_residue;
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type const
+                            fp3_extension_params<mnt6_base_field<ModulusBits>>::non_residue;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr
-                        typename std::size_t const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::s;
+                        typename std::size_t const fp3_extension_params<mnt6_base_field<ModulusBits>>::s;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr typename fp3_extension_params<
-                        mnt6_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
-                        fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::t;
+                        mnt6_base_field<ModulusBits>>::extended_modulus_type const
+                        fp3_extension_params<mnt6_base_field<ModulusBits>>::t;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr typename fp3_extension_params<
-                        mnt6_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
-                        fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::t_minus_1_over_2;
+                        mnt6_base_field<ModulusBits>>::extended_modulus_type const
+                        fp3_extension_params<mnt6_base_field<ModulusBits>>::t_minus_1_over_2;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr std::array<
-                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                        3> const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::nqr;
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type,
+                        3> const fp3_extension_params<mnt6_base_field<ModulusBits>>::nqr;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr std::array<
-                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                        3> const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::nqr_to_t;
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type,
+                        3> const fp3_extension_params<mnt6_base_field<ModulusBits>>::nqr_to_t;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr typename fp3_extension_params<
-                        mnt6_base_field<ModulusBits, GeneratorBits>>::extended_modulus_type const
-                        fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::group_order;
+                        mnt6_base_field<ModulusBits>>::extended_modulus_type const
+                        fp3_extension_params<mnt6_base_field<ModulusBits>>::group_order;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr
-                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                            fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus;
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type const
+                            fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr std::array<
-                        typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type,
-                        3> const fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                        typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type,
+                        3> const fp3_extension_params<mnt6_base_field<ModulusBits>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

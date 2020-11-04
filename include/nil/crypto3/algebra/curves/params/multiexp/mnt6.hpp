@@ -41,7 +41,7 @@ namespace nil {
                 /************************* MNT6-298 ***********************************/
 
                 template<>
-                struct multiexp_params<typename mnt6<298, CHAR_BIT>::g1_type> {
+                struct multiexp_params<typename mnt6<298>::g1_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 3.96]
@@ -91,7 +91,7 @@ namespace nil {
                 };
 
                 template<>
-                struct multiexp_params<typename mnt6<298, CHAR_BIT>::g2_type> {
+                struct multiexp_params<typename mnt6<298>::g2_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 4.25]
@@ -143,9 +143,9 @@ namespace nil {
                 /************************* MNT6-298 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename mnt6<298, CHAR_BIT>::g1_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename mnt6<298>::g1_type>::fixed_base_exp_window_table;
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename mnt6<298, CHAR_BIT>::g2_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename mnt6<298>::g2_type>::fixed_base_exp_window_table;
 
             }    // namespace curves
         }        // namespace algebra

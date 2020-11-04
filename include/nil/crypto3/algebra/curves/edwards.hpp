@@ -40,10 +40,10 @@ namespace nil {
 
                 using namespace algebra;
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                template<std::size_t ModulusBits = 183>
                 struct edwards {
 
-                    using policy_type = detail::edwards_basic_policy<ModulusBits, GeneratorBits>;
+                    using policy_type = detail::edwards_basic_policy<ModulusBits>;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -56,24 +56,24 @@ namespace nil {
                     constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
                     constexpr static const number_type q = policy_type::q;
 
-                    typedef typename detail::edwards_g1<ModulusBits, GeneratorBits> g1_type;
-                    typedef typename detail::edwards_g2<ModulusBits, GeneratorBits> g2_type;
+                    typedef typename detail::edwards_g1<ModulusBits> g1_type;
+                    typedef typename detail::edwards_g2<ModulusBits> g2_type;
 
-                    typedef typename pairing::pairing_policy<edwards<ModulusBits, GeneratorBits>> pairing_policy;
+                    typedef typename pairing::pairing_policy<edwards<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = false;
                 };
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                using edwards_g1 = typename edwards<ModulusBits, GeneratorBits>::g1_type;
+                template<std::size_t ModulusBits = 183>
+                using edwards_g1 = typename edwards<ModulusBits>::g1_type;
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                using edwards_g2 = typename edwards<ModulusBits, GeneratorBits>::g2_type;
+                template<std::size_t ModulusBits = 183>
+                using edwards_g2 = typename edwards<ModulusBits>::g2_type;
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                using edwards_gt = typename edwards<ModulusBits, GeneratorBits>::gt_type;
+                template<std::size_t ModulusBits = 183>
+                using edwards_gt = typename edwards<ModulusBits>::gt_type;
 
             }    // namespace curves
         }        // namespace algebra

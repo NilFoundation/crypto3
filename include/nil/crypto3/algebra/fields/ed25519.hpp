@@ -41,14 +41,13 @@ namespace nil {
                 /*!
                  * @brief ED25519 groups
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
-                template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct ed25519 : public field<ModulusBits, GeneratorBits> { };
+                template<std::size_t ModulusBits>
+                struct ed25519 : public field<ModulusBits> { };
 
                 template<>
-                struct ed25519<255, CHAR_BIT> : public field<255, CHAR_BIT> {
-                    typedef field<255, CHAR_BIT> policy_type;
+                struct ed25519<255> : public field<255> {
+                    typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -61,19 +60,16 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED_cppui255;    // 2^255 - 19
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
+                    constexpr static const modulus_type mul_generator = 0x02;    // ?
 
-                    constexpr static const generator_type mul_generator = 0x02;    // ?
-
-                    typedef typename detail::element_fp<params<ed25519<modulus_bits, generator_bits>>> value_type;
+                    typedef typename detail::element_fp<params<ed25519<modulus_bits>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename ed25519<255, CHAR_BIT>::modulus_type const ed25519<255, CHAR_BIT>::modulus;
-                constexpr typename ed25519<255, CHAR_BIT>::generator_type const ed25519<255, CHAR_BIT>::mul_generator;
+                constexpr typename ed25519<255>::modulus_type const ed25519<255>::modulus;
+                constexpr typename ed25519<255>::modulus_type const ed25519<255>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

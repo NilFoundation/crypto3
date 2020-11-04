@@ -42,13 +42,13 @@ namespace nil {
 
                     using namespace algebra;
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 183>
                     struct edwards_basic_policy { };
 
                     template<>
-                    struct edwards_basic_policy<183, CHAR_BIT> {
+                    struct edwards_basic_policy<183> {
                         constexpr static const std::size_t base_field_bits = 183;
-                        typedef fields::edwards_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        typedef fields::edwards_fq<base_field_bits> g1_field_type;
                         typedef g1_field_type base_field_type;
                         typedef typename fields::fp3<base_field_type> g2_field_type;
                         typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
@@ -59,7 +59,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                         constexpr static const std::size_t scalar_field_bits = 183;
-                        typedef fields::edwards_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                        typedef fields::edwards_fr<scalar_field_bits> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                         constexpr static const number_type p = base_field_modulus;
@@ -69,23 +69,23 @@ namespace nil {
                         constexpr static const number_type d = 0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179;
                     };
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::base_field_modulus;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::base_field_modulus;
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::scalar_field_modulus;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::scalar_field_modulus;
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::a;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::a;
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::d;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::d;
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::p;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::p;
 
-                    constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
-                        edwards_basic_policy<183, CHAR_BIT>::q;
+                    constexpr typename edwards_basic_policy<183>::number_type const
+                        edwards_basic_policy<183>::q;
 
                 }    // namespace detail
             }        // namespace curves

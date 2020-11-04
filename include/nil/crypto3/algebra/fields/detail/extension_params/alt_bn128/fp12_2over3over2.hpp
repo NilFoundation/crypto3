@@ -49,11 +49,11 @@ namespace nil {
 
                     /************************* ALT_BN128 ***********************************/
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    class fp12_2over3over2_extension_params<fields::alt_bn128<ModulusBits, GeneratorBits>>
-                        : public params<fields::alt_bn128<ModulusBits, GeneratorBits>> {
+                    template<std::size_t ModulusBits>
+                    class fp12_2over3over2_extension_params<fields::alt_bn128<ModulusBits>>
+                        : public params<fields::alt_bn128<ModulusBits>> {
 
-                        typedef fields::alt_bn128<ModulusBits, GeneratorBits> base_field_type;
+                        typedef fields::alt_bn128<ModulusBits> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -122,19 +122,19 @@ namespace nil {
                         constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
                     };
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr std::array<typename fp12_2over3over2_extension_params<
-                                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                             alt_bn128_base_field<ModulusBits>>::modulus_type,
                                          2> const
                         fp12_2over3over2_extension_params<
-                            alt_bn128_base_field<ModulusBits, GeneratorBits>>::non_residue;
+                            alt_bn128_base_field<ModulusBits>>::non_residue;
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     constexpr std::array<typename fp12_2over3over2_extension_params<
-                                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                             alt_bn128_base_field<ModulusBits>>::modulus_type,
                                          12 * 2> const
                         fp12_2over3over2_extension_params<
-                            alt_bn128_base_field<ModulusBits, GeneratorBits>>::Frobenius_coeffs_c1;
+                            alt_bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

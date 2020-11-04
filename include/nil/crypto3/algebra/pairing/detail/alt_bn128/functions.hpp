@@ -38,12 +38,12 @@ namespace nil {
 
                     using nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 254>
                     class alt_bn128_pairing_functions;
 
                     template<>
-                    class alt_bn128_pairing_functions<254, CHAR_BIT> : public alt_bn128_basic_policy<254, CHAR_BIT> {
-                        using policy_type = alt_bn128_basic_policy<254, CHAR_BIT>;
+                    class alt_bn128_pairing_functions<254> : public alt_bn128_basic_policy<254> {
+                        using policy_type = alt_bn128_basic_policy<254>;
 
                     public:
                         using Fq = typename policy_type::Fq;

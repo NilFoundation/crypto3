@@ -29,6 +29,12 @@
 #include <nil/crypto3/detail/type_traits.hpp>
 
 #include <boost/multiprecision/number.hpp>
+
+//temporary includes begin
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
+//temporary includes end
+
 #include <cstdint>
 
 namespace nil {
@@ -100,7 +106,11 @@ namespace nil {
                                                 ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
                     GroupValueType operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        return left * typename GroupValueType::underlying_field_type::number_type(right.data);
+                        //temporary added until fixed-precision modular adaptor is ready:
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                            non_fixed_precision_modulus_type;
+
+                        return left * non_fixed_precision_modulus_type(right.data);
                     }
 
                     template<typename GroupValueType, typename FieldValueType, typename = 

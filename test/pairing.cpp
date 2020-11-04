@@ -75,17 +75,17 @@ void print_fp12_2_3_2_curve_group_element(std::ostream &os, const Fp12_2_3_2Curv
 }
 
 void print_fpt_curve_group_element(std::ostream &os,
-                                   const typename curves::bls12<381, CHAR_BIT>::pairing_policy::GT_type &e) {
+                                   const typename curves::bls12<381>::pairing_policy::GT_type &e) {
     print_fp12_2_3_2_curve_group_element(os, e);
 }
 
 void print_ate_g1_precomp_element(std::ostream &os,
-                                  const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_precomp &e) {
+                                  const typename curves::bls12<381>::pairing_policy::G1_precomp &e) {
     os << "(" << e.PX.data << "," << e.PY.data << ")" << std::endl;
 }
 
 void print_ate_g2_precomp_element(std::ostream &os,
-                                  const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_precomp &e) {
+                                  const typename curves::bls12<381>::pairing_policy::G2_precomp &e) {
     os << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , [" << e.QY.data[0].data
        << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [&os](const auto &c) {
@@ -113,41 +113,41 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381, CHAR_BIT>::pairing_policy::G1_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::G1_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::G1_type &e) {
                     print_fp_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381, CHAR_BIT>::pairing_policy::G2_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::G2_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::G2_type &e) {
                     print_fp2_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381, CHAR_BIT>::pairing_policy::G1_precomp> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::G1_precomp> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_precomp &e) {
+                                const typename curves::bls12<381>::pairing_policy::G1_precomp &e) {
                     print_ate_g1_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381, CHAR_BIT>::pairing_policy::G2_precomp> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::G2_precomp> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_precomp &e) {
+                                const typename curves::bls12<381>::pairing_policy::G2_precomp &e) {
                     print_ate_g2_precomp_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381, CHAR_BIT>::pairing_policy::GT_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::GT_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381, CHAR_BIT>::pairing_policy::GT_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::GT_type &e) {
                     print_fpt_curve_group_element(os, e);
                 }
             };
@@ -268,9 +268,9 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
 
 template<typename TestSet>
 void pairing_test_Fr_init(
-    std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::Fp_type::value_type> &elements,
+    std::vector<typename curves::bls12<381>::pairing_policy::Fp_type::value_type> &elements,
     const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::Fp_type::value_type;
     using modulus_type = typename value_type::modulus_type;
 
@@ -281,9 +281,9 @@ void pairing_test_Fr_init(
 }
 
 template<typename TestSet>
-void pairing_test_G1_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_type> &elements,
+void pairing_test_G1_init(std::vector<typename curves::bls12<381>::pairing_policy::G1_type> &elements,
                           const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G1_type;
     using modulus_type = typename value_type::underlying_field_value_type::modulus_type;
 
@@ -300,9 +300,9 @@ void pairing_test_G1_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pai
 }
 
 template<typename TestSet>
-void pairing_test_G2_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_type> &elements,
+void pairing_test_G2_init(std::vector<typename curves::bls12<381>::pairing_policy::G2_type> &elements,
                           const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G2_type;
     using underlying_type = typename value_type::underlying_field_value_type;
     using modulus_type = typename underlying_type::underlying_type::modulus_type;
@@ -324,9 +324,9 @@ void pairing_test_G2_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pai
 }
 
 template<typename TestSet>
-void pairing_test_GT_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::GT_type> &elements,
+void pairing_test_GT_init(std::vector<typename curves::bls12<381>::pairing_policy::GT_type> &elements,
                           const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::GT_type;
     using underlying_type = typename value_type::underlying_type;
     using under_underlying_type = typename underlying_type::underlying_type;
@@ -355,9 +355,9 @@ void pairing_test_GT_init(std::vector<typename curves::bls12<381, CHAR_BIT>::pai
 
 template<typename TestSet>
 void pairing_test_G1_precomp_init(
-    std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_precomp> &elements,
+    std::vector<typename curves::bls12<381>::pairing_policy::G1_precomp> &elements,
     const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G1_precomp;
     using element_value_type = value_type::value_type;
     using modulus_type = typename element_value_type::modulus_type;
@@ -371,9 +371,9 @@ void pairing_test_G1_precomp_init(
 
 template<typename TestSet>
 void pairing_test_G2_precomp_init(
-    std::vector<typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_precomp> &elements,
+    std::vector<typename curves::bls12<381>::pairing_policy::G2_precomp> &elements,
     const TestSet &test_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G2_precomp;
     using element_value_type = value_type::value_type;
     using coeffs_type = value_type::coeffs_type::value_type;
@@ -458,13 +458,13 @@ void pairing_operation_test(const TestSet &test_set) {
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
 BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {
-    using pairing_policy = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
 
     pairing_operation_test<pairing_policy>(data_set);
 }
 
 // BOOST_AUTO_TEST_CASE(curves_manual_test1) {
-//     using PairingT = typename curves::bls12<381, CHAR_BIT>::pairing_policy;
+//     using PairingT = typename curves::bls12<381>::pairing_policy;
 //     using g1_value_type = typename PairingT::G1_type::underlying_field_value_type;
 //     using g2_value_type = typename PairingT::G2_type::underlying_field_value_type;
 //     using modulus_type_g1 = typename g1_value_type::modulus_type;

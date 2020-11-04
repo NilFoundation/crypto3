@@ -35,18 +35,18 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                template<std::size_t ModulusBits>
                 struct edwards;
             }    // namespace curves
             namespace pairing {
 
                 using namespace nil::crypto3::algebra;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                class pairing_policy<curves::edwards<ModulusBits, GeneratorBits>>
-                    : public detail::edwards_pairing_functions<ModulusBits, GeneratorBits> {
-                    using policy_type = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>;
-                    using basic_policy = detail::edwards_basic_policy<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits>
+                class pairing_policy<curves::edwards<ModulusBits>>
+                    : public detail::edwards_pairing_functions<ModulusBits> {
+                    using policy_type = detail::edwards_pairing_functions<ModulusBits>;
+                    using basic_policy = detail::edwards_basic_policy<ModulusBits>;
 
                 public:
                     using number_type = typename basic_policy::number_type;
@@ -76,9 +76,9 @@ namespace nil {
                     using policy_type::miller_loop;
                 };
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename pairing_policy<curves::edwards<ModulusBits, GeneratorBits>>::number_type const
-                    pairing_policy<curves::edwards<ModulusBits, GeneratorBits>>::pairing_loop_count;
+                template<std::size_t ModulusBits>
+                constexpr typename pairing_policy<curves::edwards<ModulusBits>>::number_type const
+                    pairing_policy<curves::edwards<ModulusBits>>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

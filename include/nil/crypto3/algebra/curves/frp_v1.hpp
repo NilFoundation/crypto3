@@ -42,12 +42,12 @@ namespace nil {
                 template<>
                 struct frp_v1<256> {
                     constexpr static const std::size_t base_field_bits = 256;
-                    typedef fields::frp_v1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::frp_v1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 256;
-                    typedef fields::frp_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::frp_v1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;

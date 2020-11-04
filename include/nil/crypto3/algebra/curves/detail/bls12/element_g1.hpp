@@ -41,21 +41,21 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 381>
                     struct bls12_g1;
 
                     using namespace nil::crypto3::algebra;
                     using namespace boost::multiprecision;
 
-                    template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 381>
                     struct element_bls12_g1 { };
 
                     template<>
-                    struct element_bls12_g1<381, CHAR_BIT> {
+                    struct element_bls12_g1<381> {
 
-                        using group_type = bls12_g1<381, CHAR_BIT>;
+                        using group_type = bls12_g1<381>;
 
-                        using policy_type = bls12_basic_policy<381, CHAR_BIT>;
+                        using policy_type = bls12_basic_policy<381>;
 
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
@@ -343,11 +343,11 @@ namespace nil {
                     };
 
                     template<>
-                    struct element_bls12_g1<377, CHAR_BIT> {
+                    struct element_bls12_g1<377> {
 
-                        using group_type = bls12_g1<377, CHAR_BIT>;
+                        using group_type = bls12_g1<377>;
 
-                        using policy_type = bls12_basic_policy<377, CHAR_BIT>;
+                        using policy_type = bls12_basic_policy<377>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
@@ -633,8 +633,6 @@ namespace nil {
                             underlying_field_value_type(0x1914A69C5102EFF1F674F5D30AFEEC4BD7FB348CA3E52D96D182AD44FB82305C2FE3D3634A9591AFD82DE55559C8EA6_cppui377),
                             underlying_field_value_type::one()};*/
                     };
-
-                    
 
                 }    // namespace detail
             }        // namespace curves

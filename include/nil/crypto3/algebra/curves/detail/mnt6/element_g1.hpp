@@ -41,10 +41,10 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 298>
                     struct element_mnt6_g1 {
 
-                        using policy_type = mnt6_basic_policy<ModulusBits, GeneratorBits>;
+                        using policy_type = mnt6_basic_policy<ModulusBits>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
@@ -294,20 +294,20 @@ namespace nil {
                                                 typename g2_field_type_value::underlying_type::one(),
                                                 typename g2_field_type_value::underlying_type::zero());
 
-                        static const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits, GeneratorBits>::a;
-                        static const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits, GeneratorBits>::b;
+                        static const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits>::a;
+                        static const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits>::b;
 
                         static const g1_field_type_value twist_mul_by_a_c0 =
-                            element_mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
+                            element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_a_c1 =
-                            element_mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_a_c2 = element_mnt6_g1<ModulusBits,
-                        GeneratorBits>::a; static const g1_field_type_value twist_mul_by_b_c0 =
-                            element_mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                            element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
+                        static const g1_field_type_value twist_mul_by_a_c2 = 
+                            element_mnt6_g1<ModulusBits>::a; static const g1_field_type_value twist_mul_by_b_c0 =
+                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_b_c1 =
-                            element_mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
                         static const g1_field_type_value twist_mul_by_b_c2 =
-                            element_mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
 
                         static const g1_field_type_value twist_mul_by_q_X(
                             0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);

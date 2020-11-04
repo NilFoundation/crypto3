@@ -51,12 +51,12 @@ namespace nil {
                 template<>
                 struct x962_p_v2<192> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::x962_p_v2_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::x962_p_v2_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::x962_p_v2_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -71,12 +71,12 @@ namespace nil {
                 template<>
                 struct x962_p_v3<192> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::x962_p_v2_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::x962_p_v2_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::x962_p_v2_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -91,12 +91,12 @@ namespace nil {
                 template<>
                 struct x962_p_v1<239> {
                     constexpr static const std::size_t base_field_bits = 239;
-                    typedef fields::x962_p_v1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::x962_p_v1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 239;
-                    typedef fields::x962_p_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::x962_p_v1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -115,12 +115,12 @@ namespace nil {
                 template<>
                 struct x962_p_v2<239> {
                     constexpr static const std::size_t base_field_bits = 239;
-                    typedef fields::x962_p_v2_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::x962_p_v2_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 239;
-                    typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::x962_p_v2_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -139,12 +139,12 @@ namespace nil {
                 template<>
                 struct x962_p_v3<239> {
                     constexpr static const std::size_t base_field_bits = 239;
-                    typedef fields::x962_p_v3_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::x962_p_v3_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 239;
-                    typedef fields::x962_p_v3_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::x962_p_v3_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;

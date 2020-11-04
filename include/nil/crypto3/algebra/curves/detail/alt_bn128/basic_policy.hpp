@@ -42,14 +42,14 @@ namespace nil {
 
                     using namespace algebra;
 
-                    template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 254>
                     struct alt_bn128_basic_policy { };
 
                     template<>
-                    struct alt_bn128_basic_policy<254, CHAR_BIT> {
+                    struct alt_bn128_basic_policy<254> {
                         constexpr static const std::size_t base_field_bits = 254;
 
-                        typedef fields::alt_bn128_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        typedef fields::alt_bn128_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
@@ -60,7 +60,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                         constexpr static const std::size_t scalar_field_bits = 254;
-                        typedef fields::alt_bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                        typedef fields::alt_bn128_fr<scalar_field_bits> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                         constexpr static const number_type p = base_field_modulus;
@@ -70,21 +70,21 @@ namespace nil {
                         constexpr static const number_type b = number_type(0x03);
                     };
 
-                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
-                        alt_bn128_basic_policy<254, CHAR_BIT>::a;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const
+                        alt_bn128_basic_policy<254>::a;
 
-                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
-                        alt_bn128_basic_policy<254, CHAR_BIT>::b;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const
+                        alt_bn128_basic_policy<254>::b;
 
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::base_field_bits;
+                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::base_field_bits;
 
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::scalar_field_bits;
+                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::scalar_field_bits;
 
-                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
-                        alt_bn128_basic_policy<254, CHAR_BIT>::p;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const
+                        alt_bn128_basic_policy<254>::p;
 
-                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
-                        alt_bn128_basic_policy<254, CHAR_BIT>::q;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const
+                        alt_bn128_basic_policy<254>::q;
 
                 }    // namespace detail
             }        // namespace curves

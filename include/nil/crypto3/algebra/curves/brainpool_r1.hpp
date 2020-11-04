@@ -46,12 +46,12 @@ namespace nil {
                 struct brainpool_r1<160> {
 
                     constexpr static const std::size_t base_field_bits = 160;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 160;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<160> g1_type;
@@ -72,12 +72,12 @@ namespace nil {
                 struct brainpool_r1<192> {
 
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<192> g1_type;
@@ -98,12 +98,12 @@ namespace nil {
                 struct brainpool_r1<224> {
 
                     constexpr static const std::size_t base_field_bits = 224;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 224;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<224> g1_type;
@@ -128,12 +128,12 @@ namespace nil {
                 struct brainpool_r1<256> {
 
                     constexpr static const std::size_t base_field_bits = 256;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 256;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<256> g1_type;
@@ -157,12 +157,12 @@ namespace nil {
                 template<>
                 struct brainpool_r1<320> {
                     constexpr static const std::size_t base_field_bits = 320;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 320;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<320> g1_type;
@@ -186,12 +186,12 @@ namespace nil {
                 template<>
                 struct brainpool_r1<384> {
                     constexpr static const std::size_t base_field_bits = 384;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 384;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<384> g1_type;
@@ -215,12 +215,12 @@ namespace nil {
                 template<>
                 struct brainpool_r1<512> {
                     constexpr static const std::size_t base_field_bits = 512;
-                    typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::brainpool_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 512;
-                    typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::brainpool_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     typedef typename detail::brainpool_r1_g1<512> g1_type;

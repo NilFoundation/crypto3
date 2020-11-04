@@ -41,14 +41,13 @@ namespace nil {
                 /*!
                  * @brief IETF IPsec groups
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
-                template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct bn128_scalar_field : public field<ModulusBits, GeneratorBits> { };
+                template<std::size_t ModulusBits>
+                struct bn128_scalar_field : public field<ModulusBits> { };
 
                 template<>
-                struct bn128_scalar_field<254, CHAR_BIT> : public field<254, CHAR_BIT> {
-                    typedef field<254, CHAR_BIT> policy_type;
+                struct bn128_scalar_field<254> : public field<254> {
+                    typedef field<254> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -61,26 +60,23 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui254;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    typedef typename detail::element_fp<params<bn128_scalar_field<254, CHAR_BIT>>> value_type;
+                    typedef typename detail::element_fp<params<bn128_scalar_field<254>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const bn128_scalar_field<254, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const bn128_scalar_field<254>::modulus_bits;
 
-                constexpr typename std::size_t const bn128_scalar_field<254, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const bn128_scalar_field<254>::number_bits;
 
-                constexpr typename std::size_t const bn128_scalar_field<254, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const bn128_scalar_field<254>::value_bits;
 
-                constexpr typename bn128_scalar_field<254, CHAR_BIT>::modulus_type const
-                    bn128_scalar_field<254, CHAR_BIT>::modulus;
+                constexpr typename bn128_scalar_field<254>::modulus_type const
+                    bn128_scalar_field<254>::modulus;
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                using bn128_fr = bn128_scalar_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 254>
+                using bn128_fr = bn128_scalar_field<ModulusBits>;
 
             }    // namespace fields
         }        // namespace algebra

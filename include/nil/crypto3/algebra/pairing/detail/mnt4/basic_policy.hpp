@@ -38,19 +38,19 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 298>
                     class mnt4_basic_policy;
 
                     template<>
-                    class mnt4_basic_policy<298, CHAR_BIT> {
-                        using policy_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>;
+                    class mnt4_basic_policy<298> {
+                        using policy_type = curves::detail::mnt4_basic_policy<298>;
 
                     public:
                         using number_type = typename policy_type::number_type;
                         using extended_number_type = typename policy_type::extended_number_type;
 
-                        using g1_group = curves::detail::mnt4_g1<298, CHAR_BIT>;
-                        using g2_group = curves::detail::mnt4_g2<298, CHAR_BIT>;
+                        using g1_group = curves::detail::mnt4_g1<298>;
+                        using g2_group = curves::detail::mnt4_g2<298>;
                         using Fp_field = typename policy_type::scalar_field_type;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
@@ -81,8 +81,8 @@ namespace nil {
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };
 
-                    constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                        mnt4_basic_policy<298, CHAR_BIT>::ate_loop_count;
+                    constexpr typename mnt4_basic_policy<298>::number_type const
+                        mnt4_basic_policy<298>::ate_loop_count;
 
                 }    // namespace detail
             }        // namespace pairing

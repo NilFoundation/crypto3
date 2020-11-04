@@ -41,7 +41,7 @@ namespace nil {
                 /************************* BLS12-381 ***********************************/
 
                 template<>
-                struct multiexp_params<typename bls12<381, CHAR_BIT>::g1_type> {
+                struct multiexp_params<typename bls12<381>::g1_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 4.99]
@@ -91,7 +91,7 @@ namespace nil {
                 };
 
                 template<>
-                struct multiexp_params<typename bls12<381, CHAR_BIT>::g2_type> {
+                struct multiexp_params<typename bls12<381>::g2_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 5.10]
@@ -143,7 +143,7 @@ namespace nil {
                 /************************* BLS12-377 ***********************************/
 
                 template<>
-                struct multiexp_params<typename bls12<377, CHAR_BIT>::g1_type> {
+                struct multiexp_params<typename bls12<377>::g1_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 4.99]
@@ -193,7 +193,7 @@ namespace nil {
                 };
 
                 template<>
-                struct multiexp_params<typename bls12<377, CHAR_BIT>::g2_type> {
+                struct multiexp_params<typename bls12<377>::g2_type> {
 
                     constexpr static const std::array<std::size_t, 22> fixed_base_exp_window_table = {
                         // window 1 is unbeaten in [-inf, 5.10]
@@ -245,16 +245,16 @@ namespace nil {
                 /************************* BLS12-381 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename bls12<381, CHAR_BIT>::g1_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename bls12<381>::g1_type>::fixed_base_exp_window_table;
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename bls12<381, CHAR_BIT>::g2_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename bls12<381>::g2_type>::fixed_base_exp_window_table;
 
                 /************************* BLS12-377 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename bls12<377, CHAR_BIT>::g1_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename bls12<377>::g1_type>::fixed_base_exp_window_table;
                 constexpr std::array<std::size_t, 22> const
-                    multiexp_params<typename bls12<377, CHAR_BIT>::g2_type>::fixed_base_exp_window_table;
+                    multiexp_params<typename bls12<377>::g2_type>::fixed_base_exp_window_table;
 
             }    // namespace curves
         }        // namespace algebra

@@ -41,13 +41,13 @@ namespace nil {
                 /************************* BLS12-381 ***********************************/
 
                 template<>
-                struct wnaf_params<typename bls12<381, CHAR_BIT>::g1_type> {
+                struct wnaf_params<typename bls12<381>::g1_type> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {11, 24, 60, 127};
                 };
 
                 template<>
-                struct wnaf_params<typename bls12<381, CHAR_BIT>::g2_type> {
+                struct wnaf_params<typename bls12<381>::g2_type> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {5, 15, 39, 109};
                 };
@@ -55,13 +55,13 @@ namespace nil {
                 /************************* BLS12-377 ***********************************/
 
                 template<>
-                struct wnaf_params<typename bls12<377, CHAR_BIT>::g1_type> {
+                struct wnaf_params<typename bls12<377>::g1_type> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {11, 24, 60, 127};
                 };
 
                 template<>
-                struct wnaf_params<typename bls12<377, CHAR_BIT>::g2_type> {
+                struct wnaf_params<typename bls12<377>::g2_type> {
 
                     constexpr static const std::array<std::size_t, 4> wnaf_window_table = {5, 15, 39, 109};
                 };
@@ -69,16 +69,16 @@ namespace nil {
                 /************************* BLS12-381 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<381, CHAR_BIT>::g1_type>::wnaf_window_table;
+                    wnaf_params<typename bls12<381>::g1_type>::wnaf_window_table;
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<381, CHAR_BIT>::g2_type>::wnaf_window_table;
+                    wnaf_params<typename bls12<381>::g2_type>::wnaf_window_table;
 
                 /************************* BLS12-377 definitions ***********************************/
 
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<377, CHAR_BIT>::g1_type>::wnaf_window_table;
+                    wnaf_params<typename bls12<377>::g1_type>::wnaf_window_table;
                 constexpr std::array<std::size_t, 4> const
-                    wnaf_params<typename bls12<377, CHAR_BIT>::g2_type>::wnaf_window_table;
+                    wnaf_params<typename bls12<377>::g2_type>::wnaf_window_table;
 
             }    // namespace curves
         }        // namespace algebra

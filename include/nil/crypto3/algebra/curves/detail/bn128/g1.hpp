@@ -46,14 +46,14 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 254>
                     struct bn128_g1 {
 
                         constexpr static const std::size_t g1_field_bits = ModulusBits;
-                        typedef typename fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
+                        typedef typename fields::bn128_fq<g1_field_bits>::value_type g1_field_type_value;
 
                         constexpr static const std::size_t g2_field_bits = ModulusBits;
-                        typedef typename fields::fp2<fields::bn128_fq<g2_field_bits, CHAR_BIT>>::value_type
+                        typedef typename fields::fp2<fields::bn128_fq<g2_field_bits>>::value_type
                             g2_field_type_value;
 
                         using underlying_field_value_type = g1_field_type_value;

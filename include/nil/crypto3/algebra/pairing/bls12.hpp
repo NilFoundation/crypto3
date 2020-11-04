@@ -36,18 +36,18 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                template<std::size_t ModulusBits>
                 struct bls12;
             }    // namespace curves
             namespace pairing {
 
                 using namespace nil::crypto3::algebra;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                class pairing_policy<curves::bls12<ModulusBits, GeneratorBits>>
-                    : public detail::bls12_pairing_functions<ModulusBits, GeneratorBits> {
-                    using policy_type = detail::bls12_pairing_functions<ModulusBits, GeneratorBits>;
-                    using basic_policy = detail::bls12_basic_policy<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits>
+                class pairing_policy<curves::bls12<ModulusBits>>
+                    : public detail::bls12_pairing_functions<ModulusBits> {
+                    using policy_type = detail::bls12_pairing_functions<ModulusBits>;
+                    using basic_policy = detail::bls12_basic_policy<ModulusBits>;
 
                 public:
                     using number_type = typename basic_policy::number_type;
@@ -77,9 +77,9 @@ namespace nil {
                     using policy_type::miller_loop;
                 };
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename pairing_policy<curves::bls12<ModulusBits, GeneratorBits>>::number_type const
-                    pairing_policy<curves::bls12<ModulusBits, GeneratorBits>>::pairing_loop_count;
+                template<std::size_t ModulusBits>
+                constexpr typename pairing_policy<curves::bls12<ModulusBits>>::number_type const
+                    pairing_policy<curves::bls12<ModulusBits>>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

@@ -42,10 +42,10 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 183>
                     struct element_edwards_g2 {
 
-                        using policy_type = edwards_basic_policy<ModulusBits, GeneratorBits>;
+                        using policy_type = edwards_basic_policy<ModulusBits>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;

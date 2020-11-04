@@ -58,15 +58,15 @@ void print_fp12_2_3_2_curve_group_element(const Fp12_2_3_2CurveGroup &e) {
               << e.data[1].data[2].data[0].data << " , " << e.data[1].data[2].data[1].data << "]]]" << std::endl;
 }
 
-void print_fpt_curve_group_element(const typename curves::bls12<381, CHAR_BIT>::pairing_policy::GT_type &e) {
+void print_fpt_curve_group_element(const typename curves::bls12<381>::pairing_policy::GT_type &e) {
     print_fp12_2_3_2_curve_group_element(e);
 }
 
-void print_ate_g1_precomp_element(const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G1_precomp &e) {
+void print_ate_g1_precomp_element(const typename curves::bls12<381>::pairing_policy::G1_precomp &e) {
     std::cout << e.PX.data << " " << e.PY.data << std::endl;
 }
 
-void print_ate_g2_precomp_element(const typename curves::bls12<381, CHAR_BIT>::pairing_policy::G2_precomp &e) {
+void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing_policy::G2_precomp &e) {
     std::cout << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , ["
               << e.QY.data[0].data << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [](const auto &c) {
@@ -139,5 +139,5 @@ void pairing_example() {
 }
 
 int main() {
-    pairing_example<curves::bls12<381, CHAR_BIT>::pairing_policy>();
+    pairing_example<curves::bls12<381>::pairing_policy>();
 }

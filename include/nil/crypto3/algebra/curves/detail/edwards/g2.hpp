@@ -36,16 +36,16 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     struct edwards_g2 {
 
-                        using policy_type = edwards_basic_policy<ModulusBits, GeneratorBits>;
+                        using policy_type = edwards_basic_policy<ModulusBits>;
 
                         using underlying_field_type = typename policy_type::g2_field_type;
 
                         constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;
 
-                        using value_type = element_edwards_g2<ModulusBits, GeneratorBits>;
+                        using value_type = element_edwards_g2<ModulusBits>;
                     };
 
                 }    // namespace detail

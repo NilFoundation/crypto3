@@ -42,7 +42,7 @@ namespace nil {
                  * of words. It is optimized for tight memory consumption, so the modulus p is
                  * passed as a template parameter, to avoid per-element overheads.
                  */
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                template<std::size_t ModulusBits>
                 struct field {
 
                     constexpr static const std::size_t modulus_bits = ModulusBits;
@@ -63,12 +63,6 @@ namespace nil {
                             // boost::multiprecision::unchecked, void
                             >>>
                         number_type;
-
-                    constexpr static const std::size_t generator_bits = GeneratorBits;
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                        generator_bits, generator_bits, boost::multiprecision::unsigned_magnitude,
-                        boost::multiprecision::unchecked, void>>
-                        generator_type;
                 };
 
             }    // namespace fields

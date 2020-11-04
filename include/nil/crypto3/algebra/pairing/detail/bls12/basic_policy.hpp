@@ -37,19 +37,19 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 381>
                     class bls12_basic_policy;
 
                     template<>
-                    class bls12_basic_policy<381, CHAR_BIT> {
-                        using policy_type = curves::detail::bls12_basic_policy<381, CHAR_BIT>;
+                    class bls12_basic_policy<381> {
+                        using policy_type = curves::detail::bls12_basic_policy<381>;
 
                     public:
                         using number_type = typename policy_type::number_type;
                         using extended_number_type = typename policy_type::extended_number_type;
 
-                        using g1_group = curves::detail::bls12_g1<381, CHAR_BIT>;
-                        using g2_group = curves::detail::bls12_g2<381, CHAR_BIT>;
+                        using g1_group = curves::detail::bls12_g1<381>;
+                        using g2_group = curves::detail::bls12_g2<381>;
                         using Fp_field = typename policy_type::scalar_field_type;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
@@ -80,15 +80,15 @@ namespace nil {
                     };
 
                     template<>
-                    class bls12_basic_policy<377, CHAR_BIT> {
-                        using policy_type = curves::detail::bls12_basic_policy<377, CHAR_BIT>;
+                    class bls12_basic_policy<377> {
+                        using policy_type = curves::detail::bls12_basic_policy<377>;
 
                     public:
                         using number_type = typename policy_type::number_type;
                         using extended_number_type = typename policy_type::extended_number_type;
 
-                        using g1_group = curves::detail::bls12_g1<381, CHAR_BIT>;
-                        using g2_group = curves::detail::bls12_g2<381, CHAR_BIT>;
+                        using g1_group = curves::detail::bls12_g1<381>;
+                        using g2_group = curves::detail::bls12_g2<381>;
                         using Fp_field = typename policy_type::scalar_field_type;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
@@ -116,18 +116,18 @@ namespace nil {
                         constexpr static const bool final_exponent_is_z_neg = false;
                     };
 
-                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type const
-                        bls12_basic_policy<381, CHAR_BIT>::ate_loop_count;
-                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type const
-                        bls12_basic_policy<377, CHAR_BIT>::ate_loop_count;
+                    constexpr typename bls12_basic_policy<381>::number_type const
+                        bls12_basic_policy<381>::ate_loop_count;
+                    constexpr typename bls12_basic_policy<377>::number_type const
+                        bls12_basic_policy<377>::ate_loop_count;
 
-                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type const
-                        bls12_basic_policy<381, CHAR_BIT>::final_exponent_z;
-                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type const
-                        bls12_basic_policy<377, CHAR_BIT>::final_exponent_z;
+                    constexpr typename bls12_basic_policy<381>::number_type const
+                        bls12_basic_policy<381>::final_exponent_z;
+                    constexpr typename bls12_basic_policy<377>::number_type const
+                        bls12_basic_policy<377>::final_exponent_z;
 
-                    constexpr bool const bls12_basic_policy<381, CHAR_BIT>::final_exponent_is_z_neg;
-                    constexpr bool const bls12_basic_policy<377, CHAR_BIT>::final_exponent_is_z_neg;
+                    constexpr bool const bls12_basic_policy<381>::final_exponent_is_z_neg;
+                    constexpr bool const bls12_basic_policy<377>::final_exponent_is_z_neg;
 
                 }    // namespace detail
             }        // namespace pairing

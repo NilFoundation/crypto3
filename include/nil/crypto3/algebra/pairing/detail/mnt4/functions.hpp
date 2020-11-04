@@ -40,12 +40,12 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 298>
                     class mnt4_pairing_functions;
 
                     template<>
-                    class mnt4_pairing_functions<298, CHAR_BIT> : public mnt4_basic_policy<298, CHAR_BIT> {
-                        using policy_type = mnt4_basic_policy<298, CHAR_BIT>;
+                    class mnt4_pairing_functions<298> : public mnt4_basic_policy<298> {
+                        using policy_type = mnt4_basic_policy<298>;
 
                     public:
                         using Fq = typename policy_type::Fq;

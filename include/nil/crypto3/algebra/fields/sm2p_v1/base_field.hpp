@@ -41,14 +41,13 @@ namespace nil {
                 /*!
                  * @brief IETF IPsec groups
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
-                template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct sm2p_v1_base_field : public field<ModulusBits, GeneratorBits> { };
+                template<std::size_t ModulusBits>
+                struct sm2p_v1_base_field : public field<ModulusBits> { };
 
                 template<>
-                struct sm2p_v1_base_field<256, CHAR_BIT> : public field<256, CHAR_BIT> {
-                    typedef field<256, CHAR_BIT> policy_type;
+                struct sm2p_v1_base_field<256> : public field<256> {
+                    typedef field<256> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -61,23 +60,20 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF_cppui256;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    typedef typename detail::element_fp<params<sm2p_v1_base_field<256, CHAR_BIT>>> value_type;
+                    typedef typename detail::element_fp<params<sm2p_v1_base_field<256>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename sm2p_v1_base_field<256, CHAR_BIT>::modulus_type const
-                    sm2p_v1_base_field<256, CHAR_BIT>::modulus;
+                constexpr typename sm2p_v1_base_field<256>::modulus_type const
+                    sm2p_v1_base_field<256>::modulus;
 
-                template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
-                using sm2p_v1_fq = sm2p_v1_base_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 256>
+                using sm2p_v1_fq = sm2p_v1_base_field<ModulusBits>;
 
-                template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
-                using sm2p_v1 = sm2p_v1_base_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 256>
+                using sm2p_v1 = sm2p_v1_base_field<ModulusBits>;
 
             }    // namespace fields
         }        // namespace algebra

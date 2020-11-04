@@ -47,7 +47,6 @@ namespace nil {
                 /*!
                  * @brief
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
                 template<typename BaseField>
                 struct fp2 {
@@ -66,10 +65,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    // constexpr static const generator_type mul_generator = policy_type::mul_generator;
+                    // constexpr static const modulus_type mul_generator = policy_type::mul_generator;
 
                     typedef typename detail::element_fp2<extension_policy> value_type;
 
@@ -81,7 +77,7 @@ namespace nil {
                 constexpr typename fp2<BaseField>::modulus_type const fp2<BaseField>::modulus;
 
                 // template<typename BaseField>
-                // constexpr typename fp2<BaseField>::generator_type const fp2<BaseField>::mul_generator;
+                // constexpr typename fp2<BaseField>::modulus_type const fp2<BaseField>::mul_generator;
 
                 template<typename BaseField>
                 constexpr typename std::size_t const fp2<BaseField>::arity;

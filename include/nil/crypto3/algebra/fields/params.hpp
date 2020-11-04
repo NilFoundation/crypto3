@@ -43,23 +43,17 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = field_type::modulus;
 
-                    constexpr static const std::size_t generator_bits = field_type::generator_bits;
-                    typedef typename field_type::generator_type generator_type;
-
-                    constexpr static const generator_type mul_generator = field_type::mul_generator;
+                    constexpr static const modulus_type mul_generator = field_type::mul_generator;
                 };
 
                 template<typename FieldType>
                 constexpr typename params<FieldType>::modulus_type const params<FieldType>::modulus;
 
                 template<typename FieldType>
-                constexpr typename params<FieldType>::generator_type const params<FieldType>::mul_generator;
+                constexpr typename params<FieldType>::modulus_type const params<FieldType>::mul_generator;
 
                 template<typename FieldType>
                 constexpr typename std::size_t const params<FieldType>::modulus_bits;
-
-                template<typename FieldType>
-                constexpr typename std::size_t const params<FieldType>::generator_bits;
 
                 template<typename FieldType>
                 struct arithmetic_params;

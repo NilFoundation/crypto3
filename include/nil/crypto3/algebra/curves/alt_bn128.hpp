@@ -40,10 +40,10 @@ namespace nil {
 
                 using namespace algebra;
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                template<std::size_t ModulusBits = 254>
                 struct alt_bn128 {
 
-                    using policy_type = detail::alt_bn128_basic_policy<ModulusBits, GeneratorBits>;
+                    using policy_type = detail::alt_bn128_basic_policy<ModulusBits>;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -56,22 +56,22 @@ namespace nil {
                     constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
                     constexpr static const number_type q = policy_type::q;
 
-                    typedef typename detail::alt_bn128_g1<ModulusBits, GeneratorBits> g1_type;
-                    typedef typename detail::alt_bn128_g2<ModulusBits, GeneratorBits> g2_type;
+                    typedef typename detail::alt_bn128_g1<ModulusBits> g1_type;
+                    typedef typename detail::alt_bn128_g2<ModulusBits> g2_type;
 
-                    // typedef typename pairing::pairing_policy<alt_bn128<ModulusBits, GeneratorBits>> pairing_policy;
+                    // typedef typename pairing::pairing_policy<alt_bn128<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
                 };
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                using alt_bn128_g1 = typename alt_bn128<ModulusBits, GeneratorBits>::g1_type;
+                template<std::size_t ModulusBits = 254>
+                using alt_bn128_g1 = typename alt_bn128<ModulusBits>::g1_type;
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                using alt_bn128_g2 = typename alt_bn128<ModulusBits, GeneratorBits>::g2_type;
+                template<std::size_t ModulusBits = 254>
+                using alt_bn128_g2 = typename alt_bn128<ModulusBits>::g2_type;
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                using alt_bn128_gt = typename alt_bn128<ModulusBits, GeneratorBits>::gt_type;
+                template<std::size_t ModulusBits = 254>
+                using alt_bn128_gt = typename alt_bn128<ModulusBits>::gt_type;
 
             }    // namespace curves
         }        // namespace algebra

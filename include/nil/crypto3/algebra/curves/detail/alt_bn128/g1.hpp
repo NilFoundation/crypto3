@@ -36,16 +36,16 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                    template<std::size_t ModulusBits>
                     struct alt_bn128_g1 {
 
-                        using policy_type = alt_bn128_basic_policy<ModulusBits, GeneratorBits>;
+                        using policy_type = alt_bn128_basic_policy<ModulusBits>;
 
                         using underlying_field_type = typename policy_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;
 
-                        using value_type = element_alt_bn128_g1<ModulusBits, GeneratorBits>;
+                        using value_type = element_alt_bn128_g1<ModulusBits>;
                     };
 
                 }    // namespace detail

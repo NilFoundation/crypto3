@@ -41,14 +41,13 @@ namespace nil {
                 /*!
                  * @brief
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
-                template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct bls12_scalar_field : public field<ModulusBits, GeneratorBits> { };
+                template<std::size_t ModulusBits>
+                struct bls12_scalar_field : public field<ModulusBits> { };
 
                 template<>
-                struct bls12_scalar_field<381, CHAR_BIT> : public field<381, CHAR_BIT> {
-                    typedef field<255, CHAR_BIT> policy_type;
+                struct bls12_scalar_field<381> : public field<381> {
+                    typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -61,18 +60,15 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001_cppui255;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    typedef typename detail::element_fp<params<bls12_scalar_field<381, CHAR_BIT>>> value_type;
+                    typedef typename detail::element_fp<params<bls12_scalar_field<381>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
                 template<>
-                struct bls12_scalar_field<377, CHAR_BIT> : public field<377, CHAR_BIT> {
-                    typedef field<255, CHAR_BIT> policy_type;
+                struct bls12_scalar_field<377> : public field<377> {
+                    typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -85,31 +81,28 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x12AB655E9A2CA55660B44D1E5C37B00159AA76FED00000010A11800000000001_cppui253;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    typedef typename detail::element_fp<params<bls12_scalar_field<377, CHAR_BIT>>> value_type;
+                    typedef typename detail::element_fp<params<bls12_scalar_field<377>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const bls12_scalar_field<381, CHAR_BIT>::modulus_bits;
-                constexpr typename std::size_t const bls12_scalar_field<377, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const bls12_scalar_field<381>::modulus_bits;
+                constexpr typename std::size_t const bls12_scalar_field<377>::modulus_bits;
 
-                constexpr typename std::size_t const bls12_scalar_field<381, CHAR_BIT>::number_bits;
-                constexpr typename std::size_t const bls12_scalar_field<377, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const bls12_scalar_field<381>::number_bits;
+                constexpr typename std::size_t const bls12_scalar_field<377>::number_bits;
 
-                constexpr typename std::size_t const bls12_scalar_field<381, CHAR_BIT>::value_bits;
-                constexpr typename std::size_t const bls12_scalar_field<377, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const bls12_scalar_field<381>::value_bits;
+                constexpr typename std::size_t const bls12_scalar_field<377>::value_bits;
 
-                constexpr typename bls12_scalar_field<381, CHAR_BIT>::modulus_type const
-                    bls12_scalar_field<381, CHAR_BIT>::modulus;
-                constexpr typename bls12_scalar_field<377, CHAR_BIT>::modulus_type const
-                    bls12_scalar_field<377, CHAR_BIT>::modulus;
+                constexpr typename bls12_scalar_field<381>::modulus_type const
+                    bls12_scalar_field<381>::modulus;
+                constexpr typename bls12_scalar_field<377>::modulus_type const
+                    bls12_scalar_field<377>::modulus;
 
-                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
-                using bls12_fr = bls12_scalar_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 381>
+                using bls12_fr = bls12_scalar_field<ModulusBits>;
 
             }    // namespace fields
         }        // namespace algebra

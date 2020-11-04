@@ -48,12 +48,12 @@ namespace nil {
                 template<>
                 struct secp_k1<160> {
                     constexpr static const std::size_t base_field_bits = 160;
-                    typedef fields::secp_k1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_k1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 160;
-                    typedef fields::secp_k1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_k1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -68,12 +68,12 @@ namespace nil {
                 template<>
                 struct secp_r1<160> {
                     constexpr static const std::size_t base_field_bits = 160;
-                    typedef fields::secp_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 160;
-                    typedef fields::secp_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -88,12 +88,12 @@ namespace nil {
                 template<>
                 struct secp_r2<160> {
                     constexpr static const std::size_t base_field_bits = 160;
-                    typedef fields::secp_r2_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_r2_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 160;
-                    typedef fields::secp_r2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_r2_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -108,12 +108,12 @@ namespace nil {
                 template<>
                 struct secp_k1<192> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::secp_k1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_k1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::secp_k1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_k1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -128,12 +128,12 @@ namespace nil {
                 template<>
                 struct secp_r1<192> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::secp_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::secp_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -148,12 +148,12 @@ namespace nil {
                 template<>
                 struct secp_k1<224> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::secp_k1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_k1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::secp_k1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_k1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -170,12 +170,12 @@ namespace nil {
                 template<>
                 struct secp_r1<224> {
                     constexpr static const std::size_t base_field_bits = 192;
-                    typedef fields::secp_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_r1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 192;
-                    typedef fields::secp_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_r1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;
@@ -194,12 +194,12 @@ namespace nil {
                 template<>
                 struct secp_k1<256> {
                     constexpr static const std::size_t base_field_bits = 256;
-                    typedef fields::secp_k1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                    typedef fields::secp_k1_fq<base_field_bits> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 256;
-                    typedef fields::secp_k1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                    typedef fields::secp_k1_fr<scalar_field_bits> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                     constexpr static const number_type p = base_field_modulus;

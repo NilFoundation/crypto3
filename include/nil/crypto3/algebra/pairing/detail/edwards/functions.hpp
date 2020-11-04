@@ -39,12 +39,12 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 183>
                     class edwards_pairing_functions;
 
                     template<>
-                    class edwards_pairing_functions<183, CHAR_BIT> : public edwards_basic_policy<183, CHAR_BIT> {
-                        using policy_type = edwards_basic_policy<183, CHAR_BIT>;
+                    class edwards_pairing_functions<183> : public edwards_basic_policy<183> {
+                        using policy_type = edwards_basic_policy<183>;
 
                     public:
                         using Fq = typename policy_type::Fq;

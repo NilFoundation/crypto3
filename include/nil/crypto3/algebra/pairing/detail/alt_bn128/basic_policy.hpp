@@ -36,18 +36,18 @@ namespace nil {
 
                     using namespace nil::crypto3::algebra;
 
-                    template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 254>
                     struct alt_bn128_basic_policy;
 
                     template<>
-                    struct alt_bn128_basic_policy<254, CHAR_BIT> {
+                    struct alt_bn128_basic_policy<254> {
 
-                        using number_type = curves::detail::alt_bn128_basic_policy<254, CHAR_BIT>::number_type;
+                        using number_type = curves::detail::alt_bn128_basic_policy<254>::number_type;
                         using extended_number_type =
-                            curves::detail::alt_bn128_basic_policy<254, CHAR_BIT>::extended_number_type;
+                            curves::detail::alt_bn128_basic_policy<254>::extended_number_type;
 
-                        using g1_group = curves::detail::alt_bn128_g1<254, CHAR_BIT>;
-                        using g2_group = curves::detail::alt_bn128_g2<254, CHAR_BIT>;
+                        using g1_group = curves::detail::alt_bn128_g1<254>;
+                        using g2_group = curves::detail::alt_bn128_g2<254>;
                         using Fp_field = typename policy_type::scalar_field_type;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
@@ -75,8 +75,8 @@ namespace nil {
                         constexpr static const number_type final_exponent_is_z_neg = false;
                     };
 
-                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
-                        alt_bn128_basic_policy<254, CHAR_BIT>::ate_loop_count;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const
+                        alt_bn128_basic_policy<254>::ate_loop_count;
                 }    // namespace detail
             }        // namespace pairing
         }            // namespace algebra

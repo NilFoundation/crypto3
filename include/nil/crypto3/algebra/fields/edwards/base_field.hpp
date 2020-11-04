@@ -41,14 +41,13 @@ namespace nil {
                 /*!
                  * @brief IETF IPsec groups
                  * @tparam ModulusBits
-                 * @tparam GeneratorBits
                  */
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                struct edwards_base_field : public field<ModulusBits, GeneratorBits> { };
+                template<std::size_t ModulusBits = 183>
+                struct edwards_base_field : public field<ModulusBits> { };
 
                 template<>
-                struct edwards_base_field<183, CHAR_BIT> : public field<183, CHAR_BIT> {
-                    typedef field<183, CHAR_BIT> policy_type;
+                struct edwards_base_field<183> : public field<183> {
+                    typedef field<183> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -61,29 +60,26 @@ namespace nil {
                     constexpr static const modulus_type modulus =
                         0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000001_cppui183;
 
-                    constexpr static const std::size_t generator_bits = policy_type::generator_bits;
-                    typedef typename policy_type::generator_type generator_type;
-
-                    typedef typename detail::element_fp<params<edwards_base_field<183, CHAR_BIT>>> value_type;
+                    typedef typename detail::element_fp<params<edwards_base_field<183>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::modulus_bits;
+                constexpr typename std::size_t const edwards_base_field<183>::modulus_bits;
 
-                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::number_bits;
+                constexpr typename std::size_t const edwards_base_field<183>::number_bits;
 
-                constexpr typename std::size_t const edwards_base_field<183, CHAR_BIT>::value_bits;
+                constexpr typename std::size_t const edwards_base_field<183>::value_bits;
 
-                constexpr typename edwards_base_field<183, CHAR_BIT>::modulus_type const
-                    edwards_base_field<183, CHAR_BIT>::modulus;
+                constexpr typename edwards_base_field<183>::modulus_type const
+                    edwards_base_field<183>::modulus;
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                using edwards_fq = edwards_base_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 183>
+                using edwards_fq = edwards_base_field<ModulusBits>;
 
-                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                using edwards = edwards_base_field<ModulusBits, GeneratorBits>;
+                template<std::size_t ModulusBits = 183>
+                using edwards = edwards_base_field<ModulusBits>;
 
             }    // namespace fields
         }        // namespace algebra

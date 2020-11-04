@@ -42,13 +42,13 @@ namespace nil {
 
                     using namespace algebra;
 
-                    template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                    template<std::size_t ModulusBits = 298>
                     struct mnt4_basic_policy { };
 
                     template<>
-                    struct mnt4_basic_policy<298, CHAR_BIT> {
+                    struct mnt4_basic_policy<298> {
                         constexpr static const std::size_t base_field_bits = 298;
-                        typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        typedef fields::mnt4_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp4<base_field_type> gt_field_type;
@@ -59,7 +59,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                         constexpr static const std::size_t scalar_field_bits = 298;
-                        typedef fields::mnt4_scalar_field<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                        typedef fields::mnt4_scalar_field<scalar_field_bits> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                         constexpr static const number_type p = base_field_modulus;
@@ -70,21 +70,21 @@ namespace nil {
                             0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);
                     };
 
-                    constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                        mnt4_basic_policy<298, CHAR_BIT>::a;
+                    constexpr typename mnt4_basic_policy<298>::number_type const
+                        mnt4_basic_policy<298>::a;
 
-                    constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                        mnt4_basic_policy<298, CHAR_BIT>::b;
+                    constexpr typename mnt4_basic_policy<298>::number_type const
+                        mnt4_basic_policy<298>::b;
 
-                    constexpr typename std::size_t const mnt4_basic_policy<298, CHAR_BIT>::base_field_bits;
+                    constexpr typename std::size_t const mnt4_basic_policy<298>::base_field_bits;
 
-                    constexpr typename std::size_t const mnt4_basic_policy<298, CHAR_BIT>::scalar_field_bits;
+                    constexpr typename std::size_t const mnt4_basic_policy<298>::scalar_field_bits;
 
-                    constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                        mnt4_basic_policy<298, CHAR_BIT>::p;
+                    constexpr typename mnt4_basic_policy<298>::number_type const
+                        mnt4_basic_policy<298>::p;
 
-                    constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                        mnt4_basic_policy<298, CHAR_BIT>::q;
+                    constexpr typename mnt4_basic_policy<298>::number_type const
+                        mnt4_basic_policy<298>::q;
 
                 }    // namespace detail
             }        // namespace curves
