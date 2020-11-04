@@ -146,16 +146,11 @@ namespace nil {
                 constexpr typename ffdhe_ietf<6144>::modulus_type const ffdhe_ietf<6144>::modulus;
                 constexpr typename ffdhe_ietf<8192>::modulus_type const ffdhe_ietf<8192>::modulus;
 
-                constexpr
-                    typename ffdhe_ietf<2048>::modulus_type const ffdhe_ietf<2048>::mul_generator;
-                constexpr
-                    typename ffdhe_ietf<3072>::modulus_type const ffdhe_ietf<3072>::mul_generator;
-                constexpr
-                    typename ffdhe_ietf<4096>::modulus_type const ffdhe_ietf<4096>::mul_generator;
-                constexpr
-                    typename ffdhe_ietf<6144>::modulus_type const ffdhe_ietf<6144>::mul_generator;
-                constexpr
-                    typename ffdhe_ietf<8192>::modulus_type const ffdhe_ietf<8192>::mul_generator;
+                constexpr typename ffdhe_ietf<2048>::modulus_type const ffdhe_ietf<2048>::mul_generator;
+                constexpr typename ffdhe_ietf<3072>::modulus_type const ffdhe_ietf<3072>::mul_generator;
+                constexpr typename ffdhe_ietf<4096>::modulus_type const ffdhe_ietf<4096>::mul_generator;
+                constexpr typename ffdhe_ietf<6144>::modulus_type const ffdhe_ietf<6144>::mul_generator;
+                constexpr typename ffdhe_ietf<8192>::modulus_type const ffdhe_ietf<8192>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

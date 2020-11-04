@@ -91,14 +91,7 @@ namespace nil {
                     constexpr static const number_type y = 0x01;
                 };
 
-                template<std::size_t ModulusBits = 254>
-                using bn128_g1 = typename bn128<ModulusBits>::g1_type;
-
-                template<std::size_t ModulusBits = 254>
-                using bn128_g2 = typename bn128<ModulusBits>::g2_type;
-
-                template<std::size_t ModulusBits = 254>
-                using bn128_gt = typename bn128<ModulusBits>::gt_type;
+                typedef bn128<254> bn128_254;
 
             }    // namespace curves
         }        // namespace algebra

@@ -43,8 +43,7 @@ namespace nil {
                     struct alt_bn128_basic_policy<254> {
 
                         using number_type = curves::detail::alt_bn128_basic_policy<254>::number_type;
-                        using extended_number_type =
-                            curves::detail::alt_bn128_basic_policy<254>::extended_number_type;
+                        using extended_number_type = curves::detail::alt_bn128_basic_policy<254>::extended_number_type;
 
                         using g1_group = curves::detail::alt_bn128_g1<254>;
                         using g2_group = curves::detail::alt_bn128_g2<254>;

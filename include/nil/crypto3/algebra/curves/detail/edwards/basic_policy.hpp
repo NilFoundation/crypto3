@@ -75,17 +75,13 @@ namespace nil {
                     constexpr typename edwards_basic_policy<183>::number_type const
                         edwards_basic_policy<183>::scalar_field_modulus;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const
-                        edwards_basic_policy<183>::a;
+                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::a;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const
-                        edwards_basic_policy<183>::d;
+                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::d;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const
-                        edwards_basic_policy<183>::p;
+                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::p;
 
-                    constexpr typename edwards_basic_policy<183>::number_type const
-                        edwards_basic_policy<183>::q;
+                    constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::q;
 
                 }    // namespace detail
             }        // namespace curves

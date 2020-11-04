@@ -30,10 +30,10 @@
 
 #include <boost/multiprecision/number.hpp>
 
-//temporary includes begin
+// temporary includes begin
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
-//temporary includes end
+// temporary includes end
 
 #include <cstdint>
 
@@ -65,58 +65,59 @@ namespace nil {
                     }
 
                     template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
-                    GroupValueType operator*(
-                        const GroupValueType &left, 
-                        const number<Backend, ExpressionTemplates> &right) {
+                    GroupValueType operator*(const GroupValueType &left,
+                                             const number<Backend, ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
-                    GroupValueType operator*(
-                        const number<Backend, ExpressionTemplates> &left,
-                        const GroupValueType &right) {
+                    GroupValueType operator*(const number<Backend, ExpressionTemplates> &left,
+                                             const GroupValueType &right) {
 
                         return right * left;
                     }
 
-                    /*template<typename GroupValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
-                                                !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
-                    GroupValueType operator*(
-                        const GroupValueType &left, 
+                    /*template<typename GroupValueType, typename =
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename
+                    GroupValueType::group_type>::value &&
+                                                !::nil::crypto3::detail::is_field<typename
+                    GroupValueType::group_type>::value>::type> GroupValueType operator*( const GroupValueType &left,
                         const typename GroupValueType::underlying_field_type::modulus_type &right) {
 
                         return scalar_mul(left, right);
                     }
 
-                    template<typename GroupValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
-                                                !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
-                    GroupValueType operator*(
-                        const typename GroupValueType::underlying_field_type::modulus_type &left,
-                        const GroupValueType &right) {
+                    template<typename GroupValueType, typename =
+                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename
+                    GroupValueType::group_type>::value &&
+                                                !::nil::crypto3::detail::is_field<typename
+                    GroupValueType::group_type>::value>::type> GroupValueType operator*( const typename
+                    GroupValueType::underlying_field_type::modulus_type &left, const GroupValueType &right) {
 
                         return right * left;
                     }*/
 
-                    template<typename GroupValueType, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
-                                               !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value   &&
-                                                ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    template<typename GroupValueType,
+                             typename FieldValueType,
+                             typename = typename std::enable_if<
+                                 ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
+                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
+                                 ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
                     GroupValueType operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        //temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
+                        // temporary added until fixed-precision modular adaptor is ready:
+                        typedef number<backends::cpp_int_backend<>> non_fixed_precision_modulus_type;
 
                         return left * non_fixed_precision_modulus_type(right.data);
                     }
 
-                    template<typename GroupValueType, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
-                                               !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value   &&
-                                                ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
+                    template<typename GroupValueType,
+                             typename FieldValueType,
+                             typename = typename std::enable_if<
+                                 ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
+                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
+                                 ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
                     GroupValueType operator*(const FieldValueType &left, const GroupValueType &right) {
 
                         return right * left;

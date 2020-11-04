@@ -40,8 +40,7 @@ namespace nil {
             namespace fields {
 
                 template<std::size_t ModulusBits>
-                struct arithmetic_params<bn128_base_field<ModulusBits>>
-                    : public params<bn128_base_field<ModulusBits>> {
+                struct arithmetic_params<bn128_base_field<ModulusBits>> : public params<bn128_base_field<ModulusBits>> {
                 private:
                     typedef params<bn128_base_field<ModulusBits>> policy_type;
 
@@ -171,15 +170,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<bn128_base_field<254>>::modulus_type const
                     arithmetic_params<bn128_base_field<254>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bn128_base_field<254>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bn128_base_field<254>>>::nqr;
                 constexpr typename arithmetic_params<bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<bn128_scalar_field<254>>::nqr;
 
                 constexpr typename arithmetic_params<bn128_base_field<254>>::modulus_type const
                     arithmetic_params<bn128_base_field<254>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bn128_base_field<254>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bn128_base_field<254>>>::nqr_to_t;
                 constexpr typename arithmetic_params<bn128_scalar_field<254>>::modulus_type const
                     arithmetic_params<bn128_scalar_field<254>>::nqr_to_t;
 

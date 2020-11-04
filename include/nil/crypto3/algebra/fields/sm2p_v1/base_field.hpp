@@ -66,8 +66,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                constexpr typename sm2p_v1_base_field<256>::modulus_type const
-                    sm2p_v1_base_field<256>::modulus;
+                constexpr typename sm2p_v1_base_field<256>::modulus_type const sm2p_v1_base_field<256>::modulus;
 
                 template<std::size_t ModulusBits = 256>
                 using sm2p_v1_fq = sm2p_v1_base_field<ModulusBits>;

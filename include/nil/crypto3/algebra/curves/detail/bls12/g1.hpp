@@ -36,7 +36,7 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t ModulusBits>
-                    struct bls12;
+                struct bls12;
 
                 namespace detail {
 
@@ -45,7 +45,7 @@ namespace nil {
 
                         using policy_type = bls12_basic_policy<ModulusBits>;
 
-                        using group_type = bls12<ModulusBits>;
+                        using curve_type = bls12<ModulusBits>;
 
                         using underlying_field_type = typename policy_type::g1_field_type;
 

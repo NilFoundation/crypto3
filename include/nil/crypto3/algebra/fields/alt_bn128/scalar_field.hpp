@@ -74,11 +74,10 @@ namespace nil {
 
                 constexpr typename std::size_t const alt_bn128_scalar_field<254>::value_bits;
 
-                constexpr typename alt_bn128_scalar_field<254>::modulus_type const
-                    alt_bn128_scalar_field<254>::modulus;
+                constexpr typename alt_bn128_scalar_field<254>::modulus_type const alt_bn128_scalar_field<254>::modulus;
 
-                constexpr typename alt_bn128_scalar_field<254>::modulus_type const
-                    alt_bn128_scalar_field<254>::mul_generator;
+                constexpr
+                    typename alt_bn128_scalar_field<254>::modulus_type const alt_bn128_scalar_field<254>::mul_generator;
 
                 template<std::size_t ModulusBits = 254>
                 using alt_bn128_fr = alt_bn128_scalar_field<ModulusBits>;

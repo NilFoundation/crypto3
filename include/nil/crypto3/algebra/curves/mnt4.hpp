@@ -40,7 +40,7 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                template<std::size_t ModulusBits = 298>
+                template<std::size_t ModulusBits>
                 struct mnt4 {
 
                     using policy_type = detail::mnt4_basic_policy<ModulusBits>;
@@ -66,14 +66,7 @@ namespace nil {
                     constexpr static const bool has_affine_pairing = true;
                 };
 
-                template<std::size_t ModulusBits = 298>
-                using mnt4_g1 = typename mnt4<ModulusBits>::g1_type;
-
-                template<std::size_t ModulusBits = 298>
-                using mnt4_g2 = typename mnt4<ModulusBits>::g2_type;
-
-                template<std::size_t ModulusBits = 298>
-                using mnt4_gt = typename mnt4<ModulusBits>::gt_type;
+                typedef mnt4<298> mnt4_298;
 
             }    // namespace curves
         }        // namespace algebra

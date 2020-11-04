@@ -72,8 +72,7 @@ namespace nil {
 
                 constexpr typename std::size_t const edwards_scalar_field<183>::value_bits;
 
-                constexpr typename edwards_scalar_field<183>::modulus_type const
-                    edwards_scalar_field<183>::modulus;
+                constexpr typename edwards_scalar_field<183>::modulus_type const edwards_scalar_field<183>::modulus;
 
                 template<std::size_t ModulusBits = 183>
                 using edwards_fr = edwards_scalar_field<ModulusBits>;

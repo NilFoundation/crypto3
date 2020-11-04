@@ -36,8 +36,9 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-                    template<typename BaseField>
-                    struct fp2;                namespace detail {
+                template<typename BaseField>
+                struct fp2;
+                namespace detail {
 
                     using namespace nil::crypto3::algebra;
 
@@ -54,9 +55,8 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
-
                         using field_type = fields::fp2<base_field_type>;
-                        
+
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::modulus_type modulus_type;
                         typedef typename policy_type::extended_modulus_type extended_modulus_type;
@@ -93,48 +93,40 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr
-                        typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
-                            fp2_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
+                        fp2_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
-                    constexpr
-                        typename std::size_t const fp2_extension_params<mnt4_base_field<ModulusBits>>::s;
+                    constexpr typename std::size_t const fp2_extension_params<mnt4_base_field<ModulusBits>>::s;
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp2_extension_params<
-                        mnt4_base_field<ModulusBits>>::extended_modulus_type const
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::extended_modulus_type const
                         fp2_extension_params<mnt4_base_field<ModulusBits>>::t;
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp2_extension_params<
-                        mnt4_base_field<ModulusBits>>::extended_modulus_type const
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::extended_modulus_type const
                         fp2_extension_params<mnt4_base_field<ModulusBits>>::t_minus_1_over_2;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
-                        2> const fp2_extension_params<mnt4_base_field<ModulusBits>>::nqr;
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
+                                         2> const fp2_extension_params<mnt4_base_field<ModulusBits>>::nqr;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
-                        2> const fp2_extension_params<mnt4_base_field<ModulusBits>>::nqr_to_t;
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
+                                         2> const fp2_extension_params<mnt4_base_field<ModulusBits>>::nqr_to_t;
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp2_extension_params<
-                        mnt4_base_field<ModulusBits>>::extended_modulus_type const
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::extended_modulus_type const
                         fp2_extension_params<mnt4_base_field<ModulusBits>>::group_order;
 
                     template<std::size_t ModulusBits>
-                    constexpr
-                        typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
-                            fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus;
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
+                        fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
-                        2> const fp2_extension_params<mnt4_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
+                                         2> const
+                        fp2_extension_params<mnt4_base_field<ModulusBits>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

@@ -40,8 +40,7 @@ namespace nil {
             namespace fields {
 
                 template<std::size_t ModulusBits>
-                struct arithmetic_params<mnt6_base_field<ModulusBits>>
-                    : public params<mnt6_base_field<ModulusBits>> {
+                struct arithmetic_params<mnt6_base_field<ModulusBits>> : public params<mnt6_base_field<ModulusBits>> {
                 private:
                     typedef params<mnt6_base_field<ModulusBits>> policy_type;
 
@@ -129,13 +128,13 @@ namespace nil {
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type,
-                                     3> const arithmetic_params<fp3<mnt6_base_field<298>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
+                    arithmetic_params<fp3<mnt6_base_field<298>>>::nqr;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type,
-                                     3> const arithmetic_params<fp3<mnt6_base_field<298>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
+                    arithmetic_params<fp3<mnt6_base_field<298>>>::nqr_to_t;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::Rsquared;

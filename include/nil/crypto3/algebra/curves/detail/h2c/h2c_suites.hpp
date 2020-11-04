@@ -65,10 +65,10 @@ namespace nil {
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;
 
-                        /*constexpr*/ static inline const field_value_type Ai =
-                            field_value_type(0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381);
-                        /*constexpr*/ static inline const field_value_type Bi =
-                            field_value_type(0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381);
+                        /*constexpr*/ static inline const field_value_type Ai = field_value_type(
+                            0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381);
+                        /*constexpr*/ static inline const field_value_type Bi = field_value_type(
+                            0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381);
                         /*constexpr*/ static inline const field_value_type Z = field_value_type(11);
                         constexpr static number_type h_eff = 0xd201000000010001_cppui381;
                     };

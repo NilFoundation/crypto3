@@ -39,13 +39,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 381>
+                    template<std::size_t ModulusBits>
                     struct bls12_g2;
 
                     using namespace nil::crypto3::algebra;
                     using namespace boost::multiprecision;
 
-                    template<std::size_t ModulusBits = 381>
+                    template<std::size_t ModulusBits>
                     struct element_bls12_g2 { };
 
                     template<>

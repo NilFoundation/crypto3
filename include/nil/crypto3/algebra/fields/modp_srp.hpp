@@ -190,20 +190,13 @@ namespace nil {
                 constexpr typename modp_srp<6144>::modulus_type const modp_srp<6144>::modulus;
                 constexpr typename modp_srp<8192>::modulus_type const modp_srp<8192>::modulus;
 
-                constexpr
-                    typename modp_srp<1024>::modulus_type const modp_srp<1024>::mul_generator;
-                constexpr
-                    typename modp_srp<1536>::modulus_type const modp_srp<1536>::mul_generator;
-                constexpr
-                    typename modp_srp<2048>::modulus_type const modp_srp<2048>::mul_generator;
-                constexpr
-                    typename modp_srp<3072>::modulus_type const modp_srp<3072>::mul_generator;
-                constexpr
-                    typename modp_srp<4096>::modulus_type const modp_srp<4096>::mul_generator;
-                constexpr
-                    typename modp_srp<6144>::modulus_type const modp_srp<6144>::mul_generator;
-                constexpr
-                    typename modp_srp<8192>::modulus_type const modp_srp<8192>::mul_generator;
+                constexpr typename modp_srp<1024>::modulus_type const modp_srp<1024>::mul_generator;
+                constexpr typename modp_srp<1536>::modulus_type const modp_srp<1536>::mul_generator;
+                constexpr typename modp_srp<2048>::modulus_type const modp_srp<2048>::mul_generator;
+                constexpr typename modp_srp<3072>::modulus_type const modp_srp<3072>::mul_generator;
+                constexpr typename modp_srp<4096>::modulus_type const modp_srp<4096>::mul_generator;
+                constexpr typename modp_srp<6144>::modulus_type const modp_srp<6144>::mul_generator;
+                constexpr typename modp_srp<8192>::modulus_type const modp_srp<8192>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

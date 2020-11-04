@@ -40,7 +40,7 @@ namespace nil {
 
                 using namespace algebra;
 
-                template<std::size_t ModulusBits = 183>
+                template<std::size_t ModulusBits>
                 struct edwards {
 
                     using policy_type = detail::edwards_basic_policy<ModulusBits>;
@@ -66,14 +66,7 @@ namespace nil {
                     constexpr static const bool has_affine_pairing = false;
                 };
 
-                template<std::size_t ModulusBits = 183>
-                using edwards_g1 = typename edwards<ModulusBits>::g1_type;
-
-                template<std::size_t ModulusBits = 183>
-                using edwards_g2 = typename edwards<ModulusBits>::g2_type;
-
-                template<std::size_t ModulusBits = 183>
-                using edwards_gt = typename edwards<ModulusBits>::gt_type;
+                typedef edwards<183> edwards_183;
 
             }    // namespace curves
         }        // namespace algebra

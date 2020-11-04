@@ -96,10 +96,8 @@ namespace nil {
                 constexpr typename std::size_t const bls12_base_field<381>::value_bits;
                 constexpr typename std::size_t const bls12_base_field<377>::value_bits;
 
-                constexpr typename bls12_base_field<381>::modulus_type const
-                    bls12_base_field<381>::modulus;
-                constexpr typename bls12_base_field<377>::modulus_type const
-                    bls12_base_field<377>::modulus;
+                constexpr typename bls12_base_field<381>::modulus_type const bls12_base_field<381>::modulus;
+                constexpr typename bls12_base_field<377>::modulus_type const bls12_base_field<377>::modulus;
 
                 template<std::size_t ModulusBits = 381>
                 using bls12_fq = bls12_base_field<ModulusBits>;

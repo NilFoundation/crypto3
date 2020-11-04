@@ -76,8 +76,8 @@ namespace nil {
                 constexpr typename fp12_2over3over2<BaseField>::modulus_type const fp12_2over3over2<BaseField>::modulus;
 
                 template<typename BaseField>
-                constexpr typename fp12_2over3over2<BaseField>::modulus_type const
-                    fp12_2over3over2<BaseField>::mul_generator;
+                constexpr
+                    typename fp12_2over3over2<BaseField>::modulus_type const fp12_2over3over2<BaseField>::mul_generator;
 
                 template<typename BaseField>
                 constexpr typename std::size_t const fp12_2over3over2<BaseField>::arity;

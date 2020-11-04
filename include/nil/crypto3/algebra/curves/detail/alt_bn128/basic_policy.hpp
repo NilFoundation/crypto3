@@ -70,21 +70,17 @@ namespace nil {
                         constexpr static const number_type b = number_type(0x03);
                     };
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const
-                        alt_bn128_basic_policy<254>::a;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::a;
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const
-                        alt_bn128_basic_policy<254>::b;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::b;
 
                     constexpr typename std::size_t const alt_bn128_basic_policy<254>::base_field_bits;
 
                     constexpr typename std::size_t const alt_bn128_basic_policy<254>::scalar_field_bits;
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const
-                        alt_bn128_basic_policy<254>::p;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::p;
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const
-                        alt_bn128_basic_policy<254>::q;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::q;
 
                 }    // namespace detail
             }        // namespace curves

@@ -42,8 +42,7 @@ namespace nil {
                 /************************* BLS12-381 ***********************************/
 
                 template<>
-                struct arithmetic_params<bls12_base_field<381>>
-                    : public params<bls12_base_field<381>> {
+                struct arithmetic_params<bls12_base_field<381>> : public params<bls12_base_field<381>> {
                 private:
                     typedef params<bls12_base_field<381>> policy_type;
 
@@ -75,8 +74,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<fp2<bls12_base_field<381>>>
-                    : public params<bls12_base_field<381>> {
+                struct arithmetic_params<fp2<bls12_base_field<381>>> : public params<bls12_base_field<381>> {
                 private:
                     typedef params<bls12_base_field<381>> policy_type;
 
@@ -101,8 +99,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<bls12_scalar_field<381>>
-                    : public params<bls12_scalar_field<381>> {
+                struct arithmetic_params<bls12_scalar_field<381>> : public params<bls12_scalar_field<381>> {
                 private:
                     typedef params<bls12_scalar_field<381>> policy_type;
 
@@ -136,8 +133,7 @@ namespace nil {
                 /************************* BLS12-377 ***********************************/
 
                 template<>
-                struct arithmetic_params<bls12_base_field<377>>
-                    : public params<bls12_base_field<377>> {
+                struct arithmetic_params<bls12_base_field<377>> : public params<bls12_base_field<377>> {
                 private:
                     typedef params<bls12_base_field<377>> policy_type;
 
@@ -169,8 +165,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<fp2<bls12_base_field<377>>>
-                    : public params<bls12_base_field<377>> {
+                struct arithmetic_params<fp2<bls12_base_field<377>>> : public params<bls12_base_field<377>> {
                 private:
                     typedef params<bls12_base_field<377>> policy_type;
 
@@ -195,8 +190,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<bls12_scalar_field<377>>
-                    : public params<bls12_scalar_field<377>> {
+                struct arithmetic_params<bls12_scalar_field<377>> : public params<bls12_scalar_field<377>> {
                 private:
                     typedef params<bls12_scalar_field<377>> policy_type;
 
@@ -269,15 +263,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<bls12_base_field<381>>::modulus_type const
                     arithmetic_params<bls12_base_field<381>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bls12_base_field<381>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bls12_base_field<381>>>::nqr;
                 constexpr typename arithmetic_params<bls12_scalar_field<381>>::modulus_type const
                     arithmetic_params<bls12_scalar_field<381>>::nqr;
 
                 constexpr typename arithmetic_params<bls12_base_field<381>>::modulus_type const
                     arithmetic_params<bls12_base_field<381>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bls12_base_field<381>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bls12_base_field<381>>>::nqr_to_t;
                 constexpr typename arithmetic_params<bls12_scalar_field<381>>::modulus_type const
                     arithmetic_params<bls12_scalar_field<381>>::nqr_to_t;
 
@@ -347,15 +341,15 @@ namespace nil {
 
                 constexpr typename arithmetic_params<bls12_base_field<377>>::modulus_type const
                     arithmetic_params<bls12_base_field<377>>::nqr;
-                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bls12_base_field<377>>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bls12_base_field<377>>>::nqr;
                 constexpr typename arithmetic_params<bls12_scalar_field<377>>::modulus_type const
                     arithmetic_params<bls12_scalar_field<377>>::nqr;
 
                 constexpr typename arithmetic_params<bls12_base_field<377>>::modulus_type const
                     arithmetic_params<bls12_base_field<377>>::nqr_to_t;
-                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377>>>::modulus_type,
-                                     2> const arithmetic_params<fp2<bls12_base_field<377>>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377>>>::modulus_type, 2> const
+                    arithmetic_params<fp2<bls12_base_field<377>>>::nqr_to_t;
                 constexpr typename arithmetic_params<bls12_scalar_field<377>>::modulus_type const
                     arithmetic_params<bls12_scalar_field<377>>::nqr_to_t;
 

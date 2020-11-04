@@ -188,10 +188,10 @@ namespace nil {
                     return result;
                 }
 
-                template<typename BaseType, typename FieldType, multiexp_method Method,
-                         typename = typename std::enable_if<
-                             (Method == multiexp_method_bos_coster) &&
-                             ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
+                template<
+                    typename BaseType, typename FieldType, multiexp_method Method,
+                    typename = typename std::enable_if<(Method == multiexp_method_bos_coster) &&
+                                                       ::nil::crypto3::detail::is_fp_field<FieldType>::value>::type>
                 typename BaseType::value_type
                     multiexp_inner(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                                    typename std::vector<typename BaseType::value_type>::const_iterator vec_end,

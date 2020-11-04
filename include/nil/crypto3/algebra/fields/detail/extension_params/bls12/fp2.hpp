@@ -36,7 +36,6 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-
                 template<typename BaseField>
                 struct fp2;
 
@@ -50,14 +49,12 @@ namespace nil {
                     /************************* BLS12-381 ***********************************/
 
                     template<>
-                    class fp2_extension_params<fields::bls12<381>>
-                        : public params<fields::bls12<381>> {
+                    class fp2_extension_params<fields::bls12<381>> : public params<fields::bls12<381>> {
 
                         typedef fields::bls12<381> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
-
                         using field_type = fields::fp2<base_field_type>;
 
                         typedef typename policy_type::number_type number_type;
@@ -99,16 +96,14 @@ namespace nil {
                     /************************* BLS12-377 ***********************************/
 
                     template<>
-                    class fp2_extension_params<fields::bls12<377>>
-                        : public params<fields::bls12<377>> {
+                    class fp2_extension_params<fields::bls12<377>> : public params<fields::bls12<377>> {
 
                         typedef fields::bls12<377> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
-
                         using field_type = fields::fp2<base_field_type>;
-                        
+
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::modulus_type modulus_type;
                         typedef typename policy_type::extended_modulus_type extended_modulus_type;
@@ -153,42 +148,34 @@ namespace nil {
                     constexpr typename std::size_t const fp2_extension_params<bls12_base_field<381>>::s;
                     constexpr typename std::size_t const fp2_extension_params<bls12_base_field<377>>::s;
 
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<381>>::t;
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<377>>::t;
+                    constexpr typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<381>>::t;
+                    constexpr typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<377>>::t;
 
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<381>>::t_minus_1_over_2;
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<377>>::t_minus_1_over_2;
+                    constexpr typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<381>>::t_minus_1_over_2;
+                    constexpr typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<377>>::t_minus_1_over_2;
 
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type,
-                                         2> const fp2_extension_params<bls12_base_field<381>>::nqr;
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type,
-                                         2> const fp2_extension_params<bls12_base_field<377>>::nqr;
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type, 2> const
+                        fp2_extension_params<bls12_base_field<381>>::nqr;
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type, 2> const
+                        fp2_extension_params<bls12_base_field<377>>::nqr;
 
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type,
-                                         2> const fp2_extension_params<bls12_base_field<381>>::nqr_to_t;
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type,
-                                         2> const fp2_extension_params<bls12_base_field<377>>::nqr_to_t;
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type, 2> const
+                        fp2_extension_params<bls12_base_field<381>>::nqr_to_t;
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type, 2> const
+                        fp2_extension_params<bls12_base_field<377>>::nqr_to_t;
 
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<381>>::group_order;
-                    constexpr
-                        typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
-                            fp2_extension_params<bls12_base_field<377>>::group_order;
+                    constexpr typename fp2_extension_params<bls12_base_field<381>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<381>>::group_order;
+                    constexpr typename fp2_extension_params<bls12_base_field<377>>::extended_modulus_type const
+                        fp2_extension_params<bls12_base_field<377>>::group_order;
 
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type,
-                                         2> const
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<381>>::modulus_type, 2> const
                         fp2_extension_params<bls12_base_field<381>>::Frobenius_coeffs_c1;
-                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type,
-                                         2> const
+                    constexpr std::array<typename fp2_extension_params<bls12_base_field<377>>::modulus_type, 2> const
                         fp2_extension_params<bls12_base_field<377>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail

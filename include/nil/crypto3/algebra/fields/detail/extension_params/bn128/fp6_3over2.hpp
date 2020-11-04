@@ -85,20 +85,17 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<
-                                             bn128_base_field<ModulusBits>>::modulus_type,
-                                         2> const
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 2> const
                         fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<
-                                             bn128_base_field<ModulusBits>>::modulus_type,
-                                         6 * 2> const
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
                     template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp6_3over2_extension_params<
-                                             bn128_base_field<ModulusBits>>::modulus_type,
-                                         6 * 2> const
+                    constexpr std::array<
+                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 6 * 2> const
                         fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail
