@@ -65,9 +65,6 @@ namespace nil {
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;
 
-//                        typedef expand_message_xmd<k, hash_type> expand_message;
-//                        typedef m2c_simple_swu_zeroAB<iso_map<group_type>, field_value_type, group_type>
-//                            map_to_curve;
                         /*constexpr*/ static inline const field_value_type Ai =
                             field_value_type(0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381);
                         /*constexpr*/ static inline const field_value_type Bi =
@@ -97,9 +94,6 @@ namespace nil {
                         constexpr static std::size_t k = 128;
                         constexpr static std::size_t L = 64;
 
-//                        typedef expand_message_xmd<k, hash_type> expand_message;
-//                        typedef m2c_simple_swu_zeroAB<iso_map<group_type>, field_value_type, group_type>
-//                            map_to_curve;
                         /*constexpr*/ static inline field_value_type Ai = field_value_type(0, 240);
                         /*constexpr*/ static inline field_value_type Bi = field_value_type(1012, 1012);
                         /*constexpr*/ static inline field_value_type Z = -field_value_type(2, 1);
