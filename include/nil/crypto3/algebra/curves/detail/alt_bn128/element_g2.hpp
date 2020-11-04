@@ -41,9 +41,17 @@ namespace nil {
                 namespace detail {
 
                     template<std::size_t ModulusBits>
-                    struct element_alt_bn128_g2 {
+                    struct alt_bn128_g2;
 
-                        using policy_type = alt_bn128_basic_policy<ModulusBits>;
+                    template<std::size_t ModulusBits>
+                    struct element_alt_bn128_g2 { };
+
+                    template<>
+                    struct element_alt_bn128_g2<254> {
+
+                        using group_type = alt_bn128_g2<254>;
+
+                        using policy_type = alt_bn128_basic_policy<254>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 

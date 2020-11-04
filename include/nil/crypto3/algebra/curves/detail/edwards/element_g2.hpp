@@ -40,12 +40,18 @@ namespace nil {
             namespace curves {
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
+                    template<std::size_t ModulusBits>
+                    struct edwards_g2;
 
-                    template<std::size_t ModulusBits = 183>
-                    struct element_edwards_g2 {
+                    template<std::size_t ModulusBits>
+                    struct element_edwards_g2 { };
 
-                        using policy_type = edwards_basic_policy<ModulusBits>;
+                    template<>
+                    struct element_edwards_g2<183> {
+
+                        using group_type = edwards_g2<183>;
+
+                        using policy_type = edwards_basic_policy<183>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
