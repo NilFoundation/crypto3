@@ -43,7 +43,7 @@ namespace nil {
                                               const number<Backend, ExpressionTemplates> &scalar) {
                         GroupValueType result;
 
-                        /*bool found_one = false;
+                        bool found_one = false;
                         for (auto i = static_cast<std::int64_t>(msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
@@ -53,17 +53,33 @@ namespace nil {
                                 found_one = true;
                                 result = result + base;
                             }
-                        }*/
+                        }
 
                         return result;
                     }
-                    
-                    template<typename GroupValueType, typename = 
+
+                    template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
+                    GroupValueType operator*(
+                        const GroupValueType &left, 
+                        const number<Backend, ExpressionTemplates> &right) {
+
+                        return scalar_mul(left, right);
+                    }
+
+                    template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
+                    GroupValueType operator*(
+                        const number<Backend, ExpressionTemplates> &left,
+                        const GroupValueType &right) {
+
+                        return right * left;
+                    }
+
+                    /*template<typename GroupValueType, typename = 
                         typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
                                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
                     GroupValueType operator*(
                         const GroupValueType &left, 
-                        const typename GroupValueType::underlying_field_type::number_type &right) {
+                        const typename GroupValueType::underlying_field_type::modulus_type &right) {
 
                         return scalar_mul(left, right);
                     }
@@ -72,11 +88,11 @@ namespace nil {
                         typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
                                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
                     GroupValueType operator*(
-                        const typename GroupValueType::underlying_field_type::number_type &left,
+                        const typename GroupValueType::underlying_field_type::modulus_type &left,
                         const GroupValueType &right) {
 
                         return right * left;
-                    }
+                    }*/
 
                     template<typename GroupValueType, typename FieldValueType, typename = 
                         typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value && 
@@ -84,7 +100,7 @@ namespace nil {
                                                 ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value>::type>
                     GroupValueType operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        return left * right.data;
+                        return left * typename GroupValueType::underlying_field_type::number_type(right.data);
                     }
 
                     template<typename GroupValueType, typename FieldValueType, typename = 
