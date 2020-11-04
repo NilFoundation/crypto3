@@ -26,32 +26,18 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_UTILS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_UTILS_HPP
 
-#include <cstdint>
-#include <array>
-#include <type_traits>
-#include <iterator>
-#include <algorithm>
-#include <string>
-
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <boost/concept/assert.hpp>
-
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/accumulators/hash.hpp>
-
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
+#include <boost/concept/assert.hpp>
+
+#include <iterator>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    using namespace boost::multiprecision;
                     using namespace nil::crypto3::algebra::fields::detail;
 
                     template<typename InputType, typename OutputType>

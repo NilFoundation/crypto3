@@ -26,9 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_ISO_MAP_HPP
 #define CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_ISO_MAP_HPP
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
+
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <array>
 

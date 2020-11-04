@@ -31,6 +31,15 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/accumulators/hash.hpp>
+
+#include <boost/concept/assert.hpp>
+
+#include <array>
+#include <type_traits>
+#include <iterator>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -57,7 +66,7 @@ namespace nil {
                                 std::is_same<std::uint8_t, typename InputMsgType::value_type>::value &&
                                 std::is_same<std::uint8_t, typename InputDstType::value_type>::value &&
                                 std::is_same<std::uint8_t, typename OutputType::value_type>::value>::type>
-                        static inline void process(std::size_t len_in_bytes, const InputMsgType &msg,
+                        static inline void process(const std::size_t len_in_bytes, const InputMsgType &msg,
                                                    const InputDstType &dst, OutputType &uniform_bytes) {
                             BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputMsgType>));
                             BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputDstType>));
