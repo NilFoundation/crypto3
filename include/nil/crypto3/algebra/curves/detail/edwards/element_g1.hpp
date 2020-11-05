@@ -52,11 +52,12 @@ namespace nil {
                         using group_type = edwards_g1<183>;
 
                         using policy_type = edwards_basic_policy<183>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
-                        typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
-                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
+                        using underlying_field_type = typename policy_type::g1_field_type;
 
-                        using underlying_field_value_type = g1_field_type_value;
+                        using g1_field_type_value = typename policy_type::g1_field_type::value_type;
+                        // must be removed later
+
+                        using underlying_field_value_type = typename underlying_field_type::value_type;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;
@@ -288,24 +289,7 @@ namespace nil {
                         /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                         /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
 
-                        /*constexpr static const g2_field_type_value
-                            twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
-                                                        typename g2_field_type_value::underlying_type::one(),
-                                                        typename g2_field_type_value::underlying_type::zero());
-                        constexpr static const g2_field_type_value twist_coeff_a = twist.mul_by_Fp(a);
-                        constexpr static const g2_field_type_value twist_coeff_d = twist.mul_by_Fp(d);
-
-                        constexpr static const g1_field_type_value twist_mul_by_a_c0 = a *
-                        g2_field_type_value::non_residue; constexpr static const g1_field_type_value twist_mul_by_a_c1 =
-                        a; constexpr static const g1_field_type_value twist_mul_by_a_c2 = a; constexpr static const
-                        g1_field_type_value twist_mul_by_d_c0 = d * g2_field_type_value::non_residue; constexpr static
-                        const g1_field_type_value twist_mul_by_d_c1 = d; constexpr static const g1_field_type_value
-                        twist_mul_by_d_c2 = d; constexpr static const g1_field_type_value twist_mul_by_q_Y =
-                        g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180); constexpr static
-                        const g1_field_type_value twist_mul_by_q_Z =
-                        g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-
-                        constexpr static const underlying_field_value_type zero_fill = {
+                        /*constexpr static const underlying_field_value_type zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 

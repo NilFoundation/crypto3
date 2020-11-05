@@ -39,8 +39,6 @@ namespace nil {
             namespace fields {
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
-
                     template<typename BaseField>
                     struct fp12_2over3over2_extension_params;
 

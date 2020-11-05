@@ -34,8 +34,6 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
-
                     template<std::size_t ModulusBits = 254>
                     struct alt_bn128_basic_policy;
 

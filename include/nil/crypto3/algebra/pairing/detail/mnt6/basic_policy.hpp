@@ -36,8 +36,6 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
-
                     template<std::size_t ModulusBits = 298>
                     class mnt6_basic_policy;
 

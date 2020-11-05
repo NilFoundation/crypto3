@@ -40,8 +40,6 @@ namespace nil {
                 struct fp2;
                 namespace detail {
 
-                    using namespace nil::crypto3::algebra;
-
                     template<typename BaseField>
                     struct fp2_extension_params;
 
