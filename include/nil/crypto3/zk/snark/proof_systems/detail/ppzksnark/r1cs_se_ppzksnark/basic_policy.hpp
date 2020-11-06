@@ -240,17 +240,17 @@ namespace nil {
                                 verification_key result;
                                 result.H = algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::value_type::one(); result.G_alpha = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.H_beta =
-                            algebra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                            result.H_beta = algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::value_type::one(); result.G_gamma = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.H_gamma =
-                            algebra::random_element<typename CurveType::scalar_field_type>() * typename
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                            result.H_gamma = algebra::random_element<typename CurveType::scalar_field_type>() * typename
                             CurveType::g2_type::value_type::one();
 
                                 typename std::vector<typename CurveType::g1_type::value_type> v;
                                 for (std::size_t i = 0; i < input_size + 1; ++i) {
-                                    v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::value_type::one());
+                                    v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() *
+                            typename CurveType::g1_type::value_type::one());
                                 }
                                 result.query = std::move(v);
 
@@ -322,7 +322,8 @@ namespace nil {
 
                             proof() {
                             }
-                            proof(typename CurveType::g1_type::value_type &&A, typename CurveType::g2_type::value_type &&B,
+                            proof(typename CurveType::g1_type::value_type &&A,
+                                  typename CurveType::g2_type::value_type &&B,
                                   typename CurveType::g1_type::value_type &&C) :
                                 A(std::move(A)),
                                 B(std::move(B)), C(std::move(C)) {};
@@ -406,8 +407,10 @@ namespace nil {
                                 alpha = algebra::random_element<typename CurveType::scalar_field_type>(),
                                 beta = algebra::random_element<typename CurveType::scalar_field_type>(),
                                 gamma = algebra::random_element<typename CurveType::scalar_field_type>();
-                            const typename CurveType::g1_type::value_type G = algebra::random_element<typename CurveType::g1_type>();
-                            const typename CurveType::g2_type::value_type H = algebra::random_element<typename CurveType::g2_type>();
+                            const typename CurveType::g1_type::value_type G =
+                                algebra::random_element<typename CurveType::g1_type>();
+                            const typename CurveType::g2_type::value_type H =
+                                algebra::random_element<typename CurveType::g2_type>();
 
                             std::size_t G_exp_count = sap_inst.num_inputs() + 1    // verifier_query
                                                       + non_zero_At                // A_query
@@ -566,12 +569,11 @@ namespace nil {
                                 r * pk.G_gamma_Z + pk.A_query[0] +    // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * pk.G_gamma_Z +           // ZK-patch
                                 algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(
-                                    pk.A_query.begin() + 1,
-                                    pk.A_query.end(),
-                                    sap_wit.coefficients_for_ACs.begin(),
-                                    sap_wit.coefficients_for_ACs.end(),
-                                    chunks);
+                                                  algebra::multiexp_method_BDLO12>(pk.A_query.begin() + 1,
+                                                                                   pk.A_query.end(),
+                                                                                   sap_wit.coefficients_for_ACs.begin(),
+                                                                                   sap_wit.coefficients_for_ACs.end(),
+                                                                                   chunks);
 
                             /**
                              * compute B exactly as A, except with H as the base
@@ -580,12 +582,11 @@ namespace nil {
                                 r * pk.H_gamma_Z + pk.B_query[0] +    // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * pk.H_gamma_Z +           // ZK-patch
                                 algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(
-                                    pk.B_query.begin() + 1,
-                                    pk.B_query.end(),
-                                    sap_wit.coefficients_for_ACs.begin(),
-                                    sap_wit.coefficients_for_ACs.end(),
-                                    chunks);
+                                                  algebra::multiexp_method_BDLO12>(pk.B_query.begin() + 1,
+                                                                                   pk.B_query.end(),
+                                                                                   sap_wit.coefficients_for_ACs.begin(),
+                                                                                   sap_wit.coefficients_for_ACs.end(),
+                                                                                   chunks);
                             /**
                              * compute C = G^{f(input) +
                              *                r^2 * gamma^2 * Z(t)^2 +
@@ -598,7 +599,7 @@ namespace nil {
                              */
                             typename CurveType::g1_type::value_type C =
                                 algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(
+                                                  algebra::multiexp_method_BDLO12>(
                                     pk.C_query_1.begin(),
                                     pk.C_query_1.end(),
                                     sap_wit.coefficients_for_ACs.begin() + sap_wit.num_inputs(),
@@ -609,8 +610,8 @@ namespace nil {
                                 r * pk.C_query_2[0] +                      // i = 0 is a special case for C_query_2
                                 (r + r) * sap_wit.d1 * pk.G_gamma2_Z2 +    // ZK-patch for C_query_2
                                 r * algebra::multiexp<typename CurveType::g1_type,
-                                                       typename CurveType::scalar_field_type,
-                                                       algebra::multiexp_method_BDLO12>(
+                                                      typename CurveType::scalar_field_type,
+                                                      algebra::multiexp_method_BDLO12>(
                                         pk.C_query_2.begin() + 1,
                                         pk.C_query_2.end(),
                                         sap_wit.coefficients_for_ACs.begin(),
@@ -618,11 +619,11 @@ namespace nil {
                                         chunks) +
                                 sap_wit.d2 * pk.G_gamma2_Z_t[0] +    // ZK-patch
                                 algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(pk.G_gamma2_Z_t.begin(),
-                                                                                     pk.G_gamma2_Z_t.end(),
-                                                                                     sap_wit.coefficients_for_H.begin(),
-                                                                                     sap_wit.coefficients_for_H.end(),
-                                                                                     chunks);
+                                                  algebra::multiexp_method_BDLO12>(pk.G_gamma2_Z_t.begin(),
+                                                                                   pk.G_gamma2_Z_t.end(),
+                                                                                   sap_wit.coefficients_for_H.begin(),
+                                                                                   sap_wit.coefficients_for_H.end(),
+                                                                                   chunks);
 
                             proof prf = proof(std::move(A), std::move(B), std::move(C));
                             prf.print_size();
@@ -684,7 +685,7 @@ namespace nil {
                             typename CurveType::g1_type::value_type G_psi =
                                 pvk.query[0] +
                                 algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_bos_coster>(
+                                                  algebra::multiexp_method_bos_coster>(
                                     pvk.query.begin() + 1, pvk.query.end(), primary_input.begin(), primary_input.end(),
                                     chunks);
 

@@ -55,10 +55,8 @@ namespace nil {
                     using prover = Prover;
 
                     using verifier = Verifier;
-                };
 
-                template<typename CurveType>
-                using default_bacs_ppzksnark = bacs_ppzksnark<detail::bacs_ppzksnark_basic_policy<CurveType>>;
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

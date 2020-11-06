@@ -62,7 +62,7 @@
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
-////#include <nil/crypto3/algebra/multiexp/default.hpp>
+//#include <nil/crypto3/algebra/multiexp/default.hpp>
 
 //#include <nil/crypto3/algebra/random_element.hpp>
 
@@ -220,7 +220,8 @@ namespace nil {
                                 result.gamma_g2 = algebra::random_element<typename CurveType::g2_type>();
                                 result.delta_g2 = algebra::random_element<typename CurveType::g2_type>();
 
-                                typename CurveType::g1_type::value_type base = algebra::random_element<typename CurveType::g1_type>();
+                                typename CurveType::g1_type::value_type base =
+                                    algebra::random_element<typename CurveType::g1_type>();
                                 typename std::vector<typename CurveType::g1_type::value_type> v;
                                 for (std::size_t i = 0; i < input_size; ++i) {
                                     v.emplace_back(algebra::random_element<typename CurveType::g1_type>());
@@ -299,7 +300,8 @@ namespace nil {
                                 this->g_B = typename CurveType::g2_type::value_type::one();
                                 this->g_C = typename CurveType::g1_type::value_type::one();
                             }
-                            proof(typename CurveType::g1_type::value_type &&g_A, typename CurveType::g2_type::value_type &&g_B,
+                            proof(typename CurveType::g1_type::value_type &&g_A,
+                                  typename CurveType::g2_type::value_type &&g_B,
                                   typename CurveType::g1_type::value_type &&g_C) :
                                 g_A(std::move(g_A)),
                                 g_B(std::move(g_B)), g_C(std::move(g_C)) {};
@@ -484,7 +486,7 @@ namespace nil {
 
                             typename std::vector<typename CurveType::g1_type::value_type> H_query;
                             //= batch_exp_with_coeff(g1_scalar_size, g1_window_size, g1_table, qap.Zt * delta_inverse,
-                            //Ht);
+                            // Ht);
                             // uncomment
                             // when batch_exp_with_coeff ready
 #ifdef USE_MIXED_ADDITION
@@ -575,7 +577,8 @@ namespace nil {
                                                            qap_wit.coefficients_for_ABCs.begin(),
                                                            qap_wit.coefficients_for_ABCs.end());
 
-                            typename CurveType::g1_type::value_type evaluation_At = CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_At =
+                                CurveType::g1_type::value_type::zero();
                             /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
                                                                    algebra::multiexp_method_BDLO12>(
@@ -603,7 +606,8 @@ namespace nil {
 
                             // uncomment
                             // when kc_multiexp_with_mixed_addition ready
-                            typename CurveType::g1_type::value_type evaluation_Ht = CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_Ht =
+                                CurveType::g1_type::value_type::zero();
                             /*algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                algebra::multiexp_method_BDLO12>(
                                 pk.H_query.begin(),
@@ -614,7 +618,8 @@ namespace nil {
 
                             // uncomment
                             // when multiexp ready
-                            typename CurveType::g1_type::value_type evaluation_Lt = CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type evaluation_Lt =
+                                CurveType::g1_type::value_type::zero();
                             /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
                                                                    algebra::multiexp_method_BDLO12>(
@@ -629,17 +634,15 @@ namespace nil {
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
                             typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At;
-                            // typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
-                            // uncomment
-                            // when multiplication ready
+                            // typename CurveType::g1_type::value_type g1_A = pk.alpha_g1 + evaluation_At + r *
+                            // pk.delta_g1; uncomment when multiplication ready
 
                             /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
                             typename CurveType::g1_type::value_type g1_B = pk.beta_g1 + evaluation_Bt.h;
                             typename CurveType::g2_type::value_type g2_B = pk.beta_g2 + evaluation_Bt.g;
-                            // typename CurveType::g1_type::value_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
-                            // typename CurveType::g2_type::value_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
-                            // uncomment
-                            // when multiplication ready
+                            // typename CurveType::g1_type::value_type g1_B = pk.beta_g1 + evaluation_Bt.h + s *
+                            // pk.delta_g1; typename CurveType::g2_type::value_type g2_B = pk.beta_g2 + evaluation_Bt.g
+                            // + s * pk.delta_g2; uncomment when multiplication ready
 
                             /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b -
                              * r*s*delta
@@ -741,8 +744,8 @@ namespace nil {
                          * (1) accepts a non-processed verification key, and
                          * (2) has weak input consistency.
                          */
-                        static bool
-                            verifier_weak_IC(const verification_key &vk, const primary_input &pi, const proof &proof) {
+                        static bool verifier_weak_IC(const verification_key &vk, const primary_input &pi,
+                                                     const proof &proof) {
                             processed_verification_key pvk = verifier_process_vk(vk);
                             bool result = online_verifier_weak_IC(pvk, pi, proof);
                             return result;
