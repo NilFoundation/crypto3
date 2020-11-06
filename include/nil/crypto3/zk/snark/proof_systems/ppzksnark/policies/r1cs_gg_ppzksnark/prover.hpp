@@ -67,6 +67,8 @@
 //#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {

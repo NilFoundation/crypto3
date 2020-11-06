@@ -27,18 +27,20 @@
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/basic_policy.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FunctionsPolicy>
+                template<typename Generator = policies::tbcs_ppzksnark_generator, 
+                         typename Prover = policies::tbcs_ppzksnark_prover, 
+                         typename Verifier = policies::tbcs_ppzksnark_verifier_strong_IC>
                 class tbcs_ppzksnark {
-                    using policy_type = FunctionsPolicy;
+                    using types_policy = detail::tbcs_ppzksnark_types_policy;
 
                 public:
                     using circuit_type = typename policy_type::circuit;
@@ -52,44 +54,11 @@ namespace nil {
                     using keypair_type = typename policy_type::keypair;
                     using proof_type = typename policy_type::proof;
 
-                    static inline keypair_type generator(const circuit_type &circuit) {
-                        return policy_type::generator(circuit);
-                    }
+                    using generator = Generator;
 
-                    static inline proof_type prover(const proving_key_type &pk,
-                                                    const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input) {
+                    using prover = Prover;
 
-                        return policy_type::prover(pk, primary_input, auxiliary_input);
-                    }
-
-                    static inline processed_verification_key_type verifier_process_vk(const verification_key_type &vk) {
-                        return policy_type::verifier_process_vk(vk);
-                    }
-
-                    static inline bool online_verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                                 const primary_input_type &primary_input,
-                                                                 const proof_type &proof) {
-                        return policy_type::online_verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool online_verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::online_verifier_weak_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                          const primary_input_type &primary_input,
-                                                          const proof_type &proof) {
-                        return policy_type::verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                        const primary_input_type &primary_input,
-                                                        const proof_type &proof) {
-                        return policy_type::verifier_weak_IC(pvk, primary_input, proof);
-                    }
+                    using verifier = Verifier;
                 };
             }    // namespace snark
         }        // namespace zk

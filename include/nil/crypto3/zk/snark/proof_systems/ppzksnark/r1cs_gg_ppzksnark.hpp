@@ -27,9 +27,9 @@
 #define CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,9 +38,9 @@ namespace nil {
 
                 template<typename Generator = policies::r1cs_gg_ppzksnark_generator, 
                          typename Prover = policies::r1cs_gg_ppzksnark_prover, 
-                         typename Verifier = policies::verifier_strong_IC>
+                         typename Verifier = policies::r1cs_gg_ppzksnark_verifier_strong_IC>
                 class r1cs_gg_ppzksnark {
-                    using types_policy = FunctionsPolicy;
+                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
 
                 public:
                     using constraint_system_type = typename types_policy::constraint_system;
@@ -54,7 +54,11 @@ namespace nil {
                     using keypair_type = typename types_policy::keypair;
                     using proof_type = typename types_policy::proof;
 
-                    
+                    using generator = Generator;
+
+                    using prover = Prover;
+
+                    using verifier = Verifier;
                 };
 
             }    // namespace snark

@@ -212,7 +212,7 @@ namespace nil {
                                         this->gamma_ABC_g1 == other.gamma_ABC_g1);
                             }
 
-                            static verification_key dummy_verification_key(const std::size_t input_size) {
+                            /*static verification_key dummy_verification_key(const std::size_t input_size) {
                                 verification_key result;
                                 result.alpha_g1_beta_g2 =
                                     algebra::random_element<typename CurveType::scalar_field_type>() *
@@ -231,7 +231,7 @@ namespace nil {
                                     accumulation_vector<typename CurveType::g1_type>(std::move(base), std::move(v));
 
                                 return result;
-                            }
+                            }*/
                         };
 
                         /************************ Processed verification key *************************/

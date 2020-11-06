@@ -47,8 +47,8 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
-#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
+#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
+#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <memory>
 
@@ -66,6 +66,8 @@
 
 //#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
+
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -295,4 +297,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
+#endif    // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_VERIFIER_HPP

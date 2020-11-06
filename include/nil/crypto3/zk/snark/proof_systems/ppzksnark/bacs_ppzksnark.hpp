@@ -38,7 +38,7 @@ namespace nil {
 
                 template<typename Generator = policies::bacs_ppzksnark_generator, 
                          typename Prover = policies::bacs_ppzksnark_prover, 
-                         typename Verifier = policies::verifier_strong_IC>
+                         typename Verifier = policies::bacs_ppzksnark_verifier_strong_IC>
                 class bacs_ppzksnark {
                     using types_policy = detail::bacs_ppzksnark_types_policy;
 
@@ -49,6 +49,7 @@ namespace nil {
 
                     using proving_key_type = typename types_policy::proving_key;
                     using verification_key_type = typename types_policy::verification_key;
+                    using processed_verification_key_type = typename types_policy::processed_verification_key;
 
                     using keypair_type = typename types_policy::keypair;
                     using proof_type = typename types_policy::proof;
@@ -58,7 +59,6 @@ namespace nil {
                     using prover = Prover;
 
                     using verifier = Verifier;
-
                 };
             }    // namespace snark
         }        // namespace zk
