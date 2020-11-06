@@ -27,6 +27,9 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -94,9 +97,6 @@ namespace nil {
                         return policy_type::verifier_weak_IC(pvk, primary_input, proof);
                     }
                 };
-
-                template<typename CurveType>
-                using default_r1cs_ppzksnark = r1cs_ppzksnark<detail::r1cs_ppzksnark_basic_policy<CurveType>>;
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

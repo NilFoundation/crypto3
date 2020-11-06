@@ -52,7 +52,7 @@
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/types_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,18 +60,18 @@ namespace nil {
             namespace snark {
                 namespace policies {
 
-                    using basic_policy = detail::bacs_ppzksnark_basic_policy;
+                    using types_policy = detail::bacs_ppzksnark_types_policy;
 
-                    using circuit_type = typename basic_policy::circuit;
-                    using primary_input_type = typename basic_policy::primary_input;
-                    using auxiliary_input_type = typename basic_policy::auxiliary_input;
+                    using circuit_type = typename types_policy::circuit;
+                    using primary_input_type = typename types_policy::primary_input;
+                    using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                    using proving_key_type = typename basic_policy::proving_key;
-                    using verification_key_type = typename basic_policy::verification_key;
-                    using processed_verification_key_type = typename basic_policy::processed_verification_key;
+                    using proving_key_type = typename types_policy::proving_key;
+                    using verification_key_type = typename types_policy::verification_key;
+                    using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                    using keypair_type = typename basic_policy::keypair;
-                    using proof_type = typename basic_policy::proof;
+                    using keypair_type = typename types_policy::keypair;
+                    using proof_type = typename types_policy::proof;
                     /**
                      * A prover algorithm for the BACS ppzkSNARK.
                      *
@@ -83,19 +83,19 @@ namespace nil {
                     struct bacs_ppzksnark_prover {
 
                         template<typename CurveType>
-                        proof operator()(const proving_key &pk,
-                                         const primary_input &primary_input,
-                                         const auxiliary_input &auxiliary_input) {
+                        proof_type operator()(const proving_key_type &proving_key,
+                                              const primary_input_type &primary_input,
+                                              const auxiliary_input_type &auxiliary_input) {
 
                             typedef typename CurveType::scalar_field_type field_type;
 
                             const r1cs_variable_assignment<field_type> r1cs_va =
-                                bacs_to_r1cs_witness_map<field_type>(pk.circuit, primary_input, auxiliary_input);
+                                bacs_to_r1cs_witness_map<field_type>(proving_key.circuit, primary_input, auxiliary_input);
                             const r1cs_auxiliary_input<field_type> r1cs_ai(
                                 r1cs_va.begin() + primary_input.size(),
                                 r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
                             const typename r1cs_ppzksnark<CurveType>::proof_type r1cs_proof =
-                                r1cs_ppzksnark<CurveType>::prover(pk.r1cs_pk, primary_input, r1cs_ai);
+                                r1cs_ppzksnark<CurveType>::prover(proving_key.r1cs_pk, primary_input, r1cs_ai);
 
                             return r1cs_proof;
                         }

@@ -61,7 +61,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct tbcs_ppzksnark_basic_policy {
+                    struct tbcs_ppzksnark_types_policy {
 
                         /******************************** Params ********************************/
 

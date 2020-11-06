@@ -51,8 +51,8 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/types_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,44 +60,59 @@ namespace nil {
             namespace snark {
                 namespace policies {
 
-                    using basic_policy = detail::bacs_ppzksnark_basic_policy;
+                    using types_policy = detail::bacs_ppzksnark_types_policy;
                     
-                    using circuit_type = typename basic_policy::circuit;
-                    using primary_input_type = typename basic_policy::primary_input;
-                    using auxiliary_input_type = typename basic_policy::auxiliary_input;
+                    using circuit_type = typename types_policy::circuit;
+                    using primary_input_type = typename types_policy::primary_input;
+                    using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                    using proving_key_type = typename basic_policy::proving_key;
-                    using verification_key_type = typename basic_policy::verification_key;
-                    using processed_verification_key_type = typename basic_policy::processed_verification_key;
+                    using proving_key_type = typename types_policy::proving_key;
+                    using verification_key_type = typename types_policy::verification_key;
+                    using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                    using keypair_type = typename basic_policy::keypair;
-                    using proof_type = typename basic_policy::proof;
-
+                    using keypair_type = typename types_policy::keypair;
+                    using proof_type = typename types_policy::proof;
+                    
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
-                    struct verifier_process_vk {
+                    struct bacs_ppzksnark_verifier_process_vk {
                         template<typename CurveType>
-                        processed_verification_key operator()(const verification_key &vk) {
-                            const processed_verification_key pvk = r1cs_ppzksnark<CurveType>::verifier_process_vk(vk);
+                        processed_verification_key operator()(const verification_key_type &verification_key) {
+                            const processed_verification_key_type processed_verification_key = 
+                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
 
-                            return pvk;
+                            return processed_verification_key;
                         }
                     };
+
+                    /*
+                     Below are four variants of verifier algorithm for the BACS ppzkSNARK.
+
+                     These are the four cases that arise from the following two choices:
+
+                     (1) The verifier accepts a (non-processed) verification key or, instead, a processed
+                     verification key. In the latter case, we call the algorithm an "online verifier".
+
+                     (2) The verifier checks for "weak" input consistency or, instead, "strong" input
+                     consistency. Strong input consistency requires that |primary_input| = C.num_inputs, whereas
+                         weak input consistency requires that |primary_input| <= C.num_inputs (and
+                         the primary input is implicitly padded with zeros up to length C.num_inputs).
+                     */
 
                     /**
                      * A verifier algorithm for the BACS ppzkSNARK that:
                      * (1) accepts a non-processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    struct verifier_weak_IC {
+                    struct bacs_ppzksnark_verifier_weak_IC {
                         template<typename CurveType>
-                        bool operator()(const verification_key &vk,
-                                        const primary_input &primary_input,
-                                        const proof &proof) {
-                            const processed_verification_key pvk = verifier_process_vk(vk);
+                        bool operator()(const verification_key_type &verification_key,
+                                        const primary_input_type &primary_input,
+                                        const proof_type &proof) {
+                            const processed_verification_key_type processed_verification_key = bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
                             const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
+                                r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -108,15 +123,15 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    struct verifier_strong_IC {
+                    struct bacs_ppzksnark_verifier_strong_IC {
                         template<typename CurveType>
-                        bool operator()(const verification_key &vk,
-                                            const primary_input &primary_input,
-                                            const proof &proof) {
+                        bool operator()(const verification_key_type &verification_key,
+                                            const primary_input_type &primary_input,
+                                            const proof_type &proof) {
 
-                            const processed_verification_key pvk = verifier_process_vk(vk);
+                            const processed_verification_key_type processed_verification_key = bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
                             const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
+                                r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -127,13 +142,13 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    struct online_verifier_weak_IC {
+                    struct bacs_ppzksnark_online_verifier_weak_IC {
                         template<typename CurveType>
-                        bool operator()(const processed_verification_key &pvk,
-                                                        const primary_input &primary_input,
-                                                        const proof &proof) {
+                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                                                        const primary_input_type &primary_input,
+                                                        const proof_type &proof) {
                             const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
+                                r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -144,13 +159,13 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    struct online_verifier_strong_IC {
+                    struct bacs_ppzksnark_online_verifier_strong_IC {
                         template<typename CurveType>
-                        bool operator()(const processed_verification_key &pvk,
-                                                          const primary_input &primary_input,
-                                                          const proof &proof) {
+                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                                        const primary_input_type &primary_input,
+                                        const proof_type &proof) {
                             const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
+                                r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(processed_verification_key, primary_input, proof);
 
                             return bit;
                         }

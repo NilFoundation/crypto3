@@ -60,7 +60,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct bacs_ppzksnark_basic_policy {
+                    struct bacs_ppzksnark_types_policy {
 
                         /******************************** Params ********************************/
 
@@ -119,19 +119,6 @@ namespace nil {
                                 return r1cs_pk.size_in_bits();
                             }
 
-                            /*
-                             Below are four variants of verifier algorithm for the BACS ppzkSNARK.
-
-                             These are the four cases that arise from the following two choices:
-
-                             (1) The verifier accepts a (non-processed) verification key or, instead, a processed
-                             verification key. In the latter case, we call the algorithm an "online verifier".
-
-                             (2) The verifier checks for "weak" input consistency or, instead, "strong" input
-                             consistency. Strong input consistency requires that |primary_input| = C.num_inputs, whereas
-                                 weak input consistency requires that |primary_input| <= C.num_inputs (and
-                                 the primary input is implicitly padded with zeros up to length C.num_inputs).
-                             */
                             bool operator==(const proving_key &other) const {
                                 return (this->crct == other.crct && this->r1cs_pk == other.r1cs_pk);
                             }

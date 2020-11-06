@@ -26,77 +26,36 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FunctionsPolicy>
+                template<typename Generator = policies::r1cs_gg_ppzksnark_generator, 
+                         typename Prover = policies::r1cs_gg_ppzksnark_prover, 
+                         typename Verifier = policies::verifier_strong_IC>
                 class r1cs_gg_ppzksnark {
-                    using policy_type = FunctionsPolicy;
+                    using types_policy = FunctionsPolicy;
 
                 public:
-                    using constraint_system_type = typename policy_type::constraint_system;
-                    using primary_input_type = typename policy_type::primary_input;
-                    using auxiliary_input_type = typename policy_type::auxiliary_input;
+                    using constraint_system_type = typename types_policy::constraint_system;
+                    using primary_input_type = typename types_policy::primary_input;
+                    using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
+                    using proving_key_type = typename types_policy::proving_key;
+                    using verification_key_type = typename types_policy::verification_key;
+                    using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
+                    using keypair_type = typename types_policy::keypair;
+                    using proof_type = typename types_policy::proof;
 
-                    static inline keypair_type generator(const constraint_system_type &constraint_system) {
-                        return policy_type::generator(constraint_system);
-                    }
-
-                    static inline proof_type prover(const proving_key_type &pk,
-                                                    const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input) {
-
-                        return policy_type::prover(pk, primary_input, auxiliary_input);
-                    }
-
-                    static inline processed_verification_key_type verifier_process_vk(const verification_key_type &vk) {
-                        return policy_type::verifier_process_vk(vk);
-                    }
-
-                    static inline bool online_verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                                 const primary_input_type &primary_input,
-                                                                 const proof_type &proof) {
-                        return policy_type::online_verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool online_verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::online_verifier_weak_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                          const primary_input_type &primary_input,
-                                                          const proof_type &proof) {
-                        return policy_type::verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                        const primary_input_type &primary_input,
-                                                        const proof_type &proof) {
-                        return policy_type::verifier_weak_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool affine_verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::verifier_weak_IC(pvk, primary_input, proof);
-                    }
+                    
                 };
-
-                template<typename CurveType>
-                using default_r1cs_gg_ppzksnark = r1cs_gg_ppzksnark<detail::r1cs_gg_ppzksnark_basic_policy<CurveType>>;
 
             }    // namespace snark
         }        // namespace zk

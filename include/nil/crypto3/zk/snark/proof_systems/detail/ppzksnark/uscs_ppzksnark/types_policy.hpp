@@ -86,7 +86,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct uscs_ppzksnark_basic_policy {
+                    struct uscs_ppzksnark_types_policy {
 
                         /******************************** Params ********************************/
 

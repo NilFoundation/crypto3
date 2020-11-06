@@ -26,7 +26,10 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/bacs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,20 +38,20 @@ namespace nil {
 
                 template<typename Generator = policies::bacs_ppzksnark_generator, 
                          typename Prover = policies::bacs_ppzksnark_prover, 
-                         typename Verifier = >
+                         typename Verifier = policies::verifier_strong_IC>
                 class bacs_ppzksnark {
-                    using basic_policy = detail::bacs_ppzksnark_basic_policy;
+                    using types_policy = detail::bacs_ppzksnark_types_policy;
 
                 public:
-                    using circuit_type = typename basic_policy::circuit;
-                    using primary_input_type = typename basic_policy::primary_input;
-                    using auxiliary_input_type = typename basic_policy::auxiliary_input;
+                    using circuit_type = typename types_policy::circuit;
+                    using primary_input_type = typename types_policy::primary_input;
+                    using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                    using proving_key_type = typename basic_policy::proving_key;
-                    using verification_key_type = typename basic_policy::verification_key;
+                    using proving_key_type = typename types_policy::proving_key;
+                    using verification_key_type = typename types_policy::verification_key;
 
-                    using keypair_type = typename basic_policy::keypair;
-                    using proof_type = typename basic_policy::proof;
+                    using keypair_type = typename types_policy::keypair;
+                    using proof_type = typename types_policy::proof;
 
                     using generator = Generator;
 
