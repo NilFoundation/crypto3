@@ -161,8 +161,7 @@ namespace nil {
                         /**
                          * A key pair for the BACS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        class keypair {
-                        public:
+                        struct keypair {
                             proving_key pk;
                             verification_key vk;
 
@@ -181,116 +180,6 @@ namespace nil {
                          * A proof for the BACS ppzkSNARK.
                          */
                         using proof = typename r1cs_ppzksnark<CurveType>::proof_type;
-
-                        /***************************** Main algorithms *******************************/
-
-                        /**
-                         * A generator algorithm for the BACS ppzkSNARK.
-                         *
-                         * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
-                         */
-                        static keypair generator(const circuit &circuit) {
-                            typedef typename CurveType::scalar_field_type FieldType;
-
-                            const r1cs_constraint_system<FieldType> r1cs_cs =
-                                bacs_to_r1cs_instance_map<FieldType>(circuit);
-                            const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
-                                r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
-
-                            return keypair(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
-                        }
-
-                        /**
-                         * A prover algorithm for the BACS ppzkSNARK.
-                         *
-                         * Given a BACS primary input X and a BACS auxiliary input Y, this algorithm
-                         * produces a proof (of knowledge) that attests to the following statement:
-                         *               ``there exists Y such that C(X,Y)=0''.
-                         * Above, C is the BACS circuit that was given as input to the generator algorithm.
-                         */
-                        static proof prover(const proving_key &pk,
-                                            const primary_input &primary_input,
-                                            const auxiliary_input &auxiliary_input) {
-
-                            typedef typename CurveType::scalar_field_type FieldType;
-
-                            const r1cs_variable_assignment<FieldType> r1cs_va =
-                                bacs_to_r1cs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
-                            const r1cs_auxiliary_input<FieldType> r1cs_ai(
-                                r1cs_va.begin() + primary_input.size(),
-                                r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                            const typename r1cs_ppzksnark<CurveType>::proof_type r1cs_proof =
-                                r1cs_ppzksnark<CurveType>::prover(pk.r1cs_pk, primary_input, r1cs_ai);
-
-                            return r1cs_proof;
-                        }
-
-                        /**
-                         * Convert a (non-processed) verification key into a processed verification key.
-                         */
-                        static processed_verification_key verifier_process_vk(const verification_key &vk) {
-                            const processed_verification_key pvk = r1cs_ppzksnark<CurveType>::verifier_process_vk(vk);
-
-                            return pvk;
-                        }
-
-                        /**
-                         * A verifier algorithm for the BACS ppzkSNARK that:
-                         * (1) accepts a non-processed verification key, and
-                         * (2) has weak input consistency.
-                         */
-                        static bool verifier_weak_IC(const verification_key &vk,
-                                                     const primary_input &primary_input,
-                                                     const proof &proof) {
-                            const processed_verification_key pvk = verifier_process_vk(vk);
-                            const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
-
-                            return bit;
-                        }
-
-                        /**
-                         * A verifier algorithm for the BACS ppzkSNARK that:
-                         * (1) accepts a non-processed verification key, and
-                         * (2) has strong input consistency.
-                         */
-                        static bool verifier_strong_IC(const verification_key &vk,
-                                                       const primary_input &primary_input,
-                                                       const proof &proof) {
-                            const processed_verification_key pvk = verifier_process_vk(vk);
-                            const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
-
-                            return bit;
-                        }
-
-                        /**
-                         * A verifier algorithm for the BACS ppzkSNARK that:
-                         * (1) accepts a processed verification key, and
-                         * (2) has weak input consistency.
-                         */
-                        static bool online_verifier_weak_IC(const processed_verification_key &pvk,
-                                                            const primary_input &primary_input,
-                                                            const proof &proof) {
-                            const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_weak_IC(pvk, primary_input, proof);
-
-                            return bit;
-                        }
-
-                        /**
-                         * A verifier algorithm for the BACS ppzkSNARK that:
-                         * (1) accepts a processed verification key, and
-                         * (2) has strong input consistency.
-                         */
-                        static bool online_verifier_strong_IC(const processed_verification_key &pvk,
-                                                              const primary_input &primary_input,
-                                                              const proof &proof) {
-                            const bool bit =
-                                r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, primary_input, proof);
-
-                            return bit;
-                        }
                     };
                 }    // namespace detail
             }        // namespace snark

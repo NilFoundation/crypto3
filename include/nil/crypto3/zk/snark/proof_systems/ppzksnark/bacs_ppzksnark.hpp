@@ -33,60 +33,28 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FunctionsPolicy>
+                template<typename Generator = policies::bacs_ppzksnark_generator, 
+                         typename Prover = policies::bacs_ppzksnark_prover, 
+                         typename Verifier = >
                 class bacs_ppzksnark {
-                    using policy_type = FunctionsPolicy;
+                    using basic_policy = detail::bacs_ppzksnark_basic_policy;
 
                 public:
-                    using circuit_type = typename policy_type::circuit;
-                    using primary_input_type = typename policy_type::primary_input;
-                    using auxiliary_input_type = typename policy_type::auxiliary_input;
+                    using circuit_type = typename basic_policy::circuit;
+                    using primary_input_type = typename basic_policy::primary_input;
+                    using auxiliary_input_type = typename basic_policy::auxiliary_input;
 
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
+                    using proving_key_type = typename basic_policy::proving_key;
+                    using verification_key_type = typename basic_policy::verification_key;
 
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
+                    using keypair_type = typename basic_policy::keypair;
+                    using proof_type = typename basic_policy::proof;
 
-                    static inline keypair_type generator(const circuit_type &circuit) {
-                        return policy_type::generator(circuit);
-                    }
+                    using generator = Generator;
 
-                    static inline proof_type prover(const proving_key_type &pk,
-                                                    const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input){
+                    using prover = Prover;
 
-                        return policy_type::prover(pk, primary_input, auxiliary_input);
-                    }
-
-                    static inline processed_verification_key_type verifier_process_vk(const verification_key_type &vk) {
-                        return policy_type::verifier_process_vk(vk);
-                    }
-
-                    static inline bool online_verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                                 const primary_input_type &primary_input,
-                                                                 const proof_type &proof) {
-                        return policy_type::online_verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool online_verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::online_verifier_weak_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::verifier_strong_IC(pvk, primary_input, proof);
-                    }
-
-                    static inline bool verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
-                        return policy_type::verifier_weak_IC(pvk, primary_input, proof);
-                    }
+                    using verifier = Verifier;
                 };
 
                 template<typename CurveType>
