@@ -33,9 +33,9 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType>
-                class tbcs_ppzksnark : private detail::tbcs_ppzksnark_basic_policy<CurveType> {
-                    using policy_type = detail::tbcs_ppzksnark_basic_policy<CurveType>;
+                template<typename FunctionsPolicy>
+                class tbcs_ppzksnark {
+                    using policy_type = FunctionsPolicy;
 
                 public:
                     using circuit_type = typename policy_type::circuit;
@@ -49,17 +49,48 @@ namespace nil {
                     using keypair_type = typename policy_type::keypair;
                     using proof_type = typename policy_type::proof;
 
-                    using policy_type::generator;
-                    using policy_type::prover;
+                    static inline keypair_type generator(const circuit_type &circuit) {
+                        return policy_type::generator(circuit);
+                    }
 
-                    using policy_type::verifier_process_vk;
+                    static inline proof_type prover(const proving_key_type &pk,
+                                                    const primary_input_type &primary_input,
+                                                    const auxiliary_input_type &auxiliary_input){
 
-                    using policy_type::online_verifier_strong_IC;
-                    using policy_type::online_verifier_weak_IC;
-                    using policy_type::verifier_strong_IC;
-                    using policy_type::verifier_weak_IC;
+                        return policy_type::prover(pk, primary_input, auxiliary_input);
+                    }
+
+                    static inline processed_verification_key_type verifier_process_vk(const verification_key_type &vk) {
+                        return policy_type::verifier_process_vk(vk);
+                    }
+
+                    static inline bool online_verifier_strong_IC(const processed_verification_key_type &pvk,
+                                                                 const primary_input_type &primary_input,
+                                                                 const proof_type &proof) {
+                        return policy_type::online_verifier_strong_IC(pvk, primary_input, proof);
+                    }
+
+                    static inline bool online_verifier_weak_IC(const processed_verification_key_type &pvk,
+                                                               const primary_input_type &primary_input,
+                                                               const proof_type &proof) {
+                        return policy_type::online_verifier_weak_IC(pvk, primary_input, proof);
+                    }
+
+                    static inline bool verifier_strong_IC(const processed_verification_key_type &pvk,
+                                                               const primary_input_type &primary_input,
+                                                               const proof_type &proof) {
+                        return policy_type::verifier_strong_IC(pvk, primary_input, proof);
+                    }
+
+                    static inline bool verifier_weak_IC(const processed_verification_key_type &pvk,
+                                                               const primary_input_type &primary_input,
+                                                               const proof_type &proof) {
+                        return policy_type::verifier_weak_IC(pvk, primary_input, proof);
+                    }
                 };
 
+                template<typename CurveType>
+                using default_tbcs_ppzksnark = tbcs_ppzksnark<detail::tbcs_ppzksnark_basic_policy<CurveType>>;
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
