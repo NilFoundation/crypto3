@@ -12,7 +12,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::block
                        ${CMAKE_WORKSPACE_NAME}::hash
 
-                       boost::multiprecision
+                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
                        ${Boost_LIBRARIES})
 
@@ -37,6 +37,7 @@ endmacro()
 
 set(TESTS_NAMES
     "ecdsa"
+    "bls"
 )
 
 foreach(TEST_NAME ${TESTS_NAMES})

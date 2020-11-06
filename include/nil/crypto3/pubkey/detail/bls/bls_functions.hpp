@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
 
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include <boost/concept/assert.hpp>
@@ -35,6 +37,9 @@
 #include <type_traits>
 #include <iterator>
 
+template<typename Fp2CurveGroupElement>
+void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e);
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -42,176 +47,157 @@ namespace nil {
                 using namespace boost::multiprecision;
 
                 template<typename bls_key_policy>
-                struct bls_functions {
-                    typedef typename bls_key_policy::private_key_type private_key_type;
-                    typedef typename bls_key_policy::public_key_type public_key_type;
-                    typedef typename bls_key_policy::signature_type signature_type;
-                    typedef typename bls_key_policy::gt_value_type gt_value_type;
-                    typedef typename bls_key_policy::hash_type hash_type;
-                    typedef typename bls_key_policy::number_type number_type;
+                struct bls_functions : bls_key_policy {
+                    using typename bls_key_policy::private_key_type;
+                    using typename bls_key_policy::public_key_type;
+                    using typename bls_key_policy::signature_type;
+                    using typename bls_key_policy::gt_value_type;
+                    using typename bls_key_policy::hash_type;
+                    using typename bls_key_policy::number_type;
 
                     using bls_key_policy::hash_to_point;
                     using bls_key_policy::pairing;
 
-                    constexpr static std::size_t private_key_bits = bls_key_policy::private_key_bits;
-                    /*constexpr*/ static inline const public_key_type pk_bp = bls_key_policy::pk_bp;
-                    /*constexpr*/ static inline const signature_type sig_bp = bls_key_policy::sig_bp;
+                    using bls_key_policy::private_key_bits;
 
-                    constexpr static std::size_t L = static_cast<std::size_t>((3 * bls_key_policy::private_key_bits) / 16) +
-                                                     static_cast<std::size_t>((3 * bls_key_policy::private_key_bits) % 16 != 0);
-                    static_assert(L < 0x10000, "L requires more than 2 octets");
+                    constexpr static std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
+                                                     static_cast<std::size_t>((3 * private_key_bits) % 16 != 0);
+                    static_assert(L < 0x10000, "L is required to fit in 2 octets");
                     constexpr static std::array<std::uint8_t, 2> L_os = {static_cast<std::uint8_t>(L >> 8u),
                                                                          static_cast<std::uint8_t>(L % 0x100)};
 
-                    template<typename IkmType, typename KeyInfoType,
-                             typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename IkmType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename KeyInfoType::value_type>::value>::type>
-                    static inline private_key_type key_gen(const IkmType &ikm,
-                                                                const KeyInfoType &key_info =
-                                                                    std::array<std::uint8_t, 0> {}) {
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<IkmType>));
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<KeyInfoType>));
+                    // template<typename IkmType, typename KeyInfoType,
+                    //          typename = typename std::enable_if<
+                    //              std::is_same<std::uint8_t, typename IkmType::value_type>::value &&
+                    //              std::is_same<std::uint8_t, typename KeyInfoType::value_type>::value>::type>
+                    // static inline private_key_type key_gen(const IkmType &ikm,
+                    //                                        const KeyInfoType &key_info) {
+                    //     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<IkmType>));
+                    //     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<KeyInfoType>));
+                    //
+                    //     assert(std::distance(ikm.begin(), ikm.end()) >= 32);
+                    //
+                    //     // "BLS-SIG-KEYGEN-SALT-"
+                    //     std::array<std::uint8_t, 20> salt = {66, 76, 83, 45, 83,
+                    //                                          73, 71, 45, 75, 69,
+                    //                                          89, 71, 69, 78, 45,
+                    //                                          83, 65, 76, 84, 45};
+                    //     number_type sk(0);
+                    //     cpp_int e;
+                    //
+                    //     // TODO: use accumulators when they will be fixed
+                    //     std::vector<std::uint8_t> ikm_zero = ikm;
+                    //     ikm_zero.insert(ikm_zero.end(), static_cast<std::uint8_t>(0));
+                    //     // TODO: use accumulators when they will be fixed
+                    //     std::vector<std::uint8_t> key_info_L_os = key_info;
+                    //     key_info_L_os.insert(key_info_L_os.end(), L_os.begin(), L_os.end());
+                    //
+                    //     while (e % bls_key_policy::r == 0) {
+                    //         salt = hash<hash_type>(salt);
+                    //         // TODO: will work when hkdf finished
+                    //         auto prk = hkdf_extract<hash_type>(salt, ikm_zero);
+                    //         auto okm = hkdf_expand<hash_type>(prk, key_info_L_os, L);
+                    //         import_bits(e, okm.begin(),okm.end());
+                    //     }
+                    //
+                    //     return private_key_type(static_cast<number_type>(e));
+                    // }
 
-                        assert(std::distance(ikm.begin(), ikm.end()) >= 32);
+                    static inline public_key_type sk_to_pk(const private_key_type &sk) {
+                        assert(!sk.is_zero());
 
-                        // "BLS-SIG-KEYGEN-SALT-"
-                        std::array<std::uint8_t, 20> salt = {66, 76, 83, 45, 83,
-                                                             73, 71, 45, 75, 69,
-                                                             89, 71, 69, 78, 45,
-                                                             83, 65, 76, 84, 45};
-                        number_type sk(0);
-                        cpp_int e;
-
-                        // TODO: use accumulators when they will be fixed
-                        std::vector<std::uint8_t> ikm_zero = ikm;
-                        ikm_zero.insert(ikm_zero.end(), static_cast<std::uint8_t>(0));
-                        // TODO: use accumulators when they will be fixed
-                        std::vector<std::uint8_t> key_info_L_os = key_info;
-                        key_info_L_os.insert(key_info_L_os.end(), L_os.begin(), L_os.end());
-
-                        while (e % bls_key_policy::r == 0) {
-                            salt = hash<hash_type>(salt);
-                            // TODO: will work when hkdf finished
-                            auto prk = hkdf_extract<hash_type>(salt, ikm_zero);
-                            auto okm = hkdf_expand<hash_type>(prk, key_info_L_os, L);
-                            import_bits(e, okm.begin(),okm.end());
-                        }
-
-                        return private_key_type(static_cast<number_type>(e));
+                        return sk * public_key_type::one();
                     }
 
-                    template<typename PubkeyType, typename = typename std::enable_if<
-                        std::is_same<std::uint8_t, typename PubkeyType::value_type>::value>::type>
-                    static inline PubkeyType sk_to_pk(const private_key_type &sk) {
-                        // TODO: implement such method
-                        return (sk * pk_bp).to_octets();
-                    }
-
-                    template<typename PubkeyType, typename = typename std::enable_if<
-                        std::is_same<std::uint8_t, typename PubkeyType::value_type>::value>::type>
-                    static inline bool key_validate(const PubkeyType &pk_os) {
-                        // TODO: somehow treat assertion during creating pubkey point
-                        // TODO: implement such method
-                        public_key_type pk = public_key_type::from_octet_string(pk_os);
-                        if (pk.is_one()) {
+                    static inline bool key_validate(const public_key_type &pk) {
+                        if (pk.is_zero()) {
                             return false;
                         }
-                        // TODO: will work when is_in_subgroup finished
-                        if (!pk.is_in_subgroup()) {
+                        // TODO: is_in_subgroup should be reimplemented as class method
+                        if (!is_in_subgroup(pk)) {
                             return false;
                         }
                         return true;
                     }
 
-                    template<typename MsgType, typename DstType, typename SigType,
+                    template<typename MsgType, typename DstType,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename DstType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename SigType::value_type>::value>::type>
-                    static inline SigType core_sign(const private_key_type &sk, const MsgType &msg, const DstType &dst) {
+                                 std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline signature_type core_sign(const private_key_type &sk, const MsgType &msg,
+                                                           const DstType &dst) {
+                        assert(!sk.is_zero());
+
                         signature_type Q = hash_to_point(msg, dst);
-                        // TODO: implement such method
-                        return (sk * Q).to_octets();
+                        print_fp2_curve_group_element(std::cout, Q);
+                        return sk * Q;
                     }
 
-                    template<typename PubkeyType, typename MsgType, typename DstType, typename SigType,
+                    template<typename MsgType, typename DstType,
                              typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename PubkeyType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename DstType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename SigType::value_type>::value>::type>
-                    static inline bool core_verify(const PubkeyType &pk_os, const MsgType &msg,
-                                                   const DstType &dst, const SigType &sig_os) {
-                        // TODO: somehow treat assertion during creating sig point
-                        // TODO: implement such method
-                        signature_type R = signature_type::from_octet_string(sig_os);
-                        // TODO: will work when is_in_subgroup finished
-                        if (!R.is_in_subgroup()) {
+                                 std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline bool core_verify(const public_key_type &pk, const MsgType &msg,
+                                                   const DstType &dst, const signature_type &sig) {
+                        // TODO: is_in_subgroup should be reimplemented as class method
+                        if (!is_in_subgroup(sig)) {
                             return false;
                         }
-                        if (!key_validate(pk_os)) {
+                        if (!key_validate(pk)) {
                             return false;
                         }
-                        // TODO: somehow treat assertion during creating pubkey point
-                        // TODO: implement such method
-                        public_key_type pk = public_key_type::from_octet_string(pk_os);
                         signature_type Q = hash_to_point(msg, dst);
                         auto C1 = pairing(Q, pk);
-                        auto C2 = pairing(R, pk_bp);
+                        auto C2 = pairing(sig, public_key_type::one());
                         return C1 == C2;
                     }
 
-                    template<typename SigTypeIn, typename SigTypeOut,
-                             typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename SigTypeIn::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename SigTypeOut::value_type>::value>::type>
-                    // TODO: generalize std::vector
-                    static inline SigTypeOut aggregate(const std::vector<SigTypeIn> &sig_os_n) {
-                        assert(sig_os_n.size() > 0);
+                    template<typename SignatureRangeType, typename = typename std::enable_if<
+                        std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
+                    static inline signature_type aggregate(const SignatureRangeType &sig_n) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
 
-                        // TODO: somehow treat assertion during creating sig point
-                        // TODO: implement such method
-                        signature_type aggregate_p = signature_type::from_octet_string(sig_os_n[0]);
-                        for (std::size_t i = 1; i < sig_os_n.size(); i++) {
-                            // TODO: somehow treat assertion during creating sig point
-                            // TODO: implement such method
-                            signature_type next_p = signature_type::from_octet_string(sig_os_n[i]);
+                        assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
+
+                        auto sig_n_iter = sig_n.begin();
+                        signature_type aggregate_p = *sig_n_iter++;
+                        while (sig_n_iter != sig_n.end()) {
+                            signature_type next_p = *sig_n_iter++;
                             aggregate_p = aggregate_p + next_p;
                         }
-                        return aggregate_p.to_octets();
+                        return aggregate_p;
                     }
 
-                    template<typename PubkeyType, typename MsgType, typename DstType, typename SigType,
+                    template<typename PubkeyRangeType, typename MsgRangeType, typename DstType,
                              typename = typename std::enable_if<
-                                 std::is_same<std::uint8_t, typename PubkeyType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename DstType::value_type>::value &&
-                                 std::is_same<std::uint8_t, typename SigType::value_type>::value>::type>
-                    static inline bool core_aggregate_verify(const std::vector<PubkeyType> &pk_os_n,
-                                                             const std::vector<MsgType> &msg_n,
-                                                             const DstType &dst, const SigType &sig_os) {
-                        assert(pk_os_n.size() > 0 && pk_os_n.size() == msg_n.size());
+                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n,
+                                                             const MsgRangeType &msg_n,
+                                                             const DstType &dst, const signature_type &sig) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
 
-                        // TODO: somehow treat assertion during creating sig point
-                        // TODO: implement such method
-                        signature_type R = signature_type::from_octet_string(sig_os);
-                        // TODO: will work when is_in_subgroup finished
-                        if (!R.is_in_subgroup()) {
+                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
+                               std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
+
+                        // TODO: is_in_subgroup should be reimplemented as class method
+                        if (!is_in_subgroup(sig)) {
                             return false;
                         }
-                        gt_value_type C1 = gt_value_type::one();
-                        for (std::size_t i = 0; i < pk_os_n.size(); i++) {
-                            if (!key_validate(pk_os_n[i])) {
+
+                        auto pk_n_iter = pk_n.begin();
+                        auto msg_n_iter = msg_n.begin();
+                        gt_value_type C1 = gt_value_type::zero();
+                        while (pk_n_iter != pk_n.end() && msg_n_iter != msg_n.end()) {
+                            if (!key_validate(*pk_n_iter)) {
                                 return false;
                             }
-                            // TODO: somehow treat assertion during creating pubkey point
-                            // TODO: implement such method
-                            public_key_type pk = public_key_type::from_octet_string(pk_os_n[i]);
-                            signature_type Q = hash_to_point(msg_n[i], dst);
-                            C1 = C1 * pairing(Q, pk);
+                            signature_type Q = hash_to_point(*msg_n_iter++, dst);
+                            C1 = C1 * pairing(Q, *pk_n_iter++);
                         }
-                        return C1 == pairing(R, pk_bp);
+                        return C1 == pairing(sig, public_key_type::one());
                     }
                 };
             }    // namespace detail

@@ -26,9 +26,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
-#include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -38,100 +36,85 @@
 
 #include <cstdint>
 #include <array>
-#include <vector>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
-            struct bls_private_key {
-                typedef detail::bls_basic_key_policy<CurveType, SignatureHash> basic_key_policy_type;
-                typedef detail::bls_functions<CurveType, SignatureHash> bls_functions;
+            template<typename bls_key_policy>
+            class bls_private_key {
+                typedef detail::bls_functions<bls_key_policy> bls_functions;
 
-                typedef typename basic_key_policy_type::private_key_type private_key_type;
-                typedef typename basic_key_policy_type::signature_type signature_type;
+            public:
+                typedef typename bls_functions::private_key_type private_key_type;
+                typedef typename bls_functions::public_key_type public_key_type;
+                typedef typename bls_functions::signature_type signature_type;
 
-                inline static bool is_well_formed(const private_key_type &private_key) {
-                    // private_key < r is implicitly true due to scalar_field_type implementation
-                    return private_key != 0;
+                // template<typename SeedType, typename KeyInfoType>
+                // static inline private_key_type key_gen(const SeedType &seed,
+                //                                        const KeyInfoType &key_info = std::array<std::uint8_t, 0> {}) {
+                //     return bls_functions::key_gen(seed, key_info);
+                // }
+
+                template<typename MsgType, typename DstType>
+                static inline signature_type sign(const private_key_type &private_key, const MsgType &message,
+                                                  const DstType &dst) {
+                    return bls_functions::core_sign(private_key, message, dst);
                 }
 
-                template<std::size_t N, typename = std::enable_if_t<N >= 32>>
-                inline static private_key_type key_gen(const std::array<uint8_t, N> &seed) {
-                    return key_gen_impl(seed);
-                }
-
-                inline static private_key_type key_gen(const std::vector<uint8_t> &seed) {
-                    assert(seed.size() < 32);
-                    return bls_functions::key_gen_impl(seed);
-                }
-
-                template<typename InputRange>
-                inline static bool sign(signature_type &result, const InputRange &message,
-                                        const private_key_type &private_key) {
-                    result = message * private_key;
+                template<typename SignatureRangeType>
+                static inline signature_type aggregate(const SignatureRangeType &signatures) {
+                    return bls_functions::aggregate(signatures);
                 }
             };
 
-            template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
+            template<typename bls_key_policy>
             struct bls_public_key {
-                typedef detail::bls_basic_key_policy<CurveType, SignatureHash> basic_key_policy_type;
-                typedef detail::bls_functions<CurveType, SignatureHash> bls_functions;
+                typedef detail::bls_functions<bls_key_policy> bls_functions;
 
-                typedef typename basic_key_policy_type::number_type number_type;
-                typedef typename basic_key_policy_type::public_key_type public_key_type;
-                typedef typename basic_key_policy_type::private_key_type private_key_type;
-                typedef typename basic_key_policy_type::signature_type signature_type;
+            public:
+                typedef typename bls_functions::private_key_type private_key_type;
+                typedef typename bls_functions::public_key_type public_key_type;
+                typedef typename bls_functions::signature_type signature_type;
 
-                constexpr static const number_type pubkey_subgroup_ord = basic_key_policy_type::pubkey_subgroup_ord;
-
-                inline static bool is_well_formed(const public_key_type &public_key) {
-                    bool status = true;
-                    status &= (public_key != public_key_type::one());
-                    // TODO: will work after scalar multiplication finished
-                    status &= (public_key * pubkey_subgroup_ord == public_key_type::one());
-                    return status;
+                static inline public_key_type key_gen(const private_key_type &private_key) {
+                    return bls_functions::sk_to_pk();
                 }
 
-                inline static public_key_type key_gen(const private_key_type &private_key) {
-                    // TODO: will work after scalar multiplication finished
-                    public_key_type public_key = public_key_type::one() * private_key;
-                    // This action is not necessary while key generation
-                    assert(is_well_formed(public_key));
-                    return public_key;
+                template<typename MsgType, typename DstType>
+                static inline bool verify(const public_key_type &public_key, const MsgType &message,
+                                          const DstType &dst, const signature_type &signature) {
+                    return bls_functions::core_verify(public_key, message, dst, signature);
                 }
 
-                template<typename InputRange>
-                inline static bool verify(const InputRange &message, const signature_type &sign,
-                                          const public_key_type &public_key) {
-                    // if (!sign.is_well_formed()) {
-                    //     return false;
-                    // }
-                    //
-                    // if (!key.is_well_formed()) {
-                    //     return false;
-                    // }
-                    //
-                    // if (CurveType::modulus_r * sign != typename CurveType::g1_type::value_type::zero()) {
-                    //     return false;
-                    // }
-                    //
-                    // signature_type hash = Hashing(val);
-                    //
-                    // return (algebra::reduced_pair<CurveType>(sign, key_type::value_type::one()) ==
-                    //         algebra::reduced_pair<CurveType>(hash, key));
+                template<typename PubkeyRangeType, typename MsgRangeType, typename DstType>
+                static inline bool aggregate_verify(const PubkeyRangeType &public_keys, const MsgRangeType &messages,
+                                                    const DstType &dst, const signature_type &signature) {
+                    return bls_functions::core_aggregate_verify(public_keys, messages, dst, signature);
                 }
             };
 
-            template<typename CurveType>
-            struct bls {
+            template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
+            class bls_signature_mss_ro {
                 typedef CurveType curve_type;
+                typedef HashType hash_type;
 
-                typedef bls_public_key<curve_type> public_key_type;
-                typedef bls_private_key<curve_type> private_key_type;
+                typedef detail::bls_key_policy_mss_ro<curve_type, hash_type> bls_key_policy;
 
-                constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
-                constexpr static const std::size_t private_key_bits = private_key_type::key_bits;
+            public:
+                typedef bls_public_key<bls_key_policy> public_key_type;
+                typedef bls_private_key<bls_key_policy> private_key_type;
+            };
+
+            template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
+            struct bls_signature_mps_ro {
+                typedef CurveType curve_type;
+                typedef HashType hash_type;
+
+                typedef detail::bls_key_policy_mps_ro<curve_type, hash_type> bls_key_policy;
+
+            public:
+                typedef bls_public_key<bls_key_policy> public_key_type;
+                typedef bls_private_key<bls_key_policy> private_key_type;
             };
         }    // namespace pubkey
     }        // namespace crypto3
