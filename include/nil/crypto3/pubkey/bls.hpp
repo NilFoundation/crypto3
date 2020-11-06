@@ -41,7 +41,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename bls_key_policy>
-            class bls_private_key {
+            class bls_private_key_policy {
                 typedef detail::bls_functions<bls_key_policy> bls_functions;
 
             public:
@@ -54,6 +54,10 @@ namespace nil {
                 //                                        const KeyInfoType &key_info = std::array<std::uint8_t, 0> {}) {
                 //     return bls_functions::key_gen(seed, key_info);
                 // }
+
+                static inline bool key_validate(const private_key_type &private_key) {
+                    return bls_functions::private_key_validate(private_key);
+                }
 
                 template<typename MsgType, typename DstType>
                 static inline signature_type sign(const private_key_type &private_key, const MsgType &message,
@@ -68,7 +72,7 @@ namespace nil {
             };
 
             template<typename bls_key_policy>
-            struct bls_public_key {
+            struct bls_public_key_policy {
                 typedef detail::bls_functions<bls_key_policy> bls_functions;
 
             public:
@@ -78,6 +82,10 @@ namespace nil {
 
                 static inline public_key_type key_gen(const private_key_type &private_key) {
                     return bls_functions::sk_to_pk();
+                }
+
+                static inline bool key_validate(const public_key_type &public_key) {
+                    return bls_functions::public_key_validate(public_key);
                 }
 
                 template<typename MsgType, typename DstType>
@@ -94,15 +102,14 @@ namespace nil {
             };
 
             template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
-            class bls_signature_mss_ro {
+            struct bls_signature_mss_ro {
                 typedef CurveType curve_type;
                 typedef HashType hash_type;
 
                 typedef detail::bls_key_policy_mss_ro<curve_type, hash_type> bls_key_policy;
 
-            public:
-                typedef bls_public_key<bls_key_policy> public_key_type;
-                typedef bls_private_key<bls_key_policy> private_key_type;
+                typedef bls_public_key_policy<bls_key_policy> public_key_policy_type;
+                typedef bls_private_key_policy<bls_key_policy> private_key_policy_type;
             };
 
             template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
@@ -112,12 +119,11 @@ namespace nil {
 
                 typedef detail::bls_key_policy_mps_ro<curve_type, hash_type> bls_key_policy;
 
-            public:
-                typedef bls_public_key<bls_key_policy> public_key_type;
-                typedef bls_private_key<bls_key_policy> private_key_type;
+                typedef bls_public_key_policy<bls_key_policy> public_key_policy_type;
+                typedef bls_private_key_policy<bls_key_policy> private_key_policy_type;
             };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif
+#endif // CRYPTO3_PUBKEY_BLS_HPP

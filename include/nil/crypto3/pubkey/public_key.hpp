@@ -27,22 +27,21 @@
 
 namespace nil {
     namespace crypto3 {
-        template<typename Scheme>
-        struct public_key {
-            typedef Scheme scheme_type;
-            typedef typename scheme_type::public_key_type public_key_policy_type;
+        namespace pubkey {
+            template<typename Scheme>
+            struct public_key {
+                typedef Scheme scheme_type;
 
-            typedef typename public_key_policy_type::key_type key_type;
-            // typedef typename key_policy_type::key_schedule_type key_schedule_type;
+                typedef typename scheme_type::public_key_policy_type public_key_policy_type;
+                typedef typename public_key_policy_type::key_type public_key_type;
 
-            public_key() = default;
+                explicit public_key(const public_key_type &key) : pubkey(key) {}
 
-            explicit public_key(const key_type &key) : pubkey(key) {}
-
-        protected:
-            key_type pubkey;
-        };
-    }    // namespace crypto3
+            protected:
+                public_key_type pubkey;
+            };
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PUBLIC_KEY_HPP

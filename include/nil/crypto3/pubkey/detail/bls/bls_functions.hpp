@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+#include <nil/crypto3/algebra/curves/detail/subgroup_check.hpp>
 
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -45,6 +45,7 @@ namespace nil {
         namespace pubkey {
             namespace detail {
                 using namespace boost::multiprecision;
+                using namespace nil::crypto3::algebra::curves::detail;
 
                 template<typename bls_key_policy>
                 struct bls_functions : bls_key_policy {
@@ -99,22 +100,26 @@ namespace nil {
                     //         auto okm = hkdf_expand<hash_type>(prk, key_info_L_os, L);
                     //         import_bits(e, okm.begin(),okm.end());
                     //     }
-                    //
+                    //     // TODO: via modular type
                     //     return private_key_type(static_cast<number_type>(e));
                     // }
 
+                    static inline bool private_key_validate(const private_key_type &sk) {
+                        return !sk.is_zero();
+                    }
+
                     static inline public_key_type sk_to_pk(const private_key_type &sk) {
-                        assert(!sk.is_zero());
+                        assert(!private_key_validate(sk));
 
                         return sk * public_key_type::one();
                     }
 
-                    static inline bool key_validate(const public_key_type &pk) {
+                    static inline bool public_key_validate(const public_key_type &pk) {
                         if (pk.is_zero()) {
                             return false;
                         }
-                        // TODO: is_in_subgroup should be reimplemented as class method
-                        if (!is_in_subgroup(pk)) {
+                        // TODO: subgroup_check should be reimplemented as class method
+                        if (!subgroup_check(pk)) {
                             return false;
                         }
                         return true;
@@ -126,7 +131,7 @@ namespace nil {
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline signature_type core_sign(const private_key_type &sk, const MsgType &msg,
                                                            const DstType &dst) {
-                        assert(!sk.is_zero());
+                        assert(!private_key_validate(sk));
 
                         signature_type Q = hash_to_point(msg, dst);
                         print_fp2_curve_group_element(std::cout, Q);
@@ -139,8 +144,8 @@ namespace nil {
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool core_verify(const public_key_type &pk, const MsgType &msg,
                                                    const DstType &dst, const signature_type &sig) {
-                        // TODO: is_in_subgroup should be reimplemented as class method
-                        if (!is_in_subgroup(sig)) {
+                        // TODO: subgroup_check should be reimplemented as class method
+                        if (!subgroup_check(sig)) {
                             return false;
                         }
                         if (!key_validate(pk)) {
@@ -182,8 +187,8 @@ namespace nil {
                         assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
                                std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
 
-                        // TODO: is_in_subgroup should be reimplemented as class method
-                        if (!is_in_subgroup(sig)) {
+                        // TODO: subgroup_check should be reimplemented as class method
+                        if (!subgroup_check(sig)) {
                             return false;
                         }
 
