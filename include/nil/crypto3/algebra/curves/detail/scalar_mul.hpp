@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -121,16 +122,6 @@ namespace nil {
                     GroupValueType operator*(const FieldValueType &left, const GroupValueType &right) {
 
                         return right * left;
-                    }
-
-                    // TODO: temporary implementation due to absence of GroupValueType type_trait
-                    //  Should be implemented as class method
-                    template<typename GroupValueType,
-                             typename = typename std::enable_if<
-                                 ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
-                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
-                    bool is_in_subgroup(const GroupValueType &p) {
-                        return (p * GroupValueType::group_type::curve_type::q).is_zero();
                     }
                 }    // namespace detail
             }        // namespace curves
