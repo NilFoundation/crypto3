@@ -55,7 +55,7 @@ namespace nil {
 
                     static inline proof_type prover(const proving_key_type &pk,
                                                     const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input){
+                                                    const auxiliary_input_type &auxiliary_input) {
 
                         return policy_type::prover(pk, primary_input, auxiliary_input);
                     }
@@ -77,14 +77,14 @@ namespace nil {
                     }
 
                     static inline bool verifier_strong_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
+                                                          const primary_input_type &primary_input,
+                                                          const proof_type &proof) {
                         return policy_type::verifier_strong_IC(pvk, primary_input, proof);
                     }
 
                     static inline bool verifier_weak_IC(const processed_verification_key_type &pvk,
-                                                               const primary_input_type &primary_input,
-                                                               const proof_type &proof) {
+                                                        const primary_input_type &primary_input,
+                                                        const proof_type &proof) {
                         return policy_type::verifier_weak_IC(pvk, primary_input, proof);
                     }
                 };

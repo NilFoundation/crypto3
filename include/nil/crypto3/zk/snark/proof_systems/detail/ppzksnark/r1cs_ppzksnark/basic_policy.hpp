@@ -220,23 +220,24 @@ namespace nil {
 
                             /*static verification_key dummy_verification_key(const std::size_t input_size) {
                                 verification_key result;
-                                result.alphaA_g2 = algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.alphaB_g1 = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); result.alphaC_g2 =
+                                result.alphaA_g2 = algebra::random_element<typename CurveType::scalar_field_type>() *
+                            typename CurveType::g2_type::value_type::one(); result.alphaB_g1 =
                             algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.gamma_g2 = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one(); result.gamma_beta_g1 =
+                            CurveType::g1_type::value_type::one(); result.alphaC_g2 = algebra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
+                            result.gamma_g2 = algebra::random_element<typename CurveType::scalar_field_type>() *
+                            typename CurveType::g2_type::value_type::one(); result.gamma_beta_g1 =
                             algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::value_type::one(); result.gamma_beta_g2 = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one(); result.rC_Z_g2 =
+                            CurveType::g1_type::value_type::one(); result.gamma_beta_g2 =
                             algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one();
+                            CurveType::g2_type::value_type::one(); result.rC_Z_g2 = algebra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
 
                                 typename CurveType::g1_type::value_type base = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); 
-                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0; i < input_size; ++i) {
-                                    v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::value_type::one());
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0;
+                            i < input_size; ++i) { v.emplace_back(algebra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one());
                                 }
 
                                 result.encoded_IC_query = accumulation_vector<typename
@@ -501,10 +502,14 @@ namespace nil {
                             algebra::batch_to_special<typename CurveType::g1_type>(K_query);
 #endif
 
-                            typename CurveType::g2_type::value_type alphaA_g2 = alphaA * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g1_type::value_type alphaB_g1 = alphaB * typename CurveType::g1_type::value_type::one();
-                            typename CurveType::g2_type::value_type alphaC_g2 = alphaC * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g2_type::value_type gamma_g2 = gamma * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g2_type::value_type alphaA_g2 =
+                                alphaA * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g1_type::value_type alphaB_g1 =
+                                alphaB * typename CurveType::g1_type::value_type::one();
+                            typename CurveType::g2_type::value_type alphaC_g2 =
+                                alphaC * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g2_type::value_type gamma_g2 =
+                                gamma * typename CurveType::g2_type::value_type::one();
                             typename CurveType::g1_type::value_type gamma_beta_g1 =
                                 (gamma * beta) * typename CurveType::g1_type::value_type::one();
                             typename CurveType::g2_type::value_type gamma_beta_g2 =
@@ -569,7 +574,8 @@ namespace nil {
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C =
                                 pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables() + 1];
 
-                            typename CurveType::g1_type::value_type g_H = typename CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type g_H =
+                                typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g1_type::value_type g_K =
                                 (pk.K_query[0] + qap_wit.d1 * pk.K_query[qap_wit.num_variables() + 1] +
                                  qap_wit.d2 * pk.K_query[qap_wit.num_variables() + 2] +
@@ -582,37 +588,37 @@ namespace nil {
                             const std::size_t chunks = 1;
 #endif
 
-                            g_A = g_A +
-                                  kc_multiexp_with_mixed_addition<
-                                      typename CurveType::g1_type, typename CurveType::g1_type,
-                                      typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
-                                      pk.A_query, 1, 1 + qap_wit.num_variables(), qap_wit.coefficients_for_ABCs.begin(),
-                                      qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                            g_A = g_A + kc_multiexp_with_mixed_addition<
+                                            typename CurveType::g1_type, typename CurveType::g1_type,
+                                            typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            pk.A_query, 1, 1 + qap_wit.num_variables(),
+                                            qap_wit.coefficients_for_ABCs.begin(),
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
-                            g_B = g_B +
-                                  kc_multiexp_with_mixed_addition<
-                                      typename CurveType::g2_type, typename CurveType::g1_type,
-                                      typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
-                                      pk.B_query, 1, 1 + qap_wit.num_variables(), qap_wit.coefficients_for_ABCs.begin(),
-                                      qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                            g_B = g_B + kc_multiexp_with_mixed_addition<
+                                            typename CurveType::g2_type, typename CurveType::g1_type,
+                                            typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            pk.B_query, 1, 1 + qap_wit.num_variables(),
+                                            qap_wit.coefficients_for_ABCs.begin(),
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
-                            g_C = g_C +
-                                  kc_multiexp_with_mixed_addition<
-                                      typename CurveType::g1_type, typename CurveType::g1_type,
-                                      typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
-                                      pk.C_query, 1, 1 + qap_wit.num_variables(), qap_wit.coefficients_for_ABCs.begin(),
-                                      qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                            g_C = g_C + kc_multiexp_with_mixed_addition<
+                                            typename CurveType::g1_type, typename CurveType::g1_type,
+                                            typename CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            pk.C_query, 1, 1 + qap_wit.num_variables(),
+                                            qap_wit.coefficients_for_ABCs.begin(),
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
                             g_H = g_H +
                                   algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                     algebra::multiexp_method_BDLO12>(
+                                                    algebra::multiexp_method_BDLO12>(
                                       pk.H_query.begin(), pk.H_query.begin() + qap_wit.degree() + 1,
                                       qap_wit.coefficients_for_H.begin(),
                                       qap_wit.coefficients_for_H.begin() + qap_wit.degree() + 1, chunks);
 
                             g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                               typename CurveType::scalar_field_type,
-                                                                               algebra::multiexp_method_bos_coster>(
+                                                                              typename CurveType::scalar_field_type,
+                                                                              algebra::multiexp_method_bos_coster>(
                                             pk.K_query.begin() + 1, pk.K_query.begin() + 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
@@ -629,7 +635,8 @@ namespace nil {
                          */
                         static processed_verification_key verifier_process_vk(const verification_key &vk) {
                             processed_verification_key pvk;
-                            pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
+                            pvk.pp_G2_one_precomp =
+                                CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
                             pvk.vk_alphaA_g2_precomp = CurveType::precompute_g2(vk.alphaA_g2);
                             pvk.vk_alphaB_g1_precomp = CurveType::precompute_g1(vk.alphaB_g1);
                             pvk.vk_alphaC_g2_precomp = CurveType::precompute_g2(vk.alphaC_g2);
@@ -800,7 +807,8 @@ namespace nil {
                             assert(vk.encoded_IC_query.domain_size() >= primary_input.size());
 
                             typename pairing_policy::affine_ate_G2_precomp pvk_pp_G2_one_precomp =
-                                pairing_policy::affine_ate_precompute_G2(typename CurveType::g2_type::value_type::one());
+                                pairing_policy::affine_ate_precompute_G2(
+                                    typename CurveType::g2_type::value_type::one());
                             typename pairing_policy::affine_ate_G2_precomp pvk_vk_alphaA_g2_precomp =
                                 pairing_policy::affine_ate_precompute_G2(vk.alphaA_g2);
                             typename pairing_policy::affine_ate_G1_precomp pvk_vk_alphaB_g1_precomp =

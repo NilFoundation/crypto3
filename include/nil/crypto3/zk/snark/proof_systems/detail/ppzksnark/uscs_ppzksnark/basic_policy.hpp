@@ -117,11 +117,12 @@ namespace nil {
                             proving_key &operator=(const proving_key &other) = default;
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
-                            proving_key(typename std::vector<typename CurveType::g1_type::value_type> &&V_g1_query,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
-                                        typename std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
-                                        constraint_system &&cs) :
+                            proving_key(
+                                typename std::vector<typename CurveType::g1_type::value_type> &&V_g1_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
+                                typename std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
+                                typename std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
+                                constraint_system &&cs) :
                                 V_g1_query(std::move(V_g1_query)),
                                 alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
                                 V_g2_query(std::move(V_g2_query)), cs(std::move(cs)) {};
@@ -195,17 +196,17 @@ namespace nil {
 
                             /*static verification_key dummy_verification_key(const std::size_t input_size) {
                                 verification_key result;
-                                result.tilde_g2 = algenra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.alpha_tilde_g2 = algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one(); result.Z_g2 =
+                                result.tilde_g2 = algenra::random_element<typename CurveType::scalar_field_type>() *
+                            typename CurveType::g2_type::value_type::one(); result.alpha_tilde_g2 =
                             algenra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one();
+                            CurveType::g2_type::value_type::one(); result.Z_g2 = algenra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
 
                                 typename CurveType::g1_type::value_type base = algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one(); 
-                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0; i < input_size; ++i) {
-                                    v.emplace_back(algenra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g1_type::value_type::one());
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
+                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0;
+                            i < input_size; ++i) { v.emplace_back(algenra::random_element<typename
+                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one());
                                 }
 
                                 result.encoded_IC_query = accumulation_vector<typename CurveType::g1_type>(v);
@@ -424,10 +425,12 @@ namespace nil {
 #endif
                             const typename CurveType::scalar_field_type::value_type tilde =
                                 algebra::random_element<typename CurveType::scalar_field_type>();
-                            typename CurveType::g2_type::value_type tilde_g2 = tilde * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g2_type::value_type tilde_g2 =
+                                tilde * typename CurveType::g2_type::value_type::one();
                             typename CurveType::g2_type::value_type alpha_tilde_g2 =
                                 (alpha * tilde) * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g2_type::value_type Z_g2 = ssp_inst.Zt * typename CurveType::g2_type::value_type::one();
+                            typename CurveType::g2_type::value_type Z_g2 =
+                                ssp_inst.Zt * typename CurveType::g2_type::value_type::one();
 
                             typename CurveType::g1_type::value_type encoded_IC_base =
                                 Xt_table[0] * typename CurveType::g1_type::value_type::one();
@@ -480,10 +483,12 @@ namespace nil {
                             assert(pk.H_g1_query.size() == ssp_wit.degree() + 1);
                             assert(pk.V_g2_query.size() == ssp_wit.num_variables() + 2);
 
-                            typename CurveType::g1_type::value_type V_g1 = ssp_wit.d * pk.V_g1_query[pk.V_g1_query.size() - 1];
+                            typename CurveType::g1_type::value_type V_g1 =
+                                ssp_wit.d * pk.V_g1_query[pk.V_g1_query.size() - 1];
                             typename CurveType::g1_type::value_type alpha_V_g1 =
                                 ssp_wit.d * pk.alpha_V_g1_query[pk.alpha_V_g1_query.size() - 1];
-                            typename CurveType::g1_type::value_type H_g1 = typename CurveType::g1_type::value_type::zero();
+                            typename CurveType::g1_type::value_type H_g1 =
+                                typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g2_type::value_type V_g2 =
                                 pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
 
@@ -497,8 +502,8 @@ namespace nil {
                             // MAYBE LATER: do queries 1,2,4 at once for slightly better speed
 
                             V_g1 = V_g1 + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                                 typename CurveType::scalar_field_type,
-                                                                                 algebra::multiexp_method_BDLO12>(
+                                                                                typename CurveType::scalar_field_type,
+                                                                                algebra::multiexp_method_BDLO12>(
                                               pk.V_g1_query.begin(),
                                               pk.V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                               ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
@@ -507,28 +512,26 @@ namespace nil {
                             alpha_V_g1 =
                                 alpha_V_g1 +
                                 algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                       typename CurveType::scalar_field_type,
-                                                                       algebra::multiexp_method_BDLO12>(
+                                                                      typename CurveType::scalar_field_type,
+                                                                      algebra::multiexp_method_BDLO12>(
                                     pk.alpha_V_g1_query.begin(),
                                     pk.alpha_V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                     ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
                                     ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                            H_g1 =
-                                H_g1 +
-                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(
-                                    pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
-                                    ssp_wit.coefficients_for_H.begin(),
-                                    ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
+                            H_g1 = H_g1 +
+                                   algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                     algebra::multiexp_method_BDLO12>(
+                                       pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
+                                       ssp_wit.coefficients_for_H.begin(),
+                                       ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
 
-                            V_g2 =
-                                V_g2 +
-                                algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
-                                                   algebra::multiexp_method_BDLO12>(
-                                    pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
-                                    ssp_wit.coefficients_for_Vs.begin(),
-                                    ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                            V_g2 = V_g2 +
+                                   algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
+                                                     algebra::multiexp_method_BDLO12>(
+                                       pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
+                                       ssp_wit.coefficients_for_Vs.begin(),
+                                       ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
                             proof prf = proof(std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));
 
@@ -542,8 +545,10 @@ namespace nil {
 
                             processed_verification_key pvk;
 
-                            pvk.pp_G1_one_precomp = CurveType::precompute_g1(typename CurveType::g1_type::value_type::one());
-                            pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
+                            pvk.pp_G1_one_precomp =
+                                CurveType::precompute_g1(typename CurveType::g1_type::value_type::one());
+                            pvk.pp_G2_one_precomp =
+                                CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
 
                             pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
                             pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);
