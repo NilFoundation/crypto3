@@ -29,34 +29,12 @@
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
-#include <boost/concept/assert.hpp>
-
-#include <iterator>
-
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
                     using namespace nil::crypto3::algebra::fields::detail;
-
-                    template<typename InputType, typename OutputType>
-                    constexpr inline void strxor(const InputType &in1, const InputType &in2, OutputType &out) {
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputType>));
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<OutputType>));
-                        BOOST_CONCEPT_ASSERT((boost::WriteableRangeConcept<OutputType>));
-
-                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()));
-                        BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
-
-                        auto in1_iter = in1.begin();
-                        auto in2_iter = in2.begin();
-                        auto out_iter = out.begin();
-
-                        while (in1_iter != in1.end() && in2_iter != in2.end() && out_iter != out.end()) {
-                            *out_iter++ = *in1_iter++ ^ *in2_iter++;
-                        }
-                    }
 
                     template<typename FieldParams>
                     inline bool sgn0(const element_fp<FieldParams> &e) {

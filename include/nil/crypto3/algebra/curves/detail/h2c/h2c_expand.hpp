@@ -27,7 +27,9 @@
 #define CRYPTO3_ALGEBRA_CURVES_HASH_TO_CURVE_EXPAND_HPP
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
-#include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_sgn0.hpp>
+
+#include <nil/crypto3/detail/strxor.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -45,6 +47,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
+                    using namespace nil::crypto3::detail;
                     template<std::size_t k, typename HashType,
                              /// HashType::digest_type is required to be uint8_t[]
                              typename = typename std::enable_if<

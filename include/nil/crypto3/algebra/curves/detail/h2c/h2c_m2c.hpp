@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_iso_map.hpp>
-#include <nil/crypto3/algebra/curves/detail/h2c/h2c_utils.hpp>
+#include <nil/crypto3/algebra/curves/detail/h2c/h2c_sgn0.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
