@@ -53,8 +53,8 @@
 // <https://eprint.iacr.org/2016/260>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_BASIC_POLICY_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_BASIC_POLICY_HPP
+#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
+#define CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
 
 #include <memory>
 
@@ -337,4 +337,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_BASIC_POLICY_HPP
+#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
