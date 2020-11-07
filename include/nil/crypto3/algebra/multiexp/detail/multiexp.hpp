@@ -101,6 +101,8 @@ namespace nil {
                                    typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
 
                     using number_type = typename FieldType::modulus_type;
+                    // temporary added until fixed-precision modular adaptor is ready:
+                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
 
                     std::size_t length = std::distance(bases, bases_end);
 
@@ -108,12 +110,13 @@ namespace nil {
                     std::size_t log2_length = std::log2(length);
                     std::size_t c = log2_length - (log2_length / 3 - 2);
 
-                    std::vector<number_type> bn_exponents(length);
+                    std::vector<non_fixed_precision_number_type> bn_exponents(length);
                     std::size_t num_bits = 0;
 
                     for (std::size_t i = 0; i < length; i++) {
-                        bn_exponents[i] = exponents[i].data;
-                        num_bits = std::max(num_bits, boost::multiprecision::msb(bn_exponents[i]));
+                        bn_exponents[i] = non_fixed_precision_number_type(exponents[i].data);
+                        std::size_t bn_exponents_i_msb = boost::multiprecision::msb(bn_exponents[i]);
+                        num_bits = std::max(num_bits, bn_exponents_i_msb);
                     }
 
                     std::size_t num_groups = (num_bits + c - 1) / c;

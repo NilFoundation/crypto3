@@ -30,8 +30,6 @@
 #include <chrono>
 #include <ctime>
 
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 //#include <nil/crypto3/algebra/curves/bn128.hpp>
@@ -67,6 +65,26 @@
 // #include <nil/crypto3/algebra/curves/params/multiexp/secp.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/x962_p.hpp>
+
+#include <nil/crypto3/algebra/curves/params/wnaf/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/params/wnaf/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/p192.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/p224.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/p256.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/p384.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/p521.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/secp.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/wnaf/x962_p.hpp>
+
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

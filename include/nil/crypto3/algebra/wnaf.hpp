@@ -27,24 +27,26 @@
 
 #include <boost/multiprecision/wnaf.hpp>
 
+#include <nil/crypto3/algebra/curves/params.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            template<typename FieldValueType, typename Backend,
+            template<typename BaseValueType, typename Backend,
                      boost::multiprecision::expression_template_option ExpressionTemplates>
-            FieldValueType
-                fixed_window_wnaf_exp(const std::size_t window_size, const FieldValueType &base,
+            BaseValueType
+                fixed_window_wnaf_exp(const std::size_t window_size, const BaseValueType &base,
                                       const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                 std::vector<long> naf = boost::multiprecision::find_wnaf(window_size, scalar);
-                std::vector<FieldValueType> table(1ul << (window_size - 1));
-                FieldValueType tmp = base;
-                FieldValueType dbl = base.doubled();
+                std::vector<BaseValueType> table(1ul << (window_size - 1));
+                BaseValueType tmp = base;
+                BaseValueType dbl = base.doubled();
                 for (size_t i = 0; i < 1ul << (window_size - 1); ++i) {
                     table[i] = tmp;
                     tmp = tmp + dbl;
                 }
 
-                FieldValueType res = FieldValueType::zero();
+                BaseValueType res = BaseValueType::zero();
                 bool found_nonzero = false;
                 for (long i = naf.size() - 1; i >= 0; --i) {
                     if (found_nonzero) {
@@ -64,15 +66,16 @@ namespace nil {
                 return res;
             }
 
-            template<typename FieldValueType, typename Backend,
+            //TODO: check, that BaseValueType is a curve group element. Otherwise it has no wnaf_window_table
+            template<typename BaseValueType, typename Backend,
                      boost::multiprecision::expression_template_option ExpressionTemplates>
-            FieldValueType
-                opt_window_wnaf_exp(const FieldValueType &base,
+            BaseValueType
+                opt_window_wnaf_exp(const BaseValueType &base,
                                     const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
                                     const size_t scalar_bits) {
                 size_t best = 0;
-                for (long i = FieldValueType::wnaf_window_table.size() - 1; i >= 0; --i) {
-                    if (scalar_bits >= FieldValueType::wnaf_window_table[i]) {
+                for (long i = curves::wnaf_params<typename BaseValueType::group_type>::wnaf_window_table.size() - 1; i >= 0; --i) {
+                    if (scalar_bits >= curves::wnaf_params<typename BaseValueType::group_type>::wnaf_window_table[i]) {
                         best = i + 1;
                         break;
                     }
