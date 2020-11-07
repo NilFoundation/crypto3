@@ -47,8 +47,8 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
-#define CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
+#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_VERIFIER_HPP
+#define CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
@@ -239,4 +239,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
+#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_VERIFIER_HPP
