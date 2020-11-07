@@ -30,7 +30,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                
+
                 template<std::size_t ModulusBits>
                 struct bls12;
 
@@ -41,7 +41,7 @@ namespace nil {
                 struct pairing_policy;
 
                 template<std::size_t ModulusBits, typename PairingFunctions>
-                class pairing_policy<curves::bls12<ModulusBits>, PairingFunctions>{
+                class pairing_policy<curves::bls12<ModulusBits>, PairingFunctions> {
                     using policy_type = PairingFunctions;
 
                 public:
@@ -69,20 +69,21 @@ namespace nil {
                         return policy_type::precompute_g2(Q);
                     }
 
-                    static inline typename policy_type::gt pairing(const typename policy_type::g1 &P, 
+                    static inline typename policy_type::gt pairing(const typename policy_type::g1 &P,
                                                                    const typename policy_type::g2 &Q) {
                         return policy_type::pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt reduced_pairing(const typename policy_type::g1 &P, 
+                    static inline typename policy_type::gt reduced_pairing(const typename policy_type::g1 &P,
                                                                            const typename policy_type::g2 &Q) {
                         return policy_type::reduced_pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt double_miller_loop(const typename policy_type::g1_precomp &prec_P1, 
-                                                                              const typename policy_type::g2_precomp &prec_Q1, 
-                                                                              const typename policy_type::g1_precomp &prec_P2, 
-                                                                              const typename policy_type::g2_precomp &prec_Q2) {
+                    static inline typename policy_type::gt
+                        double_miller_loop(const typename policy_type::g1_precomp &prec_P1,
+                                           const typename policy_type::g2_precomp &prec_Q1,
+                                           const typename policy_type::g1_precomp &prec_P2,
+                                           const typename policy_type::g2_precomp &prec_Q2) {
                         return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 
@@ -90,7 +91,7 @@ namespace nil {
                         return policy_type::final_exponentiation(elt);
                     }
 
-                    static inline typename policy_type::gt miller_loop(const typename policy_type::g1_precomp &prec_P, 
+                    static inline typename policy_type::gt miller_loop(const typename policy_type::g1_precomp &prec_P,
                                                                        const typename policy_type::g2_precomp &prec_Q) {
                         return policy_type::miller_loop(prec_P, prec_Q);
                     }

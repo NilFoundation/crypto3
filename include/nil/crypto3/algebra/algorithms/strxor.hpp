@@ -33,7 +33,21 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace detail {
+        namespace algebra {
+            template<typename InputIterator1, typename InputIterator2, typename OutputIterator>
+            constexpr inline
+                typename std::enable_if<std::is_same<typename std::iterator_traits<InputIterator1>::value_type,
+                                                     typename std::iterator_traits<InputIterator2>::value_type>::value,
+                                        OutputIterator>::type
+                strxor(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                       OutputIterator out) {
+                BOOST_ASSERT(std::distance(first1, last1) == std::distance(first2, last2));
+
+                while (first1 != last1 && first2 != last2) {
+                    *out++ = *first1++ ^ *first2++;
+                }
+            }
+
             template<typename InputType, typename OutputType>
             constexpr inline void strxor(const InputType &in1, const InputType &in2, OutputType &out) {
                 BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputType>));
@@ -43,17 +57,10 @@ namespace nil {
                 BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()) &&
                              std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
 
-                auto in1_iter = in1.begin();
-                auto in2_iter = in2.begin();
-                auto out_iter = out.begin();
-
-                while (in1_iter != in1.end() && in2_iter != in2.end() && out_iter != out.end()) {
-                    *out_iter++ = *in1_iter++ ^ *in2_iter++;
-                }
+                strxor(in1.begin(), in1.end(), in2.begin(), in2.end(), out.begin());
             }
-        }    // namespace detail
+        }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil
-
 
 #endif    // CRYPTO3_STRXOR_HPP

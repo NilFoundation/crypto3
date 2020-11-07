@@ -36,9 +36,9 @@ namespace nil {
                     // TODO: temporary implementation due to absence of GroupValueType type_trait
                     //  Should be implemented as class method
                     template<typename GroupValueType,
-                        typename = typename std::enable_if<
-                            ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
-                            !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
+                             typename = typename std::enable_if<
+                                 ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
+                                 !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value>::type>
                     bool subgroup_check(const GroupValueType &p) {
                         return (p * GroupValueType::group_type::curve_type::q).is_zero();
                     }

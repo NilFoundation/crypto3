@@ -71,11 +71,11 @@ namespace nil {
                     };
 
                     /************************* EDWARDS-183 definitions ***********************************/
-                    
+
                 }    // namespace detail
-            }    // namespace curves
-        }        // namespace algebra
-    }            // namespace crypto3
+            }        // namespace curves
+        }            // namespace algebra
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_PAIRING_PARAMS_HPP

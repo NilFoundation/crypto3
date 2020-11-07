@@ -29,13 +29,15 @@
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_suites.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_sgn0.hpp>
 
-#include <nil/crypto3/detail/strxor.hpp>
+#include <nil/crypto3/algebra/algorithms/strxor.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
+#include <boost/assert.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/concept/assert.hpp>
 
 #include <array>
@@ -54,14 +56,15 @@ namespace nil {
                                  std::is_same<std::uint8_t, typename HashType::digest_type::value_type>::value>::type>
                     class expand_message_xmd {
                         // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
-                        static_assert(HashType::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
-                        static_assert(HashType::digest_bits % 8 == 0, "b_in_bytes is not a multiple of 8");
-                        static_assert(HashType::digest_bits >= 2 * k, "k-bit collision resistance is not fulfilled");
+                        BOOST_STATIC_ASSERT_MSG(HashType::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
+                        BOOST_STATIC_ASSERT_MSG(HashType::digest_bits % 8 == 0, "b_in_bytes is not a multiple of 8");
+                        BOOST_STATIC_ASSERT_MSG(HashType::digest_bits >= 2 * k,
+                                                "k-bit collision resistance is not fulfilled");
 
-                        constexpr static std::size_t b_in_bytes = HashType::digest_bits / 8;
-                        constexpr static std::size_t r_in_bytes = HashType::block_bits / 8;
+                        constexpr static const std::size_t b_in_bytes = HashType::digest_bits / 8;
+                        constexpr static const std::size_t r_in_bytes = HashType::block_bits / 8;
 
-                        constexpr static std::array<std::uint8_t, r_in_bytes> Z_pad {0};
+                        constexpr static const std::array<std::uint8_t, r_in_bytes> Z_pad {0};
 
                     public:
                         template<typename InputMsgType, typename InputDstType, typename OutputType,
@@ -77,10 +80,10 @@ namespace nil {
                             BOOST_CONCEPT_ASSERT((boost::WriteableRangeConcept<OutputType>));
 
                             // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
-                            assert(len_in_bytes < 0x10000);
-                            assert(std::distance(dst.begin(), dst.end()) >= 16 &&
-                                   std::distance(dst.begin(), dst.end()) <= 255);
-                            assert(std::distance(uniform_bytes.begin(), uniform_bytes.end()) >= len_in_bytes);
+                            BOOST_ASSERT(len_in_bytes < 0x10000);
+                            BOOST_ASSERT(std::distance(dst.begin(), dst.end()) >= 16 &&
+                                         std::distance(dst.begin(), dst.end()) <= 255);
+                            BOOST_ASSERT(std::distance(uniform_bytes.begin(), uniform_bytes.end()) >= len_in_bytes);
 
                             const std::array<std::uint8_t, 2> l_i_b_str = {
                                 static_cast<std::uint8_t>(len_in_bytes >> 8u),
@@ -89,7 +92,7 @@ namespace nil {
                                                     static_cast<std::size_t>(len_in_bytes % b_in_bytes != 0);
 
                             // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
-                            assert(ell <= 255);
+                            BOOST_ASSERT(ell <= 255);
 
                             // TODO: use accumulators when they will be fixed
                             // accumulator_set<HashType> b0_acc;

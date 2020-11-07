@@ -57,7 +57,7 @@ namespace nil {
                         using Fqk_field = typename policy_type::Fqk_field;
 
                         constexpr static const typename policy_type::number_type ate_loop_count =
-                        policy_type::ate_loop_count;
+                            policy_type::ate_loop_count;
 
                         struct ate_g1_precomp {
                             using value_type = Fq;
