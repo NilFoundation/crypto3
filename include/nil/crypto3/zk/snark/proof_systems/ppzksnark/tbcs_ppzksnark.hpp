@@ -36,8 +36,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename Generator = policies::tbcs_ppzksnark_generator, 
-                         typename Prover = policies::tbcs_ppzksnark_prover, 
+                template<typename Generator = policies::tbcs_ppzksnark_generator,
+                         typename Prover = policies::tbcs_ppzksnark_prover,
                          typename Verifier = policies::tbcs_ppzksnark_verifier_strong_IC>
                 class tbcs_ppzksnark {
                     using types_policy = detail::tbcs_ppzksnark_types_policy;

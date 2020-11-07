@@ -59,7 +59,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-                    
+
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
@@ -80,7 +80,7 @@ namespace nil {
 
                         template<typename CurveType>
                         processed_verification_key operator()(const verification_key_type &verification_key) {
-                            const processed_verification_key_type processed_verification_key = 
+                            const processed_verification_key_type processed_verification_key =
                                 r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
 
                             return processed_verification_key;
@@ -125,9 +125,10 @@ namespace nil {
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            const processed_verification_key_type processed_verification_key = bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            const bool bit =
-                                r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            const processed_verification_key_type processed_verification_key =
+                                bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
+                            const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(
+                                processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -158,9 +159,10 @@ namespace nil {
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
-                            const processed_verification_key_type processed_verification_key = bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            const bool bit =
-                                r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            const processed_verification_key_type processed_verification_key =
+                                bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                                processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -190,8 +192,9 @@ namespace nil {
                         bool operator()(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            const bool bit =
-                                r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
+
+                            const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(
+                                processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
@@ -221,13 +224,12 @@ namespace nil {
                         bool operator()(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            const bool bit =
-                                r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                                processed_verification_key, primary_input, proof);
 
                             return bit;
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

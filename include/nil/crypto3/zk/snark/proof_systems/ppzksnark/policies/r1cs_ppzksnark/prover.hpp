@@ -86,7 +86,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-                    
+
                     /**
                      * A prover algorithm for the R1CS ppzkSNARK.
                      *
@@ -99,21 +99,21 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         keypair_type operator()(const proving_key_type &proving_key,
-                                            const primary_input_type &primary_input,
-                                            const auxiliary_input_type &auxiliary_input) {
+                                                const primary_input_type &primary_input,
+                                                const auxiliary_input_type &auxiliary_input) {
 
                             const typename CurveType::scalar_field_type::value_type
                                 d1 = algebra::random_element<typename CurveType::scalar_field_type>(),
@@ -133,7 +133,8 @@ namespace nil {
                             typename CurveType::g1_type::value_type g_H =
                                 typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g1_type::value_type g_K =
-                                (proving_key.K_query[0] + qap_wit.d1 * proving_key.K_query[qap_wit.num_variables() + 1] +
+                                (proving_key.K_query[0] +
+                                 qap_wit.d1 * proving_key.K_query[qap_wit.num_variables() + 1] +
                                  qap_wit.d2 * proving_key.K_query[qap_wit.num_variables() + 2] +
                                  qap_wit.d3 * proving_key.K_query[qap_wit.num_variables() + 3]);
 
@@ -175,7 +176,8 @@ namespace nil {
                             g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                               typename CurveType::scalar_field_type,
                                                                               algebra::multiexp_method_bos_coster>(
-                                            proving_key.K_query.begin() + 1, proving_key.K_query.begin() + 1 + qap_wit.num_variables(),
+                                            proving_key.K_query.begin() + 1,
+                                            proving_key.K_query.begin() + 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 

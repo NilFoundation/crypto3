@@ -86,7 +86,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-                    
+
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
@@ -94,29 +94,36 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         processed_verification_key_type operator()(const verification_key_type &verification_key) {
                             processed_verification_key_type processed_verification_key;
                             processed_verification_key.pp_G2_one_precomp =
                                 CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
-                            processed_verification_key.vk_alphaA_g2_precomp = CurveType::precompute_g2(verification_key.alphaA_g2);
-                            processed_verification_key.vk_alphaB_g1_precomp = CurveType::precompute_g1(verification_key.alphaB_g1);
-                            processed_verification_key.vk_alphaC_g2_precomp = CurveType::precompute_g2(verification_key.alphaC_g2);
-                            processed_verification_key.vk_rC_Z_g2_precomp = CurveType::precompute_g2(verification_key.rC_Z_g2);
-                            processed_verification_key.vk_gamma_g2_precomp = CurveType::precompute_g2(verification_key.gamma_g2);
-                            processed_verification_key.vk_gamma_beta_g1_precomp = CurveType::precompute_g1(verification_key.gamma_beta_g1);
-                            processed_verification_key.vk_gamma_beta_g2_precomp = CurveType::precompute_g2(verification_key.gamma_beta_g2);
+                            processed_verification_key.vk_alphaA_g2_precomp =
+                                CurveType::precompute_g2(verification_key.alphaA_g2);
+                            processed_verification_key.vk_alphaB_g1_precomp =
+                                CurveType::precompute_g1(verification_key.alphaB_g1);
+                            processed_verification_key.vk_alphaC_g2_precomp =
+                                CurveType::precompute_g2(verification_key.alphaC_g2);
+                            processed_verification_key.vk_rC_Z_g2_precomp =
+                                CurveType::precompute_g2(verification_key.rC_Z_g2);
+                            processed_verification_key.vk_gamma_g2_precomp =
+                                CurveType::precompute_g2(verification_key.gamma_g2);
+                            processed_verification_key.vk_gamma_beta_g1_precomp =
+                                CurveType::precompute_g1(verification_key.gamma_beta_g1);
+                            processed_verification_key.vk_gamma_beta_g2_precomp =
+                                CurveType::precompute_g2(verification_key.gamma_beta_g2);
 
                             processed_verification_key.encoded_IC_query = verification_key.encoded_IC_query;
 
@@ -133,23 +140,25 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type processed_verification_key = r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            processed_verification_key_type processed_verification_key =
+                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
+                            bool result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key,
+                                                                                            primary_input, proof);
                             return result;
                         }
                     };
@@ -163,23 +172,25 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type processed_verification_key = r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            processed_verification_key_type processed_verification_key =
+                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
+                            bool result = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                                processed_verification_key, primary_input, proof);
                             return result;
                         }
                     };
@@ -193,16 +204,16 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         bool operator()(const processed_verification_key_type &processed_verification_key,
@@ -213,8 +224,9 @@ namespace nil {
                             assert(processed_verification_key.encoded_IC_query.domain_size() >= primary_input.size());
 
                             const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                                processed_verification_key.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
-                                    primary_input.begin(), primary_input.end(), 0);
+                                processed_verification_key.encoded_IC_query
+                                    .template accumulate_chunk<typename CurveType::scalar_field_type>(
+                                        primary_input.begin(), primary_input.end(), 0);
                             const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
@@ -226,10 +238,10 @@ namespace nil {
                                 CurveType::precompute_g1(proof.g_A.g);
                             typename pairing_policy::G1_precomp proof_g_A_h_precomp =
                                 CurveType::precompute_g1(proof.g_A.h);
-                            typename pairing_policy::Fqk_type kc_A_1 =
-                                pairing_policy::miller_loop(proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
-                            typename pairing_policy::Fqk_type kc_A_2 =
-                                pairing_policy::miller_loop(proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                            typename pairing_policy::Fqk_type kc_A_1 = pairing_policy::miller_loop(
+                                proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
+                            typename pairing_policy::Fqk_type kc_A_2 = pairing_policy::miller_loop(
+                                proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
                             typename CurveType::gt_type kc_A =
                                 pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
                             if (kc_A != typename CurveType::gt_type::one()) {
@@ -240,10 +252,10 @@ namespace nil {
                                 CurveType::precompute_g2(proof.g_B.g);
                             typename pairing_policy::G1_precomp proof_g_B_h_precomp =
                                 CurveType::precompute_g1(proof.g_B.h);
-                            typename pairing_policy::Fqk_type kc_B_1 =
-                                pairing_policy::miller_loop(processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                            typename pairing_policy::Fqk_type kc_B_2 =
-                                pairing_policy::miller_loop(proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                            typename pairing_policy::Fqk_type kc_B_1 = pairing_policy::miller_loop(
+                                processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
+                            typename pairing_policy::Fqk_type kc_B_2 = pairing_policy::miller_loop(
+                                proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
                             typename CurveType::gt_type kc_B =
                                 pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
                             if (kc_B != typename CurveType::gt_type::one()) {
@@ -254,10 +266,10 @@ namespace nil {
                                 CurveType::precompute_g1(proof.g_C.g);
                             typename pairing_policy::G1_precomp proof_g_C_h_precomp =
                                 CurveType::precompute_g1(proof.g_C.h);
-                            typename pairing_policy::Fqk_type kc_C_1 =
-                                pairing_policy::miller_loop(proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
-                            typename pairing_policy::Fqk_type kc_C_2 =
-                                pairing_policy::miller_loop(proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
+                            typename pairing_policy::Fqk_type kc_C_1 = pairing_policy::miller_loop(
+                                proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
+                            typename pairing_policy::Fqk_type kc_C_2 = pairing_policy::miller_loop(
+                                proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
                             typename CurveType::gt_type kc_C =
                                 pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
                             if (kc_C != typename CurveType::gt_type::one()) {
@@ -272,7 +284,8 @@ namespace nil {
                             typename pairing_policy::Fqk_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::Fqk_type QAP_23 = pairing_policy::double_miller_loop(
-                                proof_g_H_precomp, processed_verification_key.vk_rC_Z_g2_precomp, proof_g_C_g_precomp, processed_verification_key.pp_G2_one_precomp);
+                                proof_g_H_precomp, processed_verification_key.vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
+                                processed_verification_key.pp_G2_one_precomp);
                             typename CurveType::gt_type QAP =
                                 pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
                             if (QAP != typename CurveType::gt_type::one()) {
@@ -282,11 +295,11 @@ namespace nil {
                             typename pairing_policy::G1_precomp proof_g_K_precomp = CurveType::precompute_g1(proof.g_K);
                             typename pairing_policy::G1_precomp proof_g_A_g_acc_C_precomp =
                                 CurveType::precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
-                            typename pairing_policy::Fqk_type K_1 =
-                                pairing_policy::miller_loop(proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
+                            typename pairing_policy::Fqk_type K_1 = pairing_policy::miller_loop(
+                                proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
                             typename pairing_policy::Fqk_type K_23 = pairing_policy::double_miller_loop(
-                                proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp, processed_verification_key.vk_gamma_beta_g1_precomp,
-                                proof_g_B_g_precomp);
+                                proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp,
+                                processed_verification_key.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                             typename CurveType::gt_type K =
                                 pairing_policy::final_exponentiation(K_1 * K_23.unitary_inversed());
                             if (K != typename CurveType::gt_type::one()) {
@@ -306,16 +319,16 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         bool operator()(const processed_verification_key_type &processed_verification_key,
@@ -326,7 +339,8 @@ namespace nil {
                             if (processed_verification_key.encoded_IC_query.domain_size() != primary_input.size()) {
                                 result = false;
                             } else {
-                                result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
+                                result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key,
+                                                                                           primary_input, proof);
                             }
 
                             return result;
@@ -345,16 +359,16 @@ namespace nil {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
 
-                        using constraint_system_type = typename policy_type::constraint_system;
-                        using primary_input_type = typename policy_type::primary_input;
-                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                        using proving_key_type = typename policy_type::proving_key;
-                        using verification_key_type = typename policy_type::verification_key;
-                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                        using keypair_type = typename policy_type::keypair;
-                        using proof_type = typename policy_type::proof;
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
                         
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,

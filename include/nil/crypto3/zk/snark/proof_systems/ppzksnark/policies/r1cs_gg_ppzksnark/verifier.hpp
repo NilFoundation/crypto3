@@ -100,8 +100,10 @@ namespace nil {
 
                             processed_verification_key_type processed_verification_key;
                             processed_verification_key.vk_alpha_g1_beta_g2 = verification_key.alpha_g1_beta_g2;
-                            processed_verification_key.vk_gamma_g2_precomp = pairing_policy::precompute_g2(verification_key.gamma_g2);
-                            processed_verification_key.vk_delta_g2_precomp = pairing_policy::precompute_g2(verification_key.delta_g2);
+                            processed_verification_key.vk_gamma_g2_precomp =
+                                pairing_policy::precompute_g2(verification_key.gamma_g2);
+                            processed_verification_key.vk_delta_g2_precomp =
+                                pairing_policy::precompute_g2(verification_key.delta_g2);
                             // processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
                             // when ready
 
@@ -147,9 +149,10 @@ namespace nil {
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type processed_verification_key = 
+                            processed_verification_key_type processed_verification_key =
                                 r1cs_gg_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
+                            bool result =
+                                online_verifier_weak_IC<CurveType>(processed_verification_key, primary_input, proof);
                             return result;
                         }
                     };
@@ -178,8 +181,10 @@ namespace nil {
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type processed_verification_key = r1cs_gg_ppzksnark_verifier_process_vk(verification_key);
-                            bool result = r1cs_gg_ppzksnark_online_verifier_strong_IC(processed_verification_key, primary_input, proof);
+                            processed_verification_key_type processed_verification_key =
+                                r1cs_gg_ppzksnark_verifier_process_vk(verification_key);
+                            bool result = r1cs_gg_ppzksnark_online_verifier_strong_IC(processed_verification_key,
+                                                                                      primary_input, proof);
                             return result;
                         }
                     };
@@ -215,8 +220,8 @@ namespace nil {
 
                             accumulation_vector<typename CurveType::g1_type> accumulated_IC;
                             /*const accumulation_vector<typename CurveType::g1_type> accumulated_IC
-                             = processed_verification_key.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
-                                primary_input.begin(), primary_input.end(), 0);*/
+                             = processed_verification_key.gamma_ABC_g1.template accumulate_chunk<typename
+                             CurveType::scalar_field_type>( primary_input.begin(), primary_input.end(), 0);*/
                             // uncomment
                             // when accumulate_chunk ready
                             const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
@@ -237,8 +242,9 @@ namespace nil {
                             const typename pairing_policy::Fqk_type::value_type QAP1 =
                                 pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
                             const typename pairing_policy::Fqk_type::value_type QAP2 =
-                                pairing_policy::double_miller_loop(acc_precomp, processed_verification_key.vk_gamma_g2_precomp,
-                                                                   proof_g_C_precomp, processed_verification_key.vk_delta_g2_precomp);
+                                pairing_policy::double_miller_loop(
+                                    acc_precomp, processed_verification_key.vk_gamma_g2_precomp, proof_g_C_precomp,
+                                    processed_verification_key.vk_delta_g2_precomp);
                             const typename CurveType::gt_type QAP =
                                 pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
 
@@ -324,8 +330,9 @@ namespace nil {
                                 pairing_policy::affine_ate_precompute_G2(verification_key.delta_g2);
 
                             const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                                verification_key.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
-                                    primary_input.begin(), primary_input.end(), 0);
+                                verification_key.gamma_ABC_g1
+                                    .template accumulate_chunk<typename CurveType::scalar_field_type>(
+                                        primary_input.begin(), primary_input.end(), 0);
                             const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
