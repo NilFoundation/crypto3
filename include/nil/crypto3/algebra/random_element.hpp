@@ -26,21 +26,24 @@
 #ifndef CRYPTO3_ALGEBRA_RANDOM_ELEMENT_HPP
 #define CRYPTO3_ALGEBRA_RANDOM_ELEMENT_HPP
 
+#include <nil/crypto3/detail/type_traits.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<typename CurveGroupType,
-                     typename = typename std::enable_if<
-                         ::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value &&
-                         !(::nil::crypto3::algebra::detail::is_field<CurveGroupType>::value)>::type>
-                > typename CurveGroupType::value_type random_element() {
+            template<typename CurveGroupType>
+            typename std::enable_if<::nil::crypto3::detail::is_curve_group<CurveGroupType>::value, 
+                                    typename CurveGroupType::value_type>::type
+                random_element() {
+
                 return CurveGroupType::value_type::one();
             };
 
-            template<typename FieldType, typename = typename std::enable_if<
-                                             ::nil::crypto3::algebra::detail::is_field<FieldType>::value>::type>
-                > typename FieldType::value_type random_element() {
+            template<typename FieldType>
+            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value, 
+                                    typename FieldType::value_type>::type 
+                random_element() {
                 return FieldType::value_type::one();
             };
 

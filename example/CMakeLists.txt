@@ -18,6 +18,7 @@ macro(define_algebra_example name)
 endmacro()
 
 set(EXAMPLES_NAMES
+    "multiexp"
     "curves"
     "fields"
     "pairing"
