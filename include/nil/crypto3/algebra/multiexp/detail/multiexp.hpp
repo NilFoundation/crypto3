@@ -34,6 +34,8 @@
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
+#include <nil/crypto3/algebra/wnaf.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -122,7 +124,7 @@ namespace nil {
                     for (std::size_t k = num_groups - 1; k <= num_groups; k--) {
                         if (result_nonzero) {
                             for (std::size_t i = 0; i < c; i++) {
-                                result = result.dbl();
+                                result = result.doubled();
                             }
                         }
 
@@ -188,6 +190,21 @@ namespace nil {
                     return result;
                 }
 
+                template<typename NumberType>
+                class ordered_exponent {
+                    using number_type = NumberType;
+                public:
+                    std::size_t idx;
+                    number_type r;
+                    using r_type = number_type;
+
+                    ordered_exponent(const size_t idx, const number_type &r) : idx(idx), r(r) {};
+
+                    bool operator<(const ordered_exponent &other) const {
+                            return (this->r < other.r);
+                    }
+                };
+
                 template<
                     typename BaseType, typename FieldType, multiexp_method Method,
                     typename = typename std::enable_if<(Method == multiexp_method_bos_coster) &&
@@ -199,6 +216,8 @@ namespace nil {
                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
                     using number_type = typename FieldType::modulus_type;
+                    // temporary added until fixed-precision modular adaptor is ready:
+                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
 
                     if (vec_start == vec_end) {
                         return BaseType::value_type::zero();
@@ -208,7 +227,7 @@ namespace nil {
                         return (*scalar_start) * (*vec_start);
                     }
 
-                    std::vector<number_type> opt_q;
+                    std::vector<ordered_exponent<non_fixed_precision_number_type>> opt_q;
                     const std::size_t vec_len = scalar_end - scalar_start;
                     const std::size_t odd_vec_len = (vec_len % 2 == 1 ? vec_len : vec_len + 1);
                     opt_q.reserve(odd_vec_len);
@@ -222,14 +241,14 @@ namespace nil {
                          ++vec_it, ++scalar_it, ++i) {
                         g.emplace_back(*vec_it);
 
-                        opt_q.emplace_back(number_type(scalar_it->data));
+                        opt_q.emplace_back(ordered_exponent<non_fixed_precision_number_type>(i, non_fixed_precision_number_type(scalar_it->data)));
                     }
                     std::make_heap(opt_q.begin(), opt_q.end());
                     assert(scalar_it == scalar_end);
 
                     if (vec_len != odd_vec_len) {
                         g.emplace_back(BaseType::value_type::zero());
-                        opt_q.emplace_back(number_type(0ul));
+                        opt_q.emplace_back(ordered_exponent<non_fixed_precision_number_type>(odd_vec_len - 1, 0ul));
                     }
                     assert(g.size() % 2 == 1);
                     assert(opt_q.size() == g.size());
@@ -237,8 +256,8 @@ namespace nil {
                     typename BaseType::value_type opt_result = BaseType::value_type::zero();
 
                     while (true) {
-                        number_type &a = opt_q[0];
-                        number_type &b = (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
+                        ordered_exponent<non_fixed_precision_number_type> &a = opt_q[0];
+                        ordered_exponent<non_fixed_precision_number_type> &b = (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
 
                         const std::size_t abits = boost::multiprecision::msb(a.r);
 
@@ -259,10 +278,10 @@ namespace nil {
                             // opt_result = opt_result + (a.r * g[a.idx]);
                             opt_result = opt_result + opt_window_wnaf_exp(g[a.idx], a.r, abits);
 
-                            a.r.clear();
+                            a.r = 0;
                         } else {
                             // x A + y B => (x-y) A + y (B+A)
-                            a.r.data = a.r.data - b.r.data;
+                            a.r = a.r - b.r;
                             g[b.idx] = g[b.idx] + g[a.idx];
                         }
 
