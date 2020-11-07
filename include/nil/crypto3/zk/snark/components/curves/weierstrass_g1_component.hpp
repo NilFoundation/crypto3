@@ -64,7 +64,8 @@ namespace nil {
                         all_vars.emplace_back(Y);
                     }
 
-                    G1_variable(blueprint<FieldType> &pb, const typename other_curve<CurveType>::g1_type::value_type &P) :
+                    G1_variable(blueprint<FieldType> &pb,
+                                const typename other_curve<CurveType>::g1_type::value_type &P) :
                         component<FieldType>(pb) {
                         typename other_curve<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
 

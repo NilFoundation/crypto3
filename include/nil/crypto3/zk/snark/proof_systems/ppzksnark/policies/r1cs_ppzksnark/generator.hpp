@@ -99,7 +99,7 @@ namespace nil {
 
                     using keypair_type = typename policy_type::keypair;
                     using proof_type = typename policy_type::proof;
-                   
+
                     struct r1cs_ppzksnark_generator {
 
                         template<typename CurveType>

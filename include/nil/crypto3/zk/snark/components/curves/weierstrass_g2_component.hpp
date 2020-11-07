@@ -63,7 +63,8 @@ namespace nil {
                         all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
-                    G2_variable(blueprint<field_type> &pb, const typename other_curve<CurveType>::g2_type::value_type &Q) :
+                    G2_variable(blueprint<field_type> &pb,
+                                const typename other_curve<CurveType>::g2_type::value_type &Q) :
                         component<field_type>(pb) {
                         typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
 

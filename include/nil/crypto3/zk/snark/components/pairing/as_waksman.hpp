@@ -60,7 +60,8 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
 
                     G1_precomputation();
-                    G1_precomputation(blueprint<FieldType> &pb, const typename other_curve<CurveType>::g1_type::value_type &P);
+                    G1_precomputation(blueprint<FieldType> &pb,
+                                      const typename other_curve<CurveType>::g1_type::value_type &P);
                 };
 
                 /**
@@ -157,7 +158,8 @@ namespace nil {
                     std::vector<std::shared_ptr<precompute_G2_component_coeffs<CurveType>>> coeffs;
 
                     G2_precomputation();
-                    G2_precomputation(blueprint<FieldType> &pb, const typename other_curve<CurveType>::g2_type::value_type &Q_val);
+                    G2_precomputation(blueprint<FieldType> &pb,
+                                      const typename other_curve<CurveType>::g2_type::value_type &Q_val);
                 };
 
                 /**
@@ -291,8 +293,9 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                G1_precomputation<CurveType>::G1_precomputation(blueprint<FieldType> &pb,
-                                                                const typename other_curve<CurveType>::g1_type::value_type &P_val) {
+                G1_precomputation<CurveType>::G1_precomputation(
+                    blueprint<FieldType> &pb,
+                    const typename other_curve<CurveType>::g1_type::value_type &P_val) {
                     typename other_curve<CurveType>::g1_type::value_type P_val_copy = P_val;
                     P_val_copy.to_affine_coordinates();
                     P.reset(new G1_variable<CurveType>(pb, P_val_copy));
@@ -315,8 +318,9 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                G2_precomputation<CurveType>::G2_precomputation(blueprint<FieldType> &pb,
-                                                                const typename other_curve<CurveType>::g2_type::value_type &Q_val) {
+                G2_precomputation<CurveType>::G2_precomputation(
+                    blueprint<FieldType> &pb,
+                    const typename other_curve<CurveType>::g2_type::value_type &Q_val) {
                     Q.reset(new G2_variable<CurveType>(pb, Q_val));
                     const other_curve<CurveType>::pairing_policy::affine_ate_G2_precomp native_precomp =
                         other_curve<CurveType>::affine_ate_precompute_G2(Q_val);

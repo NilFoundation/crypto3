@@ -278,18 +278,19 @@ namespace nil {
                             accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1(
                                 std::move(gamma_ABC_g1_0), std::move(gamma_ABC_g1_values));
 
-                            verification_key_type vk = verification_key(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
+                            verification_key_type vk =
+                                verification_key(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
 
                             proving_key_type pk = proving_key(std::move(alpha_g1),
-                                                         std::move(beta_g1),
-                                                         std::move(beta_g2),
-                                                         std::move(delta_g1),
-                                                         std::move(delta_g2),
-                                                         std::move(A_query),
-                                                         std::move(B_query),
-                                                         std::move(H_query),
-                                                         std::move(L_query),
-                                                         std::move(r1cs_copy));
+                                                              std::move(beta_g1),
+                                                              std::move(beta_g2),
+                                                              std::move(delta_g1),
+                                                              std::move(delta_g2),
+                                                              std::move(A_query),
+                                                              std::move(B_query),
+                                                              std::move(H_query),
+                                                              std::move(L_query),
+                                                              std::move(r1cs_copy));
 
                             return keypair_type(std::move(pk), std::move(vk));
                         }

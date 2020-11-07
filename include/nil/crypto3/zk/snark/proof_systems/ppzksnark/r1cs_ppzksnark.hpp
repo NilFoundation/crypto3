@@ -36,8 +36,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename Generator = policies::r1cs_ppzksnark_generator, 
-                         typename Prover = policies::r1cs_ppzksnark_prover, 
+                template<typename Generator = policies::r1cs_ppzksnark_generator,
+                         typename Prover = policies::r1cs_ppzksnark_prover,
                          typename Verifier = policies::r1cs_ppzksnark_verifier_strong_IC>
                 class r1cs_ppzksnark {
                     using types_policy = detail::r1cs_ppzksnark_types_policy;

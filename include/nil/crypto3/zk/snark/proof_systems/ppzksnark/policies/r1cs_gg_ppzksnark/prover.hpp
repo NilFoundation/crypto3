@@ -103,10 +103,11 @@ namespace nil {
                                                      const primary_input_type &primary_input,
                                                      const auxiliary_input_type &auxiliary_input) {
 
-                            const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap::witness_map(
-                                proving_key.cs, primary_input, auxiliary_input, CurveType::scalar_field_type::value_type::zero(),
-                                CurveType::scalar_field_type::value_type::zero(),
-                                CurveType::scalar_field_type::value_type::zero());
+                            const qap_witness<typename CurveType::scalar_field_type> qap_wit =
+                                r1cs_to_qap::witness_map(proving_key.cs, primary_input, auxiliary_input,
+                                                         CurveType::scalar_field_type::value_type::zero(),
+                                                         CurveType::scalar_field_type::value_type::zero(),
+                                                         CurveType::scalar_field_type::value_type::zero());
 
                             /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                                and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
@@ -197,15 +198,17 @@ namespace nil {
                             /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
                             typename CurveType::g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h;
                             typename CurveType::g2_type::value_type g2_B = proving_key.beta_g2 + evaluation_Bt.g;
-                            // typename CurveType::g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h + s *
-                            // proving_key.delta_g1; typename CurveType::g2_type::value_type g2_B = proving_key.beta_g2 + evaluation_Bt.g
+                            // typename CurveType::g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h + s
+                            // * proving_key.delta_g1; typename CurveType::g2_type::value_type g2_B =
+                            // proving_key.beta_g2 + evaluation_Bt.g
                             // + s * proving_key.delta_g2; uncomment when multiplication ready
 
                             /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b -
                              * r*s*delta
                              */
                             typename CurveType::g1_type::value_type g1_C;
-                            //     = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * proving_key.delta_g1;
+                            //     = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) *
+                            //     proving_key.delta_g1;
                             // uncomment
                             // when multiplication ready
 
