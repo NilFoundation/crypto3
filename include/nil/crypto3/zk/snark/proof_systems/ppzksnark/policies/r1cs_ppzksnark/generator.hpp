@@ -86,22 +86,22 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-
-                    using types_policy = detail::r1cs_ppzksnark_types_policy;
-
-                    using constraint_system_type = typename policy_type::constraint_system;
-                    using primary_input_type = typename policy_type::primary_input;
-                    using auxiliary_input_type = typename policy_type::auxiliary_input;
-
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
-
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
                    
-                    struct r1cs_ppzksnark_generator {
+                    class r1cs_ppzksnark_generator {
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
 
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
+                    
                         template<typename CurveType>
                         keypair_type operator()(const constraint_system_type &constraint_system) {
 

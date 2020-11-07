@@ -86,24 +86,24 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-
-                    using types_policy = detail::r1cs_ppzksnark_types_policy;
-
-                    using constraint_system_type = typename policy_type::constraint_system;
-                    using primary_input_type = typename policy_type::primary_input;
-                    using auxiliary_input_type = typename policy_type::auxiliary_input;
-
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
-
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
                     
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
-                    struct r1cs_ppzksnark_verifier_process_vk {
+                    class r1cs_ppzksnark_verifier_process_vk {
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
+
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
 
                         template<typename CurveType>
                         processed_verification_key_type operator()(const verification_key_type &verification_key) {
@@ -129,7 +129,20 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    struct r1cs_ppzksnark_verifier_weak_IC {
+                    class r1cs_ppzksnark_verifier_weak_IC {
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
+
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
 
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
@@ -146,7 +159,20 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    struct r1cs_ppzksnark_verifier_strong_IC{
+                    class r1cs_ppzksnark_verifier_strong_IC{
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
+
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
 
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
@@ -163,7 +189,20 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    struct r1cs_ppzksnark_online_verifier_weak_IC {
+                    class r1cs_ppzksnark_online_verifier_weak_IC {
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
+
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
 
                         template<typename CurveType>
                         bool operator()(const processed_verification_key_type &processed_verification_key,
@@ -263,7 +302,20 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    struct r1cs_ppzksnark_online_verifier_strong_IC {
+                    class r1cs_ppzksnark_online_verifier_strong_IC {
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
+
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
 
                         template<typename CurveType>
                         bool operator()(const processed_verification_key_type &processed_verification_key,
@@ -289,8 +341,21 @@ namespace nil {
                      * (2) has weak input consistency, and
                      * (3) uses affine coordinates for elliptic-curve computations.
                      */
-                    struct r1cs_ppzksnark_affine_verifier_weak_IC{
+                    class r1cs_ppzksnark_affine_verifier_weak_IC{
+                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                    public:
 
+                        using constraint_system_type = typename policy_type::constraint_system;
+                        using primary_input_type = typename policy_type::primary_input;
+                        using auxiliary_input_type = typename policy_type::auxiliary_input;
+
+                        using proving_key_type = typename policy_type::proving_key;
+                        using verification_key_type = typename policy_type::verification_key;
+                        using processed_verification_key_type = typename policy_type::processed_verification_key;
+
+                        using keypair_type = typename policy_type::keypair;
+                        using proof_type = typename policy_type::proof;
+                        
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,

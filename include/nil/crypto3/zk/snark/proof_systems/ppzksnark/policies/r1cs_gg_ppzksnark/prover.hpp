@@ -75,19 +75,6 @@ namespace nil {
             namespace snark {
                 namespace policies {
 
-                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
-
-                    using constraint_system_type = typename types_policy::constraint_system;
-                    using primary_input_type = typename types_policy::primary_input;
-                    using auxiliary_input_type = typename types_policy::auxiliary_input;
-
-                    using proving_key_type = typename types_policy::proving_key;
-                    using verification_key_type = typename types_policy::verification_key;
-                    using processed_verification_key_type = typename types_policy::processed_verification_key;
-
-                    using keypair_type = typename types_policy::keypair;
-                    using proof_type = typename types_policy::proof;
-
                     /**
                      * A prover algorithm for the R1CS GG-ppzkSNARK.
                      *
@@ -96,8 +83,21 @@ namespace nil {
                      *               ``there exists Y such that CS(X,Y)=0''.
                      * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                      */
-                    struct r1cs_gg_ppzksnark_prover {
+                    class r1cs_gg_ppzksnark_prover {
+                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
+                    public:
 
+                        using constraint_system_type = typename types_policy::constraint_system;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
+                    
                         template<typename CurveType>
                         keypair_type_type operator()(const proving_key_type &proving_key,
                                                      const primary_input_type &primary_input,

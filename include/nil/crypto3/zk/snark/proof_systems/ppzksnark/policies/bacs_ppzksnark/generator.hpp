@@ -60,24 +60,25 @@ namespace nil {
             namespace snark {
                 namespace policies {
 
-                    using types_policy = detail::bacs_ppzksnark_types_policy;
-
-                    using circuit_type = typename types_policy::circuit;
-                    using primary_input_type = typename types_policy::primary_input;
-                    using auxiliary_input_type = typename types_policy::auxiliary_input;
-
-                    using proving_key_type = typename types_policy::proving_key;
-                    using verification_key_type = typename types_policy::verification_key;
-                    using processed_verification_key_type = typename types_policy::processed_verification_key;
-
-                    using keypair_type = typename types_policy::keypair;
-                    using proof_type = typename types_policy::proof;
                     /**
                      * A generator algorithm for the BACS ppzkSNARK.
                      *
                      * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
                      */
-                    struct bacs_ppzksnark_generator {
+                    class bacs_ppzksnark_generator {
+                        using types_policy = detail::bacs_ppzksnark_types_policy;
+                    public:
+
+                        using circuit_type = typename types_policy::circuit;
+                        using primary_input_type = typename types_policy::primary_input;
+                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+
+                        using proving_key_type = typename types_policy::proving_key;
+                        using verification_key_type = typename types_policy::verification_key;
+                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+
+                        using keypair_type = typename types_policy::keypair;
+                        using proof_type = typename types_policy::proof;
 
                         template<typename CurveType>
                         keypair_type operator()(const circuit_type &circuit) {

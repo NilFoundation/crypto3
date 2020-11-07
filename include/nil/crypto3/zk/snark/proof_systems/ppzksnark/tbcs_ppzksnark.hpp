@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/types_policy.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/generator.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/prover.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/verifier.hpp>
@@ -43,16 +43,16 @@ namespace nil {
                     using types_policy = detail::tbcs_ppzksnark_types_policy;
 
                 public:
-                    using circuit_type = typename policy_type::circuit;
-                    using primary_input_type = typename policy_type::primary_input;
-                    using auxiliary_input_type = typename policy_type::auxiliary_input;
+                    using circuit_type = typename types_policy::circuit;
+                    using primary_input_type = typename types_policy::primary_input;
+                    using auxiliary_input_type = typename types_policy::auxiliary_input;
 
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
+                    using proving_key_type = typename types_policy::proving_key;
+                    using verification_key_type = typename types_policy::verification_key;
+                    using processed_verification_key_type = typename types_policy::processed_verification_key;
 
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
+                    using keypair_type = typename types_policy::keypair;
+                    using proof_type = typename types_policy::proof;
 
                     using generator = Generator;
 
