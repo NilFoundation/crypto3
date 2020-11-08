@@ -45,13 +45,13 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
-                size_t big_m;
-                size_t small_m;
+                std::size_t big_m;
+                std::size_t small_m;
                 value_type omega;
                 value_type big_omega;
                 value_type small_omega;
 
-                step_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                step_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
                     //if (m <= 1)
                     //    throw std::invalid_argument("step_radix2(): expected m > 1");
 
@@ -75,17 +75,17 @@ namespace nil {
                     std::vector<value_type> d(big_m, value_type::zero());
 
                     value_type omega_i = value_type::one();
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         c[i] = (i < small_m ? a[i] + a[i + big_m] : a[i]);
                         d[i] = omega_i * (i < small_m ? a[i] - a[i + big_m] : a[i]);
                         omega_i *= omega;
                     }
 
                     std::vector<value_type> e(small_m, value_type::zero());
-                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
+                    const std::size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
                                                  static_cast<std::size_t>(std::ceil(std::log2(small_m))));
-                    for (size_t i = 0; i < small_m; ++i) {
-                        for (size_t j = 0; j < compr; ++j) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
+                        for (std::size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
                         }
                     }
@@ -93,11 +93,11 @@ namespace nil {
                     _basic_radix2_FFT<FieldType>(c, omega.squared());
                     _basic_radix2_FFT<FieldType>(e, detail::unity_root<FieldType>(small_m));
 
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
                     }
 
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         a[i + big_m] = e[i];
                     }
                 }
@@ -112,50 +112,50 @@ namespace nil {
                     _basic_radix2_FFT<FieldType>(U1, detail::unity_root<FieldType>(small_m).inversed());
 
                     const value_type U0_size_inv = value_type(big_m).inversed();
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         U0[i] *= U0_size_inv;
                     }
 
                     const value_type U1_size_inv = value_type(small_m).inversed();
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         U1[i] *= U1_size_inv;
                     }
 
                     std::vector<value_type> tmp = U0;
                     value_type omega_i = value_type::one();
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         tmp[i] *= omega_i;
                         omega_i *= omega;
                     }
 
                     // save A_suffix
-                    for (size_t i = small_m; i < big_m; ++i) {
+                    for (std::size_t i = small_m; i < big_m; ++i) {
                         a[i] = U0[i];
                     }
 
-                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
+                    const std::size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
                                                  static_cast<std::size_t>(std::ceil(std::log2(small_m))));
-                    for (size_t i = 0; i < small_m; ++i) {
-                        for (size_t j = 1; j < compr; ++j) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
+                        for (std::size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];
                         }
                     }
 
                     const value_type omega_inv = omega.inversed();
                     value_type omega_inv_i = value_type::one();
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         U1[i] *= omega_inv_i;
                         omega_inv_i *= omega_inv;
                     }
 
                     // compute A_prefix
                     const value_type over_two = value_type(2).inversed();
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         a[i] = (U0[i] + U1[i]) * over_two;
                     }
 
                     // compute B2
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         a[big_m + i] = (U0[i] - U1[i]) * over_two;
                     }
                 }
@@ -171,7 +171,7 @@ namespace nil {
                     const value_type omega_to_small_m = omega.pow(small_m);
                     const value_type big_omega_to_small_m = big_omega.pow(small_m);
                     value_type elt = value_type::one();
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         result[i] = inner_big[i] * L0 * (elt - omega_to_small_m).inversed();
                         elt *= big_omega_to_small_m;
                     }
@@ -179,14 +179,14 @@ namespace nil {
                     const value_type L1 =
                         (t.pow(big_m) - value_type::one()) * (omega.pow(big_m) - value_type::one()).inversed();
 
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         result[big_m + i] = L1 * inner_small[i];
                     }
 
                     return result;
                 }
 
-                value_type get_domain_element(const size_t idx) {
+                value_type get_domain_element(const std::size_t idx) {
                     if (idx < big_m) {
                         return big_omega.pow(idx);
                     } else {
@@ -219,7 +219,7 @@ namespace nil {
                     const value_type omega_to_2small_m = omega.pow(2 * small_m);
                     value_type elt = value_type::one();
 
-                    for (size_t i = 0; i < big_m; ++i) {
+                    for (std::size_t i = 0; i < big_m; ++i) {
                         P[i] *= (coset_to_small_m_times_Z0 * elt - omega_to_small_m_times_Z0).inversed();
                         elt *= omega_to_2small_m;
                     }
@@ -230,7 +230,7 @@ namespace nil {
                                            ((coset * omega).pow(small_m) - omega.pow(small_m)));
                     const value_type Z1_inverse = Z1.inversed();
 
-                    for (size_t i = 0; i < small_m; ++i) {
+                    for (std::size_t i = 0; i < small_m; ++i) {
                         P[big_m + i] *= Z1_inverse;
                     }
                 }

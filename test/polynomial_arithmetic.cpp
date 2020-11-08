@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
 
     std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
-    for (size_t i = 0; i < c.size(); ++i) {
+    for (std::size_t i = 0; i < c.size(); ++i) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }    
 }
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
 
     std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
 
     std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
 
     std::vector<FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
 
     std::vector<FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
 
     std::vector<FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 6, 2, -6};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
 
     std::vector<FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 7, 7, 2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
 
     std::vector<FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, -1, -5, -8};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
 
     std::vector<FieldType::value_type> c_ans = {-1, -3, -4, -25, -6, -7, -7, -2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
 
     std::vector<FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
 
     std::vector<FieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
 
     std::vector<FieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
 
     std::vector<FieldType::value_type> c_ans = {0};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
 
     std::vector<FieldType::value_type> c_ans = {0};
 
-    for (size_t i = 0; i < c.size(); i++) {
+    for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
     }
 }
@@ -280,10 +280,10 @@ BOOST_AUTO_TEST_CASE(polynomial_division) {
     std::vector<FieldType::value_type> Q_ans = {0, 0, 0, 1};
     std::vector<FieldType::value_type> R_ans = {5};
 
-    for (size_t i = 0; i < Q.size(); i++) {
+    for (std::size_t i = 0; i < Q.size(); i++) {
         BOOST_CHECK(Q_ans[i] == Q[i]);
     }
-    for (size_t i = 0; i < R.size(); i++) {
+    for (std::size_t i = 0; i < R.size(); i++) {
         BOOST_CHECK(R_ans[i] == R[i]);
     }
 }
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(extended_gcd) {
 
     std::vector<FieldType::value_type> pv_ans = {1, 6, 25, 90};
 
-    for (size_t i = 0; i < pv.size(); i++) {
+    for (std::size_t i = 0; i < pv.size(); i++) {
         BOOST_CHECK(pv_ans[i] == pv[i]);
     }
 }

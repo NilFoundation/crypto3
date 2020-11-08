@@ -44,7 +44,7 @@ namespace nil {
              * The output is the polynomial P(x) evaluated at x = t.
              */
             template<typename FieldValueType>
-            FieldValueType evaluate_polynomial(const size_t &m, const std::vector<FieldValueType> &coeff,
+            FieldValueType evaluate_polynomial(const std::size_t &m, const std::vector<FieldValueType> &coeff,
                                                const FieldValueType &t) {
                 //if (m != coeff.size())
                 //    throw DomainSizeException("expected m == coeff.size()");
@@ -53,7 +53,7 @@ namespace nil {
 
                 /* NB: unsigned reverse iteration: cannot do i >= 0, but can do i < m
                    because unsigned integers are guaranteed to wrap around */
-                for (size_t i = m - 1; i < m; i--) {
+                for (std::size_t i = m - 1; i < m; i--) {
                     result = (result * t) + coeff[i];
                 }
 
@@ -72,8 +72,8 @@ namespace nil {
              * The output is the polynomial L_{idx,S}(z) evaluated at z = t.
              */
             template<typename FieldValueType>
-            FieldValueType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldValueType> &domain,
-                                                        const FieldValueType &t, const size_t &idx) {
+            FieldValueType evaluate_lagrange_polynomial(const std::size_t &m, const std::vector<FieldValueType> &domain,
+                                                        const FieldValueType &t, const std::size_t &idx) {
                 //if (m != domain.size())
                 //    throw DomainSizeException("expected m == domain.size()");
                 //if (idx >= m)
@@ -82,7 +82,7 @@ namespace nil {
                 FieldValueType num = FieldValueType::one();
                 FieldValueType denom = FieldValueType::one();
 
-                for (size_t k = 0; k < m; ++k) {
+                for (std::size_t k = 0; k < m; ++k) {
                     if (k == idx) {
                         continue;
                     }

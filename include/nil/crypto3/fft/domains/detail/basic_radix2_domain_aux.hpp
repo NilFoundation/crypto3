@@ -55,26 +55,26 @@ namespace nil {
                                              const typename FieldType::value_type &omega) {
                     typedef typename FieldType::value_type value_type;
 
-                    const size_t n = a.size(), logn = log2(n);
+                    const std::size_t n = a.size(), logn = log2(n);
                     //if (n != (1u << logn))
                     //    throw std::invalid_argument("expected n == (1u << logn)");
 
                     /* swapping in place (from Storer's book) */
-                    for (size_t k = 0; k < n; ++k) {
-                        const size_t rk = bitreverse(k, logn);
+                    for (std::size_t k = 0; k < n; ++k) {
+                        const std::size_t rk = bitreverse(k, logn);
                         if (k < rk)
                             std::swap(a[k], a[rk]);
                     }
 
-                    size_t m = 1;    // invariant: m = 2^{s-1}
-                    for (size_t s = 1; s <= logn; ++s) {
+                    std::size_t m = 1;    // invariant: m = 2^{s-1}
+                    for (std::size_t s = 1; s <= logn; ++s) {
                         // w_m is 2^s-th root of unity now
                         const value_type w_m = omega.pow(n / (2 * m));
 
                         asm volatile("/* pre-inner */");
-                        for (size_t k = 0; k < n; k += 2 * m) {
+                        for (std::size_t k = 0; k < n; k += 2 * m) {
                             value_type w = value_type::one();
-                            for (size_t j = 0; j < m; ++j) {
+                            for (std::size_t j = 0; j < m; ++j) {
                                 const value_type t = w * a[k + j + m];
                                 a[k + j + m] = a[k + j] - t;
                                 a[k + j] += t;
@@ -89,13 +89,13 @@ namespace nil {
                 template<typename FieldType>
                 void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a,
                                                      const typename FieldType::value_type &omega,
-                                                     const size_t log_cpus) {
+                                                     const std::size_t log_cpus) {
                     typedef typename FieldType::value_type value_type;
 
-                    const size_t num_cpus = 1ul << log_cpus;
+                    const std::size_t num_cpus = 1ul << log_cpus;
 
-                    const size_t m = a.size();
-                    const size_t log_m = log2(m);
+                    const std::size_t m = a.size();
+                    const std::size_t log_m = log2(m);
                     //if (m != 1ul << log_m)
                     //    throw std::invalid_argument("expected m == 1ul<<log_m");
 
@@ -105,22 +105,22 @@ namespace nil {
                     }
 
                     std::vector<std::vector<value_type>> tmp(num_cpus);
-                    for (size_t j = 0; j < num_cpus; ++j) {
+                    for (std::size_t j = 0; j < num_cpus; ++j) {
                         tmp[j].resize(1ul << (log_m - log_cpus), value_type::zero());
                     }
 
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t j = 0; j < num_cpus; ++j) {
+                    for (std::size_t j = 0; j < num_cpus; ++j) {
                         const value_type omega_j = omega.pow(j);
                         const value_type omega_step = omega.pow(j << (log_m - log_cpus));
 
                         value_type elt = value_type::one();
-                        for (size_t i = 0; i < 1ul << (log_m - log_cpus); ++i) {
-                            for (size_t s = 0; s < num_cpus; ++s) {
+                        for (std::size_t i = 0; i < 1ul << (log_m - log_cpus); ++i) {
+                            for (std::size_t s = 0; s < num_cpus; ++s) {
                                 // invariant: elt is omega^(j*idx)
-                                const size_t idx = (i + (s << (log_m - log_cpus))) % (1u << log_m);
+                                const std::size_t idx = (i + (s << (log_m - log_cpus))) % (1u << log_m);
                                 tmp[j][i] += a[idx] * elt;
                                 elt *= omega_step;
                             }
@@ -133,15 +133,15 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t j = 0; j < num_cpus; ++j) {
+                    for (std::size_t j = 0; j < num_cpus; ++j) {
                         basic_serial_radix2_FFT<FieldType>(tmp[j], omega_num_cpus);
                     }
 
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < num_cpus; ++i) {
-                        for (size_t j = 0; j < 1ul << (log_m - log_cpus); ++j) {
+                    for (std::size_t i = 0; i < num_cpus; ++i) {
+                        for (std::size_t j = 0; j < 1ul << (log_m - log_cpus); ++j) {
                             // now: i = idx >> (log_m - log_cpus) and j = idx % (1u << (log_m - log_cpus)), for idx
                             // =
                             // ((i<<(log_m-log_cpus))+j) % (1u << log_m)
@@ -154,11 +154,11 @@ namespace nil {
                 void basic_parallel_radix2_FFT(std::vector<typename FieldType::value_type> &a,
                                                const typename FieldType::value_type &omega) {
 #ifdef MULTICORE
-                    const size_t num_cpus = omp_get_max_threads();
+                    const std::size_t num_cpus = omp_get_max_threads();
 #else
-                    const size_t num_cpus = 1;
+                    const std::size_t num_cpus = 1;
 #endif
-                    const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
+                    const std::size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
                     if (log_cpus == 0) {
                         basic_serial_radix2_FFT<FieldType>(a, omega);
@@ -173,7 +173,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 std::vector<typename FieldType::value_type>
-                    basic_radix2_evaluate_all_lagrange_polynomials(const size_t m,
+                    basic_radix2_evaluate_all_lagrange_polynomials(const std::size_t m,
                                                                    const typename FieldType::value_type &t) {
                     typedef typename FieldType::value_type value_type;
 
@@ -195,7 +195,7 @@ namespace nil {
 
                     if (t.pow(m) == value_type::one()) {
                         value_type omega_i = value_type::one();
-                        for (size_t i = 0; i < m; ++i) {
+                        for (std::size_t i = 0; i < m; ++i) {
                             if (omega_i == t)    // i.e., t equals omega^i
                             {
                                 u[i] = value_type::one();
@@ -218,7 +218,7 @@ namespace nil {
                     const value_type Z = (t.pow(m)) - value_type::one();
                     value_type l = Z * value_type(m).inversed();
                     value_type r = value_type::one();
-                    for (size_t i = 0; i < m; ++i) {
+                    for (std::size_t i = 0; i < m; ++i) {
                         u[i] = l * (t - r).inversed();
                         l *= omega;
                         r *= omega;

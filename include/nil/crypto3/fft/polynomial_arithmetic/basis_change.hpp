@@ -46,7 +46,7 @@ namespace nil {
              * page 7.
              */
             template<typename FieldType>
-            void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T) {
+            void compute_subproduct_tree(const std::size_t &m, std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -61,7 +61,7 @@ namespace nil {
 
                 /* Precompute the first row. */
                 T[0] = std::vector<std::vector<value_type>>(1u << m);
-                for (size_t j = 0; j < (1u << m); j++) {
+                for (std::size_t j = 0; j < (1u << m); j++) {
                     T[0][j] = std::vector<value_type>(2, value_type::one());
                     T[0][j][0] = value_type(-j);
                 }
@@ -69,10 +69,10 @@ namespace nil {
                 std::vector<value_type> a;
                 std::vector<value_type> b;
 
-                size_t index = 0;
-                for (size_t i = 1; i <= m; i++) {
+                std::size_t index = 0;
+                for (std::size_t i = 1; i <= m; i++) {
                     T[i] = std::vector<std::vector<value_type>>(1u << (m - i));
-                    for (size_t j = 0; j < (1u << (m - i)); j++) {
+                    for (std::size_t j = 0; j < (1u << (m - i)); j++) {
                         a = T[i - 1][index];
                         index++;
 
@@ -94,11 +94,11 @@ namespace nil {
             template<typename FieldType>
             void monomial_to_newton_basis(std::vector<typename FieldType::value_type> &a,
                                           const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
-                                          const size_t &n) {
+                                          const std::size_t &n) {
 
                 typedef typename FieldType::value_type value_type;
 
-                size_t m = log2(n);
+                std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
                 // throw DomainSizeException("expected T.size() == m + 1");
 
@@ -120,16 +120,16 @@ namespace nil {
                 std::vector<std::vector<value_type>> c(n);
                 c[0] = Q;
 
-                size_t row_length;
-                size_t c_vec;
+                std::size_t row_length;
+                std::size_t c_vec;
                 /* NB: unsigned reverse iteration: cannot do i >= 0, but can do i < m
                    because unsigned integers are guaranteed to wrap around */
-                for (size_t i = m - 1; i < m; i--) {
+                for (std::size_t i = m - 1; i < m; i--) {
                     row_length = T[i].size() - 1;
                     c_vec = 1u << i;
 
                     /* NB: unsigned reverse iteration */
-                    for (size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
+                    for (std::size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
                         c[2 * j + 1] =
                             _polynomial_multiplication_transpose<FieldType>((1u << i) - 1, T[i][row_length - 2 * j], c[j]);
                         c[2 * j] = c[j];
@@ -138,9 +138,9 @@ namespace nil {
                 }
 
                 /* Store Computed Newton Basis Coefficients */
-                size_t j = 0;
+                std::size_t j = 0;
                 /* NB: unsigned reverse iteration */
-                for (size_t i = c.size() - 1; i < c.size(); i--) {
+                for (std::size_t i = c.size() - 1; i < c.size(); i--) {
                     a[j++] = c[i][0];
                 }
             }
@@ -154,23 +154,23 @@ namespace nil {
             template<typename FieldType>
             void newton_to_monomial_basis(std::vector<typename FieldType::value_type> &a,
                                           const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
-                                          const size_t &n) {
+                                          const std::size_t &n) {
 
                 typedef typename FieldType::value_type value_type;
 
-                size_t m = log2(n);
+                std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
                 // throw DomainSizeException("expected T.size() == m + 1");
 
                 std::vector<std::vector<value_type>> f(n);
-                for (size_t i = 0; i < n; i++) {
+                for (std::size_t i = 0; i < n; i++) {
                     f[i] = std::vector<value_type>(1, a[i]);
                 }
 
                 /* NewtonToMonomial */
                 std::vector<value_type> temp(1, value_type::zero());
-                for (size_t i = 0; i < m; i++) {
-                    for (size_t j = 0; j < (1u << (m - i - 1)); j++) {
+                for (std::size_t i = 0; i < m; i++) {
+                    for (std::size_t j = 0; j < (1u << (m - i - 1)); j++) {
                         _polynomial_multiplication<FieldType>(temp, T[i][2 * j], f[2 * j + 1]);
                         _polynomial_addition<FieldType>(f[j], f[2 * j], temp);
                     }
@@ -188,7 +188,7 @@ namespace nil {
             void monomial_to_newton_basis_geometric(std::vector<typename FieldType::value_type> &a,
                                                     const std::vector<typename FieldType::value_type> &geometric_sequence,
                                                     const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
-                                                    const size_t &n) {
+                                                    const std::size_t &n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -201,7 +201,7 @@ namespace nil {
                 z[0] = value_type::one();
                 f[0] = a[0];
 
-                for (size_t i = 1; i < n; i++) {
+                for (std::size_t i = 1; i < n; i++) {
                     u[i] =
                         u[i - 1] * geometric_sequence[i] * (value_type::one() - geometric_sequence[i]).inversed();
                     w[i] = a[i] * (u[i].inversed());
@@ -219,7 +219,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                for (size_t i = 0; i < n; i++) {
+                for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }
             }
@@ -233,7 +233,7 @@ namespace nil {
             void newton_to_monomial_basis_geometric(std::vector<typename FieldType::value_type> &a,
                                                     const std::vector<typename FieldType::value_type> &geometric_sequence,
                                                     const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
-                                                    const size_t &n) {
+                                                    const std::size_t &n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -246,7 +246,7 @@ namespace nil {
                 w[0] = a[0];
                 z[0] = value_type::one();
 
-                for (size_t i = 1; i < n; i++) {
+                for (std::size_t i = 1; i < n; i++) {
                     v[i] = a[i] * geometric_triangular_sequence[i];
                     if (i % 2 == 1)
                         v[i] = -v[i];
@@ -265,7 +265,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                for (size_t i = 0; i < n; i++) {
+                for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }
             }

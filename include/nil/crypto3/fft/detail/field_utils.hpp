@@ -38,16 +38,16 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                size_t bitreverse(size_t n, const size_t l) {
-                    size_t r = 0;
-                    for (size_t k = 0; k < l; ++k) {
+                std::size_t bitreverse(std::size_t n, const std::size_t l) {
+                    std::size_t r = 0;
+                    for (std::size_t k = 0; k < l; ++k) {
                         r = (r << 1) | (n & 1);
                         n >>= 1;
                     }
                     return r;
                 }
 
-                size_t get_power_of_two(size_t n) {
+                std::size_t get_power_of_two(std::size_t n) {
                     n--;
                     n |= n >> 1;
                     n |= n >> 2;
@@ -67,7 +67,7 @@ namespace nil {
                 template<typename FieldType>
                 typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
                                         typename FieldType::value_type>::type
-                    unity_root(const size_t n) {
+                    unity_root(const std::size_t n) {
                     const double PI = 3.141592653589793238460264338328L;
 
                     return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
@@ -76,18 +76,19 @@ namespace nil {
                 template<typename FieldType>
                 typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
                                         typename FieldType::value_type>::type
-                    unity_root(const size_t n) {
+                    unity_root(const std::size_t n) {
 
                     typedef typename FieldType::value_type value_type;
 
                     const std::size_t logn = std::ceil(std::log2(n));
+                    
                     if (n != (1u << logn))
                         throw std::invalid_argument("expected n == (1u << logn)");
                     if (logn > fields::arithmetic_params<FieldType>::s)
                         throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
-
+                    
                     value_type omega = value_type(fields::arithmetic_params<FieldType>::root_of_unity);
-                    for (size_t i = fields::arithmetic_params<FieldType>::s; i > logn; --i) {
+                    for (std::size_t i = fields::arithmetic_params<FieldType>::s; i > logn; --i) {
                         omega *= omega;
                     }
 

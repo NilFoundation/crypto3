@@ -49,12 +49,12 @@ namespace nil {
             public:
                 value_type omega;
 
-                basic_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
                     //if (m <= 1)
                     //    throw std::invalid_argument("basic_radix2(): expected m > 1");
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
-                        const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
+                        const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         //if (logm > (fields::arithmetic_params<FieldType>::s))
                         //    throw std::invalid_argument(
                         //        "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
@@ -77,7 +77,7 @@ namespace nil {
                     _basic_radix2_FFT<FieldType>(a, omega.inversed());
 
                     const value_type sconst = value_type(a.size()).inversed();
-                    for (size_t i = 0; i < a.size(); ++i) {
+                    for (std::size_t i = 0; i < a.size(); ++i) {
                         a[i] *= sconst;
                     }
                 }
@@ -86,7 +86,7 @@ namespace nil {
                     return detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(this->m, t);
                 }
 
-                value_type get_domain_element(const size_t idx) {
+                value_type get_domain_element(const std::size_t idx) {
                     return omega.pow(idx);
                 }
 
@@ -105,7 +105,7 @@ namespace nil {
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
                     const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (std::size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }

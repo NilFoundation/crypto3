@@ -61,14 +61,14 @@ namespace nil {
                     this->arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
 
                     this->arithmetic_sequence = std::vector<value_type>(this->m);
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         this->arithmetic_sequence[i] = this->arithmetic_generator * value_type(i);
                     }
 
                     this->precomputation_sentinel = 1;
                 }
 
-                arithmetic_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                arithmetic_sequence_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
                     //if (m <= 1) {
                     //    throw std::invalid_argument("arithmetic(): expected m > 1");
                     //}
@@ -99,7 +99,7 @@ namespace nil {
                     S[0] = value_type::one();
 
                     value_type factorial = value_type::one();
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         factorial *= value_type(i);
                         S[i] = (factorial * this->arithmetic_generator).inversed();
                     }
@@ -110,7 +110,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         a[i] *= S[i].inversed();
                     }
                 }
@@ -129,7 +129,7 @@ namespace nil {
                     W[0] = a[0] * S[0];
 
                     value_type factorial = value_type::one();
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         factorial *= value_type(i);
                         S[i] = (factorial * this->arithmetic_generator).inversed();
                         W[i] = a[i] * S[i];
@@ -156,7 +156,7 @@ namespace nil {
                      * If t equals one of the arithmetic progression values,
                      * then output 1 at the right place, and 0 elsewhere.
                      */
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (std::size_t i = 0; i < this->m; ++i) {
                         if (this->arithmetic_sequence[i] == t)    // i.e., t equals this->arithmetic_sequence[i]
                         {
                             std::vector<value_type> res(this->m, value_type::zero());
@@ -175,7 +175,7 @@ namespace nil {
                     value_type l_vanish = l[0];
                     value_type g_vanish = value_type::one();
 
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         l[i] = t - this->arithmetic_sequence[i];
                         l_vanish *= l[i];
                         g_vanish *= -this->arithmetic_sequence[i];
@@ -185,7 +185,7 @@ namespace nil {
                     w[0] = g_vanish.inversed() * (this->arithmetic_generator .pow(this->m - 1));
 
                     l[0] = l_vanish * l[0].inversed() * w[0];
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         value_type num = this->arithmetic_sequence[i - 1] - this->arithmetic_sequence[this->m - 1];
                         w[i] = w[i - 1] * num * this->arithmetic_sequence[i].inversed();
                         l[i] = l_vanish * l[i].inversed() * w[i];
@@ -193,7 +193,7 @@ namespace nil {
 
                     return l;
                 }
-                value_type get_domain_element(const size_t idx) {
+                value_type get_domain_element(const std::size_t idx) {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
@@ -205,7 +205,7 @@ namespace nil {
 
                     /* Notes: Z = prod_{i = 0 to m} (t - a[i]) */
                     value_type Z = value_type::one();
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         Z *= (t - this->arithmetic_sequence[i]);
                     }
                     return Z;
@@ -223,7 +223,7 @@ namespace nil {
 
                     std::vector<value_type> t(2, value_type::zero());
 
-                    for (size_t i = 1; i < this->m + 1; i++) {
+                    for (std::size_t i = 1; i < this->m + 1; i++) {
                         t[0] = -this->arithmetic_sequence[i];
                         t[1] = value_type::one();
 
@@ -233,14 +233,14 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < this->m + 1; i++) {
+                    for (std::size_t i = 0; i < this->m + 1; i++) {
                         H[i] += (x[i] * coeff);
                     }
                 }
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
                     const value_type coset = this->arithmetic_generator; /* coset in arithmetic sequence? */
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (std::size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }

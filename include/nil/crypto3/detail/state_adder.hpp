@@ -31,8 +31,8 @@ namespace nil {
             struct state_adder {
                 template<typename T>
                 void operator()(T &s1, T const &s2) {
-                    typedef typename T::size_type size_type;
-                    size_type n = (s2.size() < s1.size() ? s2.size() : s1.size());
+                    typedef typename T::size_type std::size_type;
+                    std::size_type n = (s2.size() < s1.size() ? s2.size() : s1.size());
                     for (typename T::size_type i = 0; i < n; ++i) {
                         s1[i] += s2[i];
                     }

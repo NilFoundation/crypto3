@@ -62,7 +62,7 @@ namespace nil {
                     this->geometric_triangular_sequence = std::vector<value_type>(this->m, value_type::zero());
                     this->geometric_triangular_sequence[0] = value_type::one();
 
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         this->geometric_sequence[i] =
                             this->geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
                         this->geometric_triangular_sequence[i] =
@@ -72,7 +72,7 @@ namespace nil {
                     this->precomputation_sentinel = 1;
                 }
 
-                geometric_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                geometric_sequence_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
                     if (m <= 1) {
                         throw std::invalid_argument("geometric(): expected m > 1");
                     }
@@ -104,7 +104,7 @@ namespace nil {
                     std::vector<value_type> g(this->m);
                     g[0] = a[0];
 
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         T[i] = T[i - 1] * (this->geometric_sequence[i] - value_type::one()).inversed();
                         g[i] = this->geometric_triangular_sequence[i] * a[i];
                     }
@@ -115,7 +115,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         a[i] *= T[i].inversed();
                     }
                 }
@@ -134,7 +134,7 @@ namespace nil {
                     W[0] = a[0] * T[0];
 
                     value_type prev_T = T[0];
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         prev_T *= (this->geometric_sequence[i] - value_type::one()).inversed();
 
                         W[i] = a[i] * prev_T;
@@ -149,7 +149,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         a[i] *= this->geometric_triangular_sequence[i].inversed();
                     }
 
@@ -170,7 +170,7 @@ namespace nil {
                      * If t equals one of the geometric progression values,
                      * then output 1 at the right place, and 0 elsewhere.
                      */
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (std::size_t i = 0; i < this->m; ++i) {
                         if (this->geometric_sequence[i] == t)    // i.e., t equals a[i]
                         {
                             std::vector<value_type> res(this->m, value_type::zero());
@@ -191,7 +191,7 @@ namespace nil {
 
                     value_type l_vanish = l[0];
                     value_type g_vanish = value_type::one();
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         l[i] = t - this->geometric_sequence[i];
                         g[i] = value_type::one() - this->geometric_sequence[i];
 
@@ -206,7 +206,7 @@ namespace nil {
                     g_i[0] = g_vanish.inversed();
 
                     l[0] = l_vanish * l[0].inversed() * g_i[0];
-                    for (size_t i = 1; i < this->m; i++) {
+                    for (std::size_t i = 1; i < this->m; i++) {
                         g_i[i] = g_i[i - 1] * g[this->m - i] * -g[i].inversed() * this->geometric_sequence[i];
                         l[i] = l_vanish * r_i * l[i].inversed() * g_i[i];
                         r_i *= r;
@@ -214,7 +214,7 @@ namespace nil {
 
                     return l;
                 }
-                value_type get_domain_element(const size_t idx) {
+                value_type get_domain_element(const std::size_t idx) {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
@@ -227,7 +227,7 @@ namespace nil {
                     /* Notes: Z = prod_{i = 0 to m} (t - a[i]) */
                     /* Better approach: Montgomery Trick + Divide&Conquer/FFT */
                     value_type Z = value_type::one();
-                    for (size_t i = 0; i < this->m; i++) {
+                    for (std::size_t i = 0; i < this->m; i++) {
                         Z *= (t - this->geometric_sequence[i]);
                     }
                     return Z;
@@ -245,7 +245,7 @@ namespace nil {
 
                     std::vector<value_type> t(2, value_type::zero());
 
-                    for (size_t i = 1; i < this->m + 1; i++) {
+                    for (std::size_t i = 1; i < this->m + 1; i++) {
                         t[0] = -this->geometric_sequence[i];
                         t[1] = value_type::one();
 
@@ -255,7 +255,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < this->m + 1; i++) {
+                    for (std::size_t i = 0; i < this->m + 1; i++) {
                         H[i] += (x[i] * coeff);
                     }
                 }
@@ -264,7 +264,7 @@ namespace nil {
                         fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric
                                                                                             sequence? */
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (std::size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }

@@ -52,9 +52,9 @@ namespace nil {
                 bool square = (v1 == v2) ? 1 : 0;
 
                 // Polynomial length
-                size_t n1 = v1.size();
-                size_t n2 = v2.size();
-                size_t n3 = n1 + n2 - 1;
+                std::size_t n1 = v1.size();
+                std::size_t n2 = v2.size();
+                std::size_t n3 = n1 + n2 - 1;
 
                 // Determine number of bits needed
                 value_type v1_max = *max_element(std::begin(v1), std::end(v1));
@@ -63,8 +63,8 @@ namespace nil {
 
                 
                 // Number of limbs needed in total
-                size_t k1 = (n1 * b + (GMP_NUMB_BITS)-1) / GMP_NUMB_BITS;
-                size_t k2 = (n2 * b + (GMP_NUMB_BITS)-1) / GMP_NUMB_BITS;
+                std::size_t k1 = (n1 * b + (GMP_NUMB_BITS)-1) / GMP_NUMB_BITS;
+                std::size_t k2 = (n2 * b + (GMP_NUMB_BITS)-1) / GMP_NUMB_BITS;
 
 
                 // Output polynomial
@@ -91,7 +91,7 @@ namespace nil {
                 ref = p1;
                 limb = 0;
                 limb_b = 0;
-                for (size_t i = 0; i < n1; i++) {
+                for (std::size_t i = 0; i < n1; i++) {
                     val = v1[i].as_ulong();
                     limb += (val << limb_b);
 
@@ -115,7 +115,7 @@ namespace nil {
                     ref = p2;
                     limb = 0;
                     limb_b = 0;
-                    for (size_t i = 0; i < n2; i++) {
+                    for (std::size_t i = 0; i < n2; i++) {
                         val = v2[i].as_ulong();
                         limb += (val << limb_b);
 
@@ -138,7 +138,7 @@ namespace nil {
 
                 // Perfect alignment case: bits B is equivalent to GMP_LIMB_BITS
                 if (b == GMP_LIMB_BITS)
-                    for (size_t i = 0; i < n3; i++)
+                    for (std::size_t i = 0; i < n3; i++)
                         v3[i] = value_type(*p3++);
                 // Non-alignment case 
                 else {
@@ -147,7 +147,7 @@ namespace nil {
 
                     limb = 0;
                     limb_b = 0;
-                    for (size_t i = 0; i < n3; i++) {
+                    for (std::size_t i = 0; i < n3; i++) {
                         
                          // If the coefficient's bit length is contained in LIMB, then
                          // write the masked value out to vector V3 and decrement LIMB

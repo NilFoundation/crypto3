@@ -36,7 +36,7 @@ namespace nil {
             template<typename FieldValueType>
             void multiply_by_coset(std::vector<FieldValueType> &a, const FieldValueType &g) {
                 FieldValueType u = g;
-                for (size_t i = 1; i < a.size(); ++i) {
+                for (std::size_t i = 1; i < a.size(); ++i) {
                     a[i] *= u;
                     u *= g;
                 }

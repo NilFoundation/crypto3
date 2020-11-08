@@ -44,19 +44,19 @@ namespace nil {
 
             public:
 
-                const size_t m;
+                const std::size_t m;
 
                 /**
                  * Construct an evaluation domain S of size m, if possible.
                  *
                  * (See the function get_evaluation_domain below.)
                  */
-                evaluation_domain(const size_t m) : m(m) {};
+                evaluation_domain(const std::size_t m) : m(m) {};
 
                 /**
                  * Get the idx-th element in S.
                  */
-                virtual value_type get_domain_element(const size_t idx) = 0;
+                virtual value_type get_domain_element(const std::size_t idx) = 0;
 
                 /**
                  * Compute the FFT, over the domain S, of the vector a.

@@ -66,7 +66,7 @@ namespace nil {
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 38].
              */
             template<typename FieldValueType>
-            void _reverse(std::vector<FieldValueType> &a, const size_t n) {
+            void _reverse(std::vector<FieldValueType> &a, const std::size_t n) {
                 std::reverse(a.begin(), a.end());
                 a.resize(n);
             }
@@ -87,8 +87,8 @@ namespace nil {
                 } else if (_is_zero(b)) {
                     c = a;
                 } else {
-                    size_t a_size = a.size();
-                    size_t b_size = b.size();
+                    std::size_t a_size = a.size();
+                    std::size_t b_size = b.size();
 
                     if (a_size > b_size) {
                         c.resize(a_size);
@@ -121,8 +121,8 @@ namespace nil {
                     c.resize(b.size());
                     std::transform(b.begin(), b.end(), c.begin(), std::negate<value_type>());
                 } else {
-                    size_t a_size = a.size();
-                    size_t b_size = b.size();
+                    std::size_t a_size = a.size();
+                    std::size_t b_size = b.size();
 
                     if (a_size > b_size) {
                         c.resize(a_size);
@@ -149,7 +149,7 @@ namespace nil {
 
                 typedef typename FieldType::value_type value_type;
 
-                const size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
+                const std::size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
                 value_type omega = detail::unity_root<FieldType>(n);
 
                 std::vector<value_type> u(a);
@@ -197,13 +197,13 @@ namespace nil {
              */
             template<typename FieldType>
             std::vector<typename FieldType::value_type>
-                _polynomial_multiplication_transpose(const size_t &n,
+                _polynomial_multiplication_transpose(const std::size_t &n,
                                                      const std::vector<typename FieldType::value_type> &a,
                                                      const std::vector<typename FieldType::value_type> &c) {
 
                 typedef typename FieldType::value_type value_type;
 
-                const size_t m = a.size();
+                const std::size_t m = a.size();
                 // if (c.size() - 1 > m + n)
                 // throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
@@ -213,7 +213,7 @@ namespace nil {
 
                 /* Determine Middle Product */
                 std::vector<value_type> result;
-                for (size_t i = m - 1; i < n + m; i++) {
+                for (std::size_t i = m - 1; i < n + m; i++) {
                     result.emplace_back(r[i]);
                 }
                 return result;
@@ -232,14 +232,14 @@ namespace nil {
 
                 typedef typename FieldType::value_type value_type;
 
-                size_t d = b.size() - 1;            /* Degree of B */
+                std::size_t d = b.size() - 1;            /* Degree of B */
                 value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                 r = std::vector<value_type>(a);
                 q = std::vector<value_type>(r.size(), value_type::zero());
 
-                size_t r_deg = r.size() - 1;
-                size_t shift;
+                std::size_t r_deg = r.size() - 1;
+                std::size_t shift;
 
                 while (r_deg >= d && !_is_zero(r)) {
                     if (r_deg >= d)
