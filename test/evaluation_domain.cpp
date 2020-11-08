@@ -87,7 +87,8 @@ void test_fft() {
         
         for (std::size_t i = 0; i < m; i++) {
             value_type e = evaluate_polynomial(m, f, idx[i]);
-            BOOST_CHECK(e == a[i]);
+            BOOST_CHECK_EQUAL(e.data, a[i].data);
+            //std::cout << e.data << " == " << a[i].data << std::endl;
         }
     }
 }
@@ -100,7 +101,7 @@ void test_inverse_fft_to_fft() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
-        if (key == 0)
+        /*if (key == 0)
             domain.reset(new basic_radix2_domain<FieldType>(m));
         else if (key == 1)
             domain.reset(new extended_radix2_domain<FieldType>(m));
@@ -109,14 +110,17 @@ void test_inverse_fft_to_fft() {
         else if (key == 3)
             domain.reset(new geometric_sequence_domain<FieldType>(m));
         else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));
+            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+
+        domain = make_evaluation_domain<FieldType>(m);
 
         std::vector<value_type> a(f);
         domain->FFT(a);
         domain->iFFT(a);
 
         for (std::size_t i = 0; i < m; i++) {
-            BOOST_CHECK(f[i] == a[i]);
+            BOOST_CHECK_EQUAL(f[i].data, a[i].data);
+            //std::cout << f[i].data << " == " << a[i].data << std::endl;
         }
     }
 }
@@ -131,7 +135,7 @@ void test_inverse_coset_ftt_to_coset_fft() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 3; key++) {
-        if (key == 0)
+        /*if (key == 0)
             domain.reset(new basic_radix2_domain<FieldType>(m));
         else if (key == 1)
             domain.reset(new extended_radix2_domain<FieldType>(m));
@@ -140,7 +144,9 @@ void test_inverse_coset_ftt_to_coset_fft() {
         else if (key == 3)
             domain.reset(new geometric_sequence_domain<FieldType>(m));
         else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));
+            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+
+        domain = make_evaluation_domain<FieldType>(m);
 
         std::vector<value_type> a(f);
         multiply_by_coset(a, coset);
@@ -149,7 +155,8 @@ void test_inverse_coset_ftt_to_coset_fft() {
         multiply_by_coset(a, coset.inversed());
 
         for (std::size_t i = 0; i < m; i++) {
-            BOOST_CHECK(f[i] == a[i]);
+            BOOST_CHECK_EQUAL(f[i].data, a[i].data);
+            //std::cout << f[i].data << " == " << a[i].data << std::endl;
         }
     }
 }
@@ -163,7 +170,7 @@ void test_lagrange_coefficients() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
-        if (key == 0)
+        /*if (key == 0)
             domain.reset(new basic_radix2_domain<FieldType>(m));
         else if (key == 1)
             domain.reset(new extended_radix2_domain<FieldType>(m));
@@ -172,7 +179,9 @@ void test_lagrange_coefficients() {
         else if (key == 3)
             domain.reset(new geometric_sequence_domain<FieldType>(m));
         else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));
+            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+
+        domain = make_evaluation_domain<FieldType>(m);
 
         std::vector<value_type> a;
         a = domain->evaluate_all_lagrange_polynomials(t);
@@ -185,7 +194,8 @@ void test_lagrange_coefficients() {
         for (std::size_t i = 0; i < m; i++) {
             value_type e = evaluate_lagrange_polynomial(m, d, t, i);
             //printf("%ld == %ld\n", e.as_ulong(), a[i].as_ulong());
-            BOOST_CHECK(e == a[i]);
+            BOOST_CHECK_EQUAL(e.data, a[i].data);
+            //std::cout << e.data << " == " << a[i].data << std::endl;
         }
     }
 }
@@ -199,7 +209,7 @@ void test_compute_z() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
-        if (key == 0)
+        /*if (key == 0)
             domain.reset(new basic_radix2_domain<FieldType>(m));
         else if (key == 1)
             domain.reset(new extended_radix2_domain<FieldType>(m));
@@ -208,7 +218,9 @@ void test_compute_z() {
         else if (key == 3)
             domain.reset(new geometric_sequence_domain<FieldType>(m));
         else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));
+            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+
+        domain = make_evaluation_domain<FieldType>(m);
 
         value_type a;
         a = domain->compute_vanishing_polynomial(t);
@@ -218,7 +230,8 @@ void test_compute_z() {
             Z *= (t - domain->get_domain_element(i));
         }
 
-        BOOST_CHECK(Z == a);
+        BOOST_CHECK_EQUAL(Z.data, a.data);
+        //std::cout << Z.data << " == " << a.data << std::endl;
     }
 }
 
@@ -228,12 +241,14 @@ BOOST_AUTO_TEST_CASE(fft) {
     test_fft<fields::bls12<381>>();
 }
 
-/*BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
+BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
     test_inverse_fft_to_fft<fields::bls12<381>>();
 }
+
 BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
     test_inverse_coset_ftt_to_coset_fft<fields::bls12<381>>();
 }
+/*
 BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
     test_lagrange_coefficients<fields::bls12<381>>();
 }
