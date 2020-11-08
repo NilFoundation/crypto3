@@ -172,7 +172,7 @@ namespace nil {
 
                         template<typename PowerType>
                         element_fp pow(const PowerType &pwr) const {
-                            return element_fp(power(*this, pwr));
+                            return element_fp(power(*this, modulus_type(pwr)));
                         }
                     };
 

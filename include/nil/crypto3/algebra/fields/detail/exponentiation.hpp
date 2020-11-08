@@ -41,6 +41,9 @@ namespace nil {
                     FieldValueType power(const FieldValueType &base, const NumberType &exponent) {
                         FieldValueType result = FieldValueType::one();
 
+                        if (exponent == 0)
+                            return result;
+
                         bool found_one = false;
 
                         for (long i = boost::multiprecision::msb(exponent); i >= 0; --i) {
