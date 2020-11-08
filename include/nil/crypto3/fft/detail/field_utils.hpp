@@ -78,7 +78,7 @@ namespace nil {
                                         typename FieldType::value_type>::type
                     unity_root(const size_t n) {
 
-                    using value_type = typename FieldType::value_type;
+                    typedef typename FieldType::value_type value_type;
 
                     const std::size_t logn = std::ceil(std::log2(n));
                     if (n != (1u << logn))

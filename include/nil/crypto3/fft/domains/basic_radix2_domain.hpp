@@ -44,7 +44,7 @@ namespace nil {
 
             template<typename FieldType>
             class basic_radix2_domain : public evaluation_domain<FieldType> {
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
             public:
                 value_type omega;

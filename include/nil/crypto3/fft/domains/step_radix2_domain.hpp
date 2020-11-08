@@ -42,7 +42,7 @@ namespace nil {
 
             template<typename FieldType>
             class step_radix2_domain : public evaluation_domain<FieldType> {
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
             public:
                 size_t big_m;

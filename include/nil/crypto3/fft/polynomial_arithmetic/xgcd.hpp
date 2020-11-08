@@ -49,7 +49,7 @@ namespace nil {
                                   std::vector<typename FieldType::value_type> &u,
                                   std::vector<typename FieldType::value_type> &v) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 if (_is_zero(b)) {
                     g = a;

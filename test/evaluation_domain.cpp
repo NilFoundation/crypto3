@@ -53,7 +53,7 @@ using namespace nil::crypto3::fft;
 
 template<typename FieldType>
 void test_fft() {
-    using value_type = typename FieldType::value_type;
+    typedef typename FieldType::value_type value_type;
 
     const size_t m = 4;
     std::vector<value_type> f = {2, 5, 3, 8};
@@ -88,7 +88,7 @@ void test_fft() {
 
 template<typename FieldType>
 void test_inverse_fft_to_fft() {
-    using value_type = typename FieldType::value_type;
+    typedef typename FieldType::value_type value_type;
     const size_t m = 4;
     std::vector<value_type> f = {2, 5, 3, 8};
 
@@ -117,7 +117,7 @@ void test_inverse_fft_to_fft() {
 
 template<typename FieldType>
 void test_inverse_coset_ftt_to_coset_fft() {
-    using value_type = typename FieldType::value_type;
+    typedef typename FieldType::value_type value_type;
     const size_t m = 4;
     std::vector<value_type> f = {2, 5, 3, 8};
 
@@ -150,7 +150,7 @@ void test_inverse_coset_ftt_to_coset_fft() {
 
 template<typename FieldType>
 void test_lagrange_coefficients() {
-    using value_type = typename FieldType::value_type;
+    typedef typename FieldType::value_type value_type;
 
     const size_t m = 8;
     value_type t = value_type(10);
@@ -186,7 +186,7 @@ void test_lagrange_coefficients() {
 
 template<typename FieldType>
 void test_compute_z() {
-    using value_type = typename FieldType::value_type;
+    typedef typename FieldType::value_type value_type;
 
     const size_t m = 8;
     value_type t = value_type(10);

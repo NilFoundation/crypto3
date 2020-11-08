@@ -48,7 +48,7 @@ namespace nil {
             template<typename FieldType>
             void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 if (T.size() != m + 1)
                     T.resize(m + 1);
@@ -96,7 +96,7 @@ namespace nil {
                                           const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                           const size_t &n) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 size_t m = log2(n);
                 // if (T.size() != m + 1u)
@@ -156,7 +156,7 @@ namespace nil {
                                           const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                           const size_t &n) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 size_t m = log2(n);
                 // if (T.size() != m + 1u)
@@ -190,7 +190,7 @@ namespace nil {
                                                     const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
                                                     const size_t &n) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 std::vector<value_type> u(n, value_type::zero());
                 std::vector<value_type> w(n, value_type::zero());
@@ -235,7 +235,7 @@ namespace nil {
                                                     const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
                                                     const size_t &n) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 std::vector<value_type> v(n, value_type::zero());
                 std::vector<value_type> u(n, value_type::zero());

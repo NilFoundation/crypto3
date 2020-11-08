@@ -53,7 +53,7 @@ namespace nil {
                 template<typename FieldType>
                 void basic_serial_radix2_FFT(std::vector<typename FieldType::value_type> &a,
                                              const typename FieldType::value_type &omega) {
-                    using value_type = typename FieldType::value_type;
+                    typedef typename FieldType::value_type value_type;
 
                     const size_t n = a.size(), logn = log2(n);
                     //if (n != (1u << logn))
@@ -90,7 +90,7 @@ namespace nil {
                 void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a,
                                                      const typename FieldType::value_type &omega,
                                                      const size_t log_cpus) {
-                    using value_type = typename FieldType::value_type;
+                    typedef typename FieldType::value_type value_type;
 
                     const size_t num_cpus = 1ul << log_cpus;
 
@@ -175,7 +175,7 @@ namespace nil {
                 std::vector<typename FieldType::value_type>
                     basic_radix2_evaluate_all_lagrange_polynomials(const size_t m,
                                                                    const typename FieldType::value_type &t) {
-                    using value_type = typename FieldType::value_type;
+                    typedef typename FieldType::value_type value_type;
 
                     if (m == 1) {
                         return std::vector<value_type>(1, value_type::one());

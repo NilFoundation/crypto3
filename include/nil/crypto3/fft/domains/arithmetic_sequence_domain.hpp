@@ -47,7 +47,7 @@ namespace nil {
 
             template<typename FieldType>
             class arithmetic_sequence_domain : public evaluation_domain<FieldType> {
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
             public:
                 bool precomputation_sentinel;

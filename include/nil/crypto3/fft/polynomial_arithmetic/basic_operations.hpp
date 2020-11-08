@@ -80,7 +80,7 @@ namespace nil {
                                       const std::vector<typename FieldType::value_type> &a,
                                       const std::vector<typename FieldType::value_type> &b) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 if (_is_zero(a)) {
                     c = b;
@@ -113,7 +113,7 @@ namespace nil {
                                          const std::vector<typename FieldType::value_type> &a,
                                          const std::vector<typename FieldType::value_type> &b) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 if (_is_zero(b)) {
                     c = a;
@@ -147,7 +147,7 @@ namespace nil {
                                                    const std::vector<typename FieldType::value_type> &a,
                                                    const std::vector<typename FieldType::value_type> &b) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 const size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
                 value_type omega = detail::unity_root<FieldType>(n);
@@ -201,7 +201,7 @@ namespace nil {
                                                      const std::vector<typename FieldType::value_type> &a,
                                                      const std::vector<typename FieldType::value_type> &c) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 const size_t m = a.size();
                 // if (c.size() - 1 > m + n)
@@ -230,7 +230,7 @@ namespace nil {
                                       const std::vector<typename FieldType::value_type> &a,
                                       const std::vector<typename FieldType::value_type> &b) {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 size_t d = b.size() - 1;            /* Degree of B */
                 value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */

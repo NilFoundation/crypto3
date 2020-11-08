@@ -40,7 +40,7 @@ namespace nil {
             template<typename FieldType>
             class evaluation_domain {
 
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
             public:
 

@@ -46,7 +46,7 @@ namespace nil {
             void kronecker_substitution(std::vector<typename FieldType::value_type>& v3,
                                         const std::vector<typename FieldType::value_type>& v1,
                                         const std::vector<typename FieldType::value_type>& v2) {
-                using value_type = typename FieldType::value_type;
+                typedef typename FieldType::value_type value_type;
 
                 // Initialize
                 bool square = (v1 == v2) ? 1 : 0;
