@@ -248,12 +248,13 @@ BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
 BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
     test_inverse_coset_ftt_to_coset_fft<fields::bls12<381>>();
 }
-/*
+
 BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
     test_lagrange_coefficients<fields::bls12<381>>();
 }
+
 BOOST_AUTO_TEST_CASE(compute_z) {
     test_compute_z<fields::bls12<381>>();
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()

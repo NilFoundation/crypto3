@@ -77,7 +77,7 @@ namespace nil {
                         throw std::invalid_argument("geometric(): expected m > 1");
                     }
 
-                    if (!(value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero())) {
+                    if (value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero()) {
                         throw std::invalid_argument(
                             "geometric(): expected "
                             "value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero() != "
