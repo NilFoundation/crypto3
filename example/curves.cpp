@@ -60,8 +60,8 @@ void print_fp3_curve_group_element(Fp3CurveGroupElement e) {
 
 template<typename FpCurveGroup>
 void fp_curve_group_basic_math_examples() {
-    using group_value_type = typename FpCurveGroup::value_type;
-    using field_value_type = typename FpCurveGroup::underlying_field_type::value_type;
+    typedef typename FpCurveGroup::value_type group_value_type;
+    typedef typename FpCurveGroup::underlying_field_type::value_type field_value_type;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
     group_value_type c1(e1, e2, e3), c2(e4, e5, e6);

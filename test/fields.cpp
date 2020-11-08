@@ -155,7 +155,7 @@ void field_test_init(std::vector<typename fields::detail::element_fp2<FieldParam
                      std::vector<constant_type> &constants,
                      const TestSet &test_set) {
     using element_type = typename fields::detail::element_fp2<FieldParams>;
-    using modulus_type = typename element_type::underlying_type::modulus_type;
+    typedef typename element_type::underlying_type::modulus_type modulus_type;
 
     std::array<modulus_type, 2> element_values;
 
@@ -184,8 +184,8 @@ void field_operation_test(const TestSet &test_set) {
 
 template<typename FieldType>
 void field_not_square_test(const std::vector<const char *> &test_set) {
-    using value_type = typename FieldType::value_type;
-    using modulus_type = typename value_type::modulus_type;
+    typedef typename FieldType::value_type value_type;
+    typedef typename value_type::modulus_type modulus_type;
 
     for (auto &not_square : test_set) {
         BOOST_CHECK_EQUAL(value_type(modulus_type(not_square)).is_square(), false);
@@ -195,8 +195,8 @@ void field_not_square_test(const std::vector<const char *> &test_set) {
 
 template<typename FieldType>
 void field_not_square_test(const std::vector<std::array<const char *, 2>> &test_set) {
-    using value_type = typename FieldType::value_type;
-    using modulus_type = typename value_type::underlying_type::modulus_type;
+    typedef typename FieldType::value_type value_type;
+    typedef typename value_type::underlying_type::modulus_type modulus_type;
 
     for (auto &not_square : test_set) {
         BOOST_CHECK_EQUAL(value_type(modulus_type(not_square[0]), modulus_type(not_square[1])).is_square(), false);
@@ -435,8 +435,8 @@ BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq) {
 
 BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq2) {
     using policy_type = fields::fp2<fields::bls12_fq<381>>;
-    using value_type = typename policy_type::value_type;
-    using modulus_type = typename value_type::underlying_type::modulus_type;
+    typedef typename policy_type::value_type value_type;
+    typedef typename value_type::underlying_type::modulus_type modulus_type;
 
     std::vector<std::array<const char *, 2>> not_squares = {
         {"3524621578887081555995618340212814089553799753665493370168024281656572217651956527488772586862482092190213449"

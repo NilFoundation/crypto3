@@ -100,7 +100,7 @@ namespace nil {
                                    typename std::vector<typename FieldType::value_type>::const_iterator exponents,
                                    typename std::vector<typename FieldType::value_type>::const_iterator exponents_end) {
 
-                    using number_type = typename FieldType::modulus_type;
+                    typedef typename FieldType::modulus_type number_type;
                     // temporary added until fixed-precision modular adaptor is ready:
                     typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
 
@@ -218,7 +218,7 @@ namespace nil {
                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end) {
 
-                    using number_type = typename FieldType::modulus_type;
+                    typedef typename FieldType::modulus_type number_type;
                     // temporary added until fixed-precision modular adaptor is ready:
                     typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
 

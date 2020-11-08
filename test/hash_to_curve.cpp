@@ -316,8 +316,8 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g1_type;
     using h2c_type = ep_map<group_type>;
-    using field_value_type = typename group_type::underlying_field_type::value_type;
-    using number_type = typename curve_type::number_type;
+    typedef typename group_type::underlying_field_type::value_type field_value_type;
+    typedef typename curve_type::number_type number_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -353,8 +353,8 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g2_type;
     using h2c_type = ep2_map<group_type>;
-    using field_value_type = typename group_type::underlying_field_type::value_type;
-    using number_type = typename curve_type::number_type;
+    typedef typename group_type::underlying_field_type::value_type field_value_type;
+    typedef typename curve_type::number_type number_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -404,9 +404,9 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g1_type;
     using h2c_type = ep_map<group_type>;
-    using group_value_type = typename group_type::value_type;
-    using field_value_type = typename group_type::underlying_field_type::value_type;
-    using number_type = typename curve_type::number_type;
+    typedef typename group_type::value_type group_value_type;
+    typedef typename group_type::underlying_field_type::value_type field_value_type;
+    typedef typename curve_type::number_type number_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());
@@ -456,9 +456,9 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g2_h2c_sha256_test) {
     using curve_type = bls12_381;
     using group_type = typename curve_type::g2_type;
     using h2c_type = ep2_map<group_type>;
-    using group_value_type = typename group_type::value_type;
-    using field_value_type = typename group_type::underlying_field_type::value_type;
-    using number_type = typename curve_type::number_type;
+    typedef typename group_type::value_type group_value_type;
+    typedef typename group_type::underlying_field_type::value_type field_value_type;
+    typedef typename curve_type::number_type number_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";
     std::vector<std::uint8_t> dst(default_tag_str.begin(), default_tag_str.end());

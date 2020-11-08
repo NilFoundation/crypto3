@@ -57,7 +57,7 @@ namespace nil {
                         using g1_field_type_value = typename policy_type::g1_field_type::value_type;
                         // must be removed later
 
-                        using underlying_field_value_type = typename underlying_field_type::value_type;
+                        typedef typename underlying_field_type::value_type underlying_field_value_type;
 
                         underlying_field_value_type X;
                         underlying_field_value_type Y;

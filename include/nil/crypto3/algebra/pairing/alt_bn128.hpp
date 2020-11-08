@@ -46,18 +46,18 @@ namespace nil {
                     using policy_type = PairingFunctions;
 
                 public:
-                    using number_type = typename policy_type::number_type;
+                    typedef typename policy_type::number_type number_type;
 
                     constexpr static const typename policy_type::number_type pairing_loop_count =
                         policy_type::ate_loop_count;
 
-                    using Fp_type = typename policy_type::Fp_field;
+                    typedef typename policy_type::Fp_field Fp_type;
                     using G1_type = typename policy_type::g1;
                     using G2_type = typename policy_type::g2;
-                    using Fq_type = typename policy_type::Fq_field;
-                    using Fqe_type = typename policy_type::Fqe_field;
-                    using Fqk_type = typename policy_type::Fqk_field;
-                    using GT_type = typename policy_type::gt;
+                    typedef typename policy_type::Fq_field Fq_type;
+                    typedef typename policy_type::Fqe_field Fqe_type;
+                    typedef typename policy_type::Fqk_field Fqk_type;
+                    typedef typename policy_type::gt GT_type;
 
                     using G1_precomp = typename policy_type::g1_precomp;
                     using G2_precomp = typename policy_type::g2_precomp;

@@ -48,7 +48,7 @@ namespace nil {
                     template<typename FieldParams>
                     inline bool sgn0(const element_fp2<FieldParams> &e) {
                         using underlying_type = typename element_fp2<FieldParams>::underlying_type;
-                        using number_type = typename underlying_type::number_type;
+                        typedef typename underlying_type::number_type number_type;
 
                         static const number_type two = number_type(2, underlying_type::modulus);
 

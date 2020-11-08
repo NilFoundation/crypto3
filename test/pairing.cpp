@@ -271,8 +271,8 @@ void pairing_test_Fr_init(
     std::vector<typename curves::bls12<381>::pairing_policy::Fp_type::value_type> &elements,
     const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing_policy;
-    using value_type = typename pairing_policy::Fp_type::value_type;
-    using modulus_type = typename value_type::modulus_type;
+    typedef typename pairing_policy::Fp_type::value_type value_type;
+    typedef typename value_type::modulus_type modulus_type;
 
     for (auto &fr_elem : test_set.second.get_child("Fr")) {
         elements.emplace_back(value_type(modulus_type(fr_elem.second.data())));
@@ -285,7 +285,7 @@ void pairing_test_G1_init(std::vector<typename curves::bls12<381>::pairing_polic
                           const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G1_type;
-    using modulus_type = typename value_type::underlying_field_value_type::modulus_type;
+    typedef typename value_type::underlying_field_value_type::modulus_type modulus_type;
 
     std::array<modulus_type, 3> coordinates;
 
@@ -304,8 +304,8 @@ void pairing_test_G2_init(std::vector<typename curves::bls12<381>::pairing_polic
                           const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G2_type;
-    using underlying_type = typename value_type::underlying_field_value_type;
-    using modulus_type = typename underlying_type::underlying_type::modulus_type;
+    typedef typename value_type::underlying_field_value_type underlying_type;
+    typedef typename underlying_type::underlying_type::modulus_type modulus_type;
 
     std::array<modulus_type, 6> coordinates;
 
@@ -327,10 +327,10 @@ template<typename TestSet>
 void pairing_test_GT_init(std::vector<typename curves::bls12<381>::pairing_policy::GT_type> &elements,
                           const TestSet &test_set) {
     using pairing_policy = typename curves::bls12<381>::pairing_policy;
-    using value_type = typename pairing_policy::GT_type;
-    using underlying_type = typename value_type::underlying_type;
-    using under_underlying_type = typename underlying_type::underlying_type;
-    using modulus_type = typename under_underlying_type::underlying_type::modulus_type;
+    typedef typename pairing_policy::GT_type value_type;
+    typedef typename value_type::underlying_type underlying_type;
+    typedef typename underlying_type::underlying_type under_underlying_type;
+    typedef typename under_underlying_type::underlying_type::modulus_type modulus_type;
 
     std::array<modulus_type, 12> coordinates;
 
@@ -360,7 +360,7 @@ void pairing_test_G1_precomp_init(
     using pairing_policy = typename curves::bls12<381>::pairing_policy;
     using value_type = typename pairing_policy::G1_precomp;
     using element_value_type = value_type::value_type;
-    using modulus_type = typename element_value_type::modulus_type;
+    typedef typename element_value_type::modulus_type modulus_type;
 
     for (auto &elem : test_set.second.get_child("G1_precomp")) {
         elements.emplace_back(value_type {element_value_type(modulus_type(elem.second.get_child("PX").data())),
@@ -378,8 +378,8 @@ void pairing_test_G2_precomp_init(
     using element_value_type = value_type::value_type;
     using coeffs_type = value_type::coeffs_type::value_type;
     using coeffs_value_type = coeffs_type::value_type;
-    using element_modulus_type = typename element_value_type::underlying_type::modulus_type;
-    using coeffs_modulus_type = typename coeffs_value_type::underlying_type::modulus_type;
+    typedef typename element_value_type::underlying_type::modulus_type element_modulus_type;
+    typedef typename coeffs_value_type::underlying_type::modulus_type coeffs_modulus_type;
 
     std::array<element_modulus_type, 2> element_coordinates;
     std::array<coeffs_modulus_type, 2> coeffs_coordinates;

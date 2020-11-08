@@ -44,21 +44,21 @@ namespace nil {
                         using policy_type = curves::detail::edwards_basic_policy<183>;
 
                     public:
-                        using number_type = typename policy_type::number_type;
-                        using extended_number_type = typename policy_type::extended_number_type;
+                        typedef typename policy_type::number_type number_type;
+                        typedef typename policy_type::extended_number_type extended_number_type;
 
                         using g1_group = curves::detail::edwards_g1<183>;
                         using g2_group = curves::detail::edwards_g2<183>;
-                        using Fp_field = typename policy_type::scalar_field_type;
+                        typedef typename policy_type::scalar_field_type Fp_field;
                         using Fq_field = typename policy_type::g1_field_type;
                         using Fqe_field = typename policy_type::g2_field_type;
-                        using Fqk_field = typename policy_type::gt_field_type;
+                        typedef typename policy_type::gt_field_type Fqk_field;
 
                         using g1 = typename g1_group::value_type;
                         using g2 = typename g2_group::value_type;
-                        using Fq = typename Fq_field::value_type;
+                        typedef typename Fq_field::value_type Fq;
                         using Fq3 = typename Fqe_field::value_type;
-                        using gt = typename Fqk_field::value_type;
+                        typedef typename Fqk_field::value_type gt;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                         constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;

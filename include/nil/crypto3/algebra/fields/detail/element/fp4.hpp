@@ -42,7 +42,7 @@ namespace nil {
                         /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
                             typename policy_type::non_residue_type(policy_type::non_residue);
 
-                        using underlying_type = typename policy_type::underlying_type;
+                        typedef typename policy_type::underlying_type underlying_type;
 
                         using value_type = std::array<underlying_type, 2>;
 

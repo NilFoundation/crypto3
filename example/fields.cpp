@@ -74,7 +74,7 @@ void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
 template<typename FpField>
 void fields_fp_basic_math_examples() {
     using policy_type = FpField;
-    using value_type = typename policy_type::value_type;
+    typedef typename policy_type::value_type value_type;
 
     std::cout << "Field module value: " << policy_type::modulus << std::endl;
 
@@ -158,7 +158,7 @@ void fields_fp_basic_math_examples() {
 template<typename Fp2Field>
 void fields_fp2_basic_math_examples() {
     using policy_type = Fp2Field;
-    using value_type = typename policy_type::value_type;
+    typedef typename policy_type::value_type value_type;
 
     std::cout << "Field module value: " << policy_type::modulus << std::endl;
 
@@ -254,7 +254,7 @@ void fields_fp2_basic_math_examples() {
 template<typename Fp3Field>
 void fields_fp3_basic_math_examples() {
     using policy_type = Fp3Field;
-    using value_type = typename policy_type::value_type;
+    typedef typename policy_type::value_type value_type;
 
     std::cout << "Field module value: " << policy_type::modulus << std::endl;
 

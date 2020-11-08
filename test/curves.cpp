@@ -224,7 +224,7 @@ template<typename FpCurveGroup, typename TestSet>
 void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
                         std::vector<std::size_t> &constants,
                         const TestSet &test_set) {
-    using field_value_type = typename FpCurveGroup::underlying_field_type::value_type;
+    typedef typename FpCurveGroup::underlying_field_type::value_type field_value_type;
     std::array<field_value_type, 3> coordinates;
 
     for (auto &point : test_set.second.get_child("point_coordinates")) {
