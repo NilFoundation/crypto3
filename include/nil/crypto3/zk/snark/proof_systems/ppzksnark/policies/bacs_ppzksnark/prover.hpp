@@ -84,7 +84,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static proof_type process(const proving_key_type &proving_key,
+                        static inline proof_type process(const proving_key_type &proving_key,
                                               const primary_input_type &primary_input,
                                               const auxiliary_input_type &auxiliary_input) {
 

@@ -38,7 +38,8 @@ namespace nil {
 
                 template<typename Generator = policies::uscs_ppzksnark_generator,
                          typename Prover = policies::uscs_ppzksnark_prover,
-                         typename Verifier = policies::uscs_ppzksnark_verifier_strong_input_consistency>
+                         typename Verifier = policies::uscs_ppzksnark_verifier_strong_input_consistency,
+                         typename OnlineVerifier = policies::uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class uscs_ppzksnark {
                     using types_policy = detail::uscs_ppzksnark_types_policy;
 
@@ -54,11 +55,28 @@ namespace nil {
                     using keypair_type = typename types_policy::keypair;
                     using proof_type = typename types_policy::proof;
 
-                    using generator = Generator;
+                    static inline keypair_type generator(const circuit_type &circuit) {
+                        return Generator::process(circuit);
+                    }
 
-                    using prover = Prover;
+                    static inline proof_type prover(const proving_key_type &pk,
+                                                    const primary_input_type &primary_input,
+                                                    const auxiliary_input_type &auxiliary_input){
 
-                    using verifier = Verifier;
+                        return Prover::process(pk, primary_input, auxiliary_input);
+                    }
+
+                    static inline bool verifier(const verification_key_type &pvk,
+                                                const primary_input_type &primary_input,
+                                                const proof_type &proof){
+                        return Verifier::process(pvk, primary_input, proof);
+                    }
+
+                    static inline bool online_verifier(const processed_verification_key_type &pvk,
+                                                const primary_input_type &primary_input,
+                                                const proof_type &proof){
+                        return OnlineVerifier::process(pvk, primary_input, proof);
+                    }
                 };
             }    // namespace snark
         }        // namespace zk

@@ -79,7 +79,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static processed_verification_key process(const verification_key_type &verification_key) {
+                        static inline processed_verification_key process(const verification_key_type &verification_key) {
                             const processed_verification_key_type processed_verification_key =
                                 r1cs_ppzksnark_verifier_process_vk::process<CurveType>(verification_key);
 
@@ -122,9 +122,9 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &verification_key,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                        static inline bool process(const verification_key_type &verification_key,
+                                            const primary_input_type &primary_input,
+                                            const proof_type &proof) {
                             const processed_verification_key_type processed_verification_key =
                                 bacs_ppzksnark_verifier_process_vk::process<CurveType>(verification_key);
                             const bool bit = r1cs_ppzksnark_online_verifier_weak_input_consisatancy::process<CurveType>(
@@ -155,9 +155,9 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &verification_key,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                        static inline bool process(const verification_key_type &verification_key,
+                                            const primary_input_type &primary_input,
+                                            const proof_type &proof) {
 
                             const processed_verification_key_type processed_verification_key =
                                 bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
@@ -189,9 +189,9 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const processed_verification_key_type &processed_verification_key,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                        static inline bool process(const processed_verification_key_type &processed_verification_key,
+                                            const primary_input_type &primary_input,
+                                            const proof_type &proof) {
 
                             const bool bit = r1cs_ppzksnark_online_verifier_weak_input_consisatancy::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
@@ -221,9 +221,9 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                     
-                        static bool process(const processed_verification_key_type &processed_verification_key,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                        static inline bool process(const processed_verification_key_type &processed_verification_key,
+                                            const primary_input_type &primary_input,
+                                            const proof_type &proof) {
                             const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
 

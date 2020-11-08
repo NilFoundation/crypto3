@@ -94,7 +94,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static processed_verification_key_type process(const verification_key_type &verification_key) {
+                        static inline processed_verification_key_type process(const verification_key_type &verification_key) {
 
                             using pairing_policy = typename CurveType::pairing_policy;
 
@@ -146,7 +146,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &verification_key,
+                        static inline bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             processed_verification_key_type processed_verification_key =
@@ -178,7 +178,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &verification_key,
+                        static inline bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             processed_verification_key_type processed_verification_key =
@@ -210,7 +210,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const processed_verification_key_type &processed_verification_key,
+                        static inline bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
@@ -277,7 +277,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const processed_verification_key_type &processed_verification_key,
+                        static inline bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             bool result = true;
@@ -316,7 +316,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                     
-                        static bool process(const verification_key_type &verification_key,
+                        static inline bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 

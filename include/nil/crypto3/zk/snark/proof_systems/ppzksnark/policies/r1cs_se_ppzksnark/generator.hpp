@@ -95,7 +95,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static keypair_type process(const constraint_system_type &constraint_system) {
+                        static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                             /**
                              * draw random element t at which the SAP is evaluated.

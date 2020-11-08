@@ -93,7 +93,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static processed_verification_key_type process(const verification_key_type &vk) {
+                        static inline processed_verification_key_type process(const verification_key_type &vk) {
                             const processed_verification_key_type pvk = uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
 
                             return pvk;
@@ -120,7 +120,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &vk,
+                        static inline bool process(const verification_key_type &vk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             typedef typename CurveType::scalar_field_type field_type;
@@ -153,7 +153,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const verification_key_type &vk,
+                        static inline bool process(const verification_key_type &vk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             typedef typename CurveType::scalar_field_type field_type;
@@ -187,7 +187,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const processed_verification_key_type &pvk,
+                        static inline bool process(const processed_verification_key_type &pvk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
@@ -220,7 +220,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static bool process(const processed_verification_key_type &pvk,
+                        static inline bool process(const processed_verification_key_type &pvk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             typedef typename CurveType::scalar_field_type field_type;

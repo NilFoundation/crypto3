@@ -103,7 +103,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                     
-                        static keypair_type process(const constraint_system_type &constraint_system) {
+                        static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                             /* make the B_query "lighter" if possible */
                             constraint_system_type cs_copy(constraint_system);

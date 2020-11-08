@@ -81,7 +81,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        static keypair_type process(const circuit_type &circuit) {
+                        static inline keypair_type process(const circuit_type &circuit) {
                             typedef typename CurveType::scalar_field_type field_type;
 
                             const r1cs_constraint_system<field_type> r1cs_cs =

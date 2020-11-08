@@ -97,7 +97,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                         
-                        static keypair_type process(const constraint_system_type &cs) {
+                        static inline keypair_type process(const constraint_system_type &cs) {
 
                             using pairing_policy = typename CurveType::pairing_policy;
 
