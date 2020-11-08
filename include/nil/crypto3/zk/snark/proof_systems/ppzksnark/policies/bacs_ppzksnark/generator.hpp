@@ -67,19 +67,19 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class bacs_ppzksnark_generator {
-                        using types_policy = detail::bacs_ppzksnark_types_policy;
+                        using types_policy = detail::bacs_ppzksnark_types_policy<CurveType>;
+
                     public:
+                        typedef typename types_policy::circuit circuit_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using circuit_type = typename types_policy::circuit;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
-
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline keypair_type process(const circuit_type &circuit) {
                             typedef typename CurveType::scalar_field_type field_type;
@@ -87,7 +87,7 @@ namespace nil {
                             const r1cs_constraint_system<field_type> r1cs_cs =
                                 bacs_to_r1cs_instance_map<field_type>(circuit);
                             const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
-                                r1cs_ppzksnark::generator::process<CurveType>(r1cs_cs);
+                                r1cs_ppzksnark<CurveType>::generator::template process<CurveType>(r1cs_cs);
 
                             return keypair_type(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
                         }

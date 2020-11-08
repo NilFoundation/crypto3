@@ -52,7 +52,7 @@ namespace nil {
                 template<typename CurveType>
                 class G1_precomputation {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -81,7 +81,7 @@ namespace nil {
                         blueprint<FieldType> &pb,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
-                        using FieldType = typename CurveType::pairing_policy::Fp_type;
+                        typedef typename CurveType::pairing_policy::Fp_type FieldType;
                         using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                         using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -129,7 +129,7 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G2_component_coeffs {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -149,7 +149,7 @@ namespace nil {
                 template<typename CurveType>
                 class G2_precomputation {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -184,7 +184,7 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G2_component_doubling_step : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -232,7 +232,7 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G2_component_addition_step : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -268,7 +268,7 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G2_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type FieldType;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 

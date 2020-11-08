@@ -71,22 +71,23 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_prover {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy;
+                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using circuit_type = typename types_policy::circuit;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::circuit circuit_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline proof_type process(const proving_key_type &pk,
-                                              const primary_input_type &primary_input,
-                                              const auxiliary_input_type &auxiliary_input) {
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
                             typedef typename CurveType::scalar_field_type FieldType;
 
                             const uscs_variable_assignment<FieldType> uscs_va =
@@ -102,7 +103,6 @@ namespace nil {
                             return uscs_proof;
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

@@ -268,7 +268,7 @@ namespace nil {
                          * enables a faster verification time.
                          */
                         class processed_verification_key {
-                            using pairing_policy = typename CurveType::pairing_policy;
+                            typedef typename CurveType::pairing_policy pairing_policy;
 
                         public:
                             typename CurveType::g1_type::value_type G_alpha;

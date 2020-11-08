@@ -84,29 +84,31 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_se_ppzksnark_prover {
-                        using types_policy = detail::r1cs_se_ppzksnark_types_policy;
+                        using types_policy = detail::r1cs_se_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline proof_type process(const proving_key_type &proving_key,
-                                                const primary_input_type &primary_input,
-                                                const auxiliary_input_type &auxiliary_input) {
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
 
                             const typename CurveType::scalar_field_type::value_type
                                 d1 = algebra::random_element<typename CurveType::scalar_field_type>(),
                                 d2 = algebra::random_element<typename CurveType::scalar_field_type>();
 
                             const sap_witness<typename CurveType::scalar_field_type> sap_wit =
-                                r1cs_to_sap::witness_map(proving_key.constraint_system, primary_input, auxiliary_input, d1, d2);
+                                r1cs_to_sap<CurveType>::witness_map(
+                                    proving_key.constraint_system, primary_input, auxiliary_input, d1, d2);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -125,9 +127,11 @@ namespace nil {
                              *           = \prod_{i=0}^m A_query[i]^{input_i} * G_gamma_Z^r
                              */
                             typename CurveType::g1_type::value_type A =
-                                r * proving_key.G_gamma_Z + proving_key.A_query[0] +    // i = 0 is a special case because input_i = 1
-                                sap_wit.d1 * proving_key.G_gamma_Z +           // ZK-patch
-                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                r * proving_key.G_gamma_Z +
+                                proving_key.A_query[0] +                // i = 0 is a special case because input_i = 1
+                                sap_wit.d1 * proving_key.G_gamma_Z +    // ZK-patch
+                                algebra::multiexp<typename CurveType::g1_type,
+                                                  typename CurveType::scalar_field_type,
                                                   algebra::multiexp_method_BDLO12>(proving_key.A_query.begin() + 1,
                                                                                    proving_key.A_query.end(),
                                                                                    sap_wit.coefficients_for_ACs.begin(),
@@ -138,9 +142,11 @@ namespace nil {
                              * compute B exactly as A, except with H as the base
                              */
                             typename CurveType::g2_type::value_type B =
-                                r * proving_key.H_gamma_Z + proving_key.B_query[0] +    // i = 0 is a special case because input_i = 1
-                                sap_wit.d1 * proving_key.H_gamma_Z +           // ZK-patch
-                                algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
+                                r * proving_key.H_gamma_Z +
+                                proving_key.B_query[0] +                // i = 0 is a special case because input_i = 1
+                                sap_wit.d1 * proving_key.H_gamma_Z +    // ZK-patch
+                                algebra::multiexp<typename CurveType::g2_type,
+                                                  typename CurveType::scalar_field_type,
                                                   algebra::multiexp_method_BDLO12>(proving_key.B_query.begin() + 1,
                                                                                    proving_key.B_query.end(),
                                                                                    sap_wit.coefficients_for_ACs.begin(),
@@ -157,7 +163,8 @@ namespace nil {
                              *              = \prod_{i=0}^m C_query_2 * input_i
                              */
                             typename CurveType::g1_type::value_type C =
-                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                algebra::multiexp<typename CurveType::g1_type,
+                                                  typename CurveType::scalar_field_type,
                                                   algebra::multiexp_method_BDLO12>(
                                     proving_key.C_query_1.begin(),
                                     proving_key.C_query_1.end(),
@@ -165,8 +172,8 @@ namespace nil {
                                     sap_wit.coefficients_for_ACs.end(),
                                     chunks) +
                                 (r * r) * proving_key.G_gamma2_Z2 + r * proving_key.G_ab_gamma_Z +
-                                sap_wit.d1 * proving_key.G_ab_gamma_Z +             // ZK-patch
-                                r * proving_key.C_query_2[0] +                      // i = 0 is a special case for C_query_2
+                                sap_wit.d1 * proving_key.G_ab_gamma_Z +    // ZK-patch
+                                r * proving_key.C_query_2[0] +             // i = 0 is a special case for C_query_2
                                 (r + r) * sap_wit.d1 * proving_key.G_gamma2_Z2 +    // ZK-patch for C_query_2
                                 r * algebra::multiexp<typename CurveType::g1_type,
                                                       typename CurveType::scalar_field_type,
@@ -177,7 +184,8 @@ namespace nil {
                                         sap_wit.coefficients_for_ACs.end(),
                                         chunks) +
                                 sap_wit.d2 * proving_key.G_gamma2_Z_t[0] +    // ZK-patch
-                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                algebra::multiexp<typename CurveType::g1_type,
+                                                  typename CurveType::scalar_field_type,
                                                   algebra::multiexp_method_BDLO12>(proving_key.G_gamma2_Z_t.begin(),
                                                                                    proving_key.G_gamma2_Z_t.end(),
                                                                                    sap_wit.coefficients_for_H.begin(),
@@ -190,7 +198,6 @@ namespace nil {
                             return proof;
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

@@ -30,6 +30,7 @@
 #define CRYPTO3_ZK_TBCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -122,7 +123,6 @@ namespace nil {
 
                     return example;
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

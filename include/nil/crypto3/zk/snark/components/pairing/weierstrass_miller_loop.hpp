@@ -55,7 +55,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using field_type = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -135,7 +135,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using field_type = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -212,7 +212,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using field_type = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -363,7 +363,7 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using field_type = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
@@ -564,7 +564,7 @@ namespace nil {
                 class mnt_e_times_e_over_e_miller_loop_component
                     : public component<typename CurveType::scalar_field_type> {
                 public:
-                    using field_type = typename CurveType::pairing_policy::Fp_type;
+                    typedef typename CurveType::pairing_policy::Fp_type field_type;
                     using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                     using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 

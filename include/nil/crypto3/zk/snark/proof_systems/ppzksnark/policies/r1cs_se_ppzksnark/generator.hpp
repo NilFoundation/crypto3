@@ -82,18 +82,19 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_se_ppzksnark_generator {
-                        using types_policy = detail::r1cs_se_ppzksnark_types_policy;
+                        using types_policy = detail::r1cs_se_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline keypair_type process(const constraint_system_type &constraint_system) {
 
@@ -102,14 +103,16 @@ namespace nil {
                              * it should be the case that Z(t) != 0
                              */
                             const std::shared_ptr<fft::evaluation_domain<typename CurveType::scalar_field_type>>
-                                domain = r1cs_to_sap::get_domain(constraint_system);
+                                domain =
+                                    r1cs_to_sap<typename CurveType::scalar_field_type>::get_domain(constraint_system);
                             typename CurveType::scalar_field_type::value_type t;
                             do {
                                 t = algebra::random_element<typename CurveType::scalar_field_type>();
                             } while (domain->compute_vanishing_polynomial(t).is_zero());
 
                             sap_instance_evaluation<typename CurveType::scalar_field_type> sap_inst =
-                                r1cs_to_sap::instance_map_with_evaluation(constraint_system, t);
+                                r1cs_to_sap<typename CurveType::scalar_field_type>::instance_map_with_evaluation(
+                                    constraint_system, t);
 
                             std::size_t non_zero_At = 0;
                             for (std::size_t i = 0; i < sap_inst.num_variables() + 1; ++i) {
@@ -243,9 +246,10 @@ namespace nil {
 
                             constraint_system_type cs_copy(constraint_system);
 
-                            proving_key_type pk = proving_key_type(std::move(A_query), std::move(B_query), std::move(C_query_1),
-                                                         std::move(C_query_2), G_gamma_Z, H_gamma_Z, G_ab_gamma_Z,
-                                                         G_gamma2_Z2, std::move(G_gamma2_Z_t), std::move(cs_copy));
+                            proving_key_type pk =
+                                proving_key_type(std::move(A_query), std::move(B_query), std::move(C_query_1),
+                                                 std::move(C_query_2), G_gamma_Z, H_gamma_Z, G_ab_gamma_Z, G_gamma2_Z2,
+                                                 std::move(G_gamma2_Z_t), std::move(cs_copy));
 
                             pk.print_size();
                             vk.print_size();
@@ -253,7 +257,6 @@ namespace nil {
                             return keypair_type(std::move(pk), std::move(vk));
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

@@ -47,7 +47,7 @@ namespace nil {
                 template<typename CurveType>
                 struct mnt4_final_exp_component : public component<typename CurveType::scalar_field_type> {
 
-                    using field_type = typename CurveType::scalar_field_type;
+                    typedef typename CurveType::scalar_field_type field_type;
 
                     Fqk_variable<CurveType> el;
                     std::shared_ptr<Fqk_variable<CurveType>> one;
@@ -192,7 +192,7 @@ namespace nil {
                 template<typename CurveType>
                 struct mnt6_final_exp_component : public component<typename CurveType::scalar_field_type> {
 
-                    using field_type = typename CurveType::scalar_field_type;
+                    typedef typename CurveType::scalar_field_type field_type;
 
                     Fqk_variable<CurveType> el;
                     std::shared_ptr<Fqk_variable<CurveType>> one;

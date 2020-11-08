@@ -83,23 +83,23 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_generator {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
+                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+
                     public:
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
-                        
                         static inline keypair_type process(const constraint_system_type &cs) {
 
-                            using pairing_policy = typename CurveType::pairing_policy;
+                            typedef typename CurveType::pairing_policy pairing_policy;
 
                             /* Make the B_query "lighter" if possible */
                             constraint_system_type r1cs_copy(cs);
@@ -121,7 +121,7 @@ namespace nil {
 
                             /* A quadratic arithmetic program evaluated at t. */
                             qap_instance_evaluation<typename CurveType::scalar_field_type> qap =
-                                r1cs_to_qap::instance_map_with_evaluation(r1cs_copy, t);
+                                r1cs_to_qap<CurveType>::instance_map_with_evaluation(r1cs_copy, t);
 
                             std::size_t non_zero_At = 0;
                             std::size_t non_zero_Bt = 0;

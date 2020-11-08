@@ -82,18 +82,18 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_generator {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline keypair_type process(const constraint_system_type &cs) {
 
@@ -213,7 +213,6 @@ namespace nil {
                             return keypair_type(std::move(pk), std::move(vk));
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

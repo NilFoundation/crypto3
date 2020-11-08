@@ -63,11 +63,11 @@ namespace nil {
                     using curve_type = typename curves::mnt4<ModulusBits, GeneratorBits>;
 
                 public:
-                    using other_curve_type = typename curve_type::pairing_policy::other_curve;    // mnt6
+                    typedef typename curve_type::pairing_policy::other_curve other_curve_type;    // mnt6
 
-                    using field_type = typename curve_type::pairing_policy::Fp_type;
-                    using fqe_type = typename other_curve::pairing_policy::Fqe_type;
-                    using fqk_type = typename other_curve::pairing_policy::Fqk_type;
+                    typedef typename curve_type::pairing_policy::Fp_type field_type;
+                    typedef typename other_curve::pairing_policy::Fqe_type fqe_type;
+                    typedef typename other_curve::pairing_policy::Fqk_type fqk_type;
 
                     typedef Fp3_variable<fqe_type> Fqe_variable_type;
                     typedef Fp3_mul_component<fqe_type> Fqe_mul_component_type;
@@ -96,11 +96,11 @@ namespace nil {
                     using curve_type = typename curves::mnt6<ModulusBits, GeneratorBits>;
 
                 public:
-                    using other_curve_type = typename curve_type::pairing_policy::other_curve;    // mnt4
+                    typedef typename curve_type::pairing_policy::other_curve other_curve_type;    // mnt4
 
-                    using field_type = typename curve_type::pairing_policy::Fp_type;
-                    using fqe_type = typename other_curve::pairing_policy::Fqe_type;
-                    using fqk_type = typename other_curve::pairing_policy::Fqk_type;
+                    typedef typename curve_type::pairing_policy::Fp_type field_type;
+                    typedef typename other_curve::pairing_policy::Fqe_type fqe_type;
+                    typedef typename other_curve::pairing_policy::Fqk_type fqk_type;
 
                     typedef Fp2_variable<fqe_type> Fqe_variable_type;
                     typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;

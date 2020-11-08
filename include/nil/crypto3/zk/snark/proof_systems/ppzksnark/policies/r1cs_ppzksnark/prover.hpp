@@ -97,31 +97,33 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_ppzksnark_prover {
-                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                        using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
+
                     public:
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
-
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::circuit circuit_type;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline keypair_type process(const proving_key_type &proving_key,
-                                                const primary_input_type &primary_input,
-                                                const auxiliary_input_type &auxiliary_input) {
+                                                           const primary_input_type &primary_input,
+                                                           const auxiliary_input_type &auxiliary_input) {
 
                             const typename CurveType::scalar_field_type::value_type
                                 d1 = algebra::random_element<typename CurveType::scalar_field_type>(),
                                 d2 = algebra::random_element<typename CurveType::scalar_field_type>(),
                                 d3 = algebra::random_element<typename CurveType::scalar_field_type>();
 
-                            const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap::witness_map(
-                                proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
+                            const qap_witness<typename CurveType::scalar_field_type> qap_wit =
+                                r1cs_to_qap<typename CurveType::scalar_field_type>::witness_map(
+                                    proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A =
                                 proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables() + 1];

@@ -86,23 +86,24 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-                    
+
                     template<typename CurveType>
                     class r1cs_ppzksnark_generator {
-                        using types_policy = detail::r1cs_ppzksnark_types_policy;
+                        using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
+
                     public:
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::circuit circuit_type;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
-                    
                         static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                             /* make the B_query "lighter" if possible */
@@ -114,7 +115,7 @@ namespace nil {
                                 algebra::random_element<typename CurveType::scalar_field_type>();
 
                             qap_instance_evaluation<typename CurveType::scalar_field_type> qap_inst =
-                                r1cs_to_qap::instance_map_with_evaluation(cs_copy, t);
+                                r1cs_to_qap<CurveType>::instance_map_with_evaluation(cs_copy, t);
 
                             std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
                             for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
@@ -255,15 +256,15 @@ namespace nil {
                             accumulation_vector<typename CurveType::g1_type> encoded_IC_query(
                                 std::move(encoded_IC_base), std::move(encoded_IC_values));
 
-                            verification_key vk =
+                            verification_key_type vk =
                                 verification_key(alphaA_g2, alphaB_g1, alphaC_g2, gamma_g2, gamma_beta_g1,
                                                  gamma_beta_g2, rC_Z_g2, encoded_IC_query);
-                            proving_key pk = proving_key(std::move(A_query),
-                                                         std::move(B_query),
-                                                         std::move(C_query),
-                                                         std::move(H_query),
-                                                         std::move(K_query),
-                                                         std::move(cs_copy));
+                            proving_key_type pk = proving_key(std::move(A_query),
+                                                              std::move(B_query),
+                                                              std::move(C_query),
+                                                              std::move(H_query),
+                                                              std::move(K_query),
+                                                              std::move(cs_copy));
 
                             pk.print_size();
                             vk.print_size();

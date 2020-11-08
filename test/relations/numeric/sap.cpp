@@ -40,7 +40,6 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 

@@ -30,6 +30,7 @@
 #define CRYPTO3_ZK_R1CS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -276,7 +276,7 @@ void test_Frobenius(const std::string &annotation) {
 template<typename CurveType>
 void test_full_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
-    using pairing_policy = typename CurveType::pairing_policy::other_curve::pairing_policy;
+    typedef typename CurveType::pairing_policy::other_curve::pairing_policy pairing_policy;
 
     blueprint<FieldType> pb;
     other_curve<CurveType>::g1_type::value_type P_val =
@@ -332,7 +332,7 @@ void test_full_pairing(const std::string &annotation) {
 template<typename CurveType>
 void test_full_precomputed_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
-    using pairing_policy = typename CurveType::pairing_policy::other_curve::pairing_policy;
+    typedef typename CurveType::pairing_policy::other_curve::pairing_policy pairing_policy;
 
     blueprint<FieldType> pb;
     other_curve<CurveType>::g1_type::value_type P_val =

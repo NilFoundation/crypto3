@@ -38,27 +38,27 @@ namespace nil {
                     using policy_type = detail::r1cs_ppzkadsnark_basic_policy<CurveType>;
 
                 public:
-                    using snark_pp = typename policy_type::snark_pp;
-                    using constraint_system = typename policy_type::constraint_system;
-                    using primary_input = typename policy_type::primary_input;
-                    using auxiliary_input = typename policy_type::auxiliary_input;
+                    typedef typename policy_type::snark_pp snark_pp;
+                    typedef typename policy_type::constraint_system constraint_system;
+                    typedef typename policy_type::primary_input primary_input;
+                    typedef typename policy_type::auxiliary_input auxiliary_input;
 
-                    using secret_key = typename policy_type::secret_key;
-                    using vkT = typename policy_type::vkT;
-                    using signature = typename policy_type::signature;
-                    using prf_key = typename policy_type::prf_key;
+                    typedef typename policy_type::secret_key secret_key;
+                    typedef typename policy_type::vkT vkT;
+                    typedef typename policy_type::signature signature;
+                    typedef typename policy_type::prf_key prf_key;
 
-                    using pub_auth_prms_type = typename policy_type::pub_auth_prms;
-                    using sec_auth_key_type = typename policy_type::sec_auth_key;
-                    using pub_auth_key_type = typename policy_type::pub_auth_key;
-                    using auth_data_type = typename policy_type::auth_data;
+                    typedef typename policy_type::pub_auth_prms pub_auth_prms_type;
+                    typedef typename policy_type::sec_auth_key sec_auth_key_type;
+                    typedef typename policy_type::pub_auth_key pub_auth_key_type;
+                    typedef typename policy_type::auth_data auth_data_type;
 
-                    using proving_key_type = typename policy_type::proving_key;
-                    using verification_key_type = typename policy_type::verification_key;
-                    using processed_verification_key_type = typename policy_type::processed_verification_key;
+                    typedef typename policy_type::proving_key proving_key_type;
+                    typedef typename policy_type::verification_key verification_key_type;
+                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                    using keypair_type = typename policy_type::keypair;
-                    using proof_type = typename policy_type::proof;
+                    typedef typename policy_type::keypair keypair_type;
+                    typedef typename policy_type::proof proof_type;
 
                     using policy_type::generator;
                     using policy_type::online_verifier;

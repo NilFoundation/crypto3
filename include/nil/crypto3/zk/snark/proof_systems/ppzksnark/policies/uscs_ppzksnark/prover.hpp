@@ -47,8 +47,8 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_GENERATOR_HPP
-#define CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_GENERATOR_HPP
+#ifndef CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_PROVER_HPP
+#define CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_PROVER_HPP
 
 #include <memory>
 
@@ -84,32 +84,35 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_prover {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline proof_type process(const proving_key_type &proving_key,
-                                              const primary_input_type &primary_input,
-                                              const auxiliary_input_type &auxiliary_input) {
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
 
                             const typename CurveType::scalar_field_type::value_type d =
                                 algebra::random_element<typename CurveType::scalar_field_type>();
 
                             const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
-                                uscs_to_ssp::witness_map(proving_key.constraint_system, primary_input, auxiliary_input, d);
+                                uscs_to_ssp<typename CurveType::scalar_field_type>::witness_map(
+                                    proving_key.constraint_system, primary_input, auxiliary_input, d);
 
                             /* sanity checks */
                             assert(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
-                            assert(proving_key.V_g1_query.size() == ssp_wit.num_variables() + 2 - ssp_wit.num_inputs() - 1);
+                            assert(proving_key.V_g1_query.size() ==
+                                   ssp_wit.num_variables() + 2 - ssp_wit.num_inputs() - 1);
                             assert(proving_key.alpha_V_g1_query.size() ==
                                    ssp_wit.num_variables() + 2 - ssp_wit.num_inputs() - 1);
                             assert(proving_key.H_g1_query.size() == ssp_wit.degree() + 1);
@@ -122,7 +125,8 @@ namespace nil {
                             typename CurveType::g1_type::value_type H_g1 =
                                 typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g2_type::value_type V_g2 =
-                                proving_key.V_g2_query[0] + ssp_wit.d * proving_key.V_g2_query[proving_key.V_g2_query.size() - 1];
+                                proving_key.V_g2_query[0] +
+                                ssp_wit.d * proving_key.V_g2_query[proving_key.V_g2_query.size() - 1];
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -137,40 +141,43 @@ namespace nil {
                                                                                 typename CurveType::scalar_field_type,
                                                                                 algebra::multiexp_method_BDLO12>(
                                               proving_key.V_g1_query.begin(),
-                                              proving_key.V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
+                                              proving_key.V_g1_query.begin() +
+                                                  (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                               ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
                                               ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                            alpha_V_g1 =
-                                alpha_V_g1 +
-                                algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                      typename CurveType::scalar_field_type,
-                                                                      algebra::multiexp_method_BDLO12>(
-                                    proving_key.alpha_V_g1_query.begin(),
-                                    proving_key.alpha_V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
-                                    ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
-                                    ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                            alpha_V_g1 = alpha_V_g1 +
+                                         algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
+                                                                               typename CurveType::scalar_field_type,
+                                                                               algebra::multiexp_method_BDLO12>(
+                                             proving_key.alpha_V_g1_query.begin(),
+                                             proving_key.alpha_V_g1_query.begin() +
+                                                 (ssp_wit.num_variables() - ssp_wit.num_inputs()),
+                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
+                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
                             H_g1 = H_g1 +
                                    algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                      algebra::multiexp_method_BDLO12>(
-                                       proving_key.H_g1_query.begin(), proving_key.H_g1_query.begin() + ssp_wit.degree() + 1,
+                                       proving_key.H_g1_query.begin(),
+                                       proving_key.H_g1_query.begin() + ssp_wit.degree() + 1,
                                        ssp_wit.coefficients_for_H.begin(),
                                        ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
 
                             V_g2 = V_g2 +
                                    algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
                                                      algebra::multiexp_method_BDLO12>(
-                                       proving_key.V_g2_query.begin() + 1, proving_key.V_g2_query.begin() + ssp_wit.num_variables() + 1,
+                                       proving_key.V_g2_query.begin() + 1,
+                                       proving_key.V_g2_query.begin() + ssp_wit.num_variables() + 1,
                                        ssp_wit.coefficients_for_Vs.begin(),
                                        ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                            proof_type proof = proof_type(std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));
+                            proof_type proof =
+                                proof_type(std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));
 
                             return proof;
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

@@ -93,20 +93,21 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_process_vk {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
-                        static inline processed_verification_key process(const verification_key_type &vk) {
+                        static inline processed_verification_key_type process(const verification_key_type &vk) {
 
                             processed_verification_key_type pvk;
 
@@ -135,23 +136,24 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_online_verifier_weak_input_consistency {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline bool process(const processed_verification_key_type &pvk,
-                                            const primary_input_type &primary_input,
-                                            const proof_type &proof) {
-                            using pairing_policy = typename CurveType::pairing_policy;
+                                                   const primary_input_type &primary_input,
+                                                   const proof_type &proof) {
+                            typedef typename CurveType::pairing_policy pairing_policy;
 
                             assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
@@ -221,25 +223,28 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_weak_input_consistency {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline bool process(const verification_key_type &vk,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                                                   const primary_input_type &primary_input,
+                                                   const proof_type &proof) {
 
-                            processed_verification_key_type pvk = uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
-                            bool result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(pvk, primary_input, proof);
+                            processed_verification_key_type pvk =
+                                uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                            bool result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                                pvk, primary_input, proof);
                             return result;
                         }
                     };
@@ -251,29 +256,31 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_online_verifier_strong_input_consistency {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline bool process(const processed_verification_key_type &pvk,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                                                   const primary_input_type &primary_input,
+                                                   const proof_type &proof) {
 
                             bool result = true;
 
                             if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
                                 result = false;
                             } else {
-                                result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(pvk, primary_input, proof);
+                                result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                                    pvk, primary_input, proof);
                             }
 
                             return result;
@@ -287,29 +294,31 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_strong_input_consistency {
-                        using types_policy = detail::uscs_ppzksnark_types_policy;
+                        using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
-                        using constraint_system_type = typename types_policy::constraint_system;
-                        using primary_input_type = typename types_policy::primary_input;
-                        using auxiliary_input_type = typename types_policy::auxiliary_input;
+                        typedef typename types_policy::constraint_system constraint_system_type;
+                        typedef typename types_policy::primary_input primary_input_type;
+                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
 
-                        using proving_key_type = typename types_policy::proving_key;
-                        using verification_key_type = typename types_policy::verification_key;
-                        using processed_verification_key_type = typename types_policy::processed_verification_key;
+                        typedef typename types_policy::proving_key proving_key_type;
+                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        using keypair_type = typename types_policy::keypair;
-                        using proof_type = typename types_policy::proof;
+                        typedef typename types_policy::keypair keypair_type;
+                        typedef typename types_policy::proof proof_type;
 
                         static inline bool process(const verification_key_type &vk,
-                                        const primary_input_type &primary_input,
-                                        const proof_type &proof) {
+                                                   const primary_input_type &primary_input,
+                                                   const proof_type &proof) {
 
-                            processed_verification_key_type pvk = uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
-                            bool result = uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(pvk, primary_input, proof);
+                            processed_verification_key_type pvk =
+                                uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                            bool result = uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                                pvk, primary_input, proof);
                             return result;
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk

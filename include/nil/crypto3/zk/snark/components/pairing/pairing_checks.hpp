@@ -46,7 +46,7 @@ namespace nil {
                 template<typename CurveType>
                 struct check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
 
-                    using field_type = typename CurveType::scalar_field_type;
+                    typedef typename CurveType::scalar_field_type field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
                     std::shared_ptr<e_over_e_miller_loop_component<CurveType>> compute_ratio;
@@ -87,7 +87,7 @@ namespace nil {
                 template<typename CurveType>
                 struct check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
 
-                    using field_type = typename CurveType::scalar_field_type;
+                    typedef typename CurveType::scalar_field_type field_type;
 
                     std::shared_ptr<Fqk_variable<CurveType>> ratio;
                     std::shared_ptr<e_times_e_over_e_miller_loop_component<CurveType>> compute_ratio;

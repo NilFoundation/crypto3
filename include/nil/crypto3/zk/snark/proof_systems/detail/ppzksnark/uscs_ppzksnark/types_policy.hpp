@@ -225,7 +225,7 @@ namespace nil {
                          * enables a faster verification time.
                          */
                         class processed_verification_key {
-                            using pairing_policy = typename CurveType::pairing_policy;
+                            typedef typename CurveType::pairing_policy pairing_policy;
 
                         public:
                             typename pairing_policy::G1_precomp pp_G1_one_precomp;
