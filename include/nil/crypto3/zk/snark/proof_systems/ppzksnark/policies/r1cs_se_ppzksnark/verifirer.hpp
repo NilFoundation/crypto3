@@ -77,6 +77,7 @@ namespace nil {
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
+                    template<typename CurveType>
                     class r1cs_se_ppzksnark_verifier_process_vk {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
@@ -91,8 +92,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        processed_verification_key_type operator()(const verification_key_type &verification_key) {
+                        static processed_verification_key_type process(const verification_key_type &verification_key) {
                             using pairing_policy = typename CurveType::pairing_policy;
 
                             typename pairing_policy::G1_precomp G_alpha_pc = pairing_policy::precompute_g1(verification_key.G_alpha);
@@ -131,7 +131,8 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    class r1cs_se_ppzksnark_online_verifier_weak_IC {
+                    template<typename CurveType>
+                    class r1cs_se_ppzksnark_online_verifier_weak_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
                         using constraint_system_type = typename types_policy::constraint_system;
@@ -145,8 +146,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                        static bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
@@ -215,7 +215,8 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    class r1cs_se_ppzksnark_verifier_weak_IC {
+                    template<typename CurveType>
+                    class r1cs_se_ppzksnark_verifier_weak_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
                         using constraint_system_type = typename types_policy::constraint_system;
@@ -229,12 +230,11 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const verification_key_type &vk,
+                        static bool process(const verification_key_type &vk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type pvk = r1cs_se_ppzksnark_verifier_process_vk(vk);
-                            bool result = r1cs_se_ppzksnark_online_verifier_weak_IC(pvk, primary_input, proof);
+                            processed_verification_key_type pvk = r1cs_se_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                            bool result = r1cs_se_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(pvk, primary_input, proof);
                             return result;
                         }
                     };
@@ -244,6 +244,7 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
+                    template<typename CurveType>
                     class r1cs_se_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
@@ -258,8 +259,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const processed_verification_key_type &pvk,
+                        static bool process(const processed_verification_key_type &pvk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
@@ -268,7 +268,7 @@ namespace nil {
                             if (pvk.query.size() != primary_input.size() + 1) {
                                 result = false;
                             } else {
-                                result = r1cs_se_ppzksnark_online_verifier_weak_IC(pvk, primary_input, proof);
+                                result = r1cs_se_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(pvk, primary_input, proof);
                             }
 
                             return result;
@@ -280,6 +280,7 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
+                    template<typename CurveType>
                     class r1cs_se_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
@@ -294,12 +295,11 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const verification_key_type &vk,
+                        static bool process(const verification_key_type &vk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            processed_verification_key_type pvk = r1cs_se_ppzksnark_verifier_process_vk(vk);
-                            bool result = r1cs_se_ppzksnark_online_verifier_strong_input_consistency(pvk, primary_input, proof);
+                            processed_verification_key_type pvk = r1cs_se_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                            bool result = r1cs_se_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(pvk, primary_input, proof);
                             return result;
                         }
                     };

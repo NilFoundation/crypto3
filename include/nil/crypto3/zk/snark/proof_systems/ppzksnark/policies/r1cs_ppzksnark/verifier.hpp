@@ -106,24 +106,27 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        processed_verification_key_type operator()(const verification_key_type &verification_key) {
+                        static processed_verification_key_type process(const verification_key_type &verification_key) {
+
+                            using pairing_policy = typename CurveType::pairing_policy;
+                            
                             processed_verification_key_type processed_verification_key;
                             processed_verification_key.pp_G2_one_precomp =
-                                CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
+                                pairing_policy::precompute_g2(typename CurveType::g2_type::value_type::one());
                             processed_verification_key.vk_alphaA_g2_precomp =
-                                CurveType::precompute_g2(verification_key.alphaA_g2);
+                                pairing_policy::precompute_g2(verification_key.alphaA_g2);
                             processed_verification_key.vk_alphaB_g1_precomp =
-                                CurveType::precompute_g1(verification_key.alphaB_g1);
+                                pairing_policy::precompute_g1(verification_key.alphaB_g1);
                             processed_verification_key.vk_alphaC_g2_precomp =
-                                CurveType::precompute_g2(verification_key.alphaC_g2);
+                                pairing_policy::precompute_g2(verification_key.alphaC_g2);
                             processed_verification_key.vk_rC_Z_g2_precomp =
-                                CurveType::precompute_g2(verification_key.rC_Z_g2);
+                                pairing_policy::precompute_g2(verification_key.rC_Z_g2);
                             processed_verification_key.vk_gamma_g2_precomp =
-                                CurveType::precompute_g2(verification_key.gamma_g2);
+                                pairing_policy::precompute_g2(verification_key.gamma_g2);
                             processed_verification_key.vk_gamma_beta_g1_precomp =
-                                CurveType::precompute_g1(verification_key.gamma_beta_g1);
+                                pairing_policy::precompute_g1(verification_key.gamma_beta_g1);
                             processed_verification_key.vk_gamma_beta_g2_precomp =
-                                CurveType::precompute_g2(verification_key.gamma_beta_g2);
+                                pairing_policy::precompute_g2(verification_key.gamma_beta_g2);
 
                             processed_verification_key.encoded_IC_query = verification_key.encoded_IC_query;
 
@@ -137,7 +140,7 @@ namespace nil {
                      * (2) has weak input consistency.
                      */
                     template<typename CurveType>
-                    class r1cs_ppzksnark_verifier_weak_IC {
+                    class r1cs_ppzksnark_verifier_weak_input_consisatancy {
                         using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
 
                     public:
@@ -152,12 +155,12 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        bool operator()(const verification_key_type &verification_key,
+                        static bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             processed_verification_key_type processed_verification_key =
-                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key,
+                                r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key);
+                            bool result = r1cs_ppzksnark_online_verifier_weak_input_consisatancy<CurveType>::process(processed_verification_key,
                                                                                             primary_input, proof);
                             return result;
                         }
@@ -184,12 +187,12 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        bool operator()(const verification_key_type &verification_key,
+                        static bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             processed_verification_key_type processed_verification_key =
-                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
+                                r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key);
+                            bool result = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
                                 processed_verification_key, primary_input, proof);
                             return result;
                         }
@@ -201,7 +204,7 @@ namespace nil {
                      * (2) has weak input consistency.
                      */
                     template<typename CurveType>
-                    class r1cs_ppzksnark_online_verifier_weak_IC {
+                    class r1cs_ppzksnark_online_verifier_weak_input_consisatancy {
                         using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
 
                     public:
@@ -216,7 +219,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                        static bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             using pairing_policy = typename CurveType::pairing_policy;
@@ -235,9 +238,9 @@ namespace nil {
                                 result = false;
                             }
                             typename pairing_policy::G1_precomp proof_g_A_g_precomp =
-                                CurveType::precompute_g1(proof.g_A.g);
+                                pairing_policy::precompute_g1(proof.g_A.g);
                             typename pairing_policy::G1_precomp proof_g_A_h_precomp =
-                                CurveType::precompute_g1(proof.g_A.h);
+                                pairing_policy::precompute_g1(proof.g_A.h);
                             typename pairing_policy::Fqk_type kc_A_1 = pairing_policy::miller_loop(
                                 proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
                             typename pairing_policy::Fqk_type kc_A_2 = pairing_policy::miller_loop(
@@ -249,9 +252,9 @@ namespace nil {
                             }
 
                             typename pairing_policy::G2_precomp proof_g_B_g_precomp =
-                                CurveType::precompute_g2(proof.g_B.g);
+                                pairing_policy::precompute_g2(proof.g_B.g);
                             typename pairing_policy::G1_precomp proof_g_B_h_precomp =
-                                CurveType::precompute_g1(proof.g_B.h);
+                                pairing_policy::precompute_g1(proof.g_B.h);
                             typename pairing_policy::Fqk_type kc_B_1 = pairing_policy::miller_loop(
                                 processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::Fqk_type kc_B_2 = pairing_policy::miller_loop(
@@ -263,9 +266,9 @@ namespace nil {
                             }
 
                             typename pairing_policy::G1_precomp proof_g_C_g_precomp =
-                                CurveType::precompute_g1(proof.g_C.g);
+                                pairing_policy::precompute_g1(proof.g_C.g);
                             typename pairing_policy::G1_precomp proof_g_C_h_precomp =
-                                CurveType::precompute_g1(proof.g_C.h);
+                                pairing_policy::precompute_g1(proof.g_C.h);
                             typename pairing_policy::Fqk_type kc_C_1 = pairing_policy::miller_loop(
                                 proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
                             typename pairing_policy::Fqk_type kc_C_2 = pairing_policy::miller_loop(
@@ -279,8 +282,8 @@ namespace nil {
                             // check that g^((A+acc)*B)=g^(H*\Prod(t-\sigma)+C)
                             // equivalently, via pairings, that e(g^(A+acc), g^B) = e(g^H, g^Z) + e(g^C, g^1)
                             typename pairing_policy::G1_precomp proof_g_A_g_acc_precomp =
-                                CurveType::precompute_g1(proof.g_A.g + acc);
-                            typename pairing_policy::G1_precomp proof_g_H_precomp = CurveType::precompute_g1(proof.g_H);
+                                pairing_policy::precompute_g1(proof.g_A.g + acc);
+                            typename pairing_policy::G1_precomp proof_g_H_precomp = pairing_policy::precompute_g1(proof.g_H);
                             typename pairing_policy::Fqk_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::Fqk_type QAP_23 = pairing_policy::double_miller_loop(
@@ -292,9 +295,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G1_precomp proof_g_K_precomp = CurveType::precompute_g1(proof.g_K);
+                            typename pairing_policy::G1_precomp proof_g_K_precomp = pairing_policy::precompute_g1(proof.g_K);
                             typename pairing_policy::G1_precomp proof_g_A_g_acc_C_precomp =
-                                CurveType::precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
+                                pairing_policy::precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
                             typename pairing_policy::Fqk_type K_1 = pairing_policy::miller_loop(
                                 proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
                             typename pairing_policy::Fqk_type K_23 = pairing_policy::double_miller_loop(
@@ -331,7 +334,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                        static bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             bool result = true;
@@ -339,8 +342,8 @@ namespace nil {
                             if (processed_verification_key.encoded_IC_query.domain_size() != primary_input.size()) {
                                 result = false;
                             } else {
-                                result = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(processed_verification_key,
-                                                                                           primary_input, proof);
+                                result = r1cs_ppzksnark_online_verifier_weak_input_consisatancy<CurveType>::process(
+                                    processed_verification_key, primary_input, proof);
                             }
 
                             return result;
@@ -356,7 +359,7 @@ namespace nil {
                      * (3) uses affine coordinates for elliptic-curve computations.
                      */
                     template<typename CurveType>
-                    class r1cs_ppzksnark_affine_verifier_weak_IC {
+                    class r1cs_ppzksnark_affine_verifier_weak_input_consisatancy {
                         using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
 
                     public:
@@ -371,7 +374,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        bool operator()(const verification_key_type &vk,
+                        static bool process(const verification_key_type &vk,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             using pairing_policy = typename CurveType::pairing_policy;

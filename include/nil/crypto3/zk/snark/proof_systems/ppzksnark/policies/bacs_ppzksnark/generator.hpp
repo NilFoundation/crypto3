@@ -65,6 +65,7 @@ namespace nil {
                      *
                      * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
                      */
+                    template<typename CurveType>
                     class bacs_ppzksnark_generator {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
@@ -80,14 +81,13 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        keypair_type operator()(const circuit_type &circuit) {
+                        static keypair_type process(const circuit_type &circuit) {
                             typedef typename CurveType::scalar_field_type field_type;
 
                             const r1cs_constraint_system<field_type> r1cs_cs =
                                 bacs_to_r1cs_instance_map<field_type>(circuit);
                             const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
-                                r1cs_ppzksnark<CurveType>::generator(r1cs_cs);
+                                r1cs_ppzksnark::generator::process<CurveType>(r1cs_cs);
 
                             return keypair_type(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
                         }

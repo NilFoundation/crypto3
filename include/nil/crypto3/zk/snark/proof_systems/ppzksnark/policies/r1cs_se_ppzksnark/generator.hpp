@@ -80,6 +80,7 @@ namespace nil {
                      * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for
                      * CS.
                      */
+                    template<typename CurveType>
                     class r1cs_se_ppzksnark_generator {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
@@ -94,8 +95,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        keypair_type operator()(const constraint_system_type &constraint_system) {
+                        static keypair_type process(const constraint_system_type &constraint_system) {
 
                             /**
                              * draw random element t at which the SAP is evaluated.
@@ -239,18 +239,18 @@ namespace nil {
 #endif
 
                             verification_key_type vk =
-                                verification_key(H, G_alpha, H_beta, G_gamma, H_gamma, std::move(verifier_query));
+                                verification_key_type(H, G_alpha, H_beta, G_gamma, H_gamma, std::move(verifier_query));
 
                             constraint_system_type cs_copy(constraint_system);
 
-                            proving_key pk = proving_key(std::move(A_query), std::move(B_query), std::move(C_query_1),
+                            proving_key_type pk = proving_key_type(std::move(A_query), std::move(B_query), std::move(C_query_1),
                                                          std::move(C_query_2), G_gamma_Z, H_gamma_Z, G_ab_gamma_Z,
                                                          G_gamma2_Z2, std::move(G_gamma2_Z_t), std::move(cs_copy));
 
                             pk.print_size();
                             vk.print_size();
 
-                            return keypair(std::move(pk), std::move(vk));
+                            return keypair_type(std::move(pk), std::move(vk));
                         }
                     };
 

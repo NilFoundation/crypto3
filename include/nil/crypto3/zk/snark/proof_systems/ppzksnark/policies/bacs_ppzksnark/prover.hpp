@@ -68,6 +68,7 @@ namespace nil {
                      *               ``there exists Y such that C(X,Y)=0''.
                      * Above, C is the BACS circuit that was given as input to the generator algorithm.
                      */
+                    template<typename CurveType>
                     class bacs_ppzksnark_prover {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
@@ -83,8 +84,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        proof_type operator()(const proving_key_type &proving_key,
+                        static proof_type process(const proving_key_type &proving_key,
                                               const primary_input_type &primary_input,
                                               const auxiliary_input_type &auxiliary_input) {
 
@@ -96,7 +96,7 @@ namespace nil {
                                 r1cs_va.begin() + primary_input.size(),
                                 r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
                             const typename r1cs_ppzksnark<CurveType>::proof_type r1cs_proof =
-                                r1cs_ppzksnark<CurveType>::prover(proving_key.r1cs_pk, primary_input, r1cs_ai);
+                                r1cs_ppzksnark::prover::process<CurveType>(proving_key.r1cs_pk, primary_input, r1cs_ai);
 
                             return r1cs_proof;
                         }

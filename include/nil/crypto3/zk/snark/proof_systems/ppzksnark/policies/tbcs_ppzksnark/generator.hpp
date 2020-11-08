@@ -66,6 +66,7 @@ namespace nil {
                      *
                      * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
                      */
+                    template<typename CurveType>
                     class tbcs_ppzksnark_generator {
                         using types_policy = detail::tbcs_ppzksnark_types_policy;
                     public:
@@ -80,8 +81,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        keypair_type operator()(const circuit_type &circuit) {
+                        static keypair_type process(const circuit_type &circuit) {
                             typedef typename CurveType::scalar_field_type field_type;
 
                             const uscs_constraint_system<field_type> uscs_cs =

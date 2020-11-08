@@ -86,7 +86,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace policies {
-                   
+                    
+                    template<typename CurveType>
                     class r1cs_ppzksnark_generator {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
                     public:
@@ -102,8 +103,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                     
-                        template<typename CurveType>
-                        keypair_type operator()(const constraint_system_type &constraint_system) {
+                        static keypair_type process(const constraint_system_type &constraint_system) {
 
                             /* make the B_query "lighter" if possible */
                             constraint_system_type cs_copy(constraint_system);

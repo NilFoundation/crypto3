@@ -81,6 +81,7 @@ namespace nil {
                      * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for
                      * CS.
                      */
+                    template<typename CurveType>
                     class r1cs_gg_ppzksnark_generator {
                         using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
                     public:
@@ -96,8 +97,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                         
-                        template<typename CurveType>
-                        keypair_type operator()(const constraint_system_type &cs) {
+                        static keypair_type process(const constraint_system_type &cs) {
 
                             using pairing_policy = typename CurveType::pairing_policy;
 

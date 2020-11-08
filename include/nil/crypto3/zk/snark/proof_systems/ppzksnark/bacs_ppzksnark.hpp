@@ -36,9 +36,10 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename Generator = policies::bacs_ppzksnark_generator,
-                         typename Prover = policies::bacs_ppzksnark_prover,
-                         typename Verifier = policies::bacs_ppzksnark_verifier_strong_input_consistency>
+                template<typename CurveType,
+                         typename Generator = policies::bacs_ppzksnark_generator<CurveType>,
+                         typename Prover = policies::bacs_ppzksnark_prover<CurveType>,
+                         typename Verifier = policies::bacs_ppzksnark_verifier_strong_input_consistency<CurveType>>
                 class bacs_ppzksnark {
                     using types_policy = detail::bacs_ppzksnark_types_policy;
 
@@ -54,11 +55,11 @@ namespace nil {
                     using keypair_type = typename types_policy::keypair;
                     using proof_type = typename types_policy::proof;
 
-                    using generator = Generator;
+                    using generator = Generator::process;
 
-                    using prover = Prover;
+                    using prover = Prover::process;
 
-                    using verifier = Verifier;
+                    using verifier = Verifier::process;
                 };
             }    // namespace snark
         }        // namespace zk

@@ -63,6 +63,7 @@ namespace nil {
                     /**
                      * Convert a (non-processed) verification key into a processed verification key.
                      */
+                    template<typename CurveType>
                     class bacs_ppzksnark_verifier_process_vk {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
@@ -78,10 +79,9 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        processed_verification_key operator()(const verification_key_type &verification_key) {
+                        static processed_verification_key process(const verification_key_type &verification_key) {
                             const processed_verification_key_type processed_verification_key =
-                                r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
+                                r1cs_ppzksnark_verifier_process_vk::process<CurveType>(verification_key);
 
                             return processed_verification_key;
                         }
@@ -106,7 +106,8 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    class bacs_ppzksnark_verifier_weak_IC {
+                    template<typename CurveType>
+                    class bacs_ppzksnark_verifier_weak_input_consisatancy {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
 
@@ -121,13 +122,12 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const verification_key_type &verification_key,
+                        static bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             const processed_verification_key_type processed_verification_key =
-                                bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(
+                                bacs_ppzksnark_verifier_process_vk::process<CurveType>(verification_key);
+                            const bool bit = r1cs_ppzksnark_online_verifier_weak_input_consisatancy::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;
@@ -139,6 +139,7 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
+                    template<typename CurveType>
                     class bacs_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
@@ -154,14 +155,13 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const verification_key_type &verification_key,
+                        static bool process(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
                             const processed_verification_key_type processed_verification_key =
                                 bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;
@@ -173,7 +173,8 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has weak input consistency.
                      */
-                    class bacs_ppzksnark_online_verifier_weak_IC {
+                    template<typename CurveType>
+                    class bacs_ppzksnark_online_verifier_weak_input_consisatancy {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
 
@@ -188,12 +189,11 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                        static bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
 
-                            const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(
+                            const bool bit = r1cs_ppzksnark_online_verifier_weak_input_consisatancy::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;
@@ -205,6 +205,7 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
+                    template<typename CurveType>
                     class bacs_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
@@ -220,11 +221,10 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
                     
-                        template<typename CurveType>
-                        bool operator()(const processed_verification_key_type &processed_verification_key,
+                        static bool process(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency::process<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;

@@ -69,6 +69,7 @@ namespace nil {
                      *               ``there exists Y such that C(X,Y)=0''.
                      * Above, C is the TBCS circuit that was given as input to the generator algorithm.
                      */
+                    template<typename CurveType>
                     class tbcs_ppzksnark_prover {
                         using types_policy = detail::tbcs_ppzksnark_types_policy;
                     public:
@@ -83,8 +84,7 @@ namespace nil {
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
 
-                        template<typename CurveType>
-                        proof_type operator()(const proving_key_type &pk,
+                        static proof_type process(const proving_key_type &pk,
                                               const primary_input_type &primary_input,
                                               const auxiliary_input_type &auxiliary_input) {
                             typedef typename CurveType::scalar_field_type FieldType;
