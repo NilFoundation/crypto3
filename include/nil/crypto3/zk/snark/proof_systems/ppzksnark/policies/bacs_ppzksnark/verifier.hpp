@@ -139,7 +139,7 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class bacs_ppzksnark_verifier_strong_IC {
+                    class bacs_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
 
@@ -161,7 +161,7 @@ namespace nil {
 
                             const processed_verification_key_type processed_verification_key =
                                 bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;
@@ -205,7 +205,7 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class bacs_ppzksnark_online_verifier_strong_IC {
+                    class bacs_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::bacs_ppzksnark_types_policy;
                     public:
 
@@ -224,7 +224,7 @@ namespace nil {
                         bool operator()(const processed_verification_key_type &processed_verification_key,
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
-                            const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                            const bool bit = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
                                 processed_verification_key, primary_input, proof);
 
                             return bit;

@@ -138,7 +138,7 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class tbcs_ppzksnark_verifier_strong_IC {
+                    class tbcs_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::tbcs_ppzksnark_types_policy;
                     public:
                         using circuit_type = typename types_policy::circuit;
@@ -161,7 +161,7 @@ namespace nil {
                             const uscs_primary_input<field_type> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
                             const bool bit =
-                                uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
+                                uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(pvk, uscs_input, proof);
 
                             return bit;
                         }
@@ -205,7 +205,7 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class tbcs_ppzksnark_online_verifier_strong_IC {
+                    class tbcs_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::tbcs_ppzksnark_types_policy;
                     public:
                         using circuit_type = typename types_policy::circuit;
@@ -227,7 +227,7 @@ namespace nil {
                             const uscs_primary_input<field_type> uscs_input =
                                 algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
                             const bool bit =
-                                uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, uscs_input, proof);
+                                uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(pvk, uscs_input, proof);
 
                             return bit;
                         }

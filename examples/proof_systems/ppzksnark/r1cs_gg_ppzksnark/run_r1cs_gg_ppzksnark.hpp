@@ -92,13 +92,13 @@ namespace nil {
 
                     std::cout << "R1CS GG-ppzkSNARK Verifier" << std::endl;
                     const bool ans =
-                        r1cs_gg_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
                     
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "R1CS GG-ppzkSNARK Online Verifier" << std::endl;
                     const bool ans2 =
-                        r1cs_gg_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);

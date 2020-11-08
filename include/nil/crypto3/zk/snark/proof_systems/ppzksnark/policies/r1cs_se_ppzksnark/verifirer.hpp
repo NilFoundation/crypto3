@@ -244,7 +244,7 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class r1cs_se_ppzksnark_online_verifier_strong_IC {
+                    class r1cs_se_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
                         using constraint_system_type = typename types_policy::constraint_system;
@@ -280,7 +280,7 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class r1cs_se_ppzksnark_verifier_strong_IC {
+                    class r1cs_se_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_se_ppzksnark_types_policy;
                     public:
                         using constraint_system_type = typename types_policy::constraint_system;
@@ -299,7 +299,7 @@ namespace nil {
                                         const primary_input_type &primary_input,
                                         const proof_type &proof) {
                             processed_verification_key_type pvk = r1cs_se_ppzksnark_verifier_process_vk(vk);
-                            bool result = r1cs_se_ppzksnark_online_verifier_strong_IC(pvk, primary_input, proof);
+                            bool result = r1cs_se_ppzksnark_online_verifier_strong_input_consistency(pvk, primary_input, proof);
                             return result;
                         }
                     };

@@ -430,7 +430,7 @@ namespace nil {
                         get_sp_translation_step_pcd_circuit_input<curve_B_pp>(pvk.translation_step_r1cs_vk_bits,
                                                                               primary_input);
                     const bool result =
-                        r1cs_ppzksnark::online_verifier_strong_IC(pvk.translation_step_r1cs_pvk, r1cs_input, proof);
+                        r1cs_ppzksnark::online_verifier_strong_input_consistency(pvk.translation_step_r1cs_pvk, r1cs_input, proof);
 
                     return result;
                 }

@@ -92,8 +92,8 @@ namespace nil {
                      */
                     class r1cs_ppzksnark_verifier_process_vk {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -138,8 +138,8 @@ namespace nil {
                      */
                     class r1cs_ppzksnark_verifier_weak_IC {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -168,10 +168,10 @@ namespace nil {
                      * (1) accepts a non-processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class r1cs_ppzksnark_verifier_strong_IC{
+                    class r1cs_ppzksnark_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -189,7 +189,7 @@ namespace nil {
                                         const proof_type &proof) {
                             processed_verification_key_type processed_verification_key =
                                 r1cs_ppzksnark_verifier_process_vk<CurveType>(verification_key);
-                            bool result = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(
+                            bool result = r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
                                 processed_verification_key, primary_input, proof);
                             return result;
                         }
@@ -202,8 +202,8 @@ namespace nil {
                      */
                     class r1cs_ppzksnark_online_verifier_weak_IC {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -315,10 +315,10 @@ namespace nil {
                      * (1) accepts a processed verification key, and
                      * (2) has strong input consistency.
                      */
-                    class r1cs_ppzksnark_online_verifier_strong_IC {
+                    class r1cs_ppzksnark_online_verifier_strong_input_consistency {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -355,10 +355,10 @@ namespace nil {
                      * (2) has weak input consistency, and
                      * (3) uses affine coordinates for elliptic-curve computations.
                      */
-                    class r1cs_ppzksnark_affine_verifier_weak_IC{
+                    class r1cs_ppzksnark_affine_verifier_weak_IC {
                         using types_policy = detail::r1cs_ppzksnark_types_policy;
-                    public:
 
+                    public:
                         using constraint_system_type = typename types_policy::constraint_system;
                         using primary_input_type = typename types_policy::primary_input;
                         using auxiliary_input_type = typename types_policy::auxiliary_input;
@@ -369,7 +369,7 @@ namespace nil {
 
                         using keypair_type = typename types_policy::keypair;
                         using proof_type = typename types_policy::proof;
-                        
+
                         template<typename CurveType>
                         bool operator()(const verification_key_type &verification_key,
                                         const primary_input_type &primary_input,

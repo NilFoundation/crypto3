@@ -69,10 +69,10 @@ namespace nil {
                         r1cs_se_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     const bool ans =
-                        r1cs_se_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
+                        r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
 
                     const bool ans2 =
-                        r1cs_se_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
+                        r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

@@ -38,7 +38,7 @@ namespace nil {
 
                 template<typename Generator = policies::r1cs_se_ppzksnark_generator,
                          typename Prover = policies::r1cs_se_ppzksnark_prover,
-                         typename Verifier = policies::r1cs_se_ppzksnark_verifier_strong_IC>
+                         typename Verifier = policies::r1cs_se_ppzksnark_verifier_strong_input_consistency>
                 class r1cs_se_ppzksnark {
                     using types_policy = detail::r1cs_se_ppzksnark_types_policy;
 

@@ -90,11 +90,11 @@ namespace nil {
                         r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "R1CS ppzkSNARK Verifier" << std::endl;
-                    const bool ans = r1cs_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "R1CS ppzkSNARK Online Verifier" << std::endl;
-                    const bool ans2 = r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
+                    const bool ans2 = r1cs_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);

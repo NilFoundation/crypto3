@@ -68,11 +68,11 @@ namespace nil {
                         bacs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "BACS ppzkSNARK Verifier" << std::endl;
-                    bool ans = bacs_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
+                    bool ans = bacs_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "BACS ppzkSNARK Online Verifier" <<std::endl;
-                    bool ans2 = bacs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
+                    bool ans2 = bacs_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

@@ -70,12 +70,12 @@ namespace nil {
 
                     std::cout << "R1CS SEppzkSNARK Verifier" << std::endl;
                     const bool ans =
-                        r1cs_se_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                        r1cs_se_ppzksnark_verifier_strong_input_consistency<CurveType>(keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "R1CS SEppzkSNARK Online Verifier" << std::endl;
                     const bool ans2 =
-                        r1cs_se_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                        r1cs_se_ppzksnark_online_verifier_strong_input_consistency<CurveType>(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     return ans;

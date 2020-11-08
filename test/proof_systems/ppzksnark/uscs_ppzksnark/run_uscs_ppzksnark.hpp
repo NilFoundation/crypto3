@@ -65,9 +65,9 @@ namespace nil {
                     uscs_ppzksnark_proof<CurveType> proof =
                         uscs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    bool ans = uscs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    bool ans = uscs_ppzksnark_verifier_strong_input_consistency<CurveType>(keypair.vk, example.primary_input, proof);
 
-                    bool ans2 = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    bool ans2 = uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

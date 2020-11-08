@@ -86,9 +86,9 @@ namespace nil {
                     typename r1cs_ppzksnark<CurveType>::proof_type proof =
                         r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    const bool ans = r1cs_ppzksnark<CurveType>::verifier_strong_IC(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
 
-                    const bool ans2 = r1cs_ppzksnark<CurveType>::online_verifier_strong_IC(pvk, example.primary_input, proof);
+                    const bool ans2 = r1cs_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);

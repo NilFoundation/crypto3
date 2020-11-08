@@ -575,7 +575,7 @@ namespace nil {
                             const r1cs_primary_input<FieldT_B> translated_msg =
                                 get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                                     pk.commitment_to_translation_step_r1cs_vks, auxiliary_input.incoming_messages[i]);
-                            const bool bit = r1cs_ppzksnark<curve_B_pp>::verifier_strong_IC(
+                            const bool bit = r1cs_ppzksnark<curve_B_pp>::verifier_strong_input_consistency(
                                 translation_step_vks[i], translated_msg, padded_proofs[i]);
                             assert(bit);
                         } else {
@@ -614,7 +614,7 @@ namespace nil {
                     const r1cs_primary_input<FieldT_A> compliance_step_input =
                         get_mp_compliance_step_pcd_circuit_input<curve_A_pp>(pk.commitment_to_translation_step_r1cs_vks,
                                                                              primary_input.outgoing_message);
-                    const bool compliance_step_ok = r1cs_ppzksnark<curve_A_pp>::verifier_strong_IC(
+                    const bool compliance_step_ok = r1cs_ppzksnark<curve_A_pp>::verifier_strong_input_consistency(
                         pk.compliance_step_r1cs_vks[compliance_predicate_idx],
                         compliance_step_input,
                         compliance_step_proof);
@@ -639,7 +639,7 @@ namespace nil {
                                                            translation_step_auxiliary_input);
 
 #ifdef DEBUG
-                    const bool translation_step_ok = r1cs_ppzksnark<curve_B_pp>::verifier_strong_IC(
+                    const bool translation_step_ok = r1cs_ppzksnark<curve_B_pp>::verifier_strong_input_consistency(
                         pk.translation_step_r1cs_vks[compliance_predicate_idx],
                         translation_step_primary_input,
                         translation_step_proof);
@@ -662,7 +662,7 @@ namespace nil {
                     const r1cs_primary_input<typename curve_B_pp::scalar_field_type> r1cs_input =
                         get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                             pvk.commitment_to_translation_step_r1cs_vks, primary_input);
-                    const bool result = r1cs_ppzksnark::online_verifier_strong_IC(
+                    const bool result = r1cs_ppzksnark::online_verifier_strong_input_consistency(
                         pvk.translation_step_r1cs_pvks[proof.compliance_predicate_idx], r1cs_input, proof.r1cs_proof);
 
                     return result;
