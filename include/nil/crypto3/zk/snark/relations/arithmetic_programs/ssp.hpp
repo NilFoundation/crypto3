@@ -41,7 +41,7 @@
 #include <map>
 #include <memory>
 
-//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/inner_product.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

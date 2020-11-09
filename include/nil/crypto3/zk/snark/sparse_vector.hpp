@@ -33,6 +33,7 @@
 #include <numeric>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -208,12 +209,12 @@ namespace nil {
                                         accumulated_value +
                                         algebra::multiexp<
                                             T, typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                            algebra::multiexp_method_bos_coster>(
+                                            algebra::policies::multiexp_method_bos_coster<
+                                            T, typename std::iterator_traits<InputIterator>::value_type::field_type>>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
                                             it_begin + (indices[first_pos] - offset),
                                             it_begin + (indices[last_pos] - offset) + 1, chunks);
-                                    // uncomment when multiexp
-                                    // will be ready
+                                
                                 }
                             } else {
                                 if (matching_pos) {
@@ -236,16 +237,16 @@ namespace nil {
                         if (in_block) {
                             accumulated_value =
                                 accumulated_value +
-                                algebra::multiexp<T,
-                                                  typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                                  algebra::multiexp_method_bos_coster>(
+                                algebra::multiexp<
+                                    T, typename std::iterator_traits<InputIterator>::value_type::field_type,
+                                    algebra::policies::multiexp_method_bos_coster<
+                                    T, typename std::iterator_traits<InputIterator>::value_type::field_type>>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
                                     chunks);
-                            // uncomment when multiexp
-                            // will be ready
+                            
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);

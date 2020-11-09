@@ -35,7 +35,7 @@
   Will probably go away in more general exp refactoring.
 */
 
-//#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 
@@ -53,7 +53,7 @@ namespace nil {
                                                         opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
-                template<typename T1, typename T2, typename FieldType, algebra::multiexp_method Method>
+                template<typename T1, typename T2, typename FieldType, typename MultiexpMethod>
                 knowledge_commitment<T1, T2> kc_multiexp_with_mixed_addition(
                     const knowledge_commitment_vector<T1, T2> &vec,
                     const std::size_t min_idx,
@@ -108,7 +108,7 @@ namespace nil {
                         ++value_it;
                     }
 
-                    return acc + algebra::multiexp<knowledge_commitment<T1, T2>, FieldType, Method>(
+                    return acc + algebra::multiexp<knowledge_commitment<T1, T2>, FieldType, MultiexpMethod>(
                                      g.begin(), g.end(), p.begin(), p.end(), chunks);
                 }
 

@@ -67,7 +67,8 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/prf.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/signature.hpp>
 
-//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
 //#include <nil/crypto3/algebra/random_element.hpp>
 
@@ -849,35 +850,48 @@ namespace nil {
 
                             g_A = g_A + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
-                                            CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            typename CurveType::scalar_field_type, 
+                                            algebra::policies::multiexp_method_bos_coster<
+                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename CurveType::scalar_field_type>>(
                                             pk.A_query, 1 + qap_wit.num_inputs(), 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
                             g_Ain = g_Ain + kc_multiexp_with_mixed_addition<
-                                                typename CurveType::g1_type, typename CurveType::g1_type,
-                                                CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
-                                                pk.A_query, 1, 1 + qap_wit.num_inputs(),
-                                                qap_wit.coefficients_for_ABCs.begin(),
-                                                qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(), chunks);
+                                            typename CurveType::g1_type, typename CurveType::g1_type,
+                                            typename CurveType::scalar_field_type, 
+                                            algebra::policies::multiexp_method_bos_coster<
+                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename CurveType::scalar_field_type>>(
+                                            pk.A_query, 1, 1 + qap_wit.num_inputs(),
+                                            qap_wit.coefficients_for_ABCs.begin(),
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(), chunks);
                             // std :: cout << "The input proof term: " << g_Ain << "\n";
 
                             g_B = g_B + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g2_type, typename CurveType::g1_type,
-                                            CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            typename CurveType::scalar_field_type, 
+                                            algebra::policies::multiexp_method_bos_coster<
+                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename CurveType::scalar_field_type>>(
                                             pk.B_query, 1, 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
                             g_C = g_C + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
-                                            CurveType::scalar_field_type, algebra::multiexp_method_bos_coster>(
+                                            typename CurveType::scalar_field_type, 
+                                            algebra::policies::multiexp_method_bos_coster<
+                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename CurveType::scalar_field_type>>(
                                             pk.C_query, 1, 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
 
-                            g_H = g_H + algebra::multiexp<typename CurveType::g1_type, CurveType::scalar_field_type,
-                                                          algebra::multiexp_method_BDLO12>(
+                            g_H = g_H + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                          algebra::policies::multiexp_method_BDLO12<
+                                                          typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             pk.H_query.begin(),
                                             pk.H_query.begin() + qap_wit.degree() + 1,
                                             qap_wit.coefficients_for_H.begin(),
@@ -885,8 +899,9 @@ namespace nil {
                                             chunks);
 
                             g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                              CurveType::scalar_field_type,
-                                                                              algebra::multiexp_method_bos_coster>(
+                                                                              typename CurveType::scalar_field_type,
+                                                                              algebra::policies::multiexp_method_bos_coster<
+                                                                              typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             pk.K_query.begin() + 1,
                                             pk.K_query.begin() + 1 + qap_wit.num_variables(),
                                             qap_wit.coefficients_for_ABCs.begin(),
@@ -902,8 +917,9 @@ namespace nil {
                                 Ains.emplace_back(pk.A_query[i + 1].g);
                             }
                             typename CurveType::g1_type::value_type muA = dauth * pk.rA_i_Z_g1;
-                            muA = muA + algebra::multiexp<typename CurveType::g1_type, CurveType::scalar_field_type,
-                                                          algebra::multiexp_method_bos_coster>(
+                            muA = muA + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                          algebra::policies::multiexp_method_bos_coster<
+                                                          typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             Ains.begin(), Ains.begin() + qap_wit.num_inputs(), mus.begin(),
                                             mus.begin() + qap_wit.num_inputs(), chunks);
 
@@ -991,8 +1007,9 @@ namespace nil {
                                 lambdas.emplace_back(prfCompute<CurveType>(sak.S, labels[i]));
                             }
                             typename CurveType::g1_type::value_type prodA = sak.i * proof.g_Aau.g;
-                            prodA = prodA + algebra::multiexp<typename CurveType::g1_type, CurveType::scalar_field_type,
-                                                              algebra::multiexp_method_bos_coster>(
+                            prodA = prodA + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                              algebra::policies::multiexp_method_bos_coster<
+                                                              typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                                 pvk.Ain.begin(), pvk.Ain.begin() + labels.size(), lambdas.begin(),
                                                 lambdas.begin() + labels.size(), 1);
 

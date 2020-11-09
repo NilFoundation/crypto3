@@ -56,9 +56,10 @@
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
 
-//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
-//#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -139,7 +140,9 @@ namespace nil {
 
                             V_g1 = V_g1 + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                                 typename CurveType::scalar_field_type,
-                                                                                algebra::multiexp_method_BDLO12>(
+                                                                                algebra::policies::multiexp_method_BDLO12<
+                                                                                typename CurveType::g1_type,
+                                                                                typename CurveType::scalar_field_type>>(
                                               proving_key.V_g1_query.begin(),
                                               proving_key.V_g1_query.begin() +
                                                   (ssp_wit.num_variables() - ssp_wit.num_inputs()),
@@ -149,7 +152,9 @@ namespace nil {
                             alpha_V_g1 = alpha_V_g1 +
                                          algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                                typename CurveType::scalar_field_type,
-                                                                               algebra::multiexp_method_BDLO12>(
+                                                                               algebra::policies::multiexp_method_BDLO12<
+                                                                               typename CurveType::g1_type,
+                                                                               typename CurveType::scalar_field_type>>(
                                              proving_key.alpha_V_g1_query.begin(),
                                              proving_key.alpha_V_g1_query.begin() +
                                                  (ssp_wit.num_variables() - ssp_wit.num_inputs()),
@@ -158,7 +163,8 @@ namespace nil {
 
                             H_g1 = H_g1 +
                                    algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                     algebra::multiexp_method_BDLO12>(
+                                                     algebra::policies::multiexp_method_BDLO12<
+                                                     typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                        proving_key.H_g1_query.begin(),
                                        proving_key.H_g1_query.begin() + ssp_wit.degree() + 1,
                                        ssp_wit.coefficients_for_H.begin(),
@@ -166,7 +172,8 @@ namespace nil {
 
                             V_g2 = V_g2 +
                                    algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
-                                                     algebra::multiexp_method_BDLO12>(
+                                                     algebra::policies::multiexp_method_BDLO12<
+                                                     typename CurveType::g2_type, typename CurveType::scalar_field_type>>(
                                        proving_key.V_g2_query.begin() + 1,
                                        proving_key.V_g2_query.begin() + ssp_wit.num_variables() + 1,
                                        ssp_wit.coefficients_for_Vs.begin(),

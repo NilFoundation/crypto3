@@ -53,18 +53,15 @@
 #include <memory>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
-//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_se_ppzksnark/types_policy.hpp>
 
@@ -179,7 +176,8 @@ namespace nil {
                             typename CurveType::g1_type::value_type G_psi =
                                 processed_verification_key.query[0] +
                                 algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                  algebra::multiexp_method_bos_coster>(
+                                                  algebra::policies::multiexp_method_bos_coster<
+                                                  typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                     processed_verification_key.query.begin() + 1,
                                     processed_verification_key.query.end(), primary_input.begin(), primary_input.end(),
                                     chunks);

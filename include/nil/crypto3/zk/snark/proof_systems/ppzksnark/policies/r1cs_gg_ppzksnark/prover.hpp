@@ -56,15 +56,16 @@
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
-//#include <nil/crypto3/algebra/multiexp/default.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
-//#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-//#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
@@ -138,58 +139,55 @@ namespace nil {
 
                             typename CurveType::g1_type::value_type evaluation_At =
                                 CurveType::g1_type::value_type::zero();
-                            /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
+                            algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
-                                                                   algebra::multiexp_method_BDLO12>(
+                                                                   algebra::policies::multiexp_method_BDLO12<
+                                                                   typename CurveType::g1_type,
+                                                                   typename CurveType::scalar_field_type>>(
                                 proving_key.A_query.begin(),
                                 proving_key.A_query.begin() + qap_wit.num_variables() + 1,
                                 const_padded_assignment.begin(),
                                 const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                                chunks);*/
-
-                            // uncomment
-                            // when multiexp_with_mixed_addition ready
+                                chunks);
 
                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type>
                                 evaluation_Bt;
 
-                            /*kc_multiexp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
+                            kc_multiexp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
                                                              typename CurveType::scalar_field_type,
-                                                             algebra::multiexp_method_BDLO12>(
+                                                             algebra::policies::multiexp_method_BDLO12<
+                                                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type,
+                                                             typename CurveType::scalar_field_type>>(
                                 proving_key.B_query,
                                 0,
                                 qap_wit.num_variables() + 1,
                                 const_padded_assignment.begin(),
                                 const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                                chunks);*/
+                                chunks);
 
-                            // uncomment
-                            // when kc_multiexp_with_mixed_addition ready
                             typename CurveType::g1_type::value_type evaluation_Ht =
                                 CurveType::g1_type::value_type::zero();
-                            /*algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                               algebra::multiexp_method_BDLO12>(
+                            algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                               algebra::policies::multiexp_method_BDLO12<
+                                               typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                 proving_key.H_query.begin(),
                                 proving_key.H_query.begin() + (qap_wit.degree - 1),
                                 qap_wit.coefficients_for_H.begin(),
                                 qap_wit.coefficients_for_H.begin() + (qap_wit.degree - 1),
-                                chunks);*/
+                                chunks);
 
-                            // uncomment
-                            // when multiexp ready
                             typename CurveType::g1_type::value_type evaluation_Lt =
                                 CurveType::g1_type::value_type::zero();
-                            /*algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
+                            algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                    typename CurveType::scalar_field_type,
-                                                                   algebra::multiexp_method_BDLO12>(
+                                                                   algebra::policies::multiexp_method_BDLO12<
+                                                                   typename CurveType::g1_type,
+                                                                   typename CurveType::scalar_field_type>>(
                                 proving_key.L_query.begin(),
                                 proving_key.L_query.end(),
                                 const_padded_assignment.begin() + qap_wit.num_inputs() + 1,
                                 const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                                chunks);*/
-
-                            // uncomment
-                            // when multiexp_with_mixed_addition ready
+                                chunks);
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
                             typename CurveType::g1_type::value_type g1_A = proving_key.alpha_g1 + evaluation_At;
