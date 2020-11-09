@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PRIVATE_KEY_HPP
-#define CRYPTO3_PRIVATE_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
+#define CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
 
 #include <nil/crypto3/pubkey/public_key.hpp>
 
@@ -45,23 +45,17 @@ namespace nil {
                     this->pubkey = public_key_policy_type::key_gen(privkey);
                 }
 
-                template<typename SeedType>
-                explicit private_key(const SeedType &seed) {
-                    privkey = private_key_policy_type::key_gen(seed);
-                    this->pubkey = public_key_policy_type::key_gen(privkey);
-                }
-
                 template<typename ...Args>
                 explicit private_key(const Args&... args) {
                     privkey = private_key_policy_type::key_gen(args...);
                     this->pubkey = public_key_policy_type::key_gen(privkey);
                 }
 
-            private:
+            protected:
                 private_key_type privkey;
             };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PRIVATE_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_PRIVATE_KEY_HPP

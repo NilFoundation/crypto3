@@ -41,7 +41,7 @@ namespace nil {
                          /// HashType::digest_type is required to be uint8_t[]
                          typename = typename std::enable_if<
                              std::is_same<std::uint8_t, typename HashType::digest_type::value_type>::value>::type>
-                struct bls_basic_key_policy {
+                struct bls_basic_policy {
                     typedef CurveType curve_type;
                     typedef HashType hash_type;
 
@@ -58,10 +58,10 @@ namespace nil {
                 /// Minimal-signature-size
                 /// Random oracle version of hash-to-point
                 template<typename CurveType, typename HashType>
-                struct bls_key_policy_mss_ro : bls_basic_key_policy<CurveType, HashType> {
-                    using typename bls_basic_key_policy<CurveType, HashType>::curve_type;
-                    using typename bls_basic_key_policy<CurveType, HashType>::gt_value_type;
-                    using typename bls_basic_key_policy<CurveType, HashType>::pairing_type;
+                struct bls_policy_mss_ro : bls_basic_policy<CurveType, HashType> {
+                    using typename bls_basic_policy<CurveType, HashType>::curve_type;
+                    using typename bls_basic_policy<CurveType, HashType>::gt_value_type;
+                    using typename bls_basic_policy<CurveType, HashType>::pairing_type;
 
                     typedef typename curve_type::g2_type public_key_group_type;
                     typedef typename curve_type::g1_type signature_group_type;
@@ -91,10 +91,10 @@ namespace nil {
                 /// Minimal-pubkey-size
                 /// Random oracle version of hash-to-point
                 template<typename CurveType, typename HashType>
-                struct bls_key_policy_mps_ro : bls_basic_key_policy<CurveType, HashType> {
-                    using typename bls_basic_key_policy<CurveType, HashType>::curve_type;
-                    using typename bls_basic_key_policy<CurveType, HashType>::gt_value_type;
-                    using typename bls_basic_key_policy<CurveType, HashType>::pairing_type;
+                struct bls_policy_mps_ro : bls_basic_policy<CurveType, HashType> {
+                    using typename bls_basic_policy<CurveType, HashType>::curve_type;
+                    using typename bls_basic_policy<CurveType, HashType>::gt_value_type;
+                    using typename bls_basic_policy<CurveType, HashType>::pairing_type;
 
                     typedef typename curve_type::g1_type public_key_group_type;
                     typedef typename curve_type::g2_type signature_group_type;

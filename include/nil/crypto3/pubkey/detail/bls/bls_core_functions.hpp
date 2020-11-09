@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
-#define CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
+#ifndef CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
+#define CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 
 #include <nil/crypto3/algebra/curves/detail/subgroup_check.hpp>
 
@@ -37,9 +37,6 @@
 #include <type_traits>
 #include <iterator>
 
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e);
-
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -47,19 +44,19 @@ namespace nil {
                 using namespace boost::multiprecision;
                 using namespace nil::crypto3::algebra::curves::detail;
 
-                template<typename bls_key_policy>
-                struct bls_functions : bls_key_policy {
-                    using typename bls_key_policy::private_key_type;
-                    using typename bls_key_policy::public_key_type;
-                    using typename bls_key_policy::signature_type;
-                    using typename bls_key_policy::gt_value_type;
-                    using typename bls_key_policy::hash_type;
-                    using typename bls_key_policy::number_type;
+                template<typename bls_policy>
+                struct bls_core_functions : bls_policy {
+                    using typename bls_policy::private_key_type;
+                    using typename bls_policy::public_key_type;
+                    using typename bls_policy::signature_type;
+                    using typename bls_policy::gt_value_type;
+                    using typename bls_policy::hash_type;
+                    using typename bls_policy::number_type;
 
-                    using bls_key_policy::hash_to_point;
-                    using bls_key_policy::pairing;
+                    using bls_policy::hash_to_point;
+                    using bls_policy::pairing;
 
-                    using bls_key_policy::private_key_bits;
+                    using bls_policy::private_key_bits;
 
                     constexpr static std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
                                                      static_cast<std::size_t>((3 * private_key_bits) % 16 != 0);
@@ -109,7 +106,7 @@ namespace nil {
                     }
 
                     static inline public_key_type sk_to_pk(const private_key_type &sk) {
-                        assert(!private_key_validate(sk));
+                        assert(private_key_validate(sk));
 
                         return sk * public_key_type::one();
                     }
@@ -131,10 +128,9 @@ namespace nil {
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline signature_type core_sign(const private_key_type &sk, const MsgType &msg,
                                                            const DstType &dst) {
-                        assert(!private_key_validate(sk));
+                        assert(private_key_validate(sk));
 
                         signature_type Q = hash_to_point(msg, dst);
-                        print_fp2_curve_group_element(std::cout, Q);
                         return sk * Q;
                     }
 
@@ -210,4 +206,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_BLS_FUNCTIONS_HPP
+#endif // CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP

@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBLIC_KEY_HPP
-#define CRYPTO3_PUBLIC_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_PUBLIC_KEY_HPP
+#define CRYPTO3_PUBKEY_PUBLIC_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -44,4 +44,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBLIC_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_PUBLIC_KEY_HPP
