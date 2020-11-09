@@ -45,16 +45,16 @@ namespace nil {
             namespace snark {
                 template<typename T1, typename T2, typename Backend,
                          boost::multiprecision::expression_template_option ExpressionTemplates>
-                knowledge_commitment<T1, T2>
-                    opt_window_wnaf_exp(const knowledge_commitment<T1, T2> &base,
+                typename knowledge_commitment<T1, T2>::value_type
+                    opt_window_wnaf_exp(const typename knowledge_commitment<T1, T2>::value_type &base,
                                         const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
                                         const std::size_t scalar_bits) {
-                    return knowledge_commitment<T1, T2>(opt_window_wnaf_exp(base.g, scalar, scalar_bits),
+                    return typename knowledge_commitment<T1, T2>::value_type(opt_window_wnaf_exp(base.g, scalar, scalar_bits),
                                                         opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
                 template<typename T1, typename T2, typename FieldType, typename MultiexpMethod>
-                knowledge_commitment<T1, T2> kc_multiexp_with_mixed_addition(
+                typename knowledge_commitment<T1, T2>::value_type kc_multiexp_with_mixed_addition(
                     const knowledge_commitment_vector<T1, T2> &vec,
                     const std::size_t min_idx,
                     const std::size_t max_idx,
@@ -70,9 +70,10 @@ namespace nil {
                     const typename FieldType::value_type one = FieldType::value_type::zero();
 
                     std::vector<typename FieldType::value_type> p;
-                    std::vector<knowledge_commitment<T1, T2>> g;
+                    std::vector<typename knowledge_commitment<T1, T2>::value_type> g;
 
-                    knowledge_commitment<T1, T2> acc = knowledge_commitment<T1, T2>::zero();
+                    typename knowledge_commitment<T1, T2>::value_type acc = 
+                        knowledge_commitment<T1, T2>::value_type::zero();
 
                     std::size_t num_skip = 0;
                     std::size_t num_add = 0;
@@ -132,9 +133,9 @@ namespace nil {
 
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
-                            res.values.emplace_back(knowledge_commitment<T1, T2>(
-                                windowed_exp(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
-                                windowed_exp(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
+                            res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(
+                                windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
+                                windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
                             res.indices.emplace_back(pos);
                         }
                     }
@@ -192,7 +193,7 @@ namespace nil {
                             scalar_size, T1_window, T2_window, T1_table, T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
                             chunk_pos[i + 1], i == num_chunks - 1 ? last_chunk : chunk_size);
 #ifdef USE_MIXED_ADDITION
-                        algebra::batch_to_special<knowledge_commitment<T1, T2>>(tmp[i].values);
+                        algebra::batch_to_special<typename knowledge_commitment<T1, T2>::value_type>(tmp[i].values);
 #endif
                     }
 

@@ -245,47 +245,44 @@ namespace nil {
                         /**
                          * A proving key for the R1CS ppzkADSNARK.
                          */
-                        struct proving_key {
+                        class proving_key {
+                            using g1_type = typename CurveType::g1_type;
+                            using g2_type = typename CurveType::g2_type;
+                            using g1_value_type = typename g1_type::value_type;
+                            using g2_value_type = typename g2_type::value_type;
+                        public:
 
-                            knowledge_commitment_vector<typename CurveType::g1_type::value_type,
-                                                        typename CurveType::g1_type::value_type>
-                                A_query;
-                            knowledge_commitment_vector<typename CurveType::g2_type::value_type,
-                                                        typename CurveType::g1_type::value_type>
-                                B_query;
-                            knowledge_commitment_vector<typename CurveType::g1_type::value_type,
-                                                        typename CurveType::g1_type::value_type>
-                                C_query;
+                            knowledge_commitment_vector<g1_type, g1_type> A_query;
+                            knowledge_commitment_vector<g2_type, g1_type> B_query;
+                            knowledge_commitment_vector<g1_type, g1_type> C_query;
 
-                            typename std::vector<typename CurveType::g1_type::value_type> H_query;    // t powers
-                            typename std::vector<typename CurveType::g1_type::value_type> K_query;
+                            typename std::vector<g1_value_type> H_query;    // t powers
+                            typename std::vector<g1_value_type> K_query;
                             /* Now come the additional elements for ad */
-                            typename CurveType::g1_type::value_type rA_i_Z_g1;
+                            typename g1_value_type rA_i_Z_g1;
 
                             constraint_system<CurveType> constraint_system;
 
                             proving_key() {};
-                            proving_key<CurveType> &operator=(const proving_key<CurveType> &other) = default;
-                            proving_key(const proving_key<CurveType> &other) = default;
-                            proving_key(proving_key<CurveType> &&other) = default;
-                            proving_key(knowledge_commitment_vector<typename CurveType::g1_type::value_type,
-                                                                    typename CurveType::g1_type::value_type> &&A_query,
-                                        knowledge_commitment_vector<typename CurveType::g2_type::value_type,
-                                                                    typename CurveType::g1_type::value_type> &&B_query,
-                                        knowledge_commitment_vector<typename CurveType::g1_type::value_type,
-                                                                    typename CurveType::g1_type::value_type> &&C_query,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&K_query,
-                                        typename CurveType::g1_type::value_type &&rA_i_Z_g1,
+                            proving_key &operator=(const proving_key &other) = default;
+                            proving_key(const proving_key &other) = default;
+                            proving_key(proving_key &&other) = default;
+                            proving_key(knowledge_commitment_vector<g1_type, g1_type> &&A_query,
+                                        knowledge_commitment_vector<g2_type, g1_type> &&B_query,
+                                        knowledge_commitment_vector<g1_type, g1_type> &&C_query,
+                                        typename std::vector<g1_value_type> &&H_query,
+                                        typename std::vector<g1_value_type> &&K_query,
+                                        g1_value_type &&rA_i_Z_g1,
                                         constraint_system<CurveType> &&constraint_system) :
                                 A_query(std::move(A_query)),
-                                B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
-                                K_query(std::move(K_query)), rA_i_Z_g1(std::move(rA_i_Z_g1)),
+                                B_query(std::move(B_query)), C_query(std::move(C_query)), 
+                                H_query(std::move(H_query)), K_query(std::move(K_query)), 
+                                rA_i_Z_g1(std::move(rA_i_Z_g1)),
                                 constraint_system(std::move(constraint_system)) {};
 
                             std::size_t G1_size() const {
-                                return 2 * (A_query.domain_size() + C_query.domain_size()) + B_query.domain_size() +
-                                       H_query.size() + K_query.size() + 1;
+                                return 2 * (A_query.domain_size() + C_query.domain_size()) + 
+                                        B_query.domain_size() + H_query.size() + K_query.size() + 1;
                             }
 
                             std::size_t G2_size() const {
@@ -302,10 +299,11 @@ namespace nil {
                             }
 
                             std::size_t size_in_bits() const {
-                                return A_query.size_in_bits() + B_query.size_in_bits() + C_query.size_in_bits() +
-                                       H_query.size() * CurveType::g1_type::value_type::value_bits +
-                                       K_query.size() * CurveType::g1_type::value_type::value_bits +
-                                       CurveType::g1_type::value_bits;
+                                return A_query.size_in_bits() + B_query.size_in_bits() + 
+                                       C_query.size_in_bits() +
+                                       H_query.size() * g1_type::value_bits +
+                                       K_query.size() * g1_type::value_bits +
+                                       g1_type::value_bits;
                             }
 
                             bool operator==(const proving_key<CurveType> &other) const {
@@ -476,50 +474,48 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        struct proof {
+                        class proof {
+                            using g1_type = typename CurveType::g1_type;
+                            using g2_type = typename CurveType::g2_type;
+                            using g1_value_type = typename g1_type::value_type;
+                            using g2_value_type = typename g2_type::value_type;
+                        public:
 
-                            knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                 typename CurveType::g1_type::value_type>
-                                g_A;
-                            knowledge_commitment<typename CurveType::g2_type::value_type,
-                                                 typename CurveType::g1_type::value_type>
-                                g_B;
-                            knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                 typename CurveType::g1_type::value_type>
-                                g_C;
-                            typename CurveType::g1_type::value_type g_H;
-                            typename CurveType::g1_type::value_type g_K;
-                            knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                 typename CurveType::g1_type::value_type>
-                                g_Aau;
-                            typename CurveType::g1_type::value_type muA;
+                            typename knowledge_commitment<g1_value_type,
+                                                          g1_value_type>::value_type g_A;
+                            typename knowledge_commitment<g2_value_type,
+                                                          g1_value_type>::value_type g_B;
+                            typename knowledge_commitment<g1_value_type,
+                                                          g1_value_type>::value_type g_C;
+                            g1_value_type g_H;
+                            g1_value_type g_K;
+                            typename knowledge_commitment<g1_value_type,
+                                                          g1_value_type>::value_type g_Aau;
+                            g1_value_type muA;
 
                             proof() {
                                 // invalid proof with valid curve points
-                                this->g_A.g = typename CurveType::g1_type::value_type::one();
-                                this->g_A.h = typename CurveType::g1_type::value_type::one();
-                                this->g_B.g = typename CurveType::g2_type::value_type::one();
-                                this->g_B.h = typename CurveType::g1_type::value_type::one();
-                                this->g_C.g = typename CurveType::g1_type::value_type::one();
-                                this->g_C.h = typename CurveType::g1_type::value_type::one();
-                                this->g_H = typename CurveType::g1_type::value_type::one();
-                                this->g_K = typename CurveType::g1_type::value_type::one();
-                                g_Aau = knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>(
-                                    typename CurveType::g1_type::value_type::one(),
-                                    typename CurveType::g1_type::value_type::one());
-                                this->muA = typename CurveType::g1_type::value_type::one();
+                                this->g_A.g = g1_value_type::one();
+                                this->g_A.h = g1_value_type::one();
+                                this->g_B.g = g2_value_type::one();
+                                this->g_B.h = g1_value_type::one();
+                                this->g_C.g = g1_value_type::one();
+                                this->g_C.h = g1_value_type::one();
+                                this->g_H = g1_value_type::one();
+                                this->g_K = g1_value_type::one();
+                                g_Aau = typename knowledge_commitment<g1_type, g1_type>
+                                                    ::value_type(g1_value_type::one(),
+                                                                 g1_value_type::one());
+
+                                this->muA = g1_value_type::one();
                             }
-                            proof(knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                       typename CurveType::g1_type::value_type> &&g_A,
-                                  knowledge_commitment<typename CurveType::g2_type::value_type,
-                                                       typename CurveType::g1_type::value_type> &&g_B,
-                                  knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                       typename CurveType::g1_type::value_type> &&g_C,
-                                  typename CurveType::g1_type::value_type &&g_H,
-                                  typename CurveType::g1_type::value_type &&g_K,
-                                  knowledge_commitment<typename CurveType::g1_type::value_type,
-                                                       typename CurveType::g1_type::value_type> &&g_Aau,
-                                  typename CurveType::g1_type::value_type &&muA) :
+                            proof(typename knowledge_commitment<g1_type, g1_type>::value_type &&g_A,
+                                  typename knowledge_commitment<g2_type, g1_type>::value_type &&g_B,
+                                  typename knowledge_commitment<g1_type, g1_type>::value_type &&g_C,
+                                  g1_value_type &&g_H,
+                                  g1_value_type &&g_K,
+                                  typename knowledge_commitment<g1_type, g1_type>::value_type &&g_Aau,
+                                  g1_value_type &&muA) :
                                 g_A(std::move(g_A)),
                                 g_B(std::move(g_B)), g_C(std::move(g_C)), g_H(std::move(g_H)), g_K(std::move(g_K)),
                                 g_Aau(std::move(g_Aau)), muA(std::move(muA)) {};
@@ -533,8 +529,8 @@ namespace nil {
                             }
 
                             std::size_t size_in_bits() const {
-                                return G1_size() * CurveType::g1_type::value_type::value_bits +
-                                       G2_size() * CurveType::g2_type::value_type::value_bits;
+                                return G1_size() * g1_value_type::value_bits +
+                                       G2_size() * g2_value_type::value_bits;
                             }
 
                             bool is_well_formed() const {
@@ -824,14 +820,18 @@ namespace nil {
                             const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap::witness_map(
                                 pk.constraint_system, primary_input, auxiliary_input, d1 + dauth, d2, d3);
 
-                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A =
+                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                          typename CurveType::g1_type>::value_type g_A =
                                 /* pk.A_query[0] + */ d1 * pk.A_query[qap_wit.num_variables + 1];
-                            knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> g_B =
+                            typename knowledge_commitment<typename CurveType::g2_type, 
+                                                          typename CurveType::g1_type>::value_type g_B =
                                 pk.B_query[0] + qap_wit.d2 * pk.B_query[qap_wit.num_variables + 1];
-                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C =
+                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                          typename CurveType::g1_type>::value_type g_C =
                                 pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables + 1];
 
-                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_Ain =
+                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                          typename CurveType::g1_type>::value_type g_Ain =
                                 dauth * pk.A_query[qap_wit.num_variables + 1];
 
                             typename CurveType::g1_type::value_type g_H =
@@ -852,7 +852,8 @@ namespace nil {
                                             typename CurveType::g1_type, typename CurveType::g1_type,
                                             typename CurveType::scalar_field_type, 
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                                          typename CurveType::g1_type>::value_type, 
                                             typename CurveType::scalar_field_type>>(
                                             pk.A_query, 1 + qap_wit.num_inputs, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs,
@@ -862,7 +863,8 @@ namespace nil {
                                             typename CurveType::g1_type, typename CurveType::g1_type,
                                             typename CurveType::scalar_field_type, 
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                                          typename CurveType::g1_type>::value_type, 
                                             typename CurveType::scalar_field_type>>(
                                             pk.A_query, 1, 1 + qap_wit.num_inputs,
                                             qap_wit.coefficients_for_ABCs.begin(),
@@ -873,7 +875,8 @@ namespace nil {
                                             typename CurveType::g2_type, typename CurveType::g1_type,
                                             typename CurveType::scalar_field_type, 
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                                          typename CurveType::g1_type>::value_type, 
                                             typename CurveType::scalar_field_type>>(
                                             pk.B_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
@@ -883,7 +886,8 @@ namespace nil {
                                             typename CurveType::g1_type, typename CurveType::g1_type,
                                             typename CurveType::scalar_field_type, 
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
+                                            typename knowledge_commitment<typename CurveType::g1_type, 
+                                                                          typename CurveType::g1_type>::value_type, 
                                             typename CurveType::scalar_field_type>>(
                                             pk.C_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),

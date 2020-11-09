@@ -155,14 +155,14 @@ namespace nil {
                                 const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
-                            knowledge_commitment<g2_type, g1_type>
-                                evaluation_Bt;
+                            typename knowledge_commitment<g2_type, g1_type>
+                                ::value_type evaluation_Bt;
 
                             kc_multiexp_with_mixed_addition<g2_type, g1_type,
-                                                             scalar_field_type,
-                                                             algebra::policies::multiexp_method_BDLO12<
-                                                             knowledge_commitment<g2_type, g1_type>,
-                                                             scalar_field_type>>(
+                                                            scalar_field_type,
+                                                            algebra::policies::multiexp_method_BDLO12<
+                                                            knowledge_commitment<g2_type, g1_type>,
+                                                            scalar_field_type>>(
                                 proving_key.B_query,
                                 0,
                                 qap_wit.num_variables + 1,

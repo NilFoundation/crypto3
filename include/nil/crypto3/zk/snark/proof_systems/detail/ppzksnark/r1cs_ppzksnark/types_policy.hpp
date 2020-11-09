@@ -96,15 +96,18 @@ namespace nil {
                         /**
                          * A proving key for the R1CS ppzkSNARK.
                          */
-                        struct proving_key {
-                            knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                A_query;
-                            knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
-                                B_query;
-                            knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                C_query;
-                            typename std::vector<typename CurveType::g1_type::value_type> H_query;
-                            typename std::vector<typename CurveType::g1_type::value_type> K_query;
+                        class proving_key {
+                            using g1_type = typename CurveType::g1_type;
+                            using g2_type = typename CurveType::g2_type;
+                            using g1_value_type = typename g1_type::value_type;
+                            using g2_value_type = typename g2_type::value_type;
+                        public:
+
+                            knowledge_commitment_vector<g1_type, g1_type> A_query;
+                            knowledge_commitment_vector<g2_type, g1_type> B_query;
+                            knowledge_commitment_vector<g1_type, g1_type> C_query;
+                            typename std::vector<g1_value_type> H_query;
+                            typename std::vector<g1_value_type> K_query;
 
                             constraint_system constraint_system;
 
@@ -113,14 +116,11 @@ namespace nil {
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
                             proving_key(
-                                knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                    &&A_query,
-                                knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
-                                    &&B_query,
-                                knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                    &&C_query,
-                                typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
-                                typename std::vector<typename CurveType::g1_type::value_type> &&K_query,
+                                knowledge_commitment_vector<g1_type, g1_type> &&A_query,
+                                knowledge_commitment_vector<g2_type, g1_type> &&B_query,
+                                knowledge_commitment_vector<g1_type, g1_type> &&C_query,
+                                typename std::vector<g1_value_type> &&H_query,
+                                typename std::vector<g1_value_type> &&K_query,
                                 constraint_system &&constraint_system) :
                                 A_query(std::move(A_query)),
                                 B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
@@ -301,29 +301,35 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        struct proof {
-                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A;
-                            knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> g_B;
-                            knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C;
-                            typename CurveType::g1_type::value_type g_H;
-                            typename CurveType::g1_type::value_type g_K;
+                        class proof {
+                            using g1_type = typename CurveType::g1_type;
+                            using g2_type = typename CurveType::g2_type;
+                            using g1_value_type = typename g1_type::value_type;
+                            using g2_value_type = typename g2_type::value_type;
+                        public:
+
+                            typename knowledge_commitment<g1_type, g1_type>::value_type g_A;
+                            typename knowledge_commitment<g2_type, g1_type>::value_type g_B;
+                            typename knowledge_commitment<g1_type, g1_type>::value_type g_C;
+                            g1_value_type g_H;
+                            g1_value_type g_K;
 
                             proof() {
                                 // invalid proof with valid curve points
-                                this->g_A.g = typename CurveType::g1_type::value_type::one();
-                                this->g_A.h = typename CurveType::g1_type::value_type::one();
-                                this->g_B.g = typename CurveType::g2_type::value_type::one();
-                                this->g_B.h = typename CurveType::g1_type::value_type::one();
-                                this->g_C.g = typename CurveType::g1_type::value_type::one();
-                                this->g_C.h = typename CurveType::g1_type::value_type::one();
-                                this->g_H = typename CurveType::g1_type::value_type::one();
-                                this->g_K = typename CurveType::g1_type::value_type::one();
+                                this->g_A.g = g1_value_type::one();
+                                this->g_A.h = g1_value_type::one();
+                                this->g_B.g = g2_value_type::one();
+                                this->g_B.h = g1_value_type::one();
+                                this->g_C.g = g1_value_type::one();
+                                this->g_C.h = g1_value_type::one();
+                                this->g_H = g1_value_type::one();
+                                this->g_K = g1_value_type::one();
                             }
-                            proof(knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> &&g_A,
-                                  knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> &&g_B,
-                                  knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> &&g_C,
-                                  typename CurveType::g1_type::value_type &&g_H,
-                                  typename CurveType::g1_type::value_type &&g_K) :
+                            proof(typename knowledge_commitment<g1_type, g1_type>::value_type &&g_A,
+                                  typename knowledge_commitment<g2_type, g1_type>::value_type &&g_B,
+                                  typename knowledge_commitment<g1_type, g1_type>::value_type &&g_C,
+                                  g1_value_type &&g_H,
+                                  g1_value_type &&g_K) :
                                 g_A(std::move(g_A)),
                                 g_B(std::move(g_B)), g_C(std::move(g_C)), g_H(std::move(g_H)), g_K(std::move(g_K)) {};
 
