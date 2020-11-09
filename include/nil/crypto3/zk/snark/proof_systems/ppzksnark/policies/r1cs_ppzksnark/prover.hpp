@@ -112,7 +112,7 @@ namespace nil {
                         typedef typename types_policy::keypair keypair_type;
                         typedef typename types_policy::proof proof_type;
 
-                        static inline keypair_type process(const proving_key_type &proving_key,
+                        static inline proof_type process(const proving_key_type &proving_key,
                                                            const primary_input_type &primary_input,
                                                            const auxiliary_input_type &auxiliary_input) {
 
