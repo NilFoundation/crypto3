@@ -116,17 +116,6 @@ namespace nil {
                                  g.begin(), g.end(), p.begin(), p.end(), chunks_count);
             }
 
-            template<typename BaseType>
-            typename BaseType::value_type
-                inner_product(typename std::vector<typename BaseType::value_type>::const_iterator a_start,
-                              typename std::vector<typename BaseType::value_type>::const_iterator a_end,
-                              typename std::vector<typename BaseType::value_type>::const_iterator b_start,
-                              typename std::vector<typename BaseType::value_type>::const_iterator b_end) {
-
-                return multiexp<BaseType, BaseType,
-                                policies::multiexp_method_naive_plain<BaseType, BaseType>>(a_start, a_end, b_start, b_end, 1);
-            }
-
             /**
              * A window table stores window sizes for different instance sizes for fixed-base multi-scalar
              * multiplications.
