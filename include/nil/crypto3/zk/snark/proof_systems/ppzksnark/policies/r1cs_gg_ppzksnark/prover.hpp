@@ -150,9 +150,9 @@ namespace nil {
                                                                    g1_type,
                                                                    scalar_field_type>>(
                                 proving_key.A_query.begin(),
-                                proving_key.A_query.begin() + qap_wit.num_variables() + 1,
+                                proving_key.A_query.begin() + qap_wit.num_variables + 1,
                                 const_padded_assignment.begin(),
-                                const_padded_assignment.begin() + qap_wit.num_variables() + 1,
+                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
                             knowledge_commitment<g2_type, g1_type>
@@ -165,9 +165,9 @@ namespace nil {
                                                              scalar_field_type>>(
                                 proving_key.B_query,
                                 0,
-                                qap_wit.num_variables() + 1,
+                                qap_wit.num_variables + 1,
                                 const_padded_assignment.begin(),
-                                const_padded_assignment.begin() + qap_wit.num_variables() + 1,
+                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
                             typename g1_type::value_type evaluation_Ht =
@@ -190,8 +190,8 @@ namespace nil {
                                                                    scalar_field_type>>(
                                 proving_key.L_query.begin(),
                                 proving_key.L_query.end(),
-                                const_padded_assignment.begin() + qap_wit.num_inputs() + 1,
-                                const_padded_assignment.begin() + qap_wit.num_variables() + 1,
+                                const_padded_assignment.begin() + qap_wit.num_inputs + 1,
+                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */

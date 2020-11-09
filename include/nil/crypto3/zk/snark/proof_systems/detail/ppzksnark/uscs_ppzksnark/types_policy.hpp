@@ -225,7 +225,7 @@ namespace nil {
                             typename pairing_policy::G2_precomp vk_tilde_g2_precomp;
                             typename pairing_policy::G2_precomp vk_alpha_tilde_g2_precomp;
                             typename pairing_policy::G2_precomp vk_Z_g2_precomp;
-                            typename CurveType::gt_type pairing_of_g1_and_g2;
+                            typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
 
                             accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
 

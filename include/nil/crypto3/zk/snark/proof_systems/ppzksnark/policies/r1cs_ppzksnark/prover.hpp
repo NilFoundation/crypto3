@@ -126,19 +126,19 @@ namespace nil {
                                     proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A =
-                                proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables() + 1];
+                                proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables + 1];
                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> g_B =
-                                proving_key.B_query[0] + qap_wit.d2 * proving_key.B_query[qap_wit.num_variables() + 1];
+                                proving_key.B_query[0] + qap_wit.d2 * proving_key.B_query[qap_wit.num_variables + 1];
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C =
-                                proving_key.C_query[0] + qap_wit.d3 * proving_key.C_query[qap_wit.num_variables() + 1];
+                                proving_key.C_query[0] + qap_wit.d3 * proving_key.C_query[qap_wit.num_variables + 1];
 
                             typename CurveType::g1_type::value_type g_H =
                                 typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g1_type::value_type g_K =
                                 (proving_key.K_query[0] +
-                                 qap_wit.d1 * proving_key.K_query[qap_wit.num_variables() + 1] +
-                                 qap_wit.d2 * proving_key.K_query[qap_wit.num_variables() + 2] +
-                                 qap_wit.d3 * proving_key.K_query[qap_wit.num_variables() + 3]);
+                                 qap_wit.d1 * proving_key.K_query[qap_wit.num_variables + 1] +
+                                 qap_wit.d2 * proving_key.K_query[qap_wit.num_variables + 2] +
+                                 qap_wit.d3 * proving_key.K_query[qap_wit.num_variables + 3]);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -154,9 +154,9 @@ namespace nil {
                                             knowledge_commitment<
                                             typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            proving_key.A_query, 1, 1 + qap_wit.num_variables(),
+                                            proving_key.A_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_B = g_B + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g2_type, typename CurveType::g1_type,
@@ -165,9 +165,9 @@ namespace nil {
                                             knowledge_commitment<
                                             typename CurveType::g2_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            proving_key.B_query, 1, 1 + qap_wit.num_variables(),
+                                            proving_key.B_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_C = g_C + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
@@ -176,17 +176,17 @@ namespace nil {
                                             knowledge_commitment<
                                             typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            proving_key.C_query, 1, 1 + qap_wit.num_variables(),
+                                            proving_key.C_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_H = g_H +
                                   algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                     algebra::policies::multiexp_method_BDLO12<
                                                     typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
-                                      proving_key.H_query.begin(), proving_key.H_query.begin() + qap_wit.degree() + 1,
+                                      proving_key.H_query.begin(), proving_key.H_query.begin() + qap_wit.degree + 1,
                                       qap_wit.coefficients_for_H.begin(),
-                                      qap_wit.coefficients_for_H.begin() + qap_wit.degree() + 1, chunks);
+                                      qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1, chunks);
 
                             g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
                                                                               typename CurveType::scalar_field_type,
@@ -194,9 +194,9 @@ namespace nil {
                                                                               typename CurveType::g1_type,
                                                                               typename CurveType::scalar_field_type>>(
                                             proving_key.K_query.begin() + 1,
-                                            proving_key.K_query.begin() + 1 + qap_wit.num_variables(),
+                                            proving_key.K_query.begin() + 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             proof_type proof =
                                 proof(std::move(g_A), std::move(g_B), std::move(g_C), std::move(g_H), std::move(g_K));

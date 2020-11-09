@@ -191,7 +191,7 @@ namespace nil {
                                                                        processed_verification_key.H_gamma_pc),
                                 test1_r3 = pairing_policy::miller_loop(pairing_policy::precompute_g1(proof.C),
                                                                        processed_verification_key.H_pc);
-                            typename CurveType::gt_type test1 = pairing_policy::final_exponentiation(
+                            typename CurveType::gt_type::value_type test1 = pairing_policy::final_exponentiation(
                                 test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
 
                             if (test1 != typename CurveType::gt_type::one()) {
@@ -207,7 +207,7 @@ namespace nil {
                                                               test2_r = pairing_policy::miller_loop(
                                                                   processed_verification_key.G_gamma_pc,
                                                                   pairing_policy::precompute_g2(proof.B));
-                            typename CurveType::gt_type test2 =
+                            typename CurveType::gt_type::value_type test2 =
                                 pairing_policy::final_exponentiation(test2_l * test2_r.unitary_inversed());
 
                             if (test2 != typename CurveType::gt_type::one()) {

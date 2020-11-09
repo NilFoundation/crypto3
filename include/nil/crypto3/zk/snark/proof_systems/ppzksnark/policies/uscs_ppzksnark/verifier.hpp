@@ -173,7 +173,7 @@ namespace nil {
                                 pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::Fqk_type V_2 =
                                 pairing_policy::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                            typename CurveType::gt_type V =
+                            typename CurveType::gt_type::value_type V =
                                 pairing_policy::final_exponentiation(V_1 * V_2.unitary_inversed());
 
                             if (V != typename CurveType::gt_type::one()) {
@@ -186,7 +186,7 @@ namespace nil {
                                 pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
                             typename pairing_policy::Fqk_type SSP_2 =
                                 pairing_policy::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
-                            typename CurveType::gt_type SSP = pairing_policy::final_exponentiation(
+                            typename CurveType::gt_type::value_type SSP = pairing_policy::final_exponentiation(
                                 SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
 
                             if (SSP != typename CurveType::gt_type::one()) {
@@ -201,7 +201,7 @@ namespace nil {
                                 pairing_policy::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
                             typename pairing_policy::Fqk_type alpha_V_2 =
                                 pairing_policy::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                            typename CurveType::gt_type alpha_V =
+                            typename CurveType::gt_type::value_type alpha_V =
                                 pairing_policy::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inversed());
 
                             if (alpha_V != typename CurveType::gt_type::one()) {

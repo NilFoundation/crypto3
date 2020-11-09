@@ -172,7 +172,7 @@ namespace nil {
                                 proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
                             typename pairing_policy::Fqk_type kc_A_2 = pairing_policy::miller_loop(
                                 proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_A =
+                            typename CurveType::gt_type::value_type kc_A =
                                 pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
                             if (kc_A != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -186,7 +186,7 @@ namespace nil {
                                 processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::Fqk_type kc_B_2 = pairing_policy::miller_loop(
                                 proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_B =
+                            typename CurveType::gt_type::value_type kc_B =
                                 pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
                             if (kc_B != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -200,7 +200,7 @@ namespace nil {
                                 proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
                             typename pairing_policy::Fqk_type kc_C_2 = pairing_policy::miller_loop(
                                 proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_C =
+                            typename CurveType::gt_type::value_type kc_C =
                                 pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
                             if (kc_C != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -217,7 +217,7 @@ namespace nil {
                             typename pairing_policy::Fqk_type QAP_23 = pairing_policy::double_miller_loop(
                                 proof_g_H_precomp, processed_verification_key.vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
                                 processed_verification_key.pp_G2_one_precomp);
-                            typename CurveType::gt_type QAP =
+                            typename CurveType::gt_type::value_type QAP =
                                 pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
                             if (QAP != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -232,7 +232,7 @@ namespace nil {
                             typename pairing_policy::Fqk_type K_23 = pairing_policy::double_miller_loop(
                                 proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp,
                                 processed_verification_key.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
-                            typename CurveType::gt_type K =
+                            typename CurveType::gt_type::value_type K =
                                 pairing_policy::final_exponentiation(K_1 * K_23.unitary_inversed());
                             if (K != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -406,7 +406,7 @@ namespace nil {
                             typename pairing_policy::Fqk_type kc_A_miller = CurveType::affine_ate_e_over_e_miller_loop(
                                 proof_g_A_g_precomp, pvk_vk_alphaA_g2_precomp, proof_g_A_h_precomp,
                                 pvk_pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_A = pairing_policy::final_exponentiation(kc_A_miller);
+                            typename CurveType::gt_type::value_type kc_A = pairing_policy::final_exponentiation(kc_A_miller);
 
                             if (kc_A != typename CurveType::gt_type::one()) {
                                 result = false;
@@ -419,7 +419,7 @@ namespace nil {
                             typename pairing_policy::Fqk_type kc_B_miller = CurveType::affine_ate_e_over_e_miller_loop(
                                 pvk_vk_alphaB_g1_precomp, proof_g_B_g_precomp, proof_g_B_h_precomp,
                                 pvk_pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_B = pairing_policy::final_exponentiation(kc_B_miller);
+                            typename CurveType::gt_type::value_type kc_B = pairing_policy::final_exponentiation(kc_B_miller);
                             if (kc_B != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -431,7 +431,7 @@ namespace nil {
                             typename pairing_policy::Fqk_type kc_C_miller = CurveType::affine_ate_e_over_e_miller_loop(
                                 proof_g_C_g_precomp, pvk_vk_alphaC_g2_precomp, proof_g_C_h_precomp,
                                 pvk_pp_G2_one_precomp);
-                            typename CurveType::gt_type kc_C = pairing_policy::final_exponentiation(kc_C_miller);
+                            typename CurveType::gt_type::value_type kc_C = pairing_policy::final_exponentiation(kc_C_miller);
                             if (kc_C != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -444,7 +444,7 @@ namespace nil {
                                 CurveType::affine_ate_e_times_e_over_e_miller_loop(
                                     proof_g_H_precomp, pvk_vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
                                     pvk_pp_G2_one_precomp, proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
-                            typename CurveType::gt_type QAP = pairing_policy::final_exponentiation(QAP_miller);
+                            typename CurveType::gt_type::value_type QAP = pairing_policy::final_exponentiation(QAP_miller);
                             if (QAP != typename CurveType::gt_type::one()) {
                                 result = false;
                             }
@@ -458,7 +458,7 @@ namespace nil {
                                     proof_g_A_g_acc_C_precomp, pvk_vk_gamma_beta_g2_precomp,
                                     pvk_vk_gamma_beta_g1_precomp, proof_g_B_g_precomp, proof_g_K_precomp,
                                     pvk_vk_gamma_g2_precomp);
-                            typename CurveType::gt_type K = pairing_policy::final_exponentiation(K_miller);
+                            typename CurveType::gt_type::value_type K = pairing_policy::final_exponentiation(K_miller);
                             if (K != typename CurveType::gt_type::one()) {
                                 result = false;
                             }

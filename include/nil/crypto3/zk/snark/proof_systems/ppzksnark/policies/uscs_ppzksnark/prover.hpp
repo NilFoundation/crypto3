@@ -113,11 +113,11 @@ namespace nil {
                             /* sanity checks */
                             assert(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
                             assert(proving_key.V_g1_query.size() ==
-                                   ssp_wit.num_variables() + 2 - ssp_wit.num_inputs() - 1);
+                                   ssp_wit.num_variables + 2 - ssp_wit.num_inputs - 1);
                             assert(proving_key.alpha_V_g1_query.size() ==
-                                   ssp_wit.num_variables() + 2 - ssp_wit.num_inputs() - 1);
-                            assert(proving_key.H_g1_query.size() == ssp_wit.degree() + 1);
-                            assert(proving_key.V_g2_query.size() == ssp_wit.num_variables() + 2);
+                                   ssp_wit.num_variables + 2 - ssp_wit.num_inputs - 1);
+                            assert(proving_key.H_g1_query.size() == ssp_wit.degree + 1);
+                            assert(proving_key.V_g2_query.size() == ssp_wit.num_variables + 2);
 
                             typename CurveType::g1_type::value_type V_g1 =
                                 ssp_wit.d * proving_key.V_g1_query[proving_key.V_g1_query.size() - 1];
@@ -145,9 +145,9 @@ namespace nil {
                                                                                 typename CurveType::scalar_field_type>>(
                                               proving_key.V_g1_query.begin(),
                                               proving_key.V_g1_query.begin() +
-                                                  (ssp_wit.num_variables() - ssp_wit.num_inputs()),
-                                              ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
-                                              ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                                                  (ssp_wit.num_variables - ssp_wit.num_inputs),
+                                              ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs,
+                                              ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables, chunks);
 
                             alpha_V_g1 = alpha_V_g1 +
                                          algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
@@ -157,27 +157,27 @@ namespace nil {
                                                                                typename CurveType::scalar_field_type>>(
                                              proving_key.alpha_V_g1_query.begin(),
                                              proving_key.alpha_V_g1_query.begin() +
-                                                 (ssp_wit.num_variables() - ssp_wit.num_inputs()),
-                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
-                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                                                 (ssp_wit.num_variables - ssp_wit.num_inputs),
+                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs,
+                                             ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables, chunks);
 
                             H_g1 = H_g1 +
                                    algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                      algebra::policies::multiexp_method_BDLO12<
                                                      typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                        proving_key.H_g1_query.begin(),
-                                       proving_key.H_g1_query.begin() + ssp_wit.degree() + 1,
+                                       proving_key.H_g1_query.begin() + ssp_wit.degree + 1,
                                        ssp_wit.coefficients_for_H.begin(),
-                                       ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
+                                       ssp_wit.coefficients_for_H.begin() + ssp_wit.degree + 1, chunks);
 
                             V_g2 = V_g2 +
                                    algebra::multiexp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
                                                      algebra::policies::multiexp_method_BDLO12<
                                                      typename CurveType::g2_type, typename CurveType::scalar_field_type>>(
                                        proving_key.V_g2_query.begin() + 1,
-                                       proving_key.V_g2_query.begin() + ssp_wit.num_variables() + 1,
+                                       proving_key.V_g2_query.begin() + ssp_wit.num_variables + 1,
                                        ssp_wit.coefficients_for_Vs.begin(),
-                                       ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                                       ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables, chunks);
 
                             proof_type proof =
                                 proof_type(std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));

@@ -825,21 +825,21 @@ namespace nil {
                                 pk.constraint_system, primary_input, auxiliary_input, d1 + dauth, d2, d3);
 
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_A =
-                                /* pk.A_query[0] + */ d1 * pk.A_query[qap_wit.num_variables() + 1];
+                                /* pk.A_query[0] + */ d1 * pk.A_query[qap_wit.num_variables + 1];
                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> g_B =
-                                pk.B_query[0] + qap_wit.d2 * pk.B_query[qap_wit.num_variables() + 1];
+                                pk.B_query[0] + qap_wit.d2 * pk.B_query[qap_wit.num_variables + 1];
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_C =
-                                pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables() + 1];
+                                pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables + 1];
 
                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type> g_Ain =
-                                dauth * pk.A_query[qap_wit.num_variables() + 1];
+                                dauth * pk.A_query[qap_wit.num_variables + 1];
 
                             typename CurveType::g1_type::value_type g_H =
                                 typename CurveType::g1_type::value_type::zero();
                             typename CurveType::g1_type::value_type g_K =
-                                (pk.K_query[0] + qap_wit.d1 * pk.K_query[qap_wit.num_variables() + 1] +
-                                 qap_wit.d2 * pk.K_query[qap_wit.num_variables() + 2] +
-                                 qap_wit.d3 * pk.K_query[qap_wit.num_variables() + 3]);
+                                (pk.K_query[0] + qap_wit.d1 * pk.K_query[qap_wit.num_variables + 1] +
+                                 qap_wit.d2 * pk.K_query[qap_wit.num_variables + 2] +
+                                 qap_wit.d3 * pk.K_query[qap_wit.num_variables + 3]);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -854,9 +854,9 @@ namespace nil {
                                             algebra::policies::multiexp_method_bos_coster<
                                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            pk.A_query, 1 + qap_wit.num_inputs(), 1 + qap_wit.num_variables(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            pk.A_query, 1 + qap_wit.num_inputs, 1 + qap_wit.num_variables,
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs,
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_Ain = g_Ain + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
@@ -864,9 +864,9 @@ namespace nil {
                                             algebra::policies::multiexp_method_bos_coster<
                                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            pk.A_query, 1, 1 + qap_wit.num_inputs(),
+                                            pk.A_query, 1, 1 + qap_wit.num_inputs,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs, chunks);
                             // std :: cout << "The input proof term: " << g_Ain << "\n";
 
                             g_B = g_B + kc_multiexp_with_mixed_addition<
@@ -875,9 +875,9 @@ namespace nil {
                                             algebra::policies::multiexp_method_bos_coster<
                                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            pk.B_query, 1, 1 + qap_wit.num_variables(),
+                                            pk.B_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_C = g_C + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
@@ -885,17 +885,17 @@ namespace nil {
                                             algebra::policies::multiexp_method_bos_coster<
                                             knowledge_commitment<typename CurveType::g1_type, typename CurveType::g1_type>, 
                                             typename CurveType::scalar_field_type>>(
-                                            pk.C_query, 1, 1 + qap_wit.num_variables(),
+                                            pk.C_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_H = g_H + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                           algebra::policies::multiexp_method_BDLO12<
                                                           typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             pk.H_query.begin(),
-                                            pk.H_query.begin() + qap_wit.degree() + 1,
+                                            pk.H_query.begin() + qap_wit.degree + 1,
                                             qap_wit.coefficients_for_H.begin(),
-                                            qap_wit.coefficients_for_H.begin() + qap_wit.degree() + 1,
+                                            qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1,
                                             chunks);
 
                             g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
@@ -903,16 +903,16 @@ namespace nil {
                                                                               algebra::policies::multiexp_method_bos_coster<
                                                                               typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             pk.K_query.begin() + 1,
-                                            pk.K_query.begin() + 1 + qap_wit.num_variables(),
+                                            pk.K_query.begin() + 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(),
+                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables,
                                             chunks);
 
                             std::vector<typename CurveType::scalar_field_type::value_type> mus;
                             std::vector<typename CurveType::g1_type::value_type> Ains;
-                            mus.reserve(qap_wit.num_inputs());
-                            Ains.reserve(qap_wit.num_inputs());
-                            for (std::size_t i = 0; i < qap_wit.num_inputs(); i++) {
+                            mus.reserve(qap_wit.num_inputs);
+                            Ains.reserve(qap_wit.num_inputs);
+                            for (std::size_t i = 0; i < qap_wit.num_inputs; i++) {
                                 mus.emplace_back(auth_data[i].mu);
                                 Ains.emplace_back(pk.A_query[i + 1].g);
                             }
@@ -920,8 +920,8 @@ namespace nil {
                             muA = muA + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                                           algebra::policies::multiexp_method_bos_coster<
                                                           typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
-                                            Ains.begin(), Ains.begin() + qap_wit.num_inputs(), mus.begin(),
-                                            mus.begin() + qap_wit.num_inputs(), chunks);
+                                            Ains.begin(), Ains.begin() + qap_wit.num_inputs, mus.begin(),
+                                            mus.begin() + qap_wit.num_inputs, chunks);
 
                             // To Do: Decide whether to include relevant parts of auth_data in proof
 
