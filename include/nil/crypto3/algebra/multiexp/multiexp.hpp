@@ -31,7 +31,7 @@
 
 #include <boost/multiprecision/number.hpp>
 
-#include <nil/crypto3/algebra/multiexp/detail/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/curves/params.hpp>
 
 namespace nil {
@@ -39,29 +39,31 @@ namespace nil {
         namespace algebra {
 
             // TODO: Implement not only for vectors
-            template<typename BaseType, typename FieldType, multiexp_method Method>
+            template<typename BaseType, typename FieldType, 
+                typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
             typename BaseType::value_type
                 multiexp(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                          typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                          typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
                          const std::size_t chunks_count) {
+                using base_value_type = typename BaseType::value_type;
+                using field_value_type = typename FieldType::value_type;
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
-                    return detail::multiexp_inner<BaseType, FieldType, Method>(vec_start, vec_end, scalar_start,
-                                                                               scalar_end);
+                    return MultiexpMethod::process(vec_start, vec_end, scalar_start, scalar_end);
                 }
 
                 const std::size_t one_chunk_size = total_size / chunks_count;
 
-                typename BaseType::value_type result = BaseType::value_type::zero();
+                base_value_type result = base_value_type::zero();
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
                     result =
-                        result + detail::multiexp_inner<BaseType, FieldType, Method>(
+                        result + MultiexpMethod::process(
                                      vec_start + i * one_chunk_size,
                                      (i == chunks_count - 1 ? vec_end : vec_start + (i + 1) * one_chunk_size),
                                      scalar_start + i * one_chunk_size,
@@ -71,7 +73,8 @@ namespace nil {
                 return result;
             }
 
-            template<typename BaseType, typename FieldType, multiexp_method Method>
+            template<typename BaseType, typename FieldType, 
+                typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
             typename BaseType::value_type multiexp_with_mixed_addition(
                 typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                 typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
@@ -79,17 +82,22 @@ namespace nil {
                 typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
                 const std::size_t chunks_count) {
 
+                using base_type = BaseType;
+                using field_type = FieldType;
+                using base_value_type = typename base_type::value_type;
+                using field_value_type = typename field_type::value_type;
+
                 assert(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
 
-                typename std::vector<typename BaseType::value_type>::const_iterator vec_it;
-                typename std::vector<typename FieldType::value_type>::const_iterator scalar_it;
+                typename std::vector<base_value_type>::const_iterator vec_it;
+                typename std::vector<field_value_type>::const_iterator scalar_it;
 
-                const typename FieldType::value_type zero = FieldType::value_type::zero();
-                const typename FieldType::value_type one = FieldType::value_type::one();
-                std::vector<typename FieldType::value_type> p;
-                std::vector<typename BaseType::value_type> g;
+                const field_value_type zero = field_value_type::zero();
+                const field_value_type one = field_value_type::one();
+                std::vector<field_value_type> p;
+                std::vector<base_value_type> g;
 
-                typename BaseType::value_type acc = BaseType::value_type::zero();
+                base_value_type acc = base_value_type::zero();
 
                 for (; scalar_it != scalar_end; ++scalar_it, ++vec_it) {
                     if (*scalar_it == one) {
@@ -104,7 +112,7 @@ namespace nil {
                     }
                 }
 
-                return acc + multiexp<typename BaseType::value_type, typename FieldType::value_type, Method>(
+                return acc + multiexp<base_type, field_type, MultiexpMethod>(
                                  g.begin(), g.end(), p.begin(), p.end(), chunks_count);
             }
 
@@ -115,8 +123,8 @@ namespace nil {
                               typename std::vector<typename BaseType::value_type>::const_iterator b_start,
                               typename std::vector<typename BaseType::value_type>::const_iterator b_end) {
 
-                return multiexp<typename BaseType::value_type, typename BaseType::value_type,
-                                multiexp_method_naive_plain>(a_start, a_end, b_start, b_end, 1);
+                return multiexp<BaseType, BaseType,
+                                policies::multiexp_method_naive_plain<BaseType, BaseType>>(a_start, a_end, b_start, b_end, 1);
             }
 
             /**

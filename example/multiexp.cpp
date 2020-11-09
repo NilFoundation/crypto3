@@ -85,6 +85,7 @@
 // #include <nil/crypto3/algebra/curves/params/wnaf/x962_p.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -134,14 +135,14 @@ long long get_nsec_time()
     return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
 }
 
-template<typename GroupType, typename FieldType, multiexp_method Method>
+template<typename GroupType, typename FieldType, typename MultiexpMethod>
 run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
                                          test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multiexp<GroupType, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
+        answers.push_back(multiexp<GroupType, FieldType, MultiexpMethod>(group_elements[i].cbegin(), group_elements[i].cend(),
                                                                   scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
@@ -160,12 +161,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
         test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
         run_result_t<GroupType> result_bos_coster =
-            profile_multiexp<GroupType, FieldType, multiexp_method_bos_coster>(group_elements, scalars);
+            profile_multiexp<GroupType, FieldType, policies::multiexp_method_bos_coster<GroupType, FieldType>>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
         run_result_t<GroupType> result_djb =
-            profile_multiexp<GroupType, FieldType, multiexp_method_BDLO12>(group_elements, scalars);
+            profile_multiexp<GroupType, FieldType, policies::multiexp_method_BDLO12<GroupType, FieldType>>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -175,7 +176,7 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 
         if (expn <= expn_end_naive) {
             run_result_t<GroupType> result_naive =
-                profile_multiexp<GroupType, FieldType, multiexp_method_naive_plain>(group_elements, scalars);
+                profile_multiexp<GroupType, FieldType, policies::multiexp_method_naive_plain<GroupType, FieldType>>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 
