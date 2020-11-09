@@ -109,7 +109,6 @@ namespace nil {
                         typedef typename types_policy::verification_key verification_key_type;
                         typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::circuit circuit_type;
                         typedef typename types_policy::keypair keypair_type;
                         typedef typename types_policy::proof proof_type;
 

@@ -36,13 +36,14 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename Generator = policies::r1cs_gg_ppzksnark_generator,
-                         typename Prover = policies::r1cs_gg_ppzksnark_prover,
-                         typename Verifier = policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency,
+                template<typename CurveType,
+                         typename Generator = policies::r1cs_gg_ppzksnark_generator<CurveType>,
+                         typename Prover = policies::r1cs_gg_ppzksnark_prover<CurveType>,
+                         typename Verifier = policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
                          typename OnlineVerifier =
                              policies::r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_gg_ppzksnark {
-                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy;
+                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
 
                 public:
                     typedef typename types_policy::constraint_system constraint_system_type;
@@ -56,8 +57,8 @@ namespace nil {
                     typedef typename types_policy::keypair keypair_type;
                     typedef typename types_policy::proof proof_type;
 
-                    static inline keypair_type generator(const circuit_type &circuit) {
-                        return Generator::process(circuit);
+                    static inline keypair_type generator(const constraint_system_type &constraint_system) {
+                        return Generator::process(constraint_system);
                     }
 
                     static inline proof_type prover(const proving_key_type &pk,

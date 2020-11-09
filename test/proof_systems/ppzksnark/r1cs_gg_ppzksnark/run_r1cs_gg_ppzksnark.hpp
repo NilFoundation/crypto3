@@ -30,6 +30,7 @@
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
 #include "r1cs_examples.hpp"
 
@@ -51,7 +52,8 @@ namespace nil {
                                          const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
                                          const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
-                    const bool answer = r1cs_gg_ppzksnark<CurveType>::affine_verifier_weak_IC(vk, primary_input, proof);
+                    const bool answer = r1cs_gg_ppzksnark<CurveType, 
+                        policies::r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>::verifier(vk, primary_input, proof);
                     BOOST_CHECK(answer == expected_answer);
                 }
 
@@ -82,16 +84,16 @@ namespace nil {
                         r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
 
                     typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        r1cs_gg_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
+                        policies::r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.vk);
 
                     typename r1cs_gg_ppzksnark<CurveType>::proof_type proof =
                         r1cs_gg_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     const bool ans =
-                        r1cs_gg_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType, policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk, example.primary_input, proof);
 
                     const bool ans2 =
-                        r1cs_gg_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
+                        r1cs_gg_ppzksnark<CurveType, policies::r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>::online_verifier(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);

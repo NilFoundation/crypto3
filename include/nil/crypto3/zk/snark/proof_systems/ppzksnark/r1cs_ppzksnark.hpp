@@ -59,12 +59,11 @@ namespace nil {
                     typedef typename types_policy::verification_key verification_key_type;
                     typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                    typedef typename types_policy::circuit_type circuit_type;
                     typedef typename types_policy::keypair keypair_type;
                     typedef typename types_policy::proof proof_type;
 
-                    static inline keypair_type generator(const circuit_type &circuit) {
-                        return Generator::process(circuit);
+                    static inline keypair_type generator(const constraint_system_type &constraint_system) {
+                        return Generator::process(constraint_system);
                     }
 
                     static inline proof_type prover(const proving_key_type &pk,

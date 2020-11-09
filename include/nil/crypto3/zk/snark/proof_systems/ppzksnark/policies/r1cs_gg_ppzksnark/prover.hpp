@@ -156,7 +156,7 @@ namespace nil {
                             kc_multiexp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
                                                              typename CurveType::scalar_field_type,
                                                              algebra::policies::multiexp_method_BDLO12<
-                                                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type,
+                                                             knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type>,
                                                              typename CurveType::scalar_field_type>>(
                                 proving_key.B_query,
                                 0,
