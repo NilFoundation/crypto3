@@ -51,24 +51,24 @@ namespace nil {
 
                         typedef typename policy_type::underlying_type underlying_type;
 
-                        using value_type = std::array<underlying_type, 2>;
+                        using data_type = std::array<underlying_type, 2>;
 
-                        value_type data;
+                        data_type data;
 
                         element_fp2() {
-                            data = value_type({underlying_type::zero(), underlying_type::zero()});
+                            data = data_type({underlying_type::zero(), underlying_type::zero()});
                         }
 
                         element_fp2(int in_data0, int in_data1) {
-                            data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
+                            data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
                         element_fp2(modulus_type in_data0, modulus_type in_data1) {
-                            data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
+                            data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
                         element_fp2(underlying_type in_data0, underlying_type in_data1) {
-                            data = value_type({in_data0, in_data1});
+                            data = data_type({in_data0, in_data1});
                         }
 
                         element_fp2(const element_fp2 &B) {

@@ -22,6 +22,7 @@ set(EXAMPLES_NAMES
     "curves"
     "fields"
     "pairing"
+    "random_element"
     "hash_to_curve")
 
 foreach(EXAMPLE_NAME ${EXAMPLES_NAMES})

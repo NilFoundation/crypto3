@@ -48,13 +48,13 @@ namespace nil {
 
                         constexpr static const modulus_type modulus = policy_type::modulus;
 
-                        using value_type = number_type;
+                        using data_type = number_type;
 
-                        value_type data;
+                        data_type data;
 
-                        element_fp() : data(value_type(0, modulus)) {};
+                        element_fp() : data(data_type(0, modulus)) {};
 
-                        element_fp(value_type data) : data(data) {};
+                        element_fp(data_type data) : data(data) {};
 
                         element_fp(modulus_type data) : data(data, modulus) {};
 
@@ -73,11 +73,11 @@ namespace nil {
                         }
 
                         bool is_zero() const {
-                            return data == value_type(0, modulus);
+                            return data == data_type(0, modulus);
                         }
 
                         bool is_one() const {
-                            return data == value_type(1, modulus);
+                            return data == data_type(1, modulus);
                         }
 
                         bool operator==(const element_fp &B) const {

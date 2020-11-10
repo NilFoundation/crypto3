@@ -28,6 +28,19 @@
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
+#include <boost/core/ignore_unused.hpp>
+#include <boost/multiprecision/debug_adaptor.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/random/independent_bits.hpp>
+#include <boost/random/discard_block.hpp>
+#include <boost/random/xor_combine.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/random_number_generator.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_smallint.hpp>
+#include <boost/random/discrete_distribution.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -38,14 +51,62 @@ namespace nil {
                 random_element() {
 
                 return CurveGroupType::value_type::one();
-            };
+            }
 
-            template<typename FieldType>
-            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value, 
+            template<typename FieldType, 
+                     typename DistributionType = 
+                              boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
+                     typename GeneratorType = boost::random::mt19937>
+            typename std::enable_if<::nil::crypto3::detail::is_fp_field<FieldType>::value, 
                                     typename FieldType::value_type>::type 
                 random_element() {
-                return FieldType::value_type::one();
-            };
+
+                using field_type = FieldType;
+                using number_type = typename field_type::number_type;
+                using distribution_type = DistributionType;
+                using generator_type = GeneratorType;
+
+                distribution_type d(0, field_type::modulus);
+                
+                generator_type rd;
+
+                typename field_type::value_type value (d(rd));
+
+                //std::cout << value.data << " by modulus " << field_type::modulus << std::endl;
+
+                return value;
+            }
+
+            template<typename FieldType, 
+                     typename DistributionType = 
+                              boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
+                     typename GeneratorType = boost::random::mt19937>
+            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value &&
+                                    !(::nil::crypto3::detail::is_fp_field<FieldType>::value), 
+                                    typename FieldType::value_type>::type 
+                random_element() {
+
+                using field_type = FieldType;
+                using number_type = typename field_type::number_type;
+                using distribution_type = DistributionType;
+                using generator_type = GeneratorType;
+
+                distribution_type d(0, field_type::modulus);
+                
+                generator_type rd;
+
+                typename field_type::value_type::data_type data;
+                const std::size_t data_dimension = field_type::arity / 
+                                                   field_type::underlying_field_type::arity;
+
+                for(int n = 0; n < data_dimension; ++n){
+                    data[n] = random_element<FieldType::underlying_field_type,
+                                             distribution_type,
+                                             generator_type>();
+                }
+
+                return typename field_type::value_type(data);
+            }
 
         }    // namespace algebra
     }        // namespace crypto3
