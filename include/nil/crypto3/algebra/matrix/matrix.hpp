@@ -55,9 +55,9 @@ namespace nil {
                 // CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T)
 
                 using value_type = T;
-                using size_type = std::size_t;
-                static constexpr size_type column_size = N;    ///< Number of rows
-                static constexpr size_type row_size = M;       ///< Number of columns
+                using std::size_type = std::size_t;
+                static constexpr std::size_type column_size = N;    ///< Number of rows
+                static constexpr std::size_type row_size = M;       ///< Number of columns
 
                 /** @name Element access */
                 ///@{

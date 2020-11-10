@@ -84,7 +84,7 @@ template<typename T>
 using test_instances_t = std::vector<std::vector<T>>;
 
 template<typename GroupType>
-test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
+test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t size) {
     // generating a random group element is expensive,
     // so for now we only generate a single one and repeat it
     test_instances_t<GroupType> result(count);
@@ -103,7 +103,7 @@ test_instances_t<GroupType> generate_group_elements(size_t count, size_t size) {
 }
 
 template<typename FieldType>
-test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
+test_instances_t<FieldType> generate_scalars(size_t count, std::size_t size) {
     // we use SHA512_rng because it is much faster than
     // FieldType::random_element()
     test_instances_t<FieldType> result(count);
@@ -140,7 +140,7 @@ run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_eleme
 }
 
 template<typename GroupType, typename FieldType>
-void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_end_naive, bool compare_answers) {
+void print_performance_csv(size_t expn_start, std::size_t expn_end_fast, std::size_t expn_end_naive, bool compare_answers) {
     for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
         printf("%ld", expn);
         fflush(stdout);

@@ -66,16 +66,16 @@ namespace nil {
                 return res;
             }
 
-            //TODO: check, that BaseValueType is a curve group element. Otherwise it has no wnaf_window_table
-            template<typename BaseValueType, typename Backend,
+            //TODO: check, that CurveGroupValueType is a curve group element. Otherwise it has no wnaf_window_table
+            template<typename CurveGroupValueType, typename Backend,
                      boost::multiprecision::expression_template_option ExpressionTemplates>
-            BaseValueType
-                opt_window_wnaf_exp(const BaseValueType &base,
+            CurveGroupValueType
+                opt_window_wnaf_exp(const CurveGroupValueType &base,
                                     const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
-                                    const size_t scalar_bits) {
-                size_t best = 0;
-                for (long i = curves::wnaf_params<typename BaseValueType::group_type>::wnaf_window_table.size() - 1; i >= 0; --i) {
-                    if (scalar_bits >= curves::wnaf_params<typename BaseValueType::group_type>::wnaf_window_table[i]) {
+                                    const std::size_t scalar_bits) {
+                std::size_t best = 0;
+                for (long i = curves::wnaf_params<typename CurveGroupValueType::group_type>::wnaf_window_table.size() - 1; i >= 0; --i) {
+                    if (scalar_bits >= curves::wnaf_params<typename CurveGroupValueType::group_type>::wnaf_window_table[i]) {
                         best = i + 1;
                         break;
                     }

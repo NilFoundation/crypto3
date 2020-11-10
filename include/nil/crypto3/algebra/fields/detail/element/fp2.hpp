@@ -212,7 +212,7 @@ namespace nil {
 
                             element_fp2 one = this->one();
 
-                            size_t v = policy_type::s;
+                            std::size_t v = policy_type::s;
                             element_fp2 z(policy_type::nqr_to_t[0], policy_type::nqr_to_t[1]);
                             element_fp2 w = this->pow(policy_type::t_minus_1_over_2);
                             element_fp2 x((*this) * w);
@@ -222,7 +222,7 @@ namespace nil {
                             // (does not terminate if not a square!)
 
                             while (b != one) {
-                                size_t m = 0;
+                                std::size_t m = 0;
                                 element_fp2 b2m = b;
                                 while (b2m != one) {
                                     /* invariant: b2m = b^(2^m) after entering this loop */

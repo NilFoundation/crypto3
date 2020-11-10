@@ -49,7 +49,7 @@ namespace nil {
                         number_type r;
                         using r_type = number_type;
 
-                        ordered_exponent(const size_t idx, const number_type &r) : idx(idx), r(r) {};
+                        ordered_exponent(const std::size_t idx, const number_type &r) : idx(idx), r(r) {};
 
                         bool operator<(const ordered_exponent &other) const {
                                 return (this->r < other.r);
@@ -234,6 +234,7 @@ namespace nil {
                         const std::size_t vec_len = scalar_end - scalar_start;
                         const std::size_t odd_vec_len = (vec_len % 2 == 1 ? vec_len : vec_len + 1);
                         opt_q.reserve(odd_vec_len);
+                        
                         std::vector<base_value_type> g;
                         g.reserve(odd_vec_len);
 

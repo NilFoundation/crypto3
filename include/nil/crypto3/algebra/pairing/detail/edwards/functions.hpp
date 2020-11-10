@@ -294,7 +294,7 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
                             for (long i = policy_type::scalar_field_bits - 1; i >= 0; --i) {
                                 const bool bit = boost::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                                 if (!found_one) {
@@ -509,7 +509,7 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
                             for (long i = number_type_max_bits - 1; i >= 0; --i) {
                                 const bool bit = boost::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
@@ -544,7 +544,7 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
                             for (long i = number_type_max_bits - 1; i >= 0; --i) {
                                 const bool bit = boost::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {

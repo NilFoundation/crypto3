@@ -272,7 +272,7 @@ namespace nil {
 
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
                             bool found_nonzero = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
 
                             // std::vector<long> NAF = boost::multiprecision::find_wnaf(1, loop_count);
                             std::vector<long> NAF;
@@ -462,8 +462,8 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t dbl_idx = 0;
-                            size_t add_idx = 0;
+                            std::size_t dbl_idx = 0;
+                            std::size_t add_idx = 0;
 
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
@@ -512,8 +512,8 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t dbl_idx = 0;
-                            size_t add_idx = 0;
+                            std::size_t dbl_idx = 0;
+                            std::size_t add_idx = 0;
 
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 

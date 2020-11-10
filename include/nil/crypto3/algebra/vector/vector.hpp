@@ -52,8 +52,8 @@ namespace nil {
                 // CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T)
 
                 using value_type = T;
-                using size_type = std::size_t;
-                static constexpr size_type size = N;    ///< @brief size of the vector
+                using std::size_type = std::size_t;
+                static constexpr std::size_type size = N;    ///< @brief size of the vector
 
                 /** @name Element access */
                 ///@{

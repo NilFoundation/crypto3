@@ -292,7 +292,7 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
 
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
@@ -333,7 +333,7 @@ namespace nil {
                             gt f = gt::one();
 
                             bool found_one = false;
-                            size_t idx = 0;
+                            std::size_t idx = 0;
 
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
