@@ -56,87 +56,106 @@ namespace nil {
                 using namespace nil::crypto3::algebra;
 
                 template<typename FieldType>
-                bool is_basic_radix2_domain (std::size_t m) {
-                    return (m > 1) && !(m & (m - 1)) &&
-                        (std::ceil(std::log2(m)) <= fields::arithmetic_params<FieldType>::s);
+                bool is_basic_radix2_domain(std::size_t m) {
+                    return (m > 1) &&
+                           // !(m & (m - 1)) &&
+                           (static_cast<std::size_t>(std::ceil(std::log2(m))) <=
+                            fields::arithmetic_params<FieldType>::s);
                 };
 
                 template<typename FieldType>
-                bool is_extended_radix2_domain (std::size_t m) {
-                    return (m > 1) && !(m & (m - 1)) &&
-                        (std::ceil(std::log2(m)) == fields::arithmetic_params<FieldType>::s + 1);
+                bool is_extended_radix2_domain(std::size_t m) {
+                    return (m > 1) &&
+                           // !(m & (m - 1)) &&
+                           (static_cast<std::size_t>(std::ceil(std::log2(m))) ==
+                            fields::arithmetic_params<FieldType>::s + 1);
                 };
 
                 template<typename FieldType>
-                bool is_step_radix2_domain (std::size_t m) {
-                    std::size_t const small_m = m - (1ul << (std::size_t(std::ceil(std::log2(m))) - 1));
+                bool is_step_radix2_domain(std::size_t m) {
+                    std::size_t const small_m = m - (1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1));
 
-                    return (m > 1) && (m & (m - 1)) &&
-                        (std::ceil(std::log2(m)) <= fields::arithmetic_params<FieldType>::s) &&
-                        !(small_m & (small_m - 1));
+                    return (m > 1) &&
+                           // (m & (m - 1)) &&
+                           // (std::ceil(std::log2(m)) <= fields::arithmetic_params<FieldType>::s) &&
+                           (small_m == (1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m)))));// &&
+                           // !(small_m & (small_m - 1));
                 };
+
+                template<typename FieldType>
+                bool is_geometric_sequence_domain(std::size_t m) {
+                    return (m > 1) &&
+                           (typename FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) !=
+                            FieldType::value_type::zero());
+                }
+
+                template<typename FieldType>
+                bool is_arithmetic_sequence_domain(std::size_t m) {
+                    return (m > 1) &&
+                           (typename FieldType::value_type(fields::arithmetic_params<FieldType>::arithmetic_generator) !=
+                            FieldType::value_type::zero());
+                }
+
             }
 
 
             template<typename FieldType>
             std::shared_ptr<evaluation_domain<FieldType>> make_evaluation_domain(std::size_t m) {
+                typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
 
-                    typedef std::shared_ptr<evaluation_domain<FieldType>> ret_type;
+                const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);
+                const std::size_t rounded_small = (1ul << std::size_t(std::ceil(std::log2(m - big))));
 
-                    const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);
-                    const std::size_t rounded_small = (1ul << std::size_t(std::ceil(std::log2(m - big))));
+                if (detail::is_basic_radix2_domain<FieldType>(m)) {
+                    ret_type result;
+                    result.reset(new basic_radix2_domain<FieldType>(m));
+                    return result;
+                }
 
-                    if (detail::is_basic_radix2_domain<FieldType>(m)){
-                        ret_type result;
-                        result.reset(new basic_radix2_domain<FieldType>(m));
-                        return result;
-                    }
+                if (detail::is_extended_radix2_domain<FieldType>(m)) {
+                    ret_type result;
+                    result.reset(new extended_radix2_domain<FieldType>(m));
+                    return result;
+                }
 
-                    if (detail::is_basic_radix2_domain<FieldType>(m)
-                        &&
-                        detail::is_basic_radix2_domain<FieldType>(big + rounded_small)){
-                        ret_type result;
-                        result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
-                        return result;
-                    }
+                if (detail::is_step_radix2_domain<FieldType>(m)) {
+                    ret_type result;
+                    result.reset(new step_radix2_domain<FieldType>(m));
+                    return result;
+                }
 
-                    if (detail::is_extended_radix2_domain<FieldType> (m)) {
-                        ret_type result;
-                        result.reset(new extended_radix2_domain<FieldType>(m));
-                        return result;
-                    }
+                if (!detail::is_basic_radix2_domain<FieldType>(m) &&
+                    detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
+                    ret_type result;
+                    result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
+                    return result;
+                }
 
-                    if (!detail::is_extended_radix2_domain<FieldType>(m) &&
-                         detail::is_extended_radix2_domain<FieldType> (big + rounded_small)) {
-                        ret_type result;
-                        result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
-                        return result;
-                    }
+                if (!detail::is_extended_radix2_domain<FieldType>(m) &&
+                    detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
+                    ret_type result;
+                    result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
+                    return result;
+                }
 
-                    if (detail::is_step_radix2_domain<FieldType>(m)) {
-                        ret_type result;
-                        result.reset(new step_radix2_domain<FieldType>(m));
-                        return result;
-                    }
+                if (!detail::is_step_radix2_domain<FieldType>(m) &&
+                    detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
+                    ret_type result;
+                    result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
+                    return result;
+                }
 
-                    if (!detail::is_step_radix2_domain<FieldType>(m) && 
-                         detail::is_step_radix2_domain<FieldType> (big + rounded_small)) {
-                        ret_type result;
-                        result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
-                        return result;
-                    }
+                if (detail::is_geometric_sequence_domain<FieldType>(m)) {
+                    ret_type result;
+                    result.reset(new geometric_sequence_domain<FieldType>(m));
+                    return result;
+                }
 
-                    if (typename FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) != FieldType::value_type::zero()) {
-                        ret_type result;
-                        result.reset(new geometric_sequence_domain<FieldType>(m));
-                        return result;
-                    }
-                    
-                    if (typename FieldType::value_type(fields::arithmetic_params<FieldType>::arithmetic_generator) != FieldType::value_type::zero()) {
-                        ret_type result;
-                        result.reset(new arithmetic_sequence_domain<FieldType>(m));
-                        return result;
-                    }
+                if (detail::is_arithmetic_sequence_domain<FieldType>(m)) {
+                    ret_type result;
+                    result.reset(new arithmetic_sequence_domain<FieldType>(m));
+                    return result;
+                }
 
                 return ret_type();
             }
