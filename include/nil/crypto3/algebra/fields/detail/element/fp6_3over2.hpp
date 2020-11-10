@@ -60,6 +60,10 @@ namespace nil {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 
+                        element_fp6_3over2(const data_type &in_data) {
+                            data = data_type({in_data[0], in_data[1], in_data[2]});
+                        };
+
                         element_fp6_3over2(const element_fp6_3over2 &other) {
                             data[0] = underlying_type(other.data[0]);
                             data[1] = underlying_type(other.data[1]);
@@ -129,9 +133,9 @@ namespace nil {
                                                   A2B2 = data[2] * B.data[2];
 
                             return element_fp6_3over2(
-                                {A0B0 + mul_by_non_residue((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
+                                A0B0 + mul_by_non_residue((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
                                  (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + mul_by_non_residue(A2B2),
-                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
+                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
                         }
 
                         element_fp6_3over2 sqrt() const {

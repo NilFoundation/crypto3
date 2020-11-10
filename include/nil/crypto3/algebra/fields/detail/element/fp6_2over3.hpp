@@ -56,6 +56,10 @@ namespace nil {
                             data = data_type({in_data0, in_data1});
                         }
 
+                        element_fp6_2over3(const data_type &in_data) {
+                            data = data_type({in_data[0], in_data[1]});
+                        };
+
                         element_fp6_2over3(const element_fp6_2over3 &other) {
                             data[0] = underlying_type(other.data[0]);
                             data[1] = underlying_type(other.data[1]);

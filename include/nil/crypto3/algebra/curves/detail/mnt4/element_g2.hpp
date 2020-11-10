@@ -299,8 +299,8 @@ namespace nil {
                         /*constexpr static */ const g1_field_type_value g1_b = g1_field_type_value(policy_type::b);
 
                         /*constexpr static */ const g2_field_type_value twist =
-                            g2_field_type_value({g2_field_type_value::underlying_type::zero(),
-                                                 g2_field_type_value::underlying_type::one()});
+                            g2_field_type_value(g2_field_type_value::underlying_type::zero(),
+                                                 g2_field_type_value::underlying_type::one());
 
                         /*constexpr static */ const underlying_field_value_type a =
                             underlying_field_value_type(g1_a * twist.non_residue, g1_field_type_value::zero());

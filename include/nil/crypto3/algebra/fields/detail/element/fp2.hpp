@@ -67,6 +67,10 @@ namespace nil {
                             data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
+                        element_fp2(const data_type &in_data) {
+                            data = data_type({in_data[0], in_data[1]});
+                        };
+
                         element_fp2(underlying_type in_data0, underlying_type in_data1) {
                             data = data_type({in_data0, in_data1});
                         }
@@ -136,8 +140,8 @@ namespace nil {
                         element_fp2 operator*(const element_fp2 &B) const {
                             const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                            return element_fp2({A0B0 + non_residue * A1B1,
-                                                (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
+                            return element_fp2(A0B0 + non_residue * A1B1,
+                                                (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1);
                         }
 
                         element_fp2 &operator*=(const element_fp2 &B) {

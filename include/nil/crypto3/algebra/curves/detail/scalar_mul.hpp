@@ -103,7 +103,7 @@ namespace nil {
                              typename FieldValueType>
                     typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
                                             !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
-                                            ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
+                                            !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
                          operator*(const GroupValueType &left, const FieldValueType &right) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
@@ -116,7 +116,7 @@ namespace nil {
                              typename FieldValueType>
                     typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
                                             !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
-                                            ::nil::crypto3::detail::is_fp_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
+                                            !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
                         operator*(const FieldValueType &left, const GroupValueType &right) {
 
                         return right * left;

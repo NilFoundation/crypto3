@@ -49,6 +49,12 @@
 //#include <nil/crypto3/algebra/fields/modp_ietf.hpp>
 //#include <nil/crypto3/algebra/fields/modp_srp.hpp>
 
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp3.hpp>
@@ -78,163 +84,66 @@ void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp4<FieldParams> e) {
-    std::cout << "fp4: \n" << print_field_element(e.data[0]) << " " << print_field_element(e.data[1]) << std::endl;
+    std::cout << "fp4: \n";
+    print_field_element(e.data[0]);
+    print_field_element(e.data[1]);
 }
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp6_2over3<FieldParams> e) {
-    std::cout << "fp6_2over3: \n" << print_field_element(e.data[0]) << " " << 
-                                     print_field_element(e.data[1]) << std::endl;
+    std::cout << "fp6_2over3: \n";
+    print_field_element(e.data[0]);
+    print_field_element(e.data[1]);
 }
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp6_3over2<FieldParams> e) {
-    std::cout << "fp6_3over2: \n" << print_field_element(e.data[0]) << " " << 
-                                     print_field_element(e.data[1]) << " " << 
-                                     print_field_element(e.data[2]) << std::endl;
+    std::cout << "fp6_3over2: \n";
+    print_field_element(e.data[0]);
+    print_field_element(e.data[1]);
+    print_field_element(e.data[2]);
 }
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp12_2over3over2<FieldParams> e) {
-    std::cout << "fp12_2over3over2: \n" << print_field_element(e.data[0]) << " " << 
-                                           print_field_element(e.data[1]) << std::endl;
+    std::cout << "fp12_2over3over2: \n";;
+    print_field_element(e.data[0]);
+    print_field_element(e.data[1]);
 }
+
+template<typename CurveGroupValueType>
+void print_group_element(CurveGroupValueType e) {
+    std::cout << "Group element: \n";;
+    print_field_element(e.X);
+    print_field_element(e.Y);
+    print_field_element(e.Z);
+}
+
 template<typename FieldType>
-void random_element_example(){
+void random_field_element_example(){
     typename FieldType::value_type v = random_element<FieldType>();
 
     std::cout << "Gotten random value:" << std::endl;
     print_field_element(v);
 }
 
+template<typename CurveGroupType>
+void random_group_element_example(){
+    typename CurveGroupType::value_type v = random_element<CurveGroupType>();
+
+    std::cout << "Gotten random value:" << std::endl;
+    print_group_element(v);
+}
+
 int main() {
-    std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
-    random_element_example<fields::alt_bn128_fq<254>>();
+    std::cout << "ALT_BN128-254 Fq random element choice:" << std::endl;
+    random_field_element_example<typename fields::alt_bn128_fq<254>>();
 
-    /*std::cout << "----------------------------" << std::endl;
+    std::cout << "BLS12-381 Gt random element choice:" << std::endl;
+    random_field_element_example<typename curves::bls12<381>::gt_type>();
 
-    std::cout << "ALT_BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::alt_bn128_fq<254>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "ALT_BN128-254 Fr basic math:" << std::endl;
-    random_element_example<fields::alt_bn128_fr<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fq basic math:" << std::endl;
-    random_element_example<fields::bls12_fq<381>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bls12_fq<381>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-381 Fr basic math:" << std::endl;
-    random_element_example<fields::bls12_fr<381>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fq basic math:" << std::endl;
-    random_element_example<fields::bls12_fq<377>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bls12_fq<377>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BLS12-377 Fr basic math:" << std::endl;
-    random_element_example<fields::bls12_fr<377>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fq basic math:" << std::endl;
-    random_element_example<fields::bn128_fq<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::bn128_fq<254>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "BN128-254 Fr basic math:" << std::endl;
-    random_element_example<fields::bn128_fr<254>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fq basic math:" << std::endl;
-    random_element_example<fields::edwards_fq<183>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fq3 basic math:" << std::endl;
-    fields_fp3_basic_math_examples<fields::fp3<fields::edwards_fq<183>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "Edwards Fr basic math:" << std::endl;
-    random_element_example<fields::edwards_fr<183>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fq basic math:" << std::endl;
-    random_element_example<fields::mnt4_fq<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp2<fields::mnt4_fq<298>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT4 Fr basic math:" << std::endl;
-    random_element_example<fields::mnt4_fr<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fq basic math:" << std::endl;
-    random_element_example<fields::mnt6_fq<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fq3 basic math:" << std::endl;
-    fields_fp3_basic_math_examples<fields::fp3<fields::mnt6_fq<298>>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "MNT6 Fr basic math:" << std::endl;
-    random_element_example<fields::mnt6_fr<298>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "DSA Botan 2048 basic math:" << std::endl;
-    random_element_example<fields::dsa_botan<2048>>();
-
-    std::cout << "----------------------------" << std::endl;
-
-    std::cout << "DSA JCE 1024 basic math:" << std::endl;
-    random_element_example<fields::dsa_jce<1024>>();*/
-
-    /*    std::cout << "----------------------------" << std::endl;
-
-        std::cout << "FFDHE IETF 2048 basic math:" << std::endl;
-        random_element_example<fields::ffdhe_ietf<2048>>();
-
-        std::cout << "----------------------------" << std::endl;
-
-        std::cout << "MODP IETF 1024 basic math:" << std::endl;
-        random_element_example<fields::modp_ietf<1024>>();
-
-        std::cout << "----------------------------" << std::endl;
-
-        std::cout << "MODP SRP 1024 basic math:" << std::endl;
-        random_element_example<fields::modp_srp<1024>>();*/
+    std::cout << "BLS12-381 G1 random element choice:" << std::endl;
+    random_group_element_example<typename curves::bls12<381>::g1_type>();
 
     return 0;
 }

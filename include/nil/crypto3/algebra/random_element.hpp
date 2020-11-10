@@ -40,35 +40,30 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_smallint.hpp>
 #include <boost/random/discrete_distribution.hpp>
+#include <boost/random/random_device.hpp>
+#include <random>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<typename CurveGroupType>
-            typename std::enable_if<::nil::crypto3::detail::is_curve_group<CurveGroupType>::value, 
-                                    typename CurveGroupType::value_type>::type
-                random_element() {
-
-                return CurveGroupType::value_type::one();
-            }
-
             template<typename FieldType, 
                      typename DistributionType = 
                               boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
                      typename GeneratorType = boost::random::mt19937>
-            typename std::enable_if<::nil::crypto3::detail::is_fp_field<FieldType>::value, 
+            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value &&
+                                    !(::nil::crypto3::detail::is_extended_field<FieldType>::value), 
                                     typename FieldType::value_type>::type 
                 random_element() {
 
                 using field_type = FieldType;
-                using number_type = typename field_type::number_type;
                 using distribution_type = DistributionType;
                 using generator_type = GeneratorType;
 
                 distribution_type d(0, field_type::modulus);
-                
-                generator_type rd;
+                    
+                boost::random_device rd;
+                //rd.seed(time(0));
 
                 typename field_type::value_type value (d(rd));
 
@@ -82,30 +77,48 @@ namespace nil {
                               boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
                      typename GeneratorType = boost::random::mt19937>
             typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value &&
-                                    !(::nil::crypto3::detail::is_fp_field<FieldType>::value), 
+                                    ::nil::crypto3::detail::is_extended_field<FieldType>::value, 
                                     typename FieldType::value_type>::type 
                 random_element() {
 
                 using field_type = FieldType;
-                using number_type = typename field_type::number_type;
                 using distribution_type = DistributionType;
                 using generator_type = GeneratorType;
-
-                distribution_type d(0, field_type::modulus);
-                
-                generator_type rd;
 
                 typename field_type::value_type::data_type data;
                 const std::size_t data_dimension = field_type::arity / 
                                                    field_type::underlying_field_type::arity;
 
                 for(int n = 0; n < data_dimension; ++n){
-                    data[n] = random_element<FieldType::underlying_field_type,
+                    data[n] = random_element<typename FieldType::underlying_field_type,
                                              distribution_type,
                                              generator_type>();
                 }
 
                 return typename field_type::value_type(data);
+            }
+
+            template<typename CurveGroupType, 
+                     typename DistributionType = 
+                              boost::random::uniform_int_distribution<typename CurveGroupType::underlying_field_type::modulus_type>,
+                     typename GeneratorType = boost::random::mt19937>
+            typename std::enable_if<::nil::crypto3::detail::is_curve_group<CurveGroupType>::value, 
+                                    typename CurveGroupType::value_type>::type
+                random_element() {
+
+                using field_type = typename CurveGroupType::underlying_field_type;
+                using distribution_type = DistributionType;
+                using generator_type = GeneratorType;
+
+                return typename CurveGroupType::value_type(random_element<field_type, 
+                                                                         distribution_type, 
+                                                                         generator_type>(),
+                                                           random_element<field_type, 
+                                                                         distribution_type, 
+                                                                         generator_type>(),
+                                                           random_element<field_type, 
+                                                                         distribution_type, 
+                                                                         generator_type>());
             }
 
         }    // namespace algebra
