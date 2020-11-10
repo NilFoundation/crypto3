@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_MNT6_ARITHMETIC_PARAMS_HPP
 
 #include <nil/crypto3/algebra/fields/params.hpp>
+// #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
@@ -39,10 +40,10 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<mnt6_base_field<ModulusBits>> : public params<mnt6_base_field<ModulusBits>> {
+                template<>
+                struct arithmetic_params<mnt6_base_field<298>> : public params<mnt6_base_field<298>> {
                 private:
-                    typedef params<mnt6_base_field<ModulusBits>> policy_type;
+                    typedef params<mnt6_base_field<298>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -71,11 +72,11 @@ namespace nil {
                         0x1DE7BDE6A39D133124ED3D82A47657764B1AE7A20CA7DA4A603C92EB569DDA19A5200000000_cppui297;
                 };
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<fp3<mnt6_base_field<ModulusBits>>>
-                    : public params<mnt6_base_field<ModulusBits>> {
+                template<>
+                struct arithmetic_params<fp3<mnt6_base_field<298>>>
+                    : public params<mnt6_base_field<298>> {
                 private:
-                    typedef params<mnt6_base_field<ModulusBits>> policy_type;
+                    typedef params<mnt6_base_field<298>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -97,60 +98,114 @@ namespace nil {
                         0x1A1E3D618BA643D0F7F10B59BD7DB6981AD661CC756DCF7EC82F4F320CF354C814FAB1F72198E11AAE5A65BFAC8866CDA5F25E91FE3405FB619822AE7756E3F1CBC0B60FBD44114FC23E7CC3932D198CBE6F3DF9DF28E58FF8DBDC80329943BF3F003B81A48CADD598E4CEF600000000_cppui893;
                 };
 
-                template<std::size_t ModulusBits>
-                using arithmetic_params<mnt6_scalar_field<ModulusBits>> =
-                    arithmetic_params<mnt4_base_field<ModulusBits>>;
+                template<>
+                struct arithmetic_params<mnt6_scalar_field<298>> : public params<mnt6_scalar_field<298>> {
+                private:
+                    typedef params<mnt6_scalar_field<298>> policy_type;
+                    // typedef arithmetic_params<mnt4_base_field<298>> params_definition;
+
+                public:
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const std::size_t s = 0x11;
+                    constexpr static const modulus_type t =
+                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B3_cppui281;
+                    constexpr static const modulus_type t_minus_1_over_2 =
+                        0xEF3DEF351CE899892769EC1523B2BBB258D744CC3A906A78D794480384B24335969C59_cppui280;
+                    constexpr static const modulus_type arithmetic_generator = 0x01;
+                    constexpr static const modulus_type geometric_generator = 0x02;
+                    constexpr static const modulus_type multiplicative_generator = 0x11;
+                    constexpr static const modulus_type root_of_unity =
+                        0x214431121152176339675F00F9D465A3C037F18735DB28205F2A5F57D155F151CEC101EEC43_cppui298;
+                    constexpr static const modulus_type nqr = 0x11;
+                    constexpr static const modulus_type nqr_to_t =
+                        0x214431121152176339675F00F9D465A3C037F18735DB28205F2A5F57D155F151CEC101EEC43_cppui298;
+                    constexpr static const modulus_type Rsquared =
+                        0x224F0918A341F32E014AD38D47B66BD7673318850E1A266A1ADBF2BC8930065ACEC5613D220_cppui298;
+                    constexpr static const modulus_type Rcubed =
+                        0x35B329C5C21DB492B899FB731B0626C4C908A5073171DE648C893BA7447A3FE093A2C77F995_cppui298;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const modulus_type group_order =
+                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B30000_cppui297;
+                };
 
                 constexpr std::size_t const arithmetic_params<mnt6_base_field<298>>::s;
                 constexpr std::size_t const arithmetic_params<fp3<mnt6_base_field<298>>>::s;
+                constexpr std::size_t const arithmetic_params<mnt6_scalar_field<298>>::s;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::t;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::t;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::t;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::t_minus_1_over_2;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::t_minus_1_over_2;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::arithmetic_generator;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::arithmetic_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::geometric_generator;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::geometric_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::multiplicative_generator;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::multiplicative_generator;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::root_of_unity;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::root_of_unity;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr;
                 constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::nqr;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::nqr;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::nqr_to_t;
                 constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type, 3> const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::nqr_to_t;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::nqr_to_t;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::Rsquared;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::Rsquared;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::Rcubed;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::Rcubed;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::modulus;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::modulus;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::modulus;
 
                 constexpr typename arithmetic_params<mnt6_base_field<298>>::modulus_type const
                     arithmetic_params<mnt6_base_field<298>>::group_order;
                 constexpr typename arithmetic_params<fp3<mnt6_base_field<298>>>::extended_modulus_type const
                     arithmetic_params<fp3<mnt6_base_field<298>>>::group_order;
+                constexpr typename arithmetic_params<mnt6_scalar_field<298>>::modulus_type const
+                    arithmetic_params<mnt6_scalar_field<298>>::group_order;
 
             }    // namespace fields
         }        // namespace algebra

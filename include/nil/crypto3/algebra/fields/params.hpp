@@ -42,15 +42,10 @@ namespace nil {
                     typedef typename field_type::extended_modulus_type extended_modulus_type;
 
                     constexpr static const modulus_type modulus = field_type::modulus;
-
-                    constexpr static const modulus_type mul_generator = field_type::mul_generator;
                 };
 
                 template<typename FieldType>
                 constexpr typename params<FieldType>::modulus_type const params<FieldType>::modulus;
-
-                template<typename FieldType>
-                constexpr typename params<FieldType>::modulus_type const params<FieldType>::mul_generator;
 
                 template<typename FieldType>
                 constexpr typename std::size_t const params<FieldType>::modulus_bits;
