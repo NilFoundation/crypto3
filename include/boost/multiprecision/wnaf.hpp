@@ -23,7 +23,7 @@ std::vector<long> eval_find_wnaf(const size_t window_size, const Backend& scalar
    using default_ops::eval_right_shift;
    using default_ops::eval_subtract;
 
-   const std::size_t length = size(scalar.limbs()) * std::numeric_limits<ui_type>::digits; // upper bound
+   const std::size_t length = scalar.size() * std::numeric_limits<ui_type>::digits; // upper bound
    std::vector<long> res(length + 1);
 
    Backend c (scalar);
@@ -42,7 +42,7 @@ std::vector<long> eval_find_wnaf(const size_t window_size, const Backend& scalar
 
          if (u > 0)
          {
-            eval_subtract(c, c, u);
+            eval_subtract(c, c, Backend(u));
          }
          else
          {
