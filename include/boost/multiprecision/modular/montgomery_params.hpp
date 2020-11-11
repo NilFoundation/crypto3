@@ -185,6 +185,20 @@ namespace backends {
             return w;
         }
 
+
+        template<typename F, std::size_t... S>
+        constexpr void static_for(F&& function, std::index_sequence<S...>) {
+            int unpack[] = {0,
+                            void(function(std::integral_constant<std::size_t, S>{}), 0)...};
+
+            (void) unpack;
+        }
+
+        template<std::size_t iterations, typename F>
+        constexpr void static_for(F&& function) {
+            static_for(std::forward<F>(function), std::make_index_sequence<iterations>());
+        }
+
         template<size_t i, class... Args>
         struct TuplePrinter {
             constexpr static auto return_(const std::tuple<Args...>& t)
@@ -204,16 +218,15 @@ namespace backends {
 
             constexpr size_t N = std::max(len, 1 + (10 * len) / (3 * std::numeric_limits<T>::digits));
 
-            big_int<N, T> num{0};
+            big_int<N, T> numb{0};
             big_int<N, T> power_of_ten{1};
 
-
-            for (std::size_t i = len - 1; i > 0; --i) {
-
-                num = add_ignore_carry(num, partial_mul<N>(big_int<1, T>{static_cast<T>(return_i<0, Args...>(t))}, power_of_ten));
+            static_for<len - 1>([&](auto index) {
+                numb = add_ignore_carry(numb, partial_mul<N>(big_int<1, T>{static_cast<T>(return_i<index>(t))}, power_of_ten));
                 power_of_ten = partial_mul<N>(big_int<1, T>{static_cast<T>(10)}, power_of_ten);
-            }
-            return num;
+            });
+
+            return numb;
         }
 
         template <size_t len, typename T = uint64_t, class... Args, std::size_t... Is>
@@ -638,61 +651,7 @@ namespace backends {
             return tmp;
         }
 
-        template <typename Backend>
-        constexpr auto conver_to_string(Backend result)
-        {
-            auto str = convert_to_string(result);
-            using default_ops::eval_get_sign;
-            int base = 10;
-            unsigned Bits = result.size() * result.limbs();
-
-            std::string res;
-
-            res.assign(Bits / 3 + 1, '0');
-            std::string::difference_type pos = res.size() - 1;
-            cpp_int_backend              t(result);
-            cpp_int_backend              r;
-            bool                         neg = false;
-            if (t.sign())
-            {
-                t.negate();
-                neg = true;
-            }
-            if (result.size() == 1)
-            {
-                res = boost::lexical_cast<std::string>(t.limbs()[0]);
-            }
-            else
-            {
-                cpp_int_backend block10;
-                block10 = max_block_10;
-                while (eval_get_sign(t) != 0)
-                {
-                    cpp_int_backend t2;
-                    divide_unsigned_helper(&t2, t, block10, r);
-                    t           = t2;
-                    limb_type v = r.limbs()[0];
-                    for (unsigned i = 0; i < digits_per_block_10; ++i)
-                    {
-                        char c = '0' + v % 10;
-                        v /= 10;
-                        res[pos] = c;
-                        if (pos-- == 0)
-                            break;
-                    }
-                }
-            }
-            std::string::size_type n = res.find_first_not_of('0');
-            res.erase(0, n);
-            if (res.empty())
-                res = "0";
-            if (neg)
-                res.insert(static_cast<std::string::size_type>(0), 1, '-');
-
-            return res;
-        }
-
-        template<typename T, unsigned N, typename... REST>
+        template<typename T, size_t N, typename... REST>
         struct generate_tuple_type
         {
             typedef typename generate_tuple_type<T, N-1, T, REST...>::type type;
@@ -704,23 +663,36 @@ namespace backends {
             typedef std::tuple<REST...> type;
         };
 
-        template <typename Backend>
-        constexpr Backend eval_montgomery_reduce_compile_time_backend(Backend result)
-        {
-            //examples
+        template <typename Backend, typename gen_tuple_type>
+        constexpr auto convert_to_tuple (Backend result) {
+            auto Bits = result.size();
+            size_t pos = Bits / 3 + 1;
+
+            gen_tuple_type tuple_res;
+
+            cpp_int_backend t(result), t2(result), r(result);
+            while (eval_get_sign(t) != 0)
             {
-                constexpr auto len = 1;
-                using gen_tuple_t = generate_tuple_type<int, len>::type;
-                constexpr gen_tuple_t tmp;
-
-
-                constexpr std::tuple<int, int> tst(1, 2);
-                constexpr auto res = convert_to_backend<len>(tst);
+                divide_unsigned_helper(&t2, t, max_block_10, r);
+                t           = t2;
+                limb_type v = r.limbs()[0];
+                for (unsigned i = 0; i < digits_per_block_10; ++i)
+                {
+                    int c = v % 10;
+                    v /= 10;
+                    std::get<pos>(tuple_res) = c;
+                    if (pos-- == 0)
+                        break;
+                }
             }
+            return tuple_res;
+        }
 
-            //auto res = convert_to_string(result);
-            //result = convert_to_backned(res);
+        template <typename Backend>
+        constexpr Backend eval_montgomery_reduce_compile_time_backend(Backend result) {
 
+            auto tuple_res = convert_to_tuple<generate_tuple_type<int, result.size() / 3 + 1>::type>(result);
+            result = convert_to_backend(tuple_res);
 
             return result;
         }
