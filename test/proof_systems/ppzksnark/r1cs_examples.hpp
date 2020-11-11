@@ -203,7 +203,7 @@ namespace nil {
                     BOOST_CHECK(cs.num_variables() >= num_inputs);
                     BOOST_CHECK(cs.num_inputs() == num_inputs);
                     BOOST_CHECK(cs.num_constraints() == num_constraints);
-                    //BOOST_CHECK(cs.is_satisfied(primary_input, auxiliary_input));
+                    BOOST_CHECK(cs.is_satisfied(primary_input, auxiliary_input));
 
                     r1cs_example<FieldType> re = r1cs_example<FieldType>(std::move(cs), 
                                                                          std::move(primary_input), 

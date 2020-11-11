@@ -195,26 +195,20 @@ namespace nil {
                                 chunks);
 
                             /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
-                            typename g1_type::value_type g1_A = proving_key.alpha_g1 + evaluation_At;
-                            // typename g1_type::value_type g1_A = proving_key.alpha_g1 + evaluation_At + r *
-                            // proving_key.delta_g1; uncomment when multiplication ready
+                            typename g1_type::value_type g1_A = proving_key.alpha_g1 + 
+                            evaluation_At + r * proving_key.delta_g1;
 
                             /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
-                            typename g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h;
-                            typename g2_type::value_type g2_B = proving_key.beta_g2 + evaluation_Bt.g;
-                            // typename g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h + s
-                            // * proving_key.delta_g1; typename g2_type::value_type g2_B =
-                            // proving_key.beta_g2 + evaluation_Bt.g
-                            // + s * proving_key.delta_g2; uncomment when multiplication ready
+                            typename g1_type::value_type g1_B = proving_key.beta_g1 + evaluation_Bt.h 
+                            + s * proving_key.delta_g1;
+                            typename g2_type::value_type g2_B = proving_key.beta_g2 + evaluation_Bt.g
+                            + s * proving_key.delta_g2;
 
                             /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b -
                              * r*s*delta
                              */
-                            typename g1_type::value_type g1_C;
-                            //     = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) *
-                            //     proving_key.delta_g1;
-                            // uncomment
-                            // when multiplication ready
+                            typename g1_type::value_type g1_C = evaluation_Ht + evaluation_Lt 
+                            + s * g1_A + r * g1_B - (r * s) * proving_key.delta_g1;
 
                             proof_type prf = proof_type(std::move(g1_A), std::move(g2_B), std::move(g1_C));
 

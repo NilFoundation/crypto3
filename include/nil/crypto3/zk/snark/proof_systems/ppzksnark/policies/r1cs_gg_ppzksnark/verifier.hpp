@@ -155,9 +155,10 @@ namespace nil {
                             accumulation_vector<typename g1_type::value_type> accumulated_IC;
                             /*const accumulation_vector<typename g1_type::value_type> accumulated_IC
                              = processed_verification_key.gamma_ABC_g1.template accumulate_chunk<
-                             scalar_field_type>( primary_input.begin(), primary_input.end(), 0);*/
-                            // uncomment
-                            // when accumulate_chunk ready
+                             typename scalar_field_type::value_type>(primary_input.begin(), 
+                                                                     primary_input.end(), 
+                                                                     0);*/
+                            
                             const typename g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
