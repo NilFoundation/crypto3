@@ -130,7 +130,7 @@ namespace nil {
 
                     res.values.reserve(expected_size);
                     res.indices.reserve(expected_size);
-
+                    
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
                             res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(

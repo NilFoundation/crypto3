@@ -144,6 +144,7 @@ namespace nil {
                             std::vector<typename scalar_field_type::value_type> Ct = std::move(qap.Ct);
                             std::vector<typename scalar_field_type::value_type> Ht = std::move(qap.Ht);
 
+
                             /* The gamma inverse product component: (beta*A_i(t) + alpha*B_i(t) + C_i(t)) * gamma^{-1}.
                              */
                             std::vector<typename scalar_field_type::value_type> gamma_ABC;
@@ -183,52 +184,39 @@ namespace nil {
 
                             const typename g1_type::value_type g1_generator =
                                 algebra::random_element<g1_type>();
-                            const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables;
+                            const std::size_t g1_scalar_count = non_zero_At + 
+                                non_zero_Bt + qap.num_variables;
                             const std::size_t g1_scalar_size = scalar_field_type::value_bits;
-                            const std::size_t g1_window_size = 128;
-                            // algebra::get_exp_window_size<g1_type>(g1_scalar_count);
-                            // uncomment
-                            // when get_exp_window_size ready
+                            const std::size_t g1_window_size = 
+                                algebra::get_exp_window_size<g1_type>(g1_scalar_count);
 
-                            std::vector<std::vector<typename g1_type::value_type>> g1_table;
-                            /*algebra::window_table<g1_type> g1_table =
-                                algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);*/
-                            // uncomment
-                            // when get_window_table ready
+                            //std::vector<std::vector<typename g1_type::value_type>> g1_table;
+                            algebra::window_table<g1_type> g1_table =
+                                algebra::get_window_table<g1_type>(g1_scalar_size, 
+                                                          g1_window_size, 
+                                                          g1_generator);
 
                             const typename g2_type::value_type G2_gen =
                                 algebra::random_element<g2_type>();
                             const std::size_t g2_scalar_count = non_zero_Bt;
                             const std::size_t g2_scalar_size = scalar_field_type::value_bits;
-                            std::size_t g2_window_size = 128;
-                            // algebra::get_exp_window_size<g2_type>(g2_scalar_count);
-                            // uncomment
-                            // when get_exp_window_size ready
+                            std::size_t g2_window_size = algebra::get_exp_window_size<g2_type>(g2_scalar_count);
 
-                            std::vector<std::vector<typename g2_type::value_type>> g2_table;
-                            /*algebra::window_table<g2_type> g2_table =
-                                algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);*/
-                            // uncomment
-                            // when get_window_table ready
+                            //std::vector<std::vector<typename g2_type::value_type>> g2_table;
+                            algebra::window_table<g2_type> g2_table =
+                                algebra::get_window_table<g2_type>(g2_scalar_size, g2_window_size, G2_gen);
 
-                            typename g1_type::value_type alpha_g1 = g1_generator;
-                            typename g1_type::value_type beta_g1 = g1_generator;
-                            typename g2_type::value_type beta_g2 = G2_gen;
-                            typename g1_type::value_type delta_g1 = g1_generator;
-                            typename g2_type::value_type delta_g2 = G2_gen;
-
-                            /*typename g1_type::value_type alpha_g1 = alpha * g1_generator;
+                            typename g1_type::value_type alpha_g1 = alpha * g1_generator;
                             typename g1_type::value_type beta_g1 = beta * g1_generator;
                             typename g2_type::value_type beta_g2 = beta * G2_gen;
                             typename g1_type::value_type delta_g1 = delta * g1_generator;
-                            typename g2_type::value_type delta_g2 = delta * G2_gen;*/
-                            // uncomment
-                            // when multiplication ready
+                            typename g2_type::value_type delta_g2 = delta * G2_gen;
 
-                            typename std::vector<typename g1_type::value_type> A_query;
-                            //= batch_exp(g1_scalar_size, g1_window_size, g1_table, At);
-                            // uncomment
-                            // when batch_exp ready
+                            typename std::vector<typename g1_type::value_type> A_query 
+                                = algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, 
+                                                                                 g1_window_size, 
+                                                                                 g1_table, 
+                                                                                 At);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(A_query);
 #endif
@@ -242,38 +230,39 @@ namespace nil {
                             // NOTE: if USE_MIXED_ADDITION is defined,
                             // kc_batch_exp will convert its output to special form internally
 
-                            typename std::vector<typename g1_type::value_type> H_query;
-                            //= batch_exp_with_coeff(g1_scalar_size, g1_window_size, g1_table, qap.Zt * delta_inverse,
-                            // Ht);
-                            // uncomment
-                            // when batch_exp_with_coeff ready
+                            typename std::vector<typename g1_type::value_type> H_query 
+                                = algebra::batch_exp_with_coeff<g1_type, 
+                                                            scalar_field_type>(g1_scalar_size, 
+                                                                               g1_window_size, 
+                                                                               g1_table, 
+                                                                               qap.Zt * delta_inverse,
+                                                                               Ht);
+                            
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(H_query);
 #endif
 
-                            typename std::vector<typename g1_type::value_type> L_query;
-                            //= batch_exp(g1_scalar_size, g1_window_size, g1_table, Lt);
-                            // uncomment
-                            // when batch_exp ready
+                            typename std::vector<typename g1_type::value_type> L_query 
+                                = algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, 
+                                                                                 g1_window_size, 
+                                                                                 g1_table, 
+                                                                                 Lt);
+                            
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(L_query);
 #endif
 
                             typename gt_type::value_type alpha_g1_beta_g2 =
                                 pairing_policy::reduced_pairing(alpha_g1, beta_g2);
-                            typename g2_type::value_type gamma_g2 = G2_gen;
-                            // typename g2_type::value_type gamma_g2 = gamma * G2_gen;
-                            // uncomment
-                            // when multiplication ready
-
-                            typename g1_type::value_type gamma_ABC_g1_0 = g1_generator;
-                            // typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
-                            // uncomment
-                            // when multiplication ready
-                            typename std::vector<typename g1_type::value_type> gamma_ABC_g1_values;
-                            //= batch_exp(g1_scalar_size, g1_window_size, g1_table, gamma_ABC);
-                            // uncomment
-                            // when batch_exp ready
+                             typename g2_type::value_type gamma_g2 = gamma * G2_gen;
+                            
+                            typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
+                            
+                            typename std::vector<typename g1_type::value_type> gamma_ABC_g1_values 
+                                = algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, 
+                                                                                 g1_window_size, 
+                                                                                 g1_table, 
+                                                                                 gamma_ABC);
 
                             accumulation_vector<typename g1_type::value_type> 
                                 gamma_ABC_g1(std::move(gamma_ABC_g1_0), std::move(gamma_ABC_g1_values));
