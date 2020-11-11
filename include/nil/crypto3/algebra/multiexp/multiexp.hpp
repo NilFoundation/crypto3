@@ -50,12 +50,13 @@ namespace nil {
                          const std::size_t chunks_count) {
                 using base_value_type = typename BaseType::value_type;
                 using field_value_type = typename FieldType::value_type;
+                using multiexp_method = MultiexpMethod;
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
-                    return MultiexpMethod::process(vec_start, vec_end, scalar_start, scalar_end);
+                    return multiexp_method::process(vec_start, vec_end, scalar_start, scalar_end);
                 }
 
                 const std::size_t one_chunk_size = total_size / chunks_count;
@@ -64,7 +65,7 @@ namespace nil {
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
                     result =
-                        result + MultiexpMethod::process(
+                        result + multiexp_method::process(
                                      vec_start + i * one_chunk_size,
                                      (i == chunks_count - 1 ? vec_end : vec_start + (i + 1) * one_chunk_size),
                                      scalar_start + i * one_chunk_size,
@@ -87,6 +88,7 @@ namespace nil {
                 using field_type = FieldType;
                 using base_value_type = typename base_type::value_type;
                 using field_value_type = typename field_type::value_type;
+                using multiexp_method = MultiexpMethod;
 
                 assert(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
 
@@ -113,7 +115,7 @@ namespace nil {
                     }
                 }
 
-                return acc + multiexp<base_type, field_type, MultiexpMethod>(
+                return acc + multiexp<base_type, field_type, multiexp_method>(
                                  g.begin(), g.end(), p.begin(), p.end(), chunks_count);
             }
 

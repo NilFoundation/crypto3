@@ -69,17 +69,17 @@ using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp<FieldParams> e) {
-    std::cout << e.data << std::endl;
+    std::cout << "fp: " << e.data << std::endl;
 }
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp2<FieldParams> e) {
-    std::cout << e.data[0].data << " " << e.data[1].data << std::endl;
+    std::cout << "fp2: " << e.data[0].data << " " << e.data[1].data << std::endl;
 }
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
-    std::cout << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
+    std::cout << "fp3: " << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
 }
 
 template<typename FieldParams>
@@ -112,7 +112,7 @@ void print_field_element(typename fields::detail::element_fp12_2over3over2<Field
 }
 
 template<typename CurveGroupValueType>
-void print_group_element(CurveGroupValueType e) {
+void print_curve_group_element(CurveGroupValueType e) {
     std::cout << "Group element: \n";;
     print_field_element(e.X);
     print_field_element(e.Y);
@@ -132,7 +132,7 @@ void random_group_element_example(){
     typename CurveGroupType::value_type v = random_element<CurveGroupType>();
 
     std::cout << "Gotten random value:" << std::endl;
-    print_group_element(v);
+    print_curve_group_element(v);
 }
 
 int main() {
