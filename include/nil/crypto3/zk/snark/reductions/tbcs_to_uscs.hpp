@@ -59,7 +59,7 @@ namespace nil {
                 public:
                     using policy_type::instance_map;
                     using policy_type::witness_map;
-                }
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

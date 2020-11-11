@@ -150,39 +150,39 @@ namespace nil {
                     value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<FieldType> &var) :
-                        index(var.index), coeff(FieldType::value_type::zero()) {
+                    linear_term(const variable<field_type> &var) :
+                        index(var.index), coeff(field_type::value_type::zero()) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const integer_coeff_t int_coeff) :
+                    linear_term(const variable<field_type> &var, const integer_coeff_t int_coeff) :
                         index(var.index), coeff(value_type(int_coeff)) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const value_type &field_coeff) :
+                    linear_term(const variable<field_type> &var, const value_type &field_coeff) :
                         index(var.index), coeff(field_coeff) {
                     }
 
-                    linear_term<FieldType> operator*(const integer_coeff_t int_coeff) const {
-                        return (this->operator*(typename FieldType::value_type(int_coeff)));
+                    linear_term<field_type> operator*(const integer_coeff_t int_coeff) const {
+                        return (this->operator*(typename field_type::value_type(int_coeff)));
                     }
 
-                    linear_term<FieldType> operator*(const value_type &field_coeff) const {
-                        return linear_term<FieldType>(this->index, field_coeff * this->coeff);
+                    linear_term<field_type> operator*(const value_type &field_coeff) const {
+                        return linear_term<field_type>(this->index, field_coeff * this->coeff);
                     }
 
-                    linear_combination<FieldType> operator+(const linear_combination<FieldType> &other) const {
-                        return linear_combination<FieldType>(*this) + other;
+                    linear_combination<field_type> operator+(const linear_combination<field_type> &other) const {
+                        return linear_combination<field_type>(*this) + other;
                     }
 
-                    linear_combination<FieldType> operator-(const linear_combination<FieldType> &other) const {
+                    linear_combination<field_type> operator-(const linear_combination<field_type> &other) const {
                         return (*this) + (-other);
                     }
 
-                    linear_term<FieldType> operator-() const {
-                        return linear_term<FieldType>(this->index, -this->coeff);
+                    linear_term<field_type> operator-() const {
+                        return linear_term<field_type>(this->index, -this->coeff);
                     }
 
-                    bool operator==(const linear_term<FieldType> &other) const {
+                    bool operator==(const linear_term<field_type> &other) const {
                         return (this->index == other.index && this->coeff == other.coeff);
                     }
                 };

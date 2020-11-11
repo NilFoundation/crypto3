@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
-#include "r1cs_examples.hpp"
+#include "../r1cs_examples.hpp"
 
 namespace nil {
     namespace crypto3 {
@@ -80,23 +80,27 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
+                    
                     typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
                         r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
 
-                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        policies::r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.vk);
+                    //typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                    //    policies::r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.vk);
 
                     typename r1cs_gg_ppzksnark<CurveType>::proof_type proof =
                         r1cs_gg_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    const bool ans =
+                    /*const bool ans =
                         r1cs_gg_ppzksnark<CurveType, policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk, example.primary_input, proof);
 
                     const bool ans2 =
                         r1cs_gg_ppzksnark<CurveType, policies::r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>::online_verifier(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
-                    test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);
+                    test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);*/
+
+                    const bool ans =
+                        r1cs_gg_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
 
                     return ans;
                 }
