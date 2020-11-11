@@ -112,6 +112,40 @@ void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing_pol
     std::cout << "]" << std::endl;
 }
 
+void print_ate_g1_precomp_element(const typename curves::mnt4<298>::pairing_policy::G1_precomp &e) {
+    std::cout << "Ate g1 precomp element:" << std::endl;
+    print_field_element(e.PX);
+    print_field_element(e.PY);
+    print_field_element(e.PX_twist);
+    print_field_element(e.PY_twist);
+}
+
+void print_ate_g2_precomp_element(const typename curves::mnt4<298>::pairing_policy::G2_precomp &e) {
+    std::cout << "Ate g2 precomp element:" << std::endl;
+
+    print_field_element(e.QX);
+    print_field_element(e.QY);
+    print_field_element(e.QY2);
+    print_field_element(e.QX_over_twist);
+    print_field_element(e.QY_over_twist);
+
+    for (auto &c : e.dbl_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_H);
+        print_field_element(c.c_4C);
+        print_field_element(c.c_J);
+        print_field_element(c.c_L);
+        std::cout << "},";
+    }
+
+    for (auto &c : e.add_coeffs) {
+        std::cout << "{";
+        print_field_element(c.c_L1);
+        print_field_element(c.c_RZ);
+        std::cout << "},";
+    }
+}
+
 template<typename PairingT>
 void pairing_example() {
     using g1_value_type = typename PairingT::G1_type::underlying_field_value_type;

@@ -69,8 +69,6 @@ namespace nil {
                     using affine_ate_G1_precomp = typename policy_type::affine_ate_g1_precomputation;
                     using affine_ate_G2_precomp = typename policy_type::affine_ate_g2_precomputation;
 
-                    using policy_type::affine_ate_precompute_g1;
-
                     static inline typename policy_type::affine_ate_g1_precomputation
                         affine_ate_precompute_g1(const typename policy_type::g1 &P) {
 
