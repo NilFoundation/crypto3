@@ -20,6 +20,7 @@
 #include <boost/multiprecision/modular/barrett_params.hpp>
 
 #include <type_traits>
+#include <tuple>
 #include <array>
 #include <cstddef> // std::size_t
 #include <limits>
@@ -184,41 +185,43 @@ namespace backends {
             return w;
         }
 
-        template <typename T = uint64_t, size_t L = 0, char... Chars> //, std::size_t... Is>
-        constexpr auto chars_to_big_int(std::integer_sequence<char, Chars...>) {
-            // might return a 'non-tight' representation, meaning that there could be
-            // leading zero-limbs
-            constexpr size_t len = sizeof...(Chars);
-            constexpr size_t N = std::max(L, 1 + (10 * len) / (3 * std::numeric_limits<T>::digits));
-            std::array<char, len> digits{Chars...};
+        template<size_t i, class... Args>
+        struct TuplePrinter {
+            constexpr static auto return_(const std::tuple<Args...>& t)
+            {
+                return std::get<i>(t);
+            }
+        };
+
+        template<size_t i, class... Args>
+        constexpr auto return_i(const std::tuple<Args...>& t)
+        {
+            return TuplePrinter<i, Args...>::return_(t);
+        }
+        
+        template <size_t len, typename T = uint64_t, class... Args>
+        constexpr auto int_backend(const std::tuple<Args...>& t) {
+
+            constexpr size_t N = std::max(len, 1 + (10 * len) / (3 * std::numeric_limits<T>::digits));
+
             big_int<N, T> num{0};
             big_int<N, T> power_of_ten{1};
 
-            for (int i = len - 1; i >= 0; --i) {
-                num = add_ignore_carry(num, partial_mul<N>(big_int<1, T>{static_cast<T>(digits[i]) - 48}, power_of_ten));
+
+            for (std::size_t i = len - 1; i > 0; --i) {
+
+                num = add_ignore_carry(num, partial_mul<N>(big_int<1, T>{static_cast<T>(return_i<0, Args...>(t))}, power_of_ten));
                 power_of_ten = partial_mul<N>(big_int<1, T>{static_cast<T>(10)}, power_of_ten);
             }
             return num;
         }
 
-        template <typename T = uint64_t, char... Chars, std::size_t... Is>
-        constexpr auto chars_to_integer_seq(std::integer_sequence<char, Chars...>,
-                                            std::index_sequence<Is...>) {
-            constexpr auto num = chars_to_big_int<T, sizeof...(Chars)>(std::integer_sequence<char, Chars...>{});
+        template <size_t len, typename T = uint64_t, class... Args, std::size_t... Is>
+        constexpr auto seq_backend(const std::tuple<Args...>& t,
+                                   std::index_sequence<Is...>) {
+
+            constexpr auto num = int_backend<len, T>(t);
             return std::integer_sequence<T, num[Is]...>{};
-        }
-
-        template <char... Chars> constexpr auto operator "" _Z() {
-
-            using T = uint64_t; // Question: How to elegantly expose the choice of this
-            // type to the user?
-
-            constexpr size_t len = sizeof...(Chars);
-            constexpr size_t N = 1 + (10 * len) / (3 * std::numeric_limits<T>::digits);
-
-            auto num = chars_to_integer_seq(std::integer_sequence<char, Chars...>{}, std::make_index_sequence<N>{});
-            constexpr auto L = tight_length(num) + (to_big_int(num) == big_int<1, T>{});
-            return take_first(num, std::make_index_sequence<L>{});
         }
 
         template <typename T, size_t N>
@@ -247,7 +250,6 @@ namespace backends {
             constexpr auto L = std::max(M, N);
             return subtract_same(cbn::pad<L - M>(a), cbn::pad<L - N>(b));
         }
-
 
         template <size_t N, typename T>
         constexpr bool equal(big_int<N, T> a, big_int<N, T> b) {
@@ -285,21 +287,25 @@ namespace backends {
             return subtract(a, b);
         }
 
-        template <char... Chars> constexpr auto convert_to() {
+        template <size_t len, class... Args>
+        constexpr auto convert_to_backend(const std::tuple<Args...>& t)
+        {
 
-            using T = uint64_t; // Question: How to elegantly expose the choice of this
-            // type to the user?
+            using T = uint64_t;
 
-            constexpr size_t len = sizeof...(Chars);
             constexpr size_t N = 1 + (10 * len) / (3 * std::numeric_limits<T>::digits);
 
-            auto num = chars_to_integer_seq(std::integer_sequence<char, Chars...>{}, std::make_index_sequence<N>{});
+            constexpr auto num = seq_backend<len>(t, std::make_index_sequence<N>{});
             constexpr auto L = tight_length(num) + (to_big_int(num) == big_int<1, T>{});
+
             return take_first(num, std::make_index_sequence<L>{});
+
+            //return 0;
         }
 
         template <size_t K, size_t N, typename T = uint64_t>
-        constexpr auto unary_encoding() {
+        constexpr auto unary_encoding()
+        {
             // N limbs, Kth limb set to one
             big_int<N, T> res{};
             res[K] = 1;
@@ -633,25 +639,87 @@ namespace backends {
         }
 
         template <typename Backend>
+        constexpr auto conver_to_string(Backend result)
+        {
+            auto str = convert_to_string(result);
+            using default_ops::eval_get_sign;
+            int base = 10;
+            unsigned Bits = result.size() * result.limbs();
+
+            std::string res;
+
+            res.assign(Bits / 3 + 1, '0');
+            std::string::difference_type pos = res.size() - 1;
+            cpp_int_backend              t(result);
+            cpp_int_backend              r;
+            bool                         neg = false;
+            if (t.sign())
+            {
+                t.negate();
+                neg = true;
+            }
+            if (result.size() == 1)
+            {
+                res = boost::lexical_cast<std::string>(t.limbs()[0]);
+            }
+            else
+            {
+                cpp_int_backend block10;
+                block10 = max_block_10;
+                while (eval_get_sign(t) != 0)
+                {
+                    cpp_int_backend t2;
+                    divide_unsigned_helper(&t2, t, block10, r);
+                    t           = t2;
+                    limb_type v = r.limbs()[0];
+                    for (unsigned i = 0; i < digits_per_block_10; ++i)
+                    {
+                        char c = '0' + v % 10;
+                        v /= 10;
+                        res[pos] = c;
+                        if (pos-- == 0)
+                            break;
+                    }
+                }
+            }
+            std::string::size_type n = res.find_first_not_of('0');
+            res.erase(0, n);
+            if (res.empty())
+                res = "0";
+            if (neg)
+                res.insert(static_cast<std::string::size_type>(0), 1, '-');
+
+            return res;
+        }
+
+        template<typename T, unsigned N, typename... REST>
+        struct generate_tuple_type
+        {
+            typedef typename generate_tuple_type<T, N-1, T, REST...>::type type;
+        };
+
+        template<typename T, typename... REST>
+        struct generate_tuple_type<T, 0, REST...>
+        {
+            typedef std::tuple<REST...> type;
+        };
+
+        template <typename Backend>
         constexpr Backend eval_montgomery_reduce_compile_time_backend(Backend result)
         {
-            /*
-            auto tmp = num_to_string<result>::value;
-            std::cout<<cpp_int(result)<<std::endl;
-            std::cout<<result<<std::endl;
-             */
-              //constexpr auto result_modulus = ;
-             // constexpr auto result_base = ;
+            //examples
+            {
+                constexpr auto len = 1;
+                using gen_tuple_t = generate_tuple_type<int, len>::type;
+                constexpr gen_tuple_t tmp;
 
-            //  constexpr auto eval_montgomery_reduce_compile_time_big_int(result_base, result_modulus);
 
-                constexpr auto modulus = 1267650600228229401496703205653_Z;
-                constexpr auto T = to_big_int<4>(1532495540865888858358347027150309183618739122183602175_Z);
-                constexpr auto ans = to_big_int(730531796855002292035529737298_Z);
+                constexpr std::tuple<int, int> tst(1, 2);
+                constexpr auto res = convert_to_backend<len>(tst);
+            }
 
-                constexpr auto tmp = eval_montgomery_reduce_compile_time_big_int(T, modulus);
-
-                static_assert(eval_montgomery_reduce_compile_time_big_int(T, modulus) == ans, "fail");
+            //auto res = convert_to_string(result);
+            //result = convert_to_backned(res);
 
 
             return result;
@@ -760,8 +828,6 @@ class montgomery_params : public base_params<Backend>
         using namespace cbn;
 
         result = eval_montgomery_reduce_compile_time_backend(result);
-
-        //result = eval_montgomery_reduce_compile_time_big_int(to_big_int(std::integer_sequence<Backend>(result)), this->m_mod.backend());
     }
 
 
