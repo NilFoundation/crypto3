@@ -221,7 +221,7 @@ namespace nil {
                 std::vector<typename GroupType::value_type> res(v.size(), table[0][0]);
 
                 for (std::size_t i = 0; i < v.size(); ++i) {
-                    res[i] = windowed_exp(scalar_size, window, table, v[i]);
+                    res[i] = windowed_exp<GroupType, FieldType>(scalar_size, window, table, v[i]);
                 }
 
                 return res;
@@ -237,7 +237,7 @@ namespace nil {
                 std::vector<typename GroupType::value_type> res(v.size(), table[0][0]);
 
                 for (std::size_t i = 0; i < v.size(); ++i) {
-                    res[i] = windowed_exp(scalar_size, window, table, coeff * v[i]);
+                    res[i] = windowed_exp<GroupType, FieldType>(scalar_size, window, table, coeff * v[i]);
                 }
 
                 return res;
