@@ -75,12 +75,21 @@ namespace nil {
 
                         constexpr static const number_type final_exponent_last_chunk_abs_of_w0 = number_type(
                             0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);    // same as ate_loop_count?
-                        constexpr static const number_type final_exponent_last_chunk_is_w0_neg = true;
+                        constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::ate_loop_count;
+                    constexpr typename mnt6_basic_policy<298>::number_type const 
+                        mnt6_basic_policy<298>::ate_loop_count;
+                    constexpr typename mnt6_basic_policy<298>::number_type const 
+                        mnt6_basic_policy<298>::final_exponent_last_chunk_abs_of_w0;
+                    constexpr typename mnt6_basic_policy<298>::number_type const 
+                        mnt6_basic_policy<298>::final_exponent_last_chunk_w1;
+                    constexpr typename mnt6_basic_policy<298>::extended_number_type const 
+                        mnt6_basic_policy<298>::final_exponent;
 
+                    constexpr bool const mnt6_basic_policy<298>::ate_is_loop_count_neg;
+                    constexpr bool const mnt6_basic_policy<298>::final_exponent_last_chunk_is_w0_neg;
                 }    // namespace detail
             }        // namespace pairing
         }            // namespace algebra

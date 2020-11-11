@@ -135,6 +135,11 @@ namespace nil {
                                          3> const
                         fp3_extension_params<mnt6_base_field<ModulusBits>>::Frobenius_coeffs_c1;
 
+                    template<std::size_t ModulusBits>
+                    constexpr std::array<typename fp3_extension_params<mnt6_base_field<ModulusBits>>::modulus_type,
+                                         3> const
+                        fp3_extension_params<mnt6_base_field<ModulusBits>>::Frobenius_coeffs_c2;
+
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
