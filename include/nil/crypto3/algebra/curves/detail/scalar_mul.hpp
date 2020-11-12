@@ -43,20 +43,23 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    using namespace boost::multiprecision;
 
-                    template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
+                    template<typename GroupValueType, typename Backend, 
+                        boost::multiprecision::expression_template_option ExpressionTemplates>
                     GroupValueType scalar_mul(const GroupValueType &base,
-                                              const number<Backend, ExpressionTemplates> &scalar) {
+                                              const boost::multiprecision::number<
+                                                        Backend, 
+                                                        ExpressionTemplates> &scalar) {
                         GroupValueType result;
 
                         bool found_one = false;
-                        for (auto i = static_cast<std::int64_t>(msb(scalar)); i >= 0; --i) {
+                        for (auto i = static_cast<std::int64_t>(
+                                boost::multiprecision::msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }
 
-                            if (bit_test(scalar, i)) {
+                            if (boost::multiprecision::bit_test(scalar, i)) {
                                 found_one = true;
                                 result = result + base;
                             }
@@ -65,15 +68,21 @@ namespace nil {
                         return result;
                     }
 
-                    template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
+                    template<typename GroupValueType, typename Backend, 
+                        boost::multiprecision::expression_template_option ExpressionTemplates>
                     GroupValueType operator*(const GroupValueType &left,
-                                             const number<Backend, ExpressionTemplates> &right) {
+                                             const boost::multiprecision::number<
+                                                        Backend, 
+                                                        ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
                     }
 
-                    template<typename GroupValueType, typename Backend, expression_template_option ExpressionTemplates>
-                    GroupValueType operator*(const number<Backend, ExpressionTemplates> &left,
+                    template<typename GroupValueType, typename Backend, 
+                        boost::multiprecision::expression_template_option ExpressionTemplates>
+                    GroupValueType operator*(const boost::multiprecision::number<
+                                                        Backend, 
+                                                        ExpressionTemplates> &left,
                                              const GroupValueType &right) {
 
                         return right * left;
@@ -103,11 +112,14 @@ namespace nil {
                              typename FieldValueType>
                     typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
                                             !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
+                                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
                                             !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
                          operator*(const GroupValueType &left, const FieldValueType &right) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef number<backends::cpp_int_backend<>> non_fixed_precision_modulus_type;
+                        typedef boost::multiprecision::number<
+                            boost::multiprecision::backends::cpp_int_backend<>> 
+                            non_fixed_precision_modulus_type;
 
                         return left * non_fixed_precision_modulus_type(right.data);
                     }
@@ -116,6 +128,7 @@ namespace nil {
                              typename FieldValueType>
                     typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
                                             !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
+                                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
                                             !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value, GroupValueType>::type 
                         operator*(const FieldValueType &left, const GroupValueType &right) {
 
