@@ -170,13 +170,13 @@ namespace nil {
                             typename CurveType::g2_type::value_type gamma_g2;
                             typename CurveType::g2_type::value_type delta_g2;
 
-                            accumulation_vector<typename CurveType::g1_type::value_type> gamma_ABC_g1;
+                            accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
                             verification_key() = default;
                             verification_key(const typename CurveType::gt_type::value_type &alpha_g1_beta_g2,
                                              const typename CurveType::g2_type::value_type &gamma_g2,
                                              const typename CurveType::g2_type::value_type &delta_g2,
-                                             const accumulation_vector<typename CurveType::g1_type::value_type> &gamma_ABC_g1) :
+                                             const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
                                 alpha_g1_beta_g2(alpha_g1_beta_g2),
                                 gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
 
@@ -219,7 +219,7 @@ namespace nil {
                                 }
 
                                 result.gamma_ABC_g1 =
-                                    accumulation_vector<typename CurveType::g1_type::value_type>(std::move(base), std::move(v));
+                                    accumulation_vector<typename CurveType::g1_type>(std::move(base), std::move(v));
 
                                 return result;
                             }*/
@@ -242,7 +242,7 @@ namespace nil {
                             typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
                             typename pairing_policy::G2_precomp vk_delta_g2_precomp;
 
-                            accumulation_vector<typename CurveType::g1_type::value_type> gamma_ABC_g1;
+                            accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
                             bool operator==(const processed_verification_key &other) const {
                                 return (this->vk_alpha_g1_beta_g2 == other.vk_alpha_g1_beta_g2 &&

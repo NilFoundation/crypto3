@@ -52,7 +52,6 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>

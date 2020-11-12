@@ -44,30 +44,34 @@ namespace nil {
                  * A sparse vector is a list of indices along with corresponding values.
                  * The indices are selected from the set {0,1,...,domain_size-1}.
                  */
-                template<typename T>
-                struct sparse_vector {
+                template<typename Type>
+                class sparse_vector {
+                    using underlying_value_type = typename Type::value_type;
+                public:
 
                     std::vector<std::size_t> indices;
-                    std::vector<T> values;
+                    std::vector<underlying_value_type> values;
                     std::size_t domain_size_;
 
                     sparse_vector() = default;
-                    sparse_vector(const sparse_vector<T> &other) = default;
-                    sparse_vector(sparse_vector<T> &&other) = default;
-                    sparse_vector(std::vector<T> &&v) : values(std::move(v)), domain_size_(values.size()) {
+                    sparse_vector(const sparse_vector<Type> &other) = default;
+                    sparse_vector(sparse_vector<Type> &&other) = default;
+                    sparse_vector(std::vector<underlying_value_type> &&v) : values(std::move(v)), domain_size_(values.size()) {
                         indices.resize(domain_size_);
                         std::iota(indices.begin(), indices.end(), 0);
                     }
 
-                    sparse_vector<T> &operator=(const sparse_vector<T> &other) = default;
-                    sparse_vector<T> &operator=(sparse_vector<T> &&other) = default;
+                    sparse_vector<Type> &operator=(const sparse_vector<Type> &other) = default;
+                    sparse_vector<Type> &operator=(sparse_vector<Type> &&other) = default;
 
-                    T operator[](const std::size_t idx) const {
+                    underlying_value_type operator[](const std::size_t idx) const {
                         auto it = std::lower_bound(indices.begin(), indices.end(), idx);
-                        return (it != indices.end() && *it == idx) ? values[it - indices.begin()] : T();
+                        return (it != indices.end() && *it == idx) ? 
+                               values[it - indices.begin()] : 
+                               underlying_value_type();
                     }
 
-                    bool operator==(const sparse_vector<T> &other) const {
+                    bool operator==(const sparse_vector<Type> &other) const {
                         if (this->domain_size_ != other.domain_size_) {
                             return false;
                         }
@@ -111,7 +115,7 @@ namespace nil {
                         return true;
                     }
 
-                    bool operator==(const std::vector<T> &other) const {
+                    bool operator==(const std::vector<underlying_value_type> &other) const {
                         if (this->domain_size_ < other.size()) {
                             return false;
                         }
@@ -164,14 +168,19 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return indices.size() * (sizeof(std::size_t) * 8 + T::size_in_bits());
+                        return indices.size() * (sizeof(std::size_t) * 8 + Type::value_bits);
                     }
 
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
-                    template<typename InputIterator>
-                    std::pair<T, sparse_vector<T>> accumulate(InputIterator it_begin, InputIterator it_end,
-                                                              std::size_t offset) const {
+                    template<typename BaseInputType>
+                    std::pair<underlying_value_type, sparse_vector<Type>> 
+                        accumulate(
+                            const typename std::vector<typename BaseInputType::value_type>::
+                                const_iterator it_begin, 
+                            const typename std::vector<typename BaseInputType::value_type>::
+                                const_iterator it_end,
+                            std::size_t offset) const {
 #ifdef MULTICORE
                         const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
                                                                              // or call omp_set_num_threads()
@@ -179,8 +188,8 @@ namespace nil {
                         const std::size_t chunks = 1;
 #endif
 
-                        T accumulated_value = T::zero();
-                        sparse_vector<T> resulting_vector;
+                        underlying_value_type accumulated_value = underlying_value_type::zero();
+                        sparse_vector<Type> resulting_vector;
                         resulting_vector.domain_size_ = domain_size_;
 
                         const std::size_t range_len = it_end - it_begin;
@@ -208,9 +217,9 @@ namespace nil {
                                     accumulated_value =
                                         accumulated_value +
                                         algebra::multiexp<
-                                            T, typename std::iterator_traits<InputIterator>::value_type::field_type,
+                                            Type, BaseInputType,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            T, typename std::iterator_traits<InputIterator>::value_type::field_type>>(
+                                            Type, BaseInputType>>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
                                             it_begin + (indices[first_pos] - offset),
                                             it_begin + (indices[last_pos] - offset) + 1, chunks);
@@ -238,9 +247,9 @@ namespace nil {
                             accumulated_value =
                                 accumulated_value +
                                 algebra::multiexp<
-                                    T, typename std::iterator_traits<InputIterator>::value_type::field_type,
+                                    Type, BaseInputType,
                                     algebra::policies::multiexp_method_bos_coster<
-                                    T, typename std::iterator_traits<InputIterator>::value_type::field_type>>(
+                                    Type, BaseInputType>>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),

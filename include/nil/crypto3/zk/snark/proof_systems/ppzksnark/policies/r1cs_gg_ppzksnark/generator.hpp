@@ -264,7 +264,7 @@ namespace nil {
                                                                                  g1_table, 
                                                                                  gamma_ABC);
 
-                            accumulation_vector<typename g1_type::value_type> 
+                            accumulation_vector<g1_type> 
                                 gamma_ABC_g1(std::move(gamma_ABC_g1_0), std::move(gamma_ABC_g1_values));
 
                             verification_key_type vk = verification_key_type(alpha_g1_beta_g2, 

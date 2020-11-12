@@ -51,7 +51,8 @@ namespace nil {
 
                     using value_type = detail::element_kc<Type1, Type2>;
 
-                    constexpr static const std::size_t value_bits = Type1::value_bits + Type2::value_bits;
+                    constexpr static const std::size_t value_bits = Type1::value_bits + 
+                                                                    Type2::value_bits;
 
                 };
 
@@ -61,8 +62,7 @@ namespace nil {
                  * A knowledge commitment vector is a sparse vector of knowledge commitments.
                  */
                 template<typename Type1, typename Type2>
-                using knowledge_commitment_vector = sparse_vector<
-                    typename knowledge_commitment<Type1, Type2>::value_type>;
+                using knowledge_commitment_vector = sparse_vector<knowledge_commitment<Type1, Type2>>;
 
             }    // namespace snark
         }        // namespace zk

@@ -61,7 +61,6 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/prf.hpp>

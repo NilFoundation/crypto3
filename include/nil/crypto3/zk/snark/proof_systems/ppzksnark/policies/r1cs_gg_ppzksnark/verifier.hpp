@@ -152,13 +152,12 @@ namespace nil {
 
                             assert(processed_verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                            accumulation_vector<typename g1_type::value_type> accumulated_IC;
-                            /*const accumulation_vector<typename g1_type::value_type> accumulated_IC
+                            //accumulation_vector<g1_type> accumulated_IC;
+                            const accumulation_vector<g1_type> accumulated_IC
                              = processed_verification_key.gamma_ABC_g1.template accumulate_chunk<
-                             typename scalar_field_type::value_type>(primary_input.begin(), 
-                                                                     primary_input.end(), 
-                                                                     0);*/
-                            
+                             scalar_field_type>( primary_input.begin(), primary_input.end(), 0);
+                            // uncomment
+                            // when accumulate_chunk ready
                             const typename g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;
@@ -339,7 +338,7 @@ namespace nil {
                             affine_ate_G2_precomp pvk_vk_delta_g2_precomp =
                                 pairing_policy::affine_ate_precompute_G2(verification_key.delta_g2);
 
-                            const accumulation_vector<typename g1_type::value_type> accumulated_IC =
+                            const accumulation_vector<g1_type> accumulated_IC =
                                 verification_key.gamma_ABC_g1
                                     .template accumulate_chunk<scalar_field_type>(
                                         primary_input.begin(), primary_input.end(), 0);

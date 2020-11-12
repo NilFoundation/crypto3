@@ -40,25 +40,32 @@ namespace nil {
                  * The method "accumulate_chunk" allows one to accumulate portions of the sparse
                  * vector into the accumulation value.
                  */
-                template<typename T>
+                template<typename Type>
                 class accumulation_vector {
+                    using underlying_value_type = typename Type::value_type;
                 public:
-                    T first;
-                    sparse_vector<T> rest;
+                    underlying_value_type first;
+                    sparse_vector<Type> rest;
 
                     accumulation_vector() = default;
-                    accumulation_vector(const accumulation_vector<T> &other) = default;
-                    accumulation_vector(accumulation_vector<T> &&other) = default;
-                    accumulation_vector(T &&first, sparse_vector<T> &&rest) :
+                    accumulation_vector(const accumulation_vector<Type> &other) = default;
+                    accumulation_vector(accumulation_vector<Type> &&other) = default;
+                    accumulation_vector(underlying_value_type &&first, 
+                                        sparse_vector<Type> &&rest) :
                         first(std::move(first)), rest(std::move(rest)) {};
-                    accumulation_vector(T &&first, std::vector<T> &&v) : first(std::move(first)), rest(std::move(v)) {
-                    }
-                    accumulation_vector(std::vector<T> &&v) : first(T::zero()), rest(std::move(v)) {};
+                    accumulation_vector(underlying_value_type &&first, 
+                                        std::vector<underlying_value_type> &&v) : 
+                                        first(std::move(first)), rest(std::move(v)) {}
+                    accumulation_vector(std::vector<underlying_value_type> &&v) : 
+                                        first(underlying_value_type::zero()), 
+                                        rest(std::move(v)) {};
 
-                    accumulation_vector<T> &operator=(const accumulation_vector<T> &other) = default;
-                    accumulation_vector<T> &operator=(accumulation_vector<T> &&other) = default;
+                    accumulation_vector<Type> &
+                        operator=(const accumulation_vector<Type> &other) = default;
+                    accumulation_vector<Type> &
+                        operator=(accumulation_vector<Type> &&other) = default;
 
-                    bool operator==(const accumulation_vector<T> &other) const {
+                    bool operator==(const accumulation_vector<Type> &other) const {
                         return (this->first == other.first && this->rest == other.rest);
                     }
 
@@ -75,18 +82,24 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        const std::size_t first_size_in_bits = T::size_in_bits();
+                        const std::size_t first_size_in_bits = Type::value_bits;
                         const std::size_t rest_size_in_bits = rest.size_in_bits();
                         return first_size_in_bits + rest_size_in_bits;
                     }
 
-                    template<typename InputIterator>
-                    accumulation_vector<T> accumulate_chunk(InputIterator it_begin, InputIterator it_end,
-                                                            std::size_t offset) const {
-                        std::pair<T, sparse_vector<T>> acc_result =
-                            rest.template accumulate<InputIterator>(it_begin, it_end, offset);
-                        T new_first = first + acc_result.first;
-                        return accumulation_vector<T>(std::move(new_first), std::move(acc_result.second));
+                    template<typename BaseInputType>
+                    accumulation_vector<Type> accumulate_chunk(
+                            const typename std::vector<typename BaseInputType::value_type>::
+                                const_iterator & it_begin, 
+                            const typename std::vector<typename BaseInputType::value_type>::
+                                const_iterator & it_end,
+                            std::size_t offset) const {
+
+                        std::pair<underlying_value_type, sparse_vector<Type>> acc_result =
+                            rest.template accumulate<BaseInputType>(it_begin, it_end, offset);
+                        underlying_value_type new_first = first + acc_result.first;
+                        return accumulation_vector<Type>(std::move(new_first), 
+                                                         std::move(acc_result.second));
                     }
                 };
 
