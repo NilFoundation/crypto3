@@ -50,6 +50,8 @@ namespace nil {
                 class blueprint {
                     r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
                                                                 variable of the protoboard, *NOT* constant 1 */
+                    typename FieldType::value_type constant_term;
+
                     var_index_t next_free_var;
                     lc_index_t next_free_lc;
                     std::vector<typename FieldType::value_type> lc_values;
@@ -59,6 +61,8 @@ namespace nil {
                     typedef FieldType field_type;
 
                     blueprint() {
+                        constant_term = FieldType::value_type::zero();
+
                         next_free_var = 1; /* to account for constant 1 term */
                         next_free_lc = 0;
                     }
@@ -69,7 +73,7 @@ namespace nil {
 
                     typename FieldType::value_type &val(const blueprint_variable<FieldType> &var) {
                         assert(var.index <= values.size());
-                        return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
+                        return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
                     typename FieldType::value_type val(const blueprint_variable<FieldType> &var) const {
@@ -137,7 +141,7 @@ namespace nil {
                         return constraint_system;
                     }
 
-                    friend class variable<FieldType>;
+                    friend class blueprint_variable<FieldType>;
                     friend class blueprint_linear_combination<FieldType>;
 
                 private:

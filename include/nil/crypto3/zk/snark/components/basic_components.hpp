@@ -31,6 +31,13 @@
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
+#include <boost/multiprecision/number.hpp>
+
+// temporary includes begin
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
+// temporary includes end
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -382,7 +389,14 @@ namespace nil {
                 template<typename FieldType>
                 void packing_component<FieldType>::generate_r1cs_witness_from_packed() {
                     packed.evaluate(this->pb);
-                    assert(this->pb.lc_val(packed).as_bigint().num_bits() <=
+
+                    // temporary added until fixed-precision modular adaptor is ready:
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::cpp_int_backend<>> 
+                        non_fixed_precision_modulus_type;
+
+                    assert(boost::multiprecision::msb(
+                                non_fixed_precision_modulus_type(this->pb.lc_val(packed).data)) <=
                            bits.size());    // `bits` is large enough to represent this packed value
                     bits.fill_with_bits_of_field_element(this->pb, this->pb.lc_val(packed));
                 }

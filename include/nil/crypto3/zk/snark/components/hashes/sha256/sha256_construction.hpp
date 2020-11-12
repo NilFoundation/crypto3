@@ -34,6 +34,8 @@
 #include <nil/crypto3/zk/snark/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_aux.hpp>
 
+#include <nil/crypto3/zk/snark/blueprint_variable.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -47,11 +49,11 @@ namespace nil {
                     std::vector<blueprint_variable_vector<FieldType>> W_bits;
                     std::vector<std::shared_ptr<packing_component<FieldType>>> pack_W;
 
-                    std::vector<variable<FieldType>> sigma0;
-                    std::vector<variable<FieldType>> sigma1;
+                    std::vector<blueprint_variable<FieldType>> sigma0;
+                    std::vector<blueprint_variable<FieldType>> sigma1;
                     std::vector<std::shared_ptr<small_sigma_component<FieldType>>> compute_sigma0;
                     std::vector<std::shared_ptr<small_sigma_component<FieldType>>> compute_sigma1;
-                    std::vector<variable<FieldType>> unreduced_W;
+                    std::vector<blueprint_variable<FieldType>> unreduced_W;
                     std::vector<std::shared_ptr<lastbits_component<FieldType>>> mod_reduce_W;
 
                 public:
@@ -67,24 +69,24 @@ namespace nil {
                 template<typename FieldType>
                 class sha256_round_function_component : public component<FieldType> {
                 public:
-                    variable<FieldType> sigma0;
-                    variable<FieldType> sigma1;
+                    blueprint_variable<FieldType> sigma0;
+                    blueprint_variable<FieldType> sigma1;
                     std::shared_ptr<big_sigma_component<FieldType>> compute_sigma0;
                     std::shared_ptr<big_sigma_component<FieldType>> compute_sigma1;
-                    variable<FieldType> choice;
-                    variable<FieldType> majority;
+                    blueprint_variable<FieldType> choice;
+                    blueprint_variable<FieldType> majority;
                     std::shared_ptr<choice_component<FieldType>> compute_choice;
                     std::shared_ptr<majority_component<FieldType>> compute_majority;
-                    variable<FieldType> packed_d;
+                    blueprint_variable<FieldType> packed_d;
                     std::shared_ptr<packing_component<FieldType>> pack_d;
-                    variable<FieldType> packed_h;
+                    blueprint_variable<FieldType> packed_h;
                     std::shared_ptr<packing_component<FieldType>> pack_h;
-                    variable<FieldType> unreduced_new_a;
-                    variable<FieldType> unreduced_new_e;
+                    blueprint_variable<FieldType> unreduced_new_a;
+                    blueprint_variable<FieldType> unreduced_new_e;
                     std::shared_ptr<lastbits_component<FieldType>> mod_reduce_new_a;
                     std::shared_ptr<lastbits_component<FieldType>> mod_reduce_new_e;
-                    variable<FieldType> packed_new_a;
-                    variable<FieldType> packed_new_e;
+                    blueprint_variable<FieldType> packed_new_a;
+                    blueprint_variable<FieldType> packed_new_e;
 
                 public:
                     blueprint_linear_combination_vector<FieldType> a;
@@ -95,7 +97,7 @@ namespace nil {
                     blueprint_linear_combination_vector<FieldType> f;
                     blueprint_linear_combination_vector<FieldType> g;
                     blueprint_linear_combination_vector<FieldType> h;
-                    variable<FieldType> W;
+                    blueprint_variable<FieldType> W;
                     long K;
                     blueprint_linear_combination_vector<FieldType> new_a;
                     blueprint_linear_combination_vector<FieldType> new_e;
@@ -109,7 +111,7 @@ namespace nil {
                                                     const blueprint_linear_combination_vector<FieldType> &f,
                                                     const blueprint_linear_combination_vector<FieldType> &g,
                                                     const blueprint_linear_combination_vector<FieldType> &h,
-                                                    const variable<FieldType> &W,
+                                                    const blueprint_variable<FieldType> &W,
                                                     const long &K,
                                                     const blueprint_linear_combination_vector<FieldType> &new_a,
                                                     const blueprint_linear_combination_vector<FieldType> &new_e);
@@ -132,7 +134,7 @@ namespace nil {
                             iv[i / hashes::sha2<256>::word_bits] >> (31 - (i % hashes::sha2<256>::word_bits)) & 1;
 
                         blueprint_linear_combination<FieldType> iv_element;
-                        iv_element.assign(pb, iv_val * variable<FieldType>(0));
+                        iv_element.assign(pb, iv_val * blueprint_variable<FieldType>(0));
                         iv_element.evaluate(pb);
 
                         result.emplace_back(iv_element);
@@ -233,7 +235,7 @@ namespace nil {
                     const blueprint_linear_combination_vector<FieldType> &f,
                     const blueprint_linear_combination_vector<FieldType> &g,
                     const blueprint_linear_combination_vector<FieldType> &h,
-                    const variable<FieldType> &W,
+                    const blueprint_variable<FieldType> &W,
                     const long &K,
                     const blueprint_linear_combination_vector<FieldType> &new_a,
                     const blueprint_linear_combination_vector<FieldType> &new_e) :

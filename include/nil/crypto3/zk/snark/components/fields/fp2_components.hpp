@@ -35,6 +35,8 @@
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
+#include <nil/crypto3/zk/snark/blueprint_variable.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -55,7 +57,7 @@ namespace nil {
                     blueprint_linear_combination_vector<field_type> all_vars;
 
                     Fp2_variable(blueprint<field_type> &pb) : component<field_type>(pb) {
-                        variable<field_type> c0_var, c1_var;
+                        blueprint_variable<field_type> c0_var, c1_var;
                         c0_var.allocate(pb);
                         c1_var.allocate(pb);
 
@@ -173,7 +175,7 @@ namespace nil {
                     Fp2_variable<Fp2T> B;
                     Fp2_variable<Fp2T> result;
 
-                    variable<field_type> v1;
+                    blueprint_variable<field_type> v1;
 
                     Fp2_mul_component(blueprint<field_type> &pb,
                                       const Fp2_variable<Fp2T> &A,

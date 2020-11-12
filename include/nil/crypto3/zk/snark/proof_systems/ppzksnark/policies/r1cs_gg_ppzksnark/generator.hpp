@@ -120,12 +120,15 @@ namespace nil {
                                 algebra::random_element<scalar_field_type>();
                             const typename scalar_field_type::value_type delta =
                                 algebra::random_element<scalar_field_type>();
-                            const typename scalar_field_type::value_type gamma_inverse = gamma.inversed();
-                            const typename scalar_field_type::value_type delta_inverse = delta.inversed();
+                            const typename scalar_field_type::value_type gamma_inverse = 
+                                gamma.inversed();
+                            const typename scalar_field_type::value_type delta_inverse = 
+                                delta.inversed();
 
                             /* A quadratic arithmetic program evaluated at t. */
                             qap_instance_evaluation<scalar_field_type> qap =
-                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(r1cs_copy, t);
+                                r1cs_to_qap<scalar_field_type>::
+                                    instance_map_with_evaluation(r1cs_copy, t);
 
                             std::size_t non_zero_At = 0;
                             std::size_t non_zero_Bt = 0;
@@ -163,9 +166,9 @@ namespace nil {
 
                             const std::size_t Lt_offset = qap.num_inputs + 1;
                             for (std::size_t i = 0; i < qap.num_variables - qap.num_inputs; ++i) {
-                                Lt.emplace_back(
-                                    (beta * At[Lt_offset + i] + alpha * Bt[Lt_offset + i] + Ct[Lt_offset + i]) *
-                                    delta_inverse);
+                                Lt.emplace_back((beta * At[Lt_offset + i] + 
+                                                alpha * Bt[Lt_offset + i] + 
+                                                Ct[Lt_offset + i]) * delta_inverse);
                             }
 
                             /**

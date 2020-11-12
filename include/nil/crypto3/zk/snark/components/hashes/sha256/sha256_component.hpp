@@ -219,10 +219,12 @@ namespace nil {
                     }
 
                     for (std::size_t i = 0; i < 4; ++i) {
-                        this->pb.val(unreduced_output[i]) = this->pb.val(round_functions[3 - i].packed_d) +
-                                                            this->pb.val(round_functions[63 - i].packed_new_a);
-                        this->pb.val(unreduced_output[4 + i]) = this->pb.val(round_functions[3 - i].packed_h) +
-                                                                this->pb.val(round_functions[63 - i].packed_new_e);
+                        this->pb.val(unreduced_output[i]) = 
+                            this->pb.val(round_functions[3 - i].packed_d) +
+                            this->pb.val(round_functions[63 - i].packed_new_a);
+                        this->pb.val(unreduced_output[4 + i]) = 
+                            this->pb.val(round_functions[3 - i].packed_h) +
+                            this->pb.val(round_functions[63 - i].packed_new_e);
                     }
 
                     for (std::size_t i = 0; i < 8; ++i) {
@@ -243,7 +245,8 @@ namespace nil {
                     block.insert(block.end(), right.bits.begin(), right.bits.end());
 
                     /* compute the hash itself */
-                    f.reset(new sha256_compression_function_component<FieldType>(pb, SHA256_default_IV<FieldType>(pb),
+                    f.reset(new sha256_compression_function_component<FieldType>(pb, 
+                                                                                 SHA256_default_IV<FieldType>(pb),
                                                                                  block, output));
                 }
 
@@ -256,7 +259,8 @@ namespace nil {
                     component<FieldType>(pb) {
                     assert(block_length == hashes::sha2<256>::block_bits);
                     assert(input_block.bits.size() == block_length);
-                    f.reset(new sha256_compression_function_component<FieldType>(pb, SHA256_default_IV<FieldType>(pb),
+                    f.reset(new sha256_compression_function_component<FieldType>(pb, 
+                                                                                 SHA256_default_IV<FieldType>(pb),
                                                                                  input_block.bits, output));
                 }
 

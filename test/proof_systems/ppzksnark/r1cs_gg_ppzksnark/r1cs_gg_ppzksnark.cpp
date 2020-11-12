@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
