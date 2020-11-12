@@ -26,7 +26,14 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_ELEMENT_HPP
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_ELEMENT_HPP
 
-#include <nil/crypto3/algebra/fields/field.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
+
+#include <boost/multiprecision/number.hpp>
+
+// temporary includes begin
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
+// temporary includes end
 
 namespace nil {
     namespace crypto3 {
@@ -160,10 +167,44 @@ namespace nil {
                         return element_kc<Type1, Type2>(lhs * rhs.g, lhs * rhs.h);
                     }
 
-                    template<typename Type1, typename Type2, typename FieldType>
-                    element_kc<Type1, Type2> operator*(const typename FieldType::value_type &lhs,
-                                                           const element_kc<Type1, Type2> &rhs) {
-                        return lhs * rhs;
+                    template<typename Type1, typename Type2, typename Backend,
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                    element_kc<Type1, Type2>
+                        operator*(const element_kc<Type1, Type2> &lhs, 
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &rhs) {
+                        return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
+                    }
+
+                    template<typename Type1, typename Type2, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_field<
+                                                    typename FieldValueType::field_type>::value &&
+                                               !::nil::crypto3::detail::is_extended_field<
+                                                    typename FieldValueType::field_type>::value, 
+                                                FieldValueType>::type >
+                    element_kc<Type1, Type2> operator*(const FieldValueType &lhs,
+                                                       const element_kc<Type1, Type2> &rhs) {
+
+                        // temporary added until fixed-precision modular adaptor is ready:
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> 
+                            non_fixed_precision_modulus_type;
+
+                        return non_fixed_precision_modulus_type(lhs.data) * rhs;
+                    }
+
+                    template<typename Type1, typename Type2, typename FieldValueType, typename = 
+                        typename std::enable_if<::nil::crypto3::detail::is_field<
+                                                    typename FieldValueType::field_type>::value &&
+                                               !::nil::crypto3::detail::is_extended_field<
+                                                    typename FieldValueType::field_type>::value, 
+                                                FieldValueType>::type >
+                    element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs,
+                                                       const FieldValueType &rhs) {
+
+                        // temporary added until fixed-precision modular adaptor is ready:
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> 
+                            non_fixed_precision_modulus_type;
+
+                        return lhs * non_fixed_precision_modulus_type(rhs.data);
                     }
 
                 }    // namespace detail
