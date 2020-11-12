@@ -184,7 +184,7 @@ namespace nil {
                             C.add_term(u + 1, 1);
                             C.add_term(v + 1, 1);
                         }
-                        C.add_term(lastvar + 1, -FieldType::value_type::zero());
+                        C.add_term(lastvar + 1, -FieldType::value_type::one());
 
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -

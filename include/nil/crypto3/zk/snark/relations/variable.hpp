@@ -293,7 +293,7 @@ namespace nil {
                     value_type evaluate(const std::vector<value_type> &assignment) const {
                         value_type acc = value_type::zero();
                         for (auto &lt : terms) {
-                            acc += (lt.index == 0 ? value_type::zero() : assignment[lt.index - 1]) * lt.coeff;
+                            acc += (lt.index == 0 ? value_type::one() : assignment[lt.index - 1]) * lt.coeff;
                         }
                         return acc;
                     }
