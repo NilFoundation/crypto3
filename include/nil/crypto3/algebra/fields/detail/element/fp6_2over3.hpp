@@ -131,7 +131,14 @@ namespace nil {
                         }
 
                         element_fp6_2over3 squared() const {
-                            return (*this) * (*this);    // maybe can be done more effective
+                            // return (*this) * (*this);    // maybe can be done more effective
+
+                            /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Complex) */
+                            const underlying_type &B = data[1], &A = data[0];
+                            const underlying_type AB = A * B;
+
+                            return element_fp6_2over3((A + B) * (A + mul_by_non_residue(B)) - AB - mul_by_non_residue(AB),
+                                                      AB + AB);
                         }
 
                         template<typename PowerType>
@@ -255,7 +262,7 @@ namespace nil {
                         }
 
                         /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
-                            return underlying_type(non_residue * A.data[2], A.data[1], A.data[0]);
+                            return underlying_type(non_residue * A.data[2], A.data[0], A.data[1]);
                         }
 
                         element_fp6_2over3 mul_by_2345(const element_fp6_2over3 &other) const {
