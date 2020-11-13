@@ -42,11 +42,11 @@ std::vector<long> eval_find_wnaf(const size_t window_size, const Backend& scalar
 
          if (u > 0)
          {
-            eval_subtract(c, c, Backend(u));
+            eval_subtract(c, c, ui_type(u));
          }
          else
          {
-            eval_add(c, c, -u);
+            eval_add(c, c, ui_type(-u));
          }
       }
       else
