@@ -42,15 +42,16 @@ using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
 void test_two_to_one() {
-    blueprint<FieldType> pb;
+    blueprint<FieldType> bp;
 
-    digest_variable<FieldType> left(pb, hashes::sha2<256>::digest_bits);
-    digest_variable<FieldType> right(pb, hashes::sha2<256>::digest_bits);
-    digest_variable<FieldType> output(pb, hashes::sha2<256>::digest_bits);
+    digest_variable<FieldType> left(bp, hashes::sha2<256>::digest_bits);
+    digest_variable<FieldType> right(bp, hashes::sha2<256>::digest_bits);
+    digest_variable<FieldType> output(bp, hashes::sha2<256>::digest_bits);
 
-    sha256_two_to_one_hash_component<FieldType> f(pb, left, right, output);
+    sha256_two_to_one_hash_component<FieldType> f(bp, left, right, output);
     f.generate_r1cs_constraints();
-    printf("Number of constraints for sha256_two_to_one_hash_component: %zu\n", pb.num_constraints());
+    std::cout << "Number of constraints for sha256_two_to_one_hash_component: " << 
+        bp.num_constraints() << std::endl;
 
     std::array<std::uint32_t, 8> array_a = {0x426bc2d8, 0x4dc86782, 0x81e8957a, 0x409ec148, 
                                             0xe6cffbe8, 0xafe6ba4f, 0x9c6f1978, 0xdd7af7e9};
@@ -60,9 +61,14 @@ void test_two_to_one() {
                                             0x59305141, 0x990e5c0a, 0xce40d33d, 0x0b1167d1};
 
     std::vector<bool> left_bv, right_bv, hash_bv;
+    left_bv.reserve(8*32);
+    right_bv.reserve(8*32);
+    hash_bv.reserve(8*32);
+    
     detail::pack_to<stream_endian::little_octet_big_bit, 32, 1>(
         array_a,
         left_bv.begin());
+
     detail::pack_to<stream_endian::little_octet_big_bit, 32, 1>(
         array_b,
         right_bv.begin());
@@ -77,7 +83,7 @@ void test_two_to_one() {
     f.generate_r1cs_witness();
     output.generate_r1cs_witness(hash_bv);
 
-    BOOST_CHECK(pb.is_satisfied());
+    BOOST_CHECK(bp.is_satisfied());
 }
 
 BOOST_AUTO_TEST_SUITE(sha2_256_component_test_suite)
