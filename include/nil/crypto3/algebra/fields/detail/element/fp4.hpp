@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 
+#include <boost/multiprecision/wnaf.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -181,11 +183,11 @@ namespace nil {
 
                         template<typename PowerType>
                         element_fp4 cyclotomic_exp(const PowerType &exponent) const {
-                            /*element_fp4  res = this->one();
+                            element_fp4  res = this->one();
                             element_fp4  this_inverse = this->unitary_inversed();
 
                             bool found_nonzero = false;
-                            std::vector<long> NAF = find_wnaf(1, exponent);
+                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, exponent);
 
                             for (long i = static_cast<long>(NAF.size() - 1); i >= 0; --i) {
                                 if (found_nonzero) {
@@ -204,9 +206,9 @@ namespace nil {
                                 }
                             }
 
-                            return res;*/
+                            return res;
 
-                            return *this;
+                            // return *this;
                         }
 
                         /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
