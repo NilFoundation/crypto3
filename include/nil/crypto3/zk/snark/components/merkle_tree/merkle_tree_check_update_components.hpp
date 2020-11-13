@@ -79,7 +79,7 @@ namespace nil {
                        comment in the implementation of generate_r1cs_constraints() */
 
                     merkle_tree_check_update_components(
-                        blueprint<FieldType> &pb,
+                        blueprint<FieldType> &bp,
                         const std::size_t tree_depth,
                         const blueprint_variable_vector<FieldType> &address_bits,
                         const digest_variable<FieldType> &prev_leaf_digest,
@@ -89,7 +89,7 @@ namespace nil {
                         const digest_variable<FieldType> &next_root_digest,
                         const merkle_authentication_path_variable<FieldType, Hash> &next_path,
                         const blueprint_linear_combination<FieldType> &update_successful) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
                         prev_leaf_digest(prev_leaf_digest), prev_root_digest(prev_root_digest), prev_path(prev_path),
                         next_leaf_digest(next_leaf_digest), next_root_digest(next_root_digest), next_path(next_path),
@@ -98,40 +98,40 @@ namespace nil {
                         assert(tree_depth == address_bits.size());
 
                         for (std::size_t i = 0; i < tree_depth - 1; ++i) {
-                            prev_internal_output.emplace_back(digest_variable<FieldType>(pb, digest_size));
-                            next_internal_output.emplace_back(digest_variable<FieldType>(pb, digest_size));
+                            prev_internal_output.emplace_back(digest_variable<FieldType>(bp, digest_size));
+                            next_internal_output.emplace_back(digest_variable<FieldType>(bp, digest_size));
                         }
 
-                        computed_next_root.reset(new digest_variable<FieldType>(pb, digest_size));
+                        computed_next_root.reset(new digest_variable<FieldType>(bp, digest_size));
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            block_variable<FieldType> prev_inp(pb, prev_path.left_digests[i],
+                            block_variable<FieldType> prev_inp(bp, prev_path.left_digests[i],
                                                                prev_path.right_digests[i]);
                             prev_hasher_inputs.emplace_back(prev_inp);
-                            prev_hashers.emplace_back(Hash(pb, 2 * digest_size, prev_inp,
+                            prev_hashers.emplace_back(Hash(bp, 2 * digest_size, prev_inp,
                                                            (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
 
-                            block_variable<FieldType> next_inp(pb, next_path.left_digests[i],
+                            block_variable<FieldType> next_inp(bp, next_path.left_digests[i],
                                                                next_path.right_digests[i]);
                             next_hasher_inputs.emplace_back(next_inp);
                             next_hashers.emplace_back(
-                                Hash(pb, 2 * digest_size, next_inp,
+                                Hash(bp, 2 * digest_size, next_inp,
                                      (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                         }
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             prev_propagators.emplace_back(digest_selector_component<FieldType>(
-                                pb, digest_size, i < tree_depth - 1 ? prev_internal_output[i] : prev_leaf_digest,
+                                bp, digest_size, i < tree_depth - 1 ? prev_internal_output[i] : prev_leaf_digest,
                                 address_bits[tree_depth - 1 - i], prev_path.left_digests[i],
                                 prev_path.right_digests[i]));
                             next_propagators.emplace_back(digest_selector_component<FieldType>(
-                                pb, digest_size, i < tree_depth - 1 ? next_internal_output[i] : next_leaf_digest,
+                                bp, digest_size, i < tree_depth - 1 ? next_internal_output[i] : next_leaf_digest,
                                 address_bits[tree_depth - 1 - i], next_path.left_digests[i],
                                 next_path.right_digests[i]));
                         }
 
                         check_next_root.reset(new bit_vector_copy_component<FieldType>(
-                            pb, computed_next_root->bits, next_root_digest.bits, update_successful,
+                            bp, computed_next_root->bits, next_root_digest.bits, update_successful,
                             FieldType::capacity()));
                     }
 
@@ -157,7 +157,7 @@ namespace nil {
                                   addr * (prev_left - next_left) + (1 - addr) * (prev_right - next_right) = 0
                                   addr * (prev_left - next_left - prev_right + next_right) = next_right - prev_right
                                 */
-                                this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                                this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                     address_bits[tree_depth - 1 - i],
                                     prev_path.left_digests[i].bits[j] - next_path.left_digests[i].bits[j] -
                                         prev_path.right_digests[i].bits[j] + next_path.right_digests[i].bits[j],
@@ -185,7 +185,7 @@ namespace nil {
                         /* do the hash computations bottom-up */
                         for (int i = tree_depth - 1; i >= 0; --i) {
                             /* ensure consistency of prev_path and next_path */
-                            if (this->pb.val(address_bits[tree_depth - 1 - i]) == FieldType::value_type::zero()) {
+                            if (this->bp.val(address_bits[tree_depth - 1 - i]) == FieldType::value_type::zero()) {
                                 next_path.left_digests[i].generate_r1cs_witness(prev_path.left_digests[i].get_digest());
                             } else {
                                 next_path.right_digests[i].generate_r1cs_witness(

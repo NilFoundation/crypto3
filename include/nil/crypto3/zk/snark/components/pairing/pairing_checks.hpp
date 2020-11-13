@@ -59,18 +59,18 @@ namespace nil {
 
                     variable<field_type> result;
 
-                    check_e_equals_e_component(blueprint<field_type> &pb,
+                    check_e_equals_e_component(blueprint<field_type> &bp,
                                                const G1_precomputation<CurveType> &lhs_G1,
                                                const G2_precomputation<CurveType> &lhs_G2,
                                                const G1_precomputation<CurveType> &rhs_G1,
                                                const G2_precomputation<CurveType> &rhs_G2,
                                                const variable<field_type> &result) :
-                        component<field_type>(pb),
+                        component<field_type>(bp),
                         lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
-                        ratio.reset(new Fqk_variable<CurveType>(pb));
+                        ratio.reset(new Fqk_variable<CurveType>(bp));
                         compute_ratio.reset(
-                            new e_over_e_miller_loop_component<CurveType>(pb, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
-                        check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
+                            new e_over_e_miller_loop_component<CurveType>(bp, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
+                        check_finexp.reset(new final_exp_component<CurveType>(bp, *ratio, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -102,7 +102,7 @@ namespace nil {
 
                     variable<field_type> result;
 
-                    check_e_equals_ee_component(blueprint<field_type> &pb,
+                    check_e_equals_ee_component(blueprint<field_type> &bp,
                                                 const G1_precomputation<CurveType> &lhs_G1,
                                                 const G2_precomputation<CurveType> &lhs_G2,
                                                 const G1_precomputation<CurveType> &rhs1_G1,
@@ -110,13 +110,13 @@ namespace nil {
                                                 const G1_precomputation<CurveType> &rhs2_G1,
                                                 const G2_precomputation<CurveType> &rhs2_G2,
                                                 const variable<field_type> &result) :
-                        component<field_type>(pb),
+                        component<field_type>(bp),
                         lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
                         rhs2_G2(rhs2_G2), result(result) {
-                        ratio.reset(new Fqk_variable<CurveType>(pb));
+                        ratio.reset(new Fqk_variable<CurveType>(bp));
                         compute_ratio.reset(new e_times_e_over_e_miller_loop_component<CurveType>(
-                            pb, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
-                        check_finexp.reset(new final_exp_component<CurveType>(pb, *ratio, result));
+                            bp, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
+                        check_finexp.reset(new final_exp_component<CurveType>(bp, *ratio, result));
                     }
 
                     void generate_r1cs_constraints() {

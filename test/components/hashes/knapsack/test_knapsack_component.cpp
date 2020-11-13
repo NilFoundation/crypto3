@@ -43,22 +43,22 @@ namespace nil {
                                                                        const std::vector<bool> &digest_bits) {
                     assert(knapsack_dimension<FieldType>::dimension == dimension);
                     knapsack_crh_with_bit_out_component<FieldType>::sample_randomness(input_bits.size());
-                    blueprint<FieldType> pb;
+                    blueprint<FieldType> bp;
 
-                    block_variable<FieldType> input_block(pb, input_bits.size());
+                    block_variable<FieldType> input_block(bp, input_bits.size());
                     digest_variable<FieldType> output_digest(
-                        pb, knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
+                        bp, knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
                     knapsack_crh_with_bit_out_component<FieldType> H(
-                        pb, input_bits.size(), input_block, output_digest);
+                        bp, input_bits.size(), input_block, output_digest);
 
                     input_block.generate_r1cs_witness(input_bits);
                     H.generate_r1cs_constraints();
                     H.generate_r1cs_witness();
 
                     assert(output_digest.get_digest().size() == digest_bits.size());
-                    assert(pb.is_satisfied());
+                    assert(bp.is_satisfied());
 
-                    const std::size_t num_constraints = pb.num_constraints();
+                    const std::size_t num_constraints = bp.num_constraints();
                     const std::size_t expected_constraints =
                         knapsack_crh_with_bit_out_component<FieldType>::expected_constraints();
                     assert(num_constraints == expected_constraints);

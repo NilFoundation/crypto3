@@ -45,16 +45,16 @@ namespace nil {
 
                 /* forces lc to take value 0 or 1 by adding constraint lc * (1-lc) = 0 */
                 template<typename FieldType>
-                void generate_boolean_r1cs_constraint(blueprint<FieldType> &pb,
+                void generate_boolean_r1cs_constraint(blueprint<FieldType> &bp,
                                                       const blueprint_linear_combination<FieldType> &lc) {
-                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(lc, 1 - lc, 0));
+                    bp.add_r1cs_constraint(r1cs_constraint<FieldType>(lc, 1 - lc, 0));
                 }
 
                 template<typename FieldType>
-                void generate_r1cs_equals_const_constraint(blueprint<FieldType> &pb,
+                void generate_r1cs_equals_const_constraint(blueprint<FieldType> &bp,
                                                            const blueprint_linear_combination<FieldType> &lc,
                                                            const typename FieldType::value_type &c) {
-                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, lc, c));
+                    bp.add_r1cs_constraint(r1cs_constraint<FieldType>(1, lc, c));
                 }
 
                 template<typename FieldType>
@@ -65,10 +65,10 @@ namespace nil {
                     const blueprint_linear_combination_vector<FieldType> bits;
                     const blueprint_linear_combination<FieldType> packed;
 
-                    packing_component(blueprint<FieldType> &pb,
+                    packing_component(blueprint<FieldType> &bp,
                                       const blueprint_linear_combination_vector<FieldType> &bits,
                                       const blueprint_linear_combination<FieldType> &packed) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         bits(bits), packed(packed) {
                     }
 
@@ -92,7 +92,7 @@ namespace nil {
                     const std::size_t num_chunks;
                     // const std::size_t last_chunk_size;
 
-                    multipacking_component(blueprint<FieldType> &pb,
+                    multipacking_component(blueprint<FieldType> &bp,
                                            const blueprint_linear_combination_vector<FieldType> &bits,
                                            const blueprint_linear_combination_vector<FieldType> &packed_vars,
                                            size_t chunk_size);
@@ -108,7 +108,7 @@ namespace nil {
                     const blueprint_variable_vector<FieldType> target;
                     const blueprint_linear_combination<FieldType> do_copy;
 
-                    field_vector_copy_component(blueprint<FieldType> &pb,
+                    field_vector_copy_component(blueprint<FieldType> &bp,
                                                 const blueprint_variable_vector<FieldType> &source,
                                                 const blueprint_variable_vector<FieldType> &target,
                                                 const blueprint_linear_combination<FieldType> &do_copy);
@@ -133,7 +133,7 @@ namespace nil {
                     const std::size_t chunk_size;
                     const std::size_t num_chunks;
 
-                    bit_vector_copy_component(blueprint<FieldType> &pb,
+                    bit_vector_copy_component(blueprint<FieldType> &bp,
                                               const blueprint_variable_vector<FieldType> &source_bits,
                                               const blueprint_variable_vector<FieldType> &target_bits,
                                               const blueprint_linear_combination<FieldType> &do_copy,
@@ -151,26 +151,26 @@ namespace nil {
                     blueprint_variable<FieldType> packed;
                     blueprint_variable_vector<FieldType> bits;
 
-                    dual_variable_component(blueprint<FieldType> &pb, size_t width) : component<FieldType>(pb) {
-                        packed.allocate(pb);
-                        bits.allocate(pb, width);
-                        consistency_check.reset(new packing_component<FieldType>(pb, bits, packed));
+                    dual_variable_component(blueprint<FieldType> &bp, size_t width) : component<FieldType>(bp) {
+                        packed.allocate(bp);
+                        bits.allocate(bp, width);
+                        consistency_check.reset(new packing_component<FieldType>(bp, bits, packed));
                     }
 
-                    dual_variable_component(blueprint<FieldType> &pb,
+                    dual_variable_component(blueprint<FieldType> &bp,
                                             const blueprint_variable_vector<FieldType> &bits) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         bits(bits) {
-                        packed.allocate(pb);
-                        consistency_check.reset(new packing_component<FieldType>(pb, bits, packed));
+                        packed.allocate(bp);
+                        consistency_check.reset(new packing_component<FieldType>(bp, bits, packed));
                     }
 
-                    dual_variable_component(blueprint<FieldType> &pb, const blueprint_variable<FieldType> &packed,
+                    dual_variable_component(blueprint<FieldType> &bp, const blueprint_variable<FieldType> &packed,
                                             size_t width) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         packed(packed) {
-                        bits.allocate(pb, width);
-                        consistency_check.reset(new packing_component<FieldType>(pb, bits, packed));
+                        bits.allocate(bp, width);
+                        consistency_check.reset(new packing_component<FieldType>(bp, bits, packed));
                     }
 
                     void generate_r1cs_constraints(bool enforce_bitness);
@@ -196,13 +196,13 @@ namespace nil {
                     const blueprint_variable_vector<FieldType> inputs;
                     const blueprint_variable<FieldType> output;
 
-                    disjunction_component(blueprint<FieldType> &pb,
+                    disjunction_component(blueprint<FieldType> &bp,
                                           const blueprint_variable_vector<FieldType> &inputs,
                                           const blueprint_variable<FieldType> &output) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
-                        inv.allocate(pb);
+                        inv.allocate(bp);
                     }
 
                     void generate_r1cs_constraints();
@@ -218,13 +218,13 @@ namespace nil {
                     const blueprint_variable_vector<FieldType> inputs;
                     const blueprint_variable<FieldType> output;
 
-                    conjunction_component(blueprint<FieldType> &pb,
+                    conjunction_component(blueprint<FieldType> &bp,
                                           const blueprint_variable_vector<FieldType> &inputs,
                                           const blueprint_variable<FieldType> &output) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
-                        inv.allocate(pb);
+                        inv.allocate(bp);
                     }
 
                     void generate_r1cs_constraints();
@@ -248,24 +248,24 @@ namespace nil {
                     const blueprint_variable<FieldType> less;
                     const blueprint_variable<FieldType> less_or_eq;
 
-                    comparison_component(blueprint<FieldType> &pb,
+                    comparison_component(blueprint<FieldType> &bp,
                                          size_t n,
                                          const blueprint_linear_combination<FieldType> &A,
                                          const blueprint_linear_combination<FieldType> &B,
                                          const blueprint_variable<FieldType> &less,
                                          const blueprint_variable<FieldType> &less_or_eq) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         n(n), A(A), B(B), less(less), less_or_eq(less_or_eq) {
-                        alpha.allocate(pb, n);
+                        alpha.allocate(bp, n);
                         alpha.emplace_back(less_or_eq);    // alpha[n] is less_or_eq
 
-                        alpha_packed.allocate(pb);
-                        not_all_zeros.allocate(pb);
+                        alpha_packed.allocate(bp);
+                        not_all_zeros.allocate(bp);
 
-                        pack_alpha.reset(new packing_component<FieldType>(pb, alpha, alpha_packed));
+                        pack_alpha.reset(new packing_component<FieldType>(bp, alpha, alpha_packed));
 
                         all_zeros_test.reset(new disjunction_component<FieldType>(
-                            pb, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
+                            bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
                     };
 
                     void generate_r1cs_constraints();
@@ -283,16 +283,16 @@ namespace nil {
                     const blueprint_linear_combination_vector<FieldType> B;
                     const blueprint_variable<FieldType> result;
 
-                    inner_product_component(blueprint<FieldType> &pb,
+                    inner_product_component(blueprint<FieldType> &bp,
                                             const blueprint_linear_combination_vector<FieldType> &A,
                                             const blueprint_linear_combination_vector<FieldType> &B,
                                             const blueprint_variable<FieldType> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         A(A), B(B), result(result) {
                         assert(A.size() >= 1);
                         assert(A.size() == B.size());
 
-                        S.allocate(pb, A.size() - 1);
+                        S.allocate(bp, A.size() - 1);
                     }
 
                     void generate_r1cs_constraints();
@@ -320,15 +320,15 @@ namespace nil {
                     const blueprint_variable<FieldType> result;
                     const blueprint_variable<FieldType> success_flag;
 
-                    loose_multiplexing_component(blueprint<FieldType> &pb,
+                    loose_multiplexing_component(blueprint<FieldType> &bp,
                                                  const blueprint_linear_combination_vector<FieldType> &arr,
                                                  const blueprint_variable<FieldType> &index,
                                                  const blueprint_variable<FieldType> &result,
                                                  const blueprint_variable<FieldType> &success_flag) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         arr(arr), index(index), result(result), success_flag(success_flag) {
-                        alpha.allocate(pb, arr.size());
-                        compute_result.reset(new inner_product_component<FieldType>(pb, alpha, arr, result));
+                        alpha.allocate(bp, arr.size());
+                        compute_result.reset(new inner_product_component<FieldType>(bp, alpha, arr, result));
                     };
 
                     void generate_r1cs_constraints();
@@ -337,7 +337,7 @@ namespace nil {
 
                 template<typename FieldType, typename VarT>
                 void create_linear_combination_constraints(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const std::vector<typename FieldType::value_type> &base,
                     const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
                     const VarT &target) {
@@ -353,21 +353,21 @@ namespace nil {
 
                         c.add_term(target.all_vars[i]);
 
-                        pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
+                        bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
                     }
                 }
 
                 template<typename FieldType, typename VarT>
                 void create_linear_combination_witness(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const std::vector<typename FieldType::value_type> &base,
                     const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
                     const VarT &target) {
                     for (std::size_t i = 0; i < base.size(); ++i) {
-                        pb.val(target.all_vars[i]) = base[i];
+                        bp.val(target.all_vars[i]) = base[i];
 
                         for (auto &p : v) {
-                            pb.val(target.all_vars[i]) += p.second * pb.val(p.first.all_vars[i]);
+                            bp.val(target.all_vars[i]) += p.second * bp.val(p.first.all_vars[i]);
                         }
                     }
                 }
@@ -376,19 +376,19 @@ namespace nil {
                 void packing_component<FieldType>::generate_r1cs_constraints(bool enforce_bitness)
                 /* adds constraint result = \sum  bits[i] * 2^i */
                 {
-                    this->pb.add_r1cs_constraint(
+                    this->bp.add_r1cs_constraint(
                         r1cs_constraint<FieldType>(1, pb_packing_sum<FieldType>(bits), packed));
 
                     if (enforce_bitness) {
                         for (std::size_t i = 0; i < bits.size(); ++i) {
-                            generate_boolean_r1cs_constraint<FieldType>(this->pb, bits[i]);
+                            generate_boolean_r1cs_constraint<FieldType>(this->bp, bits[i]);
                         }
                     }
                 }
 
                 template<typename FieldType>
                 void packing_component<FieldType>::generate_r1cs_witness_from_packed() {
-                    packed.evaluate(this->pb);
+                    packed.evaluate(this->bp);
 
                     // temporary added until fixed-precision modular adaptor is ready:
                     typedef boost::multiprecision::number<
@@ -396,24 +396,24 @@ namespace nil {
                         non_fixed_precision_modulus_type;
 
                     assert(boost::multiprecision::msb(
-                                non_fixed_precision_modulus_type(this->pb.lc_val(packed).data)) <=
+                                non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) <=
                            bits.size());    // `bits` is large enough to represent this packed value
-                    bits.fill_with_bits_of_field_element(this->pb, this->pb.lc_val(packed));
+                    bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                 }
 
                 template<typename FieldType>
                 void packing_component<FieldType>::generate_r1cs_witness_from_bits() {
-                    bits.evaluate(this->pb);
-                    this->pb.lc_val(packed) = bits.get_field_element_from_bits(this->pb);
+                    bits.evaluate(this->bp);
+                    this->bp.lc_val(packed) = bits.get_field_element_from_bits(this->bp);
                 }
 
                 template<typename FieldType>
                 multipacking_component<FieldType>::multipacking_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const blueprint_linear_combination_vector<FieldType> &bits,
                     const blueprint_linear_combination_vector<FieldType> &packed_vars,
                     size_t chunk_size) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     bits(bits), packed_vars(packed_vars), chunk_size(chunk_size),
                     num_chunks((bits.size() + (chunk_size - 1)) / chunk_size)
                 // last_chunk_size(bits.size() - (num_chunks-1) * chunk_size)
@@ -421,7 +421,7 @@ namespace nil {
                     assert(packed_vars.size() == num_chunks);
                     for (std::size_t i = 0; i < num_chunks; ++i) {
                         packers.emplace_back(packing_component<FieldType>(
-                            this->pb,
+                            this->bp,
                             blueprint_linear_combination_vector<FieldType>(
                                 bits.begin() + i * chunk_size,
                                 bits.begin() + std::min((i + 1) * chunk_size, bits.size())),
@@ -457,11 +457,11 @@ namespace nil {
 
                 template<typename FieldType>
                 field_vector_copy_component<FieldType>::field_vector_copy_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const blueprint_variable_vector<FieldType> &source,
                     const blueprint_variable_vector<FieldType> &target,
                     const blueprint_linear_combination<FieldType> &do_copy) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     source(source), target(target), do_copy(do_copy) {
                     assert(source.size() == target.size());
                 }
@@ -469,43 +469,43 @@ namespace nil {
                 template<typename FieldType>
                 void field_vector_copy_component<FieldType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < source.size(); ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(do_copy, source[i] - target[i], 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(do_copy, source[i] - target[i], 0));
                     }
                 }
 
                 template<typename FieldType>
                 void field_vector_copy_component<FieldType>::generate_r1cs_witness() {
-                    do_copy.evaluate(this->pb);
-                    assert(this->pb.lc_val(do_copy) == FieldType::value_type::zero() ||
-                           this->pb.lc_val(do_copy) == FieldType::value_type::zero());
-                    if (this->pb.lc_val(do_copy) != FieldType::value_type::zero()) {
+                    do_copy.evaluate(this->bp);
+                    assert(this->bp.lc_val(do_copy) == FieldType::value_type::zero() ||
+                           this->bp.lc_val(do_copy) == FieldType::value_type::zero());
+                    if (this->bp.lc_val(do_copy) != FieldType::value_type::zero()) {
                         for (std::size_t i = 0; i < source.size(); ++i) {
-                            this->pb.val(target[i]) = this->pb.val(source[i]);
+                            this->bp.val(target[i]) = this->bp.val(source[i]);
                         }
                     }
                 }
 
                 template<typename FieldType>
                 bit_vector_copy_component<FieldType>::bit_vector_copy_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const blueprint_variable_vector<FieldType> &source_bits,
                     const blueprint_variable_vector<FieldType> &target_bits,
                     const blueprint_linear_combination<FieldType> &do_copy,
                     size_t chunk_size) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     source_bits(source_bits), target_bits(target_bits), do_copy(do_copy), chunk_size(chunk_size),
                     num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
                     assert(source_bits.size() == target_bits.size());
 
-                    packed_source.allocate(pb, num_chunks);
+                    packed_source.allocate(bp, num_chunks);
                     pack_source.reset(
-                        new multipacking_component<FieldType>(pb, source_bits, packed_source, chunk_size));
+                        new multipacking_component<FieldType>(bp, source_bits, packed_source, chunk_size));
 
-                    packed_target.allocate(pb, num_chunks);
+                    packed_target.allocate(bp, num_chunks);
                     pack_target.reset(
-                        new multipacking_component<FieldType>(pb, target_bits, packed_target, chunk_size));
+                        new multipacking_component<FieldType>(bp, target_bits, packed_target, chunk_size));
 
-                    copier.reset(new field_vector_copy_component<FieldType>(pb, packed_source, packed_target, do_copy));
+                    copier.reset(new field_vector_copy_component<FieldType>(bp, packed_source, packed_target, do_copy));
                 }
 
                 template<typename FieldType>
@@ -519,12 +519,12 @@ namespace nil {
 
                 template<typename FieldType>
                 void bit_vector_copy_component<FieldType>::generate_r1cs_witness() {
-                    do_copy.evaluate(this->pb);
-                    assert(this->pb.lc_val(do_copy) == FieldType::value_type::zero() ||
-                           this->pb.lc_val(do_copy) == FieldType::value_type::zero());
-                    if (this->pb.lc_val(do_copy) == FieldType::value_type::zero()) {
+                    do_copy.evaluate(this->bp);
+                    assert(this->bp.lc_val(do_copy) == FieldType::value_type::zero() ||
+                           this->bp.lc_val(do_copy) == FieldType::value_type::zero());
+                    if (this->bp.lc_val(do_copy) == FieldType::value_type::zero()) {
                         for (std::size_t i = 0; i < source_bits.size(); ++i) {
-                            this->pb.val(target_bits[i]) = this->pb.val(source_bits[i]);
+                            this->bp.val(target_bits[i]) = this->bp.val(source_bits[i]);
                         }
                     }
 
@@ -557,7 +557,7 @@ namespace nil {
                     }
                     c1.add_term(output);
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a1, b1, c1));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a1, b1, c1));
 
                     /* (1-output) * sum = 0 */
                     linear_combination<FieldType> a2, b2, c2;
@@ -568,7 +568,7 @@ namespace nil {
                     }
                     c2.add_term(blueprint_variable<FieldType>(0), 0);
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
                 }
 
                 template<typename FieldType>
@@ -576,15 +576,15 @@ namespace nil {
                     typename FieldType::value_type sum = FieldType::value_type::zero();
 
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
-                        sum += this->pb.val(inputs[i]);
+                        sum += this->bp.val(inputs[i]);
                     }
 
                     if (sum.is_zero()) {
-                        this->pb.val(inv) = FieldType::value_type::zero();
-                        this->pb.val(output) = FieldType::value_type::zero();
+                        this->bp.val(inv) = FieldType::value_type::zero();
+                        this->bp.val(output) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(inv) = sum.inversed();
-                        this->pb.val(output) = FieldType::value_type::zero();
+                        this->bp.val(inv) = sum.inversed();
+                        this->bp.val(output) = FieldType::value_type::zero();
                     }
                 }
 
@@ -600,7 +600,7 @@ namespace nil {
                     c1.add_term(blueprint_variable<FieldType>(0));
                     c1.add_term(output, -1);
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a1, b1, c1));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a1, b1, c1));
 
                     /* output * (n-sum) = 0 */
                     linear_combination<FieldType> a2, b2, c2;
@@ -611,7 +611,7 @@ namespace nil {
                     }
                     c2.add_term(blueprint_variable<FieldType>(0), 0);
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
                 }
 
                 template<typename FieldType>
@@ -619,15 +619,15 @@ namespace nil {
                     typename FieldType::value_type sum = typename FieldType::value_type(inputs.size());
 
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
-                        sum -= this->pb.val(inputs[i]);
+                        sum -= this->bp.val(inputs[i]);
                     }
 
                     if (sum.is_zero()) {
-                        this->pb.val(inv) = FieldType::value_type::zero();
-                        this->pb.val(output) = FieldType::value_type::zero();
+                        this->bp.val(inv) = FieldType::value_type::zero();
+                        this->bp.val(output) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(inv) = sum.inversed();
-                        this->pb.val(output) = FieldType::value_type::zero();
+                        this->bp.val(inv) = sum.inversed();
+                        this->bp.val(output) = FieldType::value_type::zero();
                     }
                 }
 
@@ -649,31 +649,31 @@ namespace nil {
                      */
 
                     /* not_all_zeros to be Boolean, alpha_i are Boolean by packing component */
-                    generate_boolean_r1cs_constraint<FieldType>(this->pb, not_all_zeros);
+                    generate_boolean_r1cs_constraint<FieldType>(this->bp, not_all_zeros);
 
                     /* constraints for packed(alpha) = 2^n + B - A */
                     pack_alpha->generate_r1cs_constraints(true);
-                    this->pb.add_r1cs_constraint(
+                    this->bp.add_r1cs_constraint(
                         r1cs_constraint<FieldType>(1, (typename FieldType::value_type(2) ^ n) + B - A, alpha_packed));
 
                     /* compute result */
                     all_zeros_test->generate_r1cs_constraints();
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
                 }
 
                 template<typename FieldType>
                 void comparison_component<FieldType>::generate_r1cs_witness() {
-                    A.evaluate(this->pb);
-                    B.evaluate(this->pb);
+                    A.evaluate(this->bp);
+                    B.evaluate(this->bp);
 
                     /* unpack 2^n + B - A into alpha_packed */
-                    this->pb.val(alpha_packed) =
-                        (typename FieldType::value_type(2) ^ n) + this->pb.lc_val(B) - this->pb.lc_val(A);
+                    this->bp.val(alpha_packed) =
+                        (typename FieldType::value_type(2) ^ n) + this->bp.lc_val(B) - this->bp.lc_val(A);
                     pack_alpha->generate_r1cs_witness_from_packed();
 
                     /* compute result */
                     all_zeros_test->generate_r1cs_witness();
-                    this->pb.val(less) = this->pb.val(less_or_eq) * this->pb.val(not_all_zeros);
+                    this->bp.val(less) = this->bp.val(less_or_eq) * this->bp.val(not_all_zeros);
                 }
 
                 template<typename FieldType>
@@ -684,7 +684,7 @@ namespace nil {
                       S[i+1] - S[i] = A[i] * B[i]
                     */
                     for (std::size_t i = 0; i < A.size(); ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             A[i], B[i],
                             (i == A.size() - 1 ? result : S[i]) +
                                 (i == 0 ? 0 * blueprint_variable<FieldType>(0) : -S[i - 1])));
@@ -695,11 +695,11 @@ namespace nil {
                 void inner_product_component<FieldType>::generate_r1cs_witness() {
                     typename FieldType::value_type total = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < A.size(); ++i) {
-                        A[i].evaluate(this->pb);
-                        B[i].evaluate(this->pb);
+                        A[i].evaluate(this->bp);
+                        B[i].evaluate(this->bp);
 
-                        total += this->pb.lc_val(A[i]) * this->pb.lc_val(B[i]);
-                        this->pb.val(i == A.size() - 1 ? result : S[i]) = total;
+                        total += this->bp.lc_val(A[i]) * this->bp.lc_val(B[i]);
+                        this->bp.val(i == A.size() - 1 ? result : S[i]) = total;
                     }
                 }
 
@@ -707,7 +707,7 @@ namespace nil {
                 void loose_multiplexing_component<FieldType>::generate_r1cs_constraints() {
                     /* \alpha_i (index - i) = 0 */
                     for (std::size_t i = 0; i < arr.size(); ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(alpha[i], index - i, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(alpha[i], index - i, 0));
                     }
 
                     /* 1 * (\sum \alpha_i) = success_flag */
@@ -717,11 +717,11 @@ namespace nil {
                         b.add_term(alpha[i]);
                     }
                     c.add_term(success_flag);
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
 
                     /* now success_flag is constrained to either 0 (if index is out of
                        range) or \alpha_i. constrain it and \alpha_i to zero */
-                    generate_boolean_r1cs_constraint<FieldType>(this->pb, success_flag);
+                    generate_boolean_r1cs_constraint<FieldType>(this->bp, success_flag);
 
                     /* compute result */
                     compute_result->generate_r1cs_constraints();
@@ -730,23 +730,23 @@ namespace nil {
                 template<typename FieldType>
                 void loose_multiplexing_component<FieldType>::generate_r1cs_witness() {
                     /* assumes that idx can be fit in ulong; true for our purposes for now */
-                    const typename FieldType::value_type valint = this->pb.val(index);
+                    const typename FieldType::value_type valint = this->bp.val(index);
                     unsigned long idx = static_cast<unsigned long>(valint);
                     const typename FieldType::number_type arrsize(arr.size());
 
                     if (idx >= arr.size() || valint >= arrsize) {
                         for (std::size_t i = 0; i < arr.size(); ++i) {
-                            this->pb.val(alpha[i]) = FieldType::value_type::zero();
+                            this->bp.val(alpha[i]) = FieldType::value_type::zero();
                         }
 
-                        this->pb.val(success_flag) = FieldType::value_type::zero();
+                        this->bp.val(success_flag) = FieldType::value_type::zero();
                     } else {
                         for (std::size_t i = 0; i < arr.size(); ++i) {
-                            this->pb.val(alpha[i]) =
+                            this->bp.val(alpha[i]) =
                                 (i == idx ? FieldType::value_type::zero() : FieldType::value_type::zero());
                         }
 
-                        this->pb.val(success_flag) = FieldType::value_type::zero();
+                        this->bp.val(success_flag) = FieldType::value_type::zero();
                     }
 
                     compute_result->generate_r1cs_witness();

@@ -47,28 +47,28 @@ namespace nil {
                     const std::size_t new_num_constraints = num_constraints - 1;
 
                     /* construct dummy example: inner products of two vectors */
-                    blueprint<FieldType> pb;
+                    blueprint<FieldType> bp;
                     blueprint_variable_vector<FieldType> A;
                     blueprint_variable_vector<FieldType> B;
                     variable<FieldType> res;
 
                     // the variables on the protoboard are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
                     // B[0], ..., B[num_constraints-1])
-                    res.allocate(pb);
-                    A.allocate(pb, new_num_constraints);
-                    B.allocate(pb, new_num_constraints);
+                    res.allocate(bp);
+                    A.allocate(bp, new_num_constraints);
+                    B.allocate(bp, new_num_constraints);
 
-                    inner_product_component<FieldType> compute_inner_product(pb, A, B, res, "compute_inner_product");
+                    inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
                     compute_inner_product.generate_r1cs_constraints();
 
                     /* fill in random example */
                     for (std::size_t i = 0; i < new_num_constraints; ++i) {
-                        pb.val(A[i]) = algebra::random_element<FieldType>();
-                        pb.val(B[i]) = algebra::random_element<FieldType>();
+                        bp.val(A[i]) = algebra::random_element<FieldType>();
+                        bp.val(B[i]) = algebra::random_element<FieldType>();
                     }
 
                     compute_inner_product.generate_r1cs_witness();
-                    return r1cs_example<FieldType>(pb.get_constraint_system(), pb.primary_input(), pb.auxiliary_input());
+                    return r1cs_example<FieldType>(bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
                 }
 
             }

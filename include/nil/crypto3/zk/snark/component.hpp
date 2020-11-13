@@ -36,10 +36,10 @@ namespace nil {
                 template<typename FieldType>
                 class component {
                 protected:
-                    blueprint<FieldType> &pb;
+                    blueprint<FieldType> &bp;
 
                 public:
-                    component(blueprint<FieldType> &pb) : pb(pb) {
+                    component(blueprint<FieldType> &bp) : bp(bp) {
                     }
                 };
 

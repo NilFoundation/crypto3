@@ -75,11 +75,11 @@ namespace nil {
 
                     template<typename Backend,
                              typename boost::multiprecision::expression_template_option ExpressionTemplates>
-                    exponentiation_component(blueprint<FieldType> &pb,
+                    exponentiation_component(blueprint<FieldType> &bp,
                                              const Fpk_variableT<FpkT> &elt,
                                              const boost::multiprecision::number<Backend, ExpressionTemplates> &power,
                                              const Fpk_variableT<FpkT> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         elt(elt), power(power), result(result) {
                         NAF = find_wnaf(1, power);
 
@@ -109,9 +109,9 @@ namespace nil {
                         }
 
                         intermediate.resize(intermed_count);
-                        intermediate[0].reset(new Fpk_variableT<FpkT>(pb, FpkT::one()));
+                        intermediate[0].reset(new Fpk_variableT<FpkT>(bp, FpkT::one()));
                         for (std::size_t i = 1; i < intermed_count; ++i) {
-                            intermediate[i].reset(new Fpk_variableT<FpkT>(pb));
+                            intermediate[i].reset(new Fpk_variableT<FpkT>(bp));
                         }
                         addition_steps.resize(add_count);
                         subtraction_steps.resize(sub_count);
@@ -124,7 +124,7 @@ namespace nil {
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (found_nonzero) {
                                 doubling_steps[dbl_id].reset(new Fpk_sqr_componentT<FpkT>(
-                                    pb,
+                                    bp,
                                     *intermediate[intermed_id],
                                     (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])));
                                 ++intermed_id;
@@ -137,7 +137,7 @@ namespace nil {
                                 if (NAF[i] > 0) {
                                     /* next = cur * elt */
                                     addition_steps[add_id].reset(new Fpk_mul_componentT<FpkT>(
-                                        pb,
+                                        bp,
                                         *intermediate[intermed_id],
                                         elt,
                                         (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])));
@@ -146,7 +146,7 @@ namespace nil {
                                 } else {
                                     /* next = cur / elt, i.e. next * elt = cur */
                                     subtraction_steps[sub_id].reset(new Fpk_mul_componentT<FpkT>(
-                                        pb,
+                                        bp,
                                         (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1]),
                                         elt,
                                         *intermediate[intermed_id]));

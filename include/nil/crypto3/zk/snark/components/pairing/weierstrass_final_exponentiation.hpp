@@ -85,55 +85,55 @@ namespace nil {
 
                     variable<field_type> result_is_one;
 
-                    mnt4_final_exp_component(blueprint<field_type> &pb,
+                    mnt4_final_exp_component(blueprint<field_type> &bp,
                                              const Fqk_variable<CurveType> &el,
                                              const variable<field_type> &result_is_one) :
-                        component<field_type>(pb),
+                        component<field_type>(bp),
                         el(el), result_is_one(result_is_one) {
-                        one.reset(new Fqk_variable<CurveType>(pb));
-                        el_inv.reset(new Fqk_variable<CurveType>(pb));
+                        one.reset(new Fqk_variable<CurveType>(bp));
+                        el_inv.reset(new Fqk_variable<CurveType>(bp));
                         el_q_3.reset(new Fqk_variable<CurveType>(el.Frobenius_map(3)));
-                        el_q_3_minus_1.reset(new Fqk_variable<CurveType>(pb));
+                        el_q_3_minus_1.reset(new Fqk_variable<CurveType>(bp));
                         alpha.reset(new Fqk_variable<CurveType>(el_q_3_minus_1->Frobenius_map(1)));
-                        beta.reset(new Fqk_variable<CurveType>(pb));
+                        beta.reset(new Fqk_variable<CurveType>(bp));
                         beta_q.reset(new Fqk_variable<CurveType>(beta->Frobenius_map(1)));
 
                         el_inv_q_3.reset(new Fqk_variable<CurveType>(el_inv->Frobenius_map(3)));
-                        el_inv_q_3_minus_1.reset(new Fqk_variable<CurveType>(pb));
+                        el_inv_q_3_minus_1.reset(new Fqk_variable<CurveType>(bp));
                         inv_alpha.reset(new Fqk_variable<CurveType>(el_inv_q_3_minus_1->Frobenius_map(1)));
-                        inv_beta.reset(new Fqk_variable<CurveType>(pb));
-                        w1.reset(new Fqk_variable<CurveType>(pb));
-                        w0.reset(new Fqk_variable<CurveType>(pb));
-                        result.reset(new Fqk_variable<CurveType>(pb));
+                        inv_beta.reset(new Fqk_variable<CurveType>(bp));
+                        w1.reset(new Fqk_variable<CurveType>(bp));
+                        w0.reset(new Fqk_variable<CurveType>(bp));
+                        result.reset(new Fqk_variable<CurveType>(bp));
 
-                        compute_el_inv.reset(new Fqk_mul_component<CurveType>(pb, el, *el_inv, *one));
+                        compute_el_inv.reset(new Fqk_mul_component<CurveType>(bp, el, *el_inv, *one));
                         compute_el_q_3_minus_1.reset(
-                            new Fqk_mul_component<CurveType>(pb, *el_q_3, *el_inv, *el_q_3_minus_1));
-                        compute_beta.reset(new Fqk_mul_component<CurveType>(pb, *alpha, *el_q_3_minus_1, *beta));
+                            new Fqk_mul_component<CurveType>(bp, *el_q_3, *el_inv, *el_q_3_minus_1));
+                        compute_beta.reset(new Fqk_mul_component<CurveType>(bp, *alpha, *el_q_3_minus_1, *beta));
 
                         compute_el_inv_q_3_minus_1.reset(
-                            new Fqk_mul_component<CurveType>(pb, *el_inv_q_3, el, *el_inv_q_3_minus_1));
+                            new Fqk_mul_component<CurveType>(bp, *el_inv_q_3, el, *el_inv_q_3_minus_1));
                         compute_inv_beta.reset(
-                            new Fqk_mul_component<CurveType>(pb, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
+                            new Fqk_mul_component<CurveType>(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
                         compute_w1.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
                                          Fp6_variable,
                                          Fp6_mul_component,
                                          Fp6_cyclotomic_sqr_component,
                                          algebra::mnt6_q_limbs >
-                                             (pb, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
+                                             (bp, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
                         compute_w0.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
                                          Fp6_variable,
                                          Fp6_mul_component,
                                          Fp6_cyclotomic_sqr_component,
                                          algebra::mnt6_q_limbs >
-                                             (pb,
+                                             (bp,
                                               (algebra::mnt6_final_exponent_last_chunk_is_w0_neg ? *inv_beta : *beta),
                                               algebra::mnt6_final_exponent_last_chunk_abs_of_w0,
                                               *w0));
 
-                        compute_result.reset(new Fqk_mul_component<CurveType>(pb, *w1, *w0, *result));
+                        compute_result.reset(new Fqk_mul_component<CurveType>(bp, *w1, *w0, *result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -151,13 +151,13 @@ namespace nil {
                         compute_w1->generate_r1cs_constraints();
                         compute_result->generate_r1cs_constraints();
 
-                        generate_boolean_r1cs_constraint<field_type>(this->pb, result_is_one);
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c2, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c2, 0));
+                        generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c2, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c2, 0));
                     }
 
                     void generate_r1cs_witness() {
@@ -180,8 +180,8 @@ namespace nil {
                         compute_w1->generate_r1cs_witness();
                         compute_result->generate_r1cs_witness();
 
-                        this->pb.val(result_is_one) =
-                            (result->get_element() == one->get_element() ? field_type::value_type::zero() :
+                        this->bp.val(result_is_one) =
+                            (result->get_element() == one->get_element() ? field_type::value_type::one() :
                                                                            field_type::value_type::zero());
                     }
                 };
@@ -224,45 +224,45 @@ namespace nil {
 
                     variable<field_type> result_is_one;
 
-                    mnt6_final_exp_component(blueprint<field_type> &pb,
+                    mnt6_final_exp_component(blueprint<field_type> &bp,
                                              const Fqk_variable<CurveType> &el,
                                              const variable<field_type> &result_is_one) :
-                        component<field_type>(pb),
+                        component<field_type>(bp),
                         el(el), result_is_one(result_is_one) {
-                        one.reset(new Fqk_variable<CurveType>(pb));
-                        el_inv.reset(new Fqk_variable<CurveType>(pb));
+                        one.reset(new Fqk_variable<CurveType>(bp));
+                        el_inv.reset(new Fqk_variable<CurveType>(bp));
                         el_q_2.reset(new Fqk_variable<CurveType>(el.Frobenius_map(2)));
-                        el_q_2_minus_1.reset(new Fqk_variable<CurveType>(pb));
+                        el_q_2_minus_1.reset(new Fqk_variable<CurveType>(bp));
                         el_q_3_minus_q.reset(new Fqk_variable<CurveType>(el_q_2_minus_1->Frobenius_map(1)));
                         el_inv_q_2.reset(new Fqk_variable<CurveType>(el_inv->Frobenius_map(2)));
-                        el_inv_q_2_minus_1.reset(new Fqk_variable<CurveType>(pb));
-                        w1.reset(new Fqk_variable<CurveType>(pb));
-                        w0.reset(new Fqk_variable<CurveType>(pb));
-                        result.reset(new Fqk_variable<CurveType>(pb));
+                        el_inv_q_2_minus_1.reset(new Fqk_variable<CurveType>(bp));
+                        w1.reset(new Fqk_variable<CurveType>(bp));
+                        w0.reset(new Fqk_variable<CurveType>(bp));
+                        result.reset(new Fqk_variable<CurveType>(bp));
 
-                        compute_el_inv.reset(new Fqk_mul_component<CurveType>(pb, el, *el_inv, *one));
+                        compute_el_inv.reset(new Fqk_mul_component<CurveType>(bp, el, *el_inv, *one));
                         compute_el_q_2_minus_1.reset(
-                            new Fqk_mul_component<CurveType>(pb, *el_q_2, *el_inv, *el_q_2_minus_1));
+                            new Fqk_mul_component<CurveType>(bp, *el_q_2, *el_inv, *el_q_2_minus_1));
                         compute_el_inv_q_2_minus_1.reset(
-                            new Fqk_mul_component<CurveType>(pb, *el_inv_q_2, el, *el_inv_q_2_minus_1));
+                            new Fqk_mul_component<CurveType>(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
                         compute_w1.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
                                          Fp4_variable,
                                          Fp4_mul_component,
                                          Fp4_cyclotomic_sqr_component,
                                          algebra::mnt4_q_limbs >
-                                             (pb, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
+                                             (bp, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
                         compute_w0.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
                                          Fp4_variable,
                                          Fp4_mul_component,
                                          Fp4_cyclotomic_sqr_component,
                                          algebra::mnt4_q_limbs >
-                                             (pb,
+                                             (bp,
                                               (algebra::mnt4_final_exponent_last_chunk_is_w0_neg ? *el_inv_q_2_minus_1 :
                                                                                                    *el_q_2_minus_1),
                                               algebra::mnt4_final_exponent_last_chunk_abs_of_w0,
                                               *w0));
-                        compute_result.reset(new Fqk_mul_component<CurveType>(pb, *w1, *w0, *result));
+                        compute_result.reset(new Fqk_mul_component<CurveType>(bp, *w1, *w0, *result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -276,11 +276,11 @@ namespace nil {
                         compute_w0->generate_r1cs_constraints();
                         compute_result->generate_r1cs_constraints();
 
-                        generate_boolean_r1cs_constraint<field_type>(this->pb, result_is_one);
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
-                        this->pb.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
+                        generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
                     }
 
                     void generate_r1cs_witness() {
@@ -297,8 +297,8 @@ namespace nil {
                         compute_w0->generate_r1cs_witness();
                         compute_result->generate_r1cs_witness();
 
-                        this->pb.val(result_is_one) =
-                            (result->get_element() == one->get_element() ? field_type::value_type::zero() :
+                        this->bp.val(result_is_one) =
+                            (result->get_element() == one->get_element() ? field_type::value_type::one() :
                                                                            field_type::value_type::zero());
                     }
                 };

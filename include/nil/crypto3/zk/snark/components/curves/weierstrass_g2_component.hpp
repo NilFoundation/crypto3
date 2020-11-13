@@ -56,20 +56,20 @@ namespace nil {
 
                     blueprint_linear_combination_vector<field_type> all_vars;
 
-                    G2_variable(blueprint<field_type> &pb) : component<field_type>(pb) {
-                        X.reset(new Fqe_variable<CurveType>(pb));
-                        Y.reset(new Fqe_variable<CurveType>(pb));
+                    G2_variable(blueprint<field_type> &bp) : component<field_type>(bp) {
+                        X.reset(new Fqe_variable<CurveType>(bp));
+                        Y.reset(new Fqe_variable<CurveType>(bp));
 
                         all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
-                    G2_variable(blueprint<field_type> &pb,
+                    G2_variable(blueprint<field_type> &bp,
                                 const typename other_curve<CurveType>::g2_type::value_type &Q) :
-                        component<field_type>(pb) {
+                        component<field_type>(bp) {
                         typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
 
-                        X.reset(new Fqe_variable<CurveType>(pb, Q_copy.X()));
-                        Y.reset(new Fqe_variable<CurveType>(pb, Q_copy.Y()));
+                        X.reset(new Fqe_variable<CurveType>(bp, Q_copy.X()));
+                        Y.reset(new Fqe_variable<CurveType>(bp, Q_copy.Y()));
 
                         all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
@@ -112,13 +112,13 @@ namespace nil {
                     std::shared_ptr<Fqe_sqr_component<CurveType>> compute_Ysquared;
                     std::shared_ptr<Fqe_mul_component<CurveType>> curve_equation;
 
-                    G2_checker_component(blueprint<field_type> &pb, const G2_variable<CurveType> &Q) :
-                        component<field_type>(pb), Q(Q) {
-                        Xsquared.reset(new Fqe_variable<CurveType>(pb));
-                        Ysquared.reset(new Fqe_variable<CurveType>(pb));
+                    G2_checker_component(blueprint<field_type> &bp, const G2_variable<CurveType> &Q) :
+                        component<field_type>(bp), Q(Q) {
+                        Xsquared.reset(new Fqe_variable<CurveType>(bp));
+                        Ysquared.reset(new Fqe_variable<CurveType>(bp));
 
-                        compute_Xsquared.reset(new Fqe_sqr_component<CurveType>(pb, *(Q.X), *Xsquared));
-                        compute_Ysquared.reset(new Fqe_sqr_component<CurveType>(pb, *(Q.Y), *Ysquared));
+                        compute_Xsquared.reset(new Fqe_sqr_component<CurveType>(bp, *(Q.X), *Xsquared));
+                        compute_Ysquared.reset(new Fqe_sqr_component<CurveType>(bp, *(Q.Y), *Ysquared));
 
                         Xsquared_plus_a.reset(
                             new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::g2_type::a));
@@ -126,7 +126,7 @@ namespace nil {
                             new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::g2_type::b)));
 
                         curve_equation.reset(
-                            new Fqe_mul_component<CurveType>(pb, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
+                            new Fqe_mul_component<CurveType>(bp, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
                     }
 
                     void generate_r1cs_constraints() {

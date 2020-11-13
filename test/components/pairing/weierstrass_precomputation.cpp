@@ -40,21 +40,21 @@ using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void test_G1_variable_precomp(const std::string &annotation) {
-    blueprint<typename CurveType::scalar_field_type> pb;
+    blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g1_type::value_type g_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
             other_curve<CurveType>::g1_type::value_type::one();
 
-    G1_variable<CurveType> g(pb);
+    G1_variable<CurveType> g(bp);
     G1_precomputation<CurveType> precomp;
-    precompute_G1_component<CurveType> do_precomp(pb, g, precomp);
+    precompute_G1_component<CurveType> do_precomp(bp, g, precomp);
     do_precomp.generate_r1cs_constraints();
 
     g.generate_r1cs_witness(g_val);
     do_precomp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
-    G1_precomputation<CurveType> const_precomp(pb, g_val);
+    G1_precomputation<CurveType> const_precomp(bp, g_val);
 
     algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_precomp =
         other_curve<CurveType>::affine_ate_precompute_G1(g_val);
@@ -64,19 +64,19 @@ void test_G1_variable_precomp(const std::string &annotation) {
 
 template<typename CurveType>
 void test_G2_variable_precomp(const std::string &annotation) {
-    blueprint<typename CurveType::scalar_field_type> pb;
+    blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g2_type::value_type g_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
             other_curve<CurveType>::g2_type::value_type::one();
 
-    G2_variable<CurveType> g(pb, "g");
+    G2_variable<CurveType> g(bp, "g");
     G2_precomputation<CurveType> precomp;
-    precompute_G2_component<CurveType> do_precomp(pb, g, precomp);
+    precompute_G2_component<CurveType> do_precomp(bp, g, precomp);
     do_precomp.generate_r1cs_constraints();
 
     g.generate_r1cs_witness(g_val);
     do_precomp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
     algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
         other_curve<CurveType>::affine_ate_precompute_G2(g_val);
@@ -90,7 +90,7 @@ void test_G2_variable_precomp(const std::string &annotation) {
         assert(precomp.coeffs[i]->gamma_X->get_element() == native_precomp.coeffs[i].gamma_X);
     }
 
-    printf("number of constraints for G2 precomp (Fr is %s)  = %zu\n", annotation.c_str(), pb.num_constraints());
+    printf("number of constraints for G2 precomp (Fr is %s)  = %zu\n", annotation.c_str(), bp.num_constraints());
 }
 
 BOOST_AUTO_TEST_SUITE(weierstrass_precomputation_components_test_suite)

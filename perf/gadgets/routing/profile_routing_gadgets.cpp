@@ -37,19 +37,19 @@ using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
 void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints, std::size_t &num_variables) {
-    blueprint<FieldType> pb;
+    blueprint<FieldType> bp;
 
     std::vector<blueprint_variable_vector<FieldType>> randbits(n), outbits(n);
     for (std::size_t y = 0; y < n; ++y) {
-        randbits[y].allocate(pb, l);
-        outbits[y].allocate(pb, l);
+        randbits[y].allocate(bp, l);
+        outbits[y].allocate(bp, l);
     }
 
-    as_waksman_routing_component<FieldType> r(pb, n, randbits, outbits);
+    as_waksman_routing_component<FieldType> r(bp, n, randbits, outbits);
     r.generate_r1cs_constraints();
 
-    num_constraints = pb.num_constraints();
-    num_variables = pb.num_variables();
+    num_constraints = bp.num_constraints();
+    num_variables = bp.num_variables();
 }
 
 template<typename FieldType>
@@ -57,19 +57,19 @@ void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_c
     const std::size_t t = static_cast<std::size_t>(std::ceil(std::log2(n)));
     assert(n == 1ul << t);
 
-    blueprint<FieldType> pb;
+    blueprint<FieldType> bp;
 
     std::vector<blueprint_variable_vector<FieldType>> randbits(1ul << t), outbits(1ul << t);
     for (std::size_t y = 0; y < 1ul << t; ++y) {
-        randbits[y].allocate(pb, l);
-        outbits[y].allocate(pb, l);
+        randbits[y].allocate(bp, l);
+        outbits[y].allocate(bp, l);
     }
 
-    benes_routing_component<FieldType> r(pb, n, randbits, outbits, n);
+    benes_routing_component<FieldType> r(bp, n, randbits, outbits, n);
     r.generate_r1cs_constraints();
 
-    num_constraints = pb.num_constraints();
-    num_variables = pb.num_variables();
+    num_constraints = bp.num_constraints();
+    num_variables = bp.num_variables();
 }
 
 template<typename FieldType>

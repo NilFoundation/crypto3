@@ -64,7 +64,7 @@ namespace nil {
                     merkle_authentication_path_variable<FieldType, Hash> path;
                     blueprint_linear_combination<FieldType> read_successful;
 
-                    merkle_tree_check_read_component(blueprint<FieldType> &pb,
+                    merkle_tree_check_read_component(blueprint<FieldType> &bp,
                                                      const std::size_t tree_depth,
                                                      const blueprint_linear_combination_vector<FieldType> &address_bits,
                                                      const digest_variable<FieldType> &leaf_digest,
@@ -82,14 +82,14 @@ namespace nil {
 
                 template<typename FieldType, typename Hash>
                 merkle_tree_check_read_component<FieldType, Hash>::merkle_tree_check_read_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const std::size_t tree_depth,
                     const blueprint_linear_combination_vector<FieldType> &address_bits,
                     const digest_variable<FieldType> &leaf,
                     const digest_variable<FieldType> &root,
                     const merkle_authentication_path_variable<FieldType, Hash> &path,
                     const blueprint_linear_combination<FieldType> &read_successful) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits), leaf(leaf),
                     root(root), path(path), read_successful(read_successful) {
                     /*
@@ -105,16 +105,16 @@ namespace nil {
                     assert(tree_depth == address_bits.size());
 
                     for (std::size_t i = 0; i < tree_depth - 1; ++i) {
-                        internal_output.emplace_back(digest_variable<FieldType>(pb, digest_size));
+                        internal_output.emplace_back(digest_variable<FieldType>(bp, digest_size));
                     }
 
-                    computed_root.reset(new digest_variable<FieldType>(pb, digest_size));
+                    computed_root.reset(new digest_variable<FieldType>(bp, digest_size));
 
                     for (std::size_t i = 0; i < tree_depth; ++i) {
-                        block_variable<FieldType> inp(pb, path.left_digests[i], path.right_digests[i]);
+                        block_variable<FieldType> inp(bp, path.left_digests[i], path.right_digests[i]);
                         hasher_inputs.emplace_back(inp);
                         hashers.emplace_back(
-                            Hash(pb, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
+                            Hash(bp, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
                     }
 
                     for (std::size_t i = 0; i < tree_depth; ++i) {
@@ -124,11 +124,11 @@ namespace nil {
                           or the right slot of authentication_path_variable.
                         */
                         propagators.emplace_back(digest_selector_component<FieldType>(
-                            pb, digest_size, i < tree_depth - 1 ? internal_output[i] : leaf,
+                            bp, digest_size, i < tree_depth - 1 ? internal_output[i] : leaf,
                             address_bits[tree_depth - 1 - i], path.left_digests[i], path.right_digests[i]));
                     }
 
-                    check_root.reset(new bit_vector_copy_component<FieldType>(pb, computed_root->bits, root.bits,
+                    check_root.reset(new bit_vector_copy_component<FieldType>(bp, computed_root->bits, root.bits,
                                                                               read_successful, FieldType::capacity()));
                 }
 

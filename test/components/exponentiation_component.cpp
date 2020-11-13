@@ -39,12 +39,12 @@ template<typename FpkT, template<class> class Fpk_variableT, template<class> cla
 void test_exponentiation_component(const boost::multiprecision::number<Backend, ExpressionTemplates> &power) {
     typedef typename FpkT::my_Fp FieldType;
 
-    blueprint<FieldType> pb;
-    Fpk_variableT<FpkT> x(pb);
-    Fpk_variableT<FpkT> x_to_power(pb);
+    blueprint<FieldType> bp;
+    Fpk_variableT<FpkT> x(bp);
+    Fpk_variableT<FpkT> x_to_power(bp);
     exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,
                              boost::multiprecision::number<Backend, ExpressionTemplates>>
-        exp_component(pb, x, power, x_to_power);
+        exp_component(bp, x, power, x_to_power);
     exp_component.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 10; ++i) {
@@ -52,7 +52,7 @@ void test_exponentiation_component(const boost::multiprecision::number<Backend, 
         x.generate_r1cs_witness(x_val);
         exp_component.generate_r1cs_witness();
         const FpkT res = x_to_power.get_element();
-        assert(pb.is_satisfied());
+        assert(bp.is_satisfied());
         assert(res == (x_val ^ power));
     }
     power.print();

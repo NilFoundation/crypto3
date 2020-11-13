@@ -60,7 +60,7 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
 
                     G1_precomputation();
-                    G1_precomputation(blueprint<FieldType> &pb,
+                    G1_precomputation(blueprint<FieldType> &bp,
                                       const typename other_curve<CurveType>::g1_type::value_type &P);
                 };
 
@@ -78,7 +78,7 @@ namespace nil {
                     /* two possible pre-computations one for mnt4 and one for mnt6 */
                     template<typename FieldType>
                     precompute_G1_component(
-                        blueprint<FieldType> &pb,
+                        blueprint<FieldType> &bp,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
                         typedef typename CurveType::pairing_policy::Fp_type FieldType;
@@ -88,33 +88,33 @@ namespace nil {
                         const typename std::enable_if<
                             other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 4,
                             FieldType>::type & = typename FieldType::value_type()) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         precomp(precomp) {
                         blueprint_linear_combination<FieldType> c0, c1;
-                        c0.assign(pb, P.Y * ((algebra::mnt4_twist).squared().c0));
-                        c1.assign(pb, P.Y * ((algebra::mnt4_twist).squared().c1));
+                        c0.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c0));
+                        c1.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c1));
 
                         precomp.P.reset(new G1_variable<CurveType>(P));
-                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(pb, c0, c1));
+                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(bp, c0, c1));
                     }
 
                     template<typename FieldType>
                     precompute_G1_component(
-                        blueprint<FieldType> &pb,
+                        blueprint<FieldType> &bp,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
                         const typename std::enable_if<
                             other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 6,
                             FieldType>::type & = typename FieldType::value_type()) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         precomp(precomp) {
                         blueprint_linear_combination<FieldType> c0, c1, c2;
-                        c0.assign(pb, P.Y * ((algebra::mnt6_twist).squared().c0));
-                        c1.assign(pb, P.Y * ((algebra::mnt6_twist).squared().c1));
-                        c2.assign(pb, P.Y * ((algebra::mnt6_twist).squared().c2));
+                        c0.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c0));
+                        c1.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c1));
+                        c2.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c2));
 
                         precomp.P.reset(new G1_variable<CurveType>(P));
-                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(pb, c0, c1, c2));
+                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(bp, c0, c1, c2));
                     }
 
                     void generate_r1cs_constraints();
@@ -139,8 +139,8 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> gamma_X;
 
                     precompute_G2_component_coeffs();
-                    precompute_G2_component_coeffs(blueprint<FieldType> &pb);
-                    precompute_G2_component_coeffs(blueprint<FieldType> &pb, const G2_variable<CurveType> &Q);
+                    precompute_G2_component_coeffs(blueprint<FieldType> &bp);
+                    precompute_G2_component_coeffs(blueprint<FieldType> &bp, const G2_variable<CurveType> &Q);
                 };
 
                 /**
@@ -158,7 +158,7 @@ namespace nil {
                     std::vector<std::shared_ptr<precompute_G2_component_coeffs<CurveType>>> coeffs;
 
                     G2_precomputation();
-                    G2_precomputation(blueprint<FieldType> &pb,
+                    G2_precomputation(blueprint<FieldType> &bp,
                                       const typename other_curve<CurveType>::g2_type::value_type &Q_val);
                 };
 
@@ -205,7 +205,7 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> RY_plus_next_RY;
                     std::shared_ptr<Fqe_mul_component<CurveType>> compute_next_RY;
 
-                    precompute_G2_component_doubling_step(blueprint<FieldType> &pb,
+                    precompute_G2_component_doubling_step(blueprint<FieldType> &bp,
                                                           const precompute_G2_component_coeffs<CurveType> &cur,
                                                           const precompute_G2_component_coeffs<CurveType> &next);
                     void generate_r1cs_constraints();
@@ -253,7 +253,7 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> RY_plus_next_RY;
                     std::shared_ptr<Fqe_mul_component<CurveType>> compute_next_RY;
 
-                    precompute_G2_component_addition_step(blueprint<FieldType> &pb,
+                    precompute_G2_component_addition_step(blueprint<FieldType> &bp,
                                                           const bool invert_Q,
                                                           const precompute_G2_component_coeffs<CurveType> &cur,
                                                           const precompute_G2_component_coeffs<CurveType> &next,
@@ -280,7 +280,7 @@ namespace nil {
 
                     G2_precomputation<CurveType> &precomp;    // important to have a reference here
 
-                    precompute_G2_component(blueprint<FieldType> &pb,
+                    precompute_G2_component(blueprint<FieldType> &bp,
                                             const G2_variable<CurveType> &Q,
                                             G2_precomputation<CurveType> &precomp);
                     void generate_r1cs_constraints();
@@ -294,13 +294,13 @@ namespace nil {
 
                 template<typename CurveType>
                 G1_precomputation<CurveType>::G1_precomputation(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const typename other_curve<CurveType>::g1_type::value_type &P_val) {
                     typename other_curve<CurveType>::g1_type::value_type P_val_copy = P_val;
                     P_val_copy.to_affine_coordinates();
-                    P.reset(new G1_variable<CurveType>(pb, P_val_copy));
+                    P.reset(new G1_variable<CurveType>(bp, P_val_copy));
                     PY_twist_squared.reset(new Fqe_variable<CurveType>(
-                        pb, P_val_copy.Y() * other_curve<CurveType>::g2_type::value_type::twist.squared()));
+                        bp, P_val_copy.Y() * other_curve<CurveType>::g2_type::value_type::twist.squared()));
                 }
 
                 template<typename CurveType>
@@ -319,9 +319,9 @@ namespace nil {
 
                 template<typename CurveType>
                 G2_precomputation<CurveType>::G2_precomputation(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const typename other_curve<CurveType>::g2_type::value_type &Q_val) {
-                    Q.reset(new G2_variable<CurveType>(pb, Q_val));
+                    Q.reset(new G2_variable<CurveType>(bp, Q_val));
                     const other_curve<CurveType>::pairing_policy::affine_ate_G2_precomp native_precomp =
                         other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
 
@@ -329,10 +329,10 @@ namespace nil {
                                   1);    // the last precomp remains for convenient programming
                     for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
                         coeffs[i].reset(new precompute_G2_component_coeffs<CurveType>());
-                        coeffs[i]->RX.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].old_RX));
-                        coeffs[i]->RY.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].old_RY));
-                        coeffs[i]->gamma.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].gamma));
-                        coeffs[i]->gamma_X.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].gamma_X));
+                        coeffs[i]->RX.reset(new Fqe_variable<CurveType>(bp, native_precomp.coeffs[i].old_RX));
+                        coeffs[i]->RY.reset(new Fqe_variable<CurveType>(bp, native_precomp.coeffs[i].old_RY));
+                        coeffs[i]->gamma.reset(new Fqe_variable<CurveType>(bp, native_precomp.coeffs[i].gamma));
+                        coeffs[i]->gamma_X.reset(new Fqe_variable<CurveType>(bp, native_precomp.coeffs[i].gamma_X));
                     }
                 }
 
@@ -342,21 +342,21 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                precompute_G2_component_coeffs<CurveType>::precompute_G2_component_coeffs(blueprint<FieldType> &pb) {
-                    RX.reset(new Fqe_variable<CurveType>(pb));
-                    RY.reset(new Fqe_variable<CurveType>(pb));
-                    gamma.reset(new Fqe_variable<CurveType>(pb));
-                    gamma_X.reset(new Fqe_variable<CurveType>(pb));
+                precompute_G2_component_coeffs<CurveType>::precompute_G2_component_coeffs(blueprint<FieldType> &bp) {
+                    RX.reset(new Fqe_variable<CurveType>(bp));
+                    RY.reset(new Fqe_variable<CurveType>(bp));
+                    gamma.reset(new Fqe_variable<CurveType>(bp));
+                    gamma_X.reset(new Fqe_variable<CurveType>(bp));
                 }
 
                 template<typename CurveType>
                 precompute_G2_component_coeffs<CurveType>::precompute_G2_component_coeffs(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const G2_variable<CurveType> &Q) {
                     RX.reset(new Fqe_variable<CurveType>(*(Q.X)));
                     RY.reset(new Fqe_variable<CurveType>(*(Q.Y)));
-                    gamma.reset(new Fqe_variable<CurveType>(pb));
-                    gamma_X.reset(new Fqe_variable<CurveType>(pb));
+                    gamma.reset(new Fqe_variable<CurveType>(bp));
+                    gamma_X.reset(new Fqe_variable<CurveType>(bp));
                 }
 
                 /*
@@ -379,31 +379,31 @@ namespace nil {
 
                 template<typename CurveType>
                 precompute_G2_component_doubling_step<CurveType>::precompute_G2_component_doubling_step(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const precompute_G2_component_coeffs<CurveType> &cur,
                     const precompute_G2_component_coeffs<CurveType> &next) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     cur(cur), next(next) {
-                    RXsquared.reset(new Fqe_variable<CurveType>(pb));
-                    compute_RXsquared.reset(new Fqe_sqr_component<CurveType>(pb, *(cur.RX), *RXsquared));
+                    RXsquared.reset(new Fqe_variable<CurveType>(bp));
+                    compute_RXsquared.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.RX), *RXsquared));
                     three_RXsquared_plus_a.reset(new Fqe_variable<CurveType>(
                         (*RXsquared) * typename FieldType::value_type(0x03) + other_curve<CurveType>::g2_type::a));
                     two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(0x02)));
 
                     compute_gamma.reset(
-                        new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
+                        new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
                     compute_gamma_X.reset(
-                        new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
+                        new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
 
                     next_RX_plus_two_RX.reset(
                         new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(0x02)));
-                    compute_next_RX.reset(new Fqe_sqr_component<CurveType>(pb, *(cur.gamma), *next_RX_plus_two_RX));
+                    compute_next_RX.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.gamma), *next_RX_plus_two_RX));
 
                     RX_minus_next_RX.reset(
                         new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
                     RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
-                        new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
+                        new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                 }
 
                 template<typename CurveType>
@@ -461,12 +461,12 @@ namespace nil {
                  */
                 template<typename CurveType>
                 precompute_G2_component_addition_step<CurveType>::precompute_G2_component_addition_step(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const bool invert_Q,
                     const precompute_G2_component_coeffs<CurveType> &cur,
                     const precompute_G2_component_coeffs<CurveType> &next,
                     const G2_variable<CurveType> &Q) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     invert_Q(invert_Q), cur(cur), next(next), Q(Q) {
                     RY_minus_QY.reset(
                         new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() :
@@ -474,17 +474,17 @@ namespace nil {
 
                     RX_minus_QX.reset(
                         new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::value_type::zero())));
-                    compute_gamma.reset(new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
-                    compute_gamma_X.reset(new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
+                    compute_gamma.reset(new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
+                    compute_gamma_X.reset(new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
 
                     next_RX_plus_RX_plus_QX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) + *(Q.X)));
-                    compute_next_RX.reset(new Fqe_sqr_component<CurveType>(pb, *(cur.gamma), *next_RX_plus_RX_plus_QX));
+                    compute_next_RX.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.gamma), *next_RX_plus_RX_plus_QX));
 
                     RX_minus_next_RX.reset(
                         new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
                     RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
-                        new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
+                        new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                 }
 
                 template<typename CurveType>
@@ -526,10 +526,10 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                precompute_G2_component<CurveType>::precompute_G2_component(blueprint<FieldType> &pb,
+                precompute_G2_component<CurveType>::precompute_G2_component(blueprint<FieldType> &bp,
                                                                             const G2_variable<CurveType> &Q,
                                                                             G2_precomputation<CurveType> &precomp) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     precomp(precomp) {
                     precomp.Q.reset(new G2_variable<CurveType>(Q));
 
@@ -561,9 +561,9 @@ namespace nil {
                     addition_steps.resize(add_count);
                     doubling_steps.resize(dbl_count);
 
-                    precomp.coeffs[0].reset(new precompute_G2_component_coeffs<CurveType>(pb, Q));
+                    precomp.coeffs[0].reset(new precompute_G2_component_coeffs<CurveType>(bp, Q));
                     for (std::size_t i = 1; i < coeff_count; ++i) {
-                        precomp.coeffs[i].reset(new precompute_G2_component_coeffs<CurveType>(pb));
+                        precomp.coeffs[i].reset(new precompute_G2_component_coeffs<CurveType>(bp));
                     }
 
                     std::size_t add_id = 0;
@@ -579,13 +579,13 @@ namespace nil {
                         }
 
                         doubling_steps[dbl_id].reset(new precompute_G2_component_doubling_step<CurveType>(
-                            pb, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1])));
+                            bp, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1])));
                         ++dbl_id;
                         ++coeff_id;
 
                         if (NAF[i] != 0) {
                             addition_steps[add_id].reset(new precompute_G2_component_addition_step<CurveType>(
-                                pb, NAF[i] < 0, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1]), Q));
+                                bp, NAF[i] < 0, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1]), Q));
                             ++add_id;
                             ++coeff_id;
                         }

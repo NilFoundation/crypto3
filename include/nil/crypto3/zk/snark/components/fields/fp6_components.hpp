@@ -55,13 +55,13 @@ namespace nil {
                     Fp3_variable<Fp3T> c0;
                     Fp3_variable<Fp3T> c1;
 
-                    Fp6_variable(blueprint<FieldType> &pb) : component<FieldType>(pb), c0(pb), c1(pb) {
+                    Fp6_variable(blueprint<FieldType> &bp) : component<FieldType>(bp), c0(bp), c1(bp) {
                     }
-                    Fp6_variable(blueprint<FieldType> &pb, const Fp6T &el) :
-                        component<FieldType>(pb), c0(pb, el.c0), c1(pb, el.c1) {
+                    Fp6_variable(blueprint<FieldType> &bp, const Fp6T &el) :
+                        component<FieldType>(bp), c0(bp, el.c0), c1(bp, el.c1) {
                     }
-                    Fp6_variable(blueprint<FieldType> &pb, const Fp3_variable<Fp3T> &c0, const Fp3_variable<Fp3T> &c1) :
-                        component<FieldType>(pb), c0(c0), c1(c1) {
+                    Fp6_variable(blueprint<FieldType> &bp, const Fp3_variable<Fp3T> &c0, const Fp3_variable<Fp3T> &c1) :
+                        component<FieldType>(bp), c0(c0), c1(c1) {
                     }
 
                     void generate_r1cs_equals_const_constraints(const Fp6T &el) {
@@ -84,20 +84,20 @@ namespace nil {
                     Fp6_variable<Fp6T> Frobenius_map(const std::size_t power) const {
                         blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1,
                             new_c1c2;
-                        new_c0c0.assign(this->pb, c0.c0);
-                        new_c0c1.assign(this->pb, c0.c1 * Fp3T::Frobenius_coeffs_c1[power % 3]);
-                        new_c0c2.assign(this->pb, c0.c2 * Fp3T::Frobenius_coeffs_c2[power % 3]);
-                        new_c1c0.assign(this->pb, c1.c0 * Fp6T::Frobenius_coeffs_c1[power % 6]);
+                        new_c0c0.assign(this->bp, c0.c0);
+                        new_c0c1.assign(this->bp, c0.c1 * Fp3T::Frobenius_coeffs_c1[power % 3]);
+                        new_c0c2.assign(this->bp, c0.c2 * Fp3T::Frobenius_coeffs_c2[power % 3]);
+                        new_c1c0.assign(this->bp, c1.c0 * Fp6T::Frobenius_coeffs_c1[power % 6]);
                         new_c1c1.assign(
-                            this->pb,
+                            this->bp,
                             c1.c1 * (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c1[power % 3]));
                         new_c1c2.assign(
-                            this->pb,
+                            this->bp,
                             c1.c2 * (Fp6T::Frobenius_coeffs_c1[power % 6] * Fp3T::Frobenius_coeffs_c2[power % 3]));
 
-                        return Fp6_variable<Fp6T>(this->pb,
-                                                  Fp3_variable<Fp3T>(this->pb, new_c0c0, new_c0c1, new_c0c2),
-                                                  Fp3_variable<Fp3T>(this->pb, new_c1c0, new_c1c1, new_c1c2));
+                        return Fp6_variable<Fp6T>(this->bp,
+                                                  Fp3_variable<Fp3T>(this->bp, new_c0c0, new_c0c1, new_c0c2),
+                                                  Fp3_variable<Fp3T>(this->bp, new_c1c0, new_c1c1, new_c1c2));
                     }
 
                     void evaluate() const {
@@ -146,11 +146,11 @@ namespace nil {
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_v1;
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
-                    Fp6_mul_component(blueprint<FieldType> &pb,
+                    Fp6_mul_component(blueprint<FieldType> &bp,
                                       const Fp6_variable<Fp6T> &A,
                                       const Fp6_variable<Fp6T> &B,
                                       const Fp6_variable<Fp6T> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         A(A), B(B), result(result) {
                         /*
                             Karatsuba multiplication for Fp6 as a quadratic extension of Fp3:
@@ -169,39 +169,39 @@ namespace nil {
                                 "Multiplication and Squaring on Pairing-Friendly Fields"
                                 Devegili, OhEigeartaigh, Scott, Dahab
                         */
-                        v1.reset(new Fp3_variable<Fp3T>(pb));
+                        v1.reset(new Fp3_variable<Fp3T>(bp));
 
-                        compute_v1.reset(new Fp3_mul_component<Fp3T>(pb, A.c1, B.c1, *v1));
+                        compute_v1.reset(new Fp3_mul_component<Fp3T>(bp, A.c1, B.c1, *v1));
 
-                        v0_c0.assign(pb, result.c0.c0 - Fp6T::non_residue * v1->c2);
-                        v0_c1.assign(pb, result.c0.c1 - v1->c0);
-                        v0_c2.assign(pb, result.c0.c2 - v1->c1);
-                        v0.reset(new Fp3_variable<Fp3T>(pb, v0_c0, v0_c1, v0_c2));
+                        v0_c0.assign(bp, result.c0.c0 - Fp6T::non_residue * v1->c2);
+                        v0_c1.assign(bp, result.c0.c1 - v1->c0);
+                        v0_c2.assign(bp, result.c0.c2 - v1->c1);
+                        v0.reset(new Fp3_variable<Fp3T>(bp, v0_c0, v0_c1, v0_c2));
 
-                        compute_v0.reset(new Fp3_mul_component<Fp3T>(pb, A.c0, B.c0, *v0));
+                        compute_v0.reset(new Fp3_mul_component<Fp3T>(bp, A.c0, B.c0, *v0));
 
-                        Ac0_plus_Ac1_c0.assign(pb, A.c0.c0 + A.c1.c0);
-                        Ac0_plus_Ac1_c1.assign(pb, A.c0.c1 + A.c1.c1);
-                        Ac0_plus_Ac1_c2.assign(pb, A.c0.c2 + A.c1.c2);
+                        Ac0_plus_Ac1_c0.assign(bp, A.c0.c0 + A.c1.c0);
+                        Ac0_plus_Ac1_c1.assign(bp, A.c0.c1 + A.c1.c1);
+                        Ac0_plus_Ac1_c2.assign(bp, A.c0.c2 + A.c1.c2);
                         Ac0_plus_Ac1.reset(
-                            new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
+                            new Fp3_variable<Fp3T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
 
-                        Bc0_plus_Bc1_c0.assign(pb, B.c0.c0 + B.c1.c0);
-                        Bc0_plus_Bc1_c1.assign(pb, B.c0.c1 + B.c1.c1);
-                        Bc0_plus_Bc1_c2.assign(pb, B.c0.c2 + B.c1.c2);
+                        Bc0_plus_Bc1_c0.assign(bp, B.c0.c0 + B.c1.c0);
+                        Bc0_plus_Bc1_c1.assign(bp, B.c0.c1 + B.c1.c1);
+                        Bc0_plus_Bc1_c2.assign(bp, B.c0.c2 + B.c1.c2);
                         Bc0_plus_Bc1.reset(
-                            new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
+                            new Fp3_variable<Fp3T>(bp, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
 
-                        result_c1_plus_v0_plus_v1_c0.assign(pb, result.c1.c0 + v0->c0 + v1->c0);
-                        result_c1_plus_v0_plus_v1_c1.assign(pb, result.c1.c1 + v0->c1 + v1->c1);
-                        result_c1_plus_v0_plus_v1_c2.assign(pb, result.c1.c2 + v0->c2 + v1->c2);
-                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(pb,
+                        result_c1_plus_v0_plus_v1_c0.assign(bp, result.c1.c0 + v0->c0 + v1->c0);
+                        result_c1_plus_v0_plus_v1_c1.assign(bp, result.c1.c1 + v0->c1 + v1->c1);
+                        result_c1_plus_v0_plus_v1_c2.assign(bp, result.c1.c2 + v0->c2 + v1->c2);
+                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(bp,
                                                                                result_c1_plus_v0_plus_v1_c0,
                                                                                result_c1_plus_v0_plus_v1_c1,
                                                                                result_c1_plus_v0_plus_v1_c2));
 
                         compute_result_c1.reset(
-                            new Fp3_mul_component<Fp3T>(pb, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
+                            new Fp3_mul_component<Fp3T>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -214,13 +214,13 @@ namespace nil {
                         compute_v0->generate_r1cs_witness();
                         compute_v1->generate_r1cs_witness();
 
-                        Ac0_plus_Ac1_c0.evaluate(this->pb);
-                        Ac0_plus_Ac1_c1.evaluate(this->pb);
-                        Ac0_plus_Ac1_c2.evaluate(this->pb);
+                        Ac0_plus_Ac1_c0.evaluate(this->bp);
+                        Ac0_plus_Ac1_c1.evaluate(this->bp);
+                        Ac0_plus_Ac1_c2.evaluate(this->bp);
 
-                        Bc0_plus_Bc1_c0.evaluate(this->pb);
-                        Bc0_plus_Bc1_c1.evaluate(this->pb);
-                        Bc0_plus_Bc1_c2.evaluate(this->pb);
+                        Bc0_plus_Bc1_c0.evaluate(this->bp);
+                        Bc0_plus_Bc1_c1.evaluate(this->bp);
+                        Bc0_plus_Bc1_c2.evaluate(this->bp);
 
                         compute_result_c1->generate_r1cs_witness();
 
@@ -230,9 +230,9 @@ namespace nil {
 
                         result.generate_r1cs_witness(Rval);
 
-                        result_c1_plus_v0_plus_v1_c0.evaluate(this->pb);
-                        result_c1_plus_v0_plus_v1_c1.evaluate(this->pb);
-                        result_c1_plus_v0_plus_v1_c2.evaluate(this->pb);
+                        result_c1_plus_v0_plus_v1_c0.evaluate(this->bp);
+                        result_c1_plus_v0_plus_v1_c1.evaluate(this->bp);
+                        result_c1_plus_v0_plus_v1_c2.evaluate(this->bp);
 
                         compute_result_c1->generate_r1cs_witness();
                     }
@@ -278,11 +278,11 @@ namespace nil {
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_v1;
                     std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
-                    Fp6_mul_by_2345_component(blueprint<FieldType> &pb,
+                    Fp6_mul_by_2345_component(blueprint<FieldType> &bp,
                                               const Fp6_variable<Fp6T> &A,
                                               const Fp6_variable<Fp6T> &B,
                                               const Fp6_variable<Fp6T> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         A(A), B(B), result(result) {
                         /*
                             Karatsuba multiplication for Fp6 as a quadratic extension of Fp3:
@@ -308,44 +308,44 @@ namespace nil {
                                 "Multiplication and Squaring on Pairing-Friendly Fields"
                                 Devegili, OhEigeartaigh, Scott, Dahab
                         */
-                        v1.reset(new Fp3_variable<Fp3T>(pb));
-                        compute_v1.reset(new Fp3_mul_component<Fp3T>(pb, A.c1, B.c1, *v1));
+                        v1.reset(new Fp3_variable<Fp3T>(bp));
+                        compute_v1.reset(new Fp3_mul_component<Fp3T>(bp, A.c1, B.c1, *v1));
 
                         /* we inline result.c0 in v0 as follows: v0 = (result.c0.c0 - Fp6T::non_residue * v1->c2,
                          * result.c0.c1 - v1->c0, result.c0.c2 - v1->c1) */
-                        v0.reset(new Fp3_variable<Fp3T>(pb));
+                        v0.reset(new Fp3_variable<Fp3T>(bp));
 
-                        Ac0_plus_Ac1_c0.assign(pb, A.c0.c0 + A.c1.c0);
-                        Ac0_plus_Ac1_c1.assign(pb, A.c0.c1 + A.c1.c1);
-                        Ac0_plus_Ac1_c2.assign(pb, A.c0.c2 + A.c1.c2);
+                        Ac0_plus_Ac1_c0.assign(bp, A.c0.c0 + A.c1.c0);
+                        Ac0_plus_Ac1_c1.assign(bp, A.c0.c1 + A.c1.c1);
+                        Ac0_plus_Ac1_c2.assign(bp, A.c0.c2 + A.c1.c2);
                         Ac0_plus_Ac1.reset(
-                            new Fp3_variable<Fp3T>(pb, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
+                            new Fp3_variable<Fp3T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1, Ac0_plus_Ac1_c2));
 
-                        Bc0_plus_Bc1_c0.assign(pb, B.c0.c0 + B.c1.c0);
-                        Bc0_plus_Bc1_c1.assign(pb, B.c0.c1 + B.c1.c1);
-                        Bc0_plus_Bc1_c2.assign(pb, B.c0.c2 + B.c1.c2);
+                        Bc0_plus_Bc1_c0.assign(bp, B.c0.c0 + B.c1.c0);
+                        Bc0_plus_Bc1_c1.assign(bp, B.c0.c1 + B.c1.c1);
+                        Bc0_plus_Bc1_c2.assign(bp, B.c0.c2 + B.c1.c2);
                         Bc0_plus_Bc1.reset(
-                            new Fp3_variable<Fp3T>(pb, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
+                            new Fp3_variable<Fp3T>(bp, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1, Bc0_plus_Bc1_c2));
 
-                        result_c1_plus_v0_plus_v1_c0.assign(pb, result.c1.c0 + v0->c0 + v1->c0);
-                        result_c1_plus_v0_plus_v1_c1.assign(pb, result.c1.c1 + v0->c1 + v1->c1);
-                        result_c1_plus_v0_plus_v1_c2.assign(pb, result.c1.c2 + v0->c2 + v1->c2);
-                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(pb,
+                        result_c1_plus_v0_plus_v1_c0.assign(bp, result.c1.c0 + v0->c0 + v1->c0);
+                        result_c1_plus_v0_plus_v1_c1.assign(bp, result.c1.c1 + v0->c1 + v1->c1);
+                        result_c1_plus_v0_plus_v1_c2.assign(bp, result.c1.c2 + v0->c2 + v1->c2);
+                        result_c1_plus_v0_plus_v1.reset(new Fp3_variable<Fp3T>(bp,
                                                                                result_c1_plus_v0_plus_v1_c0,
                                                                                result_c1_plus_v0_plus_v1_c1,
                                                                                result_c1_plus_v0_plus_v1_c2));
 
                         compute_result_c1.reset(
-                            new Fp3_mul_component<Fp3T>(pb, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
+                            new Fp3_mul_component<Fp3T>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
                         compute_v1->generate_r1cs_constraints();
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             A.c0.c1, Fp3T::non_residue * B.c0.c2, result.c0.c0 - Fp6T::non_residue * v1->c2));
-                        this->pb.add_r1cs_constraint(
+                        this->bp.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(A.c0.c2, Fp3T::non_residue * B.c0.c2, result.c0.c1 - v1->c0));
-                        this->pb.add_r1cs_constraint(
+                        this->bp.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(A.c0.c0, B.c0.c2, result.c0.c2 - v1->c1));
                         compute_result_c1->generate_r1cs_constraints();
                     }
@@ -361,13 +361,13 @@ namespace nil {
                         const Fp3T v0_val = A_c0_val * B_c0_val;
                         v0->generate_r1cs_witness(v0_val);
 
-                        Ac0_plus_Ac1_c0.evaluate(this->pb);
-                        Ac0_plus_Ac1_c1.evaluate(this->pb);
-                        Ac0_plus_Ac1_c2.evaluate(this->pb);
+                        Ac0_plus_Ac1_c0.evaluate(this->bp);
+                        Ac0_plus_Ac1_c1.evaluate(this->bp);
+                        Ac0_plus_Ac1_c2.evaluate(this->bp);
 
-                        Bc0_plus_Bc1_c0.evaluate(this->pb);
-                        Bc0_plus_Bc1_c1.evaluate(this->pb);
-                        Bc0_plus_Bc1_c2.evaluate(this->pb);
+                        Bc0_plus_Bc1_c0.evaluate(this->bp);
+                        Bc0_plus_Bc1_c1.evaluate(this->bp);
+                        Bc0_plus_Bc1_c2.evaluate(this->bp);
 
                         compute_result_c1->generate_r1cs_witness();
 
@@ -377,9 +377,9 @@ namespace nil {
 
                         result.generate_r1cs_witness(Rval);
 
-                        result_c1_plus_v0_plus_v1_c0.evaluate(this->pb);
-                        result_c1_plus_v0_plus_v1_c1.evaluate(this->pb);
-                        result_c1_plus_v0_plus_v1_c2.evaluate(this->pb);
+                        result_c1_plus_v0_plus_v1_c0.evaluate(this->bp);
+                        result_c1_plus_v0_plus_v1_c1.evaluate(this->bp);
+                        result_c1_plus_v0_plus_v1_c2.evaluate(this->bp);
 
                         compute_result_c1->generate_r1cs_witness();
                     }
@@ -399,12 +399,12 @@ namespace nil {
 
                     std::shared_ptr<Fp6_mul_component<Fp6T>> mul;
 
-                    Fp6_sqr_component(blueprint<FieldType> &pb,
+                    Fp6_sqr_component(blueprint<FieldType> &bp,
                                       const Fp6_variable<Fp6T> &A,
                                       const Fp6_variable<Fp6T> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         A(A), result(result) {
-                        mul.reset(new Fp6_mul_component<Fp6T>(pb, A, A, result));
+                        mul.reset(new Fp6_mul_component<Fp6T>(bp, A, A, result));
                     }
 
                     void generate_r1cs_constraints() {
@@ -450,10 +450,10 @@ namespace nil {
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_bsq;
                     std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_csq;
 
-                    Fp6_cyclotomic_sqr_component(blueprint<FieldType> &pb,
+                    Fp6_cyclotomic_sqr_component(blueprint<FieldType> &bp,
                                                  const Fp6_variable<Fp6T> &A,
                                                  const Fp6_variable<Fp6T> &result) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         A(A), result(result) {
                         /*
                             underlying_field_type a = underlying_field_type(c0.c0, c1.c1);
@@ -476,28 +476,28 @@ namespace nil {
                             return Fp6_2over3_model<n, mbodulus>(my_Fp3(A_a, C_a, B_b),
                                                                  my_Fp3(B_a, A_b, C_b))
                         */
-                        a.reset(new Fp2_variable<Fp2T>(pb, A.c0.c0, A.c1.c1));
-                        b.reset(new Fp2_variable<Fp2T>(pb, A.c1.c0, A.c0.c2));
-                        c.reset(new Fp2_variable<Fp2T>(pb, A.c0.c1, A.c1.c2));
+                        a.reset(new Fp2_variable<Fp2T>(bp, A.c0.c0, A.c1.c1));
+                        b.reset(new Fp2_variable<Fp2T>(bp, A.c1.c0, A.c0.c2));
+                        c.reset(new Fp2_variable<Fp2T>(bp, A.c0.c1, A.c1.c2));
 
-                        asq_c0.assign(pb, (result.c0.c0 + 2 * a->c0) * typename FieldType::value_type(3).inversed());
-                        asq_c1.assign(pb, (result.c1.c1 - 2 * a->c1) * typename FieldType::value_type(3).inversed());
+                        asq_c0.assign(bp, (result.c0.c0 + 2 * a->c0) * typename FieldType::value_type(3).inversed());
+                        asq_c1.assign(bp, (result.c1.c1 - 2 * a->c1) * typename FieldType::value_type(3).inversed());
 
-                        bsq_c0.assign(pb, (result.c0.c1 + 2 * c->c0) * typename FieldType::value_type(3).inversed());
-                        bsq_c1.assign(pb, (result.c1.c2 - 2 * c->c1) * typename FieldType::value_type(3).inversed());
+                        bsq_c0.assign(bp, (result.c0.c1 + 2 * c->c0) * typename FieldType::value_type(3).inversed());
+                        bsq_c1.assign(bp, (result.c1.c2 - 2 * c->c1) * typename FieldType::value_type(3).inversed());
 
-                        csq_c0.assign(pb, (result.c0.c2 + 2 * b->c1) * typename FieldType::value_type(3).inversed());
-                        csq_c1.assign(pb,
+                        csq_c0.assign(bp, (result.c0.c2 + 2 * b->c1) * typename FieldType::value_type(3).inversed());
+                        csq_c1.assign(bp,
                                       (result.c1.c0 - 2 * b->c0) *
                                           (typename FieldType::value_type(3) * Fp2T::non_residue).inversed());
 
-                        asq.reset(new Fp2_variable<Fp2T>(pb, asq_c0, asq_c1));
-                        bsq.reset(new Fp2_variable<Fp2T>(pb, bsq_c0, bsq_c1));
-                        csq.reset(new Fp2_variable<Fp2T>(pb, csq_c0, csq_c1));
+                        asq.reset(new Fp2_variable<Fp2T>(bp, asq_c0, asq_c1));
+                        bsq.reset(new Fp2_variable<Fp2T>(bp, bsq_c0, bsq_c1));
+                        csq.reset(new Fp2_variable<Fp2T>(bp, csq_c0, csq_c1));
 
-                        compute_asq.reset(new Fp2_sqr_component<Fp2T>(pb, *a, *asq));
-                        compute_bsq.reset(new Fp2_sqr_component<Fp2T>(pb, *b, *bsq));
-                        compute_csq.reset(new Fp2_sqr_component<Fp2T>(pb, *c, *csq));
+                        compute_asq.reset(new Fp2_sqr_component<Fp2T>(bp, *a, *asq));
+                        compute_bsq.reset(new Fp2_sqr_component<Fp2T>(bp, *b, *bsq));
+                        compute_csq.reset(new Fp2_sqr_component<Fp2T>(bp, *c, *csq));
                     }
 
                     void generate_r1cs_constraints() {

@@ -93,7 +93,7 @@ namespace nil {
                     }
 
                     linear_term<FieldType> operator-() const {
-                        return linear_term<FieldType>(*this, -FieldType::value_type::zero());
+                        return linear_term<FieldType>(*this, -FieldType::value_type::one());
                     }
 
                     bool operator==(const variable<FieldType> &other) const {
@@ -151,7 +151,7 @@ namespace nil {
 
                     linear_term() {};
                     linear_term(const variable<field_type> &var) :
-                        index(var.index), coeff(field_type::value_type::zero()) {
+                        index(var.index), coeff(field_type::value_type::one()) {
                     }
 
                     linear_term(const variable<field_type> &var, const integer_coeff_t int_coeff) :
@@ -278,7 +278,7 @@ namespace nil {
                     }
 
                     void add_term(const variable<FieldType> &var) {
-                        this->terms.emplace_back(linear_term<FieldType>(var.index, value_type::zero()));
+                        this->terms.emplace_back(linear_term<FieldType>(var.index, value_type::one()));
                     }
                     void add_term(const variable<FieldType> &var, integer_coeff_t int_coeff) {
                         this->terms.emplace_back(linear_term<FieldType>(var.index, int_coeff));
@@ -346,7 +346,7 @@ namespace nil {
                         return (*this) + (-other);
                     }
                     linear_combination operator-() const {
-                        return (*this) * (-value_type::zero());
+                        return (*this) * (-value_type::one());
                     }
 
                     bool operator==(const linear_combination &other) const {

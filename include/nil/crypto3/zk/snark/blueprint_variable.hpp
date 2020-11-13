@@ -144,7 +144,7 @@ namespace nil {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             const typename FieldType::value_type v = bp.val((*this)[i]);
-                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
+                            assert(v.is_zero() || v.is_one());
                             result.push_back(v == FieldType::value_type::one());
                         }
                         return result;
@@ -156,7 +156,7 @@ namespace nil {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
                             const typename FieldType::value_type v = bp.val((*this)[this->size() - 1 - i]);
-                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
+                            assert(v.is_zero() || v.is_one());
                             result += result + v;
                         }
 
@@ -321,8 +321,8 @@ namespace nil {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             const typename FieldType::value_type v = bp.lc_val((*this)[i]);
-                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
-                            result.push_back(v == FieldType::value_type::zero());
+                            assert(v.is_zero() || v.is_one());
+                            result.push_back(v.is_one());
                         }
                         return result;
                     }
@@ -333,7 +333,7 @@ namespace nil {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
                             const typename FieldType::value_type v = bp.lc_val((*this)[this->size() - 1 - i]);
-                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
+                            assert(v.is_zero() || v.is_one());
                             result += result + v;
                         }
 
@@ -354,7 +354,7 @@ namespace nil {
                 template<typename FieldType>
                 linear_combination<FieldType> pb_packing_sum(const blueprint_linear_combination_vector<FieldType> &v) {
                     typename FieldType::value_type twoi =
-                        FieldType::value_type::zero();    // will hold 2^i entering each iteration
+                        FieldType::value_type::one();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {

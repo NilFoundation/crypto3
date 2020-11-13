@@ -60,20 +60,19 @@ void test_two_to_one() {
     std::array<std::uint32_t, 8> array_c = {0xeffd0b7f, 0x1ccba116, 0x2ee816f7, 0x31c62b48, 
                                             0x59305141, 0x990e5c0a, 0xce40d33d, 0x0b1167d1};
 
-    std::vector<bool> left_bv, right_bv, hash_bv;
-    left_bv.reserve(8*32);
-    right_bv.reserve(8*32);
-    hash_bv.reserve(8*32);
+    std::vector<bool> left_bv(hashes::sha2<256>::digest_bits), 
+                      right_bv(hashes::sha2<256>::digest_bits), 
+                      hash_bv(hashes::sha2<256>::digest_bits);
     
-    detail::pack_to<stream_endian::little_octet_big_bit, 32, 1>(
+    detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
         array_a,
         left_bv.begin());
 
-    detail::pack_to<stream_endian::little_octet_big_bit, 32, 1>(
+    detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
         array_b,
         right_bv.begin());
 
-    detail::pack_to<stream_endian::little_octet_big_bit, 32, 1>(
+    detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
         array_c,
         hash_bv.begin());
 

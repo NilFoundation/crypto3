@@ -46,10 +46,10 @@ namespace nil {
                     std::map<std::size_t, std::size_t> cs_to_vars;
 
                 public:
-                    component_from_r1cs(blueprint<FieldType> &pb,
+                    component_from_r1cs(blueprint<FieldType> &bp,
                                         const std::vector<blueprint_variable_vector<FieldType>> &vars,
                                         const r1cs_constraint_system<FieldType> &cs) :
-                        component<FieldType>(pb),
+                        component<FieldType>(bp),
                         vars(vars), cs(cs) {
                         cs_to_vars[0] = 0; /* constant term maps to constant term */
 
@@ -84,7 +84,7 @@ namespace nil {
                                     linear_term<FieldType>(variable<FieldType>(cs_to_vars[t.index]), t.coeff));
                             }
 
-                            this->pb.add_r1cs_constraint(translated_constr);
+                            this->bp.add_r1cs_constraint(translated_constr);
                         }
                     }
                     void generate_r1cs_witness(const r1cs_primary_input<FieldType> &primary_input,
@@ -93,11 +93,11 @@ namespace nil {
                         assert(cs.num_variables() == primary_input.size() + auxiliary_input.size());
 
                         for (std::size_t i = 0; i < primary_input.size(); ++i) {
-                            this->pb.val(variable<FieldType>(cs_to_vars[i + 1])) = primary_input[i];
+                            this->bp.val(variable<FieldType>(cs_to_vars[i + 1])) = primary_input[i];
                         }
 
                         for (std::size_t i = 0; i < auxiliary_input.size(); ++i) {
-                            this->pb.val(variable<FieldType>(cs_to_vars[primary_input.size() + i + 1])) =
+                            this->bp.val(variable<FieldType>(cs_to_vars[primary_input.size() + i + 1])) =
                                 auxiliary_input[i];
                         }
                     }

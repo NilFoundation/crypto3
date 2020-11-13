@@ -91,7 +91,7 @@ namespace nil {
                     block_variable<FieldType> input_block;
                     blueprint_linear_combination_vector<FieldType> output;
 
-                    knapsack_CRH_with_field_out_component(blueprint<FieldType> &pb,
+                    knapsack_CRH_with_field_out_component(blueprint<FieldType> &bp,
                                                           std::size_t input_len,
                                                           const block_variable<FieldType> &input_block,
                                                           const blueprint_linear_combination_vector<FieldType> &output);
@@ -126,7 +126,7 @@ namespace nil {
                     block_variable<FieldType> input_block;
                     digest_variable<FieldType> output_digest;
 
-                    knapsack_crh_with_bit_out_component(blueprint<FieldType> &pb,
+                    knapsack_crh_with_bit_out_component(blueprint<FieldType> &bp,
                                                         std::size_t input_len,
                                                         const block_variable<FieldType> &input_block,
                                                         const digest_variable<FieldType> &output_digest);
@@ -151,11 +151,11 @@ namespace nil {
 
                 template<typename FieldType>
                 knapsack_CRH_with_field_out_component<FieldType>::knapsack_CRH_with_field_out_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     std::size_t input_len,
                     const block_variable<FieldType> &input_block,
                     const blueprint_linear_combination_vector<FieldType> &output) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension), input_block(input_block),
                     output(output) {
                     assert(input_block.bits.size() == input_len);
@@ -168,7 +168,7 @@ namespace nil {
                 template<typename FieldType>
                 void knapsack_CRH_with_field_out_component<FieldType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < dimension; ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
                             pb_coeff_sum<FieldType>(input_block.bits,
                                                     std::vector<typename FieldType::value_type>(
@@ -190,7 +190,7 @@ namespace nil {
                             }
                         }
 
-                        this->pb.lc_val(output[i]) = sum;
+                        this->bp.lc_val(output[i]) = sum;
                     }
                 }
 
@@ -244,11 +244,11 @@ namespace nil {
 
                 template<typename FieldType>
                 knapsack_crh_with_bit_out_component<FieldType>::knapsack_crh_with_bit_out_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     std::size_t input_len,
                     const block_variable<FieldType> &input_block,
                     const digest_variable<FieldType> &output_digest) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension), input_block(input_block),
                     output_digest(output_digest) {
                     assert(output_digest.bits.size() == this->get_digest_len());
@@ -256,14 +256,14 @@ namespace nil {
                     output.resize(dimension);
 
                     for (std::size_t i = 0; i < dimension; ++i) {
-                        output[i].assign(pb,
+                        output[i].assign(bp,
                                          pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                              output_digest.bits.begin() + i * FieldType::size_in_bits(),
                                              output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits())));
                     }
 
                     hasher.reset(
-                        new knapsack_CRH_with_field_out_component<FieldType>(pb, input_len, input_block, output));
+                        new knapsack_CRH_with_field_out_component<FieldType>(bp, input_len, input_block, output));
                 }
 
                 template<typename FieldType>
@@ -272,7 +272,7 @@ namespace nil {
 
                     if (enforce_bitness) {
                         for (std::size_t k = 0; k < output_digest.bits.size(); ++k) {
-                            generate_boolean_r1cs_constraint<FieldType>(this->pb, output_digest.bits[k]);
+                            generate_boolean_r1cs_constraint<FieldType>(this->bp, output_digest.bits[k]);
                         }
                     }
                 }
@@ -282,12 +282,12 @@ namespace nil {
                     hasher->generate_r1cs_witness();
 
                     /* do unpacking in place */
-                    const std::vector<bool> input = input_block.bits.get_bits(this->pb);
+                    const std::vector<bool> input = input_block.bits.get_bits(this->bp);
                     for (std::size_t i = 0; i < dimension; ++i) {
                         blueprint_variable_vector<FieldType> va(
                             output_digest.bits.begin() + i * FieldType::size_in_bits(),
                             output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits());
-                        va.fill_with_bits_of_field_element(this->pb, this->pb.lc_val(output[i]));
+                        va.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(output[i]));
                     }
                 }
 

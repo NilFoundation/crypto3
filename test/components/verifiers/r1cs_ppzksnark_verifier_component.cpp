@@ -41,9 +41,9 @@ using namespace nil::crypto3::algebra;
 #ifndef NDEBUG
 
 template<typename FieldType>
-void dump_constraints(const blueprint<FieldType> &pb) {
+void dump_constraints(const blueprint<FieldType> &bp) {
 #ifdef DEBUG
-    for (auto s : pb.constraint_system.constraint_annotations) {
+    for (auto s : bp.constraint_system.constraint_annotations) {
         printf("constraint: %s\n", s.second.c_str());
     }
 #endif
@@ -72,23 +72,23 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
     const size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
-    blueprint<FieldT_B> pb;
+    blueprint<FieldT_B> bp;
     blueprint_variable_vector<FieldT_B> vk_bits;
-    vk_bits.allocate(pb, vk_size_in_bits, "vk_bits");
+    vk_bits.allocate(bp, vk_size_in_bits, "vk_bits");
 
     blueprint_variable_vector<FieldT_B> primary_input_bits;
-    primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
+    primary_input_bits.allocate(bp, primary_input_size_in_bits, "primary_input_bits");
 
-    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
+    r1cs_ppzksnark_proof_variable<ppT_B> proof(bp, "proof");
 
-    r1cs_ppzksnark_verification_key_variable<ppT_B> vk(pb, vk_bits, primary_input_size, "vk");
+    r1cs_ppzksnark_verification_key_variable<ppT_B> vk(bp, vk_bits, primary_input_size, "vk");
 
     variable<FieldT_B> result;
-    result.allocate(pb, "result");
+    result.allocate(bp, "result");
 
-    r1cs_ppzksnark_verifier_component<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result, "verifier");
+    r1cs_ppzksnark_verifier_component<ppT_B> verifier(bp, vk, primary_input_bits, elt_size, proof, result, "verifier");
 
-    PROFILE_CONSTRAINTS(pb, "check that proofs lies on the curve") {
+    PROFILE_CONSTRAINTS(bp, "check that proofs lies on the curve") {
         proof.generate_r1cs_constraints();
     }
     verifier.generate_r1cs_constraints();
@@ -99,26 +99,26 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
         input_as_bits.insert(input_as_bits.end(), v.begin(), v.end());
     }
 
-    primary_input_bits.fill_with_bits(pb, input_as_bits);
+    primary_input_bits.fill_with_bits(bp, input_as_bits);
 
     vk.generate_r1cs_witness(keypair.vk);
     proof.generate_r1cs_witness(pi);
     verifier.generate_r1cs_witness();
-    pb.val(result) = FieldT_B::one();
+    bp.val(result) = FieldT_B::one();
 
     printf("positive test:\n");
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
-    pb.val(primary_input_bits[0]) = FieldT_B::one() - pb.val(primary_input_bits[0]);
+    bp.val(primary_input_bits[0]) = FieldT_B::one() - bp.val(primary_input_bits[0]);
     verifier.generate_r1cs_witness();
-    pb.val(result) = FieldT_B::one();
+    bp.val(result) = FieldT_B::one();
 
     printf("negative test:\n");
-    assert(!pb.is_satisfied());
+    assert(!bp.is_satisfied());
     PRINT_CONSTRAINT_PROFILING();
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
-        pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
+        bp.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
 }
 
 template<typename ppT_A, typename ppT_B>
@@ -143,21 +143,21 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     const size_t elt_size = FieldT_A::size_in_bits();
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
-    blueprint<FieldT_B> pb;
-    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk,
+    blueprint<FieldT_B> bp;
+    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.vk,
                                                                                              "hardcoded_vk");
     blueprint_variable_vector<FieldT_B> primary_input_bits;
-    primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
+    primary_input_bits.allocate(bp, primary_input_size_in_bits, "primary_input_bits");
 
-    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
+    r1cs_ppzksnark_proof_variable<ppT_B> proof(bp, "proof");
 
     variable<FieldT_B> result;
-    result.allocate(pb, "result");
+    result.allocate(bp, "result");
 
-    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
+    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(bp, hardcoded_vk, primary_input_bits, elt_size, proof,
                                                                  result, "online_verifier");
 
-    PROFILE_CONSTRAINTS(pb, "check that proofs lies on the curve") {
+    PROFILE_CONSTRAINTS(bp, "check that proofs lies on the curve") {
         proof.generate_r1cs_constraints();
     }
     online_verifier.generate_r1cs_constraints();
@@ -168,36 +168,36 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
         input_as_bits.insert(input_as_bits.end(), v.begin(), v.end());
     }
 
-    primary_input_bits.fill_with_bits(pb, input_as_bits);
+    primary_input_bits.fill_with_bits(bp, input_as_bits);
 
     proof.generate_r1cs_witness(pi);
     online_verifier.generate_r1cs_witness();
-    pb.val(result) = FieldT_B::one();
+    bp.val(result) = FieldT_B::one();
 
     printf("positive test:\n");
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
-    pb.val(primary_input_bits[0]) = FieldT_B::one() - pb.val(primary_input_bits[0]);
+    bp.val(primary_input_bits[0]) = FieldT_B::one() - bp.val(primary_input_bits[0]);
     online_verifier.generate_r1cs_witness();
-    pb.val(result) = FieldT_B::one();
+    bp.val(result) = FieldT_B::one();
 
     printf("negative test:\n");
-    assert(!pb.is_satisfied());
+    assert(!bp.is_satisfied());
     PRINT_CONSTRAINT_PROFILING();
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
-        pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
+        bp.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
 }
 
 template<typename FpExtT, template<class> class VarT, template<class> class MulT>
 void test_mul(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> y(pb, "y");
-    VarT<FpExtT> xy(pb, "xy");
-    MulT<FpExtT> mul(pb, x, y, xy, "mul");
+    blueprint<FieldType> bp;
+    VarT<FpExtT> x(bp, "x");
+    VarT<FpExtT> y(bp, "y");
+    VarT<FpExtT> xy(bp, "xy");
+    MulT<FpExtT> mul(bp, x, y, xy, "mul");
     mul.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -208,19 +208,19 @@ void test_mul(const std::string &annotation) {
         mul.generate_r1cs_witness();
         const typename FpExtT::value_type res = xy.get_element();
         assert(res == x_val * y_val);
-        assert(pb.is_satisfied());
+        assert(bp.is_satisfied());
     }
-    printf("number of constraints for %s_mul = %zu\n", annotation.c_str(), pb.num_constraints());
+    printf("number of constraints for %s_mul = %zu\n", annotation.c_str(), bp.num_constraints());
 }
 
 template<typename FpExtT, template<class> class VarT, template<class> class SqrT>
 void test_sqr(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> xsq(pb, "xsq");
-    SqrT<FpExtT> sqr(pb, x, xsq, "sqr");
+    blueprint<FieldType> bp;
+    VarT<FpExtT> x(bp, "x");
+    VarT<FpExtT> xsq(bp, "xsq");
+    SqrT<FpExtT> sqr(bp, x, xsq, "sqr");
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -229,9 +229,9 @@ void test_sqr(const std::string &annotation) {
         sqr.generate_r1cs_witness();
         const typename FpExtT::value_type res = xsq.get_element();
         assert(res == x_val.squared());
-        assert(pb.is_satisfied());
+        assert(bp.is_satisfied());
     }
-    printf("number of constraints for %s_sqr = %zu\n", annotation.c_str(), pb.num_constraints());
+    printf("number of constraints for %s_sqr = %zu\n", annotation.c_str(), bp.num_constraints());
 }
 
 template<typename CurveType, template<class> class VarT, template<class> class CycloSqrT>
@@ -239,10 +239,10 @@ void test_cyclotomic_sqr(const std::string &annotation) {
     typedef algebra::Fqk<CurveType> FpExtT;
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> xsq(pb, "xsq");
-    CycloSqrT<FpExtT> sqr(pb, x, xsq, "sqr");
+    blueprint<FieldType> bp;
+    VarT<FpExtT> x(bp, "x");
+    VarT<FpExtT> xsq(bp, "xsq");
+    CycloSqrT<FpExtT> sqr(bp, x, xsq, "sqr");
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -253,9 +253,9 @@ void test_cyclotomic_sqr(const std::string &annotation) {
         sqr.generate_r1cs_witness();
         const typename FpExtT::value_type res = xsq.get_element();
         assert(res == x_val.squared());
-        assert(pb.is_satisfied());
+        assert(bp.is_satisfied());
     }
-    printf("number of constraints for %s_cyclotomic_sqr = %zu\n", annotation.c_str(), pb.num_constraints());
+    printf("number of constraints for %s_cyclotomic_sqr = %zu\n", annotation.c_str(), bp.num_constraints());
 }
 
 template<typename FpExtT, template<class> class VarT>
@@ -263,8 +263,8 @@ void test_Frobenius(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
     for (size_t i = 0; i < 100; ++i) {
-        blueprint<FieldType> pb;
-        VarT<FpExtT> x(pb, "x");
+        blueprint<FieldType> bp;
+        VarT<FpExtT> x(bp, "x");
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
         const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
@@ -272,7 +272,7 @@ void test_Frobenius(const std::string &annotation) {
         x_frob.evaluate();
         const typename FpExtT::value_type res = x_frob.get_element();
         assert(res == x_val.Frobenius_map(i));
-        assert(pb.is_satisfied());
+        assert(bp.is_satisfied());
     }
 
     printf("Frobenius map for %s correct\n", annotation.c_str());
@@ -282,7 +282,7 @@ template<typename CurveType>
 void test_full_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
-    blueprint<FieldType> pb;
+    blueprint<FieldType> bp;
     typename other_curve<CurveType>::g1_type P_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
         other_curve<CurveType>::g1_type::value_type::one();
@@ -290,30 +290,30 @@ void test_full_pairing(const std::string &annotation) {
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
         other_curve<CurveType>::g2_type::value_type::one();
 
-    G1_variable<CurveType> P(pb, "P");
-    G2_variable<CurveType> Q(pb, "Q");
+    G1_variable<CurveType> P(bp, "P");
+    G2_variable<CurveType> Q(bp, "Q");
     G1_precomputation<CurveType> prec_P;
     G2_precomputation<CurveType> prec_Q;
 
-    precompute_G1_component<CurveType> compute_prec_P(pb, P, prec_P, "compute_prec_P");
-    precompute_G2_component<CurveType> compute_prec_Q(pb, Q, prec_Q, "compute_prec_Q");
+    precompute_G1_component<CurveType> compute_prec_P(bp, P, prec_P, "compute_prec_P");
+    precompute_G2_component<CurveType> compute_prec_Q(bp, Q, prec_Q, "compute_prec_Q");
 
-    Fqk_variable<CurveType> miller_result(pb, "miller_result");
-    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
+    Fqk_variable<CurveType> miller_result(bp, "miller_result");
+    mnt_miller_loop_component<CurveType> miller(bp, prec_P, prec_Q, miller_result, "miller");
     variable<FieldType> result_is_one;
-    result_is_one.allocate(pb, "result_is_one");
-    final_exp_component<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
+    result_is_one.allocate(bp, "result_is_one");
+    final_exp_component<CurveType> finexp(bp, miller_result, result_is_one, "finexp");
 
-    PROFILE_CONSTRAINTS(pb, "precompute P") {
+    PROFILE_CONSTRAINTS(bp, "precompute P") {
         compute_prec_P.generate_r1cs_constraints();
     }
-    PROFILE_CONSTRAINTS(pb, "precompute Q") {
+    PROFILE_CONSTRAINTS(bp, "precompute Q") {
         compute_prec_Q.generate_r1cs_constraints();
     }
-    PROFILE_CONSTRAINTS(pb, "Miller loop") {
+    PROFILE_CONSTRAINTS(bp, "Miller loop") {
         miller.generate_r1cs_constraints();
     }
-    PROFILE_CONSTRAINTS(pb, "final exp") {
+    PROFILE_CONSTRAINTS(bp, "final exp") {
         finexp.generate_r1cs_constraints();
     }
     PRINT_CONSTRAINT_PROFILING();
@@ -324,7 +324,7 @@ void test_full_pairing(const std::string &annotation) {
     compute_prec_Q.generate_r1cs_witness();
     miller.generate_r1cs_witness();
     finexp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
     algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
     algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
@@ -338,14 +338,14 @@ void test_full_pairing(const std::string &annotation) {
 
     assert(finexp.result->get_element() == native_finexp_result);
 
-    printf("number of constraints for full pairing (Fr is %s)  = %zu\n", annotation.c_str(), pb.num_constraints());
+    printf("number of constraints for full pairing (Fr is %s)  = %zu\n", annotation.c_str(), bp.num_constraints());
 }
 
 template<typename CurveType>
 void test_full_precomputed_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
-    blueprint<FieldType> pb;
+    blueprint<FieldType> bp;
     typename other_curve<CurveType>::g1_type P_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
         other_curve<CurveType>::g1_type::value_type::one();
@@ -353,26 +353,26 @@ void test_full_precomputed_pairing(const std::string &annotation) {
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
         other_curve<CurveType>::g2_type::value_type::one();
 
-    G1_precomputation<CurveType> prec_P(pb, P_val, "prec_P");
-    G2_precomputation<CurveType> prec_Q(pb, Q_val, "prec_Q");
+    G1_precomputation<CurveType> prec_P(bp, P_val, "prec_P");
+    G2_precomputation<CurveType> prec_Q(bp, Q_val, "prec_Q");
 
-    Fqk_variable<CurveType> miller_result(pb, "miller_result");
-    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
+    Fqk_variable<CurveType> miller_result(bp, "miller_result");
+    mnt_miller_loop_component<CurveType> miller(bp, prec_P, prec_Q, miller_result, "miller");
     variable<FieldType> result_is_one;
-    result_is_one.allocate(pb, "result_is_one");
-    final_exp_component<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
+    result_is_one.allocate(bp, "result_is_one");
+    final_exp_component<CurveType> finexp(bp, miller_result, result_is_one, "finexp");
 
-    PROFILE_CONSTRAINTS(pb, "Miller loop") {
+    PROFILE_CONSTRAINTS(bp, "Miller loop") {
         miller.generate_r1cs_constraints();
     }
-    PROFILE_CONSTRAINTS(pb, "final exp") {
+    PROFILE_CONSTRAINTS(bp, "final exp") {
         finexp.generate_r1cs_constraints();
     }
     PRINT_CONSTRAINT_PROFILING();
 
     miller.generate_r1cs_witness();
     finexp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    assert(bp.is_satisfied());
 
     algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
     algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
@@ -387,7 +387,7 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     assert(finexp.result->get_element() == native_finexp_result);
 
     printf("number of constraints for full precomputed pairing (Fr is %s)  = %zu\n", annotation.c_str(),
-           pb.num_constraints());
+           bp.num_constraints());
 }
 
 int main() {

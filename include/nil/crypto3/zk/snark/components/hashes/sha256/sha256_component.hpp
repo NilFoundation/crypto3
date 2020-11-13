@@ -67,7 +67,7 @@ namespace nil {
                     digest_variable<FieldType> output;
 
                     sha256_compression_function_component(
-                        blueprint<FieldType> &pb,
+                        blueprint<FieldType> &bp,
                         const blueprint_linear_combination_vector<FieldType> &prev_output,
                         const blueprint_variable_vector<FieldType> &new_block,
                         const digest_variable<FieldType> &output);
@@ -90,11 +90,11 @@ namespace nil {
 
                     std::shared_ptr<sha256_compression_function_component<FieldType>> f;
 
-                    sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
+                    sha256_two_to_one_hash_component(blueprint<FieldType> &bp,
                                                      const digest_variable<FieldType> &left,
                                                      const digest_variable<FieldType> &right,
                                                      const digest_variable<FieldType> &output);
-                    sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
+                    sha256_two_to_one_hash_component(blueprint<FieldType> &bp,
                                                      size_t block_length,
                                                      const block_variable<FieldType> &input_block,
                                                      const digest_variable<FieldType> &output);
@@ -112,15 +112,15 @@ namespace nil {
 
                 template<typename FieldType>
                 sha256_compression_function_component<FieldType>::sha256_compression_function_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const blueprint_linear_combination_vector<FieldType> &prev_output,
                     const blueprint_variable_vector<FieldType> &new_block,
                     const digest_variable<FieldType> &output) :
-                    component<FieldType>(pb),
+                    component<FieldType>(bp),
                     prev_output(prev_output), new_block(new_block), output(output) {
                     /* message schedule and inputs for it */
-                    packed_W.allocate(pb, block::detail::shacal2_policy<256>::rounds);
-                    message_schedule.reset(new sha256_message_schedule_component<FieldType>(pb, new_block, packed_W));
+                    packed_W.allocate(bp, block::detail::shacal2_policy<256>::rounds);
+                    message_schedule.reset(new sha256_message_schedule_component<FieldType>(bp, new_block, packed_W));
 
                     /* initalize */
                     round_a.push_back(blueprint_linear_combination_vector<FieldType>(
@@ -158,25 +158,25 @@ namespace nil {
                         round_b.push_back(round_a[i]);
 
                         blueprint_variable_vector<FieldType> new_round_a_variables;
-                        new_round_a_variables.allocate(pb, hashes::sha2<256>::word_bits);
+                        new_round_a_variables.allocate(bp, hashes::sha2<256>::word_bits);
                         round_a.emplace_back(new_round_a_variables);
 
                         blueprint_variable_vector<FieldType> new_round_e_variables;
-                        new_round_e_variables.allocate(pb, hashes::sha2<256>::word_bits);
+                        new_round_e_variables.allocate(bp, hashes::sha2<256>::word_bits);
                         round_e.emplace_back(new_round_e_variables);
 
                         round_functions.push_back(sha256_round_function_component<FieldType>(
-                            pb, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i], round_g[i],
+                            bp, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i], round_g[i],
                             round_h[i], packed_W[i], block::detail::shacal2_policy<256>::constants[i], round_a[i + 1],
                             round_e[i + 1]));
                     }
 
                     /* finalize */
-                    unreduced_output.allocate(pb, 8);
-                    reduced_output.allocate(pb, 8);
+                    unreduced_output.allocate(bp, 8);
+                    reduced_output.allocate(bp, 8);
                     for (std::size_t i = 0; i < 8; ++i) {
                         reduce_output.push_back(lastbits_component<FieldType>(
-                            pb,
+                            bp,
                             unreduced_output[i],
                             hashes::sha2<256>::word_bits + 1,
                             reduced_output[i],
@@ -194,12 +194,12 @@ namespace nil {
                     }
 
                     for (std::size_t i = 0; i < 4; ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
                             round_functions[3 - i].packed_d + round_functions[63 - i].packed_new_a,
                             unreduced_output[i]));
 
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
                             round_functions[3 - i].packed_h + round_functions[63 - i].packed_new_e,
                             unreduced_output[4 + i]));
@@ -219,12 +219,12 @@ namespace nil {
                     }
 
                     for (std::size_t i = 0; i < 4; ++i) {
-                        this->pb.val(unreduced_output[i]) = 
-                            this->pb.val(round_functions[3 - i].packed_d) +
-                            this->pb.val(round_functions[63 - i].packed_new_a);
-                        this->pb.val(unreduced_output[4 + i]) = 
-                            this->pb.val(round_functions[3 - i].packed_h) +
-                            this->pb.val(round_functions[63 - i].packed_new_e);
+                        this->bp.val(unreduced_output[i]) = 
+                            this->bp.val(round_functions[3 - i].packed_d) +
+                            this->bp.val(round_functions[63 - i].packed_new_a);
+                        this->bp.val(unreduced_output[4 + i]) = 
+                            this->bp.val(round_functions[3 - i].packed_h) +
+                            this->bp.val(round_functions[63 - i].packed_new_e);
                     }
 
                     for (std::size_t i = 0; i < 8; ++i) {
@@ -234,33 +234,33 @@ namespace nil {
 
                 template<typename FieldType>
                 sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     const digest_variable<FieldType> &left,
                     const digest_variable<FieldType> &right,
                     const digest_variable<FieldType> &output) :
-                    component<FieldType>(pb) {
+                    component<FieldType>(bp) {
                     /* concatenate block = left || right */
                     blueprint_variable_vector<FieldType> block;
                     block.insert(block.end(), left.bits.begin(), left.bits.end());
                     block.insert(block.end(), right.bits.begin(), right.bits.end());
 
                     /* compute the hash itself */
-                    f.reset(new sha256_compression_function_component<FieldType>(pb, 
-                                                                                 SHA256_default_IV<FieldType>(pb),
+                    f.reset(new sha256_compression_function_component<FieldType>(bp, 
+                                                                                 SHA256_default_IV<FieldType>(bp),
                                                                                  block, output));
                 }
 
                 template<typename FieldType>
                 sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_component(
-                    blueprint<FieldType> &pb,
+                    blueprint<FieldType> &bp,
                     size_t block_length,
                     const block_variable<FieldType> &input_block,
                     const digest_variable<FieldType> &output) :
-                    component<FieldType>(pb) {
+                    component<FieldType>(bp) {
                     assert(block_length == hashes::sha2<256>::block_bits);
                     assert(input_block.bits.size() == block_length);
-                    f.reset(new sha256_compression_function_component<FieldType>(pb, 
-                                                                                 SHA256_default_IV<FieldType>(pb),
+                    f.reset(new sha256_compression_function_component<FieldType>(bp, 
+                                                                                 SHA256_default_IV<FieldType>(bp),
                                                                                  input_block.bits, output));
                 }
 
@@ -288,11 +288,11 @@ namespace nil {
                 template<typename FieldType>
                 std::vector<bool>
                     sha256_two_to_one_hash_component<FieldType>::get_hash(const std::vector<bool> &input) {
-                    blueprint<FieldType> pb;
+                    blueprint<FieldType> bp;
 
-                    block_variable<FieldType> input_variable(pb, hashes::sha2<256>::block_bits);
-                    digest_variable<FieldType> output_variable(pb, hashes::sha2<256>::digest_bits);
-                    sha256_two_to_one_hash_component<FieldType> f(pb, hashes::sha2<256>::block_bits, input_variable,
+                    block_variable<FieldType> input_variable(bp, hashes::sha2<256>::block_bits);
+                    digest_variable<FieldType> output_variable(bp, hashes::sha2<256>::digest_bits);
+                    sha256_two_to_one_hash_component<FieldType> f(bp, hashes::sha2<256>::block_bits, input_variable,
                                                                   output_variable);
 
                     input_variable.generate_r1cs_witness(input);

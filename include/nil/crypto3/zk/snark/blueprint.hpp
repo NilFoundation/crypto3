@@ -61,7 +61,7 @@ namespace nil {
                     typedef FieldType field_type;
 
                     blueprint() {
-                        constant_term = FieldType::value_type::zero();
+                        constant_term = FieldType::value_type::one();
 
                         next_free_var = 1; /* to account for constant 1 term */
                         next_free_lc = 0;
@@ -78,7 +78,7 @@ namespace nil {
 
                     typename FieldType::value_type val(const blueprint_variable<FieldType> &var) const {
                         assert(var.index <= values.size());
-                        return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
+                        return (var.index == 0 ? constant_term : values[var.index - 1]);
                     }
 
                     typename FieldType::value_type &lc_val(const blueprint_linear_combination<FieldType> &lc) {
