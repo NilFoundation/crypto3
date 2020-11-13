@@ -71,7 +71,7 @@ namespace nil {
                         };
 
                         struct ate_ell_coeffs {
-                            using value_type = Fq2;
+                            typedef Fq2 value_type;
 
                             value_type ell_0;
                             value_type ell_VW;
@@ -84,12 +84,12 @@ namespace nil {
                         };
 
                         struct ate_g2_precomp {
-                            using value_type = Fq2;
-                            using coeffs_type = std::vector<ate_ell_coeffs>;
+                            typedef Fq2 value_type;
+                            typedef ate_ell_coeffs coeffs_type;
 
                             value_type QX;
                             value_type QY;
-                            coeffs_type coeffs;
+                            std::vector<coeffs_type> coeffs;
 
                             bool operator==(const ate_g2_precomp &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);

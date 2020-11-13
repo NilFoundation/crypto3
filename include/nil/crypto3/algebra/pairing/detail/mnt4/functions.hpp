@@ -84,10 +84,13 @@ namespace nil {
                         /* ate pairing */
 
                         struct ate_g1_precomp {
-                            Fq PX;
-                            Fq PY;
-                            Fq2 PX_twist;
-                            Fq2 PY_twist;
+                            typedef Fq value_type;
+                            typedef Fq2 twist_value_type;
+
+                            value_type PX;
+                            value_type PY;
+                            twist_value_type PX_twist;
+                            twist_value_type PY_twist;
 
                             bool operator==(const ate_g1_precomp &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY &&
@@ -98,10 +101,12 @@ namespace nil {
                         typedef ate_g1_precomp g1_precomp;
 
                         struct ate_dbl_coeffs {
-                            Fq2 c_H;
-                            Fq2 c_4C;
-                            Fq2 c_J;
-                            Fq2 c_L;
+                            typedef Fq2 value_type;
+
+                            value_type c_H;
+                            value_type c_4C;
+                            value_type c_J;
+                            value_type c_L;
 
                             bool operator==(const ate_dbl_coeffs &other) const {
                                 return (this->c_H == other.c_H && this->c_4C == other.c_4C && this->c_J == other.c_J &&
@@ -110,8 +115,10 @@ namespace nil {
                         };
 
                         struct ate_add_coeffs {
-                            Fq2 c_L1;
-                            Fq2 c_RZ;
+                            typedef Fq2 value_type;
+
+                            value_type c_L1;
+                            value_type c_RZ;
 
                             bool operator==(const ate_add_coeffs &other) const {
                                 return (this->c_L1 == other.c_L1 && this->c_RZ == other.c_RZ);
@@ -119,13 +126,17 @@ namespace nil {
                         };
 
                         struct ate_g2_precomp {
-                            Fq2 QX;
-                            Fq2 QY;
-                            Fq2 QY2;
-                            Fq2 QX_over_twist;
-                            Fq2 QY_over_twist;
-                            std::vector<ate_dbl_coeffs> dbl_coeffs;
-                            std::vector<ate_add_coeffs> add_coeffs;
+                            typedef Fq2 value_type;
+                            typedef ate_dbl_coeffs dbl_coeffs_type;
+                            typedef ate_add_coeffs add_coeffs_type;
+
+                            value_type QX;
+                            value_type QY;
+                            value_type QY2;
+                            value_type QX_over_twist;
+                            value_type QY_over_twist;
+                            std::vector<dbl_coeffs_type> dbl_coeffs;
+                            std::vector<add_coeffs_type> add_coeffs;
 
                             bool operator==(const ate_g2_precomp &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->QY2 == other.QY2 &&
