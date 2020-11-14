@@ -333,6 +333,7 @@ namespace nil {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
                             const typename FieldType::value_type v = bp.lc_val((*this)[this->size() - 1 - i]);
+                            std::cout << i << ": " << v.data << std::endl;
                             assert(v.is_zero() || v.is_one());
                             result += result + v;
                         }

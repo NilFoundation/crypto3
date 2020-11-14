@@ -49,6 +49,7 @@ void test_two_to_one() {
     digest_variable<FieldType> output(bp, hashes::sha2<256>::digest_bits);
 
     sha256_two_to_one_hash_component<FieldType> f(bp, left, right, output);
+
     f.generate_r1cs_constraints();
     std::cout << "Number of constraints for sha256_two_to_one_hash_component: " << 
         bp.num_constraints() << std::endl;

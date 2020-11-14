@@ -129,7 +129,7 @@ namespace nil {
                         }
                     }
 
-                    merkle_tree(size_t depth, size_t value_size,
+                    merkle_tree(size_t depth, std::size_t value_size,
                                 const std::map<std::size_t, std::vector<bool>> &contents) :
                         merkle_tree<Hash>(depth, value_size) {
 

@@ -121,7 +121,7 @@ namespace nil {
                  * For example, all cross edges in the 0-th column flip the most
                  * significant bit of row_idx.
                  */
-                std::size_t benes_cross_edge_mask(size_t dimension, size_t column_idx) {
+                std::size_t benes_cross_edge_mask(size_t dimension, std::size_t column_idx) {
                     return (column_idx < dimension ? 1ul << (dimension - 1 - column_idx) :
                                                      1ul << (column_idx - dimension));
                 }
@@ -141,7 +141,7 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx+1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_lhs_packet_destination(size_t dimension, size_t column_idx, size_t row_idx,
+                std::size_t benes_lhs_packet_destination(size_t dimension, std::size_t column_idx, std::size_t row_idx,
                                                          bool use_top) {
                     const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return (use_top ? row_idx & ~mask : row_idx | mask);
@@ -162,7 +162,7 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx-1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_rhs_packet_source(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
+                std::size_t benes_rhs_packet_source(size_t dimension, std::size_t column_idx, std::size_t row_idx, bool use_top) {
                     return benes_lhs_packet_destination(dimension, column_idx - 1, row_idx, use_top); /* by symmetry */
                 }
 
@@ -171,7 +171,7 @@ namespace nil {
                  * return the switch setting that would route its packet using the top
                  * subnetwork.
                  */
-                bool benes_get_switch_setting_from_subnetwork(size_t dimension, size_t column_idx, size_t row_idx,
+                bool benes_get_switch_setting_from_subnetwork(size_t dimension, std::size_t column_idx, std::size_t row_idx,
                                                               bool use_top) {
                     return (row_idx != benes_lhs_packet_destination(dimension, column_idx, row_idx, use_top));
                 }
@@ -182,7 +182,7 @@ namespace nil {
                  * benes_cross_edge_mask), this returns row_idx' of the "cross"
                  * destination.
                  */
-                std::size_t benes_packet_cross_destination(size_t dimension, size_t column_idx, size_t row_idx) {
+                std::size_t benes_packet_cross_destination(size_t dimension, std::size_t column_idx, std::size_t row_idx) {
                     const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return row_idx ^ mask;
                 }
@@ -193,7 +193,7 @@ namespace nil {
                  * comment by benes_cross_edge_mask), this returns row_idx' of the
                  * "cross" source packet.
                  */
-                std::size_t benes_packet_cross_source(size_t dimension, size_t column_idx, size_t packet_idx) {
+                std::size_t benes_packet_cross_source(size_t dimension, std::size_t column_idx, std::size_t packet_idx) {
                     return benes_packet_cross_destination(dimension, column_idx - 1, packet_idx); /* by symmetry */
                 }
 
@@ -237,10 +237,10 @@ namespace nil {
                 void route_benes_inner(size_t dimension,
                                        const integer_permutation &permutation,
                                        const integer_permutation &permutation_inv,
-                                       size_t column_idx_start,
-                                       size_t column_idx_end,
-                                       size_t subnetwork_offset,
-                                       size_t subnetwork_size,
+                                       std::size_t column_idx_start,
+                                       std::size_t column_idx_end,
+                                       std::size_t subnetwork_offset,
+                                       std::size_t subnetwork_size,
                                        benes_routing &routing) {
                     assert(permutation.size() == subnetwork_size);
                     assert(permutation.is_valid());

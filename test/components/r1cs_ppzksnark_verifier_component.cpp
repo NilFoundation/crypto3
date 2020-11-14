@@ -56,8 +56,8 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     typedef typename ppT_A::scalar_field_type FieldT_A;
     typedef typename ppT_B::scalar_field_type FieldT_B;
 
-    const size_t num_constraints = 50;
-    const size_t primary_input_size = 3;
+    const std::size_t num_constraints = 50;
+    const std::size_t primary_input_size = 3;
 
     r1cs_example<FieldT_A> example =
         generate_r1cs_example_with_field_input<FieldT_A>(num_constraints, primary_input_size);
@@ -70,9 +70,9 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.vk, example.primary_input, pi);
     BOOST_CHECK(bit);
 
-    const size_t elt_size = FieldT_A::size_in_bits();
-    const size_t primary_input_size_in_bits = elt_size * primary_input_size;
-    const size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
+    const std::size_t elt_size = FieldT_A::size_in_bits();
+    const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
+    const std::size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
     blueprint<FieldT_B> bp;
     blueprint_variable_vector<FieldT_B> vk_bits;
@@ -125,8 +125,8 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     typedef typename ppT_A::scalar_field_type FieldT_A;
     typedef typename ppT_B::scalar_field_type FieldT_B;
 
-    const size_t num_constraints = 50;
-    const size_t primary_input_size = 3;
+    const std::size_t num_constraints = 50;
+    const std::size_t primary_input_size = 3;
 
     r1cs_example<FieldT_A> example =
         generate_r1cs_example_with_field_input<FieldT_A>(num_constraints, primary_input_size);
@@ -139,8 +139,8 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.vk, example.primary_input, pi);
     BOOST_CHECK(bit);
 
-    const size_t elt_size = FieldT_A::size_in_bits();
-    const size_t primary_input_size_in_bits = elt_size * primary_input_size;
+    const std::size_t elt_size = FieldT_A::size_in_bits();
+    const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
     blueprint<FieldT_B> bp;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.vk);
