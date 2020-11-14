@@ -663,12 +663,26 @@ namespace backends {
             typedef std::tuple<REST...> type;
         };
 
-        template <typename Backend, typename gen_tuple_type>
+        template<size_t value, size_t i, class... Args>
+        struct TupleChange {
+            constexpr static void change_(const std::tuple<Args...>& t)
+            {
+               std::get<i>(t) = value;
+            }
+        };
+
+        template<size_t value, size_t i, class... Args>
+        constexpr void change_i(const std::tuple<Args...>& t)
+        {
+           TupleChange<value, i, Args...>::change_(t);
+        }
+
+        template <typename Backend>
         constexpr auto convert_to_tuple (Backend result) {
             auto Bits = result.size();
             size_t pos = Bits / 3 + 1;
 
-            gen_tuple_type tuple_res;
+            //gen_tuple_type tuple_res;
 
             cpp_int_backend t(result), t2(result), r(result);
             while (eval_get_sign(t) != 0)
@@ -680,19 +694,47 @@ namespace backends {
                 {
                     int c = v % 10;
                     v /= 10;
-                    std::get<pos>(tuple_res) = c;
+                    //change_i<c, pos>(tuple_res);
                     if (pos-- == 0)
                         break;
                 }
             }
-            return tuple_res;
+            return result;
+        }
+
+        template <typename Backend, Backend result>
+        constexpr auto exampl (void) {
+            return result;
         }
 
         template <typename Backend>
         constexpr Backend eval_montgomery_reduce_compile_time_backend(Backend result) {
 
-            auto tuple_res = convert_to_tuple<generate_tuple_type<int, result.size() / 3 + 1>::type>(result);
-            result = convert_to_backend(tuple_res);
+            auto Bits = result.size();
+            size_t pos = Bits / 3 + 1;
+            auto len = pos;
+
+            using gen_type = generate_tuple_type<int, len>::type;
+            gen_type tuple_res;
+
+            cpp_int_backend t(result), t2(result), r(result);
+            while (eval_get_sign(t) != 0)
+            {
+                divide_unsigned_helper(&t2, t, max_block_10, r);
+                t           = t2;
+                limb_type v = r.limbs()[0];
+                for (unsigned i = 0; i < digits_per_block_10; ++i)
+                {
+                    int c = v % 10;
+                    v /= 10;
+                    change_i<c, pos>(tuple_res);
+                    if (pos-- == 0)
+                        break;
+                }
+            }
+
+            //auto gen_tuple = convert_to_tuple(result);
+            result = convert_to_backend<len>(gen_tuple)
 
             return result;
         }
@@ -791,10 +833,6 @@ class montgomery_params : public base_params<Backend>
       return *this;
    }
 
-
-
-
-
     constexpr void eval_montgomery_reduce_compile_time(Backend& result) const
     {
         using namespace cbn;
@@ -802,7 +840,82 @@ class montgomery_params : public base_params<Backend>
         result = eval_montgomery_reduce_compile_time_backend(result);
     }
 
+    constexpr void eval_montgomery_reduce_compile_time_last(Backend& result) const
+    {
+        using default_ops::eval_lt;
+        using default_ops::eval_multiply_add;
 
+        typedef cpp_int_backend<sizeof(limb_type) * CHAR_BIT * 3, sizeof(limb_type) * CHAR_BIT * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
+
+        const size_t    p_size = m_p_words;
+        const limb_type p_dash = m_p_dash;
+        const size_t    z_size = 2 * (p_words() + 1);
+
+        const size_t res_size = result.size();
+
+        //container::vector<limb_type> z(res_size, 0); //container::vector<limb_type, alloc> z(result.size(), 0);
+        std::array<limb_type, res_size> z;
+
+        for (size_t i = 0; i < res_size; ++i)
+        {
+            z[i] = result.limbs()[i];
+        }
+
+        if (res_size < z_size)
+        {
+            result.resize(z_size, z_size);
+            //z.resize(z_size, 0);
+        }
+
+        cpp_three_int_backend w(z[0]);
+
+        result.limbs()[0] = w.limbs()[0] * p_dash;
+
+        eval_multiply_add(w, result.limbs()[0], this->m_mod.backend().limbs()[0]);
+        eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+
+        for (size_t i = 1; i != p_size; ++i)
+        {
+            for (size_t j = 0; j < i; ++j)
+            {
+                eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[i - j]);
+            }
+
+            eval_add(w, z[i]);
+
+            result.limbs()[i] = w.limbs()[0] * p_dash;
+
+            eval_multiply_add(w, result.limbs()[i], this->m_mod.backend().limbs()[0]);
+
+            eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+        }
+
+        for (size_t i = 0; i != p_size; ++i)
+        {
+            for (size_t j = i + 1; j != p_size; ++j)
+            {
+                eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[p_size + i - j]);
+            }
+
+            eval_add(w, z[p_size + i]);
+
+            result.limbs()[i] = w.limbs()[0];
+
+            eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+        }
+
+        eval_add(w, z[z_size - 1]);
+
+        result.limbs()[p_size]     = w.limbs()[0];
+        result.limbs()[p_size + 1] = w.limbs()[1];
+        /*
+        if (result.size() != p_size + 1)
+        {
+            result.resize(p_size + 1, p_size + 1);
+        }
+         */
+        result.normalize();
+    }
 
 
 
