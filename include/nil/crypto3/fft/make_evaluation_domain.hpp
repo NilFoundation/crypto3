@@ -57,30 +57,38 @@ namespace nil {
 
                 template<typename FieldType>
                 bool is_basic_radix2_domain(std::size_t m) {
+                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
+
                     return (m > 1) &&
-                           // !(m & (m - 1)) &&
-                           (static_cast<std::size_t>(std::ceil(std::log2(m))) <=
-                            fields::arithmetic_params<FieldType>::s);
-                };
+                           (log_m <= fields::arithmetic_params<FieldType>::s) &&
+                           (m == (1ul << log_m));
+                }
 
                 template<typename FieldType>
                 bool is_extended_radix2_domain(std::size_t m) {
+                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
+                    const std::size_t small_m = m / 2;
+                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
+
                     return (m > 1) &&
-                           // !(m & (m - 1)) &&
-                           (static_cast<std::size_t>(std::ceil(std::log2(m))) ==
-                            fields::arithmetic_params<FieldType>::s + 1);
-                };
+                           (log_m == fields::arithmetic_params<FieldType>::s + 1) &&
+                           (small_m == (1ul << log_small_m)) &&
+                           (log_small_m <= fields::arithmetic_params<FieldType>::s);
+                }
 
                 template<typename FieldType>
                 bool is_step_radix2_domain(std::size_t m) {
-                    std::size_t const small_m = m - (1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1));
+                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
+                    const std::size_t shift_log_m = (1ul << log_m);
+                    const std::size_t log_shift_log_m = static_cast<std::size_t>(std::ceil(std::log2(shift_log_m)));
+                    const std::size_t small_m = m - (1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1));
+                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
 
                     return (m > 1) &&
-                           // (m & (m - 1)) &&
-                           // (std::ceil(std::log2(m)) <= fields::arithmetic_params<FieldType>::s) &&
-                           (small_m == (1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m)))));// &&
-                           // !(small_m & (small_m - 1));
-                };
+                           (small_m == (1ul << log_small_m)) &&
+                           (shift_log_m == (1ul << log_shift_log_m)) &&
+                           (log_shift_log_m <= fields::arithmetic_params<FieldType>::s);
+                }
 
                 template<typename FieldType>
                 bool is_geometric_sequence_domain(std::size_t m) {
@@ -124,22 +132,19 @@ namespace nil {
                     return result;
                 }
 
-                if (!detail::is_basic_radix2_domain<FieldType>(m) &&
-                    detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
+                if (detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
                     ret_type result;
                     result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
                     return result;
                 }
 
-                if (!detail::is_extended_radix2_domain<FieldType>(m) &&
-                    detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
+                if (detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
                     ret_type result;
                     result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
                     return result;
                 }
 
-                if (!detail::is_step_radix2_domain<FieldType>(m) &&
-                    detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
+                if (detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
                     ret_type result;
                     result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
                     return result;
