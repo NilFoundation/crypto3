@@ -75,7 +75,7 @@ namespace nil {
                     /* adds constraint result = \sum  bits[i] * 2^i */
                     void generate_r1cs_constraints(bool enforce_bitness){
                         this->bp.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(1, pb_packing_sum<FieldType>(bits), packed));
+                            r1cs_constraint<FieldType>(1, blueprint_packing_sum<FieldType>(bits), packed));
 
                         if (enforce_bitness) {
                             for (std::size_t i = 0; i < bits.size(); ++i) {

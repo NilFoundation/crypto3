@@ -40,8 +40,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType>
-                blueprint_linear_combination_vector<FieldType> SHA256_default_IV(blueprint<FieldType> &bp);
 
                 template<typename FieldType>
                 class sha256_message_schedule_component : public component<FieldType> {

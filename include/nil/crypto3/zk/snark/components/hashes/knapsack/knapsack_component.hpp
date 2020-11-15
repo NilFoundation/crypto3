@@ -170,7 +170,7 @@ namespace nil {
                     for (std::size_t i = 0; i < dimension; ++i) {
                         this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
-                            pb_coeff_sum<FieldType>(input_block.bits,
+                            blueprint_coeff_sum<FieldType>(input_block.bits,
                                                     std::vector<typename FieldType::value_type>(
                                                         knapsack_coefficients.begin() + input_len * i,
                                                         knapsack_coefficients.begin() + input_len * (i + 1))),
@@ -257,7 +257,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < dimension; ++i) {
                         output[i].assign(bp,
-                                         pb_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
+                                         blueprint_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                              output_digest.bits.begin() + i * FieldType::size_in_bits(),
                                              output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits())));
                     }

@@ -63,8 +63,9 @@ namespace nil {
 
                 template<typename FieldType>
                 class blueprint_variable_vector : private std::vector<blueprint_variable<FieldType>> {
-                    typedef std::vector<blueprint_variable<FieldType>> contents;
-
+                    typedef FieldType field_type;
+                    typedef typename field_type::value_type field_value_type;
+                    typedef std::vector<blueprint_variable<field_type>> contents;
                 public:
                     using typename contents::const_iterator;
                     using typename contents::const_reverse_iterator;
@@ -84,7 +85,7 @@ namespace nil {
                     using contents::resize;
 
                     blueprint_variable_vector() : contents() {};
-                    blueprint_variable_vector(std::size_t count, const blueprint_variable<FieldType> &value) :
+                    blueprint_variable_vector(std::size_t count, const blueprint_variable<field_type> &value) :
                         contents(count, value) {};
                     blueprint_variable_vector(typename contents::const_iterator first,
                                               typename contents::const_iterator last) :
@@ -93,8 +94,8 @@ namespace nil {
                                               typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
-                    /* allocates variable<FieldType> array in MSB->LSB order */
-                    void allocate(blueprint<FieldType> &bp, const std::size_t n) {
+                    /* allocates variable<field_type> array in MSB->LSB order */
+                    void allocate(blueprint<field_type> &bp, const std::size_t n) {
                         (*this).resize(n);
 
                         for (std::size_t i = 0; i < n; ++i) {
@@ -102,60 +103,59 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<FieldType> &bp,
-                                                  const std::vector<typename FieldType::value_type> &vals) const {
+                    void fill_with_field_elements(blueprint<field_type> &bp,
+                                                  const std::vector<field_value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             bp.val((*this)[i]) = vals[i];
                         }
                     }
 
-                    void fill_with_bits(blueprint<FieldType> &bp, const std::vector<bool> &bits) const {
+                    void fill_with_bits(blueprint<field_type> &bp, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
                             bp.val((*this)[i]) =
-                                (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
+                                (bits[i] ? field_value_type::one() : field_value_type::zero());
                         }
                     }
 
-                    void fill_with_bits_of_ulong(blueprint<FieldType> &bp, 
+                    void fill_with_bits_of_ulong(blueprint<field_type> &bp, 
                                                  const unsigned long i) const {
-                        this->fill_with_bits_of_field_element(bp, 
-                                                              typename FieldType::value_type(i, true));
+                        this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<FieldType> &bp,
-                                                         const typename FieldType::value_type &r) const {
+                    void fill_with_bits_of_field_element(blueprint<field_type> &bp,
+                                                         const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.val((*this)[i]) = boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() :
-                                                                                         FieldType::value_type::zero();
+                            bp.val((*this)[i]) = boost::multiprecision::bit_test(r, i) ? field_value_type::one() :
+                                                                                         field_value_type::zero();
                         }
                     }
 
-                    std::vector<typename FieldType::value_type> get_vals(const blueprint<FieldType> &bp) const {
-                        std::vector<typename FieldType::value_type> result(this->size());
+                    std::vector<field_value_type> get_vals(const blueprint<field_type> &bp) const {
+                        std::vector<field_value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = bp.val((*this)[i]);
                         }
                         return result;
                     }
 
-                    std::vector<bool> get_bits(const blueprint<FieldType> &bp) const {
+                    std::vector<bool> get_bits(const blueprint<field_type> &bp) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const typename FieldType::value_type v = bp.val((*this)[i]);
+                            const field_value_type v = bp.val((*this)[i]);
                             assert(v.is_zero() || v.is_one());
-                            result.push_back(v == FieldType::value_type::one());
+                            result.push_back(v.is_one());
                         }
                         return result;
                     }
 
-                    typename FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &bp) const {
-                        typename FieldType::value_type result = FieldType::value_type::zero();
+                    field_value_type get_field_element_from_bits(const blueprint<field_type> &bp) const {
+                        field_value_type result = field_value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const typename FieldType::value_type v = bp.val((*this)[this->size() - 1 - i]);
+                            const field_value_type v = bp.val((*this)[this->size() - 1 - i]);
                             assert(v.is_zero() || v.is_one());
                             result += result + v;
                         }
@@ -166,6 +166,8 @@ namespace nil {
 
                 template<typename FieldType>
                 class blueprint_linear_combination : public linear_combination<FieldType> {
+                    typedef FieldType field_type;
+                    typedef typename field_type::value_type field_value_type;
                 public:
                     bool is_variable;
                     lc_index_t index;
@@ -174,26 +176,26 @@ namespace nil {
                         this->is_variable = false;
                     }
 
-                    blueprint_linear_combination(const blueprint_variable<FieldType> &var) {
+                    blueprint_linear_combination(const blueprint_variable<field_type> &var) {
                         this->is_variable = true;
                         this->index = var.index;
-                        this->terms.emplace_back(linear_term<FieldType>(var));
+                        this->terms.emplace_back(linear_term<field_type>(var));
                     }
 
-                    void assign(blueprint<FieldType> &bp, const linear_combination<FieldType> &lc) {
+                    void assign(blueprint<field_type> &bp, const linear_combination<field_type> &lc) {
                         assert(this->is_variable == false);
                         this->index = bp.allocate_lc_index();
                         this->terms = lc.terms;
                     }
 
-                    void evaluate(blueprint<FieldType> &bp) const {
+                    void evaluate(blueprint<field_type> &bp) const {
                         if (this->is_variable) {
                             return;    // do nothing
                         }
 
-                        typename FieldType::value_type sum = 0;
+                        field_value_type sum = 0;
                         for (auto term : this->terms) {
-                            sum += term.coeff * bp.val(blueprint_variable<FieldType>(term.index));
+                            sum += term.coeff * bp.val(blueprint_variable<field_type>(term.index));
                         }
 
                         bp.lc_val(*this) = sum;
@@ -213,11 +215,11 @@ namespace nil {
                         }
                     }
 
-                    typename FieldType::value_type constant_term() const {
+                    field_value_type constant_term() const {
                         if (is_variable) {
-                            return (index == 0 ? FieldType::value_type::one() : FieldType::value_type::zero());
+                            return (index == 0 ? field_value_type::one() : field_value_type::zero());
                         } else {
-                            typename FieldType::value_type result = FieldType::value_type::zero();
+                            field_value_type result = field_value_type::zero();
                             for (auto term : this->terms) {
                                 if (term.index == 0) {
                                     result += term.coeff;
@@ -229,10 +231,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class blueprint_linear_combination_vector
-                    : private std::vector<blueprint_linear_combination<FieldType>> {
-                    typedef std::vector<blueprint_linear_combination<FieldType>> contents;
+                class blueprint_linear_combination_vector : private std::vector
+                                                                <blueprint_linear_combination<FieldType>> {
 
+                    typedef FieldType field_type;
+                    typedef typename field_type::value_type field_value_type;
+                    typedef std::vector<blueprint_linear_combination<field_type>> contents;
                 public:
                     using typename contents::const_iterator;
                     using typename contents::const_reverse_iterator;
@@ -252,13 +256,13 @@ namespace nil {
                     using contents::resize;
 
                     blueprint_linear_combination_vector() : contents() {};
-                    blueprint_linear_combination_vector(const blueprint_variable_vector<FieldType> &arr) {
+                    blueprint_linear_combination_vector(const blueprint_variable_vector<field_type> &arr) {
                         for (auto &v : arr)
-                            this->emplace_back(blueprint_linear_combination<FieldType>(v));
+                            this->emplace_back(blueprint_linear_combination<field_type>(v));
                     };
                     blueprint_linear_combination_vector(std::size_t count) : contents(count) {};
                     blueprint_linear_combination_vector(std::size_t count,
-                                                        const blueprint_linear_combination<FieldType> &value) :
+                                                        const blueprint_linear_combination<field_type> &value) :
                         contents(count, value) {};
                     blueprint_linear_combination_vector(typename contents::const_iterator first,
                                                         typename contents::const_iterator last) :
@@ -267,34 +271,34 @@ namespace nil {
                                                         typename contents::const_reverse_iterator last) :
                         contents(first, last) {};
 
-                    void evaluate(blueprint<FieldType> &bp) const {
+                    void evaluate(blueprint<field_type> &bp) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             (*this)[i].evaluate(bp);
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<FieldType> &bp,
-                                                  const std::vector<typename FieldType::value_type> &vals) const {
+                    void fill_with_field_elements(blueprint<field_type> &bp,
+                                                  const std::vector<field_value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             bp.lc_val((*this)[i]) = vals[i];
                         }
                     }
 
-                    void fill_with_bits(blueprint<FieldType> &bp, const std::vector<bool> &bits) const {
+                    void fill_with_bits(blueprint<field_type> &bp, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
                             bp.lc_val((*this)[i]) =
-                                (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
+                                (bits[i] ? field_value_type::one() : field_value_type::zero());
                         }
                     }
 
-                    void fill_with_bits_of_ulong(blueprint<FieldType> &bp, const unsigned long i) const {
-                        this->fill_with_bits_of_field_element(bp, typename FieldType::value_type(i));
+                    void fill_with_bits_of_ulong(blueprint<field_type> &bp, const unsigned long i) const {
+                        this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<FieldType> &bp,
-                                                         const typename FieldType::value_type &r) const {
+                    void fill_with_bits_of_field_element(blueprint<field_type> &bp,
+                                                         const field_value_type &r) const {
 
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef boost::multiprecision::number<
@@ -304,35 +308,35 @@ namespace nil {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.lc_val((*this)[i]) = 
                                 boost::multiprecision::bit_test(non_fixed_precision_modulus_type(r.data), i) ?
-                                                                FieldType::value_type::one() :
-                                                                FieldType::value_type::zero();
+                                                                field_value_type::one() :
+                                                                field_value_type::zero();
                         }
                     }
 
-                    std::vector<typename FieldType::value_type> get_vals(const blueprint<FieldType> &bp) const {
-                        std::vector<typename FieldType::value_type> result(this->size());
+                    std::vector<field_value_type> get_vals(const blueprint<field_type> &bp) const {
+                        std::vector<field_value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = bp.lc_val((*this)[i]);
                         }
                         return result;
                     }
 
-                    std::vector<bool> get_bits(const blueprint<FieldType> &bp) const {
+                    std::vector<bool> get_bits(const blueprint<field_type> &bp) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const typename FieldType::value_type v = bp.lc_val((*this)[i]);
+                            const field_value_type v = bp.lc_val((*this)[i]);
                             assert(v.is_zero() || v.is_one());
                             result.push_back(v.is_one());
                         }
                         return result;
                     }
 
-                    typename FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &bp) const {
-                        typename FieldType::value_type result = FieldType::value_type::zero();
+                    field_value_type get_field_element_from_bits(const blueprint<field_type> &bp) const {
+                        field_value_type result = field_value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const typename FieldType::value_type v = bp.lc_val((*this)[this->size() - 1 - i]);
+                            const field_value_type v = bp.lc_val((*this)[this->size() - 1 - i]);
                             std::cout << i << ": " << v.data << std::endl;
                             assert(v.is_zero() || v.is_one());
                             result += result + v;
@@ -343,7 +347,9 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_sum(const blueprint_linear_combination_vector<FieldType> &v) {
+                linear_combination<FieldType> blueprint_sum(
+                    const blueprint_linear_combination_vector<FieldType> &v) {
+
                     linear_combination<FieldType> result;
                     for (auto &term : v) {
                         result = result + term;
@@ -353,7 +359,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_packing_sum(const blueprint_linear_combination_vector<FieldType> &v) {
+                linear_combination<FieldType> blueprint_packing_sum(
+                    const blueprint_linear_combination_vector<FieldType> &v) {
+
                     typename FieldType::value_type twoi =
                         FieldType::value_type::one();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
@@ -368,8 +376,10 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> pb_coeff_sum(const blueprint_linear_combination_vector<FieldType> &v,
-                                                           const std::vector<typename FieldType::value_type> &coeffs) {
+                linear_combination<FieldType> blueprint_coeff_sum(
+                    const blueprint_linear_combination_vector<FieldType> &v,
+                    const std::vector<typename FieldType::value_type> &coeffs) {
+                    
                     assert(v.size() == coeffs.size());
                     std::vector<linear_term<FieldType>> all_terms;
 

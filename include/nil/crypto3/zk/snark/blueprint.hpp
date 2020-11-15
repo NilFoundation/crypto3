@@ -49,7 +49,7 @@ namespace nil {
                 template<typename FieldType>
                 class blueprint {
                     r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
-                                                                variable of the protoboard, *NOT* constant 1 */
+                                                                variable of the blueprint, *NOT* constant 1 */
                     typename FieldType::value_type constant_term;
 
                     var_index_t next_free_var;

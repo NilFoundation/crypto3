@@ -52,7 +52,7 @@ namespace nil {
                     blueprint_variable_vector<FieldType> B;
                     variable<FieldType> res;
 
-                    // the variables on the protoboard are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
+                    // the variables on the blueprint are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
                     // B[0], ..., B[num_constraints-1])
                     res.allocate(bp);
                     A.allocate(bp, new_num_constraints);

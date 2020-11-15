@@ -263,7 +263,7 @@ namespace nil {
                         expected_constraints(bool ensure_output_bitness = true){    // TODO: ignored for now
                         return 27280; /* hardcoded for now */
                     }
-                };   
+                };
 
             }    // namespace snark
         }        // namespace zk

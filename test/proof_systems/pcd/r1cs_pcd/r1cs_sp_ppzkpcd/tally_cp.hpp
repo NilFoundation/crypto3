@@ -297,12 +297,12 @@ namespace nil {
                             r1cs_constraint<FieldType>(this->arity - FieldType(i), arity_indicators[i], 0));
                     }
 
-                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(1, pb_sum<FieldType>(arity_indicators), 1));
+                    this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(1, blueprint_sum<FieldType>(arity_indicators), 1));
 
                     /* require that types of messages that are past arity (i.e. unbound wires) carry 0 */
                     for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->bp.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(0 + pb_sum<FieldType>(blueprint_variable_vector<FieldType>(
+                            r1cs_constraint<FieldType>(0 + blueprint_sum<FieldType>(blueprint_variable_vector<FieldType>(
                                 arity_indicators.begin(), arity_indicators.begin() + i)),
                                 incoming_types[i], 0));
                     }
@@ -320,7 +320,7 @@ namespace nil {
 
                     /* count_out = 1 + \sum_i count_in[i] */
                     this->bp.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(1, 1 + pb_sum<FieldType>(count_in_packed), count_out_packed),
+                        r1cs_constraint<FieldType>(1, 1 + blueprint_sum<FieldType>(count_in_packed), count_out_packed),
                         "update_count");
                 }
 
