@@ -316,12 +316,10 @@ namespace nil {
 
                             domain->divide_by_Z_on_coset(H_tmp);
 
-                            /*domain->iFFT(H_tmp, fields::arithmetic_params<FieldType>::multiplicative_generator);
-                            multiply_by_coset(H_tmp,
-                            fields::arithmetic_params<FieldType>::multiplicative_generator.inversed());*/
-                            // uncomment
-                            // when fft ready
-
+                            domain->iFFT(H_tmp);
+                            multiply_by_coset(H_tmp, 
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator).inversed());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -330,7 +328,8 @@ namespace nil {
                             }
 
                             return qap_witness<FieldType>(cs.num_variables(), 
-                                                          domain->m, cs.num_inputs(), 
+                                                          domain->m, 
+                                                          cs.num_inputs(), 
                                                           d1, d2, d3,
                                                           full_variable_assignment, 
                                                           std::move(coefficients_for_H));

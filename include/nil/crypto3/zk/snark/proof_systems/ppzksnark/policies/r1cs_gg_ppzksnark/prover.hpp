@@ -117,12 +117,15 @@ namespace nil {
                                     scalar_field_type::value_type::zero(),
                                     scalar_field_type::value_type::zero());
 
+                            std::cout << "qap_wit witness_map finished" << std::endl;
+
                             /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                                and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
                             assert(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 
+                            std::cout << "qap_inst instance_map_with_evaluation started" << std::endl;
                             //added temporary for debug
                             const typename scalar_field_type::value_type t = 
                                 algebra::random_element<scalar_field_type>();
