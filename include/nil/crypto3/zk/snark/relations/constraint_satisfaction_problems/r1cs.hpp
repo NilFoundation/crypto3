@@ -190,8 +190,8 @@ namespace nil {
                     }
 
                     void swap_AB_if_beneficial() {
-                        std::vector<bool> touched_by_A(this->num_variables() + 1, false),
-                            touched_by_B(this->num_variables() + 1, false);
+                        std::vector<bool> touched_by_A(this->num_variables() + 1, false), 
+                                          touched_by_B(this->num_variables() + 1, false);
 
                         for (std::size_t i = 0; i < this->constraints.size(); ++i) {
                             for (std::size_t j = 0; j < this->constraints[i].a.terms.size(); ++j) {

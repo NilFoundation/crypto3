@@ -226,9 +226,12 @@ namespace nil {
 
                             knowledge_commitment_vector<g2_type, g1_type> B_query =
                                 kc_batch_exp<g2_type, g1_type, scalar_field_type>(
-                                    scalar_field_type::value_bits, g2_window_size, g1_window_size,
-                                    g2_table, g1_table, scalar_field_type::value_type::one(),
-                                    scalar_field_type::value_type::one(), Bt, chunks);
+                                    scalar_field_type::value_bits, 
+                                    g2_window_size, g1_window_size,
+                                    g2_table, g1_table, 
+                                    scalar_field_type::value_type::one(),
+                                    scalar_field_type::value_type::one(), 
+                                    Bt, chunks);
 
                             // NOTE: if USE_MIXED_ADDITION is defined,
                             // kc_batch_exp will convert its output to special form internally

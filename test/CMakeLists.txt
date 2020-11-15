@@ -44,7 +44,7 @@ set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
     "components/hashes/knapsack/test_knapsack_component"
-    "components/hashes/sha256/test_sha256_component"
+    "components/hashes/sha256/sha256_component"
 
     "components/routing/as_waksman"
 

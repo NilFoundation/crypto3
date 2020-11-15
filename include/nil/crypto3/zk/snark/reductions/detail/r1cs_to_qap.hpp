@@ -97,7 +97,7 @@ namespace nil {
                              */
                             for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
                                 A_in_Lagrange_basis[i][cs.num_constraints() + i] 
-                                = FieldType::value_type::zero();
+                                = FieldType::value_type::one();
                             }
                             /* process all other constraints */
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -182,7 +182,7 @@ namespace nil {
                                 }
                             }
 
-                            typename FieldType::value_type ti = FieldType::value_type::zero();
+                            typename FieldType::value_type ti = FieldType::value_type::one();
                             for (std::size_t i = 0; i < domain->m + 1; ++i) {
                                 Ht.emplace_back(ti);
                                 ti *= t;
@@ -243,14 +243,14 @@ namespace nil {
                                                             auxiliary_input.begin(),
                                                             auxiliary_input.end());
 
-                            std::vector<typename FieldType::value_type> aA(domain->m, 
-                                                                           FieldType::value_type::zero()),
+                            std::vector<typename FieldType::value_type> 
+                                aA(domain->m, FieldType::value_type::zero()),
                                 aB(domain->m, FieldType::value_type::zero());
 
                             /* account for the additional constraints input_i * 0 = 0 */
                             for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
                                 aA[i + cs.num_constraints()] =
-                                    (i > 0 ? full_variable_assignment[i - 1] : FieldType::value_type::zero());
+                                    (i > 0 ? full_variable_assignment[i - 1] : FieldType::value_type::one());
                             }
                             /* account for all other constraints */
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -274,18 +274,18 @@ namespace nil {
                             coefficients_for_H[0] -= d3;
                             domain->add_poly_Z(d1 * d2, coefficients_for_H);
 
-                            /*fft::multiply_by_coset(aA,
-                            fields::arithmetic_params<FieldType>::multiplicative_generator); domain->FFT(aA,
-                            fields::arithmetic_params<FieldType>::multiplicative_generator);
+                            fft::multiply_by_coset(aA,
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator)); 
+                            domain->FFT(aA);
 
-                            fft::multiply_by_coset(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);
-                            domain->FFT(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);*/
+                            fft::multiply_by_coset(aB, 
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            domain->FFT(aB);
 
-                            // uncomment
-                            // when fft ready
-
-                            std::vector<typename FieldType::value_type> &H_tmp =
-                                aA;    // can overwrite aA because it is not used later
+                            std::vector<typename FieldType::value_type> &H_tmp = aA;
+                            // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -302,12 +302,10 @@ namespace nil {
 
                             domain->iFFT(aC);
 
-                            /*fft::multiply_by_coset(aC,
-                            fields::arithmetic_params<FieldType>::multiplicative_generator); domain->FFT(aC,
-                            fields::arithmetic_params<FieldType>::multiplicative_generator);*/
-
-                            // uncomment
-                            // when fft ready
+                            fft::multiply_by_coset(aC, 
+                                typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            domain->FFT(aC);
 
 #ifdef MULTICORE
 #pragma omp parallel for

@@ -152,12 +152,10 @@ namespace nil {
 
                             assert(processed_verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                            //accumulation_vector<g1_type> accumulated_IC;
                             const accumulation_vector<g1_type> accumulated_IC
                              = processed_verification_key.gamma_ABC_g1.template accumulate_chunk<
                              scalar_field_type>( primary_input.begin(), primary_input.end(), 0);
-                            // uncomment
-                            // when accumulate_chunk ready
+                            
                             const typename g1_type::value_type &acc = accumulated_IC.first;
 
                             bool result = true;

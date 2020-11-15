@@ -120,6 +120,10 @@ namespace nil {
                                                            const primary_input_type &primary_input,
                                                            const auxiliary_input_type &auxiliary_input) {
 
+#ifdef DEBUG
+                            assert(pk.constraint_system.is_satisfied(primary_input, auxiliary_input));
+#endif
+
                             const typename scalar_field_type::value_type
                                 d1 = algebra::random_element<scalar_field_type>(),
                                 d2 = algebra::random_element<scalar_field_type>(),
@@ -129,6 +133,11 @@ namespace nil {
                                 r1cs_to_qap<scalar_field_type>::witness_map(
                                     proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
+#ifdef DEBUG
+                            const libff::Fr<ppT> t = libff::Fr<ppT>::random_element();
+                            qap_instance_evaluation<libff::Fr<ppT> > qap_inst = r1cs_to_qap_instance_map_with_evaluation(pk.constraint_system, t);
+                            assert(qap_inst.is_satisfied(qap_wit));
+#endif
 
                             typename knowledge_commitment<g1_type, g1_type>::value_type g_A =
                                 proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables + 1];
@@ -143,7 +152,17 @@ namespace nil {
                                  qap_wit.d1 * proving_key.K_query[qap_wit.num_variables + 1] +
                                  qap_wit.d2 * proving_key.K_query[qap_wit.num_variables + 2] +
                                  qap_wit.d3 * proving_key.K_query[qap_wit.num_variables + 3]);
-
+#ifdef DEBUG
+                            for (size_t i = 0; i < qap_wit.num_inputs() + 1; ++i)
+                            {
+                                assert(pk.A_query[i].g == libff::G1<ppT>::zero());
+                            }
+                            assert(pk.A_query.domain_size() == qap_wit.num_variables()+2);
+                            assert(pk.B_query.domain_size() == qap_wit.num_variables()+2);
+                            assert(pk.C_query.domain_size() == qap_wit.num_variables()+2);
+                            assert(pk.H_query.size() == qap_wit.degree()+1);
+                            assert(pk.K_query.size() == qap_wit.num_variables()+4);
+#endif
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
                                                                                  // var or call omp_set_num_threads()

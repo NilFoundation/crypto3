@@ -67,7 +67,7 @@ namespace nil {
                     auto value_it = vec.values.begin() + offset;
 
                     const typename FieldType::value_type zero = FieldType::value_type::zero();
-                    const typename FieldType::value_type one = FieldType::value_type::zero();
+                    const typename FieldType::value_type one = FieldType::value_type::one();
 
                     std::vector<typename FieldType::value_type> p;
                     std::vector<typename knowledge_commitment<T1, T2>::value_type> g;

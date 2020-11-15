@@ -311,9 +311,7 @@ namespace nil {
                             }
 
                             bool is_well_formed() const {
-                                // return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
-                                // uncomment
-                                // when is_well_formed ready
+                                return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
                                 return true;
                             }
 

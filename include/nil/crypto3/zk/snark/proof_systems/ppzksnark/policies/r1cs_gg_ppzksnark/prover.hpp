@@ -108,6 +108,8 @@ namespace nil {
                             typedef typename CurveType::g2_type g2_type;
                             typedef typename CurveType::gt_type gt_type;
 
+                            assert(proving_key.cs.is_satisfied(primary_input, auxiliary_input));
+
                             const qap_witness<scalar_field_type> qap_wit =
                                 r1cs_to_qap<scalar_field_type>::witness_map(
                                     proving_key.cs, primary_input, auxiliary_input,
@@ -121,12 +123,27 @@ namespace nil {
                             assert(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 
+                            //added temporary for debug
+                            const typename scalar_field_type::value_type t = 
+                                algebra::random_element<scalar_field_type>();
+                            qap_instance_evaluation<scalar_field_type> qap_inst = 
+                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(proving_key.cs, t);
+                            assert(qap_inst.is_satisfied(qap_wit));
+                            //delete after debug ended
+
                             /* Choose two random field elements for prover zero-knowledge. */
                             const typename scalar_field_type::value_type r =
                                 algebra::random_element<scalar_field_type>();
                             const typename scalar_field_type::value_type s =
                                 algebra::random_element<scalar_field_type>();
 
+                            //added temporary for debug
+                            assert(qap_wit.coefficients_for_ABCs.size() == qap_wit.num_variables);
+                            assert(proving_key.A_query.size() == qap_wit.num_variables+1);
+                            assert(proving_key.B_query.domain_size() == qap_wit.num_variables+1);
+                            assert(proving_key.H_query.size() == qap_wit.degree - 1);
+                            assert(proving_key.L_query.size() == qap_wit.num_variables - qap_wit.num_inputs);
+                            //delete after debug ended
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
                                                                                  // var or call omp_set_num_threads()
