@@ -80,11 +80,15 @@ namespace nil {
                         static qap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
 
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + 
+                                                                       cs.num_inputs() + 1);
 
-                            std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
-                            std::vector<std::map<std::size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
-                            std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, FieldType>> 
+                                A_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, FieldType>> 
+                                B_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, FieldType>> 
+                                C_in_Lagrange_basis(cs.num_variables() + 1);
 
                             /**
                              * add and process the constraints
@@ -92,7 +96,8 @@ namespace nil {
                              * to ensure soundness of input consistency
                              */
                             for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
-                                A_in_Lagrange_basis[i][cs.num_constraints() + i] = FieldType::value_type::zero();
+                                A_in_Lagrange_basis[i][cs.num_constraints() + i] 
+                                = FieldType::value_type::zero();
                             }
                             /* process all other constraints */
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -113,7 +118,8 @@ namespace nil {
                             }
 
                             return qap_instance<FieldType>(
-                                domain, cs.num_variables(), domain->m, cs.num_inputs(), std::move(A_in_Lagrange_basis),
+                                domain, cs.num_variables(), domain->m, cs.num_inputs(), 
+                                std::move(A_in_Lagrange_basis),
                                 std::move(B_in_Lagrange_basis), std::move(C_in_Lagrange_basis));
                         }
 
@@ -136,7 +142,8 @@ namespace nil {
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + 
+                                                                       cs.num_inputs() + 1);
 
                             std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
@@ -160,15 +167,18 @@ namespace nil {
                             /* process all other constraints */
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                                 for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
-                                    At[cs.constraints[i].a.terms[j].index] += u[i] * cs.constraints[i].a.terms[j].coeff;
+                                    At[cs.constraints[i].a.terms[j].index] += u[i] * 
+                                    cs.constraints[i].a.terms[j].coeff;
                                 }
 
                                 for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
-                                    Bt[cs.constraints[i].b.terms[j].index] += u[i] * cs.constraints[i].b.terms[j].coeff;
+                                    Bt[cs.constraints[i].b.terms[j].index] += u[i] * 
+                                    cs.constraints[i].b.terms[j].coeff;
                                 }
 
                                 for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
-                                    Ct[cs.constraints[i].c.terms[j].index] += u[i] * cs.constraints[i].c.terms[j].coeff;
+                                    Ct[cs.constraints[i].c.terms[j].index] += u[i] * 
+                                    cs.constraints[i].c.terms[j].coeff;
                                 }
                             }
 
@@ -179,8 +189,9 @@ namespace nil {
                             }
 
                             return qap_instance_evaluation<FieldType>(domain, cs.num_variables(), domain->m,
-                                                                      cs.num_inputs(), t, std::move(At), std::move(Bt),
-                                                                      std::move(Ct), std::move(Ht), Zt);
+                                                                      cs.num_inputs(), t, std::move(At), 
+                                                                      std::move(Bt), std::move(Ct), 
+                                                                      std::move(Ht), Zt);
                         }
 
                         /**
@@ -224,13 +235,16 @@ namespace nil {
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
 
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
-                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                                fft::make_evaluation_domain<FieldType>(cs.num_constraints() + 
+                                                                       cs.num_inputs() + 1);
 
                             r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
-                            full_variable_assignment.insert(full_variable_assignment.end(), auxiliary_input.begin(),
+                            full_variable_assignment.insert(full_variable_assignment.end(), 
+                                                            auxiliary_input.begin(),
                                                             auxiliary_input.end());
 
-                            std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()),
+                            std::vector<typename FieldType::value_type> aA(domain->m, 
+                                                                           FieldType::value_type::zero()),
                                 aB(domain->m, FieldType::value_type::zero());
 
                             /* account for the additional constraints input_i * 0 = 0 */
@@ -280,7 +294,8 @@ namespace nil {
                             }
                             std::vector<typename FieldType::value_type>().swap(aB);    // destroy aB
 
-                            std::vector<typename FieldType::value_type> aC(domain->m, FieldType::value_type::zero());
+                            std::vector<typename FieldType::value_type> aC(domain->m, 
+                                                                           FieldType::value_type::zero());
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                                 aC[i] += cs.constraints[i].c.evaluate(full_variable_assignment);
                             }
@@ -316,8 +331,11 @@ namespace nil {
                                 coefficients_for_H[i] += H_tmp[i];
                             }
 
-                            return qap_witness<FieldType>(cs.num_variables(), domain->m, cs.num_inputs(), d1, d2, d3,
-                                                          full_variable_assignment, std::move(coefficients_for_H));
+                            return qap_witness<FieldType>(cs.num_variables(), 
+                                                          domain->m, cs.num_inputs(), 
+                                                          d1, d2, d3,
+                                                          full_variable_assignment, 
+                                                          std::move(coefficients_for_H));
                         }
                     };
                 }    // namespace detail

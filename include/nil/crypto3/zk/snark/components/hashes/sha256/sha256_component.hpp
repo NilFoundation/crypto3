@@ -76,7 +76,8 @@ namespace nil {
 
                         /* message schedule and inputs for it */
                         packed_W.allocate(bp, block::detail::shacal2_policy<256>::rounds);
-                        message_schedule.reset(new sha256_message_schedule_component<FieldType>(bp, new_block, packed_W));
+                        message_schedule.reset(
+                            new sha256_message_schedule_component<FieldType>(bp, new_block, packed_W));
 
                         /* initalize */
                         round_a.push_back(blueprint_linear_combination_vector<FieldType>(
