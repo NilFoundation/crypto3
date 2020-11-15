@@ -140,6 +140,29 @@ namespace nil {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
+                        bool is_well_formed() const {
+                            if (this->is_zero()) {
+                                return true;
+                            }
+                            else {
+                                /*
+                                  y^2 = x^3 + ax + b
+
+                                  We are using projective, so equation we need to check is actually
+
+                                  (y/z)^2 = (x/z)^3 + a (x/z) + b
+                                  z y^2 = x^3  + a z^2 x + b z^3
+
+                                  z (y^2 - b z^2) = x ( x^2 + a z^2)
+                                */
+                                const underlying_field_value_type X2 = this->X.squared();
+                                const underlying_field_value_type Y2 = this->Y.squared();
+                                const underlying_field_value_type Z2 = this->Z.squared();
+                                const underlying_field_value_type aZ2 =  twist_coeff_a * Z2;
+
+                                return (this->Z * (Y2 - twist_coeff_b * Z2) == this->X * (X2 + aZ2));
+                            }
+                        }
                         /*************************  Arithmetic operations  ***********************************/
 
                         element_mnt4_g2 operator=(const element_mnt4_g2 &other) {

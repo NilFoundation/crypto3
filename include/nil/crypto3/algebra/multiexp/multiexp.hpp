@@ -174,7 +174,7 @@ namespace nil {
                     }
 
                     for (std::size_t i = 0; i < window; ++i) {
-                        gouter = gouter + gouter;
+                        gouter = gouter.doubled();
                     }
                 }
 
