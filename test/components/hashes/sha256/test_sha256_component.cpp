@@ -96,30 +96,9 @@ void test_two_to_one() {
         array_c_intermediate,
         hash_bv.begin());
 
-    std::cout << "bits from pack:" << std::endl;
-    for (int i = 0; i < left_bv.size(); ++i){
-        std::cout << left_bv[i] << " ";
-    }
-
-    std::cout << std::endl;
-
     left.generate_r1cs_witness(left_bv);
 
-    std::cout << "bits from pack:" << std::endl;
-    for (int i = 0; i < right_bv.size(); ++i){
-        std::cout << right_bv[i] << " ";
-    }
-
-    std::cout << std::endl;
-
     right.generate_r1cs_witness(right_bv);
-
-    std::cout << "bits from pack:" << std::endl;
-    for (int i = 0; i < hash_bv.size(); ++i){
-        std::cout << hash_bv[i] << " ";
-    }
-
-    std::cout << std::endl;
 
     f.generate_r1cs_witness();
     output.generate_r1cs_witness(hash_bv);

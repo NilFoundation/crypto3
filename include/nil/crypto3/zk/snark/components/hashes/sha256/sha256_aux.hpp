@@ -273,7 +273,7 @@ namespace nil {
                         for (std::size_t i = 0; i < 32; ++i) {
                             this->bp.val(result_bits[i]) =
                                 this->bp.lc_val(X[i]) * this->bp.lc_val(Y[i]) +
-                                (FieldType::value_type::zero() - this->bp.lc_val(X[i])) * this->bp.lc_val(Z[i]);
+                                (FieldType::value_type::one() - this->bp.lc_val(X[i])) * this->bp.lc_val(Z[i]);
                         }
                         pack_result->generate_r1cs_witness_from_bits();
                     }

@@ -129,13 +129,13 @@ namespace nil {
 
                     void generate_r1cs_witness(){
                         for (std::size_t i = 0; i < 16; ++i) {
-                            std::cout << "pack_W generation" << std::endl;
                             pack_W[i]->generate_r1cs_witness_from_bits();
                         }
 
                         for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                             compute_sigma0[i]->generate_r1cs_witness();
                             compute_sigma1[i]->generate_r1cs_witness();
+
 
                             this->bp.val(unreduced_W[i]) = this->bp.val(sigma0[i]) + 
                                                            this->bp.val(sigma1[i]) +
@@ -263,9 +263,7 @@ namespace nil {
 
                         compute_choice->generate_r1cs_witness();
                         compute_majority->generate_r1cs_witness();
-                        std::cout << "pack_d generation" <<std::endl;
                         pack_d->generate_r1cs_witness_from_bits();
-                        std::cout << "pack_h generation" <<std::endl;
                         pack_h->generate_r1cs_witness_from_bits();
 
                         this->bp.val(unreduced_new_a) = this->bp.val(packed_h) + this->bp.val(sigma1) +
