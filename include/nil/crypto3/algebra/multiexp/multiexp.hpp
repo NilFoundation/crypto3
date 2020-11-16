@@ -255,8 +255,7 @@ namespace nil {
 
                 GroupType::batch_to_special_all_non_zeros(non_zero_vec);
                 typename std::vector<typename GroupType::value_type>::const_iterator it = non_zero_vec.begin();
-                typename GroupType::value_type zero_special = GroupType::value_type::zero();
-                zero_special.to_special();
+                typename GroupType::value_type zero_special = GroupType::value_type::zero().to_special();
 
                 for (std::size_t i = 0; i < vec.size(); ++i) {
                     if (!vec[i].is_zero()) {
