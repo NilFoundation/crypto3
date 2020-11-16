@@ -193,7 +193,6 @@ namespace nil {
                             const std::size_t g1_window_size = 
                                 algebra::get_exp_window_size<g1_type>(g1_scalar_count);
 
-                            //std::vector<std::vector<typename g1_type::value_type>> g1_table;
                             algebra::window_table<g1_type> g1_table =
                                 algebra::get_window_table<g1_type>(g1_scalar_size, 
                                                           g1_window_size, 
@@ -205,7 +204,6 @@ namespace nil {
                             const std::size_t g2_scalar_size = scalar_field_type::value_bits;
                             std::size_t g2_window_size = algebra::get_exp_window_size<g2_type>(g2_scalar_count);
 
-                            //std::vector<std::vector<typename g2_type::value_type>> g2_table;
                             algebra::window_table<g2_type> g2_table =
                                 algebra::get_window_table<g2_type>(g2_scalar_size, g2_window_size, G2_gen);
 

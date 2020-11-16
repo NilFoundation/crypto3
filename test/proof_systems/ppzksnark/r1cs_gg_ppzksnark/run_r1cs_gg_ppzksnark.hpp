@@ -79,7 +79,7 @@ namespace nil {
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
                     
-                    std::cout << "Starting generator" << std::endl;                    
+                    std::cout << "Starting generator" << std::endl;
                     typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
                         r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
 
@@ -106,6 +106,7 @@ namespace nil {
                     const bool ans =
                         r1cs_gg_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
 
+                    std::cout << "Verifier finished, result: " << ans << std::endl;
                     return ans;
                 }
             }    // namespace snark

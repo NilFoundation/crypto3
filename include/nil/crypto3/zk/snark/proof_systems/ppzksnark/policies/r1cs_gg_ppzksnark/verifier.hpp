@@ -96,8 +96,7 @@ namespace nil {
                                 pairing_policy::precompute_g2(verification_key.gamma_g2);
                             processed_verification_key.vk_delta_g2_precomp =
                                 pairing_policy::precompute_g2(verification_key.delta_g2);
-                            // processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
-                            // when ready
+                            processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
 
                             return processed_verification_key;
                         }
@@ -162,7 +161,9 @@ namespace nil {
 
                             if (!proof.is_well_formed()) {
                                 result = false;
+                                std::cout << "!proof.is_well_formed" << std::endl;
                             }
+
                             const G1_precomp proof_g_A_precomp =
                                 pairing_policy::precompute_g1(proof.g_A);
                             const G2_precomp proof_g_B_precomp =
@@ -181,6 +182,19 @@ namespace nil {
                                 pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
 
                             if (QAP != processed_verification_key.vk_alpha_g1_beta_g2) {
+                                std::cout << "QAP: " << QAP.data[0].data[0].data << " " << 
+                                             QAP.data[0].data[1].data << " " <<
+                                             QAP.data[1].data[0].data << " " << 
+                                             QAP.data[1].data[1].data << "\n" << 
+                                             "processed_verification_key.vk_alpha_g1_beta_g2: " << 
+                                             processed_verification_key.vk_alpha_g1_beta_g2.data[0].data[0].data 
+                                             << " " << 
+                                             processed_verification_key.vk_alpha_g1_beta_g2.data[0].data[1].data 
+                                             << " " <<
+                                             processed_verification_key.vk_alpha_g1_beta_g2.data[1].data[0].data 
+                                             << " " << 
+                                             processed_verification_key.vk_alpha_g1_beta_g2.data[1].data[1].data 
+                                             << std::endl;
                                 result = false;
                             }
 
@@ -248,6 +262,7 @@ namespace nil {
                             bool result = true;
 
                             if (processed_verification_key.gamma_ABC_g1.domain_size() != primary_input.size()) {
+                                std::cout << processed_verification_key.gamma_ABC_g1.domain_size() << " != " << primary_input.size() << std::endl;
                                 result = false;
                             } else {
                                 result = r1cs_gg_ppzksnark_online_verifier_weak_input_consistency<

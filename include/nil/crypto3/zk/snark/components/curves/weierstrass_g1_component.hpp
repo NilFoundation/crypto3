@@ -67,7 +67,8 @@ namespace nil {
                     G1_variable(blueprint<FieldType> &bp,
                                 const typename other_curve<CurveType>::g1_type::value_type &P) :
                         component<FieldType>(bp) {
-                        typename other_curve<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
+                        typename other_curve<CurveType>::g1_type::value_type Pcopy 
+                            = P.to_affine_coordinates();
 
                         X.assign(bp, Pcopy.X());
                         Y.assign(bp, Pcopy.Y());
@@ -79,7 +80,8 @@ namespace nil {
 
                     template<typename CurveType1>
                     void generate_r1cs_witness(const typename CurveType1::g1_type::value_type &el) {
-                        typename other_curve<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
+                        typename other_curve<CurveType>::g1_type::value_type el_normalized 
+                            = el.to_affine_coordinates();
 
                         this->bp.lc_val(X) = el_normalized.X();
                         this->bp.lc_val(Y) = el_normalized.Y();

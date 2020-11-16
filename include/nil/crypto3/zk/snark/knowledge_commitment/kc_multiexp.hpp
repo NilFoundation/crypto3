@@ -61,6 +61,10 @@ namespace nil {
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
                     const std::size_t chunks) {
+
+                    const size_t scalar_length = std::distance(scalar_start, scalar_end);
+                    assert((size_t)(scalar_length) <= vec.domain_size_);
+
                     auto index_it = std::lower_bound(vec.indices.begin(), vec.indices.end(), min_idx);
                     const std::size_t offset = index_it - vec.indices.begin();
 
@@ -75,12 +79,6 @@ namespace nil {
                     typename knowledge_commitment<T1, T2>::value_type acc = 
                         knowledge_commitment<T1, T2>::value_type::zero();
 
-                    std::size_t num_skip = 0;
-                    std::size_t num_add = 0;
-                    std::size_t num_other = 0;
-
-                    const std::size_t scalar_length = std::distance(scalar_start, scalar_end);
-
                     while (index_it != vec.indices.end() && *index_it < max_idx) {
                         const std::size_t scalar_position = (*index_it) - min_idx;
                         assert(scalar_position < scalar_length);
@@ -89,7 +87,6 @@ namespace nil {
 
                         if (scalar == zero) {
                             // do nothing
-                            ++num_skip;
                         } else if (scalar == one) {
 #ifdef USE_MIXED_ADDITION
                             acc.g = acc.g.mixed_add(value_it->g);
@@ -98,11 +95,9 @@ namespace nil {
                             acc.g = acc.g + value_it->g;
                             acc.h = acc.h + value_it->h;
 #endif
-                            ++num_add;
                         } else {
                             p.emplace_back(scalar);
                             g.emplace_back(*value_it);
-                            ++num_other;
                         }
 
                         ++index_it;
@@ -134,8 +129,14 @@ namespace nil {
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
                             res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(
-                                windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
-                                windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
+                                windowed_exp<T1, FieldType>(scalar_size, 
+                                                            T1_window, 
+                                                            T1_table, 
+                                                            T1_coeff * v[pos]),
+                                windowed_exp<T2, FieldType>(scalar_size, 
+                                                            T2_window, 
+                                                            T2_table, 
+                                                            T2_coeff * v[pos])));
                             res.indices.emplace_back(pos);
                         }
                     }
@@ -161,7 +162,9 @@ namespace nil {
                         nonzero += (v[i].is_zero() ? 0 : 1);
                     }
 
-                    const std::size_t num_chunks = std::max((std::size_t)1, std::min(nonzero, suggested_num_chunks));
+                    const std::size_t num_chunks = std::max((std::size_t)1, 
+                                                            std::min(nonzero, 
+                                                                     suggested_num_chunks));
 
                     std::vector<knowledge_commitment_vector<T1, T2>> tmp(num_chunks);
                     std::vector<std::size_t> chunk_pos(num_chunks + 1);
@@ -190,7 +193,8 @@ namespace nil {
 #endif
                     for (std::size_t i = 0; i < num_chunks; ++i) {
                         tmp[i] = kc_batch_exp_internal<T1, T2, FieldType>(
-                            scalar_size, T1_window, T2_window, T1_table, T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
+                            scalar_size, T1_window, T2_window, T1_table, 
+                            T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
                             chunk_pos[i + 1], i == num_chunks - 1 ? last_chunk : chunk_size);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename knowledge_commitment<T1, T2>::value_type>(tmp[i].values);
@@ -202,8 +206,12 @@ namespace nil {
                         return tmp[0];
                     } else {
                         for (std::size_t i = 0; i < num_chunks; ++i) {
-                            res.values.insert(res.values.end(), tmp[i].values.begin(), tmp[i].values.end());
-                            res.indices.insert(res.indices.end(), tmp[i].indices.begin(), tmp[i].indices.end());
+                            res.values.insert(res.values.end(), 
+                                              tmp[i].values.begin(), 
+                                              tmp[i].values.end());
+                            res.indices.insert(res.indices.end(), 
+                                               tmp[i].indices.begin(), 
+                                               tmp[i].indices.end());
                         }
                         return res;
                     }

@@ -152,7 +152,8 @@ namespace nil {
                             Ct.resize(cs.num_variables() + 1, FieldType::value_type::zero());
                             Ht.reserve(domain->m + 1);
 
-                            const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
+                            const typename FieldType::value_type Zt 
+                                = domain->compute_vanishing_polynomial(t);
 
                             const std::vector<typename FieldType::value_type> u =
                                 domain->evaluate_all_lagrange_polynomials(t);

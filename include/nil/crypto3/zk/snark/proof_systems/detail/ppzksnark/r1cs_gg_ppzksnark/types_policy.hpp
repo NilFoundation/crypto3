@@ -311,8 +311,9 @@ namespace nil {
                             }
 
                             bool is_well_formed() const {
-                                return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
-                                return true;
+                                return (g_A.is_well_formed() 
+                                     && g_B.is_well_formed() 
+                                     && g_C.is_well_formed());
                             }
 
                             bool operator==(const proof &other) const {

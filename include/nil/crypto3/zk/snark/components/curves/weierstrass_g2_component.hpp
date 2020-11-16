@@ -66,7 +66,8 @@ namespace nil {
                     G2_variable(blueprint<field_type> &bp,
                                 const typename other_curve<CurveType>::g2_type::value_type &Q) :
                         component<field_type>(bp) {
-                        typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
+                        typename other_curve<CurveType>::g2_type::value_type Q_copy 
+                            = Q.to_affine_coordinates();
 
                         X.reset(new Fqe_variable<CurveType>(bp, Q_copy.X()));
                         Y.reset(new Fqe_variable<CurveType>(bp, Q_copy.Y()));
@@ -76,7 +77,8 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness(const typename other_curve<CurveType>::g2_type::value_type &Q) {
-                        typename other_curve<CurveType>::g2_type::value_type Qcopy = Q.to_affine_coordinates();
+                        typename other_curve<CurveType>::g2_type::value_type Qcopy 
+                            = Q.to_affine_coordinates();
 
                         X->generate_r1cs_witness(Qcopy.X());
                         Y->generate_r1cs_witness(Qcopy.Y());

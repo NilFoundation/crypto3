@@ -127,7 +127,8 @@ namespace nil {
                             const typename scalar_field_type::value_type t = 
                                 algebra::random_element<scalar_field_type>();
                             qap_instance_evaluation<scalar_field_type> qap_inst = 
-                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(proving_key.cs, t);
+                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(
+                                    proving_key.cs, t);
                             assert(qap_inst.is_satisfied(qap_wit));
                             //delete after debug ended
                             
@@ -223,9 +224,15 @@ namespace nil {
                             typename g1_type::value_type g1_C = evaluation_Ht + evaluation_Lt 
                             + s * g1_A + r * g1_B - (r * s) * proving_key.delta_g1;
 
-                            proof_type prf = proof_type(std::move(g1_A), std::move(g2_B), std::move(g1_C));
+                            proof_type proof = proof_type(std::move(g1_A), 
+                                                          std::move(g2_B), 
+                                                          std::move(g1_C));
 
-                            return prf;
+                            if (!proof.is_well_formed()) {
+                                std::cout << "!proof.is_well_formed" << std::endl;
+                            }
+
+                            return proof;
                         }
                     };
                 }    // namespace policies

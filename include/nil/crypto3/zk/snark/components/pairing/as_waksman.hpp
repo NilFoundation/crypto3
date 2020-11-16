@@ -296,8 +296,8 @@ namespace nil {
                 G1_precomputation<CurveType>::G1_precomputation(
                     blueprint<FieldType> &bp,
                     const typename other_curve<CurveType>::g1_type::value_type &P_val) {
-                    typename other_curve<CurveType>::g1_type::value_type P_val_copy = P_val;
-                    P_val_copy.to_affine_coordinates();
+                    typename other_curve<CurveType>::g1_type::value_type P_val_copy 
+                      = P_val.to_affine_coordinates();
                     P.reset(new G1_variable<CurveType>(bp, P_val_copy));
                     PY_twist_squared.reset(new Fqe_variable<CurveType>(
                         bp, P_val_copy.Y() * other_curve<CurveType>::g2_type::value_type::twist.squared()));
