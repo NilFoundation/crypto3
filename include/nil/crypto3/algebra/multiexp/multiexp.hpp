@@ -92,8 +92,8 @@ namespace nil {
 
                 assert(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
 
-                typename std::vector<base_value_type>::const_iterator vec_it;
-                typename std::vector<field_value_type>::const_iterator scalar_it;
+                typename std::vector<base_value_type>::const_iterator vec_it = vec_start;
+                typename std::vector<field_value_type>::const_iterator scalar_it = scalar_start;
 
                 const field_value_type zero = field_value_type::zero();
                 const field_value_type one = field_value_type::one();
