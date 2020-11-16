@@ -117,15 +117,12 @@ namespace nil {
                                     scalar_field_type::value_type::zero(),
                                     scalar_field_type::value_type::zero());
 
-                            std::cout << "qap_wit witness_map finished" << std::endl;
-
                             /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                                and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
                             assert(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 
-                            std::cout << "qap_inst instance_map_with_evaluation started" << std::endl;
                             //added temporary for debug
                             const typename scalar_field_type::value_type t = 
                                 algebra::random_element<scalar_field_type>();
@@ -133,13 +130,13 @@ namespace nil {
                                 r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(proving_key.cs, t);
                             assert(qap_inst.is_satisfied(qap_wit));
                             //delete after debug ended
-
+                            
                             /* Choose two random field elements for prover zero-knowledge. */
                             const typename scalar_field_type::value_type r =
                                 algebra::random_element<scalar_field_type>();
                             const typename scalar_field_type::value_type s =
                                 algebra::random_element<scalar_field_type>();
-
+                            
                             //added temporary for debug
                             assert(qap_wit.coefficients_for_ABCs.size() == qap_wit.num_variables);
                             assert(proving_key.A_query.size() == qap_wit.num_variables+1);
@@ -161,8 +158,9 @@ namespace nil {
                                                            qap_wit.coefficients_for_ABCs.begin(),
                                                            qap_wit.coefficients_for_ABCs.end());
 
-                            typename g1_type::value_type evaluation_At =
-                                algebra::multiexp_with_mixed_addition<g1_type,
+                            
+                            typename g1_type::value_type evaluation_At 
+                                = algebra::multiexp_with_mixed_addition<g1_type,
                                                                       scalar_field_type,
                                                                       algebra::policies::multiexp_method_BDLO12<
                                                                         g1_type,
@@ -173,24 +171,23 @@ namespace nil {
                                 const_padded_assignment.begin() + qap_wit.num_variables + 1,
                                 chunks);
 
-                            typename knowledge_commitment<g2_type, g1_type>
-                                ::value_type evaluation_Bt;
-
-                            kc_multiexp_with_mixed_addition<g2_type, g1_type,
-                                                            scalar_field_type,
-                                                            algebra::policies::multiexp_method_BDLO12<
-                                                            knowledge_commitment<g2_type, g1_type>,
-                                                            scalar_field_type>>(
+                            typename knowledge_commitment<g2_type, g1_type>::value_type evaluation_Bt
+                                = kc_multiexp_with_mixed_addition<g2_type, g1_type,
+                                                                  scalar_field_type,
+                                                                  algebra::policies::multiexp_method_BDLO12<
+                                                                  knowledge_commitment<g2_type, g1_type>,
+                                                                  scalar_field_type>>(
                                 proving_key.B_query,
                                 0,
                                 qap_wit.num_variables + 1,
                                 const_padded_assignment.begin(),
-                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
+                                const_padded_assignment.begin() + 
+                                qap_wit.num_variables + 1,
                                 chunks);
 
-                            typename g1_type::value_type evaluation_Ht =
-                                algebra::multiexp<g1_type, scalar_field_type,
-                                                   algebra::policies::multiexp_method_BDLO12<
+                            typename g1_type::value_type evaluation_Ht
+                                = algebra::multiexp<g1_type, scalar_field_type,
+                                                    algebra::policies::multiexp_method_BDLO12<
                                                         g1_type, scalar_field_type>>(
                                 proving_key.H_query.begin(),
                                 proving_key.H_query.begin() + (qap_wit.degree - 1),
@@ -198,10 +195,10 @@ namespace nil {
                                 qap_wit.coefficients_for_H.begin() + (qap_wit.degree - 1),
                                 chunks);
 
-                            typename g1_type::value_type evaluation_Lt =
-                                algebra::multiexp_with_mixed_addition<g1_type,
-                                                                       scalar_field_type,
-                                                                       algebra::policies::multiexp_method_BDLO12<
+                            typename g1_type::value_type evaluation_Lt 
+                                = algebra::multiexp_with_mixed_addition<g1_type,
+                                                                        scalar_field_type,
+                                                                        algebra::policies::multiexp_method_BDLO12<
                                                                            g1_type,
                                                                            scalar_field_type>>(
                                 proving_key.L_query.begin(),
