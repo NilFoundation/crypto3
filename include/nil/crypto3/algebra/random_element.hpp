@@ -109,16 +109,12 @@ namespace nil {
                 using field_type = typename CurveGroupType::underlying_field_type;
                 using distribution_type = DistributionType;
                 using generator_type = GeneratorType;
+                using curve_type = typename CurveGroupType::curve_type;
 
-                return typename CurveGroupType::value_type(random_element<field_type, 
-                                                                         distribution_type, 
-                                                                         generator_type>(),
-                                                           random_element<field_type, 
-                                                                         distribution_type, 
-                                                                         generator_type>(),
-                                                           random_element<field_type, 
-                                                                         distribution_type, 
-                                                                         generator_type>());
+                return random_element<typename curve_type::scalar_field_type, 
+                                      distribution_type, 
+                                      generator_type>() * 
+                       CurveGroupType::value_type::one();
             }
 
         }    // namespace algebra

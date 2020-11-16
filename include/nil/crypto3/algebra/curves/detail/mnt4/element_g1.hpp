@@ -76,6 +76,10 @@ namespace nil {
                         // element_mnt4_g1() : element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
+                        element_mnt4_g1(const underlying_field_value_type& X, 
+                                        const underlying_field_value_type& Y) : 
+                                        X(X), Y(Y), Z(underlying_field_value_type::one()) {};
+
                         element_mnt4_g1(underlying_field_value_type X,
                                         underlying_field_value_type Y,
                                         underlying_field_value_type Z) {
