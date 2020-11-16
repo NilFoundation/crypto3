@@ -135,7 +135,7 @@ namespace nil {
                         }
 
                         bool is_special() const {
-                            return (this->is_zero() || this->Z == underlying_field_value_type::one());
+                            return (this->is_zero() || this->Z.is_one());
                         }
 
                         bool is_well_formed() const {
