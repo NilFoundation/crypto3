@@ -87,6 +87,10 @@ namespace nil {
                     class r1cs_gg_ppzksnark_prover {
                         using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
 
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
+                        typedef typename CurveType::g1_type g1_type;
+                        typedef typename CurveType::g2_type g2_type;
+                        typedef typename CurveType::gt_type gt_type;
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -102,11 +106,6 @@ namespace nil {
                         static inline proof_type process(const proving_key_type &proving_key,
                                                            const primary_input_type &primary_input,
                                                            const auxiliary_input_type &auxiliary_input) {
-
-                            typedef typename CurveType::scalar_field_type scalar_field_type;
-                            typedef typename CurveType::g1_type g1_type;
-                            typedef typename CurveType::g2_type g2_type;
-                            typedef typename CurveType::gt_type gt_type;
 
                             assert(proving_key.cs.is_satisfied(primary_input, auxiliary_input));
 

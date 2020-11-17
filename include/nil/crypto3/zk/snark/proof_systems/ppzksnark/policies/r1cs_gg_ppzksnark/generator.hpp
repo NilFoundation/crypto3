@@ -84,7 +84,12 @@ namespace nil {
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_generator {
                         using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
-
+                        
+                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
+                        typedef typename CurveType::g1_type g1_type;
+                        typedef typename CurveType::g2_type g2_type;
+                        typedef typename CurveType::gt_type gt_type;
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -98,12 +103,6 @@ namespace nil {
                         typedef typename types_policy::proof proof_type;
 
                         static inline keypair_type process(const constraint_system_type &cs) {
-
-                            typedef typename CurveType::pairing_policy pairing_policy;
-                            typedef typename CurveType::scalar_field_type scalar_field_type;
-                            typedef typename CurveType::g1_type g1_type;
-                            typedef typename CurveType::g2_type g2_type;
-                            typedef typename CurveType::gt_type gt_type;
 
                             /* Make the B_query "lighter" if possible */
                             constraint_system_type r1cs_copy(cs);

@@ -30,6 +30,8 @@
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
 #include "../r1cs_examples.hpp"
@@ -139,7 +141,6 @@ namespace nil {
                     BOOST_CHECK(ans == ans4);
 
                     /*test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);*/
-
                     
                     return ans;
                 }

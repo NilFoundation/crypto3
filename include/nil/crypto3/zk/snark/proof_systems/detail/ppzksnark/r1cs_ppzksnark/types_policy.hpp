@@ -109,7 +109,7 @@ namespace nil {
                             typename std::vector<g1_value_type> H_query;
                             typename std::vector<g1_value_type> K_query;
 
-                            constraint_system constraint_system;
+                            constraint_system cs;
 
                             proving_key() {};
                             proving_key &operator=(const proving_key &other) = default;
@@ -121,10 +121,10 @@ namespace nil {
                                 knowledge_commitment_vector<g1_type, g1_type> &&C_query,
                                 typename std::vector<g1_value_type> &&H_query,
                                 typename std::vector<g1_value_type> &&K_query,
-                                constraint_system &&constraint_system) :
+                                constraint_system &&cs) :
                                 A_query(std::move(A_query)),
                                 B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
-                                K_query(std::move(K_query)), constraint_system(std::move(constraint_system)) {};
+                                K_query(std::move(K_query)), cs(std::move(cs)) {};
 
                             std::size_t G1_size() const {
                                 return 2 * (A_query.domain_size() + C_query.domain_size()) + B_query.domain_size() +
@@ -154,7 +154,7 @@ namespace nil {
                                 return (this->A_query == other.A_query && this->B_query == other.B_query &&
                                         this->C_query == other.C_query && this->H_query == other.H_query &&
                                         this->K_query == other.K_query &&
-                                        this->constraint_system == other.constraint_system);
+                                        this->cs == other.cs);
                             }
                         };
 

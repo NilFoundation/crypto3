@@ -103,19 +103,23 @@ namespace nil {
 
                         static inline keypair_type process(const constraint_system_type &constraint_system) {
 
+                            typedef typename CurveType::scalar_field_type scalar_field_type;
+                            typedef typename CurveType::g1_type g1_type;
+                            typedef typename CurveType::g2_type g2_type;
+
                             /* make the B_query "lighter" if possible */
                             constraint_system_type cs_copy(constraint_system);
                             cs_copy.swap_AB_if_beneficial();
 
                             /* draw random element at which the QAP is evaluated */
-                            const typename CurveType::scalar_field_type::value_type t =
-                                algebra::random_element<typename CurveType::scalar_field_type>();
+                            const typename scalar_field_type::value_type t =
+                                algebra::random_element<scalar_field_type>();
 
-                            qap_instance_evaluation<typename CurveType::scalar_field_type> qap_inst =
-                                r1cs_to_qap<CurveType>::instance_map_with_evaluation(cs_copy, t);
+                            qap_instance_evaluation<scalar_field_type> qap_inst =
+                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(cs_copy, t);
 
                             std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
-                            for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
+                            for (std::size_t i = 0; i < qap_inst.num_variables + 1; ++i) {
                                 if (!qap_inst.At[i].is_zero()) {
                                     ++non_zero_At;
                                 }
@@ -126,19 +130,19 @@ namespace nil {
                                     ++non_zero_Ct;
                                 }
                             }
-                            for (std::size_t i = 0; i < qap_inst.degree() + 1; ++i) {
+                            for (std::size_t i = 0; i < qap_inst.degree + 1; ++i) {
                                 if (!qap_inst.Ht[i].is_zero()) {
                                     ++non_zero_Ht;
                                 }
                             }
 
-                            std::vector<typename CurveType::scalar_field_type::value_type> At = std::move(
+                            std::vector<typename scalar_field_type::value_type> At = std::move(
                                 qap_inst.At);    // qap_inst.At is now in unspecified state, but we do not use it later
-                            std::vector<typename CurveType::scalar_field_type::value_type> Bt = std::move(
+                            std::vector<typename scalar_field_type::value_type> Bt = std::move(
                                 qap_inst.Bt);    // qap_inst.Bt is now in unspecified state, but we do not use it later
-                            std::vector<typename CurveType::scalar_field_type::value_type> Ct = std::move(
+                            std::vector<typename scalar_field_type::value_type> Ct = std::move(
                                 qap_inst.Ct);    // qap_inst.Ct is now in unspecified state, but we do not use it later
-                            std::vector<typename CurveType::scalar_field_type::value_type> Ht = std::move(
+                            std::vector<typename scalar_field_type::value_type> Ht = std::move(
                                 qap_inst.Ht);    // qap_inst.Ht is now in unspecified state, but we do not use it later
 
                             /* append Zt to At,Bt,Ct with */
@@ -146,21 +150,21 @@ namespace nil {
                             Bt.emplace_back(qap_inst.Zt);
                             Ct.emplace_back(qap_inst.Zt);
 
-                            const typename CurveType::scalar_field_type::value_type
-                                alphaA = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                alphaB = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                alphaC = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                rA = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                rB = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                beta = algebra::random_element<typename CurveType::scalar_field_type>(),
-                                gamma = algebra::random_element<typename CurveType::scalar_field_type>();
-                            const typename CurveType::scalar_field_type rC = rA * rB;
+                            const typename scalar_field_type::value_type
+                                alphaA = algebra::random_element<scalar_field_type>(),
+                                alphaB = algebra::random_element<scalar_field_type>(),
+                                alphaC = algebra::random_element<scalar_field_type>(),
+                                rA = algebra::random_element<scalar_field_type>(),
+                                rB = algebra::random_element<scalar_field_type>(),
+                                beta = algebra::random_element<scalar_field_type>(),
+                                gamma = algebra::random_element<scalar_field_type>();
+                            const typename scalar_field_type::value_type rC = rA * rB;
 
                             // consrtuct the same-coefficient-check query (must happen before zeroing out the prefix of
                             // At)
-                            std::vector<typename CurveType::scalar_field_type::value_type> Kt;
-                            Kt.reserve(qap_inst.num_variables() + 4);
-                            for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
+                            std::vector<typename scalar_field_type::value_type> Kt;
+                            Kt.reserve(qap_inst.num_variables + 4);
+                            for (std::size_t i = 0; i < qap_inst.num_variables + 1; ++i) {
                                 Kt.emplace_back(beta * (rA * At[i] + rB * Bt[i] + rC * Ct[i]));
                             }
                             Kt.emplace_back(beta * rA * qap_inst.Zt);
@@ -168,22 +172,22 @@ namespace nil {
                             Kt.emplace_back(beta * rC * qap_inst.Zt);
 
                             /* zero out prefix of At and stick it into IC coefficients */
-                            std::vector<typename CurveType::scalar_field_type::value_type> IC_coefficients;
-                            IC_coefficients.reserve(qap_inst.num_inputs() + 1);
-                            for (std::size_t i = 0; i < qap_inst.num_inputs() + 1; ++i) {
+                            std::vector<typename scalar_field_type::value_type> IC_coefficients;
+                            IC_coefficients.reserve(qap_inst.num_inputs + 1);
+                            for (std::size_t i = 0; i < qap_inst.num_inputs + 1; ++i) {
                                 IC_coefficients.emplace_back(At[i]);
                                 assert(!IC_coefficients[i].is_zero());
-                                At[i] = typename CurveType::scalar_field_type::zero();
+                                At[i] = scalar_field_type::value_type::zero();
                             }
 
-                            const std::size_t g1_exp_count = 2 * (non_zero_At - qap_inst.num_inputs() + non_zero_Ct) +
+                            const std::size_t g1_exp_count = 2 * (non_zero_At - qap_inst.num_inputs + non_zero_Ct) +
                                                              non_zero_Bt + non_zero_Ht + Kt.size();
                             const std::size_t g2_exp_count = non_zero_Bt;
 
                             std::size_t g1_window =
-                                algebra::get_exp_window_size<typename CurveType::g1_type>(g1_exp_count);
+                                algebra::get_exp_window_size<g1_type>(g1_exp_count);
                             std::size_t g2_window =
-                                algebra::get_exp_window_size<typename CurveType::g2_type>(g2_exp_count);
+                                algebra::get_exp_window_size<g2_type>(g2_exp_count);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -192,71 +196,71 @@ namespace nil {
                             const std::size_t chunks = 1;
 #endif
 
-                            algebra::window_table<typename CurveType::g1_type> g1_table =
-                                get_window_table(typename CurveType::scalar_field_type::value_bits, g1_window,
-                                                 typename CurveType::g1_type::value_type::one());
+                            algebra::window_table<g1_type> g1_table =
+                                get_window_table<g1_type>(scalar_field_type::value_bits, g1_window,
+                                                 g1_type::value_type::one());
 
-                            algebra::window_table<typename CurveType::g2_type> g2_table =
-                                get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window,
-                                                 typename CurveType::g2_type::value_type::one());
+                            algebra::window_table<g2_type> g2_table =
+                                get_window_table<g2_type>(scalar_field_type::value_bits, g2_window,
+                                                 g2_type::value_type::one());
 
-                            knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                A_query = kc_batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window,
+                            knowledge_commitment_vector<g1_type, g1_type>
+                                A_query = kc_batch_exp<g1_type>(scalar_field_type::value_bits, g1_window,
                                                        g1_window, g1_table, g1_table, rA, rA * alphaA, At, chunks);
 
-                            knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
-                                B_query = kc_batch_exp(typename CurveType::scalar_field_type::value_bits, g2_window,
+                            knowledge_commitment_vector<g2_type, g1_type>
+                                B_query = kc_batch_exp<>(scalar_field_type::value_bits, g2_window,
                                                        g1_window, g2_table, g1_table, rB, rB * alphaB, Bt, chunks);
 
-                            knowledge_commitment_vector<typename CurveType::g1_type, typename CurveType::g1_type>
-                                C_query = kc_batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window,
+                            knowledge_commitment_vector<g1_type, g1_type>
+                                C_query = kc_batch_exp<>(scalar_field_type::value_bits, g1_window,
                                                        g1_window, g1_table, g1_table, rC, rC * alphaC, Ct, chunks);
 
-                            typename std::vector<typename CurveType::g1_type::value_type> H_query =
-                                batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht);
+                            typename std::vector<typename g1_type::value_type> H_query =
+                                batch_exp(scalar_field_type::value_bits, g1_window, g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
-                            algebra::batch_to_special<typename CurveType::g1_type>(H_query);
+                            algebra::batch_to_special<g1_type>(H_query);
 #endif
 
-                            typename std::vector<typename CurveType::g1_type::value_type> K_query =
-                                batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Kt);
+                            typename std::vector<typename g1_type::value_type> K_query =
+                                batch_exp(scalar_field_type::value_bits, g1_window, g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
-                            algebra::batch_to_special<typename CurveType::g1_type>(K_query);
+                            algebra::batch_to_special<g1_type>(K_query);
 #endif
 
-                            typename CurveType::g2_type::value_type alphaA_g2 =
-                                alphaA * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g1_type::value_type alphaB_g1 =
-                                alphaB * typename CurveType::g1_type::value_type::one();
-                            typename CurveType::g2_type::value_type alphaC_g2 =
-                                alphaC * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g2_type::value_type gamma_g2 =
-                                gamma * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g1_type::value_type gamma_beta_g1 =
-                                (gamma * beta) * typename CurveType::g1_type::value_type::one();
-                            typename CurveType::g2_type::value_type gamma_beta_g2 =
-                                (gamma * beta) * typename CurveType::g2_type::value_type::one();
-                            typename CurveType::g2_type::value_type rC_Z_g2 =
-                                (rC * qap_inst.Zt) * typename CurveType::g2_type::value_type::one();
+                            typename g2_type::value_type alphaA_g2 =
+                                alphaA * g2_type::value_type::one();
+                            typename g1_type::value_type alphaB_g1 =
+                                alphaB * g1_type::value_type::one();
+                            typename g2_type::value_type alphaC_g2 =
+                                alphaC * g2_type::value_type::one();
+                            typename g2_type::value_type gamma_g2 =
+                                gamma * g2_type::value_type::one();
+                            typename g1_type::value_type gamma_beta_g1 =
+                                (gamma * beta) * g1_type::value_type::one();
+                            typename g2_type::value_type gamma_beta_g2 =
+                                (gamma * beta) * g2_type::value_type::one();
+                            typename g2_type::value_type rC_Z_g2 =
+                                (rC * qap_inst.Zt) * g2_type::value_type::one();
 
-                            typename CurveType::g1_type::value_type encoded_IC_base =
-                                (rA * IC_coefficients[0]) * typename CurveType::g1_type::value_type::one();
-                            std::vector<typename CurveType::scalar_field_type::value_type> multiplied_IC_coefficients;
-                            multiplied_IC_coefficients.reserve(qap_inst.num_inputs());
-                            for (std::size_t i = 1; i < qap_inst.num_inputs() + 1; ++i) {
+                            typename g1_type::value_type encoded_IC_base =
+                                (rA * IC_coefficients[0]) * g1_type::value_type::one();
+                            std::vector<typename scalar_field_type::value_type> multiplied_IC_coefficients;
+                            multiplied_IC_coefficients.reserve(qap_inst.num_inputs);
+                            for (std::size_t i = 1; i < qap_inst.num_inputs + 1; ++i) {
                                 multiplied_IC_coefficients.emplace_back(rA * IC_coefficients[i]);
                             }
-                            typename std::vector<typename CurveType::g1_type::value_type> encoded_IC_values =
-                                batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
+                            typename std::vector<typename g1_type::value_type> encoded_IC_values =
+                                batch_exp(scalar_field_type::value_bits, g1_window, g1_table,
                                           multiplied_IC_coefficients);
 
-                            accumulation_vector<typename CurveType::g1_type> encoded_IC_query(
+                            accumulation_vector<g1_type> encoded_IC_query(
                                 std::move(encoded_IC_base), std::move(encoded_IC_values));
 
                             verification_key_type vk =
-                                verification_key(alphaA_g2, alphaB_g1, alphaC_g2, gamma_g2, gamma_beta_g1,
+                                verification_key_type(alphaA_g2, alphaB_g1, alphaC_g2, gamma_g2, gamma_beta_g1,
                                                  gamma_beta_g2, rC_Z_g2, encoded_IC_query);
-                            proving_key_type pk = proving_key(std::move(A_query),
+                            proving_key_type pk = proving_key_type(std::move(A_query),
                                                               std::move(B_query),
                                                               std::move(C_query),
                                                               std::move(H_query),
@@ -266,7 +270,7 @@ namespace nil {
                             pk.print_size();
                             vk.print_size();
 
-                            return keypair(std::move(pk), std::move(vk));
+                            return keypair_type(std::move(pk), std::move(vk));
                         }
                     };
                 }    // namespace policies

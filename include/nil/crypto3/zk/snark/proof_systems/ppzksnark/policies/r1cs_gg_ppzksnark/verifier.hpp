@@ -72,6 +72,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark_verifier_process_vk {
                     using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
 
+                    typedef typename CurveType::pairing_policy pairing_policy;
                 public:
                     typedef typename types_policy::constraint_system constraint_system_type;
                     typedef typename types_policy::primary_input primary_input_type;
@@ -86,8 +87,6 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-
-                        typedef typename CurveType::pairing_policy pairing_policy;
 
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.vk_alpha_g1_beta_g2 = verification_key.alpha_g1_beta_g2;
@@ -126,6 +125,13 @@ namespace nil {
                     class r1cs_gg_ppzksnark_online_verifier_weak_input_consistency {
                         using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
 
+                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
+                        typedef typename CurveType::g1_type g1_type;
+                        typedef typename CurveType::gt_type gt_type;
+                        typedef typename pairing_policy::G1_precomp G1_precomp;
+                        typedef typename pairing_policy::G2_precomp G2_precomp;
+                        typedef typename pairing_policy::Fqk_type Fqk_type;
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -141,14 +147,6 @@ namespace nil {
                         static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                    const primary_input_type &primary_input,
                                                    const proof_type &proof) {
-
-                            typedef typename CurveType::pairing_policy pairing_policy;
-                            typedef typename CurveType::scalar_field_type scalar_field_type;
-                            typedef typename CurveType::g1_type g1_type;
-                            typedef typename CurveType::gt_type gt_type;
-                            typedef typename pairing_policy::G1_precomp G1_precomp;
-                            typedef typename pairing_policy::G2_precomp G2_precomp;
-                            typedef typename pairing_policy::Fqk_type Fqk_type;
 
                             assert(processed_verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
@@ -306,6 +304,14 @@ namespace nil {
                     class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
                         using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
 
+                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
+                        typedef typename CurveType::g1_type g1_type;
+                        typedef typename CurveType::gt_type gt_type;
+                        typedef typename pairing_policy::affine_ate_G1_precomp affine_ate_G1_precomp;
+                        typedef typename pairing_policy::affine_ate_G2_precomp affine_ate_G2_precomp;
+                        typedef typename pairing_policy::Fqk_type Fqk_type;
+                        
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -321,14 +327,6 @@ namespace nil {
                         static inline bool process(const verification_key_type &verification_key,
                                                    const primary_input_type &primary_input,
                                                    const proof_type &proof) {
-
-                            typedef typename CurveType::pairing_policy pairing_policy;
-                            typedef typename CurveType::scalar_field_type scalar_field_type;
-                            typedef typename CurveType::g1_type g1_type;
-                            typedef typename CurveType::gt_type gt_type;
-                            typedef typename pairing_policy::affine_ate_G1_precomp affine_ate_G1_precomp;
-                            typedef typename pairing_policy::affine_ate_G2_precomp affine_ate_G2_precomp;
-                            typedef typename pairing_policy::Fqk_type Fqk_type;
 
                             assert(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 

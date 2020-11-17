@@ -102,8 +102,8 @@ namespace nil {
                         using g2_type = typename CurveType::g2_type;
                         using g1_value_type = typename g1_type::value_type;
                         using g2_value_type = typename g2_type::value_type;
-
                         using scalar_field_type = typename CurveType::scalar_field_type;
+                        
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -121,7 +121,7 @@ namespace nil {
                                                            const auxiliary_input_type &auxiliary_input) {
 
 #ifdef DEBUG
-                            assert(pk.constraint_system.is_satisfied(primary_input, auxiliary_input));
+                            assert(proving_key.cs.is_satisfied(primary_input, auxiliary_input));
 #endif
 
                             const typename scalar_field_type::value_type
@@ -131,11 +131,11 @@ namespace nil {
 
                             const qap_witness<scalar_field_type> qap_wit =
                                 r1cs_to_qap<scalar_field_type>::witness_map(
-                                    proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
+                                    proving_key.cs, primary_input, auxiliary_input, d1, d2, d3);
 
 #ifdef DEBUG
                             const libff::Fr<ppT> t = libff::Fr<ppT>::random_element();
-                            qap_instance_evaluation<libff::Fr<ppT> > qap_inst = r1cs_to_qap_instance_map_with_evaluation(pk.constraint_system, t);
+                            qap_instance_evaluation<libff::Fr<ppT> > qap_inst = r1cs_to_qap_instance_map_with_evaluation(pk.cs, t);
                             assert(qap_inst.is_satisfied(qap_wit));
 #endif
 
@@ -219,8 +219,7 @@ namespace nil {
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             proof_type proof =
-                                proof(std::move(g_A), std::move(g_B), std::move(g_C), std::move(g_H), std::move(g_K));
-                            proof.print_size();
+                                proof_type(std::move(g_A), std::move(g_B), std::move(g_C), std::move(g_H), std::move(g_K));
 
                             return proof;
                         }
