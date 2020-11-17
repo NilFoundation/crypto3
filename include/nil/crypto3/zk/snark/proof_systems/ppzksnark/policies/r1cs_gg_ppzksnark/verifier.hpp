@@ -64,43 +64,44 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                /**
+                 * Convert a (non-processed) verification key into a processed verification key.
+                 */
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_verifier_process_vk {
+                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+
+                public:
+                    typedef typename types_policy::constraint_system constraint_system_type;
+                    typedef typename types_policy::primary_input primary_input_type;
+                    typedef typename types_policy::auxiliary_input auxiliary_input_type;
+
+                    typedef typename types_policy::proving_key proving_key_type;
+                    typedef typename types_policy::verification_key verification_key_type;
+                    typedef typename types_policy::processed_verification_key processed_verification_key_type;
+
+                    typedef typename types_policy::keypair keypair_type;
+                    typedef typename types_policy::proof proof_type;
+
+                    static inline processed_verification_key_type
+                        process(const verification_key_type &verification_key) {
+
+                        typedef typename CurveType::pairing_policy pairing_policy;
+
+                        processed_verification_key_type processed_verification_key;
+                        processed_verification_key.vk_alpha_g1_beta_g2 = verification_key.alpha_g1_beta_g2;
+                        processed_verification_key.vk_gamma_g2_precomp =
+                            pairing_policy::precompute_g2(verification_key.gamma_g2);
+                        processed_verification_key.vk_delta_g2_precomp =
+                            pairing_policy::precompute_g2(verification_key.delta_g2);
+                        processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
+
+                        return processed_verification_key;
+                    }
+                };
+                    
                 namespace policies {
-
-                    /**
-                     * Convert a (non-processed) verification key into a processed verification key.
-                     */
-                    template<typename CurveType>
-                    class r1cs_gg_ppzksnark_verifier_process_vk {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
-
-                    public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
-
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
-
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
-
-                        static inline processed_verification_key_type
-                            process(const verification_key_type &verification_key) {
-
-                            typedef typename CurveType::pairing_policy pairing_policy;
-
-                            processed_verification_key_type processed_verification_key;
-                            processed_verification_key.vk_alpha_g1_beta_g2 = verification_key.alpha_g1_beta_g2;
-                            processed_verification_key.vk_gamma_g2_precomp =
-                                pairing_policy::precompute_g2(verification_key.gamma_g2);
-                            processed_verification_key.vk_delta_g2_precomp =
-                                pairing_policy::precompute_g2(verification_key.delta_g2);
-                            processed_verification_key.gamma_ABC_g1 = verification_key.gamma_ABC_g1;
-
-                            return processed_verification_key;
-                        }
-                    };
 
                     /*
                       Below are four variants of verifier algorithm for the R1CS GG-ppzkSNARK.
