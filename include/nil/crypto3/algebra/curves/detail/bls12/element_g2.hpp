@@ -146,6 +146,32 @@ namespace nil {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
+                        bool is_well_formed() const {
+                            if (this->is_zero()) {
+                                return true;
+                            }
+                            else {
+                                /*
+                                  y^2 = x^3 + b
+
+                                  We are using Jacobian coordinates, so equation we need to check is actually
+
+                                  (y/z^3)^2 = (x/z^2)^3 + b
+                                  y^2 / z^6 = x^3 / z^6 + b
+                                  y^2 = x^3 + b z^6
+                                */
+                                underlying_field_value_type X2 = this->X.squared();
+                                underlying_field_value_type Y2 = this->Y.squared();
+                                underlying_field_value_type Z2 = this->Z.squared();
+
+                                underlying_field_value_type X3 = this->X * X2;
+                                underlying_field_value_type Z3 = this->Z * Z2;
+                                underlying_field_value_type Z6 = Z3.squared();
+
+                                return (Y2 == X3 + twist_coeff_b * Z6);
+                            }
+                        }
+                        
                         /*************************  Arithmetic operations  ***********************************/
 
                         element_bls12_g2 operator=(const element_bls12_g2 &other) {
@@ -442,6 +468,32 @@ namespace nil {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
+                        bool is_well_formed() const {
+                            if (this->is_zero()) {
+                                return true;
+                            }
+                            else {
+                                /*
+                                  y^2 = x^3 + b
+
+                                  We are using Jacobian coordinates, so equation we need to check is actually
+
+                                  (y/z^3)^2 = (x/z^2)^3 + b
+                                  y^2 / z^6 = x^3 / z^6 + b
+                                  y^2 = x^3 + b z^6
+                                */
+                                underlying_field_value_type X2 = this->X.squared();
+                                underlying_field_value_type Y2 = this->Y.squared();
+                                underlying_field_value_type Z2 = this->Z.squared();
+
+                                underlying_field_value_type X3 = this->X * X2;
+                                underlying_field_value_type Z3 = this->Z * Z2;
+                                underlying_field_value_type Z6 = Z3.squared();
+
+                                return (Y2 == X3 + twist_coeff_b * Z6);
+                            }
+                        }
+
                         /*************************  Arithmetic operations  ***********************************/
 
                         element_bls12_g2 operator=(const element_bls12_g2 &other) {
@@ -617,9 +669,16 @@ namespace nil {
                             return this->to_affine_coordinates();
                         }
 
+                        /*constexpr static */ const g1_field_type_value b = policy_type::b;
+
+                        /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
+                            g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one());
+
+                        /*constexpr static */ const g2_field_type_value 
+                            twist_coeff_b = b * twist.inversed();
+
                     private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        
 
                         /*constexpr static const underlying_field_value_type zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),

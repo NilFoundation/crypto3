@@ -58,7 +58,7 @@ namespace nil {
 
                         constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                        constexpr static const std::size_t scalar_field_bits = 381;    // actually, 255
+                        constexpr static const std::size_t scalar_field_bits = 381;    // actually, it's 255
                         typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
@@ -81,7 +81,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus = base_field_type::modulus;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const std::size_t scalar_field_bits = 377;    // actually, 253
+                        constexpr static const std::size_t scalar_field_bits = 377;    // actually, it's 253
                         typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
