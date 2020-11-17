@@ -122,11 +122,13 @@ namespace nil {
 
                         for (std::size_t i = 0; i < length; i++) {
                             bn_exponents[i] = non_fixed_precision_number_type(exponents[i].data);
-                            std::size_t bn_exponents_i_msb = boost::multiprecision::msb(bn_exponents[i]);
+                            std::size_t bn_exponents_i_msb = boost::multiprecision::msb(bn_exponents[i]) + 1;
                             num_bits = std::max(num_bits, bn_exponents_i_msb);
                         }
 
                         std::size_t num_groups = (num_bits + c - 1) / c;
+
+
 
                         base_value_type result;
                         bool result_nonzero = false;
