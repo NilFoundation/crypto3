@@ -265,7 +265,7 @@ namespace nil {
                             detail::ordered_exponent<non_fixed_precision_number_type> &a = opt_q[0];
                             detail::ordered_exponent<non_fixed_precision_number_type> &b = (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
 
-                            const std::size_t abits = boost::multiprecision::msb(a.r);
+                            const std::size_t abits = boost::multiprecision::msb(a.r) + 1;
 
                             if (b.r.is_zero()) {
                                 // opt_result = opt_result + (a.r * g[a.idx]);
@@ -273,7 +273,7 @@ namespace nil {
                                 break;
                             }
 
-                            const std::size_t bbits = boost::multiprecision::msb(b.r);
+                            const std::size_t bbits = boost::multiprecision::msb(b.r) + 1;
                             const std::size_t limit = (abits - bbits >= 20 ? 20 : abits - bbits);
 
                             if (bbits < 1ul << limit) {
