@@ -93,8 +93,8 @@ namespace nil {
                             non_fixed_precision_modulus_type;
 
                         assert(boost::multiprecision::msb(
-                                    non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) <=
-                               bits.size());    // `bits` is large enough to represent this packed value
+                                    non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) + 1 
+                            <= bits.size());    // `bits` is large enough to represent this packed value
                         bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                     }
 
