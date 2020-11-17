@@ -187,6 +187,7 @@ namespace nil {
 
                             const typename g1_type::value_type g1_generator =
                                 algebra::random_element<g1_type>();
+
                             const std::size_t g1_scalar_count = non_zero_At + 
                                 non_zero_Bt + qap.num_variables;
                             const std::size_t g1_scalar_size = scalar_field_type::value_bits;
@@ -200,6 +201,7 @@ namespace nil {
 
                             const typename g2_type::value_type G2_gen =
                                 algebra::random_element<g2_type>();
+
                             const std::size_t g2_scalar_count = non_zero_Bt;
                             const std::size_t g2_scalar_size = scalar_field_type::value_bits;
                             std::size_t g2_window_size = algebra::get_exp_window_size<g2_type>(g2_scalar_count);
@@ -241,7 +243,6 @@ namespace nil {
                                                                                g1_table, 
                                                                                qap.Zt * delta_inverse,
                                                                                Ht);
-                            
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(H_query);
 #endif
@@ -252,6 +253,7 @@ namespace nil {
                                                                                  g1_table, 
                                                                                  Lt);
                             
+
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(L_query);
 #endif
@@ -259,9 +261,9 @@ namespace nil {
                             typename gt_type::value_type alpha_g1_beta_g2 =
                                 pairing_policy::reduced_pairing(alpha_g1, beta_g2);
                              typename g2_type::value_type gamma_g2 = gamma * G2_gen;
-                            
+
                             typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
-                            
+
                             typename std::vector<typename g1_type::value_type> gamma_ABC_g1_values 
                                 = algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, 
                                                                                  g1_window_size, 

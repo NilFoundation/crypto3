@@ -318,6 +318,8 @@ namespace nil {
                             domain->divide_by_Z_on_coset(H_tmp);
 
                             domain->iFFT(H_tmp);
+                            
+                            
                             multiply_by_coset(H_tmp, 
                                 typename FieldType::value_type(
                                     fields::arithmetic_params<FieldType>::multiplicative_generator).inversed());

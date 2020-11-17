@@ -122,29 +122,12 @@ namespace nil {
                             assert(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                             assert(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
-
-                            //added temporary for debug
-                            const typename scalar_field_type::value_type t = 
-                                algebra::random_element<scalar_field_type>();
-                            qap_instance_evaluation<scalar_field_type> qap_inst = 
-                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(
-                                    proving_key.cs, t);
-                            assert(qap_inst.is_satisfied(qap_wit));
-                            //delete after debug ended
                             
                             /* Choose two random field elements for prover zero-knowledge. */
                             const typename scalar_field_type::value_type r =
                                 algebra::random_element<scalar_field_type>();
                             const typename scalar_field_type::value_type s =
                                 algebra::random_element<scalar_field_type>();
-                            
-                            //added temporary for debug
-                            assert(qap_wit.coefficients_for_ABCs.size() == qap_wit.num_variables);
-                            assert(proving_key.A_query.size() == qap_wit.num_variables+1);
-                            assert(proving_key.B_query.domain_size() == qap_wit.num_variables+1);
-                            assert(proving_key.H_query.size() == qap_wit.degree - 1);
-                            assert(proving_key.L_query.size() == qap_wit.num_variables - qap_wit.num_inputs);
-                            //delete after debug ended
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
                                                                                  // var or call omp_set_num_threads()
@@ -159,7 +142,7 @@ namespace nil {
                                                            qap_wit.coefficients_for_ABCs.begin(),
                                                            qap_wit.coefficients_for_ABCs.end());
 
-                            
+
                             typename g1_type::value_type evaluation_At 
                                 = algebra::multiexp_with_mixed_addition<g1_type,
                                                                       scalar_field_type,
@@ -227,10 +210,6 @@ namespace nil {
                             proof_type proof = proof_type(std::move(g1_A), 
                                                           std::move(g2_B), 
                                                           std::move(g1_C));
-
-                            if (!proof.is_well_formed()) {
-                                std::cout << "!proof.is_well_formed" << std::endl;
-                            }
 
                             return proof;
                         }
