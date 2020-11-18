@@ -247,7 +247,14 @@ namespace nil {
                         }
 
                         element_fp2 squared() const {
-                            return (*this) * (*this);    // maybe can be done more effective
+                            // return (*this) * (*this);    // maybe can be done more effective
+
+                            /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Complex squaring) */
+                            const underlying_type &A = data[0], &B = data[1];
+                            const underlying_type AB = A * B;
+
+                            return element_fp2((A + B) * (A + non_residue * B) - AB - non_residue * AB,
+                                               AB + AB);
                         }
 
                         bool is_square() const {

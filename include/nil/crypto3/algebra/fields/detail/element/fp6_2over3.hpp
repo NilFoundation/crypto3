@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 
+#include <boost/multiprecision/wnaf.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -178,68 +180,69 @@ namespace nil {
                             return element_fp6_2over3(data[0], -data[1]);
                         }
 
-                        /*element_fp6_2over3 cyclotomic_squared() const {
+                        element_fp6_2over3 cyclotomic_squared() const {
+                            using e_fp = typename underlying_type::underlying_type;
+                            using e_fp2 = std::array<e_fp, 2>;
 
-                            //my_Fp a_a = c0.data[0]; // a = Fp2([c0[0],c1[1]])
-                            //my_Fp a_b = c1.data[1];
+                            auto fp2_squared = [&](const e_fp &A, const e_fp &B){
+                                /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Complex squaring) */
+                                const e_fp AB = A * B;
 
-                            element_fp2 b = element_fp2(c1.data[0], c0.data[2]);
-                            //my_Fp b_a = c1.data[0]; // b = Fp2([c1[0],c0[2]])
-                            //my_Fp b_b = c0.data[2];
+                                return e_fp2{(A + B) * (A + non_residue * B) - AB - non_residue * AB,
+                                             AB + AB};
+                            };
 
-                            element_fp2 c = element_fp2(c0.data[1], c1.data[2]);
-                            //my_Fp c_a = c0.data[1]; // c = Fp2([c0[1],c1[2]])
-                            //my_Fp c_b = c1.data[2];
-
-                            element_fp2 asq = a.squared();
-                            element_fp2 bsq = b.squared();
-                            element_fp2 csq = c.squared();
+                            // e_fp2 a(data[0].data[0], data[1].data[1]);
+                            // e_fp2 b(data[1].data[0], data[0].data[2]);
+                            // e_fp2 c(data[0].data[1], data[1].data[2]);
+                            //
+                            // e_fp2 asq = a.squared();
+                            // e_fp2 bsq = b.squared();
+                            // e_fp2 csq = c.squared();
+                            e_fp2 asq = fp2_squared(data[0].data[0], data[1].data[1]);
+                            e_fp2 bsq = fp2_squared(data[1].data[0], data[0].data[2]);
+                            e_fp2 csq = fp2_squared(data[0].data[1], data[1].data[2]);
 
                             // A = vector(3*a^2 - 2*Fp2([vector(a)[0],-vector(a)[1]]))
                             //my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
-                            my_Fp A_a = asq.data[0] - a.data[0];
-                            A_a = A_a + A_a + asq.data[0];
+                            e_fp A_a = asq[0] - data[0].data[0];
+                            A_a = A_a + A_a + asq[0];
                             //my_Fp A_b = my_Fp(3l) * asq_b + my_Fp(2l) * a_b;
-                            my_Fp A_b = asq.data[1] + a.data[1];
-                            A_b = A_b + A_b + asq.data[1];
+                            e_fp A_b = asq[1] + data[1].data[1];
+                            A_b = A_b + A_b + asq[1];
 
                             // B = vector(3*Fp2([non_residue*c2[1],c2[0]]) + 2*Fp2([vector(b)[0],-vector(b)[1]]))
                             //my_Fp B_a = my_Fp(3l) * underlying_type::non_residue * csq_b + my_Fp(2l) * b_a;
-                            my_Fp B_tmp = underlying_type::non_residue * csq.data[1];
-                            my_Fp B_a = B_tmp + b.data[0];
+                            e_fp B_tmp = non_residue * csq[1];
+                            e_fp B_a = B_tmp + data[1].data[0];
                             B_a = B_a + B_a + B_tmp;
 
                             //my_Fp B_b = my_Fp(3l) * csq_a - my_Fp(2l) * b_b;
-                            my_Fp B_b = csq.data[0] - b.data[1];
-                            B_b = B_b + B_b + csq.data[0];
+                            e_fp B_b = csq[0] - data[0].data[2];
+                            B_b = B_b + B_b + csq[0];
 
                             // C = vector(3*b^2 - 2*Fp2([vector(c)[0],-vector(c)[1]]))
                             //my_Fp C_a = my_Fp(3l) * bsq_a - my_Fp(2l) * c_a;
-                            my_Fp C_a = bsq.data[0] - c.data[0];
-                            C_a = C_a + C_a + bsq.data[0];
+                            e_fp C_a = bsq[0] - data[0].data[1];
+                            C_a = C_a + C_a + bsq[0];
                             // my_Fp C_b = my_Fp(3l) * bsq_b + my_Fp(2l) * c_b;
-                            my_Fp C_b = bsq.data[1] + c.data[1];
-                            C_b = C_b + C_b + bsq.data[1];
-
-                            // e0 = Fp3([A[0],C[0],B[1]])
-                            // e1 = Fp3([B[0],A[1],C[1]])
-                            // fin = Fp6e([e0,e1])
-                            // return fin
+                            e_fp C_b = bsq[1] + data[1].data[2];
+                            C_b = C_b + C_b + bsq[1];
 
                             return element_fp6_2over3(underlying_type(A_a, C_a, B_b),
-                                                                underlying_type(B_a, A_b, C_b));
-                        }*/
+                                                      underlying_type(B_a, A_b, C_b));
+                        }
 
                         template<typename PowerType>
                         element_fp6_2over3 cyclotomic_exp(const PowerType &exponent) const {
                             // naive implementation
-                            return this->squared();
+                            // return this->squared();
 
-                            /*element_fp6_2over3 res = one();
+                            element_fp6_2over3 res = one();
                             element_fp6_2over3 this_inverse = this->unitary_inversed();
 
                             bool found_nonzero = false;
-                            std::vector<long> NAF = find_wnaf(1, exponent);
+                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, exponent);
 
                             for (long i = static_cast<long>(NAF.size() - 1); i >= 0; --i) {
                                 if (found_nonzero) {
@@ -258,7 +261,7 @@ namespace nil {
                                 }
                             }
 
-                            return res;*/
+                            return res;
                         }
 
                         /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
