@@ -171,9 +171,9 @@ namespace nil {
                         this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
                             blueprint_coeff_sum<FieldType>(input_block.bits,
-                                                    std::vector<typename FieldType::value_type>(
-                                                        knapsack_coefficients.begin() + input_len * i,
-                                                        knapsack_coefficients.begin() + input_len * (i + 1))),
+                                                           std::vector<typename FieldType::value_type>(
+                                                               knapsack_coefficients.begin() + input_len * i,
+                                                               knapsack_coefficients.begin() + input_len * (i + 1))),
                             output[i]));
                     }
                 }

@@ -124,8 +124,8 @@ namespace nil {
 
                             round_functions.push_back(sha256_round_function_component<FieldType>(
                                 bp, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i], round_g[i],
-                                round_h[i], packed_W[i], block::detail::shacal2_policy<256>::constants[i], round_a[i + 1],
-                                round_e[i + 1]));
+                                round_h[i], packed_W[i], block::detail::shacal2_policy<256>::constants[i],
+                                round_a[i + 1], round_e[i + 1]));
                         }
 
                         /* finalize */
@@ -172,12 +172,10 @@ namespace nil {
                         }
 
                         for (std::size_t i = 0; i < 4; ++i) {
-                            this->bp.val(unreduced_output[i]) = 
-                                this->bp.val(round_functions[3 - i].packed_d) +
-                                this->bp.val(round_functions[63 - i].packed_new_a);
-                            this->bp.val(unreduced_output[4 + i]) = 
-                                this->bp.val(round_functions[3 - i].packed_h) +
-                                this->bp.val(round_functions[63 - i].packed_new_e);
+                            this->bp.val(unreduced_output[i]) = this->bp.val(round_functions[3 - i].packed_d) +
+                                                                this->bp.val(round_functions[63 - i].packed_new_a);
+                            this->bp.val(unreduced_output[4 + i]) = this->bp.val(round_functions[3 - i].packed_h) +
+                                                                    this->bp.val(round_functions[63 - i].packed_new_e);
                         }
 
                         for (std::size_t i = 0; i < 8; ++i) {
@@ -205,7 +203,7 @@ namespace nil {
                                                      const digest_variable<FieldType> &left,
                                                      const digest_variable<FieldType> &right,
                                                      const digest_variable<FieldType> &output) :
-                                                     component<FieldType>(bp) {
+                        component<FieldType>(bp) {
 
                         /* concatenate block = left || right */
                         blueprint_variable_vector<FieldType> block;
@@ -213,40 +211,38 @@ namespace nil {
                         block.insert(block.end(), right.bits.begin(), right.bits.end());
 
                         /* compute the hash itself */
-                        f.reset(new sha256_compression_function_component<FieldType>(bp, 
-                                                                                     SHA256_default_IV<FieldType>(bp),
-                                                                                     block, output));
+                        f.reset(new sha256_compression_function_component<FieldType>(
+                            bp, SHA256_default_IV<FieldType>(bp), block, output));
                     }
                     sha256_two_to_one_hash_component(blueprint<FieldType> &bp,
                                                      std::size_t block_length,
                                                      const block_variable<FieldType> &input_block,
                                                      const digest_variable<FieldType> &output) :
-                                                     component<FieldType>(bp) {
+                        component<FieldType>(bp) {
 
                         assert(block_length == hashes::sha2<256>::block_bits);
                         assert(input_block.bits.size() == block_length);
-                        f.reset(new sha256_compression_function_component<FieldType>(bp, 
-                                                                                     SHA256_default_IV<FieldType>(bp),
-                                                                                     input_block.bits, output));
+                        f.reset(new sha256_compression_function_component<FieldType>(
+                            bp, SHA256_default_IV<FieldType>(bp), input_block.bits, output));
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = true){    // TODO: ignored for now
+                    void generate_r1cs_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
                         f->generate_r1cs_constraints();
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         f->generate_r1cs_witness();
                     }
 
-                    static std::size_t get_block_len(){
+                    static std::size_t get_block_len() {
                         return hashes::sha2<256>::block_bits;
                     }
 
-                    static std::size_t get_digest_len(){
+                    static std::size_t get_digest_len() {
                         return hashes::sha2<256>::digest_bits;
                     }
 
-                    static std::vector<bool> get_hash(const std::vector<bool> &input){
+                    static std::vector<bool> get_hash(const std::vector<bool> &input) {
                         blueprint<FieldType> bp;
 
                         block_variable<FieldType> input_variable(bp, hashes::sha2<256>::block_bits);
@@ -261,8 +257,8 @@ namespace nil {
                     }
 
                     static std::size_t
-                        expected_constraints(bool ensure_output_bitness = true){    // TODO: ignored for now
-                        return 27280; /* hardcoded for now */
+                        expected_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
+                        return 27280;                                                /* hardcoded for now */
                     }
                 };
 

@@ -59,18 +59,17 @@ namespace nil {
                     blueprint_variable_vector<FieldType> packed_W;
                     sha256_message_schedule_component(blueprint<FieldType> &bp,
                                                       const blueprint_variable_vector<FieldType> &M,
-                                                      const blueprint_variable_vector<FieldType> &packed_W):
-                                                      component<FieldType>(bp), M(M), packed_W(packed_W) {
+                                                      const blueprint_variable_vector<FieldType> &packed_W) :
+                        component<FieldType>(bp),
+                        M(M), packed_W(packed_W) {
 
                         W_bits.resize(64);
 
                         pack_W.resize(16);
                         for (std::size_t i = 0; i < 16; ++i) {
-                            W_bits[i] =
-                                blueprint_variable_vector<FieldType>(M.rbegin() + 
-                                                                     (15 - i) * hashes::sha2<256>::word_bits,
-                                                                     M.rbegin() + 
-                                                                     (16 - i) * hashes::sha2<256>::word_bits);
+                            W_bits[i] = blueprint_variable_vector<FieldType>(
+                                M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits,
+                                M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
 
                             pack_W[i].reset(new packing_component<FieldType>(bp, W_bits[i], packed_W[i]));
                         }
@@ -90,13 +89,12 @@ namespace nil {
 
                             /* compute sigma0/sigma1 */
                             compute_sigma0[i].reset(
-                                new small_sigma_component<FieldType>(bp, W_bits[i - 15], 
-                                                                     sigma0[i], 7, 18, 3));
+                                new small_sigma_component<FieldType>(bp, W_bits[i - 15], sigma0[i], 7, 18, 3));
                             compute_sigma1[i].reset(
-                                new small_sigma_component<FieldType>(bp, W_bits[i - 2], 
-                                                                     sigma1[i], 17, 19, 10));
+                                new small_sigma_component<FieldType>(bp, W_bits[i - 2], sigma1[i], 17, 19, 10));
 
-                            /* unreduced_W = sigma0(W_{i-15}) + sigma1(W_{i-2}) + W_{i-7} + W_{i-16} before modulo 2^32 */
+                            /* unreduced_W = sigma0(W_{i-15}) + sigma1(W_{i-2}) + W_{i-7} + W_{i-16} before modulo 2^32
+                             */
                             unreduced_W[i].allocate(bp);
 
                             /* allocate the bit representation of packed_W[i] */
@@ -104,14 +102,14 @@ namespace nil {
 
                             /* and finally reduce this into packed and bit representations */
                             mod_reduce_W[i].reset(new lastbits_component<FieldType>(
-                                bp, unreduced_W[i], hashes::sha2<256>::word_bits + 2, 
-                                packed_W[i], W_bits[i]));
+                                bp, unreduced_W[i], hashes::sha2<256>::word_bits + 2, packed_W[i], W_bits[i]));
                         }
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < 16; ++i) {
-                            pack_W[i]->generate_r1cs_constraints(false);    // do not enforce bitness here; caller be aware.
+                            pack_W[i]->generate_r1cs_constraints(
+                                false);    // do not enforce bitness here; caller be aware.
                         }
 
                         for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
@@ -119,15 +117,13 @@ namespace nil {
                             compute_sigma1[i]->generate_r1cs_constraints();
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                1, sigma0[i] + sigma1[i] + 
-                                packed_W[i - 16] + packed_W[i - 7], 
-                                unreduced_W[i]));
+                                1, sigma0[i] + sigma1[i] + packed_W[i - 16] + packed_W[i - 7], unreduced_W[i]));
 
                             mod_reduce_W[i]->generate_r1cs_constraints();
                         }
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         for (std::size_t i = 0; i < 16; ++i) {
                             pack_W[i]->generate_r1cs_witness_from_bits();
                         }
@@ -136,10 +132,8 @@ namespace nil {
                             compute_sigma0[i]->generate_r1cs_witness();
                             compute_sigma1[i]->generate_r1cs_witness();
 
-
-                            this->bp.val(unreduced_W[i]) = this->bp.val(sigma0[i]) + 
-                                                           this->bp.val(sigma1[i]) +
-                                                           this->bp.val(packed_W[i - 16]) + 
+                            this->bp.val(unreduced_W[i]) = this->bp.val(sigma0[i]) + this->bp.val(sigma1[i]) +
+                                                           this->bp.val(packed_W[i - 16]) +
                                                            this->bp.val(packed_W[i - 7]);
 
                             mod_reduce_W[i]->generate_r1cs_witness();
@@ -196,9 +190,8 @@ namespace nil {
                                                     const long &K,
                                                     const blueprint_linear_combination_vector<FieldType> &new_a,
                                                     const blueprint_linear_combination_vector<FieldType> &new_e) :
-                                                    component<FieldType>(bp),
-                                                    a(a), b(b), c(c), d(d), e(e), f(f), 
-                                                    g(g), h(h), W(W), K(K), new_a(new_a), new_e(new_e) {
+                        component<FieldType>(bp),
+                        a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h), W(W), K(K), new_a(new_a), new_e(new_e) {
 
                         /* compute sigma0 and sigma1 */
                         sigma0.allocate(bp);
@@ -235,7 +228,7 @@ namespace nil {
                             bp, unreduced_new_e, hashes::sha2<256>::word_bits + 3, packed_new_e, new_e));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         compute_sigma0->generate_r1cs_constraints();
                         compute_sigma1->generate_r1cs_constraints();
 
@@ -248,16 +241,14 @@ namespace nil {
                         this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1, packed_h + sigma1 + choice + K + W + sigma0 + majority, unreduced_new_a));
 
-                        this->bp.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(1, 
-                                                       packed_d + packed_h + sigma1 + choice + K + W, 
-                                                       unreduced_new_e));
+                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                            1, packed_d + packed_h + sigma1 + choice + K + W, unreduced_new_e));
 
                         mod_reduce_new_a->generate_r1cs_constraints();
                         mod_reduce_new_e->generate_r1cs_constraints();
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         compute_sigma0->generate_r1cs_witness();
                         compute_sigma1->generate_r1cs_witness();
 
@@ -267,10 +258,8 @@ namespace nil {
                         pack_h->generate_r1cs_witness_from_bits();
 
                         this->bp.val(unreduced_new_a) = this->bp.val(packed_h) + this->bp.val(sigma1) +
-                                                        this->bp.val(choice) + 
-                                                        typename FieldType::value_type(K) +
-                                                        this->bp.val(W) + this->bp.val(sigma0) + 
-                                                        this->bp.val(majority);
+                                                        this->bp.val(choice) + typename FieldType::value_type(K) +
+                                                        this->bp.val(W) + this->bp.val(sigma0) + this->bp.val(majority);
                         this->bp.val(unreduced_new_e) = this->bp.val(packed_d) + this->bp.val(packed_h) +
                                                         this->bp.val(sigma1) + this->bp.val(choice) +
                                                         typename FieldType::value_type(K) + this->bp.val(W);
@@ -291,8 +280,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < hashes::sha2<256>::digest_bits; ++i) {
                         int iv_val =
-                            iv[i / hashes::sha2<256>::word_bits] >> 
-                                (31 - (i % hashes::sha2<256>::word_bits)) & 1;
+                            iv[i / hashes::sha2<256>::word_bits] >> (31 - (i % hashes::sha2<256>::word_bits)) & 1;
 
                         blueprint_linear_combination<FieldType> iv_element;
                         iv_element.assign(bp, iv_val * blueprint_variable<FieldType>(0));

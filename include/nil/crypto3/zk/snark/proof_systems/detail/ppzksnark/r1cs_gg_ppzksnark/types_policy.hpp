@@ -100,8 +100,8 @@ namespace nil {
 
                             typename std::vector<typename CurveType::g1_type::value_type>
                                 A_query;    // this could be a sparse vector if we had multiexp for those
-                            knowledge_commitment_vector<typename CurveType::g2_type, 
-                                                        typename CurveType::g1_type> B_query;
+                            knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type>
+                                B_query;
                             typename std::vector<typename CurveType::g1_type::value_type> H_query;
                             typename std::vector<typename CurveType::g1_type::value_type> L_query;
 
@@ -311,9 +311,7 @@ namespace nil {
                             }
 
                             bool is_well_formed() const {
-                                return (g_A.is_well_formed() 
-                                     && g_B.is_well_formed() 
-                                     && g_C.is_well_formed());
+                                return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
                             }
 
                             bool operator==(const proof &other) const {

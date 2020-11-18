@@ -101,8 +101,8 @@ namespace nil {
                             using g2_type = typename CurveType::g2_type;
                             using g1_value_type = typename g1_type::value_type;
                             using g2_value_type = typename g2_type::value_type;
-                        public:
 
+                        public:
                             knowledge_commitment_vector<g1_type, g1_type> A_query;
                             knowledge_commitment_vector<g2_type, g1_type> B_query;
                             knowledge_commitment_vector<g1_type, g1_type> C_query;
@@ -115,13 +115,12 @@ namespace nil {
                             proving_key &operator=(const proving_key &other) = default;
                             proving_key(const proving_key &other) = default;
                             proving_key(proving_key &&other) = default;
-                            proving_key(
-                                knowledge_commitment_vector<g1_type, g1_type> &&A_query,
-                                knowledge_commitment_vector<g2_type, g1_type> &&B_query,
-                                knowledge_commitment_vector<g1_type, g1_type> &&C_query,
-                                typename std::vector<g1_value_type> &&H_query,
-                                typename std::vector<g1_value_type> &&K_query,
-                                constraint_system &&cs) :
+                            proving_key(knowledge_commitment_vector<g1_type, g1_type> &&A_query,
+                                        knowledge_commitment_vector<g2_type, g1_type> &&B_query,
+                                        knowledge_commitment_vector<g1_type, g1_type> &&C_query,
+                                        typename std::vector<g1_value_type> &&H_query,
+                                        typename std::vector<g1_value_type> &&K_query,
+                                        constraint_system &&cs) :
                                 A_query(std::move(A_query)),
                                 B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
                                 K_query(std::move(K_query)), cs(std::move(cs)) {};
@@ -153,8 +152,7 @@ namespace nil {
                             bool operator==(const proving_key &other) const {
                                 return (this->A_query == other.A_query && this->B_query == other.B_query &&
                                         this->C_query == other.C_query && this->H_query == other.H_query &&
-                                        this->K_query == other.K_query &&
-                                        this->cs == other.cs);
+                                        this->K_query == other.K_query && this->cs == other.cs);
                             }
                         };
 
@@ -306,8 +304,8 @@ namespace nil {
                             using g2_type = typename CurveType::g2_type;
                             using g1_value_type = typename g1_type::value_type;
                             using g2_value_type = typename g2_type::value_type;
-                        public:
 
+                        public:
                             typename knowledge_commitment<g1_type, g1_type>::value_type g_A;
                             typename knowledge_commitment<g2_type, g1_type>::value_type g_B;
                             typename knowledge_commitment<g1_type, g1_type>::value_type g_C;

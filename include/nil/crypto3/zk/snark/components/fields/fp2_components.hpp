@@ -209,8 +209,7 @@ namespace nil {
                         this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(
                             A.c0 + A.c1,
                             B.c0 + B.c1,
-                            result.c1 + result.c0 + 
-                            v1 * (field_type::value_type::one() - Fp2T::non_residue)));
+                            result.c1 + result.c0 + v1 * (field_type::value_type::one() - Fp2T::non_residue)));
                     }
 
                     void generate_r1cs_witness() {
@@ -294,9 +293,8 @@ namespace nil {
                         this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(
                             A.c0 + A.c1,
                             A.c0 + Fp2T::non_residue * A.c1,
-                            result.c0 + 
-                            result.c1 * (field_type::value_type::one() + Fp2T::non_residue) *
-                                field_type::value_type(0x02).inversed()));
+                            result.c0 + result.c1 * (field_type::value_type::one() + Fp2T::non_residue) *
+                                            field_type::value_type(0x02).inversed()));
                     }
 
                     void generate_r1cs_witness() {

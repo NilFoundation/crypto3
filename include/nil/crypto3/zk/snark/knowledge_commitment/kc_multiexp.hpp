@@ -49,8 +49,9 @@ namespace nil {
                     opt_window_wnaf_exp(const typename knowledge_commitment<T1, T2>::value_type &base,
                                         const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
                                         const std::size_t scalar_bits) {
-                    return typename knowledge_commitment<T1, T2>::value_type(opt_window_wnaf_exp(base.g, scalar, scalar_bits),
-                                                        opt_window_wnaf_exp(base.h, scalar, scalar_bits));
+                    return typename knowledge_commitment<T1, T2>::value_type(
+                        opt_window_wnaf_exp(base.g, scalar, scalar_bits),
+                        opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
                 template<typename T1, typename T2, typename FieldType, typename MultiexpMethod>
@@ -76,7 +77,7 @@ namespace nil {
                     std::vector<typename FieldType::value_type> p;
                     std::vector<typename knowledge_commitment<T1, T2>::value_type> g;
 
-                    typename knowledge_commitment<T1, T2>::value_type acc = 
+                    typename knowledge_commitment<T1, T2>::value_type acc =
                         knowledge_commitment<T1, T2>::value_type::zero();
 
                     while (index_it != vec.indices.end() && *index_it < max_idx) {
@@ -125,18 +126,12 @@ namespace nil {
 
                     res.values.reserve(expected_size);
                     res.indices.reserve(expected_size);
-                    
+
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
                             res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(
-                                windowed_exp<T1, FieldType>(scalar_size, 
-                                                            T1_window, 
-                                                            T1_table, 
-                                                            T1_coeff * v[pos]),
-                                windowed_exp<T2, FieldType>(scalar_size, 
-                                                            T2_window, 
-                                                            T2_table, 
-                                                            T2_coeff * v[pos])));
+                                windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
+                                windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
                             res.indices.emplace_back(pos);
                         }
                     }
@@ -162,9 +157,7 @@ namespace nil {
                         nonzero += (v[i].is_zero() ? 0 : 1);
                     }
 
-                    const std::size_t num_chunks = std::max((std::size_t)1, 
-                                                            std::min(nonzero, 
-                                                                     suggested_num_chunks));
+                    const std::size_t num_chunks = std::max((std::size_t)1, std::min(nonzero, suggested_num_chunks));
 
                     std::vector<knowledge_commitment_vector<T1, T2>> tmp(num_chunks);
                     std::vector<std::size_t> chunk_pos(num_chunks + 1);
@@ -193,8 +186,7 @@ namespace nil {
 #endif
                     for (std::size_t i = 0; i < num_chunks; ++i) {
                         tmp[i] = kc_batch_exp_internal<T1, T2, FieldType>(
-                            scalar_size, T1_window, T2_window, T1_table, 
-                            T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
+                            scalar_size, T1_window, T2_window, T1_table, T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
                             chunk_pos[i + 1], i == num_chunks - 1 ? last_chunk : chunk_size);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename knowledge_commitment<T1, T2>::value_type>(tmp[i].values);
@@ -206,12 +198,8 @@ namespace nil {
                         return tmp[0];
                     } else {
                         for (std::size_t i = 0; i < num_chunks; ++i) {
-                            res.values.insert(res.values.end(), 
-                                              tmp[i].values.begin(), 
-                                              tmp[i].values.end());
-                            res.indices.insert(res.indices.end(), 
-                                               tmp[i].indices.begin(), 
-                                               tmp[i].indices.end());
+                            res.values.insert(res.values.end(), tmp[i].values.begin(), tmp[i].values.end());
+                            res.indices.insert(res.indices.end(), tmp[i].indices.begin(), tmp[i].indices.end());
                         }
                         return res;
                     }

@@ -43,6 +43,7 @@ namespace nil {
                 template<typename Type>
                 class accumulation_vector {
                     using underlying_value_type = typename Type::value_type;
+
                 public:
                     underlying_value_type first;
                     sparse_vector<Type> rest;
@@ -50,20 +51,16 @@ namespace nil {
                     accumulation_vector() = default;
                     accumulation_vector(const accumulation_vector<Type> &other) = default;
                     accumulation_vector(accumulation_vector<Type> &&other) = default;
-                    accumulation_vector(underlying_value_type &&first, 
-                                        sparse_vector<Type> &&rest) :
+                    accumulation_vector(underlying_value_type &&first, sparse_vector<Type> &&rest) :
                         first(std::move(first)), rest(std::move(rest)) {};
-                    accumulation_vector(underlying_value_type &&first, 
-                                        std::vector<underlying_value_type> &&v) : 
-                                        first(std::move(first)), rest(std::move(v)) {}
-                    accumulation_vector(std::vector<underlying_value_type> &&v) : 
-                                        first(underlying_value_type::zero()), 
-                                        rest(std::move(v)) {};
+                    accumulation_vector(underlying_value_type &&first, std::vector<underlying_value_type> &&v) :
+                        first(std::move(first)), rest(std::move(v)) {
+                    }
+                    accumulation_vector(std::vector<underlying_value_type> &&v) :
+                        first(underlying_value_type::zero()), rest(std::move(v)) {};
 
-                    accumulation_vector<Type> &
-                        operator=(const accumulation_vector<Type> &other) = default;
-                    accumulation_vector<Type> &
-                        operator=(accumulation_vector<Type> &&other) = default;
+                    accumulation_vector<Type> &operator=(const accumulation_vector<Type> &other) = default;
+                    accumulation_vector<Type> &operator=(accumulation_vector<Type> &&other) = default;
 
                     bool operator==(const accumulation_vector<Type> &other) const {
                         return (this->first == other.first && this->rest == other.rest);
@@ -89,17 +86,14 @@ namespace nil {
 
                     template<typename BaseInputType>
                     accumulation_vector<Type> accumulate_chunk(
-                            const typename std::vector<typename BaseInputType::value_type>::
-                                const_iterator & it_begin, 
-                            const typename std::vector<typename BaseInputType::value_type>::
-                                const_iterator & it_end,
-                            std::size_t offset) const {
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator &it_begin,
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator &it_end,
+                        std::size_t offset) const {
 
                         std::pair<underlying_value_type, sparse_vector<Type>> acc_result =
                             rest.template accumulate<BaseInputType>(it_begin, it_end, offset);
                         underlying_value_type new_first = first + acc_result.first;
-                        return accumulation_vector<Type>(std::move(new_first), 
-                                                         std::move(acc_result.second));
+                        return accumulation_vector<Type>(std::move(new_first), std::move(acc_result.second));
                     }
                 };
 

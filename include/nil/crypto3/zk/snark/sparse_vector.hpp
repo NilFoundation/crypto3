@@ -47,8 +47,8 @@ namespace nil {
                 template<typename Type>
                 class sparse_vector {
                     using underlying_value_type = typename Type::value_type;
-                public:
 
+                public:
                     std::vector<std::size_t> indices;
                     std::vector<underlying_value_type> values;
                     std::size_t domain_size_;
@@ -56,7 +56,8 @@ namespace nil {
                     sparse_vector() = default;
                     sparse_vector(const sparse_vector<Type> &other) = default;
                     sparse_vector(sparse_vector<Type> &&other) = default;
-                    sparse_vector(std::vector<underlying_value_type> &&v) : values(std::move(v)), domain_size_(values.size()) {
+                    sparse_vector(std::vector<underlying_value_type> &&v) :
+                        values(std::move(v)), domain_size_(values.size()) {
                         indices.resize(domain_size_);
                         std::iota(indices.begin(), indices.end(), 0);
                     }
@@ -66,9 +67,8 @@ namespace nil {
 
                     underlying_value_type operator[](const std::size_t idx) const {
                         auto it = std::lower_bound(indices.begin(), indices.end(), idx);
-                        return (it != indices.end() && *it == idx) ? 
-                               values[it - indices.begin()] : 
-                               underlying_value_type();
+                        return (it != indices.end() && *it == idx) ? values[it - indices.begin()] :
+                                                                     underlying_value_type();
                     }
 
                     bool operator==(const sparse_vector<Type> &other) const {
@@ -174,13 +174,10 @@ namespace nil {
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
                     template<typename BaseInputType>
-                    std::pair<underlying_value_type, sparse_vector<Type>> 
-                        accumulate(
-                            const typename std::vector<typename BaseInputType::value_type>::
-                                const_iterator it_begin, 
-                            const typename std::vector<typename BaseInputType::value_type>::
-                                const_iterator it_end,
-                            std::size_t offset) const {
+                    std::pair<underlying_value_type, sparse_vector<Type>> accumulate(
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_begin,
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_end,
+                        std::size_t offset) const {
 #ifdef MULTICORE
                         const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
                                                                              // or call omp_set_num_threads()
@@ -218,12 +215,10 @@ namespace nil {
                                         accumulated_value +
                                         algebra::multiexp<
                                             Type, BaseInputType,
-                                            algebra::policies::multiexp_method_bos_coster<
-                                            Type, BaseInputType>>(
+                                            algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
                                             it_begin + (indices[first_pos] - offset),
                                             it_begin + (indices[last_pos] - offset) + 1, chunks);
-                                
                                 }
                             } else {
                                 if (matching_pos) {
@@ -246,16 +241,13 @@ namespace nil {
                         if (in_block) {
                             accumulated_value =
                                 accumulated_value +
-                                algebra::multiexp<
-                                    Type, BaseInputType,
-                                    algebra::policies::multiexp_method_bos_coster<
-                                    Type, BaseInputType>>(
+                                algebra::multiexp<Type, BaseInputType,
+                                                  algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
                                     chunks);
-                            
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);

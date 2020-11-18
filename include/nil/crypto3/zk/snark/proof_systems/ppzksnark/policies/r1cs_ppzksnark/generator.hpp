@@ -184,10 +184,8 @@ namespace nil {
                                                              non_zero_Bt + non_zero_Ht + Kt.size();
                             const std::size_t g2_exp_count = non_zero_Bt;
 
-                            std::size_t g1_window =
-                                algebra::get_exp_window_size<g1_type>(g1_exp_count);
-                            std::size_t g2_window =
-                                algebra::get_exp_window_size<g2_type>(g2_exp_count);
+                            std::size_t g1_window = algebra::get_exp_window_size<g1_type>(g1_exp_count);
+                            std::size_t g2_window = algebra::get_exp_window_size<g2_type>(g2_exp_count);
 
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -196,25 +194,23 @@ namespace nil {
                             const std::size_t chunks = 1;
 #endif
 
-                            algebra::window_table<g1_type> g1_table =
-                                get_window_table<g1_type>(scalar_field_type::value_bits, g1_window,
-                                                 g1_type::value_type::one());
+                            algebra::window_table<g1_type> g1_table = get_window_table<g1_type>(
+                                scalar_field_type::value_bits, g1_window, g1_type::value_type::one());
 
-                            algebra::window_table<g2_type> g2_table =
-                                get_window_table<g2_type>(scalar_field_type::value_bits, g2_window,
-                                                 g2_type::value_type::one());
+                            algebra::window_table<g2_type> g2_table = get_window_table<g2_type>(
+                                scalar_field_type::value_bits, g2_window, g2_type::value_type::one());
 
-                            knowledge_commitment_vector<g1_type, g1_type>
-                                A_query = kc_batch_exp<g1_type>(scalar_field_type::value_bits, g1_window,
-                                                       g1_window, g1_table, g1_table, rA, rA * alphaA, At, chunks);
+                            knowledge_commitment_vector<g1_type, g1_type> A_query =
+                                kc_batch_exp<g1_type>(scalar_field_type::value_bits, g1_window, g1_window, g1_table,
+                                                      g1_table, rA, rA * alphaA, At, chunks);
 
-                            knowledge_commitment_vector<g2_type, g1_type>
-                                B_query = kc_batch_exp<>(scalar_field_type::value_bits, g2_window,
-                                                       g1_window, g2_table, g1_table, rB, rB * alphaB, Bt, chunks);
+                            knowledge_commitment_vector<g2_type, g1_type> B_query =
+                                kc_batch_exp<>(scalar_field_type::value_bits, g2_window, g1_window, g2_table, g1_table,
+                                               rB, rB * alphaB, Bt, chunks);
 
-                            knowledge_commitment_vector<g1_type, g1_type>
-                                C_query = kc_batch_exp<>(scalar_field_type::value_bits, g1_window,
-                                                       g1_window, g1_table, g1_table, rC, rC * alphaC, Ct, chunks);
+                            knowledge_commitment_vector<g1_type, g1_type> C_query =
+                                kc_batch_exp<>(scalar_field_type::value_bits, g1_window, g1_window, g1_table, g1_table,
+                                               rC, rC * alphaC, Ct, chunks);
 
                             typename std::vector<typename g1_type::value_type> H_query =
                                 batch_exp(scalar_field_type::value_bits, g1_window, g1_table, Ht);
@@ -228,20 +224,13 @@ namespace nil {
                             algebra::batch_to_special<g1_type>(K_query);
 #endif
 
-                            typename g2_type::value_type alphaA_g2 =
-                                alphaA * g2_type::value_type::one();
-                            typename g1_type::value_type alphaB_g1 =
-                                alphaB * g1_type::value_type::one();
-                            typename g2_type::value_type alphaC_g2 =
-                                alphaC * g2_type::value_type::one();
-                            typename g2_type::value_type gamma_g2 =
-                                gamma * g2_type::value_type::one();
-                            typename g1_type::value_type gamma_beta_g1 =
-                                (gamma * beta) * g1_type::value_type::one();
-                            typename g2_type::value_type gamma_beta_g2 =
-                                (gamma * beta) * g2_type::value_type::one();
-                            typename g2_type::value_type rC_Z_g2 =
-                                (rC * qap_inst.Zt) * g2_type::value_type::one();
+                            typename g2_type::value_type alphaA_g2 = alphaA * g2_type::value_type::one();
+                            typename g1_type::value_type alphaB_g1 = alphaB * g1_type::value_type::one();
+                            typename g2_type::value_type alphaC_g2 = alphaC * g2_type::value_type::one();
+                            typename g2_type::value_type gamma_g2 = gamma * g2_type::value_type::one();
+                            typename g1_type::value_type gamma_beta_g1 = (gamma * beta) * g1_type::value_type::one();
+                            typename g2_type::value_type gamma_beta_g2 = (gamma * beta) * g2_type::value_type::one();
+                            typename g2_type::value_type rC_Z_g2 = (rC * qap_inst.Zt) * g2_type::value_type::one();
 
                             typename g1_type::value_type encoded_IC_base =
                                 (rA * IC_coefficients[0]) * g1_type::value_type::one();
@@ -250,22 +239,21 @@ namespace nil {
                             for (std::size_t i = 1; i < qap_inst.num_inputs + 1; ++i) {
                                 multiplied_IC_coefficients.emplace_back(rA * IC_coefficients[i]);
                             }
-                            typename std::vector<typename g1_type::value_type> encoded_IC_values =
-                                batch_exp(scalar_field_type::value_bits, g1_window, g1_table,
-                                          multiplied_IC_coefficients);
+                            typename std::vector<typename g1_type::value_type> encoded_IC_values = batch_exp(
+                                scalar_field_type::value_bits, g1_window, g1_table, multiplied_IC_coefficients);
 
-                            accumulation_vector<g1_type> encoded_IC_query(
-                                std::move(encoded_IC_base), std::move(encoded_IC_values));
+                            accumulation_vector<g1_type> encoded_IC_query(std::move(encoded_IC_base),
+                                                                          std::move(encoded_IC_values));
 
                             verification_key_type vk =
                                 verification_key_type(alphaA_g2, alphaB_g1, alphaC_g2, gamma_g2, gamma_beta_g1,
-                                                 gamma_beta_g2, rC_Z_g2, encoded_IC_query);
+                                                      gamma_beta_g2, rC_Z_g2, encoded_IC_query);
                             proving_key_type pk = proving_key_type(std::move(A_query),
-                                                              std::move(B_query),
-                                                              std::move(C_query),
-                                                              std::move(H_query),
-                                                              std::move(K_query),
-                                                              std::move(cs_copy));
+                                                                   std::move(B_query),
+                                                                   std::move(C_query),
+                                                                   std::move(H_query),
+                                                                   std::move(K_query),
+                                                                   std::move(cs_copy));
 
                             pk.print_size();
                             vk.print_size();

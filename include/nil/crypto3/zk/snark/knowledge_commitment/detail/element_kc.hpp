@@ -61,8 +61,8 @@ namespace nil {
                         element_kc() = default;
                         element_kc(const element_kc &other) = default;
                         element_kc(element_kc &&other) = default;
-                        element_kc(const typename Type1::value_type &g, 
-                                   const typename Type2::value_type &h) : g(g), h(h) {
+                        element_kc(const typename Type1::value_type &g, const typename Type2::value_type &h) :
+                            g(g), h(h) {
                         }
 
                         element_kc &operator=(const element_kc &other) = default;
@@ -159,7 +159,9 @@ namespace nil {
                         }
                     };
 
-                    template<typename Type1, typename Type2, typename Backend,
+                    template<typename Type1,
+                             typename Type2,
+                             typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
                     element_kc<Type1, Type2>
                         operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &lhs,
@@ -167,50 +169,54 @@ namespace nil {
                         return element_kc<Type1, Type2>(lhs * rhs.g, lhs * rhs.h);
                     }
 
-                    template<typename Type1, typename Type2, typename Backend,
+                    template<typename Type1,
+                             typename Type2,
+                             typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
                     element_kc<Type1, Type2>
-                        operator*(const element_kc<Type1, Type2> &lhs, 
+                        operator*(const element_kc<Type1, Type2> &lhs,
                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &rhs) {
                         return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
                     }
 
-                    template<typename Type1, typename Type2, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_field<
-                                                    typename FieldValueType::field_type>::value &&
-                                               !::nil::crypto3::detail::is_extended_field<
-                                                    typename FieldValueType::field_type>::value, 
-                                                FieldValueType>::type >
-                    element_kc<Type1, Type2> operator*(const FieldValueType &lhs,
-                                                       const element_kc<Type1, Type2> &rhs) {
+                    template<
+                        typename Type1,
+                        typename Type2,
+                        typename FieldValueType,
+                        typename = typename std::enable_if<
+                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
+                                !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                            FieldValueType>::type>
+                    element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> 
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_modulus_type;
 
                         return non_fixed_precision_modulus_type(lhs.data) * rhs;
                     }
 
-                    template<typename Type1, typename Type2, typename FieldValueType, typename = 
-                        typename std::enable_if<::nil::crypto3::detail::is_field<
-                                                    typename FieldValueType::field_type>::value &&
-                                               !::nil::crypto3::detail::is_extended_field<
-                                                    typename FieldValueType::field_type>::value, 
-                                                FieldValueType>::type >
-                    element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs,
-                                                       const FieldValueType &rhs) {
+                    template<
+                        typename Type1,
+                        typename Type2,
+                        typename FieldValueType,
+                        typename = typename std::enable_if<
+                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
+                                !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                            FieldValueType>::type>
+                    element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> 
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_modulus_type;
 
                         return lhs * non_fixed_precision_modulus_type(rhs.data);
                     }
 
                 }    // namespace detail
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_ELEMENT_HPP

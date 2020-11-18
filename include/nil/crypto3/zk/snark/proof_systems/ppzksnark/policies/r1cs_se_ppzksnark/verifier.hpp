@@ -174,9 +174,10 @@ namespace nil {
                              */
                             typename CurveType::g1_type::value_type G_psi =
                                 processed_verification_key.query[0] +
-                                algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                  algebra::policies::multiexp_method_bos_coster<
-                                                  typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
+                                algebra::multiexp<
+                                    typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                    algebra::policies::multiexp_method_bos_coster<
+                                        typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                     processed_verification_key.query.begin() + 1,
                                     processed_verification_key.query.end(), primary_input.begin(), primary_input.end(),
                                     chunks);

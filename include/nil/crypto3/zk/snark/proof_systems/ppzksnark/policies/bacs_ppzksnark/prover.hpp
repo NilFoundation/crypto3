@@ -96,7 +96,8 @@ namespace nil {
                                 r1cs_va.begin() + primary_input.size(),
                                 r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
                             const typename r1cs_ppzksnark<CurveType>::proof_type r1cs_proof =
-                                r1cs_ppzksnark<CurveType>::prover::process<CurveType>(proving_key.r1cs_pk, primary_input, r1cs_ai);
+                                r1cs_ppzksnark<CurveType>::prover::process<CurveType>(
+                                    proving_key.r1cs_pk, primary_input, r1cs_ai);
 
                             return r1cs_proof;
                         }

@@ -51,9 +51,7 @@ namespace nil {
 
                     using value_type = detail::element_kc<Type1, Type2>;
 
-                    constexpr static const std::size_t value_bits = Type1::value_bits + 
-                                                                    Type2::value_bits;
-
+                    constexpr static const std::size_t value_bits = Type1::value_bits + Type2::value_bits;
                 };
 
                 /******************** Knowledge commitment vector ****************************/

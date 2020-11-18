@@ -249,8 +249,8 @@ namespace nil {
                             using g2_type = typename CurveType::g2_type;
                             using g1_value_type = typename g1_type::value_type;
                             using g2_value_type = typename g2_type::value_type;
-                        public:
 
+                        public:
                             knowledge_commitment_vector<g1_type, g1_type> A_query;
                             knowledge_commitment_vector<g2_type, g1_type> B_query;
                             knowledge_commitment_vector<g1_type, g1_type> C_query;
@@ -274,14 +274,13 @@ namespace nil {
                                         g1_value_type &&rA_i_Z_g1,
                                         constraint_system<CurveType> &&constraint_system) :
                                 A_query(std::move(A_query)),
-                                B_query(std::move(B_query)), C_query(std::move(C_query)), 
-                                H_query(std::move(H_query)), K_query(std::move(K_query)), 
-                                rA_i_Z_g1(std::move(rA_i_Z_g1)),
+                                B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
+                                K_query(std::move(K_query)), rA_i_Z_g1(std::move(rA_i_Z_g1)),
                                 constraint_system(std::move(constraint_system)) {};
 
                             std::size_t G1_size() const {
-                                return 2 * (A_query.domain_size() + C_query.domain_size()) + 
-                                        B_query.domain_size() + H_query.size() + K_query.size() + 1;
+                                return 2 * (A_query.domain_size() + C_query.domain_size()) + B_query.domain_size() +
+                                       H_query.size() + K_query.size() + 1;
                             }
 
                             std::size_t G2_size() const {
@@ -298,10 +297,8 @@ namespace nil {
                             }
 
                             std::size_t size_in_bits() const {
-                                return A_query.size_in_bits() + B_query.size_in_bits() + 
-                                       C_query.size_in_bits() +
-                                       H_query.size() * g1_type::value_bits +
-                                       K_query.size() * g1_type::value_bits +
+                                return A_query.size_in_bits() + B_query.size_in_bits() + C_query.size_in_bits() +
+                                       H_query.size() * g1_type::value_bits + K_query.size() * g1_type::value_bits +
                                        g1_type::value_bits;
                             }
 
@@ -478,18 +475,14 @@ namespace nil {
                             using g2_type = typename CurveType::g2_type;
                             using g1_value_type = typename g1_type::value_type;
                             using g2_value_type = typename g2_type::value_type;
-                        public:
 
-                            typename knowledge_commitment<g1_value_type,
-                                                          g1_value_type>::value_type g_A;
-                            typename knowledge_commitment<g2_value_type,
-                                                          g1_value_type>::value_type g_B;
-                            typename knowledge_commitment<g1_value_type,
-                                                          g1_value_type>::value_type g_C;
+                        public:
+                            typename knowledge_commitment<g1_value_type, g1_value_type>::value_type g_A;
+                            typename knowledge_commitment<g2_value_type, g1_value_type>::value_type g_B;
+                            typename knowledge_commitment<g1_value_type, g1_value_type>::value_type g_C;
                             g1_value_type g_H;
                             g1_value_type g_K;
-                            typename knowledge_commitment<g1_value_type,
-                                                          g1_value_type>::value_type g_Aau;
+                            typename knowledge_commitment<g1_value_type, g1_value_type>::value_type g_Aau;
                             g1_value_type muA;
 
                             proof() {
@@ -502,9 +495,8 @@ namespace nil {
                                 this->g_C.h = g1_value_type::one();
                                 this->g_H = g1_value_type::one();
                                 this->g_K = g1_value_type::one();
-                                g_Aau = typename knowledge_commitment<g1_type, g1_type>
-                                                    ::value_type(g1_value_type::one(),
-                                                                 g1_value_type::one());
+                                g_Aau = typename knowledge_commitment<g1_type, g1_type>::value_type(
+                                    g1_value_type::one(), g1_value_type::one());
 
                                 this->muA = g1_value_type::one();
                             }
@@ -528,8 +520,7 @@ namespace nil {
                             }
 
                             std::size_t size_in_bits() const {
-                                return G1_size() * g1_value_type::value_bits +
-                                       G2_size() * g2_value_type::value_bits;
+                                return G1_size() * g1_value_type::value_bits + G2_size() * g2_value_type::value_bits;
                             }
 
                             bool is_well_formed() const {
@@ -819,17 +810,17 @@ namespace nil {
                             const qap_witness<typename CurveType::scalar_field_type> qap_wit = r1cs_to_qap::witness_map(
                                 pk.constraint_system, primary_input, auxiliary_input, d1 + dauth, d2, d3);
 
-                            typename knowledge_commitment<typename CurveType::g1_type, 
+                            typename knowledge_commitment<typename CurveType::g1_type,
                                                           typename CurveType::g1_type>::value_type g_A =
                                 /* pk.A_query[0] + */ d1 * pk.A_query[qap_wit.num_variables + 1];
-                            typename knowledge_commitment<typename CurveType::g2_type, 
+                            typename knowledge_commitment<typename CurveType::g2_type,
                                                           typename CurveType::g1_type>::value_type g_B =
                                 pk.B_query[0] + qap_wit.d2 * pk.B_query[qap_wit.num_variables + 1];
-                            typename knowledge_commitment<typename CurveType::g1_type, 
+                            typename knowledge_commitment<typename CurveType::g1_type,
                                                           typename CurveType::g1_type>::value_type g_C =
                                 pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables + 1];
 
-                            typename knowledge_commitment<typename CurveType::g1_type, 
+                            typename knowledge_commitment<typename CurveType::g1_type,
                                                           typename CurveType::g1_type>::value_type g_Ain =
                                 dauth * pk.A_query[qap_wit.num_variables + 1];
 
@@ -849,62 +840,64 @@ namespace nil {
 
                             g_A = g_A + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
-                                            typename CurveType::scalar_field_type, 
+                                            typename CurveType::scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            typename knowledge_commitment<typename CurveType::g1_type, 
-                                                                          typename CurveType::g1_type>::value_type, 
-                                            typename CurveType::scalar_field_type>>(
+                                                typename knowledge_commitment<typename CurveType::g1_type,
+                                                                              typename CurveType::g1_type>::value_type,
+                                                typename CurveType::scalar_field_type>>(
                                             pk.A_query, 1 + qap_wit.num_inputs, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs,
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
-                            g_Ain = g_Ain + kc_multiexp_with_mixed_addition<
-                                            typename CurveType::g1_type, typename CurveType::g1_type,
-                                            typename CurveType::scalar_field_type, 
-                                            algebra::policies::multiexp_method_bos_coster<
-                                            typename knowledge_commitment<typename CurveType::g1_type, 
-                                                                          typename CurveType::g1_type>::value_type, 
+                            g_Ain = g_Ain +
+                                    kc_multiexp_with_mixed_addition<
+                                        typename CurveType::g1_type, typename CurveType::g1_type,
+                                        typename CurveType::scalar_field_type,
+                                        algebra::policies::multiexp_method_bos_coster<
+                                            typename knowledge_commitment<typename CurveType::g1_type,
+                                                                          typename CurveType::g1_type>::value_type,
                                             typename CurveType::scalar_field_type>>(
-                                            pk.A_query, 1, 1 + qap_wit.num_inputs,
-                                            qap_wit.coefficients_for_ABCs.begin(),
-                                            qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs, chunks);
+                                        pk.A_query, 1, 1 + qap_wit.num_inputs, qap_wit.coefficients_for_ABCs.begin(),
+                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs, chunks);
                             // std :: cout << "The input proof term: " << g_Ain << "\n";
 
                             g_B = g_B + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g2_type, typename CurveType::g1_type,
-                                            typename CurveType::scalar_field_type, 
+                                            typename CurveType::scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            typename knowledge_commitment<typename CurveType::g1_type, 
-                                                                          typename CurveType::g1_type>::value_type, 
-                                            typename CurveType::scalar_field_type>>(
+                                                typename knowledge_commitment<typename CurveType::g1_type,
+                                                                              typename CurveType::g1_type>::value_type,
+                                                typename CurveType::scalar_field_type>>(
                                             pk.B_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_C = g_C + kc_multiexp_with_mixed_addition<
                                             typename CurveType::g1_type, typename CurveType::g1_type,
-                                            typename CurveType::scalar_field_type, 
+                                            typename CurveType::scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            typename knowledge_commitment<typename CurveType::g1_type, 
-                                                                          typename CurveType::g1_type>::value_type, 
-                                            typename CurveType::scalar_field_type>>(
+                                                typename knowledge_commitment<typename CurveType::g1_type,
+                                                                              typename CurveType::g1_type>::value_type,
+                                                typename CurveType::scalar_field_type>>(
                                             pk.C_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
-                            g_H = g_H + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                          algebra::policies::multiexp_method_BDLO12<
-                                                          typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
-                                            pk.H_query.begin(),
-                                            pk.H_query.begin() + qap_wit.degree + 1,
-                                            qap_wit.coefficients_for_H.begin(),
-                                            qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1,
-                                            chunks);
+                            g_H = g_H +
+                                  algebra::multiexp<
+                                      typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                      algebra::policies::multiexp_method_BDLO12<typename CurveType::g1_type,
+                                                                                typename CurveType::scalar_field_type>>(
+                                      pk.H_query.begin(),
+                                      pk.H_query.begin() + qap_wit.degree + 1,
+                                      qap_wit.coefficients_for_H.begin(),
+                                      qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1,
+                                      chunks);
 
-                            g_K = g_K + algebra::multiexp_with_mixed_addition<typename CurveType::g1_type,
-                                                                              typename CurveType::scalar_field_type,
-                                                                              algebra::policies::multiexp_method_bos_coster<
-                                                                              typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
+                            g_K = g_K + algebra::multiexp_with_mixed_addition<
+                                            typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                            algebra::policies::multiexp_method_bos_coster<
+                                                typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             pk.K_query.begin() + 1,
                                             pk.K_query.begin() + 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
@@ -920,9 +913,10 @@ namespace nil {
                                 Ains.emplace_back(pk.A_query[i + 1].g);
                             }
                             typename CurveType::g1_type::value_type muA = dauth * pk.rA_i_Z_g1;
-                            muA = muA + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                          algebra::policies::multiexp_method_bos_coster<
-                                                          typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
+                            muA = muA + algebra::multiexp<
+                                            typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                            algebra::policies::multiexp_method_bos_coster<
+                                                typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
                                             Ains.begin(), Ains.begin() + qap_wit.num_inputs, mus.begin(),
                                             mus.begin() + qap_wit.num_inputs, chunks);
 
@@ -1010,11 +1004,13 @@ namespace nil {
                                 lambdas.emplace_back(prfCompute<CurveType>(sak.S, labels[i]));
                             }
                             typename CurveType::g1_type::value_type prodA = sak.i * proof.g_Aau.g;
-                            prodA = prodA + algebra::multiexp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
-                                                              algebra::policies::multiexp_method_bos_coster<
-                                                              typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
-                                                pvk.Ain.begin(), pvk.Ain.begin() + labels.size(), lambdas.begin(),
-                                                lambdas.begin() + labels.size(), 1);
+                            prodA =
+                                prodA + algebra::multiexp<
+                                            typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                            algebra::policies::multiexp_method_bos_coster<
+                                                typename CurveType::g1_type, typename CurveType::scalar_field_type>>(
+                                            pvk.Ain.begin(), pvk.Ain.begin() + labels.size(), lambdas.begin(),
+                                            lambdas.begin() + labels.size(), 1);
 
                             bool result_auth = true;
 

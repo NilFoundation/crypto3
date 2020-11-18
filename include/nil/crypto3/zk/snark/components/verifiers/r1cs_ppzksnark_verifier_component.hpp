@@ -24,12 +24,13 @@
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for the the R1CS ppzkSNARK verifier component.
 //
-// The component r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark::verifier_strong_input_consistency.
-// The component is built from two main sub-components:
+// The component r1cs_ppzksnark_verifier_component verifiers correct computation of
+// r1cs_ppzksnark::verifier_strong_input_consistency. The component is built from two main sub-components:
 // - r1cs_ppzksnark_verifier_process_vk_component, which verifies correct computation of
 // r1cs_ppzksnark_verifier_process_vk, and
 // - r1cs_ppzksnark_online_verifier_component, which verifies correct computation of
-// r1cs_ppzksnark_online_verifier_strong_input_consistency. See r1cs_ppzksnark.hpp for description of the aforementioned functions.
+// r1cs_ppzksnark_online_verifier_strong_input_consistency. See r1cs_ppzksnark.hpp for description of the aforementioned
+// functions.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP

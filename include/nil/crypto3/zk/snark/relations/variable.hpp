@@ -145,14 +145,13 @@ namespace nil {
                 class linear_term {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type field_value_type;
-                public:
 
+                public:
                     var_index_t index;
                     field_value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<field_type> &var) :
-                        index(var.index), coeff(field_value_type::one()) {
+                    linear_term(const variable<field_type> &var) : index(var.index), coeff(field_value_type::one()) {
                     }
 
                     linear_term(const variable<field_type> &var, const integer_coeff_t int_coeff) :
@@ -232,6 +231,7 @@ namespace nil {
                 class linear_combination {
                     typedef FieldType field_type;
                     typedef typename field_type::value_type field_value_type;
+
                 public:
                     std::vector<linear_term<FieldType>> terms;
 

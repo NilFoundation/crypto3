@@ -42,10 +42,8 @@ namespace nil {
                     std::size_t digest_size;
                     blueprint_variable_vector<FieldType> bits;
 
-                    digest_variable(blueprint<FieldType> &bp, 
-                                    std::size_t digest_size) :
-                                    component<FieldType>(bp), 
-                                    digest_size(digest_size) {
+                    digest_variable(blueprint<FieldType> &bp, std::size_t digest_size) :
+                        component<FieldType>(bp), digest_size(digest_size) {
 
                         bits.allocate(bp, digest_size);
                     }
@@ -54,8 +52,8 @@ namespace nil {
                                     std::size_t digest_size,
                                     const blueprint_variable_vector<FieldType> &partial_bits,
                                     const blueprint_variable<FieldType> &padding) :
-                                    component<FieldType>(bp),
-                                    digest_size(digest_size) {
+                        component<FieldType>(bp),
+                        digest_size(digest_size) {
 
                         assert(bits.size() <= digest_size);
                         bits = partial_bits;
@@ -92,7 +90,7 @@ namespace nil {
 
                     block_variable(blueprint<FieldType> &bp,
                                    const std::vector<blueprint_variable_vector<FieldType>> &parts) :
-                                   component<FieldType>(bp) {
+                        component<FieldType>(bp) {
 
                         for (auto &part : parts) {
                             bits.insert(bits.end(), part.begin(), part.end());
@@ -102,7 +100,7 @@ namespace nil {
                     block_variable(blueprint<FieldType> &bp,
                                    const digest_variable<FieldType> &left,
                                    const digest_variable<FieldType> &right) :
-                                   component<FieldType>(bp) {
+                        component<FieldType>(bp) {
 
                         assert(left.bits.size() == right.bits.size());
                         block_size = 2 * left.bits.size();

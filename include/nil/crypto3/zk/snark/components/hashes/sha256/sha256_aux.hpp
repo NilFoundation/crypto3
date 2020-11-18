@@ -53,9 +53,9 @@ namespace nil {
                                        const blueprint_variable<FieldType> &X,
                                        std::size_t X_bits,
                                        const blueprint_variable<FieldType> &result,
-                                       const blueprint_linear_combination_vector<FieldType> &result_bits):
-                                       component<FieldType>(bp),
-                                       X(X), X_bits(X_bits), result(result), result_bits(result_bits) {
+                                       const blueprint_linear_combination_vector<FieldType> &result_bits) :
+                        component<FieldType>(bp),
+                        X(X), X_bits(X_bits), result(result), result_bits(result_bits) {
 
                         full_bits = result_bits;
                         for (std::size_t i = result_bits.size(); i < X_bits; ++i) {
@@ -68,12 +68,12 @@ namespace nil {
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         unpack_bits->generate_r1cs_constraints(true);
                         pack_result->generate_r1cs_constraints(false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         unpack_bits->generate_r1cs_witness_from_packed();
                         pack_result->generate_r1cs_witness_from_bits();
                     }
@@ -96,15 +96,15 @@ namespace nil {
                                    const blueprint_linear_combination<FieldType> &B,
                                    const blueprint_linear_combination<FieldType> &C,
                                    bool assume_C_is_zero,
-                                   const blueprint_linear_combination<FieldType> &out):
-                                   component<FieldType>(bp),
-                                   A(A), B(B), C(C), assume_C_is_zero(assume_C_is_zero), out(out) {
+                                   const blueprint_linear_combination<FieldType> &out) :
+                        component<FieldType>(bp),
+                        A(A), B(B), C(C), assume_C_is_zero(assume_C_is_zero), out(out) {
                         if (!assume_C_is_zero) {
                             tmp.allocate(bp);
                         }
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         /*
                           tmp = A + B - 2AB i.e. tmp = A xor B
                           out = tmp + C - 2tmp C i.e. out = tmp xor C
@@ -117,7 +117,7 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         if (assume_C_is_zero) {
                             this->bp.lc_val(out) =
                                 this->bp.lc_val(A) + this->bp.lc_val(B) -
@@ -152,9 +152,9 @@ namespace nil {
                                           const blueprint_variable<FieldType> &result,
                                           std::size_t rot1,
                                           std::size_t rot2,
-                                          std::size_t shift):
-                                          component<FieldType>(bp),
-                                          W(W), result(result) {
+                                          std::size_t shift) :
+                        component<FieldType>(bp),
+                        W(W), result(result) {
 
                         result_bits.allocate(bp, 32);
                         compute_bits.resize(32);
@@ -167,7 +167,7 @@ namespace nil {
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             compute_bits[i]->generate_r1cs_constraints();
                         }
@@ -175,7 +175,7 @@ namespace nil {
                         pack_result->generate_r1cs_constraints(false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             compute_bits[i]->generate_r1cs_witness();
                         }
@@ -201,9 +201,9 @@ namespace nil {
                                         const blueprint_variable<FieldType> &result,
                                         std::size_t rot1,
                                         std::size_t rot2,
-                                        std::size_t rot3):
-                                        component<FieldType>(bp),
-                                        W(W), result(result) {
+                                        std::size_t rot3) :
+                        component<FieldType>(bp),
+                        W(W), result(result) {
 
                         result_bits.allocate(bp, 32);
                         compute_bits.resize(32);
@@ -216,7 +216,7 @@ namespace nil {
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             compute_bits[i]->generate_r1cs_constraints();
                         }
@@ -224,7 +224,7 @@ namespace nil {
                         pack_result->generate_r1cs_constraints(false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             compute_bits[i]->generate_r1cs_witness();
                         }
@@ -249,15 +249,15 @@ namespace nil {
                     choice_component(blueprint<FieldType> &bp, const blueprint_linear_combination_vector<FieldType> &X,
                                      const blueprint_linear_combination_vector<FieldType> &Y,
                                      const blueprint_linear_combination_vector<FieldType> &Z,
-                                     const blueprint_variable<FieldType> &result):
-                                     component<FieldType>(bp),
-                                     X(X), Y(Y), Z(Z), result(result) {
+                                     const blueprint_variable<FieldType> &result) :
+                        component<FieldType>(bp),
+                        X(X), Y(Y), Z(Z), result(result) {
 
                         result_bits.allocate(bp, 32);
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             /*
                               result = x * y + (1-x) * z
@@ -269,7 +269,7 @@ namespace nil {
                         pack_result->generate_r1cs_constraints(false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             this->bp.val(result_bits[i]) =
                                 this->bp.lc_val(X[i]) * this->bp.lc_val(Y[i]) +
@@ -296,14 +296,14 @@ namespace nil {
                                        const blueprint_linear_combination_vector<FieldType> &X,
                                        const blueprint_linear_combination_vector<FieldType> &Y,
                                        const blueprint_linear_combination_vector<FieldType> &Z,
-                                       const blueprint_variable<FieldType> &result):
+                                       const blueprint_variable<FieldType> &result) :
                         component<FieldType>(bp),
                         X(X), Y(Y), Z(Z), result(result) {
                         result_bits.allocate(bp, 32);
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints(){
+                    void generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             /*
                               2*result + aux = x + y + z
@@ -311,26 +311,24 @@ namespace nil {
                               aux = x + y + z - 2*result
                             */
                             generate_boolean_r1cs_constraint<FieldType>(this->bp, result_bits[i]);
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                X[i] + Y[i] + Z[i] - 2 * result_bits[i], 1 - (X[i] + Y[i] + Z[i] - 2 * result_bits[i]), 0));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>(X[i] + Y[i] + Z[i] - 2 * result_bits[i],
+                                                           1 - (X[i] + Y[i] + Z[i] - 2 * result_bits[i]), 0));
                         }
                         pack_result->generate_r1cs_constraints(false);
                     }
 
-                    void generate_r1cs_witness(){
+                    void generate_r1cs_witness() {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<
-                            boost::multiprecision::backends::cpp_int_backend<>> 
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_modulus_type;
 
                         using modulus_type = typename FieldType::modulus_type;
 
                         for (std::size_t i = 0; i < 32; ++i) {
-                            const non_fixed_precision_modulus_type v =
-                                non_fixed_precision_modulus_type((this->bp.lc_val(X[i]) + 
-                                                                  this->bp.lc_val(Y[i]) + 
-                                                                  this->bp.lc_val(Z[i])).data);
+                            const non_fixed_precision_modulus_type v = non_fixed_precision_modulus_type(
+                                (this->bp.lc_val(X[i]) + this->bp.lc_val(Y[i]) + this->bp.lc_val(Z[i])).data);
                             this->bp.val(result_bits[i]) = typename FieldType::value_type(modulus_type(v / 2));
                         }
 

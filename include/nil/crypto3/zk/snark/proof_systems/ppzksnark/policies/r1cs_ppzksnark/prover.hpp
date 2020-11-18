@@ -103,7 +103,7 @@ namespace nil {
                         using g1_value_type = typename g1_type::value_type;
                         using g2_value_type = typename g2_type::value_type;
                         using scalar_field_type = typename CurveType::scalar_field_type;
-                        
+
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -117,8 +117,8 @@ namespace nil {
                         typedef typename types_policy::proof proof_type;
 
                         static inline proof_type process(const proving_key_type &proving_key,
-                                                           const primary_input_type &primary_input,
-                                                           const auxiliary_input_type &auxiliary_input) {
+                                                         const primary_input_type &primary_input,
+                                                         const auxiliary_input_type &auxiliary_input) {
 
 #ifdef DEBUG
                             assert(proving_key.cs.is_satisfied(primary_input, auxiliary_input));
@@ -129,13 +129,13 @@ namespace nil {
                                 d2 = algebra::random_element<scalar_field_type>(),
                                 d3 = algebra::random_element<scalar_field_type>();
 
-                            const qap_witness<scalar_field_type> qap_wit =
-                                r1cs_to_qap<scalar_field_type>::witness_map(
-                                    proving_key.cs, primary_input, auxiliary_input, d1, d2, d3);
+                            const qap_witness<scalar_field_type> qap_wit = r1cs_to_qap<scalar_field_type>::witness_map(
+                                proving_key.cs, primary_input, auxiliary_input, d1, d2, d3);
 
 #ifdef DEBUG
                             const libff::Fr<ppT> t = libff::Fr<ppT>::random_element();
-                            qap_instance_evaluation<libff::Fr<ppT> > qap_inst = r1cs_to_qap_instance_map_with_evaluation(pk.cs, t);
+                            qap_instance_evaluation<libff::Fr<ppT>> qap_inst =
+                                r1cs_to_qap_instance_map_with_evaluation(pk.cs, t);
                             assert(qap_inst.is_satisfied(qap_wit));
 #endif
 
@@ -148,20 +148,18 @@ namespace nil {
 
                             g1_value_type g_H = g1_value_type::zero();
                             g1_value_type g_K =
-                                (proving_key.K_query[0] +
-                                 qap_wit.d1 * proving_key.K_query[qap_wit.num_variables + 1] +
+                                (proving_key.K_query[0] + qap_wit.d1 * proving_key.K_query[qap_wit.num_variables + 1] +
                                  qap_wit.d2 * proving_key.K_query[qap_wit.num_variables + 2] +
                                  qap_wit.d3 * proving_key.K_query[qap_wit.num_variables + 3]);
 #ifdef DEBUG
-                            for (size_t i = 0; i < qap_wit.num_inputs() + 1; ++i)
-                            {
+                            for (size_t i = 0; i < qap_wit.num_inputs() + 1; ++i) {
                                 assert(pk.A_query[i].g == libff::G1<ppT>::zero());
                             }
-                            assert(pk.A_query.domain_size() == qap_wit.num_variables()+2);
-                            assert(pk.B_query.domain_size() == qap_wit.num_variables()+2);
-                            assert(pk.C_query.domain_size() == qap_wit.num_variables()+2);
-                            assert(pk.H_query.size() == qap_wit.degree()+1);
-                            assert(pk.K_query.size() == qap_wit.num_variables()+4);
+                            assert(pk.A_query.domain_size() == qap_wit.num_variables() + 2);
+                            assert(pk.B_query.domain_size() == qap_wit.num_variables() + 2);
+                            assert(pk.C_query.domain_size() == qap_wit.num_variables() + 2);
+                            assert(pk.H_query.size() == qap_wit.degree() + 1);
+                            assert(pk.K_query.size() == qap_wit.num_variables() + 4);
 #endif
 #ifdef MULTICORE
                             const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
@@ -171,55 +169,47 @@ namespace nil {
 #endif
 
                             g_A = g_A + kc_multiexp_with_mixed_addition<
-                                            g1_type, g1_type,
-                                            scalar_field_type, 
+                                            g1_type, g1_type, scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<g1_type, g1_type>, 
-                                                                 scalar_field_type>>(
+                                                knowledge_commitment<g1_type, g1_type>, scalar_field_type>>(
                                             proving_key.A_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_B = g_B + kc_multiexp_with_mixed_addition<
-                                            g2_type, g1_type,
-                                            scalar_field_type, 
+                                            g2_type, g1_type, scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<g2_type, g1_type>, 
-                                                                 scalar_field_type>>(
+                                                knowledge_commitment<g2_type, g1_type>, scalar_field_type>>(
                                             proving_key.B_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
                             g_C = g_C + kc_multiexp_with_mixed_addition<
-                                            g1_type, g1_type,
-                                            scalar_field_type, 
+                                            g1_type, g1_type, scalar_field_type,
                                             algebra::policies::multiexp_method_bos_coster<
-                                            knowledge_commitment<g1_type, g1_type>, 
-                                                                 scalar_field_type>>(
+                                                knowledge_commitment<g1_type, g1_type>, scalar_field_type>>(
                                             proving_key.C_query, 1, 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
-                            g_H = g_H +
-                                  algebra::multiexp<g1_type, scalar_field_type,
-                                                    algebra::policies::multiexp_method_BDLO12<
-                                                    g1_type, scalar_field_type>>(
-                                      proving_key.H_query.begin(), proving_key.H_query.begin() + qap_wit.degree + 1,
-                                      qap_wit.coefficients_for_H.begin(),
-                                      qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1, chunks);
+                            g_H =
+                                g_H + algebra::multiexp<
+                                          g1_type, scalar_field_type,
+                                          algebra::policies::multiexp_method_BDLO12<g1_type, scalar_field_type>>(
+                                          proving_key.H_query.begin(), proving_key.H_query.begin() + qap_wit.degree + 1,
+                                          qap_wit.coefficients_for_H.begin(),
+                                          qap_wit.coefficients_for_H.begin() + qap_wit.degree + 1, chunks);
 
-                            g_K = g_K + algebra::multiexp_with_mixed_addition<g1_type,
-                                                                              scalar_field_type,
-                                                                              algebra::policies::multiexp_method_bos_coster<
-                                                                              g1_type,
-                                                                              scalar_field_type>>(
+                            g_K = g_K + algebra::multiexp_with_mixed_addition<
+                                            g1_type, scalar_field_type,
+                                            algebra::policies::multiexp_method_bos_coster<g1_type, scalar_field_type>>(
                                             proving_key.K_query.begin() + 1,
                                             proving_key.K_query.begin() + 1 + qap_wit.num_variables,
                                             qap_wit.coefficients_for_ABCs.begin(),
                                             qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
 
-                            proof_type proof =
-                                proof_type(std::move(g_A), std::move(g_B), std::move(g_C), std::move(g_H), std::move(g_K));
+                            proof_type proof = proof_type(std::move(g_A), std::move(g_B), std::move(g_C),
+                                                          std::move(g_H), std::move(g_K));
 
                             return proof;
                         }

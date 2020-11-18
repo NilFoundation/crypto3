@@ -76,6 +76,7 @@ namespace nil {
                     template<typename CurveType>
                     class uscs_ppzksnark_generator {
                         using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+
                     public:
                         typedef typename types_policy::constraint_system constraint_system_type;
                         typedef typename types_policy::primary_input primary_input_type;
@@ -191,14 +192,15 @@ namespace nil {
                             accumulation_vector<typename CurveType::g1_type> encoded_IC_query(
                                 std::move(encoded_IC_base), std::move(encoded_IC_values));
 
-                            verification_key_type vk = verification_key_type(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
+                            verification_key_type vk =
+                                verification_key_type(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
 
                             constraint_system_type cs_copy = cs;
                             proving_key_type pk = proving_key_type(std::move(V_g1_query),
-                                                         std::move(alpha_V_g1_query),
-                                                         std::move(H_g1_query),
-                                                         std::move(V_g2_query),
-                                                         std::move(cs_copy));
+                                                                   std::move(alpha_V_g1_query),
+                                                                   std::move(H_g1_query),
+                                                                   std::move(V_g2_query),
+                                                                   std::move(cs_copy));
 
                             pk.print_size();
                             vk.print_size();

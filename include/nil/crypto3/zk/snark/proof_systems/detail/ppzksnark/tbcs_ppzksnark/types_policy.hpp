@@ -170,7 +170,6 @@ namespace nil {
                          * A proof for the TBCS ppzkSNARK.
                          */
                         using proof = typename uscs_ppzksnark<CurveType>::proof_type;
-
                     };
                 }    // namespace detail
             }        // namespace snark

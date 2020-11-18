@@ -128,16 +128,16 @@ namespace nil {
                                 r * proving_key.G_gamma_Z +
                                 proving_key.A_query[0] +                // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * proving_key.G_gamma_Z +    // ZK-patch
-                                algebra::multiexp<typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type,
-                                                  algebra::policies::multiexp_method_BDLO12<
-                                                  typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type>>
-                                                  (proving_key.A_query.begin() + 1,
-                                                                                   proving_key.A_query.end(),
-                                                                                   sap_wit.coefficients_for_ACs.begin(),
-                                                                                   sap_wit.coefficients_for_ACs.end(),
-                                                                                   chunks);
+                                algebra::multiexp<
+                                    typename CurveType::g1_type,
+                                    typename CurveType::scalar_field_type,
+                                    algebra::policies::multiexp_method_BDLO12<typename CurveType::g1_type,
+                                                                              typename CurveType::scalar_field_type>>(
+                                    proving_key.A_query.begin() + 1,
+                                    proving_key.A_query.end(),
+                                    sap_wit.coefficients_for_ACs.begin(),
+                                    sap_wit.coefficients_for_ACs.end(),
+                                    chunks);
 
                             /**
                              * compute B exactly as A, except with H as the base
@@ -146,16 +146,16 @@ namespace nil {
                                 r * proving_key.H_gamma_Z +
                                 proving_key.B_query[0] +                // i = 0 is a special case because input_i = 1
                                 sap_wit.d1 * proving_key.H_gamma_Z +    // ZK-patch
-                                algebra::multiexp<typename CurveType::g2_type,
-                                                  typename CurveType::scalar_field_type,
-                                                  algebra::policies::multiexp_method_BDLO12<
-                                                  typename CurveType::g2_type,
-                                                  typename CurveType::scalar_field_type>>
-                                                  (proving_key.B_query.begin() + 1,
-                                                                                   proving_key.B_query.end(),
-                                                                                   sap_wit.coefficients_for_ACs.begin(),
-                                                                                   sap_wit.coefficients_for_ACs.end(),
-                                                                                   chunks);
+                                algebra::multiexp<
+                                    typename CurveType::g2_type,
+                                    typename CurveType::scalar_field_type,
+                                    algebra::policies::multiexp_method_BDLO12<typename CurveType::g2_type,
+                                                                              typename CurveType::scalar_field_type>>(
+                                    proving_key.B_query.begin() + 1,
+                                    proving_key.B_query.end(),
+                                    sap_wit.coefficients_for_ACs.begin(),
+                                    sap_wit.coefficients_for_ACs.end(),
+                                    chunks);
                             /**
                              * compute C = G^{f(input) +
                              *                r^2 * gamma^2 * Z(t)^2 +
@@ -167,11 +167,11 @@ namespace nil {
                              *              = \prod_{i=0}^m C_query_2 * input_i
                              */
                             typename CurveType::g1_type::value_type C =
-                                algebra::multiexp<typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type,
-                                                  algebra::policies::multiexp_method_BDLO12<
-                                                  typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type>>(
+                                algebra::multiexp<
+                                    typename CurveType::g1_type,
+                                    typename CurveType::scalar_field_type,
+                                    algebra::policies::multiexp_method_BDLO12<typename CurveType::g1_type,
+                                                                              typename CurveType::scalar_field_type>>(
                                     proving_key.C_query_1.begin(),
                                     proving_key.C_query_1.end(),
                                     sap_wit.coefficients_for_ACs.begin() + sap_wit.num_inputs(),
@@ -184,23 +184,24 @@ namespace nil {
                                 r * algebra::multiexp<typename CurveType::g1_type,
                                                       typename CurveType::scalar_field_type,
                                                       algebra::policies::multiexp_method_BDLO12<
-                                                      typename CurveType::g1_type,
-                                                      typename CurveType::scalar_field_type>>(
+                                                          typename CurveType::g1_type,
+                                                          typename CurveType::scalar_field_type>>(
                                         proving_key.C_query_2.begin() + 1,
                                         proving_key.C_query_2.end(),
                                         sap_wit.coefficients_for_ACs.begin(),
                                         sap_wit.coefficients_for_ACs.end(),
                                         chunks) +
                                 sap_wit.d2 * proving_key.G_gamma2_Z_t[0] +    // ZK-patch
-                                algebra::multiexp<typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type,
-                                                  algebra::policies::multiexp_method_BDLO12<
-                                                  typename CurveType::g1_type,
-                                                  typename CurveType::scalar_field_type>>(proving_key.G_gamma2_Z_t.begin(),
-                                                                                   proving_key.G_gamma2_Z_t.end(),
-                                                                                   sap_wit.coefficients_for_H.begin(),
-                                                                                   sap_wit.coefficients_for_H.end(),
-                                                                                   chunks);
+                                algebra::multiexp<
+                                    typename CurveType::g1_type,
+                                    typename CurveType::scalar_field_type,
+                                    algebra::policies::multiexp_method_BDLO12<typename CurveType::g1_type,
+                                                                              typename CurveType::scalar_field_type>>(
+                                    proving_key.G_gamma2_Z_t.begin(),
+                                    proving_key.G_gamma2_Z_t.end(),
+                                    sap_wit.coefficients_for_H.begin(),
+                                    sap_wit.coefficients_for_H.end(),
+                                    chunks);
 
                             proof_type proof = proof(std::move(A), std::move(B), std::move(C));
                             proof.print_size();

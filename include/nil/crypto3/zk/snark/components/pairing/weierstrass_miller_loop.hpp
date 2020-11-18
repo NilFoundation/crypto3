@@ -85,9 +85,8 @@ namespace nil {
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(bp);
                             const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
-                            g_RR_at_P_c1.reset(
-                                new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                            *(c.RY) * (-field_type::value_type::one())));
+                            g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
+                                                                           *(c.RY) * (-field_type::value_type::one())));
                         } else {
                             g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(bp));
                             compute_g_RR_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
@@ -164,15 +163,13 @@ namespace nil {
                             const fqe_type gamma_twist_const = gamma_twist->get_element();
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
                                 Fqe_variable<CurveType>(this->bp, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
-                                *(Q.Y) *
-                                    (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
+                                *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(bp);
                             const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
-                            g_RQ_at_P_c1.reset(
-                                new Fqe_variable<CurveType>(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                            *(Q.Y) * (!invert_Q ? -field_type::value_type::one() :
-                                                                                  field_type::value_type::one())));
+                            g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
+                                *gamma_twist * (-P_X_const) + *(c.gamma_X) +
+                                *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                         } else {
                             g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(bp));
                             compute_g_RQ_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
