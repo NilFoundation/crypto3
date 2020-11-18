@@ -10,6 +10,8 @@
 #ifndef BOOST_MULTIPRECISION_BASE_PARAMS_HPP
 #define BOOST_MULTIPRECISION_BASE_PARAMS_HPP
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace boost {
 namespace multiprecision {
 namespace backends {
@@ -17,6 +19,36 @@ namespace backends {
 template <typename Backend>
 class base_params
 {
+   typedef number<Backend> number_type;
+
+ protected:
+   template <typename Number>
+   inline void initialize_base_params(const Number& mod)
+   {
+      m_mod = mod;
+   }
+
+ public:
+   base_params() {}
+
+   template <typename Number>
+   explicit base_params(const Number& p)
+   {
+      initialize_base_params(p);
+   }
+
+   inline const number_type& mod() const { return m_mod; }
+
+ protected:
+   number_type m_mod;
+};
+
+// fixed precision barrett params type which supports compile-time execution
+template<unsigned Bits, cpp_integer_type SignType, cpp_int_check_type Checked>
+class base_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>>
+{
+   static_assert(Bits, "number of bits should be defined");
+   typedef cpp_int_backend<Bits, Bits, SignType, Checked, void> Backend;
    typedef number<Backend> number_type;
 
  protected:
