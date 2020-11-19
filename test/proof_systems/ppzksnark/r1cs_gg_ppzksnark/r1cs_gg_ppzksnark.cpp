@@ -34,6 +34,7 @@
 #include <cstdio>
 
 #include "../r1cs_examples.hpp"
+#include "../../../components/hashes/sha256/sha256_component.hpp"
 #include "run_r1cs_gg_ppzksnark.hpp"
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -43,21 +44,49 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 
+#include <nil/crypto3/zk/snark/blueprint.hpp>
+
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
-void test_r1cs_gg_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
+void run_r1cs_gg_ppzksnark_basic_test(std::size_t num_constraints, std::size_t input_size) {
     r1cs_example<typename CurveType::scalar_field_type> example =
         generate_r1cs_example_with_binary_input<typename CurveType::scalar_field_type>(num_constraints, input_size);
     const bool bit = run_r1cs_gg_ppzksnark<CurveType>(example);
     BOOST_CHECK(bit);
 }
 
+template<typename CurveType>
+void run_r1cs_gg_ppzksnark_sha256_test() {
+	using field_type = typename CurveType::scalar_field_type;
+
+	std::cout << "SHA2-256 blueprint generation started." << std::endl;
+
+	blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
+
+	std::cout << "SHA2-256 blueprint generation finished." << std::endl;
+
+	std::cout << "R1CS generation started." << std::endl;
+
+    r1cs_example<field_type> example = r1cs_example<field_type>(bp.get_constraint_system(), 
+    														    bp.primary_input(), 
+    														    bp.auxiliary_input());
+
+    std::cout << "R1CS generation finished." << std::endl;
+
+    const bool bit = run_r1cs_gg_ppzksnark<CurveType>(example);
+    BOOST_CHECK(bit);
+}
+
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_test){
-    test_r1cs_gg_ppzksnark<curves::mnt4<298>>(1000, 100);
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_basic_test){
+    run_r1cs_gg_ppzksnark_basic_test<curves::mnt4<298>>(1000, 100);
+}
+
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_sha256_test){
+    run_r1cs_gg_ppzksnark_sha256_test<curves::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

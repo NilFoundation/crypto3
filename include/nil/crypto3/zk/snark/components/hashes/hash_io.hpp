@@ -31,6 +31,9 @@
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
+#include <nil/crypto3/zk/snark/blueprint.hpp>
+#include <nil/crypto3/zk/snark/blueprint_variable.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
