@@ -192,11 +192,11 @@ class modular_adaptor
 };
 
 // fixed precision modular backend which supports compile-time execution
-template<unsigned Bits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class modular_adaptor<cpp_int_backend<Bits, Bits, SignType, Checked, void>>
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 {
-   static_assert(Bits, "number of bits should be defined");
-   typedef cpp_int_backend<Bits, Bits, SignType, Checked, void> Backend;
+   static_assert(MinBits, "number of bits should be defined");
+   typedef cpp_int_backend<MinBits, MinBits, SignType, Checked, void> Backend;
 
  protected:
    Backend                 m_base;

@@ -108,13 +108,13 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
 };
 
 // fixed precision modular params type which supports compile-time execution
-template<unsigned Bits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class modular_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
-    public backends::montgomery_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>>,
-    public backends::barrett_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>>
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>> :
+    public backends::montgomery_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>,
+    public backends::barrett_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 {
-   static_assert(Bits, "number of bits should be defined");
-   typedef cpp_int_backend<Bits, Bits, SignType, Checked, void> Backend;
+   static_assert(MinBits, "number of bits should be defined");
+   typedef cpp_int_backend<MinBits, MinBits, SignType, Checked, void> Backend;
    typedef number<Backend> number_type;
 
  public:
@@ -157,10 +157,7 @@ class modular_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
       }
       else
       {
-          this->template eval_montgomery_reduce_compile_time(result);
-
-         // this->template eval_montgomery_reduce_run_time(result);
-         // this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         this->eval_montgomery_reduce(result);
       }
    }
 
@@ -170,11 +167,7 @@ class modular_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
       if (get_mod() % 2 != 0)
       {
          eval_multiply(result, this->r2().backend());
-
-             this->template eval_montgomery_reduce_compile_time(result);
-
-         //this->template eval_montgomery_reduce_run_time(result);
-         //this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         this->eval_montgomery_reduce(result);
       }
    }
 
@@ -183,11 +176,7 @@ class modular_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
       result = input;
       if (get_mod() % 2 != 0)
       {
-
-          this->template eval_montgomery_reduce_compile_time(result);
-
-          //this->template eval_montgomery_reduce_run_time(result);
-          //this->template eval_montgomery_reduce<std::integral_constant<int, backends::montgomery_params<Backend>::eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         this->eval_montgomery_reduce(result);
       }
    }
 
