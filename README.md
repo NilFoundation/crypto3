@@ -1,4 +1,4 @@
-Boost Multiprecision Library
+=nil; Foundation's Multiprecision Library
 ============================
 
 >ANNOUNCEMENT: Support for C++03 is now deprecated in this library and will be supported in existing features only until March 2021. New features will require at least C++11, as will existing features from next year.
@@ -40,7 +40,7 @@ Clone the whole boost project, which includes the individual Boost projects as s
     cd boost
     git submodule update --init
 
-The Boost Multiprecision Library is located in `libs/multiprecision/`. 
+The =nil; Foundation's Multiprecision Library is located in `libs/multiprecision/`. 
 
 ### Running tests ###
 First, make sure you are in `libs/multiprecision/test`. 
