@@ -222,6 +222,7 @@ inline void eval_add(modular_adaptor<Backend>&       result,
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    using default_ops::eval_gt;
+
    using default_ops::eval_eq;
    eval_add(result.base_data(), o.base_data());
    if (eval_gt(result.base_data(), result.mod_data().get_mod().backend()) ||
