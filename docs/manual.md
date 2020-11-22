@@ -2,23 +2,88 @@
 
 @tableofcontents
 
-## Proving knowledge of a hashed message 
+## Example 1: Inner-product component
 
-Before you start proving knowledge of a hashed message you need to construct a sha2-256 
-circuit on protoboard.
+Let's show how to create a simple circuit for the calculation of the public inner product of two secret vectors.
+In crypto3-zk library, the blueprint is where arithmetic circuits are collected. The statement (or public values) is called primary_input and the witness (or secret values) is called auxiliary_input. 
+Let `bp` be a blueprint and `A` and `B` are vectors which inner product `res` has to be calculated. 
+
+```c++
+blueprint<FieldType> bp;
+blueprint_variable_vector<FieldType> A;
+blueprint_variable_vector<FieldType> B;
+variable<FieldType> res;
+```
+
+Then we associate the variables to a blueprint by using the function `allocate()`. The variable `n` shows the size of the vectors `A` and `B`. Note, that each use of `allocate()` increases the size of `auxiliary_input`.
+
+```c++
+res.allocate(bp);
+A.allocate(bp, n);
+B.allocate(bp, n);
+bp.set_input_sizes(1);
+```
+
+Note, that the first allocated variable on the blueprint is a constant 1. So, the variables on the blueprint would be `1` , `res`, `A[0]`, ..., `A[n-1]`, `B[0]`, ..., `B[n-1]`. 
+
+To specify which variables are public and which ones are private we use the function `set_input_sizes(1)`, so only `res`value is a primary input. Thus, usually, the primary input is allocated before the auxiliary input in the program.
+
+
+
+*Component* is a class for constructing a particular constraint system. The component's constructor allocates intermediate variables, so the developer is responsible for allocation only primary and auxiliary variables. Any Component has to implement two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
+
+Now we initialize the simple component `inner_product_component`. The function `generate_r1cs_constraints()` add R1CS constraints to the blueprint corresponding to the circuit. 
+
+
+```c++
+inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
+compute_inner_product.generate_r1cs_constraints();
+```
+
+Next, we set the random values to vectors. 
+
+```c++
+for (std::size_t i = 0; i < n; ++i) {
+    bp.val(A[i]) = algebra::random_element<FieldType>();
+    bp.val(B[i]) = algebra::random_element<FieldType>();
+}
+```
+
+The function `generate_r1cs_witness()` computes intermediate witness value for the public values and the inner product for the `res`. 
+
+```c++
+compute_inner_product.generate_r1cs_witness();
+```
+
+### Proof generation
+
+Using the example above we can finally create and verify `proof`. 
+
+* The generator `grth16::generator` creates proving keys and verification keys for our constraints system. 
+* The proving key `keypair.pk`, public input `bp.primary_input`, and private input `bp.auxiliary_input` are used for the constructing of the proof (`grth16::prover`). 
+* For verifying of the `proof`  we use  verifying key `keypair.vk`, public input `bp.primary_input` in the `grth16::verifier`.
+
+```c++
+using grth16 = r1cs_gg_ppzksnark<curve_type>;
+typename grth16::keypair_type keypair = grth16::generator(bp.get_constraint_system());
+
+typename grth16::proof_type proof =
+    grth16::prover(keypair.pk, bp.primary_input, bp.auxiliary_input);
+
+const bool ans = grth16::verifier(keypair.vk, bp.primary_input, proof);
+```
+
+We expect to obtain the boolean value `ans == true`, which says that we have a correct proof.
+
+## Example 2: SHA2-256 component 
+
+Now we want to consider a more complicated construction of a circuit. Assume that the prover wants to prove that they know a preimage for a hash digest chosen by the verifier, without revealing what the preimage is. Let hash function be a 2-to-1 SHA256 compression function for our example.
 
 We will show the process for some pairing-friendly curve `curve_type` and its scalar field `field_type`.
 
-### Usage of SHA2-256 component
+Firstly, we need to create a `blueprint` and allocate the variables `left`, `right` and `output` at the blueprint. The allocation on the blueprint proceeds at the constructor of digest_variable. Then we initialize the  gadget ` sha256_two_to_one_hash_component ` and add constraints at the `generate_r1cs_constraints()` function.
 
-To add SHA2-256 component to `blueprint`, we need:
-* generate r1cs constraints on `blueprint`;
-* transform input into bit vectors;
-* generate r1cs witness.
-
-Firstly, we need to 
-
-```
+```c++
 blueprint<field_type> bp;
 
 digest_variable<field_type> left(bp, hashes::sha2<256>::digest_bits);
@@ -30,11 +95,11 @@ sha256_two_to_one_hash_component<field_type> f(bp, left, right, output);
 f.generate_r1cs_constraints();
 ```
 
-After generation of r1cs constraints we need to transform data blocks into bit vectors. 
-At the moment we use custom `pack`, which allows us to convert data from arbitrary data 
+After the generation of r1cs constraints, we need to transform data blocks into bit vectors. 
+We use a custom `pack`, which allows us to convert data from an arbitrary data 
 type to bit vectors. The following code can be used for this purpose:
 
-```
+```c++
 std::array<std::uint32_t, 8> array_a_intermediate;
 std::array<std::uint32_t, 8> array_b_intermediate;
 std::array<std::uint32_t, 8> array_c_intermediate;
@@ -78,9 +143,9 @@ detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
     hash_bv.begin());
 ```
 
-After getting bit vectors, we can generate r1cs witness:
+After getting bit vectors, we can generate r1cs witnesses.
 
-```
+```c++
 left.generate_r1cs_witness(left_bv);
 
 right.generate_r1cs_witness(right_bv);
@@ -89,59 +154,4 @@ f.generate_r1cs_witness();
 output.generate_r1cs_witness(hash_bv);
 ```
 
-Now we have `blueprint` with SHA2-256 component on it and can prove our knowledge of 
-the source message using GROTH-16 (`r1cs_gg_ppzksnark`).
-
-### Creating R1CS
-
-We will use a R1CS example, which comprises a R1CS constraint system, R1CS input, and R1CS witness.
-
-```
-template<typename FieldType>
-struct r1cs_example {
-    r1cs_constraint_system<FieldType> constraint_system;
-    r1cs_primary_input<FieldType> primary_input;
-    r1cs_auxiliary_input<FieldType> auxiliary_input;
-
-    r1cs_example<FieldType>() = default;
-    r1cs_example<FieldType>(const r1cs_example<FieldType> &other) = default;
-    r1cs_example<FieldType>(const r1cs_constraint_system<FieldType> &constraint_system,
-                            const r1cs_primary_input<FieldType> &primary_input,
-                            const r1cs_auxiliary_input<FieldType> &auxiliary_input) :
-        constraint_system(constraint_system),
-        primary_input(primary_input), 
-        auxiliary_input(auxiliary_input) {};
-    r1cs_example<FieldType>(r1cs_constraint_system<FieldType> &&constraint_system,
-                            r1cs_primary_input<FieldType> &&primary_input,
-                            r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
-        constraint_system(std::move(constraint_system)),
-        primary_input(std::move(primary_input)), 
-        auxiliary_input(std::move(auxiliary_input)) {};
-};
-```
-
-Creation of `r1cs_example` from `blueprint` can be done as follows:
-
-```
-r1cs_example<field_type> r1cs = r1cs_example<field_type>(bp.get_constraint_system(), 
-    														bp.primary_input(), 
-    														bp.auxiliary_input());
-```
-
-Where `bp` is `blueprint`, obtained previously.
-
-### Proving the knowledge
-
-Using obtained `r1cs_example` we can finally create and verify `proof`:
-
-```
-using grth16 = r1cs_gg_ppzksnark<curve_type>;
-
-typename grth16::keypair_type keypair =
-    grth16::generator(r1cs.constraint_system);
-
-typename grth16::proof_type proof =
-    grth16::prover(keypair.pk, r1cs.primary_input, r1cs.auxiliary_input);
-
-const bool ans = grth16::verifier(keypair.vk, r1cs.primary_input, proof);
-```
+Now we have the `blueprint` with SHA2-256 component on it and can prove our knowledge of the source message using Groth-16 (`r1cs_gg_ppzksnark`)  as we did before .
