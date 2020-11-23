@@ -1576,6 +1576,24 @@ if(TOMMATH_COMPILED)
     target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath PUBLIC -DTEST_TOMMATH)
 endif()
 
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_wnaf_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_wnaf.cpp)
+target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_wnaf_cpp_int PUBLIC -DTEST_CPP_INT)
+target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_wnaf_cpp_int no_eh_support)
+
+if(GMP_COMPILED)
+    cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_wnaf_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_wnaf.cpp)
+    target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_wnaf_gmp ${GMP_LIBRARIES})
+    target_include_directories(${CURRENT_PROJECT_NAME}_test_test_wnaf_gmp PRIVATE ${GMP_INCLUDE_DIRS})
+    target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_wnaf_gmp PUBLIC -DTEST_GMP)
+endif()
+
+if(TOMMATH_COMPILED)
+    cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_wnaf_tommath SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_wnaf.cpp)
+    target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_wnaf_tommath ${TomMath_LIBRARIES})
+    target_include_directories(${CURRENT_PROJECT_NAME}_test_test_wnaf_tommath PRIVATE ${TomMath_INCLUDE_DIRS})
+    target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_wnaf_tommath PUBLIC -DTEST_TOMMATH)
+endif()
+
 cm_test(NAME multiprecision_test_test_ressol_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_ressol.cpp)
 target_compile_definitions(multiprecision_test_test_ressol_cpp_int PUBLIC -DTEST_CPP_INT)
 target_link_libraries(multiprecision_test_test_ressol_cpp_int no_eh_support)
@@ -1599,4 +1617,3 @@ target_compile_definitions(multiprecision_test_test_inverse_cpp_int PUBLIC -DTES
 target_link_libraries(multiprecision_test_test_inverse_cpp_int no_eh_support)
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
-

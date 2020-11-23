@@ -7,6 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+//[cpp_modular_eg
 #include <iostream>
 #include <boost/multiprecision/cpp_modular.hpp>
 
@@ -56,3 +57,30 @@ int main()
    modular_number_examples<boost::multiprecision::cpp_mod, boost::multiprecision::cpp_mod_params>();
    return 0;
 }
+
+//]
+
+/*
+
+//[modular_out
+Pre-calculation parameters for module: 
+Value mod: 7
+Initialization a equal b: 1
+Value a: 4
+Value b: 4
+Value c: 2
+Some base function: 
+Add a and b: 1
+Sub a and b: 0
+Sub c and a ((-y mod x) equal ((x-y) mod x): 5
+Multiply a and b: 2
+Divide a and b: 1
+Module a % b: 0
+Some bitwise function: 
+a and b: 4
+a xor b: 0
+a or b: 4
+Pow function: 
+Pow a^b: 4
+//]
+*/

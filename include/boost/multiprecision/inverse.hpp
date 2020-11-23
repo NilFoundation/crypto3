@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MODULAR_INVERSE_HPP
-#define BOOST_MULTIPRECISION_MODULAR_INVERSE_HPP
+#ifndef BOOST_MULTIPRECISION_INVERSE_HPP
+#define BOOST_MULTIPRECISION_INVERSE_HPP
 
 #include <boost/container/vector.hpp>
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock
+//  Copyright 2012 John Maddock.
 //  Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 //  Copyright (c) 2019 Alexey Moskvin
 //
