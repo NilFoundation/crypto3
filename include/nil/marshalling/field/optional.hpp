@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -35,7 +36,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
             /// @brief Adaptor class to any other field, that makes the field optional.
@@ -55,7 +55,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::has_custom_refresh
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/Optional.h
+            /// @headerfile nil/marshalling/field/optional.h
             template<typename TField, typename... TOptions>
             class optional : private detail::adapt_basic_field_type<basic::optional<TField>, TOptions...> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::optional<TField>, TOptions...>;
@@ -80,11 +80,11 @@ namespace nil {
                 using value_type = field_type;
 
                 /// @brief Mode of the field.
-                /// @see OptionalMode
+                /// @see optional_mode
                 using Mode = optional_mode;
 
                 /// @brief Default constructor
-                /// @details The mode it is created in is OptionalMode::tentative.
+                /// @details The mode it is created in is optional_mode::tentative.
                 optional() = default;
 
                 /// @brief Construct the field.
@@ -185,10 +185,10 @@ namespace nil {
                 }
 
                 /// @brief Get length required to serialise the current field value.
-                /// @return If current mode is OptionalMode::exists, then the function
+                /// @return If current mode is optional_mode::exists, then the function
                 ///     returns whatever length() member function of the wrapped field
-                ///     returns. Otherwise (for both OptionalMode::missing and
-                ///     OptionalMode::tentative) 0 is returned.
+                ///     returns. Otherwise (for both optional_mode::missing and
+                ///     optional_mode::tentative) 0 is returned.
                 std::size_t length() const {
                     return base_impl_type::length();
                 }
@@ -206,7 +206,7 @@ namespace nil {
                 }
 
                 /// @brief Check validity of the field value.
-                /// @return If field is marked to be missing (mode is OptionalMode::missing),
+                /// @return If field is marked to be missing (mode is optional_mode::missing),
                 ///     "true" is returned, otherwise valid() member function of the wrapped
                 ///     field is called.
                 bool valid() const {
@@ -223,11 +223,11 @@ namespace nil {
                 }
 
                 /// @brief Read field value from input data sequence
-                /// @details If field is marked as missing (mode is OptionalMode::missing),
+                /// @details If field is marked as missing (mode is optional_mode::missing),
                 ///     function returns nil::marshalling::ErrorStatus::Success without advancing iterator.@n
-                ///     If field is marked as existing (mode is OptionalMode::exists) the
+                ///     If field is marked as existing (mode is optional_mode::exists) the
                 ///     read() member function of the wrapped field object is invoked.@n
-                ///     If field is marked to be tentative (mode is OptionalMode::tentative),
+                ///     If field is marked to be tentative (mode is optional_mode::tentative),
                 ///     the call redirected to wrapped field's read() member function if
                 ///     value of the "len" parameter is greater than 0, i.e. there are
                 ///     still bytes available for reading, and field itself is marked as
@@ -253,11 +253,11 @@ namespace nil {
                 }
 
                 /// @brief Write current field value to output data sequence
-                /// @details If field is marked as missing (mode is OptionalMode::missing),
+                /// @details If field is marked as missing (mode is optional_mode::missing),
                 ///     function returns nil::marshalling::ErrorStatus::Success without advancing iterator.@n
-                ///     If field is marked as existing (mode is OptionalMode::exists) the
+                ///     If field is marked as existing (mode is optional_mode::exists) the
                 ///     write() member function of the wrapped field object is invoked.@n
-                ///     If field is marked to be tentative (mode is OptionalMode::tentative),
+                ///     If field is marked to be tentative (mode is optional_mode::tentative),
                 ///     the call redirected to wrapped field's write() member function if
                 ///     value of the "len" parameter is greater than 0, i.e. there is
                 ///     space available for writing.@n Otherwise, nil::marshalling::ErrorStatus::Success
@@ -312,7 +312,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the equality comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator==(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 if (field1.get_mode() != field2.get_mode()) {
@@ -330,7 +330,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the non-equality comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator!=(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 return !(field1 == field2);
@@ -340,7 +340,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the equivalence comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator<(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 if (field1.is_missing()) {
@@ -358,7 +358,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the equivalence comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator>(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 return (field2 < field1);
@@ -368,7 +368,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the equivalence comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator<=(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 return (field1 < field2) || (field1 == field2);
@@ -378,40 +378,39 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Result of the equivalence comparison of the contained fields.
-            /// @related Optional
+            /// @related optional
             template<typename TField, typename... TOptions>
             bool operator>=(const optional<TField, TOptions...> &field1, const optional<TField, TOptions...> &field2) {
                 return field2 <= field1;
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::Optional.
+            ///     variant of nil::marshalling::field::optional.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref Optional
-            /// @related nil::marshalling::field::Optional
+            /// @return true in case provided type is any variant of @ref optional
+            /// @related nil::marshalling::field::optional
             template<typename T>
             constexpr bool is_optional() {
                 return std::is_same<typename T::tag, tag::optional>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Optional type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::optional type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Optional
+            /// @related nil::marshalling::field::optional
             template<typename TField, typename... TOptions>
             inline optional<TField, TOptions...> &to_field_base(optional<TField, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Optional type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::optional type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Optional
+            /// @related nil::marshalling::field::optional
             template<typename TField, typename... TOptions>
             inline const optional<TField, TOptions...> &to_field_base(const optional<TField, TOptions...> &field) {
                 return field;
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_OPTIONAL_HPP

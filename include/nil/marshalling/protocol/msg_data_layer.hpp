@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -241,10 +242,10 @@ namespace nil {
                 /// @brief Write the message contents.
                 /// @details The way the message contents are written is determined by the
                 ///     type of the message. If TMsg type is recognised to be actual message
-                ///     inheriting from nil::marshalling::MessageBase with its fields provided using
+                ///     inheriting from nil::marshalling::message_base with its fields provided using
                 ///     nil::marshalling::option::FieldsImpl option, the function calls @b eval_write
-                ///     non-virtual function defined by nil::marshalling::MessageBase
-                ///     (see nil::marshalling::MessageBase::eval_write) or redefined by the actual
+                ///     non-virtual function defined by nil::marshalling::message_base
+                ///     (see nil::marshalling::message_base::eval_write) or redefined by the actual
                 ///     message itself. Otherwise, TMsg type is expected to be the used
                 ///     interface which allows polymorphic write functionality.
                 ///     It must define @b write() member function which will be

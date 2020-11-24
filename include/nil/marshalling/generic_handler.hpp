@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -22,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file marshalling/GenericHandler.h
+/// @file marshalling/generic_handler.h
 /// This file contains definition of common handler.
 
 #ifndef MARSHALLING_GENERIC_HANDLER_HPP
@@ -50,7 +51,7 @@ namespace nil {
         ///          virtual TRetType handle(TDefault& msg);
         ///          @endcode
         ///          which does nothing. To override the handling behaviour just inherit
-        ///          your handler from nil::marshalling::GenericHandler and override the appropriate
+        ///          your handler from nil::marshalling::generic_handler and override the appropriate
         ///          function.
         /// @tparam TDefault Base class of all custom messages bundled in TAll.
         /// @tparam TAll All message types bundled in std::tuple that need to
@@ -60,7 +61,7 @@ namespace nil {
         /// @pre TDefault is a base class for all the custom messages in TAll.
         /// @note The default destructor is @b NOT virtual. To allow polymorphic delete
         ///     make sure to declare the destructor virtual in the inherited class.
-        /// @headerfile nil/marshalling/GenericHandler.h
+        /// @headerfile nil/marshalling/generic_handler.h
         template<typename TDefault, typename TAll, typename TRetType = void>
         class generic_handler {
             static_assert(utilities::is_tuple<TAll>::value, "TAll must be std::tuple");

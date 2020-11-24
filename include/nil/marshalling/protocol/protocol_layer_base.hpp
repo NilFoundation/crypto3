@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -40,9 +41,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace protocol {
-
             namespace detail {
 
                 template<class T, class R = void>
@@ -246,7 +245,7 @@ namespace nil {
                 /// @tparam TIter Type of iterator used for reading.
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -281,7 +280,7 @@ namespace nil {
                 /// @tparam TIter Type of iterator used for reading.
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -313,7 +312,7 @@ namespace nil {
                 /// @tparam TIter Type of iterator used for reading.
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -349,7 +348,7 @@ namespace nil {
                 ///     transport fields (@ref all_fields_type type of the last protocol layer class).
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Iterator used for reading.
                 /// @param[in] size Number of bytes available for reading.
                 /// @param[out] missingSize If not nullptr and return value is
@@ -386,7 +385,7 @@ namespace nil {
                 ///     transport fields (@ref all_fields_type type of the last protocol layer class).
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Iterator used for reading.
                 /// @param[in] size Number of bytes available for reading.
                 /// @param[out] missingSize If not nullptr and return value is
@@ -423,7 +422,7 @@ namespace nil {
                 ///     transport fields (@ref all_fields_type type of the last protocol layer class).
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Iterator used for reading.
                 /// @param[in] size Number of bytes available for reading.
                 /// @param[out] missingSize If not nullptr and return value is
@@ -682,7 +681,7 @@ namespace nil {
             protected:
                 /// @brief Detect whether type is actual message object
                 /// @tparam T Type of the object
-                /// @return @b true if @b T type is extending @b nil::marshalling::MessageBase,
+                /// @return @b true if @b T type is extending @b nil::marshalling::message_base,
                 ///     @b false otherwise.
                 template<typename T>
                 static constexpr bool is_message_obj_ref() {
@@ -979,7 +978,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-
     }    // namespace marshalling
 }    // namespace nil
 

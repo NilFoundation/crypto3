@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -38,9 +39,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace detail {
 
                 template<bool THasFixedLength>
@@ -68,7 +67,7 @@ namespace nil {
             /// @brief Bitmask value field.
             /// @details Quite often communication protocols specify bitmask values, where
             ///     any bit has a specific meaning. Although such masks are can be handled
-            ///     as unsigned integer values using nil::marshalling::field::IntValue field type,
+            ///     as unsigned integer values using nil::marshalling::field::int_value field type,
             ///     using nil::marshalling::field::Bitmask may be a bit more convenient.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
@@ -79,7 +78,7 @@ namespace nil {
             ///     For example:
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::field::EnumValue<MyFieldBase>;
+            ///         using MyField =nil::marshalling::field::enum_value<MyFieldBase>;
             ///     @endcode
             ///     The serialized value of the field in the example above will consume
             ///     sizeof(unsigned) bytes, because the underlying type chosen to be "unsigned"
@@ -87,7 +86,7 @@ namespace nil {
             ///     2 bytes serialization length:
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::field::EnumValue<MyFieldBase,
+            ///         using MyField =nil::marshalling::field::enum_value<MyFieldBase,
             ///         nil::marshalling::option::fixed_length<2> >;
             ///     @endcode
             ///     Supported options are:
@@ -105,7 +104,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::EmptySerialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/BitmaskValue.h
+            /// @headerfile nil/marshalling/field/bitmask_value.h
             /// @see MARSHALLING_BITMASK_BITS()
             /// @see MARSHALLING_BITMASK_BITS_ACCESS()
             /// @see MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE()
@@ -379,7 +378,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related BitmaskValue
+            /// @related bitmask_value
             template<typename TFieldBase, typename... TOptions>
             bool operator==(const bitmask_value<TFieldBase, TOptions...> &field1,
                             const bitmask_value<TFieldBase, TOptions...> &field2) {
@@ -390,7 +389,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related BitmaskValue
+            /// @related bitmask_value
             template<typename TFieldBase, typename... TOptions>
             bool operator!=(const bitmask_value<TFieldBase, TOptions...> &field1,
                             const bitmask_value<TFieldBase, TOptions...> &field2) {
@@ -401,7 +400,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related BitmaskValue
+            /// @related bitmask_value
             template<typename TFieldBase, typename... TOptions>
             bool operator<(const bitmask_value<TFieldBase, TOptions...> &field1,
                            const bitmask_value<TFieldBase, TOptions...> &field2) {
@@ -409,34 +408,34 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::BitmaskValue.
+            ///     variant of nil::marshalling::field::bitmask_value.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref BitmaskValue
-            /// @related nil::marshalling::field::BitmaskValue
+            /// @return true in case provided type is any variant of @ref bitmask_value
+            /// @related nil::marshalling::field::bitmask_value
             template<typename T>
             constexpr bool is_bitmask_value() {
                 return std::is_same<typename T::tag, tag::bitmask>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::BitmaskValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bitmask_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::BitmaskValue
+            /// @related nil::marshalling::field::bitmask_value
             template<typename TFieldBase, typename... TOptions>
             inline bitmask_value<TFieldBase, TOptions...> &
                 to_field_base(bitmask_value<TFieldBase, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::BitmaskValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bitmask_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::BitmaskValue
+            /// @related nil::marshalling::field::bitmask_value
             template<typename TFieldBase, typename... TOptions>
             inline const bitmask_value<TFieldBase, TOptions...> &
                 to_field_base(const bitmask_value<TFieldBase, TOptions...> &field) {
                 return field;
             }
 
-/// @brief Provide names for bits in nil::marshalling::field::BitmaskValue field.
+/// @brief Provide names for bits in nil::marshalling::field::bitmask_value field.
 /// @details Defines BitIdx enum with all the provided values prefixed with
 ///     "BitIdx_". For example usage of
 ///     @code
@@ -477,15 +476,15 @@ namespace nil {
 ///     The macro MARSHALLING_BITMASK_BITS() should be used inside definition of the
 ///     bitmask field to provide names for the bits for external use:
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         MARSHALLING_BITMASK_BITS(first, second, third, fourth);
 ///     }
 ///     @endcode
-/// @related nil::marshalling::field::BitmaskValue
+/// @related nil::marshalling::field::bitmask_value
 #define MARSHALLING_BITMASK_BITS(...) MARSHALLING_DEFINE_ENUM(BitIdx, __VA_ARGS__)
 
-/// @brief Generate access functions for bits in nil::marshalling::field::BitmaskValue field.
+/// @brief Generate access functions for bits in nil::marshalling::field::bitmask_value field.
 /// @details The @ref MARSHALLING_BITMASK_BITS() macro defines @b BitIdx enum to
 ///     be able to access internal bits. However, an ability to provide
 ///     values to the enumeration values using @b =val suffixes doesn't
@@ -494,7 +493,7 @@ namespace nil {
 ///     listed in the parameters list, @b getBitValue_*() and @b set_bit_value_*()
 ///     functions will be generated. For example, having the following definition
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         ...
 ///         MARSHALLING_BITMASK_BITS_ACCESS(first, third, fourth);
@@ -502,7 +501,7 @@ namespace nil {
 ///     @endcode
 ///     is equivalent to having following functions defined:
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         ...
 ///         bool getBitValue_first() const {
@@ -535,14 +534,14 @@ namespace nil {
 ///     @ref MARSHALLING_BITMASK_BITS(). It means that MARSHALLING_BITMASK_BITS_ACCESS()
 ///     macro can NOT be used without @ref MARSHALLING_BITMASK_BITS().
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         MARSHALLING_BITMASK_BITS(first, third=2, fourth);
 ///         MARSHALLING_BITMASK_BITS_ACCESS(first, third, fourth);
 ///     }
 ///     @endcode
 /// @pre Must be used together with @ref MARSHALLING_BITMASK_BITS()
-/// @related nil::marshalling::field::BitmaskValue
+/// @related nil::marshalling::field::bitmask_value
 /// @warning Some compilers, such as @b clang or early versions of @b g++
 ///     may have problems compiling code generated by this macro even
 ///     though it uses valid C++11 constructs in attempt to automatically identify the
@@ -551,12 +550,12 @@ namespace nil {
 ///     @ref MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE() macro instead. In
 ///     case this macro needs to reside inside a @b template class, then
 ///     there is a need to define inner @b Base type, which specifies
-///     exact type of the @ref nil::marshalling::field::BitmaskValue class. For example:
+///     exact type of the @ref nil::marshalling::field::bitmask_value class. For example:
 ///     @code
 ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
 ///     template <typename... TExtraOptions>
 ///     class MyField : public
-///         nil::marshalling::field::BitmaskValue<
+///         nil::marshalling::field::bitmask_value<
 ///             MyFieldBase,
 ///             nil::marshalling::field::fixed_length<1>,
 ///             nil::marshalling::field::BitmaskReservedBits<0xf2, 0>,
@@ -565,7 +564,7 @@ namespace nil {
 ///     {
 ///         // Duplicate definition of the base class
 ///         using Base =
-///             nil::marshalling::field::BitmaskValue<
+///             nil::marshalling::field::bitmask_value<
 ///                 MyFieldBase,
 ///                 nil::marshalling::field::fixed_length<1>,
 ///                 smarshalling::field::BitmaskReservedBits<0xf2, 0>,
@@ -594,7 +593,7 @@ namespace nil {
 ///     compilation fails and the class it is being used in is @b NOT a
 ///     template one, please use @ref MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE()
 ///     instead.
-/// @related nil::marshalling::field::BitmaskValue
+/// @related nil::marshalling::field::bitmask_value
 #define MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE(...) MARSHALLING_DO_BIT_ACC_FUNC((*this), __VA_ARGS__)
 
 /// @brief Combine usage of @ref MARSHALLING_BITMASK_BITS() and @ref MARSHALLING_BITMASK_BITS_ACCESS().
@@ -604,14 +603,14 @@ namespace nil {
 ///     @ref MARSHALLING_BITMASK_BITS() and @ref MARSHALLING_BITMASK_BITS_ACCESS() with the
 ///     same bit names. For example
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         MARSHALLING_BITMASK_BITS_SEQ(first, second, third, fourth);
 ///     }
 ///     @endcode
 ///     is equivalent to having
 ///     @code
-///     struct MyField : public nil::marshalling::field::BitmaskValue<...>
+///     struct MyField : public nil::marshalling::field::bitmask_value<...>
 ///     {
 ///         enum BitIdx
 ///         {
@@ -632,7 +631,7 @@ namespace nil {
 ///         void set_bit_value_fourth(bool value) {...}
 ///     };
 ///     @endcode
-/// @related nil::marshalling::field::BitmaskValue
+/// @related nil::marshalling::field::bitmask_value
 /// @warning Some compilers, such as @b clang or early versions of @b g++
 ///     may have problems compiling code generated by this macro even
 ///     though it uses valid C++11 constructs in attempt to automatically identify the
@@ -641,12 +640,12 @@ namespace nil {
 ///     @ref MARSHALLING_BITMASK_BITS_SEQ_NOTEMPLATE() macro instead. In
 ///     case this macro needs to reside inside a @b template class, then
 ///     there is a need to define inner @b Base type, which specifies
-///     exact type of the @ref nil::marshalling::field::BitmaskValue class. For example:
+///     exact type of the @ref nil::marshalling::field::bitmask_value class. For example:
 ///     @code
 ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
 ///     template <typename... TExtraOptions>
 ///     class MyField : public
-///         nil::marshalling::field::BitmaskValue<
+///         nil::marshalling::field::bitmask_value<
 ///             MyFieldBase,
 ///             nil::marshalling::field::fixed_length<1>,
 ///             nil::marshalling::field::BitmaskReservedBits<0xf0, 0>,
@@ -655,7 +654,7 @@ namespace nil {
 ///     {
 ///         // Duplicate definition of the base class
 ///         using Base =
-///             nil::marshalling::field::BitmaskValue<
+///             nil::marshalling::field::bitmask_value<
 ///                 MyFieldBase,
 ///                 nil::marshalling::field::fixed_length<1>,
 ///                 scomms::field::BitmaskReservedBits<0xf0, 0>,
@@ -678,13 +677,12 @@ namespace nil {
 ///     compilation fails and the class it is being used in is @b NOT a
 ///     template one, please use @ref MARSHALLING_BITMASK_BITS_SEQ_NOTEMPLATE()
 ///     instead.
-/// @related nil::marshalling::field::BitmaskValue
+/// @related nil::marshalling::field::bitmask_value
 #define MARSHALLING_BITMASK_BITS_SEQ_NOTEMPLATE(...) \
     MARSHALLING_BITMASK_BITS(__VA_ARGS__)            \
     MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE(__VA_ARGS__)
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BITMASK_VALUE_HPP

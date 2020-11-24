@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -34,7 +35,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
             /// @brief Bundles multiple fields into a single field.
@@ -53,7 +53,7 @@ namespace nil {
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::default_value_initializer - All wrapped fields may
             ///         specify their independent default value initialisers. It is
-            ///         also possible to provide initialiser for the Bundle field which
+            ///         also possible to provide initialiser for the bundle field which
             ///         will set appropriate values to the fields based on some
             ///         internal logic.
             ///     @li @ref nil::marshalling::option::ContentsValidator - All wrapped fields may specify
@@ -77,7 +77,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::EmptySerialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/Bundle.h
+            /// @headerfile nil/marshalling/field/bundle.h
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS()
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
@@ -568,7 +568,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator==(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                             const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -579,7 +579,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator!=(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                             const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -589,7 +589,7 @@ namespace nil {
             /// @brief Equivalence comparison operator.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator<(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                            const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -599,7 +599,7 @@ namespace nil {
             /// @brief Equivalence comparison operator.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator<=(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                             const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -609,7 +609,7 @@ namespace nil {
             /// @brief Equivalence comparison operator.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator>(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                            const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -619,7 +619,7 @@ namespace nil {
             /// @brief Equivalence comparison operator.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
-            /// @related Bundle
+            /// @related bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator>=(const bundle<TFieldBase, TMembers, TOptions...> &field1,
                             const bundle<TFieldBase, TMembers, TOptions...> &field2) {
@@ -627,27 +627,27 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::Bundle.
+            ///     variant of nil::marshalling::field::bundle.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref Bundle
-            /// @related nil::marshalling::field::Bundle
+            /// @return true in case provided type is any variant of @ref bundle
+            /// @related nil::marshalling::field::bundle
             template<typename T>
             constexpr bool is_bundle() {
                 return std::is_same<typename T::tag, tag::bundle>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Bundle type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bundle type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Bundle
+            /// @related nil::marshalling::field::bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline bundle<TFieldBase, TMembers, TOptions...> &
                 to_field_base(bundle<TFieldBase, TMembers, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Bundle type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bundle type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Bundle
+            /// @related nil::marshalling::field::bundle
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline const bundle<TFieldBase, TMembers, TOptions...> &
                 to_field_base(const bundle<TFieldBase, TMembers, TOptions...> &field) {
@@ -655,7 +655,6 @@ namespace nil {
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BUNDLE_HPP

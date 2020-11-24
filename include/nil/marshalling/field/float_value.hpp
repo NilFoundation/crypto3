@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -34,7 +35,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
             /// @brief field_type that represent floating point value.
@@ -48,7 +48,7 @@ namespace nil {
             ///     of the field. If no option is provided The field's value is serialized as is.
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::field::FloatValue<MyFieldBase, float>;
+            ///         using MyField =nil::marshalling::field::float_value<MyFieldBase, float>;
             ///     @endcode
             ///     In the example above it will
             ///     consume 4 bytes (because sizeof(float) == 4) and will
@@ -72,7 +72,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::InvalidByDefault
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/FloatValue.h
+            /// @headerfile nil/marshalling/field/float_value.h
             template<typename TFieldBase, typename T, typename... TOptions>
             class float_value : private detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...>;
@@ -259,7 +259,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related FloatValue
+            /// @related float_value
             template<typename TFieldBase, typename T, typename... TOptions>
             bool operator==(const float_value<TFieldBase, T, TOptions...> &field1,
                             const float_value<TFieldBase, T, TOptions...> &field2) {
@@ -270,7 +270,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related FloatValue
+            /// @related float_value
             template<typename TFieldBase, typename T, typename... TOptions>
             bool operator!=(const float_value<TFieldBase, T, TOptions...> &field1,
                             const float_value<TFieldBase, T, TOptions...> &field2) {
@@ -281,7 +281,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related FloatValue
+            /// @related float_value
             template<typename TFieldBase, typename T, typename... TOptions>
             bool operator<(const float_value<TFieldBase, T, TOptions...> &field1,
                            const float_value<TFieldBase, T, TOptions...> &field2) {
@@ -289,27 +289,27 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::FloatValue.
+            ///     variant of nil::marshalling::field::float_value.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref FloatValue
-            /// @related nil::marshalling::field::FloatValue
+            /// @return true in case provided type is any variant of @ref float_value
+            /// @related nil::marshalling::field::float_value
             template<typename T>
             constexpr bool is_float_value() {
                 return std::is_same<typename T::tag, tag::floating_point>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::FloatValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::float_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::FloatValue
+            /// @related nil::marshalling::field::float_value
             template<typename TFieldBase, typename T, typename... TOptions>
             inline float_value<TFieldBase, T, TOptions...> &
                 to_field_base(float_value<TFieldBase, T, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::FloatValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::float_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::FloatValue
+            /// @related nil::marshalling::field::float_value
             template<typename TFieldBase, typename T, typename... TOptions>
             inline const float_value<TFieldBase, T, TOptions...> &
                 to_field_base(const float_value<TFieldBase, T, TOptions...> &field) {
@@ -317,7 +317,6 @@ namespace nil {
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_FLOAT_VALUE_HPP

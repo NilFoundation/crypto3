@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -30,9 +31,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace adapter {
 
                 template<typename TLenField, nil::marshalling::status_type TStatus, typename TBase>
@@ -131,9 +130,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SEQUENCE_SER_LENGTH_FIELD_PREFIX_HPP

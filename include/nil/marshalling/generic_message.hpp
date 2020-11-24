@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -50,7 +51,7 @@ namespace nil {
         using generic_message_fields
             = std::tuple<nil::marshalling::field::array_list<TFieldBase, std::uint8_t, TExtraOpts>>;
 
-        /// @brief Generic Message
+        /// @brief Generic message
         /// @details Generic message is there to substitute definition of actual message
         ///     when contents of the latter are not important. It defines single @b data
         ///     field as variable length sequence of raw bytes (see @ref GenericMessageFields).
@@ -66,7 +67,7 @@ namespace nil {
         ///     @b std::tuple) to be passed to the definition of the @b data
         ///     field (see @ref GenericMessageFields).
         /// @tparam TExtraOpts Extra option(s) (multple options need to be bundled in
-        ///     @b std::tuple) to be passed to @ref nil::marshalling::MessageBase which is base
+        ///     @b std::tuple) to be passed to @ref nil::marshalling::message_base which is base
         ///     to this one.
         /// @pre Requires the common message interface (@b TMessage) to define
         ///     inner @b msg_id_type and @b msg_id_param_type types (expected to use
@@ -90,11 +91,11 @@ namespace nil {
 
         public:
             /// @brief Type of the message ID
-            /// @details The same as nil::marshalling::Message::msg_id_type;
+            /// @details The same as nil::marshalling::message::msg_id_type;
             using msg_id_type = typename Base::msg_id_type;
 
             /// @brief Type of the message ID passed as parameter
-            /// @details The same as nil::marshalling::Message::msg_id_param_type;
+            /// @details The same as nil::marshalling::message::msg_id_param_type;
             using msg_id_param_type = typename Base::msg_id_param_type;
 
             /// @brief Default constructor is deleted
@@ -122,19 +123,19 @@ namespace nil {
 
             /// @brief Allow access to internal fields.
             /// @details See definition of @ref MARSHALLING_MSG_FIELDS_ACCESS() macro
-            ///     related to @b nil::marshalling::MessageBase class for details.
+            ///     related to @b nil::marshalling::message_base class for details.
             ///
             MARSHALLING_MSG_FIELDS_ACCESS(data);
 
             /// @brief Get message ID information
-            /// @details The nil::marshalling::MessageBase::get_id_impl() will invoke this
+            /// @details The nil::marshalling::message_base::get_id_impl() will invoke this
             ///     function.
             msg_id_param_type eval_get_id() const {
                 return m_id;
             }
 
             /// @brief Get message name information.
-            /// @details The nil::marshalling::MessageBase::name_impl() will invoke this
+            /// @details The nil::marshalling::message_base::name_impl() will invoke this
             ///     function.
             const char *eval_name() const {
                 return "Generic message";

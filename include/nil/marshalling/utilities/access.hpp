@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -40,10 +41,10 @@ namespace nil {
 
                 namespace endian {
 
-                    /// @brief Empty class used in traits to indicate Big Endian.
+                    /// @brief Empty class used in traits to indicate big endian.
                     struct big { };
 
-                    /// @brief Empty class used in traits to indicate Little Endian.
+                    /// @brief Empty class used in traits to indicate little endian.
                     struct little { };
 
                 }    // namespace endian

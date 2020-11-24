@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -36,16 +37,15 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
             /// @brief Defines a "variant" field, that can contain any of the provided ones.
-            /// @details The @b Variant object contains uninitialised buffer that can
+            /// @details The @b variant object contains uninitialised buffer that can
             ///     fit any of the provided field types (as second template parameter).
             ///     At any given point of time this space can be initialised and used to
             ///     contain <b>at most</b> one of the specified field types. It resembles
             ///     a classic @b union, but disallows set value of one field type and read
-            ///     it as other. The @b Variant field abstraction provides
+            ///     it as other. The @b variant field abstraction provides
             ///     expected single field API functions, such as length(), read(), write(),
             ///     valid().
             ///
@@ -61,7 +61,7 @@ namespace nil {
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::default_value_initializer - All wrapped fields may
             ///         specify their independent default value initialisers. It is
-            ///         also possible to provide initialiser for the Variant field which
+            ///         also possible to provide initialiser for the variant field which
             ///         will set appropriate values to the fields based on some
             ///         internal logic.
             ///     @li @ref nil::marshalling::option::ContentsValidator - All wrapped fields may specify
@@ -80,7 +80,7 @@ namespace nil {
             ///         invoking read() member function of every member field. It is possible
             ///         to provide cusom reader functionality using nil::marshalling::option::custom_value_reader
             ///         option.
-            ///     @li @ref nil::marshalling::option::DefaultVariantIndex - By default the Variant field
+            ///     @li @ref nil::marshalling::option::DefaultVariantIndex - By default the variant field
             ///         doesn't have any valid contents. This option may be used to specify
             ///         the index of the default member field.
             ///     @li @ref nil::marshalling::option::has_custom_read
@@ -88,7 +88,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::EmptySerialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/Variant.h
+            /// @headerfile nil/marshalling/field/variant.h
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS()
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
@@ -187,7 +187,7 @@ namespace nil {
 
                 /// @brief Write current field value to output data sequence
                 /// @details Invokes write() member function of the contained field if such
-                ///     exists. If the Variant field doesn't contain any valid field, the
+                ///     exists. If the variant field doesn't contain any valid field, the
                 ///     function doesn't advance the iterator, but returns nil::marshalling::ErrorStatus::Success.
                 /// @param[in, out] iter Iterator to write the data.
                 /// @param[in] size Maximal number of bytes that can be written.
@@ -223,7 +223,7 @@ namespace nil {
                 }
 
                 /// @brief Get index of the current field (within the @ref Members tuple).
-                /// @details If the Variant field doesn't contain any valid field, the
+                /// @details If the variant field doesn't contain any valid field, the
                 ///     returned index is equivalent to size of the @ref Members tuple.
                 std::size_t current_field() const {
                     return base_impl_type::current_field();
@@ -273,7 +273,7 @@ namespace nil {
                 ///     }
                 ///     @endcode
                 ///     The TField will be the actual type of the contained field.
-                ///     If the Variant field doesn't contain any valid field, the functor
+                ///     If the variant field doesn't contain any valid field, the functor
                 ///     will @b NOT be called.
                 template<typename TFunc>
                 void current_field_exec(TFunc &&func) {
@@ -295,7 +295,7 @@ namespace nil {
                 ///     }
                 ///     @endcode
                 ///     The TField will be the actual type of the contained field.
-                ///     If the Variant field doesn't contain any valid field, the functor
+                ///     If the variant field doesn't contain any valid field, the functor
                 ///     will @b NOT be called.
                 template<typename TFunc>
                 void current_field_exec(TFunc &&func) const {
@@ -463,7 +463,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related Variant
+            /// @related variant
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator==(const variant<TFieldBase, TMembers, TOptions...> &field1,
                             const variant<TFieldBase, TMembers, TOptions...> &field2) {
@@ -492,7 +492,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related Variant
+            /// @related variant
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator!=(const variant<TFieldBase, TMembers, TOptions...> &field1,
                             const variant<TFieldBase, TMembers, TOptions...> &field2) {
@@ -500,27 +500,27 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::Variant.
+            ///     variant of nil::marshalling::field::variant.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref Variant
-            /// @related nil::marshalling::field::Variant
+            /// @return true in case provided type is any variant of @ref variant
+            /// @related nil::marshalling::field::variant
             template<typename T>
             constexpr bool is_variant() {
                 return std::is_same<typename T::tag, tag::variant>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Variant type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::variant type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Variant
+            /// @related nil::marshalling::field::variant
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline variant<TFieldBase, TMembers, TOptions...> &
                 to_field_base(variant<TFieldBase, TMembers, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Variant type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::variant type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Variant
+            /// @related nil::marshalling::field::variant
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline const variant<TFieldBase, TMembers, TOptions...> &
                 to_field_base(const variant<TFieldBase, TMembers, TOptions...> &field) {
@@ -528,19 +528,19 @@ namespace nil {
             }
 
 /// @brief Add convenience access enum and functions to the members of
-///     @ref nil::marshalling::field::Variant field.
-/// @details All the possible field types the @ref nil::marshalling::field::Variant field
+///     @ref nil::marshalling::field::variant field.
+/// @details All the possible field types the @ref nil::marshalling::field::variant field
 ///     can contain are bundled in
 ///     <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>
 ///     and provided as a template parameter to the definition of the
-///     nil::marshalling::field::Variant field.
+///     nil::marshalling::field::variant field.
 ///     @code
 ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
 ///     using ... Field1;
 ///     using ... Field2;
 ///     using ... Field3;
 ///     using MyField =
-///         nil::marshalling::field::Variant<
+///         nil::marshalling::field::variant<
 ///             MyFieldBase,
 ///             std::tuple<Field1, Field2, Field3>
 ///         >;
@@ -552,10 +552,10 @@ namespace nil {
 ///     However, it would be convenient to provide names and easier access to
 ///     all the poisble variants. The MARSHALLING_VARIANT_MEMBERS_ACCESS() macro does exactly
 ///     that when used inside the field class definition. Just inherit from
-///     the nil::marshalling::field::Variant class and use the macro inside with the names for the
+///     the nil::marshalling::field::variant class and use the macro inside with the names for the
 ///     member fields:
 ///     @code
-///     class MyField : public nil::marshalling::field::Variant<...>
+///     class MyField : public nil::marshalling::field::variant<...>
 ///     {
 ///     public:
 ///         MARSHALLING_FIELD_MEMBERS_ACCESS(member1, member2, member3);
@@ -564,7 +564,7 @@ namespace nil {
 ///     It would be equivalent to having the following types and functions
 ///     definitions:
 ///     @code
-///     class MyField : public nil::marshalling::field::Variant<...>
+///     class MyField : public nil::marshalling::field::variant<...>
 ///     {
 ///     public:
 ///         // Access indices for member fields
@@ -642,7 +642,7 @@ namespace nil {
 ///
 ///     See @ref sec_field_tutorial_variant for more examples and details
 /// @param[in] ... List of member fields' names.
-/// @related nil::marshalling::field::Variant
+/// @related nil::marshalling::field::variant
 /// @warning Some compilers, such as @b clang or early versions of @b g++
 ///     may have problems compiling code generated by this macro even
 ///     though it uses valid C++11 constructs in attempt to automatically identify the
@@ -651,11 +651,11 @@ namespace nil {
 ///     MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE() macro instead. In
 ///     case this macro needs to reside inside a @b template class, then
 ///     there is a need to define inner @b Base type, which specifies
-///     exact type of the @ref nil::marshalling::field::Variant class. For example:
+///     exact type of the @ref nil::marshalling::field::variant class. For example:
 ///     @code
 ///     template <typename... TExtraOptions>
 ///     class MyField : public
-///         nil::marshalling::field::Variant<
+///         nil::marshalling::field::variant<
 ///             MyFieldBase,
 ///             std::tuple<Field1, Field2, Field3>,
 ///             TExtraOptions...
@@ -663,7 +663,7 @@ namespace nil {
 ///     {
 ///         // Duplicate the base class definition
 ///         using Base =
-///             nil::marshalling::field::Variant<
+///             nil::marshalling::field::variant<
 ///                 MyFieldBase,
 ///                 std::tuple<Field1, Field2, Field3>,
 ///                 TExtraOptions...
@@ -688,7 +688,7 @@ namespace nil {
                       "Invalid number of names for variant field");                               \
         return var;                                                                               \
     }                                                                                             \
-    MARSHALLING_DO_VARIANT_MEM_ACC_FUNC(asVariant(), __VA_ARGS__)
+    MARSHALLING_DO_VARIANT_MEM_ACC_FUNC(as_variant(), __VA_ARGS__)
 
 /// @brief Similar to MARSHALLING_VARIANT_MEMBERS_ACCESS(), but dedicated for
 ///     non-template classes.
@@ -699,13 +699,12 @@ namespace nil {
 ///     compilation fails and the class it is being used in is @b NOT a
 ///     template one, please use @ref MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE()
 ///     instead.
-/// @related nil::marshalling::field::Variant
+/// @related nil::marshalling::field::variant
 #define MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE(...)         \
     MARSHALLING_EXPAND(MARSHALLING_DEFINE_FIELD_ENUM(__VA_ARGS__)) \
     MARSHALLING_DO_VARIANT_MEM_ACC_FUNC_NOTEMPLATE(__VA_ARGS__)
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_VARIANT_HPP

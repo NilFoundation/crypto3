@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -33,8 +34,8 @@
 #include <nil/marshalling/detail/base_detection.hpp>
 
 #ifdef MARSHALLING_MUST_DEFINE_BASE
-#define MARSHALLING_AS_VARIANT_FUNC Base& asVariant()
-#define MARSHALLING_AS_VARIANT_CONST_FUNC const Base& asVariant() const
+#define MARSHALLING_AS_VARIANT_FUNC Base& as_variant()
+#define MARSHALLING_AS_VARIANT_CONST_FUNC const Base& as_variant() const
 #define MARSHALLING_VARIANT_INIT_FIELD_FUNC(v_, n_)                                                         \
     typename std::tuple_element<MARSHALLING_CONCATENATE(FieldIdx_, n_), typename Base::members_type>::type& \
         MARSHALLING_CONCATENATE(initField_, n_)(TArgs && ... args)
@@ -47,9 +48,9 @@
 
 #else    // #ifdef MARSHALLING_MUST_DEFINE_BASE
 #define MARSHALLING_AS_VARIANT_FUNC \
-    FUNC_AUTO_REF_RETURN(asVariant, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN(as_variant, decltype(nil::marshalling::field::to_field_base(*this)))
 #define MARSHALLING_AS_VARIANT_CONST_FUNC \
-    FUNC_AUTO_REF_RETURN_CONST(asVariant, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN_CONST(as_variant, decltype(nil::marshalling::field::to_field_base(*this)))
 #define MARSHALLING_VARIANT_INIT_FIELD_FUNC(v_, n_)               \
     FUNC_ARGS_AUTO_REF_RETURN(                                    \
         MARSHALLING_CONCATENATE(initField_, n_), TArgs&&... args, \

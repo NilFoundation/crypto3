@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -49,7 +50,7 @@ namespace nil {
             /// @brief Protocol layer that uses uses message ID field as a prefix to all the
             ///        subsequent data written by other (next) layers.
             /// @details The main purpose of this layer is to process the message ID information.
-            ///     Holds instance of nil::marshalling::MsgFactory as its private member and uses it
+            ///     Holds instance of nil::marshalling::msg_factory as its private member and uses it
             ///     to create message(s) with the required ID.
             /// @tparam TField field_type type that contains message ID.
             /// @tparam TMessage Interface class for the @b input messages
@@ -57,7 +58,7 @@ namespace nil {
             ///     that this protocol stack must be able to read() as well as create (using create_msg()).
             /// @tparam TNextLayer Next transport layer type.
             /// @tparam TOptions All the options that will be forwarded to definition of
-            ///     message factory type (nil::marshalling::MsgFactory).
+            ///     message factory type (nil::marshalling::msg_factory).
             /// @headerfile nil/marshalling/protocol/MsgIdLayer.h
             template<typename TField, typename TMessage, typename TAllMessages, typename TNextLayer,
                      typename... TOptions>
@@ -77,11 +78,11 @@ namespace nil {
 
             public:
                 /// @brief All supported message types bundled in std::tuple.
-                /// @see nil::marshalling::MsgFactory::all_messages_type.
+                /// @see nil::marshalling::msg_factory::all_messages_type.
                 using all_messages_type = typename factory_type::all_messages_type;
 
                 /// @brief Type of smart pointer that will hold allocated message object.
-                /// @details Same as nil::marshalling::MsgFactory::msg_ptr_type.
+                /// @details Same as nil::marshalling::msg_factory::msg_ptr_type.
                 using msg_ptr_type = typename factory_type::msg_ptr_type;
 
                 /// @brief Type of the @b input message interface.
@@ -137,7 +138,7 @@ namespace nil {
                 /// @param[out] field field_type object to read.
                 /// @param[in, out] msg Reference to smart pointer that will hold
                 ///                 allocated message object, or to the previously allocated
-                ///                 message object itself (which extends @ref nil::marshalling::MessageBase).
+                ///                 message object itself (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -181,9 +182,9 @@ namespace nil {
                 /// @details The function will write ID of the message to the data
                 ///     sequence, then call write() member function of the next
                 ///     protocol layer. If @b TMsg type is recognised to be actual message
-                ///     type (inherited from nil::marshalling::MessageBase while using
+                ///     type (inherited from nil::marshalling::message_base while using
                 ///     nil::marshalling::option::StaticNumIdImpl option to specify its numeric ID),
-                ///     its defined @b eval_get_id() member function (see nil::marshalling::MessageBase::eval_get_id())
+                ///     its defined @b eval_get_id() member function (see nil::marshalling::message_base::eval_get_id())
                 ///     non virtual function is called. Otherwise polymorphic @b get_id()
                 ///     member function is used to retrieve the message ID information, which
                 ///     means the message interface class must use nil::marshalling::option::IdInfoInterface
@@ -220,12 +221,12 @@ namespace nil {
                 /// @copybrief ProtocolLayerBase::create_msg
                 /// @details Hides and overrides create_msg() function inherited from
                 ///     @ref ProtocolLayerBase. This function forwards the request to the
-                ///     message factory object (@ref nil::marshalling::MsgFactory) embedded as a private
+                ///     message factory object (@ref nil::marshalling::msg_factory) embedded as a private
                 ///     data member of this class.
                 /// @param[in] id ID of the message
                 /// @param[in] idx Relative index of the message with the same ID.
                 /// @return Smart pointer to the created message object.
-                /// @see nil::marshalling::MsgFactory::create_msg()
+                /// @see nil::marshalling::msg_factory::create_msg()
                 msg_ptr_type create_msg(msg_id_param_type id, unsigned idx = 0) {
                     return factory_.create_msg(id, idx);
                 }

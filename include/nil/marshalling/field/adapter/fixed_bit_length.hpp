@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -35,9 +36,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace adapter {
 
                 template<std::size_t TLen, typename TBase>
@@ -141,7 +140,8 @@ namespace nil {
 
                     using sign_ext_tag =
                         typename std::conditional
-                        < bit_length<static_cast<std::size_t>(std::numeric_limits<unsigned_serialized_type>::digits),
+                        < bit_length<static_cast<std::size_t>
+                                    (std::numeric_limits<unsigned_serialized_type>::digits),
                                      must_sign_ext_tag,
                                      no_sign_ext_tag>::type;
 
@@ -195,9 +195,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_FIXED_BIT_LENGTH_HPP

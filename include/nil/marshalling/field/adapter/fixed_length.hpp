@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -34,9 +35,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace adapter {
 
                 template<std::size_t TLen, bool TSignExtend, typename TBase>
@@ -186,9 +185,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_FIXED_LENGTH_HPP

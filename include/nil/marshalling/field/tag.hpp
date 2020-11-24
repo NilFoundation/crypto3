@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -27,9 +28,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace tag {
 
                 struct raw_array_list { };
@@ -57,9 +56,7 @@ namespace nil {
                 struct variant { };
 
             }    // namespace tag
-
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_TAG_HPP

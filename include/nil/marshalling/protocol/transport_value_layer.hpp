@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -30,7 +31,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace protocol {
 
             /// @brief Protocol layer that reads a value from transport wrapping and
@@ -43,12 +43,12 @@ namespace nil {
             ///     "extra transport" data member field. This layer requires extra support
             ///     from the defined message interface object - there is a need to pass
             ///     @ref nil::marshalling::option::extra_transport_fields_type option to the interface definition
-            ///     @ref nil::marshalling::Message class.
+            ///     @ref nil::marshalling::message class.
             ///     This layer is a mid level layer, expects other mid level layer or
             ///     MsgDataLayer to be its next one.
             /// @tparam TField Type of the field that is used read / write extra transport value.
             /// @tparam TIdx Index of "extra transport" field that message object contains
-            ///     (accessed via @ref nil::marshalling::Message::transport_fields()).
+            ///     (accessed via @ref nil::marshalling::message::transport_fields()).
             /// @tparam TNextLayer Next transport layer in protocol stack.
             /// @tparam TOptions Extending functionality options. Supported options are:
             ///     @li @ref nil::marshalling::option::PseudoValue - Mark the handled value to be "pseudo"
@@ -90,13 +90,13 @@ namespace nil {
                 /// @brief Customized read functionality, invoked by @ref read().
                 /// @details Reads the value from the input data and assigns it to appropriate
                 ///     extra transport field inside the message object (accessed via
-                ///     nil::marshalling::Message::transport_fields()). @n
+                ///     nil::marshalling::message::transport_fields()). @n
                 ///     Note, that this operation works fine even if message object is created
                 ///     after reading the transport value. There is "inner magic" that causes
                 ///     read operation to proceed until @b DATA layer
                 ///     (implemented by @ref nil::marshalling::protocol::MsgDataLayer), assigns the
                 ///     read value to message object, then proceeds to reading the message
-                ///     contents, i.e. when @ref nil::marshalling::Message::read() function is invoked
+                ///     contents, i.e. when @ref nil::marshalling::message::read() function is invoked
                 ///     the message object already has the value of the transport field updated.
                 /// @tparam TMsg Type of the @b msg parameter.
                 /// @tparam TIter Type of iterator used for reading.
@@ -104,7 +104,7 @@ namespace nil {
                 /// @param[out] field field_type object to read.
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -330,7 +330,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_TRANSPORT_VALUE_LAYER_HPP

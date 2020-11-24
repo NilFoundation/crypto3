@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -42,8 +43,8 @@ namespace nil {
 
             /// @brief Enumerator value field.
             /// @details Sometimes dealing with enum values is much more convenient that
-            ///     using integral values. nil::marshalling::field::EnumValue is very similar to
-            ///     nil::marshalling::field::IntValue, but receives underlying enum type in its
+            ///     using integral values. nil::marshalling::field::enum_value is very similar to
+            ///     nil::marshalling::field::int_value, but receives underlying enum type in its
             ///     template parameters instead of integral one.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
@@ -60,7 +61,7 @@ namespace nil {
             ///             Value3
             ///         }
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::field::EnumValue<MyFieldBase, MyEnum>;
+            ///         using MyField =nil::marshalling::field::enum_value<MyFieldBase, MyEnum>;
             ///     @endcode
             ///     The serialized value of the field in the example above will consume
             ///     2 bytes, because the underlying type of MyEnum is
@@ -87,7 +88,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::InvalidByDefault
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/Bundle.h
+            /// @headerfile nil/marshalling/field/enum_value.h
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             class enum_value
                 : private detail::adapt_basic_field_type<basic::enum_value<TFieldBase, TEnum>, TOptions...> {
@@ -290,7 +291,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related EnumValue
+            /// @related enum_value
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             bool operator==(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
                             const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
@@ -301,7 +302,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related EnumValue
+            /// @related enum_value
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             bool operator!=(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
                             const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
@@ -312,7 +313,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related EnumValue
+            /// @related enum_value
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             bool operator<(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
                            const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
@@ -320,27 +321,27 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::EnumValue.
+            ///     variant of nil::marshalling::field::enum_value.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref EnumValue
-            /// @related nil::marshalling::field::EnumValue
+            /// @return true in case provided type is any variant of @ref enum_value
+            /// @related nil::marshalling::field::enum_value
             template<typename T>
             constexpr bool is_enum_value() {
                 return std::is_same<typename T::tag, tag::enumerate>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::EnumValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::enum_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::EnumValue
+            /// @related nil::marshalling::field::enum_value
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             inline enum_value<TFieldBase, TEnum, TOptions...> &
                 to_field_base(enum_value<TFieldBase, TEnum, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::EnumValue type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::enum_value type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::EnumValue
+            /// @related nil::marshalling::field::enum_value
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             inline const enum_value<TFieldBase, TEnum, TOptions...> &
                 to_field_base(const enum_value<TFieldBase, TEnum, TOptions...> &field) {
@@ -348,7 +349,6 @@ namespace nil {
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ENUM_VALUE_HPP

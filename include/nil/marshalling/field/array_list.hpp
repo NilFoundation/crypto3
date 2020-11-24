@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -39,9 +40,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
-
             namespace detail {
 
                 template<bool THasOrigDataViewStorage>
@@ -140,12 +139,12 @@ namespace nil {
             ///     using CollectionOfBundlesField =
             ///         nil::marshalling::field::array_list<
             ///             MyFieldBase,
-            ///             std::field::Bundle<
+            ///             std::field::bundle<
             ///                 MyFieldBase,
             ///                 std::tuple<
-            ///                     nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>
-            ///                     nil::marshalling::field::IntValue<MyFieldBase, std::uint8_t>
-            ///                     nil::marshalling::field::IntValue<MyFieldBase, std::uint8_t>
+            ///                     nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+            ///                     nil::marshalling::field::int_value<MyFieldBase, std::uint8_t>
+            ///                     nil::marshalling::field::int_value<MyFieldBase, std::uint8_t>
             ///                 >
             ///             >
             ///         >;
@@ -176,7 +175,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::EmptySerialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/ArrayList.h
+            /// @headerfile nil/marshalling/field/array_list.h
             template<typename TFieldBase, typename TElement, typename... TOptions>
             class array_list : private detail::array_list_base_type<TFieldBase, TElement, TOptions...> {
                 using base_impl_type = detail::array_list_base_type<TFieldBase, TElement, TOptions...>;
@@ -360,7 +359,7 @@ namespace nil {
 
                 /// @brief Force serialization length of a single element.
                 /// @details The function can be used to force a serialization length of a
-                ///     single element within the ArrayList.
+                ///     single element within the array_list.
                 ///     Exists only if @ref nil::marshalling::option::SequenceElemLengthForcingEnabled option has been
                 ///     used.
                 /// @param[in] count Number of elements to read during following read operation.
@@ -434,7 +433,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case first field is less than second field.
-            /// @related ArrayList
+            /// @related array_list
             template<typename TFieldBase, typename TElement, typename... TOptions>
             bool operator<(const array_list<TFieldBase, TElement, TOptions...> &field1,
                            const array_list<TFieldBase, TElement, TOptions...> &field2) {
@@ -446,7 +445,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related ArrayList
+            /// @related array_list
             template<typename TFieldBase, typename TElement, typename... TOptions>
             bool operator!=(const array_list<TFieldBase, TElement, TOptions...> &field1,
                             const array_list<TFieldBase, TElement, TOptions...> &field2) {
@@ -457,7 +456,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related ArrayList
+            /// @related array_list
             template<typename TFieldBase, typename TElement, typename... TOptions>
             bool operator==(const array_list<TFieldBase, TElement, TOptions...> &field1,
                             const array_list<TFieldBase, TElement, TOptions...> &field2) {
@@ -467,7 +466,7 @@ namespace nil {
             /// @brief Compile time check function of whether a provided type is any
             ///     variant of nil::marshalling::field::array_list.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref ArrayList
+            /// @return true in case provided type is any variant of @ref array_list
             /// @related nil::marshalling::field::array_list
             template<typename T>
             constexpr bool is_array_list() {
@@ -493,7 +492,6 @@ namespace nil {
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ARRAY_LIST_HPP

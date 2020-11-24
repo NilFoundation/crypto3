@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -24,7 +25,7 @@
 //---------------------------------------------------------------------------//
 
 /// @file
-/// Contains definition of Message object interface and various base classes
+/// Contains definition of message object interface and various base classes
 /// for custom messages.
 
 #ifndef MARSHALLING_MESSAGE_HPP
@@ -88,7 +89,7 @@ namespace nil {
         ///         the message being serialized / deserialized and/or handled.
         ///     @li @ref nil::marshalling::option::version_in_extra_transport_fields - Provide index of
         ///         the version field in extra transport fields.
-        ///     @headerfile nil/marshalling/Message.h
+        ///     @headerfile nil/marshalling/message.h
         template<typename... TOptions>
         class message : public detail::message::interface_builder_type<TOptions...> {
             using base_impl_type = detail::message::interface_builder_type<TOptions...>;
@@ -503,14 +504,14 @@ namespace nil {
 #endif    // #ifdef FOR_DOXYGEN_DOC_ONLY
         };
 
-        /// @brief Upcast type of the message object to nil::marshalling::Message in order to have
+        /// @brief Upcast type of the message object to nil::marshalling::message in order to have
         ///     access to its internal types.
         template<typename... TOptions>
         inline message<TOptions...>& to_message(message<TOptions...>& msg) {
             return msg;
         }
 
-        /// @brief Upcast type of the message object to nil::marshalling::Message in order to have
+        /// @brief Upcast type of the message object to nil::marshalling::message in order to have
         ///     access to its internal types.
         template<typename... TOptions>
         inline const message<TOptions...>& to_message(const message<TOptions...>& msg) {
@@ -548,8 +549,8 @@ namespace nil {
 }    // namespace nil
 
 /// @brief Add convenience access enum and functions to extra transport fields.
-/// @details The nil::marshalling::Message class provides access to its extra transport fields via
-///     nil::marshalling::MessageBase::transport_fields() member function(s). The fields are bundled
+/// @details The nil::marshalling::message class provides access to its extra transport fields via
+///     nil::marshalling::message_base::transport_fields() member function(s). The fields are bundled
 ///     into <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>
 ///     and can be accessed using indices with
 ///     <a href="http://en.cppreference.com/w/cpp/utility/tuple/get">std::get</a>.
@@ -565,7 +566,7 @@ namespace nil {
 ///     typedef std::tuple<TransportField1, TransportField2, TransportField3> MyExtraTransportFields
 ///
 ///     class MyInterface : public
-///         nil::marshalling::Message<
+///         nil::marshalling::message<
 ///             ...
 ///             nil::marshalling::option::extra_transport_fields<MyExtraTransportFields> >
 ///     {
@@ -576,9 +577,9 @@ namespace nil {
 ///     The usage of the MARSHALLING_MSG_TRANSPORT_FIELDS_ACCESS() macro with the list of the extra transport field's
 ///     names is equivalent to having the following definitions inside the message class
 ///     @code
-///     class MyInterface : public nil::marshalling::Message<...>
+///     class MyInterface : public nil::marshalling::message<...>
 ///     {
-///         using Base = nil::marshalling::Message<...>;
+///         using Base = nil::marshalling::message<...>;
 ///     public:
 ///         enum TransportFieldIdx {
 ///             TransportFieldIdx_name1,
@@ -657,7 +658,7 @@ namespace nil {
 ///     }
 ///     @endcode
 /// @param[in] ... List of fields' names.
-/// @related nil::marshalling::Message
+/// @related nil::marshalling::message
 #define MARSHALLING_MSG_TRANSPORT_FIELDS_ACCESS(...)                                                 \
     MARSHALLING_EXPAND(MARSHALLING_DEFINE_TRANSPORT_FIELD_ENUM(__VA_ARGS__))                         \
     MARSHALLING_MSG_TRANSPORT_FIELDS_ACCESS_FUNC {                                                   \

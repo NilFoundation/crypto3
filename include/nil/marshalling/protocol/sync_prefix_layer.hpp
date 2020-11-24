@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -29,7 +30,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace protocol {
 
             /// @brief Protocol layer that uses "sync" field as a prefix to all the
@@ -76,7 +76,7 @@ namespace nil {
                 /// @param[out] field field_type object to read.
                 /// @param[in, out] msg Reference to smart pointer, that already holds or
                 ///     will hold allocated message object, or reference to actual message
-                ///     object (which extends @ref nil::marshalling::MessageBase).
+                ///     object (which extends @ref nil::marshalling::message_base).
                 /// @param[in, out] iter Input iterator used for reading.
                 /// @param[in] size Size of the data in the sequence
                 /// @param[out] missingSize If not nullptr and return value is
@@ -164,7 +164,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SYNC_PREFIX_LAYER_HPP

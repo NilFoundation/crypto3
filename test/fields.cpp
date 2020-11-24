@@ -46,7 +46,6 @@
 #include <nil/marshalling/field/float_value.hpp>
 #include <nil/marshalling/field/no_value.hpp>
 #include <nil/marshalling/field/variant.hpp>
-#include <nil/marshalling/field/basics.hpp>
 
 #include <nil/marshalling/compile_control.hpp>
 #include <nil/marshalling/units.hpp>

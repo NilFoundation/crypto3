@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -34,10 +35,9 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
-            /// @brief Bitfield field.
+            /// @brief bitfield field.
             /// @details Sometimes one or several bytes can be logically split into two
             ///     or more independent values, which are packed together to save some
             ///     space. For example, one enum type that has only 4 possible values, i.e
@@ -56,15 +56,15 @@ namespace nil {
             ///
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///         using MyField =
-            ///             nil::marshalling::field::Bitfield<
+            ///             nil::marshalling::field::bitfield<
             ///                 MyFieldBase,
             ///                 std::tuple<
-            ///                     nil::marshalling::field::EnumValue<
+            ///                     nil::marshalling::field::enum_value<
             ///                         MyFieldBase,
             ///                         MyEnumType,
             ///                         nil::marshalling::option::fixed_bit_length<2>
             ///                     >,
-            ///                     nil::marshalling::field::IntValue<
+            ///                     nil::marshalling::field::int_value<
             ///                         MyFieldBase,
             ///                         std::uint8_t,
             ///                         nil::marshalling::option::fixed_bit_length<6>
@@ -105,7 +105,7 @@ namespace nil {
             /// @pre Every field member specifies its length in bits using
             ///     nil::marshalling::option::fixed_bit_length option.
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/Bitfield.h
+            /// @headerfile nil/marshalling/field/bitfield.h
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS()
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
@@ -331,7 +331,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related Bitfield
+            /// @related bitfield
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator==(const bitfield<TFieldBase, TMembers, TOptions...> &field1,
                             const bitfield<TFieldBase, TMembers, TOptions...> &field2) {
@@ -342,7 +342,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related Bitfield
+            /// @related bitfield
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator!=(const bitfield<TFieldBase, TMembers, TOptions...> &field1,
                             const bitfield<TFieldBase, TMembers, TOptions...> &field2) {
@@ -353,7 +353,7 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related Bitfield
+            /// @related bitfield
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             bool operator<(const bitfield<TFieldBase, TMembers, TOptions...> &field1,
                            const bitfield<TFieldBase, TMembers, TOptions...> &field2) {
@@ -361,27 +361,27 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::Bitfield.
+            ///     variant of nil::marshalling::field::bitfield.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref Bitfield
-            /// @related nil::marshalling::field::Bitfield
+            /// @return true in case provided type is any variant of @ref bitfield
+            /// @related nil::marshalling::field::bitfield
             template<typename T>
-            constexpr bool isBitfield() {
+            constexpr bool isbitfield() {
                 return std::is_same<typename T::tag, tag::bitfield>::value;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Bitfield type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bitfield type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Bitfield
+            /// @related nil::marshalling::field::bitfield
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline bitfield<TFieldBase, TMembers, TOptions...> &
                 to_field_base(bitfield<TFieldBase, TMembers, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::Bitfield type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::field::bitfield type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::field::Bitfield
+            /// @related nil::marshalling::field::bitfield
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             inline const bitfield<TFieldBase, TMembers, TOptions...> &
                 to_field_base(const bitfield<TFieldBase, TMembers, TOptions...> &field) {
@@ -389,7 +389,6 @@ namespace nil {
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BITFIELD_HPP

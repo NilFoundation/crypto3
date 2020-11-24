@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -39,19 +40,19 @@ namespace nil {
 
         /// @brief Base class for all the custom protocol messages.
         /// @details The main purpose of this class is to provide default implementation
-        ///     for some pure virtual functions defined in @ref Message class. Just
-        ///     like with @ref Message class, the provided methods implementation
+        ///     for some pure virtual functions defined in @ref message class. Just
+        ///     like with @ref message class, the provided methods implementation
         ///     depends on the options passed as TOption template parameter.
         /// @tparam TMessage The main interface class of the custom protocol messages.
-        ///     It may be either @ref Message class itself or any other class that
-        ///     extends @ref Message. The @ref MessageBase inherits from class provided
+        ///     It may be either @ref message class itself or any other class that
+        ///     extends @ref message. The @ref message_base inherits from class provided
         ///     as TMessage template parameter. As the result the real inheritance
-        ///     diagram will look like: nil::marshalling::Message <-- TMessage <-- nil::marshalling::MessageBase.
+        ///     diagram will look like: nil::marshalling::message <-- TMessage <-- nil::marshalling::message_base.
         /// @tparam TOptions Variadic template parameter that can include zero or more
         ///     options that specify behaviour. The options may be comma separated as well as
         ///     bundled into std::tuple. Supported options are:
         ///     @li nil::marshalling::option::StaticNumIdImpl - In case message have numeric IDs
-        ///         (nil::marshalling::Message::msg_id_type is of integral or enum type), usage of
+        ///         (nil::marshalling::message::msg_id_type is of integral or enum type), usage of
         ///         this option will cause this class to implement get_id_impl() virtual
         ///         function that returns provided numeric value.
         ///     @li nil::marshalling::option::NoIdImpl - Some message may not have valid IDs and
@@ -59,18 +60,18 @@ namespace nil {
         ///         option will create dummy implementation of get_id_impl() virtual
         ///         function that contains always failing assertion. In DEBUG mode
         ///         compilation the application will crash while in release mode the
-        ///         default constructed value of nil::marshalling::Message::msg_id_type will be returned.
+        ///         default constructed value of nil::marshalling::message::msg_id_type will be returned.
         ///     @li nil::marshalling::option::msg_type - Provide type of actual message that
-        ///         inherits from this nil::marshalling::MessageBase class.
+        ///         inherits from this nil::marshalling::message_base class.
         ///     @li nil::marshalling::option::FieldsImpl - Usually implementation of read, write,
         ///         validity check, and length calculation is pretty straight forward. For
         ///         example the message is considered valid if all the field values
         ///         are considered to be valid, or read operation is to perform read for
         ///         all the fields in the message. If the nil::marshalling::option::FieldsImpl
         ///         option with all the message field classes bundled into
-        ///         the std::tuple is provided, then @ref MessageBase class can implement
+        ///         the std::tuple is provided, then @ref message_base class can implement
         ///         read_impl(), write_impl(), valid_impl(), length_impl() virtual functions
-        ///         declared as pure in nil::marshalling::Message interface. The option also
+        ///         declared as pure in nil::marshalling::message interface. The option also
         ///         provides an accessor functions to the all the field objects: fields().
         ///     @li nil::marshalling::option::ZeroFieldsImpl - This option is an alias to
         ///         nil::marshalling::option::FieldsImpl<std::tuple<> >, which provides implementation
@@ -83,14 +84,14 @@ namespace nil {
         ///     @li nil::marshalling::option::NoLengthImpl - Inhibit the implementation of length_impl().
         ///     @li nil::marshalling::option::NoValidImpl - Inhibit the implementation of valid_impl().
         ///     @li nil::marshalling::option::NoDispatchImpl - Inhibit the implementation of dispatch_impl().
-        ///     @li nil::marshalling::option::has_custom_refresh - Notify @ref nil::marshalling::MessageBase that
+        ///     @li nil::marshalling::option::has_custom_refresh - Notify @ref nil::marshalling::message_base that
         ///             there is custom eval_refresh() member function in the message definition
         ///             class.
         ///     @li nil::marshalling::option::has_do_get_id - Enable implementation of get_id_impl() even if
         ///         nil::marshalling::option::StaticNumIdImpl option wasn't used. Must be paired with
         ///         nil::marshalling::option::msg_type.
-        /// @extends Message
-        /// @headerfile nil/marshalling/MessageBase.h
+        /// @extends message
+        /// @headerfile nil/marshalling/message_base.h
         /// @see @ref to_message_base()
         template<typename TMessage, typename... TOptions>
         class message_base : public detail::message::impl_builder_type<TMessage, TOptions...> {
@@ -786,32 +787,32 @@ namespace nil {
 #endif    // #ifdef FOR_DOXYGEN_DOC_ONLY
         };
 
-        /// @brief Message object equality comparison operator
-        /// @details Messages are considered equal if all their fields are considered equal
-        /// @related MessageBase
+        /// @brief message object equality comparison operator
+        /// @details messages are considered equal if all their fields are considered equal
+        /// @related message_base
         template<typename TMessage1, typename TMessage2, typename... TOptions>
         bool operator==(const message_base<TMessage1, TOptions...>& msg1,
                         const message_base<TMessage2, TOptions...>& msg2) {
             return msg1.fields() == msg2.fields();
         }
 
-        /// @brief Message object inequality comparison operator
-        /// @details Messages are considered not equal if any their fields are considered inequal.
-        /// @related MessageBase
+        /// @brief message object inequality comparison operator
+        /// @details messages are considered not equal if any their fields are considered inequal.
+        /// @related message_base
         template<typename TMessage1, typename TMessage2, typename... TOptions>
         bool operator!=(const message_base<TMessage1, TOptions...>& msg1,
                         const message_base<TMessage2, TOptions...>& msg2) {
             return !(msg1 == msg2);
         }
 
-        /// @brief Upcast type of the message object to nil::marshalling::MessageBase in order to have
+        /// @brief Upcast type of the message object to nil::marshalling::message_base in order to have
         ///     access to its internal types.
         template<typename TMessage, typename... TOptions>
         inline message_base<TMessage, TOptions...>& to_message_base(message_base<TMessage, TOptions...>& msg) {
             return msg;
         }
 
-        /// @brief Upcast type of the message object to nil::marshalling::MessageBase in order to have
+        /// @brief Upcast type of the message object to nil::marshalling::message_base in order to have
         ///     access to its internal types.
         template<typename TMessage, typename... TOptions>
         inline const message_base<TMessage, TOptions...>&
@@ -820,7 +821,7 @@ namespace nil {
         }
 
         /// @brief Compile time check of of whether the type
-        ///     is a message extending @ref nil::marshalling::MessageBase.
+        ///     is a message extending @ref nil::marshalling::message_base.
         /// @details Checks existence of @b impl_options_type inner
         ///     type.
         template<typename T>
@@ -832,8 +833,8 @@ namespace nil {
 }    // namespace nil
 
 /// @brief Add convenience access enum and functions to message fields.
-/// @details The @ref nil::marshalling::MessageBase class provides access to its fields via
-///     @ref nil::marshalling::MessageBase::fields() member function(s). The fields are bundled
+/// @details The @ref nil::marshalling::message_base class provides access to its fields via
+///     @ref nil::marshalling::message_base::fields() member function(s). The fields are bundled
 ///     into <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>
 ///     and can be accessed using indices with
 ///     <a href="http://en.cppreference.com/w/cpp/utility/tuple/get">std::get</a>.
@@ -848,7 +849,7 @@ namespace nil {
 ///
 ///     typedef std::tuple<Field1, Field2, Field3> MyMessageFields
 ///
-///     class Message1 : public nil::marshalling::MessageBase<MyInterface,
+///     class Message1 : public nil::marshalling::message_base<MyInterface,
 ///     nil::marshalling::option::FieldsImpl<MyMessageFields> >
 ///     {
 ///     public:
@@ -858,9 +859,9 @@ namespace nil {
 ///     The usage of the MARSHALLING_MSG_FIELDS_ACCESS() macro with the list of the field's names
 ///     is equivalent to having the following definitions inside the message class
 ///     @code
-///     class Message1 : public nil::marshalling::MessageBase<...>
+///     class Message1 : public nil::marshalling::message_base<...>
 ///     {
-///         using Base = nil::marshalling::MessageBase<...>;
+///         using Base = nil::marshalling::message_base<...>;
 ///     public:
 ///         enum FieldIdx {
 ///             FieldIdx_name1,
@@ -931,7 +932,7 @@ namespace nil {
 ///     @endcode
 ///     or using accessor functions:
 ///     @code
-///     void handle(Message1& msg)
+///     void handle(message1& msg)
 ///     {
 ///         auto value1 = field_name1().value();
 ///         auto value2 = field_name2().value();
@@ -939,7 +940,7 @@ namespace nil {
 ///     }
 ///     @endcode
 /// @param[in] ... List of fields' names.
-/// @related nil::marshalling::MessageBase
+/// @related nil::marshalling::message_base
 #define MARSHALLING_MSG_FIELDS_ACCESS(...)                                            \
     MARSHALLING_EXPAND(MARSHALLING_DEFINE_FIELD_ENUM(__VA_ARGS__))                    \
     MARSHALLING_MSG_FIELDS_ACCESS_FUNC {                                              \

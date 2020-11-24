@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -42,7 +43,7 @@
 namespace nil {
     namespace marshalling {
 
-        /// @brief Message factory class.
+        /// @brief message factory class.
         /// @details It is responsible to create message objects given the ID of the
         ///     message. This class @b DOESN'T use dynamic memory allocation to store its
         ///     internal data structures, hence can be used in any bare-metal and other
@@ -83,11 +84,11 @@ namespace nil {
         ///         parameter) must be equal to @b TMsgBase (first template parameter)
         ///         of @b this class.
         /// @pre TMsgBase is a base class for all the messages in TAllMessages.
-        /// @pre Message type is TAllMessages must be sorted based on their IDs.
+        /// @pre message type is TAllMessages must be sorted based on their IDs.
         /// @pre If nil::marshalling::option::InPlaceAllocation option is provided, only one custom
         ///     message can be allocated. The next one can be allocated only after previous
         ///     message has been destructed.
-        /// @headerfile nil/marshalling/MsgFactory.h
+        /// @headerfile nil/marshalling/msg_factory.h
         template<typename TMsgBase, typename TAllMessages, typename... TOptions>
         class msg_factory {
             static_assert(TMsgBase::interface_options_type::has_msg_id_type,
@@ -109,7 +110,7 @@ namespace nil {
             /// @brief Type of the message ID.
             using msg_id_type = typename message_type::msg_id_type;
 
-            /// @brief Smart pointer to @ref Message which holds allocated message object.
+            /// @brief Smart pointer to @ref message which holds allocated message object.
             /// @details It is a variant of std::unique_ptr, based on whether
             ///     nil::marshalling::option::InPlaceAllocation option was used.
             using msg_ptr_type = typename factory_type::msg_ptr_type;
@@ -126,7 +127,7 @@ namespace nil {
             ///     the same ID. This parameter provides such an ability. However,
             ///     most protocols will implement single message class for single ID.
             ///     For such implementations, use default value of this parameter.
-            /// @return Smart pointer (variant of std::unique_ptr) to @ref Message type,
+            /// @return Smart pointer (variant of std::unique_ptr) to @ref message type,
             ///     which is a common base class of all the messages (provided as
             ///     first template parameter to this class). If nil::marshalling::option::InPlaceAllocation
             ///     option was used and previously allocated message wasn't de-allocated

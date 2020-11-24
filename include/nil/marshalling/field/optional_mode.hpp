@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -30,11 +31,10 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
-            /// @brief Mode to be used by nil::marshalling::field::Optional
-            /// @headerfile nil/marshalling/field/OptionalMode.h
+            /// @brief Mode to be used by nil::marshalling::field::optional
+            /// @headerfile nil/marshalling/field/optional_mode.h
             enum class optional_mode {
                 tentative,      ///< The field existence is tentative, i.e. If there is enough bytes
                                 /// to read the field's value, than field exists, if not
@@ -45,7 +45,6 @@ namespace nil {
             };
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_OPTIONAL_MODE_HPP

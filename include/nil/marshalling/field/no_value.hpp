@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -38,7 +39,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace field {
 
             /// @brief Dummy field with "do-nothing" read/write operations.
@@ -46,7 +46,7 @@ namespace nil {
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/field/NoValue.h
+            /// @headerfile nil/marshalling/field/no_value.h
             template<typename TFieldBase>
             class no_value : private detail::adapt_basic_field_type<basic::no_value<TFieldBase>> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::no_value<TFieldBase>>;
@@ -86,7 +86,7 @@ namespace nil {
                 /// @brief Get access to the value storage.
                 /// @details Should not really be used.
                 /// @return Reference to a static value. All the independent get/set
-                ///     operations on the different @ref NoValue fields access the same
+                ///     operations on the different @ref no_value fields access the same
                 ///     static value.
                 static value_type &value() {
                     return base_impl_type::value();
@@ -184,11 +184,11 @@ namespace nil {
             };
 
             /// @brief Equality comparison operator.
-            /// @details To @ref NoValue fields are always equal.
+            /// @details To @ref no_value fields are always equal.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Always true.
-            /// @related NoValue
+            /// @related no_value
             template<typename TFieldBase>
             bool operator==(const no_value<TFieldBase> &field1, const no_value<TFieldBase> &field2) {
                 static_cast<void>(field1);
@@ -197,22 +197,22 @@ namespace nil {
             }
 
             /// @brief Non-equality comparison operator.
-            /// @details To @ref NoValue fields are always equal.
+            /// @details To @ref no_value fields are always equal.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Always false.
-            /// @related NoValue
+            /// @related no_value
             template<typename TFieldBase>
             bool operator!=(const no_value<TFieldBase> &field1, const no_value<TFieldBase> &field2) {
                 return !(field1 == field2);
             }
 
             /// @brief Equivalence comparison operator.
-            /// @details To @ref NoValue fields are always equal.
+            /// @details To @ref no_value fields are always equal.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return Always false.
-            /// @related NoValue
+            /// @related no_value
             template<typename TFieldBase>
             bool operator<(const no_value<TFieldBase> &field1, const no_value<TFieldBase> &field2) {
                 static_cast<void>(field1);
@@ -221,17 +221,16 @@ namespace nil {
             }
 
             /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::field::NoValue.
+            ///     variant of nil::marshalling::field::no_value.
             /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref NoValue
-            /// @related nil::marshalling::field::NoValue
+            /// @return true in case provided type is any variant of @ref no_value
+            /// @related nil::marshalling::field::no_value
             template<typename T>
             constexpr bool is_no_value() {
                 return std::is_same<typename T::tag, tag::no_value>::value;
             }
 
         }    // namespace field
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_NO_VALUE_HPP

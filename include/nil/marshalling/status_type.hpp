@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -31,7 +32,7 @@
 namespace nil {
     namespace marshalling {
 
-        /// @brief Error statuses reported by the Communication module.
+        /// @brief Error statuses.
         enum class status_type {
             success,             ///< Used to indicate successful outcome of the operation.
             update_required,     ///< Used to indicate that write operation wasn't complete,

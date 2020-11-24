@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -33,7 +34,7 @@ namespace nil {
 
         /// @brief Empty message handler, does nothing.
         /// @details May be used in nil::marshalling::option::handler_type option to force
-        ///     existence of "nil::marshalling::Message::dispatch()" member function.
+        ///     existence of "nil::marshalling::message::dispatch()" member function.
         class empty_handler {
         public:
             template<typename TMessage>
