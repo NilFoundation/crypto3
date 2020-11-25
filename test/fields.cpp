@@ -52,8 +52,6 @@
 #include <nil/marshalling/version.hpp>
 
 #include <nil/marshalling/message.hpp>
-#include <nil/marshalling/empty_handler.hpp>
-#include <nil/marshalling/generic_handler.hpp>
 #include <nil/marshalling/message_base.hpp>
 #include <nil/marshalling/msg_factory.hpp>
 #include <nil/marshalling/generic_message.hpp>
@@ -211,7 +209,7 @@ BOOST_AUTO_TEST_CASE(custom_test1) {
     std::vector<std::uint32_t> v = be_array.value();
 
     /*for (int i = 0; i < v.size(); ++i){
-        std::cout << std::hex << "be_array i: 0x" << v[i] << std::endl;
+        std::cout << std::hex << "be_array " << i << ": 0x" << v[i] << std::endl;
     }*/
 
     BOOST_CHECK_EQUAL(v[0], 0x01020304);
@@ -242,7 +240,7 @@ BOOST_AUTO_TEST_CASE(custom_test2) {
     std::vector<std::uint32_t> v = le_array.value();
 
     /*for (int i = 0; i < v.size(); ++i){
-        std::cout << std::hex << "le_array i: 0x" << v[i] << std::endl;
+        std::cout << std::hex << "le_array " << i << ": 0x" << v[i] << std::endl;
     }*/
 
     BOOST_CHECK_EQUAL(v[0], 0x04030201);
@@ -254,8 +252,46 @@ BOOST_AUTO_TEST_CASE(custom_test2) {
     BOOST_CHECK(!le_array.set_version(5));
 }
 
+BOOST_AUTO_TEST_CASE(custom_test3) {
+
+    using big_endian_array_type = 
+    nil::marshalling::field::array_list<
+        nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+        nil::marshalling::field::int_value<
+            nil::marshalling::field_type<nil::marshalling::option::big_endian>, 
+            std::uint32_t>,
+        nil::marshalling::option::sequence_fixed_size<5>
+    >;
+
+    static const char Buf[] = {0x01, 0x02, 0x03, 0x04, 
+                               0x05, 0x06, 0x07, 0x08, 
+                               0x09, 0x0a, 0x0b, 0x0c, 
+                               0x0d, 0x0e, 0x0f, 0x10,
+                               0x11, 0x12, 0x13, 0x14, 
+                               0x15, 0x16, 0x17, 0x18, 
+                               0x19, 0x1a, 0x1b, 0x1c, 
+                               0x1d, 0x1e, 0x1f, 0x20};
+
+    static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
+    big_endian_array_type be_array = read_from_field<big_endian_array_type>(Buf, BufSize);
+
+    /*for (int i = 0; i < be_array.value().size(); ++i){
+        std::cout << std::hex << "be_array " << i << ": 0x" << (be_array.value())[i].value() << std::endl;
+    }*/
+
+    BOOST_CHECK_EQUAL((be_array.value())[0].value(), 0x01020304);
+    BOOST_CHECK_EQUAL((be_array.value())[1].value(), 0x05060708);
+    BOOST_CHECK_EQUAL((be_array.value())[2].value(), 0x090a0b0c);
+    BOOST_CHECK_EQUAL((be_array.value())[3].value(), 0x0d0e0f10);
+    BOOST_CHECK_EQUAL((be_array.value())[4].value(), 0x11121314);
+
+    BOOST_CHECK(be_array.valid());
+    BOOST_CHECK(!be_array.set_version(5));
+}
+
 BOOST_AUTO_TEST_CASE(test1) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint32_t> field_type;
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::uint32_t> field_type;
 
     static_assert(!field_type::is_version_dependent(), "Invalid version dependency assumption");
     static const char Buf[] = {0x01, 0x02, 0x03, 0x04};
@@ -269,7 +305,8 @@ BOOST_AUTO_TEST_CASE(test1) {
 }
 
 BOOST_AUTO_TEST_CASE(test2) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint32_t,
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::uint32_t,
                                                nil::marshalling::option::fixed_length<3>>
         field_type;
 
@@ -285,7 +322,8 @@ BOOST_AUTO_TEST_CASE(test2) {
 }
 
 BOOST_AUTO_TEST_CASE(test3) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::int16_t> field_type;
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::int16_t> field_type;
 
     static_assert(!field_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -298,7 +336,8 @@ BOOST_AUTO_TEST_CASE(test3) {
 }
 
 BOOST_AUTO_TEST_CASE(test4) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::int16_t> field_type;
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::int16_t> field_type;
 
     static const char Buf[] = {(char)0xff, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
@@ -309,7 +348,8 @@ BOOST_AUTO_TEST_CASE(test4) {
 }
 
 BOOST_AUTO_TEST_CASE(test5) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<LittleEndianOpt>, std::int16_t> field_type;
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<LittleEndianOpt>, 
+        std::int16_t> field_type;
 
     static const char Buf[] = {0x0, (char)0x80};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
@@ -320,7 +360,8 @@ BOOST_AUTO_TEST_CASE(test5) {
 }
 
 BOOST_AUTO_TEST_CASE(test6) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::int16_t,
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::int16_t,
                                                nil::marshalling::option::fixed_length<1>>
         field_type;
 
@@ -333,7 +374,8 @@ BOOST_AUTO_TEST_CASE(test6) {
 }
 
 BOOST_AUTO_TEST_CASE(test7) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::int16_t,
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::int16_t,
                                                nil::marshalling::option::fixed_length<1>,
                                                nil::marshalling::option::num_value_ser_offset<-2000>>
         field_type;
@@ -360,7 +402,8 @@ BOOST_AUTO_TEST_CASE(test7) {
 }
 
 BOOST_AUTO_TEST_CASE(test8) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint32_t,
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::uint32_t,
                                                nil::marshalling::option::fixed_length<3>,
                                                nil::marshalling::option::valid_num_value_range<0, 0x010200>>
         field_type;
@@ -383,7 +426,8 @@ BOOST_AUTO_TEST_CASE(test8) {
 }
 
 BOOST_AUTO_TEST_CASE(test9) {
-    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint8_t,
+    typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, 
+                                               std::uint8_t,
                                                nil::marshalling::option::valid_num_value_range<0, 10>,
 #ifndef CC_COMPILER_GCC47
                                                nil::marshalling::option::valid_num_value_range<20, 30>,
