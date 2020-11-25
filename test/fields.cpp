@@ -106,7 +106,7 @@ struct fields_fixture {
     enum class Enum2 : unsigned { Value1, Value2, Value3, Value4, NumOfValues };
 
     template<typename TField>
-    static TField read_write_field(const char *buf, std::size_t size,
+    static TField read_from_field(const char *buf, std::size_t size,
                                    nil::marshalling::status_type expectedStatus
                                    = nil::marshalling::status_type::success){
 
@@ -192,6 +192,68 @@ struct fields_fixture {
 
 BOOST_FIXTURE_TEST_SUITE(fields_test_suite, fields_fixture)
 
+BOOST_AUTO_TEST_CASE(custom_test1) {
+
+    using big_endian_array_type = 
+    nil::marshalling::field::array_list<
+        nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+        std::uint32_t
+    >;
+
+    static const char Buf[] = {0x01, 0x02, 0x03, 0x04, 
+                               0x05, 0x06, 0x07, 0x08, 
+                               0x09, 0x0a, 0x0b, 0x0c, 
+                               0x0d, 0x0e, 0x0f, 0x10};
+
+    static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
+    big_endian_array_type be_array = read_from_field<big_endian_array_type>(Buf, BufSize);
+
+    std::vector<std::uint32_t> v = be_array.value();
+
+    /*for (int i = 0; i < v.size(); ++i){
+        std::cout << std::hex << "be_array i: 0x" << v[i] << std::endl;
+    }*/
+
+    BOOST_CHECK_EQUAL(v[0], 0x01020304);
+    BOOST_CHECK_EQUAL(v[1], 0x05060708);
+    BOOST_CHECK_EQUAL(v[2], 0x090a0b0c);
+    BOOST_CHECK_EQUAL(v[3], 0x0d0e0f10);
+
+    BOOST_CHECK(be_array.valid());
+    BOOST_CHECK(!be_array.set_version(5));
+}
+
+BOOST_AUTO_TEST_CASE(custom_test2) {
+
+    using little_endian_array_type = 
+    nil::marshalling::field::array_list<
+        nil::marshalling::field_type<nil::marshalling::option::little_endian>,
+        std::uint32_t
+    >;
+
+    static const char Buf[] = {0x01, 0x02, 0x03, 0x04, 
+                               0x05, 0x06, 0x07, 0x08, 
+                               0x09, 0x0a, 0x0b, 0x0c, 
+                               0x0d, 0x0e, 0x0f, 0x10};
+
+    static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
+    little_endian_array_type le_array = read_from_field<little_endian_array_type>(Buf, BufSize);
+
+    std::vector<std::uint32_t> v = le_array.value();
+
+    /*for (int i = 0; i < v.size(); ++i){
+        std::cout << std::hex << "le_array i: 0x" << v[i] << std::endl;
+    }*/
+
+    BOOST_CHECK_EQUAL(v[0], 0x04030201);
+    BOOST_CHECK_EQUAL(v[1], 0x08070605);
+    BOOST_CHECK_EQUAL(v[2], 0x0c0b0a09);
+    BOOST_CHECK_EQUAL(v[3], 0x100f0e0d);
+
+    BOOST_CHECK(le_array.valid());
+    BOOST_CHECK(!le_array.set_version(5));
+}
+
 BOOST_AUTO_TEST_CASE(test1) {
     typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint32_t> field_type;
 
@@ -199,7 +261,7 @@ BOOST_AUTO_TEST_CASE(test1) {
     static const char Buf[] = {0x01, 0x02, 0x03, 0x04};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::uint32_t));
     BOOST_CHECK_EQUAL(field.value(), 0x01020304);
     BOOST_CHECK(field.valid());
@@ -216,7 +278,7 @@ BOOST_AUTO_TEST_CASE(test2) {
     static const char Buf[] = {0x01, 0x02, 0x03, 0x04};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), 3);
     BOOST_CHECK_EQUAL(field.value(), 0x010203);
     BOOST_CHECK(field.valid());
@@ -229,7 +291,7 @@ BOOST_AUTO_TEST_CASE(test3) {
 
     static const char Buf[] = {0x01, 0x02};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::int16_t>(0x0102));
     BOOST_CHECK(field.valid());
@@ -240,7 +302,7 @@ BOOST_AUTO_TEST_CASE(test4) {
 
     static const char Buf[] = {(char)0xff, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), -1);
     BOOST_CHECK(field.valid());
@@ -251,7 +313,7 @@ BOOST_AUTO_TEST_CASE(test5) {
 
     static const char Buf[] = {0x0, (char)0x80};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), std::numeric_limits<std::int16_t>::min());
     BOOST_CHECK(field.valid());
@@ -264,7 +326,7 @@ BOOST_AUTO_TEST_CASE(test6) {
 
     static const char Buf[] = {(char)0xff, 0x00};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), 1);
     BOOST_CHECK_EQUAL(field.value(), -1);
     BOOST_CHECK(field.valid());
@@ -280,7 +342,7 @@ BOOST_AUTO_TEST_CASE(test7) {
 
     static const char Buf[] = {13};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
 
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == 2013);
@@ -314,7 +376,7 @@ BOOST_AUTO_TEST_CASE(test8) {
     static const char Buf[] = {0x01, 0x02, 0x03, 0x04};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 3);
     BOOST_CHECK(field.value() == 0x010203);
     BOOST_CHECK(!field.valid());
@@ -346,7 +408,7 @@ BOOST_AUTO_TEST_CASE(test9) {
     static const char Buf[] = {0x05, 0x02};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == 0x05);
     BOOST_CHECK(field.valid());
@@ -367,7 +429,7 @@ BOOST_AUTO_TEST_CASE(test10) {
         (char)0xad,
     };
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == 0xdead);
     BOOST_CHECK(field.get_bit_value(0U) == true);
@@ -413,7 +475,7 @@ BOOST_AUTO_TEST_CASE(test11) {
 
     static const char Buf[] = {(char)0xde, (char)0xad, (char)0x00, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 3);
     BOOST_CHECK(field.value() == 0xadde);
     BOOST_CHECK(field.valid());
@@ -469,7 +531,7 @@ BOOST_AUTO_TEST_CASE(test12) {
 
     static const char Buf[] = {(char)Enum1_Value1, (char)0x3f};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == Enum1_Value1);
     BOOST_CHECK(field.valid());
@@ -498,7 +560,7 @@ BOOST_AUTO_TEST_CASE(test13) {
 
     static const char Buf[] = {0x0, (char)Enum2::Value4, (char)0x3f};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 2);
 
     BOOST_CHECK(field.value() == Enum2::Value4);
@@ -526,7 +588,7 @@ BOOST_AUTO_TEST_CASE(test14) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(!field.refresh());
@@ -546,13 +608,13 @@ BOOST_AUTO_TEST_CASE(test15) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
 
     static const char Buf2[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc};
     static const std::size_t BufSize2 = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf2, BufSize2);
+    field = read_from_field<field_type>(Buf2, BufSize2);
     BOOST_CHECK(field.length() == BufSize2);
     BOOST_CHECK(field.valid());
 }
@@ -589,12 +651,12 @@ BOOST_AUTO_TEST_CASE(test16) {
 
     static const char Buf[] = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(field.valid());
 
-    staticStorageField = read_write_field<StaticStorageField>(Buf, BufSize);
+    staticStorageField = read_from_field<StaticStorageField>(Buf, BufSize);
     BOOST_CHECK(staticStorageField.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(staticStorageField.length() == staticStorageField.value().size() + 1U);
     BOOST_CHECK(staticStorageField.valid());
@@ -636,13 +698,13 @@ BOOST_AUTO_TEST_CASE(test17) {
 
     static const char Buf[] = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.value() == "hello");
 
-    staticStorageField = read_write_field<StaticStorageField>(Buf, BufSize);
+    staticStorageField = read_from_field<StaticStorageField>(Buf, BufSize);
     BOOST_CHECK(staticStorageField.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(staticStorageField.length() == field.value().size() + 1U);
     BOOST_CHECK(!staticStorageField.valid());
@@ -758,7 +820,7 @@ BOOST_AUTO_TEST_CASE(test20) {
 
     static const char Buf[] = {(char)0x81, 0x01};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), 2U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint16_t>(0x81));
     BOOST_CHECK(field.valid());
@@ -780,7 +842,7 @@ BOOST_AUTO_TEST_CASE(test21) {
 
     static const char Buf[] = {(char)0x83, 0x0f};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK_EQUAL(field.length(), 2U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint32_t>(0x18f));
     BOOST_CHECK(field.valid());
@@ -802,7 +864,7 @@ BOOST_AUTO_TEST_CASE(test21) {
 
     static const char Buf2[] = {(char)0x91, (char)0xc2, (char)0x3f, (char)0xff};
     static const std::size_t BufSize2 = std::extent<decltype(Buf2)>::value;
-    field = read_write_field<field_type>(Buf2, BufSize2);
+    field = read_from_field<field_type>(Buf2, BufSize2);
     BOOST_CHECK_EQUAL(field.length(), 3U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint32_t>(0x4613f));
     BOOST_CHECK(field.valid());
@@ -817,7 +879,7 @@ BOOST_AUTO_TEST_CASE(test22) {
 
     static const char Buf[] = {(char)0x83, (char)0x8f, (char)0x8c, (char)0x3f, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize, nil::marshalling::status_type::protocol_error);
+    field_type field = read_from_field<field_type>(Buf, BufSize, nil::marshalling::status_type::protocol_error);
     static_cast<void>(field);
 }
 
@@ -858,7 +920,7 @@ BOOST_AUTO_TEST_CASE(test24) {
     static const char Buf[] = {0x00, 0x02};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field_type field = read_write_field<field_type>(Buf, BufSize);
+    field_type field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == 0x0);
     BOOST_CHECK(field.valid());
@@ -891,7 +953,7 @@ BOOST_AUTO_TEST_CASE(test25) {
     static const char Buf[] = {(char)0x41, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -921,7 +983,7 @@ BOOST_AUTO_TEST_CASE(test26) {
     static const char Buf[] = {(char)0x09, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -962,7 +1024,7 @@ BOOST_AUTO_TEST_CASE(test27) {
     static const char Buf[] = {(char)0x4f, (char)0xa1, (char)0xaa};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &mem1 = field.field_mem1();
     BOOST_CHECK(mem1.value() == 0x1);
 
@@ -992,7 +1054,7 @@ BOOST_AUTO_TEST_CASE(test28) {
 
     static const char Buf[] = {0x0, 0xa, 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.value().size() == 10U);
@@ -1020,14 +1082,14 @@ BOOST_AUTO_TEST_CASE(test29) {
 
     static const char Buf[] = {0x0, (char)Enum1_Value1, (char)0x3f};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == Enum1_Value1);
     BOOST_CHECK(field.valid());
 
     static const char Buf2[] = {0x0, (char)Enum1_NumOfValues, (char)0x3f};
     static const std::size_t BufSize2 = std::extent<decltype(Buf2)>::value;
-    read_write_field<field_type>(Buf2, BufSize2, nil::marshalling::status_type::protocol_error);
+    read_from_field<field_type>(Buf2, BufSize2, nil::marshalling::status_type::protocol_error);
 
     field.value() = Enum1_Value3;
     BOOST_CHECK(field.valid());
@@ -1147,7 +1209,7 @@ BOOST_AUTO_TEST_CASE(test32) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(intValField.value() == 3U);
@@ -1219,7 +1281,7 @@ BOOST_AUTO_TEST_CASE(test33) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value()[0].value() == "hello");
@@ -1297,7 +1359,7 @@ BOOST_AUTO_TEST_CASE(test36) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == BufSize);
@@ -1322,7 +1384,7 @@ BOOST_AUTO_TEST_CASE(test37) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 6U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 3U);
@@ -1368,7 +1430,7 @@ BOOST_AUTO_TEST_CASE(test38) {
     static const std::size_t ExpectedBufSize2 = std::extent<decltype(ExpectedBuf2)>::value;
     write_read_field(field, ExpectedBuf2, ExpectedBufSize2);
 
-    field = read_write_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
+    field = read_from_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -1407,7 +1469,7 @@ BOOST_AUTO_TEST_CASE(test40) {
     static const char Buf[] = {115};
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.value() == 115);
     BOOST_CHECK(fpEquals(field.scale_as<float>(), 1.15f));
 }
@@ -1735,7 +1797,7 @@ BOOST_AUTO_TEST_CASE(test49) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(mem1.value() == 0U);
     BOOST_CHECK(mem2.field().value() == 0x1020);
@@ -1745,7 +1807,7 @@ BOOST_AUTO_TEST_CASE(test49) {
 
     static const std::size_t Buf2Size = std::extent<decltype(Buf2)>::value;
 
-    field = read_write_field<field_type>(Buf2, Buf2Size);
+    field = read_from_field<field_type>(Buf2, Buf2Size);
     BOOST_CHECK(field.length() == 1U);
     BOOST_CHECK(mem1.value() == 1U);
     BOOST_CHECK(mem2.get_mode() == nil::marshalling::field::optional_mode::missing);
@@ -1828,7 +1890,7 @@ BOOST_AUTO_TEST_CASE(test51) {
     static const char Buf[] = {(char)0x41, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &mem1 = field.field_name1();
     BOOST_CHECK(mem1.value() == 0x1);
 
@@ -1856,7 +1918,7 @@ BOOST_AUTO_TEST_CASE(test52) {
     static const char Buf[] = {(char)0xff, (char)0xff};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 255);
@@ -1952,7 +2014,7 @@ BOOST_AUTO_TEST_CASE(test56) {
     static const std::size_t ExpectedBufSize2 = std::extent<decltype(ExpectedBuf2)>::value;
     write_read_field(field, ExpectedBuf2, ExpectedBufSize2);
 
-    field = read_write_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
+    field = read_from_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -2633,7 +2695,7 @@ BOOST_AUTO_TEST_CASE(test69) {
 
     static const char Buf[] = {0x8, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]) / 2U);
     BOOST_CHECK(field.length() == (field.value().size() * 2) + 1U);
     BOOST_CHECK(field.value()[0].value() == 0x0102);
@@ -2643,11 +2705,11 @@ BOOST_AUTO_TEST_CASE(test69) {
 
     static const char Buf2[] = {0x7, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
     static const std::size_t Buf2Size = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::invalid_msg_data);
+    field = read_from_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::invalid_msg_data);
 
     static const char Buf3[] = {0x4, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
     static const std::size_t Buf3Size = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf3, Buf3Size);
+    field = read_from_field<field_type>(Buf3, Buf3Size);
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf3[0]) / 2U);
     BOOST_CHECK(field.length() == (field.value().size() * 2) + 1U);
     BOOST_CHECK(field.value()[0].value() == 0x0a0b);
@@ -2730,21 +2792,21 @@ BOOST_AUTO_TEST_CASE(test70) {
 
     static const char Buf[] = {0x1, 0x2, 0x3};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.current_field() == 0U);
 
     static const char Buf2[] = {0x2, 0x3, 0x4};
     static const std::size_t Buf2Size = std::extent<decltype(Buf2)>::value;
-    field = read_write_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::not_enough_data);
+    field = read_from_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::not_enough_data);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.length() == 0U);
     BOOST_CHECK(field.current_field() == std::tuple_size<field_type::members_type>::value);
 
     static const char Buf3[] = {0x2, 0x3, 0x4, 0x5, 0x6};
     static const std::size_t Buf3Size = std::extent<decltype(Buf3)>::value;
-    field = read_write_field<field_type>(Buf3, Buf3Size);
+    field = read_from_field<field_type>(Buf3, Buf3Size);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.length() == 5U);
     BOOST_CHECK(field.current_field() == 1U);
@@ -2850,14 +2912,14 @@ BOOST_AUTO_TEST_CASE(test71) {
     static const char Buf[] = {0, 0, 0};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize, nil::marshalling::status_type::success);
+    field = read_from_field<field_type>(Buf, BufSize, nil::marshalling::status_type::success);
     BOOST_CHECK(field.length() == 1U);
     BOOST_CHECK(field.field_val().is_missing());
 
     static const char Buf2[] = {1, 5, 0};
     static const std::size_t Buf2Size = std::extent<decltype(Buf2)>::value;
 
-    field = read_write_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::success);
+    field = read_from_field<field_type>(Buf2, Buf2Size, nil::marshalling::status_type::success);
     BOOST_CHECK(field.length() == 2U);
     BOOST_CHECK(field.field_val().does_exist());
     BOOST_CHECK(field.field_val().field().value() == (unsigned)Buf2[1]);
@@ -2885,7 +2947,7 @@ BOOST_AUTO_TEST_CASE(test72) {
 
     static const char Buf[] = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(field.valid());
@@ -2982,7 +3044,7 @@ BOOST_AUTO_TEST_CASE(test74) {
     static const std::size_t ExpectedBufSize2 = std::extent<decltype(ExpectedBuf2)>::value;
     write_read_field(field, ExpectedBuf2, ExpectedBufSize2);
 
-    field = read_write_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
+    field = read_from_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -3003,7 +3065,7 @@ BOOST_AUTO_TEST_CASE(test75) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
 
@@ -3031,7 +3093,7 @@ BOOST_AUTO_TEST_CASE(test76) {
 
     static const char Buf[] = {0x0, 0xa, 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xf, 0xf};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 12);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 10U);
@@ -3062,7 +3124,7 @@ BOOST_AUTO_TEST_CASE(test77) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 6U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 6U);
@@ -3186,7 +3248,7 @@ BOOST_AUTO_TEST_CASE(test80) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(intValField.value() == 3U);
@@ -3249,7 +3311,7 @@ BOOST_AUTO_TEST_CASE(test82) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == 2U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(intValField.value() == 3U);
@@ -3288,7 +3350,7 @@ BOOST_AUTO_TEST_CASE(test83) {
 
     static const char Buf[] = {0x0, 0x1, 0x2, 0x3, 0x4};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == BufSize);
@@ -3327,7 +3389,7 @@ BOOST_AUTO_TEST_CASE(test84) {
     static const std::size_t ExpectedBufSize2 = std::extent<decltype(ExpectedBuf2)>::value;
     write_read_field(field, ExpectedBuf2, ExpectedBufSize2);
 
-    field = read_write_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
+    field = read_from_field<field_type>(&ExpectedBuf2[0], ExpectedBufSize2);
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -3395,7 +3457,7 @@ BOOST_AUTO_TEST_CASE(test87) {
 
     static const char Buf[] = {0x0, 0x4, 0x1, 0x0, 0x1, 0x1, 0x1, 0x2, 0x1, 0x3};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     BOOST_CHECK(field.length() == BufSize);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 4U);
@@ -3669,7 +3731,7 @@ BOOST_AUTO_TEST_CASE(test92) {
     static const char Buf[] = {(char)0x1, (char)0x2, (char)0x3};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -3912,7 +3974,7 @@ BOOST_AUTO_TEST_CASE(test100) {
     static const char Buf[] = {(char)0x87, (char)0x54, (char)0xa2, (char)0x03, (char)0xb9};
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
 
-    field = read_write_field<field_type>(Buf, BufSize);
+    field = read_from_field<field_type>(Buf, BufSize);
 
     BOOST_CHECK(std::abs(field.get_scaled<double>() - 2.67) < 0.1);
 }
