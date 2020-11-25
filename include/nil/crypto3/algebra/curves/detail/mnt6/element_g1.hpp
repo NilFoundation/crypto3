@@ -63,11 +63,6 @@ namespace nil {
 
                         /*************************  Constructors and zero/one  ***********************************/
 
-                        /*constexpr static */ const underlying_field_value_type x =
-                            underlying_field_value_type(0x00);    //?
-                        /*constexpr static */ const underlying_field_value_type y =
-                            underlying_field_value_type(0x00);    //?
-
                         element_mnt6_g1() :
                             element_mnt6_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
                                             underlying_field_value_type::zero()) {};
