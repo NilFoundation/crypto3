@@ -74,11 +74,6 @@ namespace nil {
 
                         /*************************  Constructors and zero/one  ***********************************/
 
-                        /*constexpr static */ const underlying_field_value_type x =
-                            underlying_field_value_type(0x00, 0x00);    //?
-                        /*constexpr static */ const underlying_field_value_type y =
-                            underlying_field_value_type(0x00, 0x00);    //?
-
                          /** @brief 
                          *    @return the point at infinity by default
                          *
