@@ -11,7 +11,6 @@
 #define BOOST_MULTIPRECISION_BARRETT_PARAMS_HPP
 
 #include <boost/multiprecision/modular/base_params.hpp>
-#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -104,17 +103,19 @@ class barrett_params : public base_params<Backend>
 };
 
 // fixed precision barrett params type which supports compile-time execution
-template<unsigned Bits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class barrett_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
-    public base_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>>
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+class barrett_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
+    : public base_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 {
-   static_assert(Bits, "number of bits should be defined");
-   typedef cpp_int_backend<Bits, Bits, SignType, Checked, void> Backend;
-   typedef number<Backend> number_type;
+   typedef base_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>> base_type;
+   typedef typename base_type::policy_type policy_type;
+
+   typedef typename policy_type::Backend Backend;
+   typedef typename policy_type::number_type number_type;
+   typedef typename policy_type::dbl_lmb_number_type dbl_lmb_number_type;
 
  protected:
-   template <typename Number>
-   constexpr void initialize_barrett_params(const Number& p)
+   constexpr void initialize_barrett_params(const number_type& p)
    {
       using default_ops::eval_bit_set;
       using default_ops::eval_divide;
@@ -128,15 +129,14 @@ class barrett_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
    }
 
  public:
-   constexpr barrett_params() : base_params<Backend>() {}
+   constexpr barrett_params() : base_type() {}
 
-   template <typename Number>
-   constexpr explicit barrett_params(const Number& p) : base_params<Backend>(p)
+   constexpr explicit barrett_params(const number_type& p) : base_type(p)
    {
       initialize_barrett_params(p);
    }
 
-   constexpr const number_type& mu() const { return m_mu; }
+   constexpr const auto& mu() const { return m_mu; }
 
    template <class V>
    constexpr barrett_params& operator=(const V& v)
@@ -145,7 +145,8 @@ class barrett_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
       return *this;
    }
 
-   constexpr void eval_barret_reduce(Backend& result) const
+   template<typename BackendT>
+   constexpr void eval_barret_reduce(BackendT& result) const
    {
       using default_ops::eval_add;
       using default_ops::eval_bit_set;
@@ -188,7 +189,7 @@ class barrett_params<cpp_int_backend<Bits, Bits, SignType, Checked, void>> :
    }
 
  protected:
-   number_type m_mu;
+   dbl_lmb_number_type m_mu;
 };
 
 //template <typename Backend>
