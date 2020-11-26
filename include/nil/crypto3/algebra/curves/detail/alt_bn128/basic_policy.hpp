@@ -42,12 +42,19 @@ namespace nil {
 
                     using namespace algebra;
 
+                    /** @brief A struct representing details about base and scalar fields.
+                    *    @tparam ModulusBits size of the base field in bits 
+                    *
+                    */
                     template<std::size_t ModulusBits = 254>
                     struct alt_bn128_basic_policy { };
-
+                    
+                    /** @brief A struct representing details about base and scalar fields of the size 254 bits.
+                    *
+                    */
                     template<>
                     struct alt_bn128_basic_policy<254> {
-                        constexpr static const std::size_t base_field_bits = 254;
+                        constexpr static const std::size_t base_field_bits = 254; ///< size of the base field in bits 
 
                         typedef fields::alt_bn128_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
@@ -57,30 +64,30 @@ namespace nil {
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                        constexpr static const number_type base_field_modulus = base_field_type::modulus; ///< characteristic of the base field  
 
-                        constexpr static const std::size_t scalar_field_bits = 254;
+                        constexpr static const std::size_t scalar_field_bits = 254; ///< size of the scalar field (order of the group of points) in bits 
                         typedef fields::alt_bn128_fr<scalar_field_bits> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus; ///< characteristic of the scalar field (order of the group of points) 
 
-                        constexpr static const number_type p = base_field_modulus;
-                        constexpr static const number_type q = scalar_field_modulus;
+                        constexpr static const number_type p = base_field_modulus; ///< characteristic of the base field  
+                        constexpr static const number_type q = scalar_field_modulus; ///< characteristic of the scalar field (order of the group of points) 
 
-                        constexpr static const number_type a = number_type(0x00);
-                        constexpr static const number_type b = number_type(0x03);
+                        constexpr static const number_type a = number_type(0x00); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type b = number_type(0x03); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::a;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::a; 
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::b;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::b; 
 
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::base_field_bits;
+                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::base_field_bits; 
 
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::scalar_field_bits;
+                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::scalar_field_bits; 
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::p;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::p; 
 
-                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::q;
+                    constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::q; 
 
                 }    // namespace detail
             }        // namespace curves
