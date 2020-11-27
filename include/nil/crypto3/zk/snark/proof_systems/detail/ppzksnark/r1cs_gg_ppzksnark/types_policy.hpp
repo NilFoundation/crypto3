@@ -287,9 +287,9 @@ namespace nil {
 
                             proof() {
                                 // invalid proof with valid curve points
-                                this->g_A = typename CurveType::g1_type::value_type::one();
-                                this->g_B = typename CurveType::g2_type::value_type::one();
-                                this->g_C = typename CurveType::g1_type::value_type::one();
+                                this->g_A = CurveType::g1_type::value_type::one();
+                                this->g_B = CurveType::g2_type::value_type::one();
+                                this->g_C = CurveType::g1_type::value_type::one();
                             }
                             proof(typename CurveType::g1_type::value_type &&g_A,
                                   typename CurveType::g2_type::value_type &&g_B,
