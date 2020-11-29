@@ -59,19 +59,18 @@ void run_r1cs_gg_ppzksnark_basic_test(std::size_t num_constraints, std::size_t i
 
 template<typename CurveType>
 void run_r1cs_gg_ppzksnark_sha256_test() {
-	using field_type = typename CurveType::scalar_field_type;
+    using field_type = typename CurveType::scalar_field_type;
 
-	std::cout << "SHA2-256 blueprint generation started." << std::endl;
+    std::cout << "SHA2-256 blueprint generation started." << std::endl;
 
-	blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
+    blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
 
-	std::cout << "SHA2-256 blueprint generation finished." << std::endl;
+    std::cout << "SHA2-256 blueprint generation finished." << std::endl;
 
-	std::cout << "R1CS generation started." << std::endl;
+    std::cout << "R1CS generation started." << std::endl;
 
-    r1cs_example<field_type> example = r1cs_example<field_type>(bp.get_constraint_system(), 
-    														    bp.primary_input(), 
-    														    bp.auxiliary_input());
+    r1cs_example<field_type> example =
+        r1cs_example<field_type>(bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
 
     std::cout << "R1CS generation finished." << std::endl;
 
@@ -81,11 +80,11 @@ void run_r1cs_gg_ppzksnark_sha256_test() {
 
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_basic_test){
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_basic_test) {
     run_r1cs_gg_ppzksnark_basic_test<curves::mnt4<298>>(1000, 100);
 }
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_sha256_test){
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_sha256_test) {
     run_r1cs_gg_ppzksnark_sha256_test<curves::mnt4<298>>();
 }
 

@@ -62,7 +62,7 @@ namespace nil {
                     printf("* Primary input size bound (L): %zu\n", example.boot_trace_size_bound);
                     printf("* Time bound (T): %zu\n", example.time_bound);
                     printf("Hence, algebra::log2(L+2*T) equals %zu\n",
-                        algebra::log2(example.boot_trace_size_bound + 2 * example.time_bound));
+                           algebra::log2(example.boot_trace_size_bound + 2 * example.time_bound));
 
                     std::cout << "RAM ppzkSNARK Generator" << std::endl;
                     ram_ppzksnark_keypair<ram_ppzksnark_ppT> keypair = ram_ppzksnark_generator<ram_ppzksnark_ppT>(
@@ -74,7 +74,7 @@ namespace nil {
 
                     std::cout << "RAM ppzkSNARK Verifier" << std::endl;
                     bool ans = ram_ppzksnark_verifier<ram_ppzksnark_ppT>(keypair.vk, example.boot_trace, proof);
-                    
+
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     return ans;

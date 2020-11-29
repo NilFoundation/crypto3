@@ -34,7 +34,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-              using nil::crypto3::algebra;
+                using nil::crypto3::algebra;
 
                 /**
                  * Runs the ppzkADSNARK (generator, prover, and verifier) for a given
@@ -62,7 +62,7 @@ namespace nil {
 
                     r1cs_ppzkadsnark_keypair<CurveType> keypair =
                         r1cs_ppzkadsnark_generator<CurveType>(example.constraint_system, auth_keys.pap);
-                    
+
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
                         r1cs_ppzkadsnark_verifier_process_vk<CurveType>(keypair.vk);
 
@@ -75,7 +75,7 @@ namespace nil {
                         data.emplace_back(example.primary_input[i]);
                     }
                     std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> auth_data =
-                                                                     r1cs_ppzkadsnark_auth_sign<CurveType>(data, auth_keys.sak, labels);
+                        r1cs_ppzkadsnark_auth_sign<CurveType>(data, auth_keys.sak, labels);
 
                     bool auth_res = r1cs_ppzkadsnark_auth_verify<CurveType>(data, auth_data, auth_keys.sak, labels);
                     printf("* The verification result is: %s\n", (auth_res ? "PASS" : "FAIL"));
@@ -87,14 +87,14 @@ namespace nil {
                         keypair.pk, example.primary_input, example.auxiliary_input, auth_data);
 
                     bool ans = r1cs_ppzkadsnark_verifier<CurveType>(keypair.vk, proof, auth_keys.sak, labels);
-                    
+
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     bool ans2 = r1cs_ppzkadsnark_online_verifier<CurveType>(pvk, proof, auth_keys.sak, labels);
                     assert(ans == ans2);
 
                     ans = r1cs_ppzkadsnark_verifier<CurveType>(keypair.vk, auth_data, proof, auth_keys.pak, labels);
-                    
+
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     ans2 = r1cs_ppzkadsnark_online_verifier<CurveType>(pvk, auth_data, proof, auth_keys.pak, labels);

@@ -65,14 +65,14 @@ namespace nil {
                     typename r1cs_se_ppzksnark<CurveType>::processed_verification_key_type pvk =
                         r1cs_se_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
-                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof =
-                        r1cs_se_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof = r1cs_se_ppzksnark<CurveType>::prover(
+                        keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    const bool ans =
-                        r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(
+                        keypair.vk, example.primary_input, proof);
 
-                    const bool ans2 =
-                        r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(pvk, example.primary_input, proof);
+                    const bool ans2 = r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(
+                        pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

@@ -71,10 +71,10 @@ namespace nil {
             namespace snark {
                 namespace detail {
 
-                    template <typename ProofSystem>
+                    template<typename ProofSystem>
                     struct verifier_data_from_bits;
 
-                    template <typename CurveType>
+                    template<typename CurveType>
                     class verifier_data_from_bits<r1cs_gg_ppzksnark<CurveType>> {
                         using proof_system = r1cs_gg_ppzksnark<CurveType>;
 
@@ -84,23 +84,22 @@ namespace nil {
                         constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
                         using chunk_type = std::uint8_t;
-                        
+
                         constexpr static const std::size_t chunk_size = 8;
-                        constexpr static const std::size_t modulus_chunks = modulus_bits/chunk_size + 
-                                                                            modulus_bits%chunk_size;
+                        constexpr static const std::size_t modulus_chunks =
+                            modulus_bits / chunk_size + modulus_bits % chunk_size;
 
                         template<typename FieldType>
-                        static inline 
-                        typename std::enable_if<
-                                        !::nil::crypto3::detail::is_extended_field<FieldType>::value,
-                                     typename FieldType::value_type>::type field_process (
-                            std::vector<chunk_type>::iterator &read_iter){
+                        static inline
+                            typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+                                                    typename FieldType::value_type>::type
+                            field_process(std::vector<chunk_type>::iterator &read_iter) {
 
                             using field_type = FieldType;
 
                             modulus_type fp_out;
 
-                            boost::multiprecision::import_bits(fp_out, read_iter, read_iter + modulus_chunks, 
+                            boost::multiprecision::import_bits(fp_out, read_iter, read_iter + modulus_chunks,
                                                                chunk_size, false);
 
                             read_iter += modulus_chunks;
@@ -109,91 +108,90 @@ namespace nil {
                         }
 
                         template<typename FieldType>
-                        static inline 
-                        typename std::enable_if<
-                                        ::nil::crypto3::detail::is_extended_field<FieldType>::value,
-                                     typename FieldType::value_type>::type field_process (
-                            std::vector<chunk_type>::iterator &read_iter){
+                        static inline
+                            typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+                                                    typename FieldType::value_type>::type
+                            field_process(std::vector<chunk_type>::iterator &read_iter) {
 
                             using field_type = FieldType;
 
                             typename field_type::value_type::data_type data;
-                            const std::size_t data_dimension = field_type::arity / 
-                                                   field_type::underlying_field_type::arity;
-                            
-                            for(int n = 0; n < data_dimension; ++n){
+                            const std::size_t data_dimension =
+                                field_type::arity / field_type::underlying_field_type::arity;
+
+                            for (int n = 0; n < data_dimension; ++n) {
                                 data[n] = field_process<typename field_type::underlying_field_type>(read_iter);
                             }
 
                             return typename field_type::value_type(data);
                         }
 
-                        template <typename GroupType>
-                        static inline typename GroupType::value_type group_type_process (
-                            std::vector<chunk_type>::iterator &read_iter){
+                        template<typename GroupType>
+                        static inline typename GroupType::value_type
+                            group_type_process(std::vector<chunk_type>::iterator &read_iter) {
 
-                            typename GroupType::underlying_field_type::value_type X = 
+                            typename GroupType::underlying_field_type::value_type X =
                                 field_process<typename GroupType::underlying_field_type>(read_iter);
 
-                            typename GroupType::underlying_field_type::value_type Y = 
+                            typename GroupType::underlying_field_type::value_type Y =
                                 field_process<typename GroupType::underlying_field_type>(read_iter);
 
-                            typename GroupType::underlying_field_type::value_type Z = 
+                            typename GroupType::underlying_field_type::value_type Z =
                                 field_process<typename GroupType::underlying_field_type>(read_iter);
 
                             return typename GroupType::value_type(X, Y, Z);
                         }
 
                     public:
-
                         struct verifier_data {
                             typename proof_system::verification_key_type vk;
                             typename proof_system::primary_input_type pi;
                             typename proof_system::proof_type pr;
 
-                            verifier_data(){};
+                            verifier_data() {};
 
                             verifier_data(typename proof_system::verification_key_type vk,
                                           typename proof_system::primary_input_type pi,
-                                          typename proof_system::proof_type pr):
-                                          vk(vk), pi(pi), pr(pr){};
+                                          typename proof_system::proof_type pr) :
+                                vk(vk),
+                                pi(pi), pr(pr) {};
                         };
 
-                        template <typename DataType>
-                        static inline verifier_data process (DataType data){
+                        template<typename DataType>
+                        static inline verifier_data process(DataType data) {
                             return verifier_data();
                         }
 
-                        static inline verifier_data process (std::vector<chunk_type> data){
+                        static inline verifier_data process(std::vector<chunk_type> data) {
 
                             std::vector<chunk_type>::iterator read_iter = data.begin();
 
-                            typename CurveType::g1_type::value_type g1_out = group_type_process<
-                                typename CurveType::g1_type>(read_iter);
+                            typename CurveType::g1_type::value_type g1_out =
+                                group_type_process<typename CurveType::g1_type>(read_iter);
 
-                            std::cout << "processed g1: " << g1_out.X.data << std::endl 
-                                                          << g1_out.Y.data << std::endl 
-                                                          << g1_out.Z.data << std::endl;
+                            std::cout << "processed g1: " << g1_out.X.data << std::endl
+                                      << g1_out.Y.data << std::endl
+                                      << g1_out.Z.data << std::endl;
 
-                            typename CurveType::g2_type::value_type g2_out = group_type_process<
-                                typename CurveType::g2_type>(read_iter);
+                            typename CurveType::g2_type::value_type g2_out =
+                                group_type_process<typename CurveType::g2_type>(read_iter);
 
-                            std::cout << "processed g2: " << g2_out.X.data[0].data << std::endl 
-                                                          << g2_out.X.data[1].data << std::endl 
-                                                          << g2_out.Y.data[0].data << std::endl 
-                                                          << g2_out.Y.data[1].data << std::endl 
-                                                          << g2_out.Z.data[0].data << std::endl 
-                                                          << g2_out.Z.data[1].data << std::endl;
+                            std::cout << "processed g2: " << g2_out.X.data[0].data << std::endl
+                                      << g2_out.X.data[1].data << std::endl
+                                      << g2_out.Y.data[0].data << std::endl
+                                      << g2_out.Y.data[1].data << std::endl
+                                      << g2_out.Z.data[0].data << std::endl
+                                      << g2_out.Z.data[1].data << std::endl;
 
                             return verifier_data();
                         }
                     };
 
-                    template <typename ProofSystem>
+                    template<typename ProofSystem>
                     class verifier_data_to_bits;
 
-                    //TODO: reimplement private functions using field value type trait
-                    template <typename CurveType>
+                    // TODO: reimplement private functions using field value type trait
+                    template<typename CurveType>
                     class verifier_data_to_bits<r1cs_gg_ppzksnark<CurveType>> {
                         using proof_system = r1cs_gg_ppzksnark<CurveType>;
 
@@ -205,46 +203,41 @@ namespace nil {
                         using chunk_type = std::uint8_t;
 
                         constexpr static const std::size_t chunk_size = 8;
-                        constexpr static const std::size_t modulus_chunks = modulus_bits/chunk_size + 
-                                                                            modulus_bits%chunk_size;
+                        constexpr static const std::size_t modulus_chunks =
+                            modulus_bits / chunk_size + modulus_bits % chunk_size;
 
                         template<typename FieldType>
-                        static inline 
-                        typename std::enable_if<
-                                        !::nil::crypto3::detail::is_extended_field<FieldType>::value,
-                                     void>::type field_process (
-                            typename FieldType::value_type input_fp, 
-                            std::vector<chunk_type>::iterator &write_iter){
+                        static inline
+                            typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+                                                    void>::type
+                            field_process(typename FieldType::value_type input_fp,
+                                          std::vector<chunk_type>::iterator &write_iter) {
 
-                            boost::multiprecision::export_bits(modulus_type(input_fp.data), 
-                                write_iter, chunk_size, false);
+                            boost::multiprecision::export_bits(modulus_type(input_fp.data), write_iter, chunk_size,
+                                                               false);
                             write_iter += modulus_chunks;
-
                         }
 
                         template<typename FieldType>
-                        static inline 
-                        typename std::enable_if<
-                                        ::nil::crypto3::detail::is_extended_field<FieldType>::value,
-                                     void>::type field_process (
-                            typename FieldType::value_type input_fp, 
-                            std::vector<chunk_type>::iterator &write_iter){
+                        static inline
+                            typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+                                                    void>::type
+                            field_process(typename FieldType::value_type input_fp,
+                                          std::vector<chunk_type>::iterator &write_iter) {
 
                             using field_type = FieldType;
 
-                            const std::size_t data_dimension = field_type::arity / 
-                                                   field_type::underlying_field_type::arity;
-                            
-                            for(int n = 0; n < data_dimension; ++n){
-                                field_process<typename field_type::underlying_field_type>(
-                                    input_fp.data[n], write_iter);
+                            const std::size_t data_dimension =
+                                field_type::arity / field_type::underlying_field_type::arity;
+
+                            for (int n = 0; n < data_dimension; ++n) {
+                                field_process<typename field_type::underlying_field_type>(input_fp.data[n], write_iter);
                             }
                         }
 
-                        template <typename GroupType>
-                        static inline void group_type_process (
-                            typename GroupType::value_type input_g,
-                            std::vector<chunk_type>::iterator &write_iter){
+                        template<typename GroupType>
+                        static inline void group_type_process(typename GroupType::value_type input_g,
+                                                              std::vector<chunk_type>::iterator &write_iter) {
 
                             field_process<typename GroupType::underlying_field_type>(input_g.X, write_iter);
                             field_process<typename GroupType::underlying_field_type>(input_g.Y, write_iter);
@@ -252,56 +245,54 @@ namespace nil {
                         }
 
                     public:
-
                         struct verifier_data {
                             typename proof_system::verification_key_type vk;
                             typename proof_system::primary_input_type pi;
                             typename proof_system::proof_type pr;
 
-                            verifier_data(){};
+                            verifier_data() {};
 
                             verifier_data(typename proof_system::verification_key_type vk,
                                           typename proof_system::primary_input_type pi,
-                                          typename proof_system::proof_type pr):
-                                          vk(vk), pi(pi), pr(pr){};
+                                          typename proof_system::proof_type pr) :
+                                vk(vk),
+                                pi(pi), pr(pr) {};
                         };
 
-                        static inline std::vector<chunk_type> process (){
+                        static inline std::vector<chunk_type> process() {
 
-                            constexpr static const std::size_t g1_modulus_chunks_coeff = 3 * 
-                                CurveType::g1_type::underlying_field_type::arity;
-                            constexpr static const std::size_t g2_modulus_chunks_coeff = 3 * 
-                                CurveType::g2_type::underlying_field_type::arity;
+                            constexpr static const std::size_t g1_modulus_chunks_coeff =
+                                3 * CurveType::g1_type::underlying_field_type::arity;
+                            constexpr static const std::size_t g2_modulus_chunks_coeff =
+                                3 * CurveType::g2_type::underlying_field_type::arity;
 
-                            std::vector<chunk_type> output (modulus_chunks * 
-                                                            (g1_modulus_chunks_coeff + g2_modulus_chunks_coeff));
+                            std::vector<chunk_type> output(modulus_chunks *
+                                                           (g1_modulus_chunks_coeff + g2_modulus_chunks_coeff));
 
                             std::vector<chunk_type>::iterator write_iter = output.begin();
 
                             using g2_field_value = typename CurveType::g2_type::underlying_field_type::value_type;
 
-                            typename CurveType::g1_type::value_type input_g1(16*99 + 13, 17, 10*16 + 7);
-                            typename CurveType::g2_type::value_type input_g2(g2_field_value(16*7, 1), 
+                            typename CurveType::g1_type::value_type input_g1(16 * 99 + 13, 17, 10 * 16 + 7);
+                            typename CurveType::g2_type::value_type input_g2(g2_field_value(16 * 7, 1),
                                                                              g2_field_value(11, 7),
-                                                                             g2_field_value(12*16 + 9, 5*16 + 1));
+                                                                             g2_field_value(12 * 16 + 9, 5 * 16 + 1));
 
-                            group_type_process<typename CurveType::g1_type> (input_g1, write_iter);
-                            group_type_process<typename CurveType::g2_type> (input_g2, write_iter);
+                            group_type_process<typename CurveType::g1_type>(input_g1, write_iter);
+                            group_type_process<typename CurveType::g2_type>(input_g2, write_iter);
 
                             std::cout << "g1:" << std::endl;
-                            for (int i = 0; i < modulus_chunks * (g1_modulus_chunks_coeff); ++i){
-                                std::cout << i % modulus_chunks << ": 0x" << std::hex << 
-                                    int(output[i]) << std::endl;
+                            for (int i = 0; i < modulus_chunks * (g1_modulus_chunks_coeff); ++i) {
+                                std::cout << i % modulus_chunks << ": 0x" << std::hex << int(output[i]) << std::endl;
                             }
 
                             std::cout << "g2:" << std::endl;
-                            for (int i = modulus_chunks * g1_modulus_chunks_coeff; 
-                                     i < modulus_chunks * (g1_modulus_chunks_coeff + 
-                                                           g2_modulus_chunks_coeff); ++i){
-                                std::cout << i % modulus_chunks << ": 0x" << std::hex << 
-                                    int(output[i]) << std::endl;
+                            for (int i = modulus_chunks * g1_modulus_chunks_coeff;
+                                 i < modulus_chunks * (g1_modulus_chunks_coeff + g2_modulus_chunks_coeff);
+                                 ++i) {
+                                std::cout << i % modulus_chunks << ": 0x" << std::hex << int(output[i]) << std::endl;
                             }
-                            
+
                             std::cout << std::endl;
 
                             return output;

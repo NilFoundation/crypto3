@@ -58,7 +58,7 @@ void test_ram_ppzksnark(const std::size_t w,
 
 BOOST_AUTO_TEST_SUITE(ram_ppzksnark_test_suite)
 
-BOOST_AUTO_TEST_CASE(ram_ppzksnark_test){
+BOOST_AUTO_TEST_CASE(ram_ppzksnark_test) {
     const std::size_t program_size = 100;
     const std::size_t input_size = 2;
     const std::size_t time_bound = 20;

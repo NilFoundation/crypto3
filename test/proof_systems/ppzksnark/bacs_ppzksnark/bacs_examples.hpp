@@ -52,15 +52,15 @@ namespace nil {
                     bacs_example<FieldType>() = default;
                     bacs_example<FieldType>(const bacs_example<FieldType> &other) = default;
                     bacs_example<FieldType>(const bacs_circuit<FieldType> &circuit,
-                                         const bacs_primary_input<FieldType> &primary_input,
-                                         const bacs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const bacs_primary_input<FieldType> &primary_input,
+                                            const bacs_auxiliary_input<FieldType> &auxiliary_input) :
                         circuit(circuit),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {
                     }
 
                     bacs_example<FieldType>(bacs_circuit<FieldType> &&circuit,
-                                         bacs_primary_input<FieldType> &&primary_input,
-                                         bacs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            bacs_primary_input<FieldType> &&primary_input,
+                                            bacs_auxiliary_input<FieldType> &&auxiliary_input) :
                         circuit(std::move(circuit)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {
                     }
@@ -97,9 +97,9 @@ namespace nil {
                  */
                 template<typename FieldType>
                 bacs_example<FieldType> generate_bacs_example(std::size_t primary_input_size,
-                                                           std::size_t auxiliary_input_size,
-                                                           std::size_t num_gates,
-                                                           std::size_t num_outputs) {
+                                                              std::size_t auxiliary_input_size,
+                                                              std::size_t num_gates,
+                                                              std::size_t num_outputs) {
                     bacs_example<FieldType> example;
                     for (std::size_t i = 0; i < primary_input_size; ++i) {
                         example.primary_input.emplace_back(algebra::random_element<FieldType>());
@@ -128,7 +128,8 @@ namespace nil {
                             gate.is_circuit_output = true;
                             const var_index_t var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
-                            const typename FieldType::value_type var_val = (var_idx == 0 ? FieldType::value_type::zero() : all_vals[var_idx - 1]);
+                            const typename FieldType::value_type var_val =
+                                (var_idx == 0 ? FieldType::value_type::zero() : all_vals[var_idx - 1]);
 
                             if (std::rand() % 2 == 0) {
                                 const typename FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);

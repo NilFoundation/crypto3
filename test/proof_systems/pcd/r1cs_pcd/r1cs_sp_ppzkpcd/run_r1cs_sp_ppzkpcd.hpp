@@ -46,9 +46,7 @@ namespace nil {
                  * "tally compliance predicate", of a given wordsize, arity, and depth.
                  */
                 template<typename PCD_ppT>
-                bool run_r1cs_sp_ppzkpcd_tally_example(std::size_t wordsize,
-                                                       std::size_t arity,
-                                                       std::size_t depth) {
+                bool run_r1cs_sp_ppzkpcd_tally_example(std::size_t wordsize, std::size_t arity, std::size_t depth) {
 
                     typedef algebra::Fr<typename PCD_ppT::curve_A_pp> FieldType;
 

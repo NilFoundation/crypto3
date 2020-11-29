@@ -50,6 +50,6 @@ int main(int argc, const char *argv[]) {
     std::cout << "Generate TBCS example" << std::endl;
     tbcs_example example = generate_tbcs_example(primary_input_size, auxiliary_input_size, num_gates, num_outputs);
 
-    std::cout << "Profile TBCS ppzkSNARK" <<std::endl;
+    std::cout << "Profile TBCS ppzkSNARK" << std::endl;
     run_tbcs_ppzksnark<default_tbcs_ppzksnark_pp>(example);
 }

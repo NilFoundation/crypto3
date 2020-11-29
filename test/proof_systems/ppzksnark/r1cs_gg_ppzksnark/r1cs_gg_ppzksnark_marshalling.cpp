@@ -43,7 +43,6 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
-
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 
 using namespace nil::crypto3::zk::snark;
@@ -51,12 +50,11 @@ using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_marshalling_test_suite)
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_marshalling_test){
+BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_marshalling_test) {
     using curve_type = curves::mnt4<298>;
-    std::vector<std::uint8_t> data = nil::crypto3::zk::snark::detail::verifier_data_to_bits<
-    	r1cs_gg_ppzksnark<curve_type>>::process();
-    nil::crypto3::zk::snark::detail::verifier_data_from_bits<
-    	r1cs_gg_ppzksnark<curve_type>>::process(data);
+    std::vector<std::uint8_t> data =
+        nil::crypto3::zk::snark::detail::verifier_data_to_bits<r1cs_gg_ppzksnark<curve_type>>::process();
+    nil::crypto3::zk::snark::detail::verifier_data_from_bits<r1cs_gg_ppzksnark<curve_type>>::process(data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

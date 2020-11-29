@@ -36,7 +36,8 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
-void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints, std::size_t &num_variables) {
+void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints,
+                         std::size_t &num_variables) {
     blueprint<FieldType> bp;
 
     std::vector<blueprint_variable_vector<FieldType>> randbits(n), outbits(n);
@@ -53,7 +54,8 @@ void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &
 }
 
 template<typename FieldType>
-void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints, std::size_t &num_variables) {
+void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints,
+                    std::size_t &num_variables) {
     const std::size_t t = static_cast<std::size_t>(std::ceil(std::log2(n)));
     assert(n == 1ul << t);
 
@@ -96,12 +98,12 @@ void profile_num_switches(const std::size_t l) {
 
         const std::size_t as_waksman_switches = (as_waksman_constr - n * (2 + l)) / 2;
         const std::size_t benes_switches = (benes_constr - rounded_n * (2 + l)) / 2;
-        // const std::size_t benes_expected = static_cast<std::size_t>(std::ceil(std::log2(rounded_n)))*rounded_n; // switch-Benes has (-rounded_n/2) term
+        // const std::size_t benes_expected = static_cast<std::size_t>(std::ceil(std::log2(rounded_n)))*rounded_n; //
+        // switch-Benes has (-rounded_n/2) term
     }
 }
 
 int main() {
-
 
     profile_routing_components<typename algebra::default_ec_pp::scalar_field_type>(32 + 16 + 3 + 2);
     profile_num_switches<typename algebra::default_ec_pp::scalar_field_type>(1);

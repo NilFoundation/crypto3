@@ -54,7 +54,8 @@ int main(int argc, const char *argv[]) {
 
     std::cout << "Generate R1CS example" << std::endl;
     r1cs_example<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type> example =
-        generate_r1cs_example_with_field_input<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
+        generate_r1cs_example_with_field_input<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type>(
+            num_constraints, input_size);
 
     std::cout << "Profile R1CS GG-ppzkSNARK" << std::endl;
     run_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(example);

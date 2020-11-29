@@ -48,8 +48,7 @@ namespace nil {
                     block_variable<FieldType> input_block(bp, input_bits.size());
                     digest_variable<FieldType> output_digest(
                         bp, knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
-                    knapsack_crh_with_bit_out_component<FieldType> H(
-                        bp, input_bits.size(), input_block, output_digest);
+                    knapsack_crh_with_bit_out_component<FieldType> H(bp, input_bits.size(), input_block, output_digest);
 
                     input_block.generate_r1cs_witness(input_bits);
                     H.generate_r1cs_constraints();

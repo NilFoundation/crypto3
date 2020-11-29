@@ -206,8 +206,8 @@ namespace nil {
                             typename g2_type::value_type delta_g2 = delta * G2_gen;
 
                             typename std::vector<typename g1_type::value_type> A_query =
-                                algebra::batch_exp<g1_type, scalar_field_type>(
-                                    g1_scalar_size, g1_window_size, g1_table, At);
+                                algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                               At);
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(A_query);
 #endif
@@ -229,8 +229,8 @@ namespace nil {
 #endif
 
                             typename std::vector<typename g1_type::value_type> L_query =
-                                algebra::batch_exp<g1_type, scalar_field_type>(
-                                    g1_scalar_size, g1_window_size, g1_table, Lt);
+                                algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                               Lt);
 
 #ifdef USE_MIXED_ADDITION
                             algebra::batch_to_special<g1_type>(L_query);
@@ -243,8 +243,8 @@ namespace nil {
                             typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
 
                             typename std::vector<typename g1_type::value_type> gamma_ABC_g1_values =
-                                algebra::batch_exp<g1_type, scalar_field_type>(
-                                    g1_scalar_size, g1_window_size, g1_table, gamma_ABC);
+                                algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                               gamma_ABC);
 
                             accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                       std::move(gamma_ABC_g1_values));

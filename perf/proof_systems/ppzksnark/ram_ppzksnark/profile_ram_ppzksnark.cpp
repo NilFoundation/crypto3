@@ -49,7 +49,7 @@ int main(int argc, const char *argv[]) {
     }
 
     const std::size_t w = atoi(argv[1]), k = atoi(argv[2]), program_size = atoi(argv[3]), input_size = atoi(argv[4]),
-                 time_bound = atoi(argv[5]);
+                      time_bound = atoi(argv[5]);
 
     typedef ram_ppzksnark_machine_pp<default_ram_ppzksnark_pp> machine_ppT;
 
