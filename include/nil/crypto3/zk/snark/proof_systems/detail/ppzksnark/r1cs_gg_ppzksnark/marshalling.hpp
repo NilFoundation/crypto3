@@ -75,7 +75,7 @@ namespace nil {
                     struct verifier_data_from_bits;
 
                     template<typename CurveType>
-                    class verifier_data_from_bits<r1cs_gg_ppzksnark<CurveType>> {
+                    struct verifier_data_from_bits<r1cs_gg_ppzksnark<CurveType>> {
                         using proof_system = r1cs_gg_ppzksnark<CurveType>;
 
                         using modulus_type = typename CurveType::base_field_type::modulus_type;
@@ -93,7 +93,7 @@ namespace nil {
                         static inline
                             typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     typename FieldType::value_type>::type
-                            field_process(std::vector<chunk_type>::iterator &read_iter) {
+                            field_process(typename std::vector<chunk_type>::iterator &read_iter) {
 
                             using field_type = FieldType;
 
@@ -111,7 +111,7 @@ namespace nil {
                         static inline
                             typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     typename FieldType::value_type>::type
-                            field_process(std::vector<chunk_type>::iterator &read_iter) {
+                            field_process(typename std::vector<chunk_type>::iterator &read_iter) {
 
                             using field_type = FieldType;
 
@@ -128,7 +128,7 @@ namespace nil {
 
                         template<typename GroupType>
                         static inline typename GroupType::value_type
-                            group_type_process(std::vector<chunk_type>::iterator &read_iter) {
+                            group_type_process(typename std::vector<chunk_type>::iterator &read_iter) {
 
                             typename GroupType::underlying_field_type::value_type X =
                                 field_process<typename GroupType::underlying_field_type>(read_iter);
@@ -162,9 +162,9 @@ namespace nil {
                             return verifier_data();
                         }
 
-                        static inline verifier_data process(std::vector<chunk_type> data) {
+                        static inline verifier_data process(const std::vector<chunk_type> &data) {
 
-                            std::vector<chunk_type>::iterator read_iter = data.begin();
+                            typename std::vector<chunk_type>::const_iterator read_iter = data.begin();
 
                             typename CurveType::g1_type::value_type g1_out =
                                 group_type_process<typename CurveType::g1_type>(read_iter);
@@ -211,7 +211,7 @@ namespace nil {
                             typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     void>::type
                             field_process(typename FieldType::value_type input_fp,
-                                          std::vector<chunk_type>::iterator &write_iter) {
+                                          typename std::vector<chunk_type>::iterator &write_iter) {
 
                             boost::multiprecision::export_bits(modulus_type(input_fp.data), write_iter, chunk_size,
                                                                false);
@@ -223,7 +223,7 @@ namespace nil {
                             typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     void>::type
                             field_process(typename FieldType::value_type input_fp,
-                                          std::vector<chunk_type>::iterator &write_iter) {
+                                          typename std::vector<chunk_type>::iterator &write_iter) {
 
                             using field_type = FieldType;
 
@@ -237,7 +237,7 @@ namespace nil {
 
                         template<typename GroupType>
                         static inline void group_type_process(typename GroupType::value_type input_g,
-                                                              std::vector<chunk_type>::iterator &write_iter) {
+                                                              typename std::vector<chunk_type>::iterator &write_iter) {
 
                             field_process<typename GroupType::underlying_field_type>(input_g.X, write_iter);
                             field_process<typename GroupType::underlying_field_type>(input_g.Y, write_iter);
@@ -269,7 +269,7 @@ namespace nil {
                             std::vector<chunk_type> output(modulus_chunks *
                                                            (g1_modulus_chunks_coeff + g2_modulus_chunks_coeff));
 
-                            std::vector<chunk_type>::iterator write_iter = output.begin();
+                            typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
                             using g2_field_value = typename CurveType::g2_type::underlying_field_type::value_type;
 
