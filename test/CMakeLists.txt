@@ -46,6 +46,7 @@ set(TESTS_NAMES
 
     "components/hashes/knapsack/test_knapsack_component"
     "components/hashes/sha256/sha256_component"
+    "components/hashes/sha256/sha256_r1cs_gg_ppzksnark"
 
     "components/routing/as_waksman"
 

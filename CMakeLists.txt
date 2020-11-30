@@ -51,11 +51,6 @@ if(UNIX AND BUILD_WITH_PROCPS)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/zk/snark/accumulators/snark.hpp
-
-     include/nil/crypto3/zk/snark/detail/accumulation_vector.hpp
-     include/nil/crypto3/zk/snark/detail/set_commitment.hpp
-     include/nil/crypto3/zk/snark/detail/sparse_vector.hpp
 
      include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/bar_component.hpp
      include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/fooram_blueprint.hpp
@@ -114,85 +109,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/basic_components.hpp
      include/nil/crypto3/zk/snark/components/component_from_r1cs.hpp
 
-     include/nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp
-     include/nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/mp_pcd_circuits.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd_params.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd_params.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/sp_pcd_circuits.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/ppzkpcd_compliance_predicate.hpp
-     include/nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_pcd_params.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/prf.hpp
-     include/nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/signature.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzkadsnark/r1cs_ppzkadsnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/bacs_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_se_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp
-     include/nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/uscs_ppzksnark/basic_policy.hpp
-
-     include/nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp
-
-     include/nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp
-
-     include/nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp
-
-     include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/memory_checker_component.hpp
-     include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/ram_universal_component.hpp
-     include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp
-     include/nil/crypto3/zk/snark/reductions/ram_to_r1cs/ram_to_r1cs.hpp
-
-     include/nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp
-
-     include/nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp
-
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/qap.hpp
-
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp
-
-     include/nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp
-
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp
-
-     include/nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp
-
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp
-
-     include/nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp
-
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/delegated_ra_memory.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/memory_store_trace.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/memory/ra_memory.hpp
-
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_params.hpp
-
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_aux.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp
-     include/nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp
      include/nil/crypto3/zk/snark/relations/variable.hpp
      include/nil/crypto3/zk/snark/routing/as_waksman.hpp
      include/nil/crypto3/zk/snark/routing/benes.hpp
