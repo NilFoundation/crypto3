@@ -36,6 +36,8 @@
 
 #include "../r1cs_examples.hpp"
 
+#include <nil/crypto3/zk/snark/algorithms/algorithms.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -83,9 +85,11 @@ namespace nil {
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
+                    using basic_proof_system = r1cs_gg_ppzksnark<CurveType>;
+
                     std::cout << "Starting generator" << std::endl;
                     typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
-                        r1cs_gg_ppzksnark<CurveType>::generator(example.constraint_system);
+                        generator<basic_proof_system>(example.constraint_system);
 
                     std::cout << "Starting verification key processing" << std::endl;
 
@@ -94,8 +98,8 @@ namespace nil {
 
                     std::cout << "Starting prover" << std::endl;
 
-                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = r1cs_gg_ppzksnark<CurveType>::prover(
-                        keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = 
+                        prover<basic_proof_system>(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
                         r1cs_gg_ppzksnark<CurveType,
@@ -103,14 +107,14 @@ namespace nil {
                        example.primary_input, proof);*/
 
                     std::cout << "Starting verifier" << std::endl;
-
-                    const bool ans = r1cs_gg_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
+                    
+                    const bool ans = verifier<basic_proof_system>(keypair.vk, example.primary_input, proof);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;
 
                     std::cout << "Starting online verifier" << std::endl;
 
-                    const bool ans2 = r1cs_gg_ppzksnark<CurveType>::online_verifier(pvk, example.primary_input, proof);
+                    const bool ans2 = online_verifier<basic_proof_system>(pvk, example.primary_input, proof);
 
                     std::cout << "Online verifier finished, result: " << ans2 << std::endl;
 
