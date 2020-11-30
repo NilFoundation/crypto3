@@ -34,7 +34,7 @@
 #include <cstdio>
 
 #include "../r1cs_examples.hpp"
-#include "../../../components/hashes/sha256/sha256_component.hpp"
+//#include "../../../components/hashes/sha256/sha256_component.hpp"
 #include "run_r1cs_gg_ppzksnark.hpp"
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -44,7 +44,7 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 
-#include <nil/crypto3/zk/snark/blueprint.hpp>
+//#include <nil/crypto3/zk/snark/blueprint.hpp>
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -57,7 +57,7 @@ void run_r1cs_gg_ppzksnark_basic_test(std::size_t num_constraints, std::size_t i
     BOOST_CHECK(bit);
 }
 
-template<typename CurveType>
+/*template<typename CurveType>
 void run_r1cs_gg_ppzksnark_sha256_test() {
     using field_type = typename CurveType::scalar_field_type;
 
@@ -76,7 +76,7 @@ void run_r1cs_gg_ppzksnark_sha256_test() {
 
     const bool bit = run_r1cs_gg_ppzksnark<CurveType>(example);
     BOOST_CHECK(bit);
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
@@ -84,8 +84,8 @@ BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_basic_test) {
     run_r1cs_gg_ppzksnark_basic_test<curves::mnt4<298>>(1000, 100);
 }
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_sha256_test) {
+/*BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_sha256_test) {
     run_r1cs_gg_ppzksnark_sha256_test<curves::mnt4<298>>();
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()

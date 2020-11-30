@@ -43,19 +43,6 @@ endmacro()
 set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
-    "components/hashes/knapsack/test_knapsack_component"
-    "components/hashes/sha256/sha256_component"
-
-    "components/routing/as_waksman"
-
-    "components/pairing/weierstrass_precomputation"
-
-    "components/r1cs_ppzksnark_verifier_component"
-    "components/basic_components"
-    "components/exponentiation_component"
-    "components/merkle_tree_components"
-    "components/set_commitment_component"
-
     "relations/numeric/qap"
     "relations/numeric/sap"
     "relations/numeric/ssp"
