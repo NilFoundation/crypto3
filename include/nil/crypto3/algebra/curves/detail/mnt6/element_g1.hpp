@@ -38,20 +38,29 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
+                    /** @brief A struct representing a group G1 of mnt6 curve.
+                     *    @tparam ModulusBits size of the base field in bits 
+                     *
+                     */
                     template<std::size_t ModulusBits>
                     struct mnt6_g1;
-
+                    /** @brief A struct representing an element from the group G1 of mnt6 curve.
+                     *    @tparam ModulusBits size of the base field in bits 
+                     *
+                     */
                     template<std::size_t ModulusBits>
                     struct element_mnt6_g1 { };
-
+                    /** @brief A struct representing an element from the group G1 of mnt6 curve.
+                     *
+                     * The size of the group G1 in bits equals 298.
+                     */
                     template<>
                     struct element_mnt6_g1<298> {
 
                         using group_type = mnt6_g1<298>;
 
                         using policy_type = mnt6_basic_policy<298>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
+                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
@@ -63,13 +72,21 @@ namespace nil {
 
                         /*************************  Constructors and zero/one  ***********************************/
 
+
+                        /** @brief 
+                         *    @return the point at infinity by default
+                         *
+                         */
                         element_mnt6_g1() :
                             element_mnt6_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
                                             underlying_field_value_type::zero()) {};
                         // must be
                         // element_mnt6_g1() : element_mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
-
+                        /** @brief 
+                         *    @return the selected affine point $(X:Y:1)$
+                         *
+                         */
                         element_mnt6_g1(underlying_field_value_type X,
                                         underlying_field_value_type Y,
                                         underlying_field_value_type Z) {
@@ -77,11 +94,15 @@ namespace nil {
                             this->Y = Y;
                             this->Z = Z;
                         };
-
+                         /** @brief Get the point at infinity
+                         *
+                         */
                         static element_mnt6_g1 zero() {
                             return element_mnt6_g1();
                         }
-
+                        /** @brief Get the generator of group G1
+                         *
+                         */
                         static element_mnt6_g1 one() {
                             return element_mnt6_g1(
                                 underlying_field_value_type(
@@ -123,15 +144,24 @@ namespace nil {
                         bool operator!=(const element_mnt6_g1 &other) const {
                             return !(operator==(other));
                         }
-
+                        /** @brief
+                         * 
+                         * @return true if element from group G1 is the point at infinity
+                         */
                         bool is_zero() const {
                             return (this->X.is_zero() && this->Z.is_zero());
                         }
-
+                        /** @brief
+                         * 
+                         * @return true if element from group G1 in affine coordinates
+                         */
                         bool is_special() const {
                             return (this->is_zero() || this->Z.is_one());
                         }
-
+                        /** @brief
+                         * 
+                         * @return true if element from group G1 lies on the elliptic curve
+                         */
                         bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
@@ -189,7 +219,10 @@ namespace nil {
                         element_mnt6_g1 operator-(const element_mnt6_g1 &other) const {
                             return (*this) + (-other);
                         }
-
+                        /** @brief 
+                         * 
+                         * @return doubled element from group G1
+                         */
                         element_mnt6_g1 doubled() const {
                             if (this->is_zero()) {
                                 return (*this);
@@ -217,7 +250,11 @@ namespace nil {
                                 return element_mnt6_g1(X3, Y3, Z3);
                             }
                         }
-
+                        /** @brief 
+                         * 
+                         * “Mixed addition” refers to the case Z2 known to be 1.
+                         * @return addition of two elements from group G1
+                         */
                         element_mnt6_g1 mixed_add(const element_mnt6_g1 &other) const {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
@@ -286,7 +323,10 @@ namespace nil {
 
                     public:
                         /*************************  Reducing operations  ***********************************/
-
+                        /** @brief 
+                         * 
+                         * @return return the corresponding element from group G1 in affine coordinates
+                         */
                         element_mnt6_g1 to_affine_coordinates() const {
                             underlying_field_value_type p_out[3];
 
@@ -303,7 +343,10 @@ namespace nil {
 
                             return element_mnt6_g1(p_out[0], p_out[1], p_out[2]);
                         }
-
+                        /** @brief 
+                         * 
+                         * @return return the corresponding element from group G1 in affine coordinates
+                         */
                         element_mnt6_g1 to_special() const {
                             return this->to_affine_coordinates();
                         }

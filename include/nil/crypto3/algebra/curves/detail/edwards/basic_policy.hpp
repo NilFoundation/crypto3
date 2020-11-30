@@ -41,13 +41,18 @@ namespace nil {
                 namespace detail {
 
                     using namespace algebra;
-
+                    /** @brief A struct representing details about base and scalar fields.
+                    *    @tparam ModulusBits size of the base field in bits 
+                    *
+                    */
                     template<std::size_t ModulusBits = 183>
                     struct edwards_basic_policy { };
-
+                    /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181 bits respectively.
+                    *
+                    */
                     template<>
                     struct edwards_basic_policy<183> {
-                        constexpr static const std::size_t base_field_bits = 183;
+                        constexpr static const std::size_t base_field_bits = 183;///< size of the base field in bits 
                         typedef fields::edwards_fq<base_field_bits> g1_field_type;
                         typedef g1_field_type base_field_type;
                         typedef typename fields::fp3<base_field_type> g2_field_type;
@@ -56,18 +61,18 @@ namespace nil {
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                        constexpr static const number_type base_field_modulus = base_field_type::modulus;///< characteristic of the base field  
 
-                        constexpr static const std::size_t scalar_field_bits = 183;
+                        constexpr static const std::size_t scalar_field_bits = 183; ///< size of the scalar field (order of the group of points) in bits (181) have to be 
                         typedef fields::edwards_fr<scalar_field_bits> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;///< characteristic of the scalar field (order of the group of points)
 
-                        constexpr static const number_type p = base_field_modulus;
-                        constexpr static const number_type q = scalar_field_modulus;
+                        constexpr static const number_type p = base_field_modulus; ///< characteristic of the base field  
+                        constexpr static const number_type q = scalar_field_modulus; ///< characteristic of the scalar field (order of the group of points) 
 
-                        constexpr static const number_type a = 0x01;
-                        constexpr static const number_type d = 0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179;
-                    };
+                        constexpr static const number_type a = 0x01; ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type d = 0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179; ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                    }; 
 
                     constexpr typename edwards_basic_policy<183>::number_type const
                         edwards_basic_policy<183>::base_field_modulus;

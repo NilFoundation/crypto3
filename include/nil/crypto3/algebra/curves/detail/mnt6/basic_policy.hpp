@@ -41,13 +41,19 @@ namespace nil {
                 namespace detail {
 
                     using namespace algebra;
-
+                    /** @brief A struct representing details about base and scalar fields.
+                    *    @tparam ModulusBits size of the base field in bits 
+                    *
+                    */
                     template<std::size_t ModulusBits = 298>
                     struct mnt6_basic_policy { };
 
+                    /** @brief A struct representing details about base and scalar fields of the size 298 bits.
+                    *
+                    */
                     template<>
                     struct mnt6_basic_policy<298> {
-                        constexpr static const std::size_t base_field_bits = 298;
+                        constexpr static const std::size_t base_field_bits = 298; ///< size of the base field in bits 
                         typedef fields::mnt6_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp3<base_field_type> g2_field_type;
@@ -56,18 +62,18 @@ namespace nil {
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                        constexpr static const number_type base_field_modulus = base_field_type::modulus; ///< characteristic of the base field  
 
-                        constexpr static const std::size_t scalar_field_bits = 298;
+                        constexpr static const std::size_t scalar_field_bits = 298; ///< size of the scalar field (order of the group of points) in bits 
                         typedef fields::mnt6_scalar_field<scalar_field_bits> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus; ///< characteristic of the scalar field (order of the group of points)
 
-                        constexpr static const number_type p = base_field_modulus;
-                        constexpr static const number_type q = scalar_field_modulus;
+                        constexpr static const number_type p = base_field_modulus; ///< characteristic of the base field  
+                        constexpr static const number_type q = scalar_field_modulus;///< characteristic of the scalar field (order of the group of points) 
 
-                        constexpr static const number_type a = number_type(0x0B);
+                        constexpr static const number_type a = number_type(0x0B);///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                         constexpr static const number_type b = number_type(
-                            0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
+                            0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
                     constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::a;
