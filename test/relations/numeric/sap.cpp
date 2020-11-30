@@ -63,11 +63,14 @@ void test_sap(const std::size_t sap_degree, const std::size_t num_inputs, const 
     }
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = algebra::random_element<FieldType>(), d1 = algebra::random_element<FieldType>(), d2 = algebra::random_element<FieldType>();
+    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
+                                         d1 = algebra::random_element<FieldType>(),
+                                         d2 = algebra::random_element<FieldType>();
 
     sap_instance<FieldType> sap_inst_1 = r1cs_to_sap::instance_map(example.constraint_system);
 
-    sap_instance_evaluation<FieldType> sap_inst_2 = r1cs_to_sap::instance_map_with_evaluation(example.constraint_system, t);
+    sap_instance_evaluation<FieldType> sap_inst_2 =
+        r1cs_to_sap::instance_map_with_evaluation(example.constraint_system, t);
 
     sap_witness<FieldType> sap_wit =
         r1cs_to_sap::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2);

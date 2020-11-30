@@ -75,7 +75,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    
+
                     std::cout << "Starting generator" << std::endl;
                     typename r1cs_ppzksnark<CurveType>::keypair_type keypair =
                         r1cs_ppzksnark<CurveType>::generator(example.constraint_system);
@@ -91,12 +91,13 @@ namespace nil {
                         r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
-                        r1cs_ppzksnark<CurveType, policies::r1cs_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk, example.primary_input, proof);*/
+                        r1cs_ppzksnark<CurveType,
+                       policies::r1cs_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk,
+                       example.primary_input, proof);*/
 
                     std::cout << "Starting verifier" << std::endl;
 
-                    const bool ans =
-                        r1cs_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;
 
@@ -112,11 +113,13 @@ namespace nil {
                     std::cout << "Starting weak verifier" << std::endl;
 
                     const bool ans3 =
-                        r1cs_ppzksnark<CurveType, 
+                        r1cs_ppzksnark<CurveType,
                                           typename policies::r1cs_ppzksnark_generator<CurveType>,
                                           typename policies::r1cs_ppzksnark_prover<CurveType>,
                                           typename policies::r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>,
-                                          typename policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::verifier(keypair.vk, example.primary_input, proof);
+                                          typename
+                    policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::verifier(keypair.vk,
+                    example.primary_input, proof);
 
                     std::cout << "Weak verifier finished, result: " << ans3 << std::endl;
 
@@ -125,11 +128,12 @@ namespace nil {
                     std::cout << "Starting online weak verifier" << std::endl;
 
                     const bool ans4 =
-                        r1cs_ppzksnark<CurveType, 
+                        r1cs_ppzksnark<CurveType,
                                           policies::r1cs_ppzksnark_generator<CurveType>,
                                           policies::r1cs_ppzksnark_prover<CurveType>,
                                           policies::r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>,
-                                          policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::online_verifier(pvk, example.primary_input, proof);
+                                          policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::online_verifier(pvk,
+                    example.primary_input, proof);
 
                     std::cout << "Online weak verifier finished, result: " << ans4 << std::endl;
 
@@ -137,7 +141,6 @@ namespace nil {
 
                     /*test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);*/
 
-                    
                     return ans;
                 }
             }    // namespace snark

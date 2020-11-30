@@ -48,7 +48,8 @@ int main(int argc, const char *argv[]) {
 
     std::cout << "Generate USCS example" << std::endl;
     uscs_example<typename default_uscs_ppzksnark_pp::scalar_field_type> example =
-        generate_uscs_example_with_field_input<typename default_uscs_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
+        generate_uscs_example_with_field_input<typename default_uscs_ppzksnark_pp::scalar_field_type>(num_constraints,
+                                                                                                      input_size);
 
     std::cout << "Profile USCS ppzkSNARK" << std::endl;
     run_uscs_ppzksnark<default_uscs_ppzksnark_pp>(example);

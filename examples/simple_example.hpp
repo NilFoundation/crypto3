@@ -37,7 +37,7 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_example<FieldType> gen_r1cs_example_from_blueprint(const std::size_t num_constraints,
-                                                                      const std::size_t num_inputs);
+                                                                        const std::size_t num_inputs);
 
                 /* NOTE: all examples here actually generate one constraint less to account for soundness constraint in
                  * QAP */
@@ -68,12 +68,13 @@ namespace nil {
                     }
 
                     compute_inner_product.generate_r1cs_witness();
-                    return r1cs_example<FieldType>(bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
+                    return r1cs_example<FieldType>(
+                        bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
                 }
 
-            }
-        }    // namespace zk
-    }        // namespace crypto3
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_SIMPLE_EXAMPLE_HPP

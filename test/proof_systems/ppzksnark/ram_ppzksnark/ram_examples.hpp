@@ -50,8 +50,8 @@ namespace nil {
                  */
                 template<typename RAMType>
                 ram_example<RAMType> gen_ram_example_simple(const ram_architecture_params<RAMType> &ap,
-                                                         std::size_t boot_trace_size_bound, std::size_t time_bound,
-                                                         bool satisfiable = true) {
+                                                            std::size_t boot_trace_size_bound, std::size_t time_bound,
+                                                            bool satisfiable = true) {
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
 
@@ -94,8 +94,8 @@ namespace nil {
                  */
                 template<typename RAMType>
                 ram_example<RAMType> gen_ram_example_complex(const ram_architecture_params<RAMType> &ap,
-                                                          std::size_t boot_trace_size_bound, std::size_t time_bound,
-                                                          bool satisfiable = true) {
+                                                             std::size_t boot_trace_size_bound, std::size_t time_bound,
+                                                             bool satisfiable = true) {
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
 

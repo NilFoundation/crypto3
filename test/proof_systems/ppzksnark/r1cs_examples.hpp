@@ -55,14 +55,12 @@ namespace nil {
                                             const r1cs_primary_input<FieldType> &primary_input,
                                             const r1cs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
-                        primary_input(primary_input), 
-                        auxiliary_input(auxiliary_input) {};
+                        primary_input(primary_input), auxiliary_input(auxiliary_input) {};
                     r1cs_example<FieldType>(r1cs_constraint_system<FieldType> &&constraint_system,
                                             r1cs_primary_input<FieldType> &&primary_input,
                                             r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
-                        primary_input(std::move(primary_input)), 
-                        auxiliary_input(std::move(auxiliary_input)) {};
+                        primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
 
                 /**
@@ -74,7 +72,8 @@ namespace nil {
                  * represent).
                  */
                 template<typename FieldType>
-                r1cs_example<FieldType> generate_r1cs_example_with_field_input(std::size_t num_constraints, std::size_t num_inputs) {
+                r1cs_example<FieldType> generate_r1cs_example_with_field_input(std::size_t num_constraints,
+                                                                               std::size_t num_inputs) {
 
                     BOOST_CHECK(num_inputs <= num_constraints + 2);
 
@@ -128,9 +127,9 @@ namespace nil {
 
                     /* split variable assignment */
                     r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                                                             full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                                                               full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     BOOST_CHECK(cs.num_variables() == full_variable_assignment.size());
@@ -153,7 +152,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_binary_input(std::size_t num_constraints,
-                                                                             std::size_t num_inputs) {
+                                                                                std::size_t num_inputs) {
                     BOOST_CHECK(num_inputs >= 1);
 
                     r1cs_constraint_system<FieldType> cs;
@@ -194,9 +193,9 @@ namespace nil {
 
                     /* split variable assignment */
                     r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                                                             full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                                                               full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     BOOST_CHECK(cs.num_variables() == full_variable_assignment.size());
@@ -205,9 +204,8 @@ namespace nil {
                     BOOST_CHECK(cs.num_constraints() == num_constraints);
                     BOOST_CHECK(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    r1cs_example<FieldType> re = r1cs_example<FieldType>(std::move(cs), 
-                                                                         std::move(primary_input), 
-                                                                         std::move(auxiliary_input));
+                    r1cs_example<FieldType> re =
+                        r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                     return re;
                 }
             }    // namespace snark

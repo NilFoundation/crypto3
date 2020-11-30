@@ -48,8 +48,9 @@ int main(int argc, const char *argv[]) {
     const std::size_t num_outputs = num_gates / 2;
 
     std::cout << "Generate BACS example" << std::endl;
-    bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type> example = generate_bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type>(
-        primary_input_size, auxiliary_input_size, num_gates, num_outputs);
+    bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type> example =
+        generate_bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type>(
+            primary_input_size, auxiliary_input_size, num_gates, num_outputs);
 
     std::cout << "(enter) Profile BACS ppzkSNARK" << std::endl;
     run_bacs_ppzksnark<default_bacs_ppzksnark_pp>(example);

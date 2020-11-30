@@ -64,8 +64,10 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
 
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = algebra::random_element<FieldType>(), d1 = algebra::random_element<FieldType>(), d2 = algebra::random_element<FieldType>(),
-                    d3 = algebra::random_element<FieldType>();
+    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
+                                         d1 = algebra::random_element<FieldType>(),
+                                         d2 = algebra::random_element<FieldType>(),
+                                         d3 = algebra::random_element<FieldType>();
 
     qap_instance<FieldType> qap_inst_1 = r1cs_to_qap::instance_map(example.constraint_system);
 

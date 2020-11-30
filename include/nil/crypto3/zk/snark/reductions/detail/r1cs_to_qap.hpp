@@ -227,8 +227,8 @@ namespace nil {
                                 fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
-                            full_variable_assignment.insert(
-                                full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
+                            full_variable_assignment.insert(full_variable_assignment.end(), auxiliary_input.begin(),
+                                                            auxiliary_input.end());
 
                             std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()),
                                 aB(domain->m, FieldType::value_type::zero());

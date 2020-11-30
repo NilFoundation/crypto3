@@ -62,7 +62,8 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     assert(example.primary_input.size() == primary_input_size);
 
     assert(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
-    const typename r1cs_ppzksnark<ppT_A>::keypair_type keypair = r1cs_ppzksnark<ppT_A>::generator(example.constraint_system);
+    const typename r1cs_ppzksnark<ppT_A>::keypair_type keypair =
+        r1cs_ppzksnark<ppT_A>::generator(example.constraint_system);
     const typename r1cs_ppzksnark<ppT_A>::proof_type pi =
         r1cs_ppzksnark<ppT_A>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
     bool bit = r1cs_ppzksnark<ppT_A>::verifier_strong_input_consistency(keypair.vk, example.primary_input, pi);
@@ -70,7 +71,8 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     const std::size_t elt_size = FieldT_A::size_in_bits();
     const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
-    const std::size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
+    const std::size_t vk_size_in_bits =
+        r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
     blueprint<FieldT_B> bp;
     blueprint_variable_vector<FieldT_B> vk_bits;
@@ -134,7 +136,8 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     assert(example.primary_input.size() == primary_input_size);
 
     assert(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
-    const typename r1cs_ppzksnark<ppT_A>::keypair_type keypair = r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
+    const typename r1cs_ppzksnark<ppT_A>::keypair_type keypair =
+        r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
     const typename r1cs_ppzksnark<ppT_A>::proof_type pi =
         r1cs_ppzksnark_prover<ppT_A>(keypair.pk, example.primary_input, example.auxiliary_input);
     bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.vk, example.primary_input, pi);
@@ -154,8 +157,8 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     variable<FieldT_B> result;
     result.allocate(bp, "result");
 
-    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(bp, hardcoded_vk, primary_input_bits, elt_size, proof,
-                                                                 result, "online_verifier");
+    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(bp, hardcoded_vk, primary_input_bits, elt_size,
+                                                                    proof, result, "online_verifier");
 
     PROFILE_CONSTRAINTS(bp, "check that proofs lies on the curve") {
         proof.generate_r1cs_constraints();
@@ -284,10 +287,10 @@ void test_full_pairing(const std::string &annotation) {
 
     blueprint<FieldType> bp;
     typename other_curve<CurveType>::g1_type P_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
         other_curve<CurveType>::g1_type::value_type::one();
     typename other_curve<CurveType>::g2_type Q_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
         other_curve<CurveType>::g2_type::value_type::one();
 
     G1_variable<CurveType> P(bp, "P");
@@ -326,12 +329,15 @@ void test_full_pairing(const std::string &annotation) {
     finexp.generate_r1cs_witness();
     assert(bp.is_satisfied());
 
-    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
-    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
+    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P =
+        other_curve<CurveType>::affine_ate_precompute_G1(P_val);
+    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q =
+        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
     algebra::Fqk<other_curve<CurveType>> native_miller_result =
         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    algebra::Fqk<other_curve<CurveType>> native_finexp_result = other_curve<CurveType>::final_exponentiation(native_miller_result);
+    algebra::Fqk<other_curve<CurveType>> native_finexp_result =
+        other_curve<CurveType>::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -347,10 +353,10 @@ void test_full_precomputed_pairing(const std::string &annotation) {
 
     blueprint<FieldType> bp;
     typename other_curve<CurveType>::g1_type P_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
         other_curve<CurveType>::g1_type::value_type::one();
     typename other_curve<CurveType>::g2_type Q_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
         other_curve<CurveType>::g2_type::value_type::one();
 
     G1_precomputation<CurveType> prec_P(bp, P_val, "prec_P");
@@ -374,12 +380,15 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     finexp.generate_r1cs_witness();
     assert(bp.is_satisfied());
 
-    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
-    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
+    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P =
+        other_curve<CurveType>::affine_ate_precompute_G1(P_val);
+    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q =
+        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
     algebra::Fqk<other_curve<CurveType>> native_miller_result =
         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    algebra::Fqk<other_curve<CurveType>> native_finexp_result = other_curve<CurveType>::final_exponentiation(native_miller_result);
+    algebra::Fqk<other_curve<CurveType>> native_finexp_result =
+        other_curve<CurveType>::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -397,8 +406,8 @@ int main() {
     test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component>("mnt4_Fp4");
     test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_component>("mnt4_Fp4");
     test_cyclotomic_sqr<curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>("mnt4_Fp4");
-    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component, algebra::mnt4_q_limbs>(
-        algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
+    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component,
+                                  algebra::mnt4_q_limbs>(algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
     test_Frobenius<algebra::mnt4_Fq4, Fp4_variable>("mnt4_Fq4");
 
     test_mul<algebra::mnt6_Fq3, Fp3_variable, Fp3_mul_component>("mnt6_Fp3");
@@ -407,8 +416,8 @@ int main() {
     test_mul<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component>("mnt6_Fp6");
     test_sqr<algebra::mnt6_Fq6, Fp6_variable, Fp6_sqr_component>("mnt6_Fp6");
     test_cyclotomic_sqr<curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_component>("mnt6_Fp6");
-    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component, algebra::mnt6_q_limbs>(
-        algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
+    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component,
+                                  algebra::mnt6_q_limbs>(algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
     test_Frobenius<algebra::mnt6_Fq6, Fp6_variable>("mnt6_Fq6");
 
     test_G2_checker_component<curves::mnt4>("mnt4");

@@ -72,7 +72,8 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     const std::size_t elt_size = FieldT_A::size_in_bits();
     const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
-    const std::size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
+    const std::size_t vk_size_in_bits =
+        r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
     blueprint<FieldT_B> bp;
     blueprint_variable_vector<FieldT_B> vk_bits;
@@ -280,9 +281,11 @@ void test_full_pairing(const std::string &annotation) {
 
     blueprint<FieldType> bp;
     other_curve<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::value_type::one();
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g1_type::value_type::one();
     other_curve<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::value_type::one();
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g2_type::value_type::one();
 
     G1_variable<CurveType> P(bp);
     G2_variable<CurveType> Q(bp);
@@ -311,15 +314,12 @@ void test_full_pairing(const std::string &annotation) {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_G1_precomp native_prec_P =
-        pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_G2_precomp native_prec_Q =
-        pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_G1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
+    typename pairing_policy::affine_ate_G2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    typename pairing_policy::Fqk native_finexp_result =
-        pairing_policy::final_exponentiation(native_miller_result);
+    typename pairing_policy::Fqk native_finexp_result = pairing_policy::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -336,9 +336,11 @@ void test_full_precomputed_pairing(const std::string &annotation) {
 
     blueprint<FieldType> bp;
     other_curve<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::value_type::one();
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g1_type::value_type::one();
     other_curve<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::value_type::one();
+        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g2_type::value_type::one();
 
     G1_precomputation<CurveType> prec_P(bp, P_val);
     G2_precomputation<CurveType> prec_Q(bp, Q_val);
@@ -356,15 +358,12 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_G1_precomp native_prec_P =
-        pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_G2_precomp native_prec_Q =
-        pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_G1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
+    typename pairing_policy::affine_ate_G2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
-    typename pairing_policy::Fqk native_finexp_result =
-        pairing_policy::final_exponentiation(native_miller_result);
+    typename pairing_policy::Fqk native_finexp_result = pairing_policy::final_exponentiation(native_miller_result);
     printf("Must match:\n");
     finexp.result->get_element().print();
     native_finexp_result.print();
@@ -380,18 +379,18 @@ void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> bp;
     other_curve<ppT>::g1_type P1_val =
         algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q1_val =
-        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q1_val =
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * < other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P2_val =
         algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q2_val =
-        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q2_val =
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * < other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P3_val =
         algebra::random_element<other_curve<ppT>::scalar_field_type>() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q3_val =
-        algebra::random_element<other_curve<ppT>::scalar_field_type>() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q3_val =
+        algebra::random_element<other_curve<ppT>::scalar_field_type>() * < other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P1(bp, "P1");
     G2_variable<ppT> Q1(bp, "Q1");
@@ -474,8 +473,8 @@ void test_mnt_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> bp;
     other_curve<ppT>::g1_type P_val =
         other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q_val =
+        other_curve<ppT>::scalar_field_type::random_element() * < other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P(bp, "P");
     G2_variable<ppT> Q(bp, "Q");
@@ -521,13 +520,13 @@ void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
     protoboard<algebra::Fr<ppT>> bp;
     other_curve<ppT>::g1_type P1_val =
         other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q1_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q1_val =
+        other_curve<ppT>::scalar_field_type::random_element() * < other_curve<ppT>::g2_type::value_type::one();
 
     other_curve<ppT>::g1_type P2_val =
         other_curve<ppT>::scalar_field_type::random_element() * other_curve<ppT>::g1_type::value_type::one();
-    <other_curve<ppT>::g2_type Q2_val =
-        other_curve<ppT>::scalar_field_type::random_element() * <other_curve<ppT>::g2_type::value_type::one();
+    < other_curve<ppT>::g2_type Q2_val =
+        other_curve<ppT>::scalar_field_type::random_element() * < other_curve<ppT>::g2_type::value_type::one();
 
     G1_variable<ppT> P1(bp, "P1");
     G2_variable<ppT> Q1(bp, "Q1");

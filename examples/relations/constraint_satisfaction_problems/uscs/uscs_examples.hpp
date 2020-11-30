@@ -47,13 +47,13 @@ namespace nil {
                     uscs_example<FieldType>() = default;
                     uscs_example<FieldType>(const uscs_example<FieldType> &other) = default;
                     uscs_example<FieldType>(const uscs_constraint_system<FieldType> &constraint_system,
-                                         const uscs_primary_input<FieldType> &primary_input,
-                                         const uscs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const uscs_primary_input<FieldType> &primary_input,
+                                            const uscs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {};
                     uscs_example<FieldType>(uscs_constraint_system<FieldType> &&constraint_system,
-                                         uscs_primary_input<FieldType> &&primary_input,
-                                         uscs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            uscs_primary_input<FieldType> &&primary_input,
+                                            uscs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
@@ -68,7 +68,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs);
+                                                                               const std::size_t num_inputs);
 
                 /**
                  * Generate a USCS example such that:
@@ -79,12 +79,11 @@ namespace nil {
                  */
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs);
+                                                                                const std::size_t num_inputs);
 
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs) {
-
+                                                                               const std::size_t num_inputs) {
 
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
@@ -112,9 +111,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const field_value_type x_coeff = algebra::random_element<FieldType> ();
-                        const field_value_type y_coeff = algebra::random_element<FieldType> ();
-                        const field_value_type val = (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
+                        const field_value_type x_coeff = algebra::random_element<FieldType>();
+                        const field_value_type y_coeff = algebra::random_element<FieldType>();
+                        const field_value_type val =
+                            (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
                         const field_value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inversed();
@@ -129,9 +129,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());
@@ -145,7 +145,7 @@ namespace nil {
 
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs) {
+                                                                                const std::size_t num_inputs) {
                     std::cout << "Call to generate_uscs_example_with_binary_input" << std::endl;
 
                     assert(num_inputs >= 1);
@@ -181,9 +181,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());

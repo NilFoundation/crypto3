@@ -47,7 +47,7 @@ namespace nil {
 
                 template<>
                 algebra::Fr<snark_pp<default_r1cs_ppzkadsnark_pp>>
-                prfCompute<default_r1cs_ppzkadsnark_pp>(const aesPrfKeyT &key, const label_type &label) {
+                    prfCompute<default_r1cs_ppzkadsnark_pp>(const aesPrfKeyT &key, const label_type &label) {
                     unsigned char seed_bytes[16];
                     mpz_t aux, Fr_mod;
                     unsigned char random_bytes[16 * 3];

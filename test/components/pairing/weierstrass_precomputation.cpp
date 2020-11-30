@@ -42,8 +42,8 @@ template<typename CurveType>
 void test_G1_variable_precomp(const std::string &annotation) {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g1_type::value_type g_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
-            other_curve<CurveType>::g1_type::value_type::one();
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g1_type::value_type::one();
 
     G1_variable<CurveType> g(bp);
     G1_precomputation<CurveType> precomp;
@@ -66,8 +66,8 @@ template<typename CurveType>
 void test_G2_variable_precomp(const std::string &annotation) {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g2_type::value_type g_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() * 
-            other_curve<CurveType>::g2_type::value_type::one();
+        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
+        other_curve<CurveType>::g2_type::value_type::one();
 
     G2_variable<CurveType> g(bp, "g");
     G2_precomputation<CurveType> precomp;
@@ -96,7 +96,6 @@ void test_G2_variable_precomp(const std::string &annotation) {
 BOOST_AUTO_TEST_SUITE(weierstrass_precomputation_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(weierstrass_precomputation_components_test) {
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

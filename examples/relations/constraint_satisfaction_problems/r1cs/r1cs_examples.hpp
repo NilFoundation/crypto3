@@ -35,8 +35,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                using nil::crypto3::algebra::fields;
                 using nil::crypto3::algebra;
+                using nil::crypto3::algebra::fields;
 
                 /**
                  * A R1CS example comprises a R1CS constraint system, R1CS input, and R1CS witness.
@@ -50,13 +50,13 @@ namespace nil {
                     r1cs_example<FieldType>() = default;
                     r1cs_example<FieldType>(const r1cs_example<FieldType> &other) = default;
                     r1cs_example<FieldType>(const r1cs_constraint_system<FieldType> &constraint_system,
-                                         const r1cs_primary_input<FieldType> &primary_input,
-                                         const r1cs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const r1cs_primary_input<FieldType> &primary_input,
+                                            const r1cs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {};
                     r1cs_example<FieldType>(r1cs_constraint_system<FieldType> &&constraint_system,
-                                         r1cs_primary_input<FieldType> &&primary_input,
-                                         r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            r1cs_primary_input<FieldType> &&primary_input,
+                                            r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
@@ -71,7 +71,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs);
+                                                                               const std::size_t num_inputs);
 
                 /**
                  * Generate a R1CS example such that:
@@ -82,11 +82,11 @@ namespace nil {
                  */
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs);
+                                                                                const std::size_t num_inputs);
 
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs) {
+                                                                               const std::size_t num_inputs) {
 
                     assert(num_inputs <= num_constraints + 2);
 
@@ -95,8 +95,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    field_value_type a = algebra::random_element<FieldType> ();
-                    field_value_type b = algebra::random_element<FieldType> ();
+                    field_value_type a = algebra::random_element<FieldType>();
+                    field_value_type b = algebra::random_element<FieldType>();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 
@@ -140,9 +140,9 @@ namespace nil {
 
                     /* split variable assignment */
                     r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());
@@ -156,12 +156,12 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs) {
+                                                                                const std::size_t num_inputs) {
 
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
 
-                    algebra:
+                algebra:
 
                     assert(num_inputs >= 1);
 
@@ -193,7 +193,7 @@ namespace nil {
                             C.add_term(u + 1, 1);
                             C.add_term(v + 1, 1);
                         }
-                        C.add_term(lastvar + 1, - field_value_type::one());
+                        C.add_term(lastvar + 1, -field_value_type::one());
 
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -
@@ -203,9 +203,9 @@ namespace nil {
 
                     /* split variable assignment */
                     r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());
@@ -213,8 +213,6 @@ namespace nil {
                     assert(cs.num_inputs() == num_inputs);
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
-
-            
 
                     return r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }
