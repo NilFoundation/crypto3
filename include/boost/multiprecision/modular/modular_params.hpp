@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -56,21 +57,21 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
    {
       if (get_mod() % 2 == 0)
       {
-         this->eval_barret_reduce(result);
+         this->barret_reduce(result);
       }
       else
       {
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
       }
    }
 
    void adjust_modular(Backend& result)
    {
-      this->eval_barret_reduce(result);
+      this->barret_reduce(result);
       if (get_mod() % 2 != 0)
       {
          eval_multiply(result, this->r2().backend());
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
       }
    }
 
@@ -79,7 +80,7 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       result = input;
       if (get_mod() % 2 != 0)
       {
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
       }
    }
 
@@ -120,6 +121,7 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
    typedef typename montgomery_policy::policy_type policy_type;
 
    typedef typename policy_type::Backend Backend;
+   typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type number_type;
 
  public:
@@ -157,22 +159,34 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 
       if (get_mod() % 2 == 0)
       {
-         this->eval_barret_reduce(result);
+         this->barret_reduce(result);
       }
       else
       {
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
       }
    }
 
    template<typename BackendT>
    constexpr void adjust_modular(BackendT& result)
    {
-      this->eval_barret_reduce(result);
+      this->barret_reduce(result);
       if (get_mod() % 2 != 0)
       {
          eval_multiply(result, this->r2().backend());
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
+      }
+   }
+
+   template<typename Backend1, typename Backend2>
+   constexpr void adjust_modular(Backend1& result, Backend2 input)
+   {
+      this->barret_reduce(input);
+      Backend_doubled_limbs tmp(input);
+      if (get_mod() % 2 != 0)
+      {
+         eval_multiply(tmp, this->r2().backend());
+         this->montgomery_reduce(result, tmp);
       }
    }
 
@@ -182,13 +196,25 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
       result = input;
       if (get_mod() % 2 != 0)
       {
-         this->eval_montgomery_reduce(result);
+         this->montgomery_reduce(result);
       }
    }
 
    constexpr number_type get_mod() const
    {
       return montgomery_policy::mod() | barrett_policy::mod();
+   }
+
+   template<typename Backend1, typename Backend2>
+   constexpr void mod_exp(Backend1& result, const Backend2& exp) const
+   {
+      this->mont_exp(result, exp);
+   }
+
+   template<typename Backend1, typename Backend2>
+   constexpr void mod_mul(Backend1& result, const Backend2& y) const
+   {
+      this->montgomery_mul(result, y);
    }
 
    template <typename BackendT, expression_template_option ExpressionTemplates>

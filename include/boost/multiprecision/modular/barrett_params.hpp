@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -56,7 +57,7 @@ class barrett_params : public base_params<Backend>
       return *this;
    }
 
-   inline void eval_barret_reduce(Backend& result) const
+   inline void barret_reduce(Backend& result) const
    {
       using default_ops::eval_add;
       using default_ops::eval_bit_set;
@@ -146,7 +147,7 @@ class barrett_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
    }
 
    template<typename BackendT>
-   constexpr void eval_barret_reduce(BackendT& result) const
+   constexpr void barret_reduce(BackendT& result) const
    {
       using default_ops::eval_add;
       using default_ops::eval_bit_set;
@@ -230,7 +231,7 @@ class barrett_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 //      return *this;
 //   }
 //
-//   inline void eval_barret_reduce(Backend& result) const
+//   inline void barret_reduce(Backend& result) const
 //   {
 //      using default_ops::eval_add;
 //      using default_ops::eval_bit_set;

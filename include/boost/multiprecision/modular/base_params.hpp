@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -46,7 +47,6 @@ class base_params
 // fixed precision barrett params type which supports compile-time execution
 template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
 class base_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
-    : public modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
 {
  protected:
    typedef modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>> policy_type;
