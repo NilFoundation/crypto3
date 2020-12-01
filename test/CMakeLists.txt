@@ -52,6 +52,7 @@ set(TESTS_NAMES
 
     "proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
     "proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
+    "proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
     "proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
     "proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
     "proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
