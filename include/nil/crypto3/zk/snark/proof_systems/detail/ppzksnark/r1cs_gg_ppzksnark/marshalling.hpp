@@ -98,7 +98,7 @@ namespace nil {
                         static inline
                             typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     typename FieldType::value_type>::type
-                            field_type_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             using field_type = FieldType;
 
@@ -116,7 +116,7 @@ namespace nil {
                         static inline
                             typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                                     typename FieldType::value_type>::type
-                            field_type_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             using field_type = FieldType;
 
@@ -133,7 +133,7 @@ namespace nil {
 
                         template<typename GroupType>
                         static inline typename GroupType::value_type
-                            group_type_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            group_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             typename GroupType::underlying_field_type::value_type X =
                                 field_type_process<typename GroupType::underlying_field_type>(read_iter);
@@ -148,7 +148,7 @@ namespace nil {
                         }
 
                         static inline std::size_t
-                            std_size_t_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            std_size_t_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             std::vector<std::size_t> vector_s(1, 0);
                             auto iter = vector_s.begin();
@@ -169,7 +169,7 @@ namespace nil {
 
                         template<typename T>
                         static inline sparse_vector<T>
-                            sparse_vector_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            sparse_vector_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             std::size_t indices_count = std_size_t_process(read_iter);
 
@@ -200,7 +200,7 @@ namespace nil {
 
                         template<typename T>
                         static inline accumulation_vector<T>
-                            accumulation_vector_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            accumulation_vector_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             typename T::value_type first = group_type_process<T>(read_iter);
                             sparse_vector<T> rest = sparse_vector_process<T>(read_iter);
@@ -209,7 +209,7 @@ namespace nil {
                         }
 
                         static inline typename proof_system::verification_key_type
-                            verification_key_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            verification_key_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             using verification_key_type = typename proof_system::verification_key_type;
 
@@ -230,7 +230,7 @@ namespace nil {
                         }
 
                         static inline typename proof_system::primary_input_type
-                            primary_input_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            primary_input_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             using primary_input_type = typename proof_system::primary_input_type;
 
@@ -242,13 +242,11 @@ namespace nil {
                                 pi[i] = field_type_process<typename CurveType::scalar_field_type>(read_iter);
                             }
 
-                            // primary_input_type pi_ = primary_input_type(pi);
-
                             return primary_input_type(pi);
                         }
 
                         static inline typename proof_system::proof_type
-                            proof_process(typename std::vector<chunk_type>::iterator &read_iter) {
+                            proof_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
                             using proof_type = typename proof_system::proof_type;
 
@@ -450,16 +448,30 @@ namespace nil {
 
                         static inline std::vector<chunk_type> process(verifier_data vd) {
 
-                            constexpr static const std::size_t g1_modulus_chunks_coeff =
-                                3 * CurveType::g1_type::underlying_field_type::arity;
-                            constexpr static const std::size_t g2_modulus_chunks_coeff =
-                                3 * CurveType::g2_type::underlying_field_type::arity;
+                            std::size_t g1_size =
+                                modulus_chunks * 3 * CurveType::g1_type::underlying_field_type::arity;
+                            std::size_t g2_size =
+                                modulus_chunks * 3 * CurveType::g2_type::underlying_field_type::arity;
+                            std::size_t std_size_t_size = 4;
 
-                            // TODO: count size correctly:
-                            std::vector<chunk_type> output(modulus_chunks *
-                                                               (g1_modulus_chunks_coeff + g2_modulus_chunks_coeff) +
-                                                           sizeof(std::size_t));
+                            std::size_t gt_size =
+                                modulus_chunks * CurveType::gt_type::underlying_field_type::arity;
 
+                            std::size_t sparse_vector_size = 
+                                std_size_t_size + vd.vk.gamma_ABC_g1.rest.size() * std_size_t_size + 
+                                std_size_t_size + vd.vk.gamma_ABC_g1.rest.values.size() * g1_size +                                 
+                                std_size_t_size;
+
+                            std::size_t verification_key_size = 
+                                gt_size + g2_size + g2_size + 
+                                g1_size + sparse_vector_size;
+                            std::size_t primary_input_size = 
+                                std_size_t_size + vd.pi.size() * modulus_chunks;
+                            std::size_t proof_size = 
+                                g1_size + g2_size + g1_size;
+                            
+                            std::vector<chunk_type> output(2*(verification_key_size + primary_input_size + proof_size));
+                            
                             typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
                             verification_key_process(vd.vk, write_iter);
