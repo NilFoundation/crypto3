@@ -439,20 +439,12 @@ class montgomery_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, voi
       using default_ops::eval_left_shift;
       using default_ops::eval_modulus;
 
-      Backend_padded_limbs unary_shifted(static_cast<internal_limb_type>(1u));
-      eval_left_shift(unary_shifted, limbs_count * limb_bits);
+      Backend_doubled_limbs tmp(static_cast<internal_limb_type>(1u));
+      eval_multiply(tmp, r2().backend());
+      montgomery_reduce(tmp);
+      Backend R_mod_m(tmp);
 
-      Backend_doubled_padded_limbs dbl_unary_shifted(static_cast<internal_limb_type>(1u));
-      eval_left_shift(dbl_unary_shifted, 2u * limbs_count * limb_bits);
-
-      eval_modulus(unary_shifted, this->m_mod.backend());
-      Backend R_mod_m(unary_shifted);
-
-      eval_modulus(dbl_unary_shifted, this->m_mod.backend());
-      Backend2 Rsq_mod_m(dbl_unary_shifted);
-
-      Backend base;
-      montgomery_mul(base, a, Rsq_mod_m);
+      Backend base(a);
 
       Backend3 zero(static_cast<internal_limb_type>(0u));
       if (eval_eq(exp, zero))
@@ -480,8 +472,7 @@ class montgomery_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, voi
          }
          montgomery_mul(base, base);
       }
-
-      montgomery_mul(result, R_mod_m, Backend(static_cast<internal_limb_type>(1u)));
+      result = R_mod_m;
    }
 
  protected:

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Alexey Moskvin
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -27,11 +28,14 @@ namespace multiprecision {
 namespace backends {
 
 template <typename Backend>
-class modular_adaptor
+struct modular_adaptor
 {
+   typedef Backend value_type;
+   typedef modular_params<Backend> modulus_type;
+
  protected:
-   Backend                 m_base;
-   modular_params<Backend> m_mod;
+   value_type m_base;
+   modulus_type m_mod;
 
  public:
    inline Backend& base_data() { return m_base; }
@@ -205,9 +209,13 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
    typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type number_type;
 
+ public:
+   typedef Backend_doubled_limbs value_type;
+   typedef modular_params_type modulus_type;
+
  protected:
-   Backend_doubled_limbs m_base;
-   modular_params_type m_mod;
+   value_type m_base;
+   modulus_type m_mod;
 
  public:
    constexpr auto& base_data() { return m_base; }
@@ -344,7 +352,7 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
       {
          BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with mod bigger than compared number."));
       }
-      Backend tmp;
+      value_type tmp;
       mod_data().adjust_regular(tmp, base_data());
       return tmp.compare(val);
    }
@@ -357,7 +365,7 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
 
    inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
-      Backend tmp;
+      value_type tmp;
       mod_data().adjust_regular(tmp, base_data());
       return tmp.str(dig, f);
    }
@@ -441,8 +449,7 @@ template <class Backend>
 constexpr void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
-   auto tmp1 = result.base_data();
-   auto tmp2 = o.base_data();
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
    result.mod_data().adjust_regular(tmp2, o.base_data());
    eval_divide(tmp1, tmp2);
@@ -455,8 +462,7 @@ template <class Backend>
 constexpr void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
-   auto tmp1 = result.base_data();
-   auto tmp2 = o.base_data();
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
    result.mod_data().adjust_regular(tmp2, o.base_data());
    eval_modulus(tmp1, tmp2);
@@ -491,11 +497,21 @@ eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
 
 template <class Backend, class T, class V>
 constexpr void assign_components(modular_adaptor<Backend>& result,
-                              const T& a, const V& b)
+                                 const T& a, const V& b)
 {
    result.base_data() = a;
    result.mod_data()  = b;
    result.mod_data().adjust_modular(result.base_data());
+}
+
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked,
+         class T, class V>
+constexpr void assign_components(
+    modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& result,
+    const T& a, const V& b)
+{
+   result.mod_data() = b;
+   result.mod_data().adjust_modular(result.base_data(), a);
 }
 
 template <class Backend>
@@ -537,26 +553,8 @@ size_t window_bits(size_t exp_bits)
 template <class Backend>
 inline void find_modular_pow(modular_adaptor<Backend>&       result,
                              const modular_adaptor<Backend>& b,
-                             Backend&                        exp)
+                             const Backend&                  exp)
 {
-   //   using default_ops::eval_bit_test;
-   //   using default_ops::eval_gt;
-   //   typedef typename boost::multiprecision::detail::canonical<unsigned char, Backend>::type ui_type;
-   //   typedef number<modular_adaptor<Backend> > modular_type;
-   //   modular_params<Backend>  mod = b.mod_data();
-   //   modular_type x(1, mod);
-   //   modular_type y = b;
-   //   while (eval_gt(exp, ui_type(0u)))
-   //   {
-   //      if (eval_bit_test(exp, ui_type(0u)))
-   //      {
-   //         x = x * y;
-   //      }
-   //      y = y * y;
-   //      eval_right_shift(exp, ui_type(1u));
-   //   }
-   //   result = x.backend();
-
    using default_ops::eval_bit_set;
    using default_ops::eval_decrement;
    using default_ops::eval_multiply;
@@ -613,28 +611,49 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
 
 template <class Backend>
 constexpr void eval_pow(modular_adaptor<Backend>&       result,
-                     const modular_adaptor<Backend>& b,
-                     const modular_adaptor<Backend>& e)
+                        const modular_adaptor<Backend>& b,
+                        const modular_adaptor<Backend>& e)
 {
-   auto exp = result.base_data();
+   typename modular_adaptor<Backend>::value_type exp;
    e.mod_data().adjust_regular(exp, e.base_data());
    find_modular_pow(result, b, exp);
 }
 
-template <class Backend>
-constexpr void eval_pow(modular_adaptor<Backend>&       result,
-                     const modular_adaptor<Backend>& b,
-                     const Backend&                  e)
+template <class Backend1, typename Backend2>
+constexpr void eval_pow(modular_adaptor<Backend1>&       result,
+                        const modular_adaptor<Backend1>& b,
+                        const Backend2&                  e)
 {
-   Backend exp = e;
-   find_modular_pow(result, b, exp);
+   find_modular_pow(result, b, e);
+}
+
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename Backend>
+constexpr void eval_pow(modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& result,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& b,
+                        const Backend& e)
+{
+   // BOOST_ASSERT(result.mod_data().get_mod() == b.mod_data().get_mod());
+   result.mod_data() = b.mod_data();
+   b.mod_data().mod_exp(result.base_data(), b.base_data(), e);
+}
+
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_pow(modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& result,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& b,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& e)
+{
+   using Backend = cpp_int_backend<MinBits, MinBits, SignType, Checked, void>;
+
+   typename modular_adaptor<Backend>::value_type exp;
+   e.mod_data().adjust_regular(exp, e.base_data());
+   eval_pow(result, b, exp);
 }
 
 template <class Backend, class UI>
 constexpr void eval_left_shift(modular_adaptor<Backend>& t, UI i)
 {
    using default_ops::eval_left_shift;
-   Backend tmp;
+   typename modular_adaptor<Backend>::value_type tmp;
    t.mod_data().adjust_regular(tmp, t.base_data());
    eval_left_shift(tmp, i);
    t.base_data() = tmp;
@@ -645,7 +664,7 @@ template <class Backend, class UI>
 constexpr void eval_right_shift(modular_adaptor<Backend>& t, UI i)
 {
    using default_ops::eval_right_shift;
-   Backend tmp;
+   typename modular_adaptor<Backend>::value_type tmp;
    t.mod_data().adjust_regular(tmp, t.base_data());
    eval_right_shift(tmp, i);
    t.base_data() = tmp;
@@ -656,7 +675,7 @@ template <class Backend, class UI>
 constexpr void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
    using default_ops::eval_left_shift;
-   Backend tmp1, tmp2;
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    t.mod_data().adjust_regular(tmp1, t.base_data());
    t.mod_data().adjust_regular(tmp2, v.base_data());
    eval_left_shift(tmp1, tmp2, static_cast<unsigned long>(i));
@@ -668,7 +687,7 @@ template <class Backend, class UI>
 constexpr void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
    using default_ops::eval_right_shift;
-   Backend tmp1, tmp2;
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    t.mod_data().adjust_regular(tmp1, t.base_data());
    t.mod_data().adjust_regular(tmp2, v.base_data());
    eval_right_shift(tmp1, tmp2, static_cast<unsigned long>(i));
@@ -680,8 +699,7 @@ template <class Backend>
 constexpr void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_and;
-   auto tmp1 = result.base_data();
-   auto tmp2 = v.base_data();
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
    result.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_and(tmp1, tmp1, tmp2);
@@ -693,8 +711,7 @@ template <class Backend>
 constexpr void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_or;
-   auto tmp1 = result.base_data();
-   auto tmp2 = v.base_data();
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
    result.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_or(tmp1, tmp1, tmp2);
@@ -706,8 +723,7 @@ template <class Backend>
 constexpr void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_xor;
-   auto tmp1 = result.base_data();
-   auto tmp2 = v.base_data();
+   typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
    result.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_xor(tmp1, tmp1, tmp2);

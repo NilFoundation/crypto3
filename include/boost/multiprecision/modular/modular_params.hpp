@@ -186,8 +186,9 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
       if (get_mod() % 2 != 0)
       {
          eval_multiply(tmp, this->r2().backend());
-         this->montgomery_reduce(result, tmp);
+         this->montgomery_reduce(tmp);
       }
+      result = tmp;
    }
 
    template<typename BackendT>
@@ -209,6 +210,12 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
    constexpr void mod_exp(Backend1& result, const Backend2& exp) const
    {
       this->mont_exp(result, exp);
+   }
+
+   template<typename Backend1, typename Backend2, typename Backend3>
+   constexpr void mod_exp(Backend1& result, const Backend2& a, const Backend3& exp) const
+   {
+      this->mont_exp(result, a, exp);
    }
 
    template<typename Backend1, typename Backend2>
