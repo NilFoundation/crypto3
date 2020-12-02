@@ -480,7 +480,7 @@ namespace nil {
                         /* constraints for packed(alpha) = 2^n + B - A */
                         pack_alpha->generate_r1cs_constraints(true);
                         this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                            1, (typename FieldType::value_type(2) ^ n) + B - A, alpha_packed));
+                            1, (typename FieldType::value_type(0x02).pow(n)) + B - A, alpha_packed));
 
                         /* compute result */
                         all_zeros_test->generate_r1cs_constraints();
@@ -493,7 +493,7 @@ namespace nil {
 
                         /* unpack 2^n + B - A into alpha_packed */
                         this->bp.val(alpha_packed) =
-                            (typename FieldType::value_type(2) ^ n) + this->bp.lc_val(B) - this->bp.lc_val(A);
+                            (typename FieldType::value_type(0x02).pow(n)) + this->bp.lc_val(B) - this->bp.lc_val(A);
                         pack_alpha->generate_r1cs_witness_from_packed();
 
                         /* compute result */
@@ -607,12 +607,18 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness() {
+
+                        // temporary added until fixed-precision modular adaptor is ready:
+                        typedef boost::multiprecision::number<
+                            boost::multiprecision::backends::cpp_int_backend<>> 
+                            non_fixed_precision_modulus_type;
+
                         /* assumes that idx can be fit in ulong; true for our purposes for now */
                         const typename FieldType::value_type valint = this->bp.val(index);
-                        unsigned long idx = static_cast<unsigned long>(valint);
+                        unsigned long idx = static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
                         const typename FieldType::number_type arrsize(arr.size());
 
-                        if (idx >= arr.size() || valint >= arrsize) {
+                        if (idx >= arr.size() || valint.data >= arrsize) {
                             for (std::size_t i = 0; i < arr.size(); ++i) {
                                 this->bp.val(alpha[i]) = FieldType::value_type::zero();
                             }

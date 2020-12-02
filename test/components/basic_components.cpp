@@ -27,8 +27,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bn128.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
@@ -194,30 +193,25 @@ void test_loose_multiplexing_component(size_t n) {
 BOOST_AUTO_TEST_SUITE(basic_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(basic_components_test) {
-    test_disjunction_component<fields::bn128>();
-    test_disjunction_component<fields::edwards>();
-    test_disjunction_component<fields::mnt4>();
-    test_disjunction_component<fields::mnt6>();
+    test_disjunction_component<fields::bls12<381>>(100);
+    test_disjunction_component<fields::mnt4<298>>(100);
+    test_disjunction_component<fields::mnt6<298>>(100);
 
-    test_conjunction_component<fields::bn128>();
-    test_conjunction_component<fields::edwards>();
-    test_conjunction_component<fields::mnt4>();
-    test_conjunction_component<fields::mnt6>();
+    test_conjunction_component<fields::bls12<381>>(100);
+    test_conjunction_component<fields::mnt4<298>>(100);
+    test_conjunction_component<fields::mnt6<298>>(100);
 
-    test_comparison_component<fields::bn128>();
-    test_comparison_component<fields::edwards>();
-    test_comparison_component<fields::mnt4>();
-    test_comparison_component<fields::mnt6>();
+    test_comparison_component<fields::bls12<381>>(100);
+    test_comparison_component<fields::mnt4<298>>(100);
+    test_comparison_component<fields::mnt6<298>>(100);
 
-    test_inner_product_component<fields::bn128>();
-    test_inner_product_component<fields::edwards>();
-    test_inner_product_component<fields::mnt4>();
-    test_inner_product_component<fields::mnt6>();
+    test_inner_product_component<fields::bls12<381>>(100);
+    test_inner_product_component<fields::mnt4<298>>(100);
+    test_inner_product_component<fields::mnt6<298>>(100);
 
-    test_loose_multiplexing_component<fields::bn128>();
-    test_loose_multiplexing_component<fields::edwards>();
-    test_loose_multiplexing_component<fields::mnt4>();
-    test_loose_multiplexing_component<fields::mnt6>();
+    test_loose_multiplexing_component<fields::bls12<381>>(100);
+    test_loose_multiplexing_component<fields::mnt4<298>>(100);
+    test_loose_multiplexing_component<fields::mnt6<298>>(100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
