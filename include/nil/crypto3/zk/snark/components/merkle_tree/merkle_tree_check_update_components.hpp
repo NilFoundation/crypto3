@@ -90,7 +90,7 @@ namespace nil {
                         const merkle_authentication_path_variable<FieldType, Hash> &next_path,
                         const blueprint_linear_combination<FieldType> &update_successful) :
                         component<FieldType>(bp),
-                        digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
+                        digest_size(Hash::digest_bits), tree_depth(tree_depth), address_bits(address_bits),
                         prev_leaf_digest(prev_leaf_digest), prev_root_digest(prev_root_digest), prev_path(prev_path),
                         next_leaf_digest(next_leaf_digest), next_root_digest(next_root_digest), next_path(next_path),
                         update_successful(update_successful) {
@@ -205,7 +205,7 @@ namespace nil {
                     }
 
                     static std::size_t root_size_in_bits() {
-                        return Hash::get_digest_len();
+                        return Hash::digest_bits;
                     }
                     /* for debugging purposes */
                     static std::size_t expected_constraints(const std::size_t tree_depth) {
@@ -213,12 +213,12 @@ namespace nil {
                         const std::size_t prev_hasher_constraints = tree_depth * Hash::expected_constraints(false);
                         const std::size_t next_hasher_constraints = tree_depth * Hash::expected_constraints(true);
                         const std::size_t prev_authentication_path_constraints =
-                            2 * tree_depth * Hash::get_digest_len();
-                        const std::size_t prev_propagator_constraints = tree_depth * Hash::get_digest_len();
-                        const std::size_t next_propagator_constraints = tree_depth * Hash::get_digest_len();
+                            2 * tree_depth * Hash::digest_bits;
+                        const std::size_t prev_propagator_constraints = tree_depth * Hash::digest_bits;
+                        const std::size_t next_propagator_constraints = tree_depth * Hash::digest_bits;
                         const std::size_t check_next_root_constraints =
-                            3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
-                        const std::size_t aux_equality_constraints = tree_depth * Hash::get_digest_len();
+                            3 * (Hash::digest_bits + (FieldType::capacity()) - 1) / FieldType::capacity();
+                        const std::size_t aux_equality_constraints = tree_depth * Hash::digest_bits;
 
                         return (prev_hasher_constraints + next_hasher_constraints +
                                 prev_authentication_path_constraints + prev_propagator_constraints +

@@ -42,7 +42,7 @@ namespace nil {
                     new_input.insert(new_input.end(), l.begin(), l.end());
                     new_input.insert(new_input.end(), r.begin(), r.end());
 
-                    const std::size_t digest_size = Hash::get_digest_len();
+                    const std::size_t digest_size = Hash::digest_bits;
                     assert(l.size() == digest_size);
                     assert(r.size() == digest_size);
 

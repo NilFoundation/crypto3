@@ -67,7 +67,7 @@ namespace nil {
                     set_commitment_accumulator(const std::size_t max_entries, const std::size_t value_size = 0) :
                         value_size(value_size) {
                         depth = static_cast<std::size_t>(std::ceil(std::log2(max_entries)));
-                        digest_size = Hash::get_digest_len();
+                        digest_size = Hash::digest_bits;
 
                         tree.reset(new merkle_tree<Hash>(depth, digest_size));
                     }

@@ -70,7 +70,7 @@ namespace nil {
                         if (tree_depth == 0) {
                             hash_element.reset(new Hash(bp, element_bits.size(), *element_block, root_digest));
                         } else {
-                            element_digest.reset(new digest_variable<FieldType>(bp, Hash::get_digest_len()));
+                            element_digest.reset(new digest_variable<FieldType>(bp, Hash::digest_bits));
                             hash_element.reset(new Hash(bp, element_bits.size(), *element_block, *element_digest));
                             check_membership.reset(
                                 new merkle_tree_check_read_component<FieldType, Hash>(bp,

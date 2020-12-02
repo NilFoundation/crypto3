@@ -48,8 +48,8 @@ namespace nil {
                     merkle_authentication_path_variable(blueprint<FieldType> &bp, const std::size_t tree_depth) :
                         component<FieldType>(bp), tree_depth(tree_depth) {
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            left_digests.emplace_back(digest_variable<FieldType>(bp, Hash::get_digest_len()));
-                            right_digests.emplace_back(digest_variable<FieldType>(bp, Hash::get_digest_len()));
+                            left_digests.emplace_back(digest_variable<FieldType>(bp, Hash::digest_bits));
+                            right_digests.emplace_back(digest_variable<FieldType>(bp, Hash::digest_bits));
                         }
                     }
 
