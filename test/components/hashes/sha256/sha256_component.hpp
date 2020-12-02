@@ -38,11 +38,11 @@ template<typename FieldType>
 blueprint<FieldType> sha2_two_to_one_bp() {
     blueprint<FieldType> bp;
 
-    digest_variable<FieldType> left(bp, hashes::sha2<256>::digest_bits);
-    digest_variable<FieldType> right(bp, hashes::sha2<256>::digest_bits);
-    digest_variable<FieldType> output(bp, hashes::sha2<256>::digest_bits);
+    components::digest_variable<FieldType> left(bp, hashes::sha2<256>::digest_bits);
+    components::digest_variable<FieldType> right(bp, hashes::sha2<256>::digest_bits);
+    components::digest_variable<FieldType> output(bp, hashes::sha2<256>::digest_bits);
 
-    sha256_two_to_one_hash_component<FieldType> f(bp, left, right, output);
+    components::sha256_two_to_one_hash_component<FieldType> f(bp, left, right, output);
 
     f.generate_r1cs_constraints();
     std::cout << "Number of constraints for sha256_two_to_one_hash_component: " << bp.num_constraints() << std::endl;

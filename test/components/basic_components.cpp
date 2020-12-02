@@ -46,7 +46,7 @@ void test_disjunction_component(size_t n) {
     blueprint_variable<FieldType> output;
     output.allocate(bp);
 
-    disjunction_component<FieldType> d(bp, inputs, output);
+    components::disjunction_component<FieldType> d(bp, inputs, output);
     d.generate_r1cs_constraints();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -73,7 +73,7 @@ void test_conjunction_component(size_t n) {
     blueprint_variable<FieldType> output;
     output.allocate(bp);
 
-    conjunction_component<FieldType> c(bp, inputs, output);
+    components::conjunction_component<FieldType> c(bp, inputs, output);
     c.generate_r1cs_constraints();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -102,7 +102,7 @@ void test_comparison_component(size_t n) {
     less.allocate(bp);
     less_or_eq.allocate(bp);
 
-    comparison_component<FieldType> cmp(bp, n, A, B, less, less_or_eq);
+    components::comparison_component<FieldType> cmp(bp, n, A, B, less, less_or_eq);
     cmp.generate_r1cs_constraints();
 
     for (std::size_t a = 0; a < 1ul << n; ++a) {
@@ -130,7 +130,7 @@ void test_inner_product_component(size_t n) {
     blueprint_variable<FieldType> result;
     result.allocate(bp);
 
-    inner_product_component<FieldType> g(bp, A, B, result);
+    components::inner_product_component<FieldType> g(bp, A, B, result);
     g.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {
@@ -164,7 +164,7 @@ void test_loose_multiplexing_component(size_t n) {
     result.allocate(bp);
     success_flag.allocate(bp);
 
-    loose_multiplexing_component<FieldType> g(bp, arr, index, result, success_flag);
+    components::loose_multiplexing_component<FieldType> g(bp, arr, index, result, success_flag);
     g.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {

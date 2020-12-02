@@ -38,67 +38,69 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace components {
 
-                template<typename FieldType, typename Hash>
-                class set_membership_proof_variable : public component<FieldType> {
-                public:
-                    blueprint_variable_vector<FieldType> address_bits;
-                    std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> merkle_path;
+                    template<typename FieldType, typename Hash>
+                    class set_membership_proof_variable : public component<FieldType> {
+                    public:
+                        blueprint_variable_vector<FieldType> address_bits;
+                        std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> merkle_path;
 
-                    const std::size_t max_entries;
-                    const std::size_t tree_depth;
+                        const std::size_t max_entries;
+                        const std::size_t tree_depth;
 
-                    set_membership_proof_variable(blueprint<FieldType> &bp, const std::size_t max_entries) :
-                        component<FieldType>(bp), max_entries(max_entries),
-                        tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) {
-                        if (tree_depth > 0) {
-                            address_bits.allocate(bp, tree_depth);
-                            merkle_path.reset(new merkle_authentication_path_variable<FieldType, Hash>(bp, tree_depth));
-                        }
-                    }
-
-                    void generate_r1cs_constraints() {
-                        if (tree_depth > 0) {
-                            for (std::size_t i = 0; i < tree_depth; ++i) {
-                                generate_boolean_r1cs_constraint<FieldType>(this->bp, address_bits[i]);
+                        set_membership_proof_variable(blueprint<FieldType> &bp, const std::size_t max_entries) :
+                            component<FieldType>(bp), max_entries(max_entries),
+                            tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) {
+                            if (tree_depth > 0) {
+                                address_bits.allocate(bp, tree_depth);
+                                merkle_path.reset(new merkle_authentication_path_variable<FieldType, Hash>(bp, tree_depth));
                             }
-                            merkle_path->generate_r1cs_constraints();
-                        }
-                    }
-                    void generate_r1cs_witness(const set_membership_proof &proof) {
-                        if (tree_depth > 0) {
-                            address_bits.fill_with_bits_of_field_element(this->bp,
-                                                                         typename FieldType::value_type(proof.address));
-                            merkle_path->generate_r1cs_witness(proof.address, proof.merkle_path);
-                        }
-                    }
-
-                    set_membership_proof get_membership_proof() const {
-                        set_membership_proof result;
-
-                        if (tree_depth == 0) {
-                            result.address = 0;
-                        } else {
-                            result.address = address_bits.get_field_element_from_bits(this->bp).as_ulong();
-                            result.merkle_path = merkle_path->get_authentication_path(result.address);
                         }
 
-                        return result;
-                    }
+                        void generate_r1cs_constraints() {
+                            if (tree_depth > 0) {
+                                for (std::size_t i = 0; i < tree_depth; ++i) {
+                                    generate_boolean_r1cs_constraint<FieldType>(this->bp, address_bits[i]);
+                                }
+                                merkle_path->generate_r1cs_constraints();
+                            }
+                        }
+                        void generate_r1cs_witness(const set_membership_proof &proof) {
+                            if (tree_depth > 0) {
+                                address_bits.fill_with_bits_of_field_element(this->bp,
+                                                                             typename FieldType::value_type(proof.address));
+                                merkle_path->generate_r1cs_witness(proof.address, proof.merkle_path);
+                            }
+                        }
 
-                    static r1cs_variable_assignment<FieldType>
-                        as_r1cs_variable_assignment(const set_membership_proof &proof) {
+                        set_membership_proof get_membership_proof() const {
+                            set_membership_proof result;
 
-                        blueprint<FieldType> bp;
-                        const std::size_t max_entries = (1ul << (proof.merkle_path.size()));
-                        set_membership_proof_variable<FieldType, Hash> proof_variable(bp, max_entries,
-                                                                                      "proof_variable");
-                        proof_variable.generate_r1cs_witness(proof);
+                            if (tree_depth == 0) {
+                                result.address = 0;
+                            } else {
+                                result.address = address_bits.get_field_element_from_bits(this->bp).as_ulong();
+                                result.merkle_path = merkle_path->get_authentication_path(result.address);
+                            }
 
-                        return bp.full_variable_assignment();
-                    }
-                };
+                            return result;
+                        }
 
+                        static r1cs_variable_assignment<FieldType>
+                            as_r1cs_variable_assignment(const set_membership_proof &proof) {
+
+                            blueprint<FieldType> bp;
+                            const std::size_t max_entries = (1ul << (proof.merkle_path.size()));
+                            set_membership_proof_variable<FieldType, Hash> proof_variable(bp, max_entries,
+                                                                                          "proof_variable");
+                            proof_variable.generate_r1cs_witness(proof);
+
+                            return bp.full_variable_assignment();
+                        }
+                    };
+
+                }    // namespace components
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

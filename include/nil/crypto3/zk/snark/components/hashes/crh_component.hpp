@@ -32,15 +32,17 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace components {
 
-                // for now all CRH components are knapsack CRH's; can be easily extended
-                // later to more expressive selector types.
-                template<typename FieldType>
-                using crh_with_field_out_component = knapsack_crh_with_field_out_component<FieldType>;
+                    // for now all CRH components are knapsack CRH's; can be easily extended
+                    // later to more expressive selector types.
+                    template<typename FieldType>
+                    using crh_with_field_out_component = knapsack_crh_with_field_out_component<FieldType>;
 
-                template<typename FieldType>
-                using crh_with_bit_out_component = knapsack_crh_with_bit_out_component<FieldType>;
+                    template<typename FieldType>
+                    using crh_with_bit_out_component = knapsack_crh_with_bit_out_component<FieldType>;
 
+                }    // namespace components
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
