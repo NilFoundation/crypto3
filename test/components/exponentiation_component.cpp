@@ -23,12 +23,17 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#include <nil/crypto3/algebra/curves/bn128.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
+#define BOOST_TEST_MODULE exponentiation_components_test
+
+#include <boost/test/unit_test.hpp>
+
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/exponentiation_component.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -58,9 +63,13 @@ void test_exponentiation_component(const boost::multiprecision::number<Backend, 
     power.print();
 }
 
-int main(void) {
-    test_all_set_commitment_components<curves::bn128>();
-    test_all_set_commitment_components<curves::edwards>();
-    test_all_set_commitment_components<curves::mnt4>();
-    test_all_set_commitment_components<curves::mnt6>();
+BOOST_AUTO_TEST_SUITE(exponentiation_component_test_suite)
+
+BOOST_AUTO_TEST_CASE(exponentiation_component_test_case) {
+
+    test_all_set_commitment_components<curves::bls12<381>>();
+    test_all_set_commitment_components<curves::mnt4<298>>();
+    test_all_set_commitment_components<curves::mnt6<298>>();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

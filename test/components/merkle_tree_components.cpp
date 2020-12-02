@@ -27,8 +27,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bn128.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
@@ -197,10 +196,10 @@ void test_all_merkle_tree_components() {
 BOOST_AUTO_TEST_SUITE(merkle_tree_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(merkle_tree_components_test) {
-    test_all_merkle_tree_components<curves::bn128>();
-    test_all_merkle_tree_components<curves::edwards>();
-    test_all_merkle_tree_components<curves::mnt4>();
-    test_all_merkle_tree_components<curves::mnt6>();
+
+    test_all_merkle_tree_components<curves::bls12<381>>();
+    test_all_merkle_tree_components<curves::mnt4<398>>();
+    test_all_merkle_tree_components<curves::mnt6<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

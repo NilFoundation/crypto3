@@ -23,6 +23,9 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
+#ifndef CRYPTO3_BLUEPRINT_SHA256_COMPONENT_TEST_HPP
+#define CRYPTO3_BLUEPRINT_SHA256_COMPONENT_TEST_HPP
+
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/hashes/hash_io.hpp>
 
@@ -87,3 +90,5 @@ blueprint<FieldType> sha2_two_to_one_bp() {
 
     return bp;
 }
+
+#endif    // CRYPTO3_BLUEPRINT_SHA256_COMPONENT_TEST_HPP

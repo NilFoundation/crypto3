@@ -27,18 +27,23 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation_components.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
-void test_G1_variable_precomp(const std::string &annotation) {
+void test_G1_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g1_type::value_type g_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
@@ -62,7 +67,7 @@ void test_G1_variable_precomp(const std::string &annotation) {
 }
 
 template<typename CurveType>
-void test_G2_variable_precomp(const std::string &annotation) {
+void test_G2_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename other_curve<CurveType>::g2_type::value_type g_val =
         algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
@@ -89,13 +94,16 @@ void test_G2_variable_precomp(const std::string &annotation) {
         BOOST_CHECK(precomp.coeffs[i]->gamma_X->get_element() == native_precomp.coeffs[i].gamma_X);
     }
 
-    std::cout << "number of constraints for G2 precomp (Fr is " << 
-        annotation.c_str() << ")  = " << bp.num_constraints() << std::endl;
+    std::cout << "number of constraints for G2 precomp: " << bp.num_constraints() << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE(weierstrass_precomputation_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(weierstrass_precomputation_components_test) {
+    
+    test_all_set_commitment_components<curves::mnt4<298>>();
+    test_all_set_commitment_components<curves::mnt6<298>>();
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

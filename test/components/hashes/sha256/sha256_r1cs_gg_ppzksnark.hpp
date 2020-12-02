@@ -26,8 +26,8 @@
 // a given R1CS example.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
-#define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
+#ifndef CRYPTO3_BLUEPRINT_SHA256_R1CS_GG_PPZKSNARK_TEST_HPP
+#define CRYPTO3_BLUEPRINT_SHA256_R1CS_GG_PPZKSNARK_TEST_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
@@ -153,4 +153,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
+#endif    // CRYPTO3_BLUEPRINT_SHA256_R1CS_GG_PPZKSNARK_TEST_HPP
