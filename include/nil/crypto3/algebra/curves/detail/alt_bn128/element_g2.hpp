@@ -41,14 +41,14 @@ namespace nil {
                 namespace detail {
 
                     /** @brief A struct representing a group G2 of Barreto-Naehrig curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
                     struct alt_bn128_g2;
 
                     /** @brief A struct representing an element from the group G2 of Barreto-Naehrig curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -64,22 +64,24 @@ namespace nil {
                         using group_type = alt_bn128_g2<254>;
 
                         using policy_type = alt_bn128_basic_policy<254>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
+                        constexpr static const std::size_t g1_field_bits =
+                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
-                        constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
+                        constexpr static const std::size_t g2_field_bits =
+                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef
                             typename fields::fp2<typename policy_type::base_field_type>::value_type g2_field_type_value;
 
                         using underlying_field_value_type = g2_field_type_value;
 
-                        underlying_field_value_type X; 
-                        underlying_field_value_type Y; 
-                        underlying_field_value_type Z; 
+                        underlying_field_value_type X;
+                        underlying_field_value_type Y;
+                        underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
 
-                         /** @brief 
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
@@ -91,7 +93,7 @@ namespace nil {
                         // element_alt_bn128_g2() : element_alt_bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
-                        /** @brief 
+                        /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
@@ -166,7 +168,7 @@ namespace nil {
                         }
 
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 is the point at infinity
                          */
                         bool is_zero() const {
@@ -174,7 +176,7 @@ namespace nil {
                         }
 
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 in affine coordinates
                          */
                         bool is_special() const {
@@ -217,8 +219,8 @@ namespace nil {
                             return (*this) + (-other);
                         }
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G2
                          */
                         element_alt_bn128_g2 doubled() const {
@@ -246,8 +248,8 @@ namespace nil {
                             return element_alt_bn128_g2(X3, Y3, Z3);
                         }
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
@@ -349,8 +351,8 @@ namespace nil {
                     public:
                         /*************************  Reducing operations  ***********************************/
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_alt_bn128_g2 to_affine_coordinates() {
@@ -372,8 +374,8 @@ namespace nil {
                             return element_alt_bn128_g2(p_out[0], p_out[1], p_out[2]);
                         }
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_alt_bn128_g2 to_special() {

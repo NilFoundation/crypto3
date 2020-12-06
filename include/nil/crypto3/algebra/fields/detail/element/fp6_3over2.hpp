@@ -134,8 +134,8 @@ namespace nil {
 
                             return element_fp6_3over2(
                                 A0B0 + mul_by_non_residue((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
-                                 (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + mul_by_non_residue(A2B2),
-                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
+                                (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + mul_by_non_residue(A2B2),
+                                (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
                         }
 
                         element_fp6_3over2 sqrt() const {

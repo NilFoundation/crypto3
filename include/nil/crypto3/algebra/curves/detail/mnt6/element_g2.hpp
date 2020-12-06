@@ -39,13 +39,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     /** @brief A struct representing a group G2 of mnt6 curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
                     struct mnt6_g2;
                     /** @brief A struct representing an element from the group G2 of mnt6 curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -60,7 +60,8 @@ namespace nil {
                         using group_type = mnt6_g2<298>;
 
                         using policy_type = mnt6_basic_policy<298>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
+                        constexpr static const std::size_t g1_field_bits =
+                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
@@ -71,7 +72,7 @@ namespace nil {
                         underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                         /** @brief 
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
@@ -81,7 +82,7 @@ namespace nil {
                         // must be
                         // element_mnt6_g2() : element_mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
-                        /** @brief 
+                        /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
@@ -147,28 +148,27 @@ namespace nil {
                             return !(operator==(other));
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 is the point at infinity
                          */
                         bool is_zero() const {
                             return (this->X.is_zero() && this->Z.is_zero());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 in affine coordinates
                          */
                         bool is_special() const {
                             return (this->is_zero() || this->Z.is_one());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 lies on the elliptic curve
                          */
                         bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
-                            }
-                            else {
+                            } else {
 
                                 /*
                                   y^2 = x^3 + ax + b
@@ -223,8 +223,8 @@ namespace nil {
                         element_mnt6_g2 operator-(const element_mnt6_g2 &other) const {
                             return (*this) + (-other);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G2
                          */
                         element_mnt6_g2 doubled() const {
@@ -255,8 +255,8 @@ namespace nil {
                                 return element_mnt6_g2(X3, Y3, Z3);
                             }
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
@@ -343,8 +343,8 @@ namespace nil {
                         }
 
                         /*************************  Reducing operations  ***********************************/
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_mnt6_g2 to_affine_coordinates() const {
@@ -363,8 +363,8 @@ namespace nil {
 
                             return element_mnt6_g2(p_out[0], p_out[1], p_out[2]);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_mnt6_g2 to_special() const {

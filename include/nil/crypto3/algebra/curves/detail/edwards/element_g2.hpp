@@ -40,13 +40,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     /** @brief A struct representing a group G2 of Edwards curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
                     struct edwards_g2;
-                     /** @brief A struct representing an element from the group G2 of Edwards curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                    /** @brief A struct representing an element from the group G2 of Edwards curve.
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -72,18 +72,18 @@ namespace nil {
                         underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                        /** @brief 
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
                         element_edwards_g2() :
                             element_edwards_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                                underlying_field_value_type::zero())  {};
+                                               underlying_field_value_type::zero()) {};
                         // must be
                         // element_edwards_g2() : element_edwards_g2(one_fill[0], one_fill[1]) {};
                         // when constexpr fields will be finished
-                        
-                        /** @brief 
+
+                        /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
@@ -97,7 +97,7 @@ namespace nil {
                             twist_mul_by_a_c0 = a * X.non_residue;
                             twist_mul_by_d_c0 = d * X.non_residue;
                         };
-                        /** @brief 
+                        /** @brief
                          *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
                          *
                          */
@@ -163,14 +163,14 @@ namespace nil {
                             return !(operator==(other));
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 is the point at infinity
                          */
                         bool is_zero() const {
                             return (this->Y.is_zero() && this->Z.is_zero());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 in affine coordinates
                          */
                         bool is_special() const {
@@ -212,8 +212,8 @@ namespace nil {
                         element_edwards_g2 operator-(const element_edwards_g2 &other) const {
                             return (*this) + (-other);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G2
                          */
                         element_edwards_g2 doubled() const {
@@ -239,8 +239,8 @@ namespace nil {
                                 return element_edwards_g2(X3, Y3, Z3);
                             }
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
@@ -310,8 +310,8 @@ namespace nil {
                         }
 
                         /*************************  Reducing operations  ***********************************/
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from inverted coordinates to affine coordinates
                          */
                         element_edwards_g2 to_affine_coordinates() const {
@@ -335,8 +335,8 @@ namespace nil {
 
                             return element_edwards_g2(p_out[0], p_out[1], p_out[2]);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from projective coordinates to affine coordinates
                          */
                         element_edwards_g2 to_special() const {

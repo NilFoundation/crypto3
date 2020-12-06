@@ -41,14 +41,14 @@ namespace nil {
                 namespace detail {
 
                     /** @brief A struct representing a group G1 of mnt4 curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
                     struct mnt4_g1;
 
                     /** @brief A struct representing an element from the group G1 of mnt4 curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -63,7 +63,8 @@ namespace nil {
                         using group_type = mnt4_g1<298>;
 
                         using policy_type = mnt4_basic_policy<298>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
+                        constexpr static const std::size_t g1_field_bits =
+                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
@@ -74,8 +75,8 @@ namespace nil {
                         underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                        
-                        /** @brief 
+
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
@@ -86,13 +87,12 @@ namespace nil {
                         // element_mnt4_g1() : element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
-                        /** @brief 
+                        /** @brief
                          *    @return the selected affine point $(X:Y:1)$
                          *
                          */
-                        element_mnt4_g1(const underlying_field_value_type& X, 
-                                        const underlying_field_value_type& Y) : 
-                                        X(X), Y(Y), Z(underlying_field_value_type::one()) {};
+                        element_mnt4_g1(const underlying_field_value_type &X, const underlying_field_value_type &Y) :
+                            X(X), Y(Y), Z(underlying_field_value_type::one()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
@@ -105,7 +105,7 @@ namespace nil {
                             this->Y = Y;
                             this->Z = Z;
                         };
-                         /** @brief Get the point at infinity
+                        /** @brief Get the point at infinity
                          *
                          */
                         static element_mnt4_g1 zero() {
@@ -156,28 +156,27 @@ namespace nil {
                             return !(operator==(other));
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G1 is the point at infinity
                          */
                         bool is_zero() const {
                             return (this->X.is_zero() && this->Z.is_zero());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G1 in affine coordinates
                          */
                         bool is_special() const {
                             return (this->is_zero() || this->Z.is_one());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G1 lies on the elliptic curve
                          */
                         bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 /*
                                   y^2 = x^3 + ax + b
 
@@ -192,8 +191,7 @@ namespace nil {
                                 const underlying_field_value_type Y2 = this->Y.squared();
                                 const underlying_field_value_type Z2 = this->Z.squared();
 
-                                return (this->Z * (Y2 - b * Z2) == 
-                                            this->X * (X2 + a * Z2));
+                                return (this->Z * (Y2 - b * Z2) == this->X * (X2 + a * Z2));
                             }
                         }
 
@@ -232,8 +230,8 @@ namespace nil {
                         element_mnt4_g1 operator-(const element_mnt4_g1 &other) const {
                             return (*this) + (-other);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G1
                          */
                         element_mnt4_g1 doubled() const {
@@ -264,8 +262,8 @@ namespace nil {
                                 return element_mnt4_g1(X3, Y3, Z3);
                             }
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
@@ -338,8 +336,8 @@ namespace nil {
 
                     public:
                         /*************************  Reducing operations  ***********************************/
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
                         element_mnt4_g1 to_affine_coordinates() const {
@@ -358,8 +356,8 @@ namespace nil {
 
                             return element_mnt4_g1(p_out[0], p_out[1], p_out[2]);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
                         element_mnt4_g1 to_special() const {

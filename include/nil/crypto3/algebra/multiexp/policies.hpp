@@ -44,6 +44,7 @@ namespace nil {
                     template<typename NumberType>
                     class ordered_exponent {
                         using number_type = NumberType;
+
                     public:
                         std::size_t idx;
                         number_type r;
@@ -52,7 +53,7 @@ namespace nil {
                         ordered_exponent(const std::size_t idx, const number_type &r) : idx(idx), r(r) {};
 
                         bool operator<(const ordered_exponent &other) const {
-                                return (this->r < other.r);
+                            return (this->r < other.r);
                         }
                     };
                 }    // namespace detail
@@ -64,14 +65,16 @@ namespace nil {
                  * while multiexp_method_plain uses operator *.
                  */
                 template<typename BaseType, typename FieldType>
-                struct multiexp_method_naive_plain{
+                struct multiexp_method_naive_plain {
                     using base_value_type = typename BaseType::value_type;
                     using field_value_type = typename FieldType::value_type;
+
                 public:
-                    static inline base_value_type process (typename std::vector<base_value_type>::const_iterator vec_start,
-                                                         typename std::vector<base_value_type>::const_iterator vec_end,
-                                                         typename std::vector<field_value_type>::const_iterator scalar_start,
-                                                         typename std::vector<field_value_type>::const_iterator scalar_end) {
+                    static inline base_value_type
+                        process(typename std::vector<base_value_type>::const_iterator vec_start,
+                                typename std::vector<base_value_type>::const_iterator vec_end,
+                                typename std::vector<field_value_type>::const_iterator scalar_start,
+                                typename std::vector<field_value_type>::const_iterator scalar_end) {
 
                         base_value_type result(base_value_type::zero());
 
@@ -98,18 +101,20 @@ namespace nil {
                  * .to_special(), .mixed_add(), and batch_to_special()).
                  */
                 template<typename BaseType, typename FieldType>
-                class multiexp_method_BDLO12{
+                class multiexp_method_BDLO12 {
                     using base_value_type = typename BaseType::value_type;
                     using field_value_type = typename FieldType::value_type;
+
                 public:
-                    static inline base_value_type 
+                    static inline base_value_type
                         process(typename std::vector<base_value_type>::const_iterator bases,
                                 typename std::vector<base_value_type>::const_iterator bases_end,
                                 typename std::vector<field_value_type>::const_iterator exponents,
                                 typename std::vector<field_value_type>::const_iterator exponents_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                            non_fixed_precision_number_type;
 
                         std::size_t length = std::distance(bases, bases_end);
 
@@ -127,8 +132,6 @@ namespace nil {
                         }
 
                         std::size_t num_groups = (num_bits + c - 1) / c;
-
-
 
                         base_value_type result;
                         bool result_nonzero = false;
@@ -211,18 +214,20 @@ namespace nil {
                  * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
                  */
                 template<typename BaseType, typename FieldType>
-                class multiexp_method_bos_coster{
+                class multiexp_method_bos_coster {
                     using base_value_type = typename BaseType::value_type;
                     using field_value_type = typename FieldType::value_type;
+
                 public:
-                    static inline base_value_type 
+                    static inline base_value_type
                         process(typename std::vector<base_value_type>::const_iterator vec_start,
                                 typename std::vector<base_value_type>::const_iterator vec_end,
                                 typename std::vector<field_value_type>::const_iterator scalar_start,
                                 typename std::vector<field_value_type>::const_iterator scalar_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
+                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                            non_fixed_precision_number_type;
 
                         if (vec_start == vec_end) {
                             return base_value_type::zero();
@@ -236,7 +241,7 @@ namespace nil {
                         const std::size_t vec_len = scalar_end - scalar_start;
                         const std::size_t odd_vec_len = (vec_len % 2 == 1 ? vec_len : vec_len + 1);
                         opt_q.reserve(odd_vec_len);
-                        
+
                         std::vector<base_value_type> g;
                         g.reserve(odd_vec_len);
 
@@ -247,14 +252,16 @@ namespace nil {
                              ++vec_it, ++scalar_it, ++i) {
                             g.emplace_back(*vec_it);
 
-                            opt_q.emplace_back(detail::ordered_exponent<non_fixed_precision_number_type>(i, non_fixed_precision_number_type(scalar_it->data)));
+                            opt_q.emplace_back(detail::ordered_exponent<non_fixed_precision_number_type>(
+                                i, non_fixed_precision_number_type(scalar_it->data)));
                         }
                         std::make_heap(opt_q.begin(), opt_q.end());
                         assert(scalar_it == scalar_end);
 
                         if (vec_len != odd_vec_len) {
                             g.emplace_back(base_value_type::zero());
-                            opt_q.emplace_back(detail::ordered_exponent<non_fixed_precision_number_type>(odd_vec_len - 1, 0ul));
+                            opt_q.emplace_back(
+                                detail::ordered_exponent<non_fixed_precision_number_type>(odd_vec_len - 1, 0ul));
                         }
                         assert(g.size() % 2 == 1);
                         assert(opt_q.size() == g.size());
@@ -263,7 +270,8 @@ namespace nil {
 
                         while (true) {
                             detail::ordered_exponent<non_fixed_precision_number_type> &a = opt_q[0];
-                            detail::ordered_exponent<non_fixed_precision_number_type> &b = (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
+                            detail::ordered_exponent<non_fixed_precision_number_type> &b =
+                                (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
 
                             const std::size_t abits = boost::multiprecision::msb(a.r) + 1;
 

@@ -40,7 +40,7 @@ namespace nil {
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of Edwards curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -52,7 +52,8 @@ namespace nil {
 
                         using underlying_field_type = typename policy_type::g1_field_type;
 
-                        constexpr static const std::size_t value_bits = underlying_field_type::value_bits + 1;  ///< size of the base field in bits  
+                        constexpr static const std::size_t value_bits =
+                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
                         using value_type = element_edwards_g1<ModulusBits>;
                     };

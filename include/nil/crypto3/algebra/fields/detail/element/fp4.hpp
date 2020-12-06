@@ -187,8 +187,8 @@ namespace nil {
 
                         template<typename PowerType>
                         element_fp4 cyclotomic_exp(const PowerType &exponent) const {
-                            element_fp4  res = this->one();
-                            element_fp4  this_inverse = this->unitary_inversed();
+                            element_fp4 res = this->one();
+                            element_fp4 this_inverse = this->unitary_inversed();
 
                             bool found_nonzero = false;
                             std::vector<long> NAF = boost::multiprecision::find_wnaf(1, exponent);
@@ -203,8 +203,7 @@ namespace nil {
 
                                     if (NAF[i] > 0) {
                                         res = res * (*this);
-                                    }
-                                    else {
+                                    } else {
                                         res = res * this_inverse;
                                     }
                                 }

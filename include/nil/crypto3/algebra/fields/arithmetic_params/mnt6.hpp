@@ -73,8 +73,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<fp3<mnt6_base_field<298>>>
-                    : public params<mnt6_base_field<298>> {
+                struct arithmetic_params<fp3<mnt6_base_field<298>>> : public params<mnt6_base_field<298>> {
                 private:
                     typedef params<mnt6_base_field<298>> policy_type;
 

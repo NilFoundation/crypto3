@@ -43,20 +43,21 @@ namespace nil {
                     using namespace algebra;
 
                     /** @brief A struct representing details about base and scalar fields.
-                    *    @tparam ModulusBits size of the base field in bits 
-                    *
-                    */
+                     *    @tparam ModulusBits size of the base field in bits
+                     *
+                     */
 
                     template<std::size_t ModulusBits = 381>
                     struct bls12_basic_policy { };
 
-                    /** @brief A struct representing details about base and scalar fields of the size 381 bits and 255 bits respectively.
-                    *
-                    */
+                    /** @brief A struct representing details about base and scalar fields of the size 381 bits and 255
+                     * bits respectively.
+                     *
+                     */
 
                     template<>
                     struct bls12_basic_policy<381> {
-                        constexpr static const std::size_t base_field_bits = 381; ///< size of the base field in bits 
+                        constexpr static const std::size_t base_field_bits = 381;    ///< size of the base field in bits
                         typedef fields::bls12_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
@@ -65,51 +66,71 @@ namespace nil {
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const number_type base_field_modulus = base_field_type::modulus; ///< characteristic of the base field  
+                        constexpr static const number_type base_field_modulus =
+                            base_field_type::modulus;    ///< characteristic of the base field
 
-                        constexpr static const std::size_t scalar_field_bits = 381;    // actually, it's 255 ///< size of the scalar field (order of the group of points) in bits 
+                        constexpr static const std::size_t scalar_field_bits =
+                            381;    // actually, it's 255 ///< size of the scalar field (order of the group of points)
+                                    // in bits
                         typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus; ///< characteristic of the scalar field (order of the group of points) 
+                        constexpr static const number_type scalar_field_modulus =
+                            scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
+                                                           ///< of points)
 
-                        constexpr static const number_type p = base_field_modulus; ///< characteristic of the base field  
-                        constexpr static const number_type q = scalar_field_modulus; ///< characteristic of the scalar field (order of the group of points) 
+                        constexpr static const number_type p =
+                            base_field_modulus;    ///< characteristic of the base field
+                        constexpr static const number_type q =
+                            scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
+                                                     ///< points)
 
-                        constexpr static const number_type a = number_type(0x00); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const number_type b = number_type(0x04); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type a =
+                            number_type(0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type b =
+                            number_type(0x04);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
-                    /** @brief A struct representing details about base and scalar fields of the size 377 bits and 253 bits respectively.
-                    *
-                    */
+                    /** @brief A struct representing details about base and scalar fields of the size 377 bits and 253
+                     * bits respectively.
+                     *
+                     */
 
                     template<>
                     struct bls12_basic_policy<377> {
-                        constexpr static const std::size_t base_field_bits = 377; ///< size of the base field in bits 
+                        constexpr static const std::size_t base_field_bits = 377;    ///< size of the base field in bits
                         typedef fields::bls12_fq<base_field_bits> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
 
                         typedef typename base_field_type::modulus_type number_type;
-                        constexpr static const number_type base_field_modulus = base_field_type::modulus; ///< characteristic of the base field  
+                        constexpr static const number_type base_field_modulus =
+                            base_field_type::modulus;    ///< characteristic of the base field
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const std::size_t scalar_field_bits = 377;    // actually, it's 253 ///< size of the scalar field (order of the group of points) in bits 
+                        constexpr static const std::size_t scalar_field_bits =
+                            377;    // actually, it's 253 ///< size of the scalar field (order of the group of points)
+                                    // in bits
                         typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
-                        constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus; ///< characteristic of the scalar field (order of the group of points) 
+                        constexpr static const number_type scalar_field_modulus =
+                            scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
+                                                           ///< of points)
 
+                        constexpr static const number_type p =
+                            base_field_modulus;    ///< characteristic of the base field
+                        constexpr static const number_type q =
+                            scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
+                                                     ///< points)
 
-                        constexpr static const number_type p = base_field_modulus; ///< characteristic of the base field  
-                        constexpr static const number_type q = scalar_field_modulus; ///< characteristic of the scalar field (order of the group of points) 
-
-                        constexpr static const number_type a = number_type(0x00); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const number_type b = number_type(0x01); ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type a =
+                            number_type(0x00);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type b =
+                            number_type(0x01);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                     };
 
-                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::a; 
-                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::a; 
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::a;
+                    constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::a;
 
-                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::b; 
+                    constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::b;
                     constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::b;
 
                     constexpr typename std::size_t const bls12_basic_policy<381>::base_field_bits;

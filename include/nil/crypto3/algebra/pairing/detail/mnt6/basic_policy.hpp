@@ -79,13 +79,12 @@ namespace nil {
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };
 
-                    constexpr typename mnt6_basic_policy<298>::number_type const 
-                        mnt6_basic_policy<298>::ate_loop_count;
-                    constexpr typename mnt6_basic_policy<298>::number_type const 
+                    constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::ate_loop_count;
+                    constexpr typename mnt6_basic_policy<298>::number_type const
                         mnt6_basic_policy<298>::final_exponent_last_chunk_abs_of_w0;
-                    constexpr typename mnt6_basic_policy<298>::number_type const 
+                    constexpr typename mnt6_basic_policy<298>::number_type const
                         mnt6_basic_policy<298>::final_exponent_last_chunk_w1;
-                    constexpr typename mnt6_basic_policy<298>::extended_number_type const 
+                    constexpr typename mnt6_basic_policy<298>::extended_number_type const
                         mnt6_basic_policy<298>::final_exponent;
 
                     constexpr bool const mnt6_basic_policy<298>::ate_is_loop_count_neg;

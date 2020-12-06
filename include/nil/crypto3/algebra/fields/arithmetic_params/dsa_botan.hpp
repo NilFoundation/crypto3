@@ -39,8 +39,7 @@ namespace nil {
             namespace fields {
 
                 template<>
-                struct arithmetic_params<dsa_botan_base_field<2048>>
-                    : public params<dsa_botan_base_field<2048>> {
+                struct arithmetic_params<dsa_botan_base_field<2048>> : public params<dsa_botan_base_field<2048>> {
                 private:
                     typedef params<dsa_botan_base_field<2048>> policy_type;
 
@@ -57,8 +56,7 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<dsa_botan_base_field<3072>>
-                    : public params<dsa_botan_base_field<3072>> {
+                struct arithmetic_params<dsa_botan_base_field<3072>> : public params<dsa_botan_base_field<3072>> {
                 private:
                     typedef params<dsa_botan_base_field<3072>> policy_type;
 
@@ -80,11 +78,11 @@ namespace nil {
                 constexpr typename arithmetic_params<dsa_botan_base_field<3072>>::modulus_type const
                     arithmetic_params<dsa_botan_base_field<3072>>::group_order;
 
-                //TODO: mul_generator should be renamed
-                constexpr typename arithmetic_params<dsa_botan_base_field<2048>>::modulus_type 
-                    const arithmetic_params<dsa_botan_base_field<2048>>::mul_generator;
-                constexpr typename arithmetic_params<dsa_botan_base_field<3072>>::modulus_type 
-                    const arithmetic_params<dsa_botan_base_field<3072>>::mul_generator;
+                // TODO: mul_generator should be renamed
+                constexpr typename arithmetic_params<dsa_botan_base_field<2048>>::modulus_type const
+                    arithmetic_params<dsa_botan_base_field<2048>>::mul_generator;
+                constexpr typename arithmetic_params<dsa_botan_base_field<3072>>::modulus_type const
+                    arithmetic_params<dsa_botan_base_field<3072>>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

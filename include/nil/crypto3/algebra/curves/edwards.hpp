@@ -40,7 +40,7 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a Edwards curve, providing 128 bits of security.
-                 *    @tparam ModulusBits size of the base field in bits 
+                 *    @tparam ModulusBits size of the base field in bits
                  *
                  */
                 template<std::size_t ModulusBits>
@@ -53,11 +53,15 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::extended_number_type extended_number_type;
 
-                    constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;  ///< size of the base field in bits 
-                    constexpr static const number_type p = policy_type::p; ///< base field characteristic
+                    constexpr static const std::size_t base_field_bits =
+                        policy_type::base_field_bits;                         ///< size of the base field in bits
+                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
 
-                    constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits; ///< size of the scalar field (order of the group of points) in bits 
-                    constexpr static const number_type q = policy_type::q; ///< scalar field characteristic (order of the group of points)
+                    constexpr static const std::size_t scalar_field_bits =
+                        policy_type::scalar_field_bits;    ///< size of the scalar field (order of the group of points)
+                                                           ///< in bits
+                    constexpr static const number_type q =
+                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
                     typedef typename detail::edwards_g1<ModulusBits> g1_type;
                     typedef typename detail::edwards_g2<ModulusBits> g2_type;

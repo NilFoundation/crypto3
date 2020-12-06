@@ -43,8 +43,8 @@ namespace nil {
                               typename std::vector<typename BaseType::value_type>::const_iterator b_start,
                               typename std::vector<typename BaseType::value_type>::const_iterator b_end) {
 
-                return multiexp<BaseType, BaseType,
-                                policies::multiexp_method_naive_plain<BaseType, BaseType>>(a_start, a_end, b_start, b_end, 1);
+                return multiexp<BaseType, BaseType, policies::multiexp_method_naive_plain<BaseType, BaseType>>(
+                    a_start, a_end, b_start, b_end, 1);
             }
 
         }    // namespace algebra

@@ -40,8 +40,9 @@ namespace nil {
         namespace algebra {
 
             // TODO: Implement not only for vectors
-            template<typename BaseType, typename FieldType, 
-                typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
+            template<typename BaseType,
+                     typename FieldType,
+                     typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
             typename BaseType::value_type
                 multiexp(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                          typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
@@ -75,8 +76,9 @@ namespace nil {
                 return result;
             }
 
-            template<typename BaseType, typename FieldType, 
-                typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
+            template<typename BaseType,
+                     typename FieldType,
+                     typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
             typename BaseType::value_type multiexp_with_mixed_addition(
                 typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
                 typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
@@ -190,7 +192,8 @@ namespace nil {
 
                 typedef typename FieldType::number_type number_type;
                 // temporary added until fixed-precision modular adaptor is ready:
-                typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>> non_fixed_precision_number_type;
+                typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                    non_fixed_precision_number_type;
 
                 const std::size_t outerc = (scalar_size + window - 1) / window;
                 const number_type pow_val = pow.data;
@@ -200,8 +203,8 @@ namespace nil {
                 for (std::size_t outer = 0; outer < outerc; ++outer) {
                     std::size_t inner = 0;
                     for (std::size_t i = 0; i < window; ++i) {
-                        if (boost::multiprecision::bit_test(
-                                non_fixed_precision_number_type(pow_val), outer * window + i)) {
+                        if (boost::multiprecision::bit_test(non_fixed_precision_number_type(pow_val),
+                                                            outer * window + i)) {
                             inner |= 1u << i;
                         }
                     }

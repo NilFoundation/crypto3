@@ -40,14 +40,14 @@ namespace nil {
                 namespace detail {
 
                     /** @brief A struct representing a group G2 of BLS12- curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
                     struct bls12_g2;
 
-                     /** @brief A struct representing an element from the group G2 of BLS12 curve.
-                     *    @tparam ModulusBits size of the base field in bits 
+                    /** @brief A struct representing an element from the group G2 of BLS12 curve.
+                     *    @tparam ModulusBits size of the base field in bits
                      *
                      */
                     template<std::size_t ModulusBits>
@@ -63,19 +63,20 @@ namespace nil {
                         using group_type = bls12_g1<381>;
 
                         using policy_type = bls12_basic_policy<381>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the group G1 in bits 
+                        constexpr static const std::size_t g1_field_bits =
+                            policy_type::base_field_bits;    ///< size of the group G1 in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_type = typename policy_type::g2_field_type;
                         using underlying_field_value_type = underlying_field_type::value_type;
 
-                        underlying_field_value_type X; 
-                        underlying_field_value_type Y; 
+                        underlying_field_value_type X;
+                        underlying_field_value_type Y;
                         underlying_field_value_type Z;
 
                         /*************************  Constructors and zero/one  ***********************************/
-                        /** @brief 
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
@@ -86,7 +87,7 @@ namespace nil {
                         // element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
-                        /** @brief 
+                        /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
@@ -161,28 +162,27 @@ namespace nil {
                             return !(operator==(other));
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 is the point at infinity
                          */
                         bool is_zero() const {
                             return (this->Z.is_zero());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 in affine coordinates
                          */
                         bool is_special() const {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 lies on the elliptic curve
                          */
                         bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 /*
                                   y^2 = x^3 + b
 
@@ -203,7 +203,7 @@ namespace nil {
                                 return (Y2 == X3 + twist_coeff_b * Z6);
                             }
                         }
-                        
+
                         /*************************  Arithmetic operations  ***********************************/
 
                         element_bls12_g2 operator=(const element_bls12_g2 &other) {
@@ -239,8 +239,8 @@ namespace nil {
                         element_bls12_g2 operator-(const element_bls12_g2 &other) const {
                             return (*this) + (-other);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G2
                          */
                         element_bls12_g2 doubled() const {
@@ -270,8 +270,8 @@ namespace nil {
                             return element_bls12_g2(X3, Y3, Z3);
                         }
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
@@ -363,8 +363,8 @@ namespace nil {
 
                     public:
                         /*************************  Reducing operations  ***********************************/
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_bls12_g2 to_affine_coordinates() const {
@@ -385,8 +385,8 @@ namespace nil {
 
                             return element_bls12_g2(p_out[0], p_out[1], p_out[2]);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_bls12_g2 to_special() const {
@@ -424,7 +424,8 @@ namespace nil {
                         using group_type = bls12_g1<377>;
 
                         using policy_type = bls12_basic_policy<377>;
-                        constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits; ///< size of the base field in bits 
+                        constexpr static const std::size_t g1_field_bits =
+                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
@@ -435,7 +436,7 @@ namespace nil {
                         underlying_field_value_type Y;
                         underlying_field_value_type Z;
 
-                         /** @brief 
+                        /** @brief
                          *    @return the point at infinity by default
                          *
                          */
@@ -446,7 +447,7 @@ namespace nil {
                         // element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
 
-                        /** @brief 
+                        /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
@@ -524,14 +525,14 @@ namespace nil {
                         }
 
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 is the point at infinity
                          */
                         bool is_zero() const {
                             return (this->Z.is_zero());
                         }
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 in affine coordinates
                          */
                         bool is_special() const {
@@ -539,14 +540,13 @@ namespace nil {
                         }
 
                         /** @brief
-                         * 
+                         *
                          * @return true if element from group G2 lies on the elliptic curve
                          */
                         bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
-                            }
-                            else {
+                            } else {
                                 /*
                                   y^2 = x^3 + b
 
@@ -604,8 +604,8 @@ namespace nil {
                             return (*this) + (-other);
                         }
 
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return doubled element from group G2
                          */
                         element_bls12_g2 doubled() const {
@@ -634,8 +634,8 @@ namespace nil {
 
                             return element_bls12_g2(X3, Y3, Z3);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
@@ -727,8 +727,8 @@ namespace nil {
 
                     public:
                         /*************************  Reducing operations  ***********************************/
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_bls12_g2 to_affine_coordinates() const {
@@ -749,8 +749,8 @@ namespace nil {
 
                             return element_bls12_g2(p_out[0], p_out[1], p_out[2]);
                         }
-                        /** @brief 
-                         * 
+                        /** @brief
+                         *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
                         element_bls12_g2 to_special() const {
@@ -762,12 +762,9 @@ namespace nil {
                         /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
                             g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one());
 
-                        /*constexpr static */ const g2_field_type_value 
-                            twist_coeff_b = b * twist.inversed();
+                        /*constexpr static */ const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
                     private:
-                        
-
                         /*constexpr static const underlying_field_value_type zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};

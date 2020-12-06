@@ -135,12 +135,13 @@ namespace nil {
                         element_fp6_2over3 squared() const {
                             // return (*this) * (*this);    // maybe can be done more effective
 
-                            /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Complex) */
+                            /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly
+                             * Fields.pdf; Section 3 (Complex) */
                             const underlying_type &B = data[1], &A = data[0];
                             const underlying_type AB = A * B;
 
-                            return element_fp6_2over3((A + B) * (A + mul_by_non_residue(B)) - AB - mul_by_non_residue(AB),
-                                                      AB + AB);
+                            return element_fp6_2over3(
+                                (A + B) * (A + mul_by_non_residue(B)) - AB - mul_by_non_residue(AB), AB + AB);
                         }
 
                         template<typename PowerType>
@@ -184,12 +185,12 @@ namespace nil {
                             using e_fp = typename underlying_type::underlying_type;
                             using e_fp2 = std::array<e_fp, 2>;
 
-                            auto fp2_squared = [&](const e_fp &A, const e_fp &B){
-                                /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Complex squaring) */
+                            auto fp2_squared = [&](const e_fp &A, const e_fp &B) {
+                                /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly
+                                 * Fields.pdf; Section 3 (Complex squaring) */
                                 const e_fp AB = A * B;
 
-                                return e_fp2{(A + B) * (A + non_residue * B) - AB - non_residue * AB,
-                                             AB + AB};
+                                return e_fp2 {(A + B) * (A + non_residue * B) - AB - non_residue * AB, AB + AB};
                             };
 
                             // e_fp2 a(data[0].data[0], data[1].data[1]);
@@ -204,33 +205,32 @@ namespace nil {
                             e_fp2 csq = fp2_squared(data[0].data[1], data[1].data[2]);
 
                             // A = vector(3*a^2 - 2*Fp2([vector(a)[0],-vector(a)[1]]))
-                            //my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
+                            // my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
                             e_fp A_a = asq[0] - data[0].data[0];
                             A_a = A_a + A_a + asq[0];
-                            //my_Fp A_b = my_Fp(3l) * asq_b + my_Fp(2l) * a_b;
+                            // my_Fp A_b = my_Fp(3l) * asq_b + my_Fp(2l) * a_b;
                             e_fp A_b = asq[1] + data[1].data[1];
                             A_b = A_b + A_b + asq[1];
 
                             // B = vector(3*Fp2([non_residue*c2[1],c2[0]]) + 2*Fp2([vector(b)[0],-vector(b)[1]]))
-                            //my_Fp B_a = my_Fp(3l) * underlying_type::non_residue * csq_b + my_Fp(2l) * b_a;
+                            // my_Fp B_a = my_Fp(3l) * underlying_type::non_residue * csq_b + my_Fp(2l) * b_a;
                             e_fp B_tmp = non_residue * csq[1];
                             e_fp B_a = B_tmp + data[1].data[0];
                             B_a = B_a + B_a + B_tmp;
 
-                            //my_Fp B_b = my_Fp(3l) * csq_a - my_Fp(2l) * b_b;
+                            // my_Fp B_b = my_Fp(3l) * csq_a - my_Fp(2l) * b_b;
                             e_fp B_b = csq[0] - data[0].data[2];
                             B_b = B_b + B_b + csq[0];
 
                             // C = vector(3*b^2 - 2*Fp2([vector(c)[0],-vector(c)[1]]))
-                            //my_Fp C_a = my_Fp(3l) * bsq_a - my_Fp(2l) * c_a;
+                            // my_Fp C_a = my_Fp(3l) * bsq_a - my_Fp(2l) * c_a;
                             e_fp C_a = bsq[0] - data[0].data[1];
                             C_a = C_a + C_a + bsq[0];
                             // my_Fp C_b = my_Fp(3l) * bsq_b + my_Fp(2l) * c_b;
                             e_fp C_b = bsq[1] + data[1].data[2];
                             C_b = C_b + C_b + bsq[1];
 
-                            return element_fp6_2over3(underlying_type(A_a, C_a, B_b),
-                                                      underlying_type(B_a, A_b, C_b));
+                            return element_fp6_2over3(underlying_type(A_a, C_a, B_b), underlying_type(B_a, A_b, C_b));
                         }
 
                         template<typename PowerType>
@@ -254,8 +254,7 @@ namespace nil {
 
                                     if (NAF[i] > 0) {
                                         res = res * (*this);
-                                    }
-                                    else {
+                                    } else {
                                         res = res * this_inverse;
                                     }
                                 }
