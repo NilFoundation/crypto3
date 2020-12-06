@@ -50,112 +50,140 @@ namespace nil {
                      */
                     template<typename Fp2T>
                     struct Fp2_variable : public component<typename Fp2T::underlying_field_type> {
-                        using field_type = typename Fp2T::underlying_field_type;
+                        using base_field_type = typename Fp2T::base_field_type;
+                        using base_field_value_type = typename base_field_type::value_type;
 
-                        blueprint_linear_combination<field_type> c0;
-                        blueprint_linear_combination<field_type> c1;
+                        using underlying_type = blueprint_linear_combination<base_field_type>;
 
-                        blueprint_linear_combination_vector<field_type> all_vars;
+                        using data_type = std::array<underlying_type, Fp2T::arity/Fp2T::underlying_field_type::arity>;
 
-                        Fp2_variable(blueprint<field_type> &bp) : component<field_type>(bp) {
-                            blueprint_variable<field_type> c0_var, c1_var;
+                        data_type data;
+
+                        //blueprint_linear_combination<base_field_type> c0;
+                        //blueprint_linear_combination<base_field_type> c1;
+
+                        blueprint_linear_combination_vector<base_field_type> all_vars;
+
+                        Fp2_variable(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {
+                            blueprint_variable<base_field_type> c0_var, c1_var;
+
                             c0_var.allocate(bp);
                             c1_var.allocate(bp);
 
-                            c0 = blueprint_linear_combination<field_type>(c0_var);
-                            c1 = blueprint_linear_combination<field_type>(c1_var);
+                            //c0 = blueprint_linear_combination<base_field_type>(c0_var);
+                            //c1 = blueprint_linear_combination<base_field_type>(c1_var);
 
-                            all_vars.emplace_back(c0);
-                            all_vars.emplace_back(c1);
+                            data = data_type({underlying_type(c0_var), underlying_type(c1_var)});
+
+                            all_vars.emplace_back(data[0]);
+                            all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<field_type> &bp, const Fp2T &el) : component<field_type>(bp) {
-                            c0.assign(bp, el.c0);
-                            c1.assign(bp, el.c1);
+                        Fp2_variable(blueprint<base_field_type> &bp, const typename Fp2T::value_type &el) : 
+                            component<base_field_type>(bp) {
+                            blueprint_linear_combination<base_field_type> c0_lc;
+                            blueprint_linear_combination<base_field_type> c1_lc;
 
-                            c0.evaluate(bp);
-                            c1.evaluate(bp);
+                            c0_lc.assign(bp, el.data[0]);
+                            c1_lc.assign(bp, el.data[1]);
 
-                            all_vars.emplace_back(c0);
-                            all_vars.emplace_back(c1);
+                            c0_lc.evaluate(bp);
+                            c1_lc.evaluate(bp);
+
+                            data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+
+                            all_vars.emplace_back(data[0]);
+                            all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<field_type> &bp,
-                                     const Fp2T &el,
-                                     const blueprint_linear_combination<field_type> &coeff) :
-                            component<field_type>(bp) {
-                            c0.assign(bp, el.c0 * coeff);
-                            c1.assign(bp, el.c1 * coeff);
+                        Fp2_variable(blueprint<base_field_type> &bp,
+                                     const typename Fp2T::value_type &el,
+                                     const blueprint_linear_combination<base_field_type> &coeff) :
+                            component<base_field_type>(bp) {
 
-                            all_vars.emplace_back(c0);
-                            all_vars.emplace_back(c1);
+                            blueprint_linear_combination<base_field_type> c0_lc;
+                            blueprint_linear_combination<base_field_type> c1_lc;
+
+                            c0_lc.assign(bp, el.data[0] * coeff);
+                            c1_lc.assign(bp, el.data[1] * coeff);
+
+                            data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+
+                            all_vars.emplace_back(data[0]);
+                            all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<field_type> &bp,
-                                     const blueprint_linear_combination<field_type> &c0,
-                                     const blueprint_linear_combination<field_type> &c1) :
-                            component<field_type>(bp),
-                            c0(c0), c1(c1) {
-                            all_vars.emplace_back(c0);
-                            all_vars.emplace_back(c1);
+                        Fp2_variable(blueprint<base_field_type> &bp,
+                                     const blueprint_linear_combination<base_field_type> &c0_lc,
+                                     const blueprint_linear_combination<base_field_type> &c1_lc) :
+                            component<base_field_type>(bp){
+
+                            data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+
+                            all_vars.emplace_back(data[0]);
+                            all_vars.emplace_back(data[1]);
                         }
 
-                        void generate_r1cs_equals_const_constraints(const Fp2T &el) {
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(1, el.c0, c0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(1, el.c1, c1));
+                        void generate_r1cs_equals_const_constraints(const typename Fp2T::value_type &el) {
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(1, el.data[0], data[0]));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(1, el.data[1], data[1]));
                         }
 
-                        void generate_r1cs_witness(const Fp2T &el) {
-                            this->bp.lc_val(c0) = el.c0;
-                            this->bp.lc_val(c1) = el.c1;
+                        void generate_r1cs_witness(const typename Fp2T::value_type &el) {
+                            this->bp.lc_val(data[0]) = el.data[0];
+                            this->bp.lc_val(data[1]) = el.data[1];
                         }
 
-                        Fp2T get_element() {
-                            Fp2T el;
-                            el.c0 = this->bp.lc_val(c0);
-                            el.c1 = this->bp.lc_val(c1);
+                        typename Fp2T::value_type get_element() {
+                            typename Fp2T::value_type el;
+                            el.data[0] = this->bp.lc_val(data[0]);
+                            el.data[1] = this->bp.lc_val(data[1]);
                             return el;
                         }
 
-                        Fp2_variable operator*(const typename field_type::value_type &coeff) const {
-                            blueprint_linear_combination<field_type> new_c0, new_c1;
-                            new_c0.assign(this->bp, this->c0 * coeff);
-                            new_c1.assign(this->bp, this->c1 * coeff);
+                        Fp2_variable operator*(const base_field_value_type &coeff) const {
+                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                            new_c0.assign(this->bp, this->data[0] * coeff);
+                            new_c1.assign(this->bp, this->data[1] * coeff);
                             return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
                         Fp2_variable operator+(const Fp2_variable &other) const {
-                            blueprint_linear_combination<field_type> new_c0, new_c1;
-                            new_c0.assign(this->bp, this->c0 + other.c0);
-                            new_c1.assign(this->bp, this->c1 + other.c1);
+                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                            new_c0.assign(this->bp, this->data[0] + other.data[0]);
+                            new_c1.assign(this->bp, this->data[1] + other.data[1]);
                             return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
-                        Fp2_variable operator+(const Fp2T &other) const {
-                            blueprint_linear_combination<field_type> new_c0, new_c1;
-                            new_c0.assign(this->bp, this->c0 + other.c0);
-                            new_c1.assign(this->bp, this->c1 + other.c1);
+                        Fp2_variable operator+(const typename Fp2T::value_type &other) const {
+                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                            new_c0.assign(this->bp, this->data[0] + other.data[0]);
+                            new_c1.assign(this->bp, this->data[1] + other.data[1]);
                             return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
                         Fp2_variable mul_by_X() const {
-                            blueprint_linear_combination<field_type> new_c0, new_c1;
-                            new_c0.assign(this->bp, this->c1 * Fp2T::non_residue);
-                            new_c1.assign(this->bp, this->c0);
+                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                            new_c0.assign(this->bp, this->data[1] * Fp2T::value_type::one().non_residue);
+                            // while constepr is not ready
+                            // must be:
+                            //new_c0.assign(this->bp, this->data[1] * Fp2T::value_type::non_residue);
+
+                            new_c1.assign(this->bp, this->data[0]);
                             return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
                         void evaluate() const {
-                            c0.evaluate(this->bp);
-                            c1.evaluate(this->bp);
+                            (this->data[0]).evaluate(this->bp);
+                            (this->data[1]).evaluate(this->bp);
                         }
 
                         bool is_constant() const {
-                            return (c0.is_constant() && c1.is_constant());
+                            return ((this->data[0]).is_constant() && (this->data[1]).is_constant());
                         }
 
                         static std::size_t size_in_bits() {
-                            return 2 * field_type::value_bits;
+                            return 2 * base_field_type::value_bits;
                         }
 
                         static std::size_t num_variables() {
@@ -170,19 +198,20 @@ namespace nil {
                      */
                     template<typename Fp2T>
                     struct Fp2_mul_component : public component<typename Fp2T::underlying_field_type> {
-                        using field_type = typename Fp2T::underlying_field_type;
+                        using base_field_type = typename Fp2T::underlying_field_type;
+                        using base_field_value_type = typename base_field_type::value_type;
 
                         Fp2_variable<Fp2T> A;
                         Fp2_variable<Fp2T> B;
                         Fp2_variable<Fp2T> result;
 
-                        blueprint_variable<field_type> v1;
+                        blueprint_variable<base_field_type> v1;
 
-                        Fp2_mul_component(blueprint<field_type> &bp,
+                        Fp2_mul_component(blueprint<base_field_type> &bp,
                                           const Fp2_variable<Fp2T> &A,
                                           const Fp2_variable<Fp2T> &B,
                                           const Fp2_variable<Fp2T> &result) :
-                            component<field_type>(bp),
+                            component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             v1.allocate(bp);
                         }
@@ -190,35 +219,50 @@ namespace nil {
                         void generate_r1cs_constraints() {
                             /*
                                 Karatsuba multiplication for Fp2:
-                                    v0 = A.c0 * B.c0
-                                    v1 = A.c1 * B.c1
-                                    result.c0 = v0 + non_residue * v1
-                                    result.c1 = (A.c0 + A.c1) * (B.c0 + B.c1) - v0 - v1
+                                    v0 = A.data[0] * B.data[0]
+                                    v1 = A.data[1] * B.data[1]
+                                    result.data[0] = v0 + non_residue * v1
+                                    result.data[1] = (A.data[0] + A.data[1]) * (B.data[0] + B.data[1]) - v0 - v1
 
                                 Enforced with 3 constraints:
-                                    A.c1 * B.c1 = v1
-                                    A.c0 * B.c0 = result.c0 - non_residue * v1
-                                    (A.c0+A.c1)*(B.c0+B.c1) = result.c1 + result.c0 + (1 - non_residue) * v1
+                                    A.data[1] * B.data[1] = v1
+                                    A.data[0] * B.data[0] = result.data[0] - non_residue * v1
+                                    (A.data[0]+A.data[1])*(B.data[0]+B.data[1]) = result.data[1] + result.data[0] + (1 - non_residue) * v1
 
                                 Reference:
                                     "Multiplication and Squaring on Pairing-Friendly Fields"
                                     Devegili, OhEigeartaigh, Scott, Dahab
                             */
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(A.c1, B.c1, v1));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[1], B.data[1], v1));
                             this->bp.add_r1cs_constraint(
-                                r1cs_constraint<field_type>(A.c0, B.c0, result.c0 + v1 * (-Fp2T::non_residue)));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(
-                                A.c0 + A.c1,
-                                B.c0 + B.c1,
-                                result.c1 + result.c0 + v1 * (field_type::value_type::one() - Fp2T::non_residue)));
+                                r1cs_constraint<base_field_type>(A.data[0], B.data[0], result.data[0] + v1 * (-Fp2T::value_type::one().non_residue)));
+                            // while constepr is not ready
+                            // must be:
+                            //this->bp.add_r1cs_constraint(
+                            //    r1cs_constraint<base_field_type>(A.data[0], B.data[0], result.data[0] + v1 * (-Fp2T::value_type::non_residue)));
+
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                                A.data[0] + A.data[1],
+                                B.data[0] + B.data[1],
+                                result.data[1] + result.data[0] + v1 * (base_field_value_type::one() - Fp2T::value_type::one().non_residue)));
+                            // while constepr is not ready
+                            // must be:
+                            //this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                            //    A.data[0] + A.data[1],
+                            //    B.data[0] + B.data[1],
+                            //    result.data[1] + result.data[0] + v1 * (base_field_value_type::one() - Fp2T::value_type::non_residue)));
                         }
 
                         void generate_r1cs_witness() {
-                            const typename field_type::value_type aA = this->bp.lc_val(A.c0) * this->bp.lc_val(B.c0);
-                            this->bp.val(v1) = this->bp.lc_val(A.c1) * this->bp.lc_val(B.c1);
-                            this->bp.lc_val(result.c0) = aA + Fp2T::non_residue * this->bp.val(v1);
-                            this->bp.lc_val(result.c1) = (this->bp.lc_val(A.c0) + this->bp.lc_val(A.c1)) *
-                                                             (this->bp.lc_val(B.c0) + this->bp.lc_val(B.c1)) -
+                            const base_field_value_type aA = this->bp.lc_val(A.data[0]) * this->bp.lc_val(B.data[0]);
+                            this->bp.val(v1) = this->bp.lc_val(A.data[1]) * this->bp.lc_val(B.data[1]);
+                            this->bp.lc_val(result.data[0]) = aA + Fp2T::value_type::one().non_residue * this->bp.val(v1);
+                            // while constepr is not ready
+                            // must be:
+                            //this->bp.lc_val(result.data[0]) = aA + Fp2T::value_type::non_residue * this->bp.val(v1);
+
+                            this->bp.lc_val(result.data[1]) = (this->bp.lc_val(A.data[0]) + this->bp.lc_val(A.data[1])) *
+                                                             (this->bp.lc_val(B.data[0]) + this->bp.lc_val(B.data[1])) -
                                                          aA - this->bp.lc_val(v1);
                         }
                     };
@@ -230,28 +274,28 @@ namespace nil {
                      */
                     template<typename Fp2T>
                     struct Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
-                        using field_type = typename Fp2T::underlying_field_type;
+                        using base_field_type = typename Fp2T::underlying_field_type;
 
                         Fp2_variable<Fp2T> A;
-                        blueprint_linear_combination<field_type> lc;
+                        blueprint_linear_combination<base_field_type> lc;
                         Fp2_variable<Fp2T> result;
 
-                        Fp2_mul_by_lc_component(blueprint<field_type> &bp,
+                        Fp2_mul_by_lc_component(blueprint<base_field_type> &bp,
                                                 const Fp2_variable<Fp2T> &A,
-                                                const blueprint_linear_combination<field_type> &lc,
+                                                const blueprint_linear_combination<base_field_type> &lc,
                                                 const Fp2_variable<Fp2T> &result) :
-                            component<field_type>(bp),
+                            component<base_field_type>(bp),
                             A(A), lc(lc), result(result) {
                         }
 
                         void generate_r1cs_constraints() {
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(A.c0, lc, result.c0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(A.c1, lc, result.c1));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[0], lc, result.data[0]));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[1], lc, result.data[1]));
                         }
 
                         void generate_r1cs_witness() {
-                            this->bp.lc_val(result.c0) = this->bp.lc_val(A.c0) * this->bp.lc_val(lc);
-                            this->bp.lc_val(result.c1) = this->bp.lc_val(A.c1) * this->bp.lc_val(lc);
+                            this->bp.lc_val(result.data[0]) = this->bp.lc_val(A.data[0]) * this->bp.lc_val(lc);
+                            this->bp.lc_val(result.data[1]) = this->bp.lc_val(A.data[1]) * this->bp.lc_val(lc);
                         }
                     };
 
@@ -262,48 +306,62 @@ namespace nil {
                      */
                     template<typename Fp2T>
                     struct Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
-                        using field_type = typename Fp2T::underlying_field_type;
+                        using base_field_type = typename Fp2T::base_field_type;
 
                         Fp2_variable<Fp2T> A;
                         Fp2_variable<Fp2T> result;
 
-                        Fp2_sqr_component(blueprint<field_type> &bp,
+                        using base_field_value_type = typename base_field_type::value_type;
+
+                        Fp2_sqr_component(blueprint<base_field_type> &bp,
                                           const Fp2_variable<Fp2T> &A,
                                           const Fp2_variable<Fp2T> &result) :
-                            component<field_type>(bp),
+                            component<base_field_type>(bp),
                             A(A), result(result) {
                         }
 
                         void generate_r1cs_constraints() {
                             /*
                                 Complex multiplication for Fp2:
-                                    v0 = A.c0 * A.c1
-                                    result.c0 = (A.c0 + A.c1) * (A.c0 + non_residue * A.c1) - (1 + non_residue) * v0
-                                    result.c1 = 2 * v0
+                                    v0 = A.data[0] * A.data[1]
+                                    result.data[0] = (A.data[0] + A.data[1]) * (A.data[0] + non_residue * A.data[1]) - (1 + non_residue) * v0
+                                    result.data[1] = 2 * v0
 
                                 Enforced with 2 constraints:
-                                    (2*A.c0) * A.c1 = result.c1
-                                    (A.c0 + A.c1) * (A.c0 + non_residue * A.c1) = result.c0 + result.c1 * (1 +
+                                    (2*A.data[0]) * A.data[1] = result.data[1]
+                                    (A.data[0] + A.data[1]) * (A.data[0] + non_residue * A.data[1]) = result.data[0] + result.data[1] * (1 +
                                non_residue)/2
 
                                 Reference:
                                     "Multiplication and Squaring on Pairing-Friendly Fields"
                                     Devegili, OhEigeartaigh, Scott, Dahab
                             */
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(2 * A.c0, A.c1, result.c1));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(
-                                A.c0 + A.c1,
-                                A.c0 + Fp2T::non_residue * A.c1,
-                                result.c0 + result.c1 * (field_type::value_type::one() + Fp2T::non_residue) *
-                                                field_type::value_type(0x02).inversed()));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(2 * A.data[0], A.data[1], result.data[1]));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                                A.data[0] + A.data[1],
+                                A.data[0] + Fp2T::value_type::one().non_residue * A.data[1],
+                                result.data[0] + result.data[1] * (base_field_value_type::one() + Fp2T::value_type::one().non_residue) *
+                                                base_field_value_type(0x02).inversed()));
+                            // while constepr is not ready
+                            // must be:
+                            //this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                            //    A.data[0] + A.data[1],
+                            //    A.data[0] + Fp2T::value_type::non_residue * A.data[1],
+                            //    result.data[0] + result.data[1] * (base_field_value_type::one() + Fp2T::value_type::non_residue) *
+                            //                    base_field_value_type(0x02).inversed()));
+
                         }
 
                         void generate_r1cs_witness() {
-                            const typename field_type::value_type a = this->bp.lc_val(A.c0);
-                            const typename field_type::value_type b = this->bp.lc_val(A.c1);
-                            this->bp.lc_val(result.c1) = typename field_type::value_type(0x02) * a * b;
-                            this->bp.lc_val(result.c0) =
-                                (a + b) * (a + Fp2T::non_residue * b) - a * b - Fp2T::non_residue * a * b;
+                            const base_field_value_type a = this->bp.lc_val(A.data[0]);
+                            const base_field_value_type b = this->bp.lc_val(A.data[1]);
+                            this->bp.lc_val(result.data[1]) = base_field_value_type(0x02) * a * b;
+                            this->bp.lc_val(result.data[0]) =
+                                (a + b) * (a + Fp2T::value_type::one().non_residue * b) - a * b - Fp2T::value_type::one().non_residue * a * b;
+                            // while constepr is not ready
+                            // must be:
+                            //this->bp.lc_val(result.data[0]) =
+                            //    (a + b) * (a + Fp2T::value_type::non_residue * b) - a * b - Fp2T::value_type::non_residue * a * b;
                         }
                     };
 

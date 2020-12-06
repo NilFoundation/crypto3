@@ -31,7 +31,7 @@
 #include <memory>
 #include <vector>
 
-#include <nil/crypto3/algebra/scalar_multiplication/wnaf.hpp>
+#include <boost/multiprecision/wnaf.hpp>
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
@@ -82,7 +82,7 @@ namespace nil {
                                                  const Fpk_variableT<FpkT> &result) :
                             component<FieldType>(bp),
                             elt(elt), power(power), result(result) {
-                            NAF = find_wnaf(1, power);
+                            NAF = boost::multiprecision::find_wnaf(1, power);
 
                             intermed_count = 0;
                             add_count = 0;
@@ -110,7 +110,7 @@ namespace nil {
                             }
 
                             intermediate.resize(intermed_count);
-                            intermediate[0].reset(new Fpk_variableT<FpkT>(bp, FpkT::one()));
+                            intermediate[0].reset(new Fpk_variableT<FpkT>(bp, FpkT::value_type::one()));
                             for (std::size_t i = 1; i < intermed_count; ++i) {
                                 intermediate[i].reset(new Fpk_variableT<FpkT>(bp));
                             }
@@ -171,7 +171,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_witness() {
-                            intermediate[0]->generate_r1cs_witness(FpkT::one());
+                            intermediate[0]->generate_r1cs_witness(FpkT::value_type::one());
 
                             bool found_nonzero = false;
                             std::size_t dbl_id = 0, add_id = 0, sub_id = 0, intermed_id = 0;
@@ -191,9 +191,9 @@ namespace nil {
                                         ++intermed_id;
                                         ++add_id;
                                     } else {
-                                        const FpkT cur_val = intermediate[intermed_id]->get_element();
-                                        const FpkT elt_val = elt.get_element();
-                                        const FpkT next_val = cur_val * elt_val.inversed();
+                                        const typename FpkT::value_type cur_val = intermediate[intermed_id]->get_element();
+                                        const typename FpkT::value_type elt_val = elt.get_element();
+                                        const typename FpkT::value_type next_val = cur_val * elt_val.inversed();
 
                                         (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])
                                             .generate_r1cs_witness(next_val);

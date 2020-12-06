@@ -31,7 +31,8 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/exponentiation_component.hpp>
+#include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -39,37 +40,38 @@ using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
 template<typename FpkT, template<class> class Fpk_variableT, template<class> class Fpk_mul_componentT,
-         template<class> class Fpk_sqr_componentT, typename Backend,
-         boost::multiprecision::expression_template_option ExpressionTemplates>
-void test_exponentiation_component(const boost::multiprecision::number<Backend, ExpressionTemplates> &power) {
-    typedef typename FpkT::my_Fp FieldType;
+         template<class> class Fpk_sqr_componentT>
+void test_exponentiation_component(const typename FpkT::modulus_type &power) {
+    typedef typename FpkT::base_field_type FieldType;
 
     blueprint<FieldType> bp;
     Fpk_variableT<FpkT> x(bp);
     Fpk_variableT<FpkT> x_to_power(bp);
-    exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,
-                             boost::multiprecision::number<Backend, ExpressionTemplates>>
+    components::exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,
+                             typename FpkT::modulus_type>
         exp_component(bp, x, power, x_to_power);
     exp_component.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 10; ++i) {
-        const FpkT x_val = algebra::random_element<FpkT>();
+        const typename FpkT::value_type x_val = random_element<FpkT>();
         x.generate_r1cs_witness(x_val);
         exp_component.generate_r1cs_witness();
-        const FpkT res = x_to_power.get_element();
+        const typename FpkT::value_type res = x_to_power.get_element();
         assert(bp.is_satisfied());
-        assert(res == (x_val ^ power));
+        assert(res == (x_val.pow(power)));
     }
-    power.print();
+    std::cout << "Power: " << power << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE(exponentiation_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(exponentiation_component_test_case) {
 
-    test_all_set_commitment_components<curves::bls12<381>>();
-    test_all_set_commitment_components<curves::mnt4<298>>();
-    test_all_set_commitment_components<curves::mnt6<298>>();
+    //test_exponentiation_component<curves::bls12<381>>();
+    test_exponentiation_component<curves::mnt4<298>::pairing_policy::Fqk_type, components::Fp4_variable, 
+        components::Fp4_mul_component, components::Fp4_sqr_component>(
+            curves::mnt4<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
+    //test_exponentiation_component<curves::mnt6<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

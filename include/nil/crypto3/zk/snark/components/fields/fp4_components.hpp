@@ -49,45 +49,55 @@ namespace nil {
                      */
                     template<typename Fp4T>
                     struct Fp4_variable : public component<typename Fp4T::base_field_type> {
-                        typedef typename Fp4T::base_field_type FieldType;
+                        typedef typename Fp4T::base_field_type base_field_type;
                         typedef typename Fp4T::underlying_field_type Fp2T;
 
-                        Fp2_variable<Fp2T> c0;
-                        Fp2_variable<Fp2T> c1;
+                        using underlying_type = Fp2_variable<Fp2T>;
 
-                        Fp4_variable(blueprint<FieldType> &bp) : component<FieldType>(bp), c0(bp), c1(bp) {
-                        }
-                        Fp4_variable(blueprint<FieldType> &bp, const Fp4T &el) :
-                            component<FieldType>(bp), c0(bp, el.c0), c1(bp, el.c1) {
-                        }
-                        Fp4_variable(blueprint<FieldType> &bp, const Fp2_variable<Fp2T> &c0, const Fp2_variable<Fp2T> &c1) :
-                            component<FieldType>(bp), c0(c0), c1(c1) {
+                        using data_type = std::array<underlying_type, 
+                            Fp4T::arity/Fp4T::underlying_field_type::arity>;
+
+                        data_type data;
+
+                        //Fp2_variable<Fp2T> c0;
+                        //Fp2_variable<Fp2T> c1;
+
+                        Fp4_variable(blueprint<base_field_type> &bp) : component<base_field_type>(bp), 
+                            data({underlying_type(bp), underlying_type(bp)}){}
+
+                        Fp4_variable(blueprint<base_field_type> &bp, const typename Fp4T::value_type &el) :
+                            component<base_field_type>(bp),
+                            data({underlying_type(bp, el.data[0]), underlying_type(bp, el.data[1])}){}
+
+                        Fp4_variable(blueprint<base_field_type> &bp, const Fp2_variable<Fp2T> &in_data0, 
+                            const Fp2_variable<Fp2T> &in_data1) :
+                            component<base_field_type>(bp),
+                            data({underlying_type(in_data0), underlying_type(in_data1)}){}
+
+                        void generate_r1cs_equals_const_constraints(const typename Fp4T::value_type &el) {
+                            data[0].generate_r1cs_equals_const_constraints(el.data[0]);
+                            data[1].generate_r1cs_equals_const_constraints(el.data[1]);
                         }
 
-                        void generate_r1cs_equals_const_constraints(const Fp4T &el) {
-                            c0.generate_r1cs_equals_const_constraints(el.c0);
-                            c1.generate_r1cs_equals_const_constraints(el.c1);
+                        void generate_r1cs_witness(const typename Fp4T::value_type &el) {
+                            data[0].generate_r1cs_witness(el.data[0]);
+                            data[1].generate_r1cs_witness(el.data[1]);
                         }
 
-                        void generate_r1cs_witness(const Fp4T &el) {
-                            c0.generate_r1cs_witness(el.c0);
-                            c1.generate_r1cs_witness(el.c1);
-                        }
-
-                        Fp4T get_element() {
-                            Fp4T el;
-                            el.c0 = c0.get_element();
-                            el.c1 = c1.get_element();
+                        typename Fp4T::value_type get_element() {
+                            typename Fp4T::value_type el;
+                            el.data[0] = data[0].get_element();
+                            el.data[1] = data[1].get_element();
                             return el;
                         }
 
                         Fp4_variable<Fp4T> Frobenius_map(const std::size_t power) const {
-                            blueprint_linear_combination<FieldType> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
-                            new_c0c0.assign(this->bp, c0.c0);
-                            new_c0c1.assign(this->bp, c0.c1 * Fp2T::Frobenius_coeffs_c1[power % 2]);
-                            new_c1c0.assign(this->bp, c1.c0 * Fp4T::Frobenius_coeffs_c1[power % 4]);
+                            blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
+                            new_c0c0.assign(this->bp, data[0].data[0]);
+                            new_c0c1.assign(this->bp, data[0].data[1] * Fp2T::Frobenius_coeffs_c1[power % 2]);
+                            new_c1c0.assign(this->bp, data[1].data[0] * Fp4T::Frobenius_coeffs_c1[power % 4]);
                             new_c1c1.assign(this->bp,
-                                            c1.c1 * Fp4T::Frobenius_coeffs_c1[power % 4] *
+                                            data[1].data[1] * Fp4T::Frobenius_coeffs_c1[power % 4] *
                                                 Fp2T::Frobenius_coeffs_c1[power % 2]);
 
                             return Fp4_variable<Fp4T>(this->bp,
@@ -96,8 +106,8 @@ namespace nil {
                         }
 
                         void evaluate() const {
-                            c0.evaluate();
-                            c1.evaluate();
+                            data[0].evaluate();
+                            data[1].evaluate();
                         }
                     };
 
@@ -109,29 +119,29 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_tower_mul_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type FieldType;
+                        typedef typename Fp4T::base_field_type base_field_type;
                         typedef typename Fp4T::underlying_field_type Fp2T;
 
                         Fp4_variable<Fp4T> A;
                         Fp4_variable<Fp4T> B;
                         Fp4_variable<Fp4T> result;
 
-                        blueprint_linear_combination<FieldType> v0_c0;
-                        blueprint_linear_combination<FieldType> v0_c1;
+                        blueprint_linear_combination<base_field_type> v0_c0;
+                        blueprint_linear_combination<base_field_type> v0_c1;
 
-                        blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                        blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                        blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                        blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
 
                         std::shared_ptr<Fp2_variable<Fp2T>> v0;
                         std::shared_ptr<Fp2_variable<Fp2T>> v1;
 
-                        blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c0;
-                        blueprint_linear_combination<FieldType> Bc0_plus_Bc1_c1;
+                        blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
+                        blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> Bc0_plus_Bc1;
 
-                        blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                        blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                        blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                        blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
                         std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
 
@@ -139,24 +149,24 @@ namespace nil {
                         std::shared_ptr<Fp2_mul_component<Fp2T>> compute_v1;
                         std::shared_ptr<Fp2_mul_component<Fp2T>> compute_result_c1;
 
-                        Fp4_tower_mul_component(blueprint<FieldType> &bp,
+                        Fp4_tower_mul_component(blueprint<base_field_type> &bp,
                                                 const Fp4_variable<Fp4T> &A,
                                                 const Fp4_variable<Fp4T> &B,
                                                 const Fp4_variable<Fp4T> &result) :
-                            component<FieldType>(bp),
+                            component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
                               Karatsuba multiplication for Fp4 as a quadratic extension of Fp2:
-                              v0 = A.c0 * B.c0
-                              v1 = A.c1 * B.c1
-                              result.c0 = v0 + non_residue * v1
-                              result.c1 = (A.c0 + A.c1) * (B.c0 + B.c1) - v0 - v1
-                              where "non_residue * elem" := (non_residue * elt.c1, elt.c0)
+                              v0 = A.data[0] * B.data[0]
+                              v1 = A.data[1] * B.data[1]
+                              result.data[0] = v0 + non_residue * v1
+                              result.data[1] = (A.data[0] + A.data[1]) * (B.data[0] + B.data[1]) - v0 - v1
+                              where "non_residue * elem" := (non_residue * elt.data[1], elt.data[0])
 
                               Enforced with 3 Fp2_mul_component's that ensure that:
-                              A.c1 * B.c1 = v1
-                              A.c0 * B.c0 = v0
-                              (A.c0+A.c1)*(B.c0+B.c1) = result.c1 + v0 + v1
+                              A.data[1] * B.data[1] = v1
+                              A.data[0] * B.data[0] = v0
+                              (A.data[0]+A.data[1])*(B.data[0]+B.data[1]) = result.data[1] + v0 + v1
 
                               Reference:
                               "Multiplication and Squaring on Pairing-Friendly Fields"
@@ -164,24 +174,28 @@ namespace nil {
                             */
                             v1.reset(new Fp2_variable<Fp2T>(bp));
 
-                            compute_v1.reset(new Fp2_mul_component<Fp2T>(bp, A.c1, B.c1, *v1));
+                            compute_v1.reset(new Fp2_mul_component<Fp2T>(bp, A.data[1], B.data[1], *v1));
 
-                            v0_c0.assign(bp, result.c0.c0 - Fp4T::non_residue * v1->c1);
-                            v0_c1.assign(bp, result.c0.c1 - v1->c0);
+                            v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::one().non_residue * v1->data[1]);
+                            // while constepr is not ready
+                            // must be:
+                            //v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::non_residue * v1->data[1]);
+
+                            v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                             v0.reset(new Fp2_variable<Fp2T>(bp, v0_c0, v0_c1));
 
-                            compute_v0.reset(new Fp2_mul_component<Fp2T>(bp, A.c0, B.c0, *v0));
+                            compute_v0.reset(new Fp2_mul_component<Fp2T>(bp, A.data[0], B.data[0], *v0));
 
-                            Ac0_plus_Ac1_c0.assign(bp, A.c0.c0 + A.c1.c0);
-                            Ac0_plus_Ac1_c1.assign(bp, A.c0.c1 + A.c1.c1);
+                            Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
+                            Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
                             Ac0_plus_Ac1.reset(new Fp2_variable<Fp2T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
 
-                            Bc0_plus_Bc1_c0.assign(bp, B.c0.c0 + B.c1.c0);
-                            Bc0_plus_Bc1_c1.assign(bp, B.c0.c1 + B.c1.c1);
+                            Bc0_plus_Bc1_c0.assign(bp, B.data[0].data[0] + B.data[1].data[0]);
+                            Bc0_plus_Bc1_c1.assign(bp, B.data[0].data[1] + B.data[1].data[1]);
                             Bc0_plus_Bc1.reset(new Fp2_variable<Fp2T>(bp, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1));
 
-                            result_c1_plus_v0_plus_v1_c0.assign(bp, result.c1.c0 + v0->c0 + v1->c0);
-                            result_c1_plus_v0_plus_v1_c1.assign(bp, result.c1.c1 + v0->c1 + v1->c1);
+                            result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
+                            result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                             result_c1_plus_v0_plus_v1.reset(
                                 new Fp2_variable<Fp2T>(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
@@ -207,9 +221,9 @@ namespace nil {
 
                             compute_result_c1->generate_r1cs_witness();
 
-                            const Fp4T Aval = A.get_element();
-                            const Fp4T Bval = B.get_element();
-                            const Fp4T Rval = Aval * Bval;
+                            const typename Fp4T::value_type Aval = A.get_element();
+                            const typename Fp4T::value_type Bval = B.get_element();
+                            const typename Fp4T::value_type Rval = Aval * Bval;
 
                             result.generate_r1cs_witness(Rval);
                         }
@@ -223,22 +237,24 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_direct_mul_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type FieldType;
+                        typedef typename Fp4T::base_field_type base_field_type;
                         typedef typename Fp4T::underlying_field_type Fp2T;
+
+                        using base_field_value_type = typename base_field_type::value_type;
 
                         Fp4_variable<Fp4T> A;
                         Fp4_variable<Fp4T> B;
                         Fp4_variable<Fp4T> result;
 
-                        variable<FieldType> v1;
-                        variable<FieldType> v2;
-                        variable<FieldType> v6;
+                        blueprint_variable<base_field_type> v1;
+                        blueprint_variable<base_field_type> v2;
+                        blueprint_variable<base_field_type> v6;
 
-                        Fp4_direct_mul_component(blueprint<FieldType> &bp,
+                        Fp4_direct_mul_component(blueprint<base_field_type> &bp,
                                                  const Fp4_variable<Fp4T> &A,
                                                  const Fp4_variable<Fp4T> &B,
                                                  const Fp4_variable<Fp4T> &result) :
-                            component<FieldType>(bp),
+                            component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
                                 Tom-Cook-4x for Fp4 (beta is the quartic non-residue):
@@ -250,14 +266,14 @@ namespace nil {
                                     v5 = (a0+3a1+9a2+27a3)*(b0+3b1+9b2+27b3),
                                     v6 = a3*b3
 
-                                    result.c0 = v0+beta((1/4)v0-(1/6)(v1+v2)+(1/24)(v3+v4)-5v6),
-                                    result.c1 =
+                                    result.data[0] = v0+beta((1/4)v0-(1/6)(v1+v2)+(1/24)(v3+v4)-5v6),
+                                    result.data[1] =
                                -(1/3)v0+v1-(1/2)v2-(1/4)v3+(1/20)v4+(1/30)v5-12v6+beta(-(1/12)(v0-v1)+(1/24)(v2-v3)-(1/120)(v4-v5)-3v6),
                                     result.c2 = -(5/4)v0+(2/3)(v1+v2)-(1/24)(v3+v4)+4v6+beta v6,
                                     result.c3 = (1/12)(5v0-7v1)-(1/24)(v2-7v3+v4+v5)+15v6
 
                                 Enforced with 7 constraints. Doing so requires some care, as we first
-                                compute three of the v_i explicitly, and then "inline" result.c0/c1/c2/c3
+                                compute three of the v_i explicitly, and then "inline" result.data[0]/c1/c2/c3
                                 in computations of the remaining four v_i.
 
                                 Concretely, we first compute v1, v2 and v6 explicitly, via 3 constraints as above.
@@ -275,7 +291,7 @@ namespace nil {
                                (-81 + beta) v2 + 8 (-81 + beta) (-1 + beta) v6
 
                                 The isomorphism between the representation above and towering is:
-                                    (a0, a1, a2, a3) <-> (a.c0.c0, a.c1.c0, a.c0.c1, a.c1.c1)
+                                    (a0, a1, a2, a3) <-> (a.data[0].data[0], a.data[1].data[0], a.data[0].data[1], a.data[1].data[1])
 
                                 Reference:
                                     "Multiplication and Squaring on Pairing-Friendly Fields"
@@ -300,86 +316,90 @@ namespace nil {
                         }
 
                         void generate_r1cs_constraints() {
-                            const typename FieldType::value_type beta = Fp4T::non_residue;
-                            const typename FieldType::value_type u = (FieldType::value_type::zero() - beta).inversed();
+                            const base_field_value_type beta = Fp4T::value_type::one().non_residue;
+                            // while constepr is not ready
+                            // must be:
+                            //const base_field_value_type beta = Fp4T::value_type::non_residue;
 
-                            const blueprint_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1,
-                                                                          &a3 = A.c1.c1, &b0 = B.c0.c0, &b1 = B.c1.c0,
-                                                                          &b2 = B.c0.c1, &b3 = B.c1.c1, &c0 = result.c0.c0,
-                                                                          &c1 = result.c1.c0, &c2 = result.c0.c1,
-                                                                          &c3 = result.c1.c1;
+                            const base_field_value_type u = (base_field_value_type::zero() - beta).inversed();
+
+                            const blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0], &a1 = A.data[1].data[0], &a2 = A.data[0].data[1],
+                                                                          &a3 = A.data[1].data[1], &b0 = B.data[0].data[0], &b1 = B.data[1].data[0],
+                                                                          &b2 = B.data[0].data[1], &b3 = B.data[1].data[1], &c0 = result.data[0].data[0],
+                                                                          &c1 = result.data[1].data[0], &c2 = result.data[0].data[1],
+                                                                          &c3 = result.data[1].data[1];
 
                             this->bp.add_r1cs_constraint(
-                                r1cs_constraint<FieldType>(a0 + a1 + a2 + a3, b0 + b1 + b2 + b3, v1));
+                                r1cs_constraint<base_field_type>(a0 + a1 + a2 + a3, b0 + b1 + b2 + b3, v1));
                             this->bp.add_r1cs_constraint(
-                                r1cs_constraint<FieldType>(a0 - a1 + a2 - a3, b0 - b1 + b2 - b3, v2));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(a3, b3, v6));
+                                r1cs_constraint<base_field_type>(a0 - a1 + a2 - a3, b0 - b1 + b2 - b3, v2));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(a3, b3, v6));
 
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
                                 a0,
                                 b0,
-                                u * c0 + beta * u * c2 - beta * u * typename FieldType::value_type(0x02).inversed() * v1 -
-                                    beta * u * typename FieldType::value_type(0x02).inversed() * v2 + beta * v6));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                a0 + typename FieldType::value_type(0x02) * a1 + typename FieldType::value_type(0x04) * a2 +
-                                    typename FieldType::value_type(0x08) * a3,
-                                b0 + typename FieldType::value_type(0x02) * b1 + typename FieldType::value_type(0x04) * b2 +
-                                    typename FieldType::value_type(0x08) * b3,
-                                -typename FieldType::value_type(15) * u * c0 - typename FieldType::value_type(30) * u * c1 -
-                                    typename FieldType::value_type(0x03) * (typename FieldType::value_type(0x04) + beta) *
+                                u * c0 + beta * u * c2 - beta * u * base_field_value_type(0x02).inversed() * v1 -
+                                    beta * u * base_field_value_type(0x02).inversed() * v2 + beta * v6));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                                a0 + base_field_value_type(0x02) * a1 + base_field_value_type(0x04) * a2 +
+                                    base_field_value_type(0x08) * a3,
+                                b0 + base_field_value_type(0x02) * b1 + base_field_value_type(0x04) * b2 +
+                                    base_field_value_type(0x08) * b3,
+                                -base_field_value_type(15) * u * c0 - base_field_value_type(30) * u * c1 -
+                                    base_field_value_type(0x03) * (base_field_value_type(0x04) + beta) *
                                         u * c2 -
-                                    typename FieldType::value_type(6) * (typename FieldType::value_type(0x04) + beta) * u *
+                                    base_field_value_type(6) * (base_field_value_type(0x04) + beta) * u *
                                         c3 +
-                                    (typename FieldType::value_type(24) -
-                                     typename FieldType::value_type(0x03) * beta *
-                                         typename FieldType::value_type(0x02).inversed()) *
+                                    (base_field_value_type(24) -
+                                     base_field_value_type(0x03) * beta *
+                                         base_field_value_type(0x02).inversed()) *
                                         u * v1 +
-                                    (-typename FieldType::value_type(0x08) +
-                                     beta * typename FieldType::value_type(0x02).inversed()) *
+                                    (-base_field_value_type(0x08) +
+                                     beta * base_field_value_type(0x02).inversed()) *
                                         u * v2 -
-                                    typename FieldType::value_type(0x03) * (-typename FieldType::value_type(16) + beta) *
+                                    base_field_value_type(0x03) * (-base_field_value_type(16) + beta) *
                                         v6));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                a0 - typename FieldType::value_type(0x02) * a1 + typename FieldType::value_type(0x04) * a2 -
-                                    typename FieldType::value_type(0x08) * a3,
-                                b0 - typename FieldType::value_type(0x02) * b1 + typename FieldType::value_type(0x04) * b2 -
-                                    typename FieldType::value_type(0x08) * b3,
-                                -typename FieldType::value_type(15) * u * c0 + typename FieldType::value_type(30) * u * c1 -
-                                    typename FieldType::value_type(0x03) * (typename FieldType::value_type(0x04) + beta) *
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                                a0 - base_field_value_type(0x02) * a1 + base_field_value_type(0x04) * a2 -
+                                    base_field_value_type(0x08) * a3,
+                                b0 - base_field_value_type(0x02) * b1 + base_field_value_type(0x04) * b2 -
+                                    base_field_value_type(0x08) * b3,
+                                -base_field_value_type(15) * u * c0 + base_field_value_type(30) * u * c1 -
+                                    base_field_value_type(0x03) * (base_field_value_type(0x04) + beta) *
                                         u * c2 +
-                                    typename FieldType::value_type(6) * (typename FieldType::value_type(0x04) + beta) * u *
+                                    base_field_value_type(6) * (base_field_value_type(0x04) + beta) * u *
                                         c3 +
-                                    (typename FieldType::value_type(24) -
-                                     typename FieldType::value_type(0x03) * beta *
-                                         typename FieldType::value_type(0x02).inversed()) *
+                                    (base_field_value_type(24) -
+                                     base_field_value_type(0x03) * beta *
+                                         base_field_value_type(0x02).inversed()) *
                                         u * v2 +
-                                    (-typename FieldType::value_type(0x08) +
-                                     beta * typename FieldType::value_type(0x02).inversed()) *
+                                    (-base_field_value_type(0x08) +
+                                     beta * base_field_value_type(0x02).inversed()) *
                                         u * v1 -
-                                    typename FieldType::value_type(0x03) * (-typename FieldType::value_type(16) + beta) *
+                                    base_field_value_type(0x03) * (-base_field_value_type(16) + beta) *
                                         v6));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                a0 + typename FieldType::value_type(0x03) * a1 + typename FieldType::value_type(0x09) * a2 +
-                                    typename FieldType::value_type(27) * a3,
-                                b0 + typename FieldType::value_type(0x03) * b1 + typename FieldType::value_type(0x09) * b2 +
-                                    typename FieldType::value_type(27) * b3,
-                                -typename FieldType::value_type(80) * u * c0 -
-                                    typename FieldType::value_type(240) * u * c1 -
-                                    typename FieldType::value_type(0x08) * (typename FieldType::value_type(0x09) + beta) *
+                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
+                                a0 + base_field_value_type(0x03) * a1 + base_field_value_type(0x09) * a2 +
+                                    base_field_value_type(27) * a3,
+                                b0 + base_field_value_type(0x03) * b1 + base_field_value_type(0x09) * b2 +
+                                    base_field_value_type(27) * b3,
+                                -base_field_value_type(80) * u * c0 -
+                                    base_field_value_type(240) * u * c1 -
+                                    base_field_value_type(0x08) * (base_field_value_type(0x09) + beta) *
                                         u * c2 -
-                                    typename FieldType::value_type(24) * (typename FieldType::value_type(0x09) + beta) * u *
+                                    base_field_value_type(24) * (base_field_value_type(0x09) + beta) * u *
                                         c3 -
-                                    typename FieldType::value_type(0x02) * (-typename FieldType::value_type(81) + beta) *
+                                    base_field_value_type(0x02) * (-base_field_value_type(81) + beta) *
                                         u * v1 +
-                                    (-typename FieldType::value_type(81) + beta) * u * v2 -
-                                    typename FieldType::value_type(0x08) * (-typename FieldType::value_type(81) + beta) *
+                                    (-base_field_value_type(81) + beta) * u * v2 -
+                                    base_field_value_type(0x08) * (-base_field_value_type(81) + beta) *
                                         v6));
                         }
 
                         void generate_r1cs_witness() {
-                            const blueprint_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1,
-                                                                          &a3 = A.c1.c1, &b0 = B.c0.c0, &b1 = B.c1.c0,
-                                                                          &b2 = B.c0.c1, &b3 = B.c1.c1;
+                            const blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0], &a1 = A.data[1].data[0], &a2 = A.data[0].data[1],
+                                                                          &a3 = A.data[1].data[1], &b0 = B.data[0].data[0], &b1 = B.data[1].data[0],
+                                                                          &b2 = B.data[0].data[1], &b3 = B.data[1].data[1];
 
                             this->bp.val(v1) =
                                 ((this->bp.lc_val(a0) + this->bp.lc_val(a1) + this->bp.lc_val(a2) + this->bp.lc_val(a3)) *
@@ -389,9 +409,9 @@ namespace nil {
                                  (this->bp.lc_val(b0) - this->bp.lc_val(b1) + this->bp.lc_val(b2) - this->bp.lc_val(b3)));
                             this->bp.val(v6) = this->bp.lc_val(a3) * this->bp.lc_val(b3);
 
-                            const Fp4T Aval = A.get_element();
-                            const Fp4T Bval = B.get_element();
-                            const Fp4T Rval = Aval * Bval;
+                            const typename Fp4T::value_type Aval = A.get_element();
+                            const typename Fp4T::value_type Bval = B.get_element();
+                            const typename Fp4T::value_type Rval = Aval * Bval;
 
                             result.generate_r1cs_witness(Rval);
                         }
@@ -411,7 +431,7 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_sqr_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type FieldType;
+                        typedef typename Fp4T::base_field_type base_field_type;
                         typedef typename Fp4T::underlying_field_type Fp2T;
 
                         Fp4_variable<Fp4T> A;
@@ -419,41 +439,41 @@ namespace nil {
 
                         std::shared_ptr<Fp2_variable<Fp2T>> v1;
 
-                        blueprint_linear_combination<FieldType> v0_c0;
-                        blueprint_linear_combination<FieldType> v0_c1;
+                        blueprint_linear_combination<base_field_type> v0_c0;
+                        blueprint_linear_combination<base_field_type> v0_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> v0;
 
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v0;
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v1;
 
-                        blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c0;
-                        blueprint_linear_combination<FieldType> Ac0_plus_Ac1_c1;
+                        blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                        blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
 
-                        blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c0;
-                        blueprint_linear_combination<FieldType> result_c1_plus_v0_plus_v1_c1;
+                        blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                        blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
                         std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
 
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_result_c1;
 
-                        Fp4_sqr_component(blueprint<FieldType> &bp,
+                        Fp4_sqr_component(blueprint<base_field_type> &bp,
                                           const Fp4_variable<Fp4T> &A,
                                           const Fp4_variable<Fp4T> &result) :
-                            component<FieldType>(bp),
+                            component<base_field_type>(bp),
                             A(A), result(result) {
                             /*
                               Karatsuba squaring for Fp4 as a quadratic extension of Fp2:
-                              v0 = A.c0^2
-                              v1 = A.c1^2
-                              result.c0 = v0 + non_residue * v1
-                              result.c1 = (A.c0 + A.c1)^2 - v0 - v1
-                              where "non_residue * elem" := (non_residue * elt.c1, elt.c0)
+                              v0 = A.data[0]^2
+                              v1 = A.data[1]^2
+                              result.data[0] = v0 + non_residue * v1
+                              result.data[1] = (A.data[0] + A.data[1])^2 - v0 - v1
+                              where "non_residue * elem" := (non_residue * elt.data[1], elt.data[0])
 
                               Enforced with 3 Fp2_sqr_component's that ensure that:
-                              A.c1^2 = v1
-                              A.c0^2 = v0
-                              (A.c0+A.c1)^2 = result.c1 + v0 + v1
+                              A.data[1]^2 = v1
+                              A.data[0]^2 = v0
+                              (A.data[0]+A.data[1])^2 = result.data[1] + v0 + v1
 
                               Reference:
                               "Multiplication and Squaring on Pairing-Friendly Fields"
@@ -461,20 +481,24 @@ namespace nil {
                             */
 
                             v1.reset(new Fp2_variable<Fp2T>(bp));
-                            compute_v1.reset(new Fp2_sqr_component<Fp2T>(bp, A.c1, *v1));
+                            compute_v1.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[1], *v1));
 
-                            v0_c0.assign(bp, result.c0.c0 - Fp4T::non_residue * v1->c1);
-                            v0_c1.assign(bp, result.c0.c1 - v1->c0);
+                            v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::one().non_residue * v1->data[1]);
+                            // while constepr is not ready
+                            // must be:
+                            //v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::non_residue * v1->data[1]);
+
+                            v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                             v0.reset(new Fp2_variable<Fp2T>(bp, v0_c0, v0_c1));
 
-                            compute_v0.reset(new Fp2_sqr_component<Fp2T>(bp, A.c0, *v0));
+                            compute_v0.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[0], *v0));
 
-                            Ac0_plus_Ac1_c0.assign(bp, A.c0.c0 + A.c1.c0);
-                            Ac0_plus_Ac1_c1.assign(bp, A.c0.c1 + A.c1.c1);
+                            Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
+                            Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
                             Ac0_plus_Ac1.reset(new Fp2_variable<Fp2T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
 
-                            result_c1_plus_v0_plus_v1_c0.assign(bp, result.c1.c0 + v0->c0 + v1->c0);
-                            result_c1_plus_v0_plus_v1_c1.assign(bp, result.c1.c1 + v0->c1 + v1->c1);
+                            result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
+                            result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                             result_c1_plus_v0_plus_v1.reset(
                                 new Fp2_variable<Fp2T>(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
@@ -499,8 +523,8 @@ namespace nil {
                             Ac0_plus_Ac1_c1.evaluate(this->bp);
                             compute_result_c1->generate_r1cs_witness();
 
-                            const Fp4T Aval = A.get_element();
-                            const Fp4T Rval = Aval.squared();
+                            const typename Fp4T::value_type Aval = A.get_element();
+                            const typename Fp4T::value_type Rval = Aval.squared();
                             result.generate_r1cs_witness(Rval);
                         }
                     };
@@ -515,36 +539,38 @@ namespace nil {
                     public:
                         /*
                          */
-                        typedef typename Fp4T::base_field_type FieldType;
+                        typedef typename Fp4T::base_field_type base_field_type;
                         typedef typename Fp4T::underlying_field_type Fp2T;
+
+                        using base_field_value_type = typename base_field_type::value_type;
 
                         Fp4_variable<Fp4T> A;
                         Fp4_variable<Fp4T> result;
 
-                        blueprint_linear_combination<FieldType> c0_expr_c0;
-                        blueprint_linear_combination<FieldType> c0_expr_c1;
+                        blueprint_linear_combination<base_field_type> c0_expr_c0;
+                        blueprint_linear_combination<base_field_type> c0_expr_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> c0_expr;
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c0_expr;
 
-                        blueprint_linear_combination<FieldType> A_c0_plus_A_c1_c0;
-                        blueprint_linear_combination<FieldType> A_c0_plus_A_c1_c1;
+                        blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c0;
+                        blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> A_c0_plus_A_c1;
 
-                        blueprint_linear_combination<FieldType> c1_expr_c0;
-                        blueprint_linear_combination<FieldType> c1_expr_c1;
+                        blueprint_linear_combination<base_field_type> c1_expr_c0;
+                        blueprint_linear_combination<base_field_type> c1_expr_c1;
                         std::shared_ptr<Fp2_variable<Fp2T>> c1_expr;
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c1_expr;
 
-                        Fp4_cyclotomic_sqr_component(blueprint<FieldType> &bp,
+                        Fp4_cyclotomic_sqr_component(blueprint<base_field_type> &bp,
                                                      const Fp4_variable<Fp4T> &A,
                                                      const Fp4_variable<Fp4T> &result) :
-                            component<FieldType>(bp),
+                            component<base_field_type>(bp),
                             A(A), result(result) {
                             /*
-                              A = elt.c1 ^ 2
-                              B = elt.c1 + elt.c0;
+                              A = elt.data[1] ^ 2
+                              B = elt.data[1] + elt.data[0];
                               C = B ^ 2 - A
-                              D = Fp2(A.c1 * non_residue, A.c0)
+                              D = Fp2(A.data[1] * non_residue, A.data[0])
                               E = C - D
                               F = D + D + Fp2::one()
                               G = E - Fp2::one()
@@ -553,33 +579,47 @@ namespace nil {
 
                               Enforced with 2 Fp2_sqr_component's that ensure that:
 
-                              elt.c1 ^ 2 = Fp2(result.c0.c1 / 2, (result.c0.c0 - 1) / (2 * non_residue)) = A
-                              (elt.c1 + elt.c0) ^ 2 = A + result.c1 + Fp2(A.c1 * non_residue + 1, A.c0)
+                              elt.data[1] ^ 2 = Fp2(result.data[0].data[1] / 2, (result.data[0].data[0] - 1) / (2 * non_residue)) = A
+                              (elt.data[1] + elt.data[0]) ^ 2 = A + result.data[1] + Fp2(A.data[1] * non_residue + 1, A.data[0])
 
-                              (elt.c1 + elt.c0) ^ 2 = Fp2(result.c0.c1 / 2 + result.c1.c0 + (result.c0.c0 - 1) / 2 + 1,
-                                                          (result.c0.c0 - 1) / (2 * non_residue) + result.c1.c1 +
-                              result.c0.c1 / 2)
+                              (elt.data[1] + elt.data[0]) ^ 2 = Fp2(result.data[0].data[1] / 2 + result.data[1].data[0] + (result.data[0].data[0] - 1) / 2 + 1,
+                                                          (result.data[0].data[0] - 1) / (2 * non_residue) + result.data[1].data[1] +
+                              result.data[0].data[1] / 2)
                             */
-                            c0_expr_c0.assign(bp, result.c0.c1 * typename FieldType::value_type(0x02).inversed());
+                            c0_expr_c0.assign(bp, result.data[0].data[1] * base_field_value_type(0x02).inversed());
                             c0_expr_c1.assign(bp,
-                                              (result.c0.c0 - typename FieldType::value_type(0x01)) *
-                                                  (typename FieldType::value_type(0x02) * Fp4T::non_residue).inversed());
-                            c0_expr.reset(new Fp2_variable<Fp2T>(bp, c0_expr_c0, c0_expr_c1));
-                            compute_c0_expr.reset(new Fp2_sqr_component<Fp2T>(bp, A.c1, *c0_expr));
+                                              (result.data[0].data[0] - base_field_value_type(0x01)) *
+                                                  (base_field_value_type(0x02) * Fp4T::value_type::one().non_residue).inversed());
+                            // while constepr is not ready
+                            // must be:
+                            //c0_expr_c1.assign(bp,
+                            //                  (result.data[0].data[0] - base_field_value_type(0x01)) *
+                            //                      (base_field_value_type(0x02) * Fp4T::value_type::non_residue).inversed());
 
-                            A_c0_plus_A_c1_c0.assign(bp, A.c0.c0 + A.c1.c0);
-                            A_c0_plus_A_c1_c1.assign(bp, A.c0.c1 + A.c1.c1);
+                            c0_expr.reset(new Fp2_variable<Fp2T>(bp, c0_expr_c0, c0_expr_c1));
+                            compute_c0_expr.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[1], *c0_expr));
+
+                            A_c0_plus_A_c1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
+                            A_c0_plus_A_c1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
                             A_c0_plus_A_c1.reset(new Fp2_variable<Fp2T>(bp, A_c0_plus_A_c1_c0, A_c0_plus_A_c1_c1));
 
                             c1_expr_c0.assign(bp,
-                                              (result.c0.c1 + result.c0.c0 - typename FieldType::value_type(0x01)) *
-                                                      typename FieldType::value_type(0x02).inversed() +
-                                                  result.c1.c0 + typename FieldType::value_type(0x01));
+                                              (result.data[0].data[1] + result.data[0].data[0] - base_field_value_type(0x01)) *
+                                                      base_field_value_type(0x02).inversed() +
+                                                  result.data[1].data[0] + base_field_value_type(0x01));
                             c1_expr_c1.assign(
                                 bp,
-                                (result.c0.c0 - typename FieldType::value_type(0x01)) *
-                                        (typename FieldType::value_type(0x02) * Fp4T::non_residue).inversed() +
-                                    result.c1.c1 + result.c0.c1 * typename FieldType::value_type(0x02).inversed());
+                                (result.data[0].data[0] - base_field_value_type(0x01)) *
+                                        (base_field_value_type(0x02) * Fp4T::value_type::one().non_residue).inversed() +
+                                    result.data[1].data[1] + result.data[0].data[1] * base_field_value_type(0x02).inversed());
+                            // while constepr is not ready
+                            // must be:
+                            //c1_expr_c1.assign(
+                            //    bp,
+                            //    (result.data[0].data[0] - base_field_value_type(0x01)) *
+                            //            (base_field_value_type(0x02) * Fp4T::value_type::non_residue).inversed() +
+                            //        result.data[1].data[1] + result.data[0].data[1] * base_field_value_type(0x02).inversed());
+
                             c1_expr.reset(new Fp2_variable<Fp2T>(bp, c1_expr_c0, c1_expr_c1));
 
                             compute_c1_expr.reset(new Fp2_sqr_component<Fp2T>(bp, *A_c0_plus_A_c1, *c1_expr));
@@ -597,8 +637,8 @@ namespace nil {
                             A_c0_plus_A_c1_c1.evaluate(this->bp);
                             compute_c1_expr->generate_r1cs_witness();
 
-                            const Fp4T Aval = A.get_element();
-                            const Fp4T Rval = Aval.squared();
+                            const typename Fp4T::value_type Aval = A.get_element();
+                            const typename Fp4T::value_type Rval = Aval.squared();
                             result.generate_r1cs_witness(Rval);
                         }
                     };
