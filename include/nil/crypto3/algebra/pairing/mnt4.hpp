@@ -52,8 +52,18 @@ namespace nil {
 
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const typename policy_type::number_type pairing_loop_count =
+                    constexpr static const number_type pairing_loop_count =
                         policy_type::ate_loop_count;
+
+                    constexpr static const bool ate_is_loop_count_neg = 
+                        policy_type::ate_is_loop_count_neg;
+
+                    constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
+                        policy_type::final_exponent_last_chunk_abs_of_w0;
+                    constexpr static const bool final_exponent_last_chunk_is_w0_neg = 
+                        policy_type::final_exponent_last_chunk_is_w0_neg;
+                    constexpr static const number_type final_exponent_last_chunk_w1 = 
+                        policy_type::final_exponent_last_chunk_w1;
 
                     typedef typename policy_type::Fp_field Fp_type;
                     using G1_type = typename policy_type::g1;
@@ -120,6 +130,23 @@ namespace nil {
                 template<std::size_t ModulusBits, typename PairingFunctions>
                 constexpr typename pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::number_type const
                     pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::pairing_loop_count;
+
+                template<std::size_t ModulusBits, typename PairingFunctions>
+                constexpr bool const
+                    pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::ate_is_loop_count_neg;
+
+                template<std::size_t ModulusBits, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::number_type const
+                    pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_abs_of_w0;
+
+                template<std::size_t ModulusBits, typename PairingFunctions>
+                constexpr bool const
+                    pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_is_w0_neg;
+
+                template<std::size_t ModulusBits, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::number_type const
+                    pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_w1;
+
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3
