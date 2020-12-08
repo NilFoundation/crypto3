@@ -33,6 +33,7 @@
 
 #include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp6_2over3_components.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -71,7 +72,9 @@ BOOST_AUTO_TEST_CASE(exponentiation_component_test_case) {
     test_exponentiation_component<curves::mnt4<298>::pairing_policy::Fqk_type, components::Fp4_variable, 
         components::Fp4_mul_component, components::Fp4_sqr_component>(
             curves::mnt4<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
-    //test_exponentiation_component<curves::mnt6<298>>();
+    test_exponentiation_component<curves::mnt6<298>::pairing_policy::Fqk_type, components::Fp6_2over3_variable, 
+        components::Fp6_2over3_mul_component, components::Fp6_2over3_sqr_component>(
+            curves::mnt6<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

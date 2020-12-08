@@ -35,7 +35,7 @@
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
-#include <nil/crypto3/zk/snark/components/fields/fp6_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp6_2over3_components.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
 namespace nil {
@@ -75,10 +75,10 @@ namespace nil {
                         typedef Fp3_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
                         typedef Fp3_sqr_component<fqe_type> Fqe_sqr_component_type;
 
-                        typedef Fp6_variable<fqk_type> Fqk_variable_type;
-                        typedef Fp6_mul_component<fqk_type> Fqk_mul_component_type;
-                        typedef Fp6_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
-                        typedef Fp6_sqr_component<fqk_type> Fqk_sqr_component_type;
+                        typedef Fp6_2over3_variable<fqk_type> Fqk_variable_type;
+                        typedef Fp6_2over3_mul_component<fqk_type> Fqk_mul_component_type;
+                        typedef Fp6_2over3_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
+                        typedef Fp6_2over3_sqr_component<fqk_type> Fqk_sqr_component_type;
 
                         typedef mnt_e_over_e_miller_loop_component<curve_type> e_over_e_miller_loop_component_type;
                         typedef mnt_e_times_e_over_e_miller_loop_component<curve_type>

@@ -73,14 +73,14 @@ namespace nil {
                         std::shared_ptr<Fqk_mul_component<CurveType>> compute_inv_beta;
 
                         std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
-                                        Fp6_variable,
-                                        Fp6_mul_component,
-                                        Fp6_cyclotomic_sqr_component,
+                                        Fp6_2over3_variable,
+                                        Fp6_2over3_mul_component,
+                                        Fp6_2over3_cyclotomic_sqr_component,
                                         algebra::mnt6_q_limbs> > compute_w1;
                         std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
-                                        Fp6_variable,
-                                        Fp6_mul_component,
-                                        Fp6_cyclotomic_sqr_component,
+                                        Fp6_2over3_variable,
+                                        Fp6_2over3_mul_component,
+                                        Fp6_2over3_cyclotomic_sqr_component,
                                         algebra::mnt6_q_limbs> > compute_w0;
                         std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
 
@@ -118,16 +118,16 @@ namespace nil {
                                 new Fqk_mul_component<CurveType>(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
                             compute_w1.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
-                                             Fp6_variable,
-                                             Fp6_mul_component,
-                                             Fp6_cyclotomic_sqr_component,
+                                             Fp6_2over3_variable,
+                                             Fp6_2over3_mul_component,
+                                             Fp6_2over3_cyclotomic_sqr_component,
                                              algebra::mnt6_q_limbs >
                                                  (bp, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
                             compute_w0.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
-                                             Fp6_variable,
-                                             Fp6_mul_component,
-                                             Fp6_cyclotomic_sqr_component,
+                                             Fp6_2over3_variable,
+                                             Fp6_2over3_mul_component,
+                                             Fp6_2over3_cyclotomic_sqr_component,
                                              algebra::mnt6_q_limbs >
                                                  (bp,
                                                   (algebra::mnt6_final_exponent_last_chunk_is_w0_neg ? *inv_beta : *beta),

@@ -59,9 +59,6 @@ namespace nil {
 
                         data_type data;
 
-                        //blueprint_linear_combination<base_field_type> c0;
-                        //blueprint_linear_combination<base_field_type> c1;
-
                         blueprint_linear_combination_vector<base_field_type> all_vars;
 
                         Fp2_variable(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {

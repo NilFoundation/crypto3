@@ -59,9 +59,6 @@ namespace nil {
 
                         data_type data;
 
-                        //Fp2_variable<Fp2T> c0;
-                        //Fp2_variable<Fp2T> c1;
-
                         Fp4_variable(blueprint<base_field_type> &bp) : component<base_field_type>(bp), 
                             data({underlying_type(bp), underlying_type(bp)}){}
 
