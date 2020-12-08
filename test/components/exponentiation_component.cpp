@@ -27,7 +27,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
@@ -68,7 +67,6 @@ BOOST_AUTO_TEST_SUITE(exponentiation_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(exponentiation_component_test_case) {
 
-    //test_exponentiation_component<curves::bls12<381>>();
     test_exponentiation_component<curves::mnt4<298>::pairing_policy::Fqk_type, components::Fp4_variable, 
         components::Fp4_mul_component, components::Fp4_sqr_component>(
             curves::mnt4<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);

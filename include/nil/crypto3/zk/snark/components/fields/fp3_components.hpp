@@ -220,8 +220,8 @@ namespace nil {
                         Fp3_variable<Fp3T> B;
                         Fp3_variable<Fp3T> result;
 
-                        variable<base_field_type> v0;
-                        variable<base_field_type> v4;
+                        blueprint_variable<base_field_type> v0;
+                        blueprint_variable<base_field_type> v4;
 
                         Fp3_mul_component(blueprint<base_field_type> &bp,
                                           const Fp3_variable<Fp3T> &A,
