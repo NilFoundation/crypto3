@@ -172,8 +172,10 @@ void test_loose_multiplexing_component(size_t n) {
     }
 
     for (int idx = -1; idx <= (int)(1ul << n); ++idx) {
+
         bp.val(index) = typename FieldType::value_type(idx);
         g.generate_r1cs_witness();
+
 
         if (0 <= idx && idx <= (int)(1ul << n) - 1) {
             BOOST_CHECK(bp.val(result) == typename FieldType::value_type((19 * idx) % (1ul << n)));
@@ -194,51 +196,51 @@ BOOST_AUTO_TEST_SUITE(basic_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(basic_components_disjunction_test) {
     std::cout << "Disjunction component test started" << std::endl;
-    std::cout << "Started for bls12<381>:" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
     test_disjunction_component<fields::bls12<381>>(10);
-    std::cout << "Started for mnt4<298>:" << std::endl;
+    std::cout << "Started for mnt4<298>" << std::endl;
     test_disjunction_component<fields::mnt4<298>>(10);
-    std::cout << "Started for mnt6<298>:" << std::endl;
+    std::cout << "Started for mnt6<298>" << std::endl;
     test_disjunction_component<fields::mnt6<298>>(10);
 }
 
 BOOST_AUTO_TEST_CASE(basic_components_conjunction_test) {
     std::cout << "Conjunction component test started" << std::endl;
-    std::cout << "Started for bls12<381>:" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
     test_conjunction_component<fields::bls12<381>>(10);
-    std::cout << "Started for mnt4<298>:" << std::endl;
+    std::cout << "Started for mnt4<298>" << std::endl;
     test_conjunction_component<fields::mnt4<298>>(10);
-    std::cout << "Started for mnt6<298>:" << std::endl;
+    std::cout << "Started for mnt6<298>" << std::endl;
     test_conjunction_component<fields::mnt6<298>>(10);
 }
 
 BOOST_AUTO_TEST_CASE(basic_components_comparison_test) {
     std::cout << "Comparison component test started" << std::endl;
-    std::cout << "Started for bls12<381>:" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
     test_comparison_component<fields::bls12<381>>(5);
-    std::cout << "Started for mnt4<298>:" << std::endl;
+    std::cout << "Started for mnt4<298>" << std::endl;
     test_comparison_component<fields::mnt4<298>>(5);
-    std::cout << "Started for mnt6<298>:" << std::endl;
+    std::cout << "Started for mnt6<298>" << std::endl;
     test_comparison_component<fields::mnt6<298>>(5);
 }
 
 BOOST_AUTO_TEST_CASE(basic_components_inner_product_test) {
     std::cout << "Inner product component test started" << std::endl;
-    std::cout << "Started for bls12<381>:" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
     test_inner_product_component<fields::bls12<381>>(5);
-    std::cout << "Started for mnt4<298>:" << std::endl;
+    std::cout << "Started for mnt4<298>" << std::endl;
     test_inner_product_component<fields::mnt4<298>>(5);
-    std::cout << "Started for mnt6<298>:" << std::endl;
+    std::cout << "Started for mnt6<298>" << std::endl;
     test_inner_product_component<fields::mnt6<298>>(5);
 }
 
 BOOST_AUTO_TEST_CASE(basic_components_loose_multiplexing_test) {
     std::cout << "Loose multiplexing component test started" << std::endl;
-    std::cout << "Started for bls12<381>:" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
     test_loose_multiplexing_component<fields::bls12<381>>(5);
-    std::cout << "Started for mnt4<298>:" << std::endl;
+    std::cout << "Started for mnt4<298>" << std::endl;
     test_loose_multiplexing_component<fields::mnt4<298>>(5);
-    std::cout << "Started for mnt6<298>:" << std::endl;
+    std::cout << "Started for mnt6<298>" << std::endl;
     test_loose_multiplexing_component<fields::mnt6<298>>(5);
 }
 

@@ -232,8 +232,7 @@ namespace nil {
                             */
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[1], B.data[1], v1));
                             this->bp.add_r1cs_constraint(
-                                r1cs_constraint<base_field_type>(A.data[0], B.data[0], result.data[0] + 
-                                    v1 * (-Fp2T::value_type::one().non_residue)));
+                                r1cs_constraint<base_field_type>(A.data[0], B.data[0], result.data[0] + v1 * (-Fp2T::value_type::one().non_residue)));
                             // while constepr is not ready
                             // must be:
                             //this->bp.add_r1cs_constraint(

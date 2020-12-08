@@ -552,15 +552,15 @@ namespace nil {
                         }
                     };
 
+                    /*
+                      loose_multiplexing_component implements loose multiplexer:
+                      index not in bounds -> success_flag = 0
+                      index in bounds && success_flag = 1 -> result is correct
+                      however if index is in bounds we can also set success_flag to 0 (and then result will be forced to
+                      be 0)
+                    */
                     template<typename FieldType>
                     class loose_multiplexing_component : public component<FieldType> {
-                        /*
-                          this implements loose multiplexer:
-                          index not in bounds -> success_flag = 0
-                          index in bounds && success_flag = 1 -> result is correct
-                          however if index is in bounds we can also set success_flag to 0 (and then result will be forced to
-                          be 0)
-                        */
                     public:
                         blueprint_variable_vector<FieldType> alpha;
 
@@ -616,14 +616,14 @@ namespace nil {
 
                             /* assumes that idx can be fit in ulong; true for our purposes for now */
                             const typename FieldType::value_type valint = this->bp.val(index);
+                            
                             unsigned long idx = static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
-                            const typename FieldType::number_type arrsize(arr.size());
 
-                            if (idx >= arr.size() || valint.data >= arrsize) {
+                            if (idx >= arr.size() || non_fixed_precision_modulus_type(valint.data) >= arr.size()) {
                                 for (std::size_t i = 0; i < arr.size(); ++i) {
                                     this->bp.val(alpha[i]) = FieldType::value_type::zero();
                                 }
-
+                                
                                 this->bp.val(success_flag) = FieldType::value_type::zero();
                             } else {
                                 for (std::size_t i = 0; i < arr.size(); ++i) {
