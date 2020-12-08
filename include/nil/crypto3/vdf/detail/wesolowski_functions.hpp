@@ -31,12 +31,10 @@ namespace nil {
     namespace crypto3 {
         namespace vdf {
             namespace detail {
-                struct wesolowski_functions : public wesolowski_policy {
+                struct wesolowski_functions : public wesolowski_policy { };
+            }    // namespace detail
+        }        // namespace vdf
+    }            // namespace crypto3
+}    // namespace nil
 
-                };
-            }
-        }
-    }
-}
-
-#endif //CRYPTO3_WESOLOWSKI_POLICY_HPP
+#endif    // CRYPTO3_WESOLOWSKI_POLICY_HPP

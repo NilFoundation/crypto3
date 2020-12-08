@@ -34,10 +34,9 @@ namespace nil {
                 typedef detail::wesolowski_functions policy_type;
 
             public:
-
             };
-        }
-    }
-}
+        }    // namespace vdf
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

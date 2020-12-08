@@ -64,8 +64,8 @@ namespace nil {
                 }
 
                 template<typename NumberType = mpz_t>
-                static inline state_type<NumberType>
-                    make_state(const NumberType &a, const NumberType &b, const NumberType &discriminant) {
+                static inline state_type<NumberType> make_state(const NumberType &a, const NumberType &b,
+                                                                const NumberType &discriminant) {
                     state_type<NumberType> state;
                     make_state(state, discriminant, a, b);
                     return state;

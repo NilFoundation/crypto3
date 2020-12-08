@@ -72,10 +72,9 @@ namespace nil {
                 static void step(InputValue const &x, OutIter &out) {
                     int const kb = (k % UnitBits);
                     int const ku = k - kb;
-                    int const shift =
-                        OutputBits >= UnitBits ?
-                            k :
-                            InputBits >= UnitBits ? ku + (UnitBits - (OutputBits + kb)) : InputBits - (OutputBits + kb);
+                    int const shift = OutputBits >= UnitBits ? k :
+                                      InputBits >= UnitBits  ? ku + (UnitBits - (OutputBits + kb)) :
+                                                               InputBits - (OutputBits + kb);
                     typedef typename outvalue_helper<OutIter, OutputBits>::type OutValue;
                     InputValue y = unbounded_shr<shift>(x);
                     *out++ = OutValue(low_bits<OutputBits>(y));
@@ -88,9 +87,9 @@ namespace nil {
                 static void step(InputValue const &x, OutIter &out) {
                     int const kb = (k % UnitBits);
                     int const ku = k - kb;
-                    int const shift = OutputBits >= UnitBits ?
-                                          InputBits - (OutputBits + k) :
-                                          InputBits >= UnitBits ? InputBits - (UnitBits + ku) + kb : kb;
+                    int const shift = OutputBits >= UnitBits ? InputBits - (OutputBits + k) :
+                                      InputBits >= UnitBits  ? InputBits - (UnitBits + ku) + kb :
+                                                               kb;
                     typedef typename outvalue_helper<OutIter, OutputBits>::type OutValue;
                     InputValue y = unbounded_shr<shift>(x);
                     *out++ = OutValue(low_bits<OutputBits>(y));

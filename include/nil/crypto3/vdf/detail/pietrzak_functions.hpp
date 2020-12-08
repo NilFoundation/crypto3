@@ -31,7 +31,7 @@ namespace nil {
     namespace crypto3 {
         namespace vdf {
             namespace detail {
-                struct pietrzak_functions : public pietrzak_policy {};
+                struct pietrzak_functions : public pietrzak_policy { };
             }    // namespace detail
         }        // namespace vdf
     }            // namespace crypto3

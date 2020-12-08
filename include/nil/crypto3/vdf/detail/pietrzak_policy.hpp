@@ -29,7 +29,7 @@ namespace nil {
     namespace crypto3 {
         namespace vdf {
             namespace detail {
-                struct pietrzak_policy {};
+                struct pietrzak_policy { };
             }    // namespace detail
         }        // namespace vdf
     }            // namespace crypto3

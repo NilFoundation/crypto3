@@ -1009,7 +1009,7 @@ namespace nil {
                     // We must have (x * 2^e) / op = constant approximately.
                     template<typename Backend, expression_template_option ExpressionTemplates>
                     inline static int64_t mpz_get_si_2exp(signed long int *exp,
-                                                  const number<Backend, ExpressionTemplates> &op) {
+                                                          const number<Backend, ExpressionTemplates> &op) {
                         uint64_t size = mpz_size(op);
                         uint64_t last = mpz_getlimbn(op, size - 1);
                         uint64_t ret;

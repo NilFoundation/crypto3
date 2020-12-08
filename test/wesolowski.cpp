@@ -43,8 +43,7 @@ using namespace nil::crypto3::vdf;
 
 BOOST_AUTO_TEST_SUITE(wesolowski_test_suite)
 
-    BOOST_AUTO_TEST_CASE(wesolowski_vdf) {
-
-    }
+BOOST_AUTO_TEST_CASE(wesolowski_vdf) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

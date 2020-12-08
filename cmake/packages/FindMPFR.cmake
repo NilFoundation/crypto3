@@ -27,7 +27,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 
 find_path(MPFR_INCLUDE_DIR NAMES mpfr.h PATHS $ENV{GMPDIR} $ENV{MPFRDIR}
-    ${INCLUDE_INSTALL_DIR})
+          ${INCLUDE_INSTALL_DIR})
 
 # Set MPFR_FIND_VERSION to 1.0.0 if no minimum version is specified
 if(NOT MPFR_FIND_VERSION)
@@ -49,13 +49,13 @@ if(MPFR_INCLUDE_DIR)
     file(READ "${MPFR_INCLUDE_DIR}/mpfr.h" _mpfr_version_header)
 
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_MAJOR[ \t]+([0-9]+)"
-        _mpfr_major_version_match "${_mpfr_version_header}")
+           _mpfr_major_version_match "${_mpfr_version_header}")
     set(MPFR_MAJOR_VERSION "${CMAKE_MATCH_1}")
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_MINOR[ \t]+([0-9]+)"
-        _mpfr_minor_version_match "${_mpfr_version_header}")
+           _mpfr_minor_version_match "${_mpfr_version_header}")
     set(MPFR_MINOR_VERSION "${CMAKE_MATCH_1}")
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_PATCHLEVEL[ \t]+([0-9]+)"
-        _mpfr_patchlevel_version_match "${_mpfr_version_header}")
+           _mpfr_patchlevel_version_match "${_mpfr_version_header}")
     set(MPFR_PATCHLEVEL_VERSION "${CMAKE_MATCH_1}")
 
     set(MPFR_VERSION
@@ -65,16 +65,16 @@ if(MPFR_INCLUDE_DIR)
     if(${MPFR_VERSION} VERSION_LESS ${MPFR_FIND_VERSION})
         set(MPFR_VERSION_OK FALSE)
         message(STATUS "MPFR version ${MPFR_VERSION} found in ${MPFR_INCLUDE_DIR}, "
-            "but at least version ${MPFR_FIND_VERSION} is required")
+                "but at least version ${MPFR_FIND_VERSION} is required")
     else()
         set(MPFR_VERSION_OK TRUE)
     endif()
 endif()
 
 find_library(MPFR_LIBRARIES mpfr
-    PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
+             PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPFR DEFAULT_MSG
-    MPFR_INCLUDE_DIR MPFR_LIBRARIES MPFR_VERSION_OK)
+                                  MPFR_INCLUDE_DIR MPFR_LIBRARIES MPFR_VERSION_OK)
 mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARIES)

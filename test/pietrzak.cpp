@@ -44,7 +44,6 @@ using namespace nil::crypto3::vdf;
 BOOST_AUTO_TEST_SUITE(pietrzak_test_suite)
 
 BOOST_AUTO_TEST_CASE(pietrzak_vdf) {
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
