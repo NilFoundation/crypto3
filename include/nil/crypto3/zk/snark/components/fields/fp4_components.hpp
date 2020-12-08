@@ -318,7 +318,7 @@ namespace nil {
                             // must be:
                             //const base_field_value_type beta = Fp4T::value_type::non_residue;
 
-                            const base_field_value_type u = (base_field_value_type::zero() - beta).inversed();
+                            const base_field_value_type u = (base_field_value_type::one() - beta).inversed();
 
                             const blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0], &a1 = A.data[1].data[0], &a2 = A.data[0].data[1],
                                                                           &a3 = A.data[1].data[1], &b0 = B.data[0].data[0], &b1 = B.data[1].data[0],

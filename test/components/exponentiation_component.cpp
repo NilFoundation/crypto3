@@ -28,7 +28,17 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
@@ -60,16 +70,26 @@ void test_exponentiation_component(const typename FpkT::modulus_type &power) {
         assert(bp.is_satisfied());
         assert(res == (x_val.pow(power)));
     }
+    std::cout << "Number of constraints: " << bp.num_constraints() << std::endl;
     std::cout << "Power: " << power << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE(exponentiation_component_test_suite)
 
-BOOST_AUTO_TEST_CASE(exponentiation_component_test_case) {
+BOOST_AUTO_TEST_CASE(exponentiation_component_mnt4_298_test_case) {
+
+    std::cout << "Testing mnt4<298>: " << std::endl;
 
     test_exponentiation_component<curves::mnt4<298>::pairing_policy::Fqk_type, components::Fp4_variable, 
         components::Fp4_mul_component, components::Fp4_sqr_component>(
             curves::mnt4<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
+
+}
+
+BOOST_AUTO_TEST_CASE(exponentiation_component_mnt6_298_test_case) {
+
+    std::cout << "Testing mnt6<298>: " << std::endl;
+
     test_exponentiation_component<curves::mnt6<298>::pairing_policy::Fqk_type, components::Fp6_2over3_variable, 
         components::Fp6_2over3_mul_component, components::Fp6_2over3_sqr_component>(
             curves::mnt6<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
