@@ -32,17 +32,17 @@ namespace nil {
             namespace snark {
 
                 template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type generator(
-                    const typename ProofSystemType::constraint_system_type &constraint_system) {
+                typename ProofSystemType::keypair_type
+                    generator(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
                     return ProofSystemType::generator(constraint_system);
                 }
 
                 template<typename ProofSystemType>
-                typename ProofSystemType::proof_type prover(
-                    const typename ProofSystemType::proving_key_type &pk,
-                    const typename ProofSystemType::primary_input_type &primary_input,
-                    const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
+                typename ProofSystemType::proof_type
+                    prover(const typename ProofSystemType::proving_key_type &pk,
+                           const typename ProofSystemType::primary_input_type &primary_input,
+                           const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
                     return ProofSystemType::prover(pk, primary_input, auxiliary_input);
                 }
@@ -65,7 +65,7 @@ namespace nil {
 
             }    // namespace snark
         }        // namespace zk
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_HPP

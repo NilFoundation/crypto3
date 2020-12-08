@@ -98,7 +98,7 @@ namespace nil {
 
                     std::cout << "Starting prover" << std::endl;
 
-                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = 
+                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof =
                         prover<basic_proof_system>(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
@@ -107,7 +107,7 @@ namespace nil {
                        example.primary_input, proof);*/
 
                     std::cout << "Starting verifier" << std::endl;
-                    
+
                     const bool ans = verifier<basic_proof_system>(keypair.vk, example.primary_input, proof);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;
