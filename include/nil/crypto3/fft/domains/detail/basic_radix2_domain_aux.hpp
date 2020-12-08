@@ -56,7 +56,7 @@ namespace nil {
                     typedef typename FieldType::value_type value_type;
 
                     const std::size_t n = a.size(), logn = log2(n);
-                    //if (n != (1u << logn))
+                    // if (n != (1u << logn))
                     //    throw std::invalid_argument("expected n == (1u << logn)");
 
                     /* swapping in place (from Storer's book) */
@@ -96,7 +96,7 @@ namespace nil {
 
                     const std::size_t m = a.size();
                     const std::size_t log_m = log2(m);
-                    //if (m != 1ul << log_m)
+                    // if (m != 1ul << log_m)
                     //    throw std::invalid_argument("expected m == 1ul<<log_m");
 
                     if (log_m < log_cpus) {
@@ -158,7 +158,8 @@ namespace nil {
 #else
                     const std::size_t num_cpus = 1;
 #endif
-                    const std::size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
+                    const std::size_t log_cpus =
+                        ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
                     if (log_cpus == 0) {
                         basic_serial_radix2_FFT<FieldType>(a, omega);
@@ -181,7 +182,7 @@ namespace nil {
                         return std::vector<value_type>(1, value_type::one());
                     }
 
-                    //if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
+                    // if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
                     //    throw std::invalid_argument("expected m == (1u << log2(m))");
 
                     const value_type omega = unity_root<FieldType>(m);

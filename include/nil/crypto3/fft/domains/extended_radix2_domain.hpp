@@ -50,12 +50,12 @@ namespace nil {
                 field_value_type shift;
 
                 extended_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    //if (m <= 1)
+                    // if (m <= 1)
                     //    throw std::invalid_argument("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<field_value_type, std::complex<double>>::value) {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        //if (logm != (fields::arithmetic_params<FieldType>::s + 1))
+                        // if (logm != (fields::arithmetic_params<FieldType>::s + 1))
                         //    throw std::invalid_argument(
                         //        "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
                     }
@@ -68,7 +68,7 @@ namespace nil {
                 }
 
                 void FFT(std::vector<field_value_type> &a) {
-                    //if (a.size() != this->m)
+                    // if (a.size() != this->m)
                     //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     std::vector<field_value_type> a0(small_m, field_value_type::zero());
@@ -93,7 +93,7 @@ namespace nil {
                     }
                 }
                 void iFFT(std::vector<field_value_type> &a) {
-                    //if (a.size() != this->m)
+                    // if (a.size() != this->m)
                     //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
@@ -105,7 +105,8 @@ namespace nil {
                     _basic_radix2_FFT<FieldType>(a1, omega_inverse);
 
                     const field_value_type shift_to_small_m = shift.pow(small_m);
-                    const field_value_type sconst = (field_value_type(small_m) * (field_value_type::one() - shift_to_small_m)).inversed();
+                    const field_value_type sconst =
+                        (field_value_type(small_m) * (field_value_type::one() - shift_to_small_m)).inversed();
 
                     const field_value_type shift_inverse = shift.inversed();
                     field_value_type shift_inverse_i = field_value_type::one();
@@ -118,9 +119,11 @@ namespace nil {
                     }
                 }
                 std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) {
-                    const std::vector<field_value_type> T0 = detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t);
+                    const std::vector<field_value_type> T0 =
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t);
                     const std::vector<field_value_type> T1 =
-                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t * shift.inversed());
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m,
+                                                                                          t * shift.inversed());
 
                     std::vector<field_value_type> result(this->m, field_value_type::zero());
 
@@ -150,7 +153,7 @@ namespace nil {
                 }
 
                 void add_poly_Z(const field_value_type &coeff, std::vector<field_value_type> &H) {
-                    //if (H.size() != this->m + 1)
+                    // if (H.size() != this->m + 1)
                     //    throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
                     const field_value_type shift_to_small_m = shift.pow(small_m);
@@ -169,7 +172,7 @@ namespace nil {
                     const field_value_type Z0 =
                         (coset_to_small_m - field_value_type::one()) * (coset_to_small_m - shift_to_small_m);
                     const field_value_type Z1 = (coset_to_small_m * shift_to_small_m - field_value_type::one()) *
-                                          (coset_to_small_m * shift_to_small_m - shift_to_small_m);
+                                                (coset_to_small_m * shift_to_small_m - shift_to_small_m);
 
                     const field_value_type Z0_inverse = Z0.inversed();
                     const field_value_type Z1_inverse = Z1.inversed();

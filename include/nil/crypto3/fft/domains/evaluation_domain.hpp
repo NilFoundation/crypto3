@@ -43,7 +43,6 @@ namespace nil {
                 typedef typename FieldType::value_type value_type;
 
             public:
-
                 const std::size_t m;
 
                 /**

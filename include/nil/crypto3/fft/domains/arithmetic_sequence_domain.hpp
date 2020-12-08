@@ -69,11 +69,11 @@ namespace nil {
                 }
 
                 arithmetic_sequence_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    //if (m <= 1) {
+                    // if (m <= 1) {
                     //    throw std::invalid_argument("arithmetic(): expected m > 1");
                     //}
 
-                    //if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())) {
+                    // if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())) {
                     //    throw std::invalid_argument(
                     //        "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() "
                     //        "!= true");
@@ -83,7 +83,7 @@ namespace nil {
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    //if (a.size() != this->m) {
+                    // if (a.size() != this->m) {
                     //    throw std::invalid_argument("arithmetic: expected a.size() == this->m");
                     //}
 
@@ -115,7 +115,7 @@ namespace nil {
                     }
                 }
                 void iFFT(std::vector<value_type> &a) {
-                    //if (a.size() != this->m)
+                    // if (a.size() != this->m)
                     //    throw std::invalid_argument("arithmetic: expected a.size() == this->m");
 
                     if (!this->precomputation_sentinel)
@@ -182,7 +182,7 @@ namespace nil {
                     }
 
                     std::vector<value_type> w(this->m);
-                    w[0] = g_vanish.inversed() * (this->arithmetic_generator .pow(this->m - 1));
+                    w[0] = g_vanish.inversed() * (this->arithmetic_generator.pow(this->m - 1));
 
                     l[0] = l_vanish * l[0].inversed() * w[0];
                     for (std::size_t i = 1; i < this->m; i++) {

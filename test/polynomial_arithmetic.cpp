@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
 
     for (std::size_t i = 0; i < c.size(); ++i) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
-    }    
+    }
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
@@ -120,7 +120,6 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(polynomial_subtraction_test_suite)
 
@@ -201,7 +200,6 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
 BOOST_AUTO_TEST_SUITE(polynomial_multiplication_test_suite)
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
@@ -265,7 +263,6 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_CASE(polynomial_division) {
 

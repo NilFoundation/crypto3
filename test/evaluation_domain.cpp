@@ -73,37 +73,37 @@ void test_fft() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     // for (int key = 0; key < 5; key++) {
-        /*if (key == 0)
-            domain.reset(new basic_radix2_domain<FieldType>(m));
-        else if (key == 1)
-            domain.reset(new extended_radix2_domain<FieldType>(m));
-        else if (key == 2)
-            domain.reset(new step_radix2_domain<FieldType>(m));
-        else if (key == 3)
-            domain.reset(new geometric_sequence_domain<FieldType>(m));
-        else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+    /*if (key == 0)
+        domain.reset(new basic_radix2_domain<FieldType>(m));
+    else if (key == 1)
+        domain.reset(new extended_radix2_domain<FieldType>(m));
+    else if (key == 2)
+        domain.reset(new step_radix2_domain<FieldType>(m));
+    else if (key == 3)
+        domain.reset(new geometric_sequence_domain<FieldType>(m));
+    else if (key == 4)
+        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
-        domain = make_evaluation_domain<FieldType>(m);
+    domain = make_evaluation_domain<FieldType>(m);
 
-        std::vector<value_type> a(f);
+    std::vector<value_type> a(f);
 
-        domain->FFT(a);
+    domain->FFT(a);
 
-        std::vector<value_type> idx(m);
-        
-        for (std::size_t i = 0; i < m; i++) {
-            idx[i] = domain->get_domain_element(i);
-        }
+    std::vector<value_type> idx(m);
 
-        std::cout << "FFT: key = " << typeid(*domain).name() << std::endl;
-        for (std::size_t i = 0; i < m; i++) {
-            value_type e = evaluate_polynomial(m, f, idx[i]);
-            std::cout << "idx[" << i << "] = " << idx[i].data << std::endl;
-            std::cout << "e = " << e.data << std::endl;
-            BOOST_CHECK_EQUAL(e.data, a[i].data);
-            // std::cout << e.data << " == " << a[i].data << std::endl;
-        }
+    for (std::size_t i = 0; i < m; i++) {
+        idx[i] = domain->get_domain_element(i);
+    }
+
+    std::cout << "FFT: key = " << typeid(*domain).name() << std::endl;
+    for (std::size_t i = 0; i < m; i++) {
+        value_type e = evaluate_polynomial(m, f, idx[i]);
+        std::cout << "idx[" << i << "] = " << idx[i].data << std::endl;
+        std::cout << "e = " << e.data << std::endl;
+        BOOST_CHECK_EQUAL(e.data, a[i].data);
+        // std::cout << e.data << " == " << a[i].data << std::endl;
+    }
     // }
     std::cout << "is_basic_radix2_domain = " << detail::is_basic_radix2_domain<FieldType>(m) << std::endl;
     std::cout << "is_extended_radix2_domain = " << detail::is_extended_radix2_domain<FieldType>(m) << std::endl;
@@ -120,29 +120,29 @@ void test_inverse_fft_of_fft() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     // for (int key = 0; key < 5; key++) {
-        /*if (key == 0)
-            domain.reset(new basic_radix2_domain<FieldType>(m));
-        else if (key == 1)
-            domain.reset(new extended_radix2_domain<FieldType>(m));
-        else if (key == 2)
-            domain.reset(new step_radix2_domain<FieldType>(m));
-        else if (key == 3)
-            domain.reset(new geometric_sequence_domain<FieldType>(m));
-        else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+    /*if (key == 0)
+        domain.reset(new basic_radix2_domain<FieldType>(m));
+    else if (key == 1)
+        domain.reset(new extended_radix2_domain<FieldType>(m));
+    else if (key == 2)
+        domain.reset(new step_radix2_domain<FieldType>(m));
+    else if (key == 3)
+        domain.reset(new geometric_sequence_domain<FieldType>(m));
+    else if (key == 4)
+        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
-        domain = make_evaluation_domain<FieldType>(m);
+    domain = make_evaluation_domain<FieldType>(m);
 
-        std::vector<value_type> a(f);
-        domain->FFT(a);
-        domain->iFFT(a);
+    std::vector<value_type> a(f);
+    domain->FFT(a);
+    domain->iFFT(a);
 
-        std::cout << "inverse FFT of FFT: key = " << typeid(*domain).name() << std::endl;
-        for (std::size_t i = 0; i < m; i++) {
-            std::cout << "a[" << i << "] = " << a[i].data << std::endl;
-            BOOST_CHECK_EQUAL(f[i].data, a[i].data);
-            //std::cout << f[i].data << " == " << a[i].data << std::endl;
-        }
+    std::cout << "inverse FFT of FFT: key = " << typeid(*domain).name() << std::endl;
+    for (std::size_t i = 0; i < m; i++) {
+        std::cout << "a[" << i << "] = " << a[i].data << std::endl;
+        BOOST_CHECK_EQUAL(f[i].data, a[i].data);
+        // std::cout << f[i].data << " == " << a[i].data << std::endl;
+    }
     // }
 }
 
@@ -156,29 +156,29 @@ void test_inverse_coset_ftt_of_coset_fft() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     // for (int key = 0; key < 3; key++) {
-        /*if (key == 0)
-            domain.reset(new basic_radix2_domain<FieldType>(m));
-        else if (key == 1)
-            domain.reset(new extended_radix2_domain<FieldType>(m));
-        else if (key == 2)
-            domain.reset(new step_radix2_domain<FieldType>(m));
-        else if (key == 3)
-            domain.reset(new geometric_sequence_domain<FieldType>(m));
-        else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+    /*if (key == 0)
+        domain.reset(new basic_radix2_domain<FieldType>(m));
+    else if (key == 1)
+        domain.reset(new extended_radix2_domain<FieldType>(m));
+    else if (key == 2)
+        domain.reset(new step_radix2_domain<FieldType>(m));
+    else if (key == 3)
+        domain.reset(new geometric_sequence_domain<FieldType>(m));
+    else if (key == 4)
+        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
-        domain = make_evaluation_domain<FieldType>(m);
+    domain = make_evaluation_domain<FieldType>(m);
 
-        std::vector<value_type> a(f);
-        multiply_by_coset(a, coset);
-        domain->FFT(a);
-        domain->iFFT(a);
-        multiply_by_coset(a, coset.inversed());
+    std::vector<value_type> a(f);
+    multiply_by_coset(a, coset);
+    domain->FFT(a);
+    domain->iFFT(a);
+    multiply_by_coset(a, coset.inversed());
 
-        for (std::size_t i = 0; i < m; i++) {
-            BOOST_CHECK_EQUAL(f[i].data, a[i].data);
-            //std::cout << f[i].data << " == " << a[i].data << std::endl;
-        }
+    for (std::size_t i = 0; i < m; i++) {
+        BOOST_CHECK_EQUAL(f[i].data, a[i].data);
+        // std::cout << f[i].data << " == " << a[i].data << std::endl;
+    }
     // }
 }
 
@@ -191,35 +191,35 @@ void test_lagrange_coefficients() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     // for (int key = 0; key < 5; key++) {
-        /*if (key == 0)
-            domain.reset(new basic_radix2_domain<FieldType>(m));
-        else if (key == 1)
-            domain.reset(new extended_radix2_domain<FieldType>(m));
-        else if (key == 2)
-            domain.reset(new step_radix2_domain<FieldType>(m));
-        else if (key == 3)
-            domain.reset(new geometric_sequence_domain<FieldType>(m));
-        else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+    /*if (key == 0)
+        domain.reset(new basic_radix2_domain<FieldType>(m));
+    else if (key == 1)
+        domain.reset(new extended_radix2_domain<FieldType>(m));
+    else if (key == 2)
+        domain.reset(new step_radix2_domain<FieldType>(m));
+    else if (key == 3)
+        domain.reset(new geometric_sequence_domain<FieldType>(m));
+    else if (key == 4)
+        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
-        domain = make_evaluation_domain<FieldType>(m);
+    domain = make_evaluation_domain<FieldType>(m);
 
-        std::vector<value_type> a;
-        a = domain->evaluate_all_lagrange_polynomials(t);
+    std::vector<value_type> a;
+    a = domain->evaluate_all_lagrange_polynomials(t);
 
-        std::cout << "LagrangeCoefficients: key = " << typeid(*domain).name() << std::endl;
-        std::vector<value_type> d(m);
-        for (std::size_t i = 0; i < m; i++) {
-            d[i] = domain->get_domain_element(i);
-            std::cout << "d[" << i << "] = " << d[i].data << std::endl;
-        }
+    std::cout << "LagrangeCoefficients: key = " << typeid(*domain).name() << std::endl;
+    std::vector<value_type> d(m);
+    for (std::size_t i = 0; i < m; i++) {
+        d[i] = domain->get_domain_element(i);
+        std::cout << "d[" << i << "] = " << d[i].data << std::endl;
+    }
 
-        for (std::size_t i = 0; i < m; i++) {
-            value_type e = evaluate_lagrange_polynomial(m, d, t, i);
-            //printf("%ld == %ld\n", e.as_ulong(), a[i].as_ulong());
-            BOOST_CHECK_EQUAL(e.data, a[i].data);
-            std::cout << "e = " << e.data << std::endl;
-        }
+    for (std::size_t i = 0; i < m; i++) {
+        value_type e = evaluate_lagrange_polynomial(m, d, t, i);
+        // printf("%ld == %ld\n", e.as_ulong(), a[i].as_ulong());
+        BOOST_CHECK_EQUAL(e.data, a[i].data);
+        std::cout << "e = " << e.data << std::endl;
+    }
     // }
 }
 
@@ -232,31 +232,31 @@ void test_compute_z() {
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     // for (int key = 0; key < 5; key++) {
-        /*if (key == 0)
-            domain.reset(new basic_radix2_domain<FieldType>(m));
-        else if (key == 1)
-            domain.reset(new extended_radix2_domain<FieldType>(m));
-        else if (key == 2)
-            domain.reset(new step_radix2_domain<FieldType>(m));
-        else if (key == 3)
-            domain.reset(new geometric_sequence_domain<FieldType>(m));
-        else if (key == 4)
-            domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
+    /*if (key == 0)
+        domain.reset(new basic_radix2_domain<FieldType>(m));
+    else if (key == 1)
+        domain.reset(new extended_radix2_domain<FieldType>(m));
+    else if (key == 2)
+        domain.reset(new step_radix2_domain<FieldType>(m));
+    else if (key == 3)
+        domain.reset(new geometric_sequence_domain<FieldType>(m));
+    else if (key == 4)
+        domain.reset(new arithmetic_sequence_domain<FieldType>(m));*/
 
-        domain = make_evaluation_domain<FieldType>(m);
+    domain = make_evaluation_domain<FieldType>(m);
 
-        value_type a;
-        a = domain->compute_vanishing_polynomial(t);
+    value_type a;
+    a = domain->compute_vanishing_polynomial(t);
 
-        value_type Z = value_type::one();
-        std::cout << "ComputeZ: key = " << typeid(*domain).name() << std::endl;
-        for (std::size_t i = 0; i < m; i++) {
-            Z *= (t - domain->get_domain_element(i));
-            std::cout << "Z = " << Z.data << std::endl;
-        }
+    value_type Z = value_type::one();
+    std::cout << "ComputeZ: key = " << typeid(*domain).name() << std::endl;
+    for (std::size_t i = 0; i < m; i++) {
+        Z *= (t - domain->get_domain_element(i));
+        std::cout << "Z = " << Z.data << std::endl;
+    }
 
-        BOOST_CHECK_EQUAL(Z.data, a.data);
-        //std::cout << Z.data << " == " << a.data << std::endl;
+    BOOST_CHECK_EQUAL(Z.data, a.data);
+    // std::cout << Z.data << " == " << a.data << std::endl;
     // }
 }
 

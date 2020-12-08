@@ -52,13 +52,13 @@ namespace nil {
                 value_type small_omega;
 
                 step_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    //if (m <= 1)
+                    // if (m <= 1)
                     //    throw std::invalid_argument("step_radix2(): expected m > 1");
 
                     big_m = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1);
                     small_m = m - big_m;
 
-                    //if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
+                    // if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
                     //    throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     omega = detail::unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
@@ -68,7 +68,7 @@ namespace nil {
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    //if (a.size() != this->m)
+                    // if (a.size() != this->m)
                     //    throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<value_type> c(big_m, value_type::zero());
@@ -83,7 +83,7 @@ namespace nil {
 
                     std::vector<value_type> e(small_m, value_type::zero());
                     const std::size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
-                                                 static_cast<std::size_t>(std::ceil(std::log2(small_m))));
+                                                      static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (std::size_t i = 0; i < small_m; ++i) {
                         for (std::size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
@@ -102,7 +102,7 @@ namespace nil {
                     }
                 }
                 void iFFT(std::vector<value_type> &a) {
-                    //if (a.size() != this->m)
+                    // if (a.size() != this->m)
                     //    throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<value_type> U0(a.begin(), a.begin() + big_m);
@@ -134,7 +134,7 @@ namespace nil {
                     }
 
                     const std::size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
-                                                 static_cast<std::size_t>(std::ceil(std::log2(small_m))));
+                                                      static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (std::size_t i = 0; i < small_m; ++i) {
                         for (std::size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];
@@ -161,9 +161,11 @@ namespace nil {
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
-                    std::vector<value_type> inner_big = detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(big_m, t);
+                    std::vector<value_type> inner_big =
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(big_m, t);
                     std::vector<value_type> inner_small =
-                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t * omega.inversed());
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m,
+                                                                                          t * omega.inversed());
 
                     std::vector<value_type> result(this->m, value_type::zero());
 
@@ -199,7 +201,7 @@ namespace nil {
                 }
 
                 void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
-                    //if (H.size() != this->m + 1)
+                    // if (H.size() != this->m + 1)
                     //    throw std::invalid_argument("step_radix2: expected H.size() == this->m+1");
 
                     const value_type omega_to_small_m = omega.pow(small_m);

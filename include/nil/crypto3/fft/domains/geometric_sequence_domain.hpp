@@ -45,7 +45,7 @@ namespace nil {
 
             template<typename FieldType>
             class evaluation_domain;
-            
+
             template<typename FieldType>
             class geometric_sequence_domain : public evaluation_domain<FieldType> {
                 typedef typename FieldType::value_type value_type;
@@ -94,8 +94,8 @@ namespace nil {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
-                    monomial_to_newton_basis_geometric<FieldType>(a, this->geometric_sequence, this->geometric_triangular_sequence,
-                                                       this->m);
+                    monomial_to_newton_basis_geometric<FieldType>(a, this->geometric_sequence,
+                                                                  this->geometric_triangular_sequence, this->m);
 
                     /* Newton to Evaluation */
                     std::vector<value_type> T(this->m);
@@ -153,8 +153,8 @@ namespace nil {
                         a[i] *= this->geometric_triangular_sequence[i].inversed();
                     }
 
-                    newton_to_monomial_basis_geometric<FieldType>(a, this->geometric_sequence, this->geometric_triangular_sequence,
-                                                       this->m);
+                    newton_to_monomial_basis_geometric<FieldType>(a, this->geometric_sequence,
+                                                                  this->geometric_triangular_sequence, this->m);
                 }
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */

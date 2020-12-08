@@ -232,7 +232,7 @@ namespace nil {
 
                 typedef typename FieldType::value_type value_type;
 
-                std::size_t d = b.size() - 1;            /* Degree of B */
+                std::size_t d = b.size() - 1;       /* Degree of B */
                 value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                 r = std::vector<value_type>(a);

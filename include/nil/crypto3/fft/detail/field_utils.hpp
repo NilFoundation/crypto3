@@ -61,7 +61,9 @@ namespace nil {
 
                 template<typename FieldType>
                 typename FieldType::value_type coset_shift() {
-                    return typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).squared();
+                    return
+                        typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator)
+                            .squared();
                 }
 
                 template<typename FieldType>
@@ -81,12 +83,12 @@ namespace nil {
                     typedef typename FieldType::value_type value_type;
 
                     const std::size_t logn = std::ceil(std::log2(n));
-                    
+
                     if (n != (1u << logn))
                         throw std::invalid_argument("expected n == (1u << logn)");
                     if (logn > fields::arithmetic_params<FieldType>::s)
                         throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
-                    
+
                     value_type omega = value_type(fields::arithmetic_params<FieldType>::root_of_unity);
                     for (std::size_t i = fields::arithmetic_params<FieldType>::s; i > logn; --i) {
                         omega *= omega;
