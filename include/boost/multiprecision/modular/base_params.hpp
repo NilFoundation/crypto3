@@ -11,7 +11,7 @@
 #ifndef BOOST_MULTIPRECISION_BASE_PARAMS_HPP
 #define BOOST_MULTIPRECISION_BASE_PARAMS_HPP
 
-#include <boost/multiprecision/modular/modular_policy.hpp>
+#include <boost/multiprecision/modular/modular_policy_fixed.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -44,32 +44,32 @@ class base_params
    number_type m_mod;
 };
 
-// fixed precision barrett params type which supports compile-time execution
-template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class base_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
-{
- protected:
-   typedef modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>> policy_type;
-   typedef typename policy_type::number_type number_type;
-
-   constexpr void initialize_base_params(const number_type& mod)
-   {
-      m_mod = mod;
-   }
-
- public:
-   constexpr base_params() {}
-
-   constexpr explicit base_params(const number_type& p)
-   {
-      initialize_base_params(p);
-   }
-
-   constexpr const auto& mod() const { return m_mod; }
-
- protected:
-   number_type m_mod;
-};
+// // fixed precision barrett params type which supports compile-time execution
+// template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+// class base_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>
+// {
+//  protected:
+//    typedef modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>> policy_type;
+//    typedef typename policy_type::number_type number_type;
+//
+//    constexpr void initialize_base_params(const number_type& mod)
+//    {
+//       m_mod = mod;
+//    }
+//
+//  public:
+//    constexpr base_params() {}
+//
+//    constexpr explicit base_params(const number_type& p)
+//    {
+//       initialize_base_params(p);
+//    }
+//
+//    constexpr const auto& mod() const { return m_mod; }
+//
+//  protected:
+//    number_type m_mod;
+// };
 }
 }
 } // namespace boost::multiprecision::backends
