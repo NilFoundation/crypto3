@@ -4,14 +4,15 @@
 
 ## Key Derivation Function Concept ## {#kdf_concept}
 
-A ```KeyDerivationFunction``` is an object intended to compute non-isomorphic permutations from non-fixed size
- elements integral field to fixed-size elements integral field,
+A ```KeyDerivationFunction``` is an object intended to compute non-isomorphic permutations from non-fixed size elements
+integral field to fixed-size elements integral field,
 
 ### Requirements ### {#kdf_concepts_requirements}
 
 The type ```X``` satisfies ```KeyDerivationFunction``` if
 
 Given
+
 * ```MacType```, the type named by ```X::mac_type```
 * ```KeyType```, the type named by ```X::key_type```
 * ```SaltType```, the type named by ```X::salt_type```

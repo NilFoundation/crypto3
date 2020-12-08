@@ -37,9 +37,9 @@ namespace nil {
                     constexpr static const std::size_t max_key_bits = mac_type::max_key_bits;
                     typedef typename mac_type::key_type key_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace kdf
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_HKDF_POLICY_HPP

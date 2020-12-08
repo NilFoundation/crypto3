@@ -45,7 +45,7 @@ namespace nil {
              * @ingroup kdf
              */
             template<std::size_t Version, typename MessageAuthenticationCode1, typename MessageAuthenticationCode2>
-            class prf_tls {};
+            class prf_tls { };
 
             /*!
              * @brief PRF used in TLS 1.0/1.1 with no MAC selection option.

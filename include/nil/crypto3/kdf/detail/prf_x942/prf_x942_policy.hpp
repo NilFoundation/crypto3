@@ -33,9 +33,9 @@ namespace nil {
                 struct prf_x942_policy {
                     typedef Hash hash_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace kdf
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_HKDF_POLICY_HPP

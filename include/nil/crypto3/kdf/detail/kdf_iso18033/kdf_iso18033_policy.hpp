@@ -49,9 +49,9 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = hash_type::digest_bits;
                     typedef typename hash_type::digest_type digest_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace kdf
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_HKDF_POLICY_HPP

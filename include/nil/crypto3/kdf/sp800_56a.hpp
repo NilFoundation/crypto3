@@ -42,7 +42,7 @@ namespace nil {
              * @ingroup kdf
              */
             template<typename Construction, typename = void>
-            class sp800_56a {};
+            class sp800_56a { };
 
             /*!
              * @brief Hash version of SP 800-56a KDF.

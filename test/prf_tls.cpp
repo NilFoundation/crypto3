@@ -51,7 +51,6 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 BOOST_AUTO_TEST_SUITE(prf_tls_test_suite)
 
 BOOST_AUTO_TEST_CASE(prf_tls_128_range_hash) {
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

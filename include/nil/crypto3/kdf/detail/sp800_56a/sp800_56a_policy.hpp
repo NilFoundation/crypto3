@@ -34,7 +34,7 @@ namespace nil {
 
             namespace detail {
                 template<typename Construction, typename = void>
-                struct sp800_56a_policy {};
+                struct sp800_56a_policy { };
 
                 template<typename Hash>
                 struct sp800_56a_policy<Hash, typename std::enable_if<is_hash<Hash>::value>::type> {
