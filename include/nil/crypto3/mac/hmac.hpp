@@ -101,7 +101,7 @@ namespace nil {
                 std::array<byte_type, block_bytes> ikey, okey;
             };
         }    // namespace mac
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

@@ -61,7 +61,6 @@ namespace nil {
                 }
 
                 cmac(const key_type &key) : cipher(key) {
-
                 }
 
                 inline void begin_message(const block_type &block) const {
@@ -123,7 +122,7 @@ namespace nil {
             template<typename BlockCipher>
             using omac1 = cmac<BlockCipher>;
         }    // namespace mac
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

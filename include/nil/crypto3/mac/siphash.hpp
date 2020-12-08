@@ -125,7 +125,7 @@ namespace nil {
                 }
             };
         }    // namespace mac
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

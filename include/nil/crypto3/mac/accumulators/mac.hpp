@@ -75,8 +75,7 @@ namespace nil {
                     typedef digest<block_bits> result_type;
 
                     template<typename Args>
-                    mac_impl(const Args &args) :
-                        total_seen(0), filled(false), mode(args[boost::accumulators::sample]) {
+                    mac_impl(const Args &args) : total_seen(0), filled(false), mode(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>

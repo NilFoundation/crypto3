@@ -47,7 +47,6 @@ class byte_string {
     vec_type s_;
 
 public:
-
     typedef vec_type::size_type size_type;
     typedef vec_type::value_type value_type;
     typedef vec_type::pointer pointer;
@@ -61,14 +60,12 @@ public:
     }
 
     template<typename InputIterator>
-    byte_string(InputIterator first, InputIterator last)
-            :
-            s_(first, last) {
+    byte_string(InputIterator first, InputIterator last) : s_(first, last) {
     }
 
     byte_string(const char *src, size_type len) {
         assert(!(len % 2));
-        //const unsigned char* src = static_cast<const unsigned char*>(vsrc);
+        // const unsigned char* src = static_cast<const unsigned char*>(vsrc);
         s_.resize(len / 2);
         unsigned int j = 0;
         for (unsigned int i = 0; i < len;) {
@@ -173,7 +170,6 @@ public:
     }
 };
 
-
 template<typename charT, class traits>
 std::basic_ostream<charT, traits> &operator<<(std::basic_ostream<charT, traits> &out, const byte_string &s) {
     byte_string::size_type bufsize = s.size() * 2 + 1;
@@ -196,34 +192,38 @@ inline bool operator!=(const byte_string &lhs, const byte_string &rhs) {
 
 BOOST_AUTO_TEST_SUITE(crc_mac_test_suite)
 
-    BOOST_AUTO_TEST_CASE(cmac_sample1_64byte_key) {
-        const char *const key = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f";
-        const char *const text = "Sample #1";
+BOOST_AUTO_TEST_CASE(cmac_sample1_64byte_key) {
+    const char *const key =
+        "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30313233343536"
+        "3738393a3b3c3d3e3f";
+    const char *const text = "Sample #1";
 
-        const byte_string keystr(key, 128);
-        mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
-        h.compute(text, 9, false);
-        BOOST_CHECK_EQUAL(h, "4f4ca3d5d68ba7cc0a1208c9c61e9c5da0403c0a");
-    }
+    const byte_string keystr(key, 128);
+    mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
+    h.compute(text, 9, false);
+    BOOST_CHECK_EQUAL(h, "4f4ca3d5d68ba7cc0a1208c9c61e9c5da0403c0a");
+}
 
-    BOOST_AUTO_TEST_CASE(cmac_sample2_20byte_key) {
-        const char *const key = "303132333435363738393a3b3c3d3e3f40414243";
-        const char *const text = "Sample #2";
+BOOST_AUTO_TEST_CASE(cmac_sample2_20byte_key) {
+    const char *const key = "303132333435363738393a3b3c3d3e3f40414243";
+    const char *const text = "Sample #2";
 
-        const byte_string keystr(key, 40);
-        mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
-        h.compute(text, 9, false);
-        BOOST_CHECK_EQUAL(h, "0922d3405faa3d194f82a45830737d5cc6c75d24");
-    }
+    const byte_string keystr(key, 40);
+    mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
+    h.compute(text, 9, false);
+    BOOST_CHECK_EQUAL(h, "0922d3405faa3d194f82a45830737d5cc6c75d24");
+}
 
-    BOOST_AUTO_TEST_CASE(cmac_sample3_100byte_key) {
-        const char *const key = "505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3";
-        const char *const text = "Sample #3";
+BOOST_AUTO_TEST_CASE(cmac_sample3_100byte_key) {
+    const char *const key =
+        "505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f80818283848586"
+        "8788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3";
+    const char *const text = "Sample #3";
 
-        const byte_string keystr(key, 200);
-        mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
-        h.compute(text, 9, false);
-        BOOST_CHECK_EQUAL(h, "bcf41eab8bb2d802f3d05caf7cb092ecf8d1a3aa");
-    }
+    const byte_string keystr(key, 200);
+    mac::cmac<hashes::sha1> h(keystr.begin(), keystr.end());
+    h.compute(text, 9, false);
+    BOOST_CHECK_EQUAL(h, "bcf41eab8bb2d802f3d05caf7cb092ecf8d1a3aa");
+}
 
 BOOST_AUTO_TEST_SUITE_END()

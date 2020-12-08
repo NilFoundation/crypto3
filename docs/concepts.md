@@ -4,13 +4,15 @@
 
 ## MessageAuthenticationCode Concept ## {#mac_concept}
 
-A ```MessageAuthenticationCode``` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
+A ```MessageAuthenticationCode``` is an object intended to compute non-isomorphic permutations over particular sized
+integers (e.g. rijndael).
 
 ### Requirements ### {#mac_concepts_requirements}
 
 The type ```X``` satisfies ```MessageAuthenticationCode``` if
 
 Given
+
 * ```KeyType```, the type named by ```X::key_type```
 * ```BlockType```, the type named by ```X::block_type```
 * ```DigestType```, the type named by ```X::digest_type```

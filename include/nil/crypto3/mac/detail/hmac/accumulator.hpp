@@ -77,8 +77,9 @@ namespace nil {
 
                     constexpr static const std::size_t length_bits = params_type::length_bits;
                     // FIXME: do something more intelligent than capping at 64
-                    constexpr static const std::size_t length_type_bits =
-                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                    constexpr static const std::size_t length_type_bits = length_bits < word_bits ? word_bits :
+                                                                          length_bits > 64        ? 64 :
+                                                                                                    length_bits;
                     typedef typename boost::uint_t<length_type_bits>::least length_type;
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
@@ -102,7 +103,8 @@ namespace nil {
                     inline result_type result(const ArgumentPack &args) const {
                         hash_type::digest_type step1_hash = hash_accumulator.result(args[boost::accumulators::sample]);
 
-                        hash_type::digest_type step2_hash = hash<hash_type>(nil::crypto3::detail::concat_buf(nil::crypto3::detail::xor_buf(key, ipad), step1_hash));
+                        hash_type::digest_type step2_hash = hash<hash_type>(
+                            nil::crypto3::detail::concat_buf(nil::crypto3::detail::xor_buf(key, ipad), step1_hash));
 
                         return step2_hash;
                     }

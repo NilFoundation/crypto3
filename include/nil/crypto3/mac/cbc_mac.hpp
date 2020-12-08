@@ -125,13 +125,12 @@ namespace nil {
 
             protected:
                 void schedule_key(const key_type &key) {
-
                 }
 
                 block_cipher_type cipher;
             };
         }    // namespace mac
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

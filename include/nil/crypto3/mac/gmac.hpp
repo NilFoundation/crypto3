@@ -136,6 +136,6 @@ namespace nil {
                 hash_type hash;
             };
         }    // namespace mac
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 #endif
