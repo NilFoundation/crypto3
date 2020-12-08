@@ -70,6 +70,10 @@ namespace nil {
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
 
+                        element_fp3(const data_type &in_data) {
+                            data = data_type({in_data[0], in_data[1], in_data[2]});
+                        };
+
                         element_fp3(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
