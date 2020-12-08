@@ -92,11 +92,11 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(sha_stream_processor_data_driven_adaptor_test_suite)
 
-    BOOST_DATA_TEST_CASE(sha_string_various_range_value_hash, string_data(), array_element) {
-        std::string out = array_element.first | adaptors::hashed<hashes::sha>;
+BOOST_DATA_TEST_CASE(sha_string_various_range_value_hash, string_data(), array_element) {
+    std::string out = array_element.first | adaptors::hashed<hashes::sha>;
 
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

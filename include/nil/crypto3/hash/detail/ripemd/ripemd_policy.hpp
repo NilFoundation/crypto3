@@ -133,7 +133,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<160> : public basic_ripemd_policy<160> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<160>::word_bits;
-                     typedef typename basic_ripemd_policy<160>::word_type word_type;
+                    typedef typename basic_ripemd_policy<160>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 5;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -152,7 +152,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<256> : public basic_ripemd_policy<256> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<256>::word_bits;
-                     typedef typename basic_ripemd_policy<256>::word_type word_type;
+                    typedef typename basic_ripemd_policy<256>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 8;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -172,7 +172,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<320> : public basic_ripemd_policy<320> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<320>::word_bits;
-                     typedef typename basic_ripemd_policy<320>::word_type word_type;
+                    typedef typename basic_ripemd_policy<320>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 10;
                     constexpr static const std::size_t state_bits = state_words * word_bits;

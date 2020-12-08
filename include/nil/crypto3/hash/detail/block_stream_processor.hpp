@@ -150,7 +150,7 @@ namespace nil {
                 std::size_t cache_seen;
             };
         }    // namespace hashes
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif
