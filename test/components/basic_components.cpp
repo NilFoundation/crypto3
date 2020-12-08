@@ -56,10 +56,10 @@ void test_disjunction_component(size_t n) {
 
         d.generate_r1cs_witness();
 
-        BOOST_CHECK(bp.val(output) == (w ? FieldType::value_type::zero() : FieldType::value_type::zero()));
+        BOOST_CHECK(bp.val(output) == (w ? FieldType::value_type::one() : FieldType::value_type::zero()));
         BOOST_CHECK(bp.is_satisfied());
 
-        bp.val(output) = (w ? FieldType::value_type::zero() : FieldType::value_type::zero());
+        bp.val(output) = (w ? FieldType::value_type::zero() : FieldType::value_type::one());
         BOOST_CHECK(!bp.is_satisfied());
     }
 }
@@ -78,16 +78,16 @@ void test_conjunction_component(size_t n) {
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
         for (std::size_t j = 0; j < n; ++j) {
-            bp.val(inputs[j]) = (w & (1ul << j)) ? FieldType::value_type::zero() : FieldType::value_type::zero();
+            bp.val(inputs[j]) = (w & (1ul << j)) ? FieldType::value_type::one() : FieldType::value_type::zero();
         }
 
         c.generate_r1cs_witness();
 
         BOOST_CHECK(bp.val(output) ==
-                    (w == (1ul << n) - 1 ? FieldType::value_type::zero() : FieldType::value_type::zero()));
+                    (w == (1ul << n) - 1 ? FieldType::value_type::one() : FieldType::value_type::zero()));
         BOOST_CHECK(bp.is_satisfied());
 
-        bp.val(output) = (w == (1ul << n) - 1 ? FieldType::value_type::zero() : FieldType::value_type::zero());
+        bp.val(output) = (w == (1ul << n) - 1 ? FieldType::value_type::zero() : FieldType::value_type::one());
         BOOST_CHECK(!bp.is_satisfied());
     }
 }
@@ -112,8 +112,8 @@ void test_comparison_component(size_t n) {
 
             cmp.generate_r1cs_witness();
 
-            BOOST_CHECK(bp.val(less) == (a < b ? FieldType::value_type::zero() : FieldType::value_type::zero()));
-            BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? FieldType::value_type::zero() : FieldType::value_type::zero()));
+            BOOST_CHECK(bp.val(less) == (a < b ? FieldType::value_type::one() : FieldType::value_type::zero()));
+            BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? FieldType::value_type::one() : FieldType::value_type::zero()));
             BOOST_CHECK(bp.is_satisfied());
         }
     }
@@ -137,8 +137,8 @@ void test_inner_product_component(size_t n) {
         for (std::size_t j = 0; j < 1ul << n; ++j) {
             std::size_t correct = 0;
             for (std::size_t k = 0; k < n; ++k) {
-                bp.val(A[k]) = (i & (1ul << k) ? FieldType::value_type::zero() : FieldType::value_type::zero());
-                bp.val(B[k]) = (j & (1ul << k) ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                bp.val(A[k]) = (i & (1ul << k) ? FieldType::value_type::one() : FieldType::value_type::zero());
+                bp.val(B[k]) = (j & (1ul << k) ? FieldType::value_type::one() : FieldType::value_type::zero());
                 correct += ((i & (1ul << k)) && (j & (1ul << k)) ? 1 : 0);
             }
 
@@ -177,14 +177,14 @@ void test_loose_multiplexing_component(size_t n) {
 
         if (0 <= idx && idx <= (int)(1ul << n) - 1) {
             BOOST_CHECK(bp.val(result) == typename FieldType::value_type((19 * idx) % (1ul << n)));
-            BOOST_CHECK(bp.val(success_flag) == FieldType::value_type::zero());
+            BOOST_CHECK(bp.val(success_flag) == FieldType::value_type::one());
             BOOST_CHECK(bp.is_satisfied());
-            bp.val(result) -= FieldType::value_type::zero();
+            bp.val(result) -= FieldType::value_type::one();
             BOOST_CHECK(!bp.is_satisfied());
         } else {
             BOOST_CHECK(bp.val(success_flag) == FieldType::value_type::zero());
             BOOST_CHECK(bp.is_satisfied());
-            bp.val(success_flag) = FieldType::value_type::zero();
+            bp.val(success_flag) = FieldType::value_type::one();
             BOOST_CHECK(!bp.is_satisfied());
         }
     }
@@ -192,26 +192,54 @@ void test_loose_multiplexing_component(size_t n) {
 
 BOOST_AUTO_TEST_SUITE(basic_components_test_suite)
 
-BOOST_AUTO_TEST_CASE(basic_components_test) {
-    test_disjunction_component<fields::bls12<381>>(100);
-    test_disjunction_component<fields::mnt4<298>>(100);
-    test_disjunction_component<fields::mnt6<298>>(100);
+BOOST_AUTO_TEST_CASE(basic_components_disjunction_test) {
+    std::cout << "Disjunction component test started" << std::endl;
+    std::cout << "Started for bls12<381>:" << std::endl;
+    test_disjunction_component<fields::bls12<381>>(10);
+    std::cout << "Started for mnt4<298>:" << std::endl;
+    test_disjunction_component<fields::mnt4<298>>(10);
+    std::cout << "Started for mnt6<298>:" << std::endl;
+    test_disjunction_component<fields::mnt6<298>>(10);
+}
 
-    test_conjunction_component<fields::bls12<381>>(100);
-    test_conjunction_component<fields::mnt4<298>>(100);
-    test_conjunction_component<fields::mnt6<298>>(100);
+BOOST_AUTO_TEST_CASE(basic_components_conjunction_test) {
+    std::cout << "Conjunction component test started" << std::endl;
+    std::cout << "Started for bls12<381>:" << std::endl;
+    test_conjunction_component<fields::bls12<381>>(10);
+    std::cout << "Started for mnt4<298>:" << std::endl;
+    test_conjunction_component<fields::mnt4<298>>(10);
+    std::cout << "Started for mnt6<298>:" << std::endl;
+    test_conjunction_component<fields::mnt6<298>>(10);
+}
 
-    test_comparison_component<fields::bls12<381>>(100);
-    test_comparison_component<fields::mnt4<298>>(100);
-    test_comparison_component<fields::mnt6<298>>(100);
+BOOST_AUTO_TEST_CASE(basic_components_comparison_test) {
+    std::cout << "Comparison component test started" << std::endl;
+    std::cout << "Started for bls12<381>:" << std::endl;
+    test_comparison_component<fields::bls12<381>>(5);
+    std::cout << "Started for mnt4<298>:" << std::endl;
+    test_comparison_component<fields::mnt4<298>>(5);
+    std::cout << "Started for mnt6<298>:" << std::endl;
+    test_comparison_component<fields::mnt6<298>>(5);
+}
 
-    test_inner_product_component<fields::bls12<381>>(100);
-    test_inner_product_component<fields::mnt4<298>>(100);
-    test_inner_product_component<fields::mnt6<298>>(100);
+BOOST_AUTO_TEST_CASE(basic_components_inner_product_test) {
+    std::cout << "Inner product component test started" << std::endl;
+    std::cout << "Started for bls12<381>:" << std::endl;
+    test_inner_product_component<fields::bls12<381>>(5);
+    std::cout << "Started for mnt4<298>:" << std::endl;
+    test_inner_product_component<fields::mnt4<298>>(5);
+    std::cout << "Started for mnt6<298>:" << std::endl;
+    test_inner_product_component<fields::mnt6<298>>(5);
+}
 
-    test_loose_multiplexing_component<fields::bls12<381>>(100);
-    test_loose_multiplexing_component<fields::mnt4<298>>(100);
-    test_loose_multiplexing_component<fields::mnt6<298>>(100);
+BOOST_AUTO_TEST_CASE(basic_components_loose_multiplexing_test) {
+    std::cout << "Loose multiplexing component test started" << std::endl;
+    std::cout << "Started for bls12<381>:" << std::endl;
+    test_loose_multiplexing_component<fields::bls12<381>>(5);
+    std::cout << "Started for mnt4<298>:" << std::endl;
+    test_loose_multiplexing_component<fields::mnt4<298>>(5);
+    std::cout << "Started for mnt6<298>:" << std::endl;
+    test_loose_multiplexing_component<fields::mnt6<298>>(5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

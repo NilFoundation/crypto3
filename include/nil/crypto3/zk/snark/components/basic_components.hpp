@@ -181,7 +181,7 @@ namespace nil {
 
                         void generate_r1cs_witness() {
                             do_copy.evaluate(this->bp);
-                            assert(this->bp.lc_val(do_copy) == FieldType::value_type::zero() ||
+                            assert(this->bp.lc_val(do_copy) == FieldType::value_type::one() ||
                                    this->bp.lc_val(do_copy) == FieldType::value_type::zero());
                             if (this->bp.lc_val(do_copy) != FieldType::value_type::zero()) {
                                 for (std::size_t i = 0; i < source.size(); ++i) {
@@ -241,8 +241,8 @@ namespace nil {
                         void generate_r1cs_witness() {
                             do_copy.evaluate(this->bp);
                             assert(this->bp.lc_val(do_copy) == FieldType::value_type::zero() ||
-                                   this->bp.lc_val(do_copy) == FieldType::value_type::zero());
-                            if (this->bp.lc_val(do_copy) == FieldType::value_type::zero()) {
+                                   this->bp.lc_val(do_copy) == FieldType::value_type::one());
+                            if (this->bp.lc_val(do_copy) == FieldType::value_type::one()) {
                                 for (std::size_t i = 0; i < source_bits.size(); ++i) {
                                     this->bp.val(target_bits[i]) = this->bp.val(source_bits[i]);
                                 }
@@ -358,7 +358,7 @@ namespace nil {
                                 this->bp.val(output) = FieldType::value_type::zero();
                             } else {
                                 this->bp.val(inv) = sum.inversed();
-                                this->bp.val(output) = FieldType::value_type::zero();
+                                this->bp.val(output) = FieldType::value_type::one();
                             }
                         }
                     };
@@ -414,7 +414,7 @@ namespace nil {
 
                             if (sum.is_zero()) {
                                 this->bp.val(inv) = FieldType::value_type::zero();
-                                this->bp.val(output) = FieldType::value_type::zero();
+                                this->bp.val(output) = FieldType::value_type::one();
                             } else {
                                 this->bp.val(inv) = sum.inversed();
                                 this->bp.val(output) = FieldType::value_type::zero();
@@ -628,10 +628,10 @@ namespace nil {
                             } else {
                                 for (std::size_t i = 0; i < arr.size(); ++i) {
                                     this->bp.val(alpha[i]) =
-                                        (i == idx ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                                        (i == idx ? FieldType::value_type::one() : FieldType::value_type::zero());
                                 }
 
-                                this->bp.val(success_flag) = FieldType::value_type::zero();
+                                this->bp.val(success_flag) = FieldType::value_type::one();
                             }
 
                             compute_result->generate_r1cs_witness();
