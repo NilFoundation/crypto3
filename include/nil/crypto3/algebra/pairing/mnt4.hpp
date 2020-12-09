@@ -79,50 +79,43 @@ namespace nil {
                     using affine_ate_G1_precomp = typename policy_type::affine_ate_g1_precomputation;
                     using affine_ate_G2_precomp = typename policy_type::affine_ate_g2_precomputation;
 
-                    static inline typename policy_type::affine_ate_g1_precomputation
-                        affine_ate_precompute_g1(const typename policy_type::g1 &P) {
-
+                    static inline affine_ate_G1_precomp affine_ate_precompute_g1(const G1_type &P) {
                         return policy_type::affine_ate_precompute_g1(P);
                     }
 
-                    static inline typename policy_type::affine_ate_g2_precomputation
-                        affine_ate_precompute_g2(const typename policy_type::g2 &Q) {
-
+                    static inline affine_ate_G2_precomp affine_ate_precompute_g2(const G2_type &Q) {
                         return policy_type::affine_ate_precompute_g2(Q);
                     }
 
-                    static inline typename policy_type::g1_precomp precompute_g1(const typename policy_type::g1 &P) {
+                    static inline G1_precomp precompute_g1(const G1_type &P) {
                         return policy_type::precompute_g1(P);
                     }
 
-                    static inline typename policy_type::g2_precomp precompute_g2(const typename policy_type::g2 &Q) {
+                    static inline G2_precomp precompute_g2(const G2_type &Q) {
                         return policy_type::precompute_g2(Q);
                     }
 
-                    static inline typename policy_type::gt pairing(const typename policy_type::g1 &P,
-                                                                   const typename policy_type::g2 &Q) {
+                    static inline GT_type pairing(const G1_type &P, const G2_type &Q) {
                         return policy_type::pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt reduced_pairing(const typename policy_type::g1 &P,
-                                                                           const typename policy_type::g2 &Q) {
+                    static inline GT_type reduced_pairing(const G1_type &P, const G2_type &Q) {
                         return policy_type::reduced_pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt
-                        double_miller_loop(const typename policy_type::g1_precomp &prec_P1,
-                                           const typename policy_type::g2_precomp &prec_Q1,
-                                           const typename policy_type::g1_precomp &prec_P2,
-                                           const typename policy_type::g2_precomp &prec_Q2) {
+                    static inline GT_type double_miller_loop(const G1_precomp &prec_P1,
+                                                             const G2_precomp &prec_Q1,
+                                                             const G1_precomp &prec_P2,
+                                                             const G2_precomp &prec_Q2) {
                         return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 
-                    static inline typename policy_type::gt final_exponentiation(const typename policy_type::gt &elt) {
+                    static inline GT_type final_exponentiation(const GT_type &elt) {
                         return policy_type::final_exponentiation(elt);
                     }
 
-                    static inline typename policy_type::gt miller_loop(const typename policy_type::g1_precomp &prec_P,
-                                                                       const typename policy_type::g2_precomp &prec_Q) {
+                    static inline GT_type miller_loop(const G1_precomp &prec_P,
+                                                      const G2_precomp &prec_Q) {
                         return policy_type::miller_loop(prec_P, prec_Q);
                     }
                 };
