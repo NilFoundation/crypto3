@@ -57,8 +57,19 @@ namespace nil {
                         typedef typename policy_type::Fqe_field Fqe_field;
                         typedef typename policy_type::Fqk_field Fqk_field;
 
+                        using g1_group = typename policy_type::g1_group;
+                        using g2_group = typename policy_type::g2_group;
+
                         constexpr static const typename policy_type::number_type ate_loop_count =
                             policy_type::ate_loop_count;
+
+                        /*constexpr static*/ const typename g2_group::underlying_field_type::value_type 
+                            twist = g2::one().twist;
+                        // must be
+                        //constexpr static const typename g2_group::underlying_field_type::value_type 
+                        //    twist = g2::one()::twist;
+                        // when constexpr ready
+                        //but it's better to implent a structure pairing_params with such values
 
                         struct affine_ate_g1_precomputation {
                             Fq PX;

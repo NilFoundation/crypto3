@@ -65,6 +65,9 @@ namespace nil {
                     constexpr static const number_type final_exponent_last_chunk_w1 = 
                         policy_type::final_exponent_last_chunk_w1;
 
+                    /*constexpr static*/ const typename policy_type::g2_group::underlying_field_type::value_type 
+                            twist = policy_type::twist;
+
                     typedef typename policy_type::Fp_field Fp_type;
                     using G1_type = typename policy_type::g1;
                     using G2_type = typename policy_type::g2;
