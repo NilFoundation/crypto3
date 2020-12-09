@@ -282,7 +282,6 @@ namespace nil {
                             return result;
                         }
 
-                    private:
                         static gt affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P,
                                                          const affine_ate_g2_precomputation &prec_Q) {
 
@@ -327,6 +326,8 @@ namespace nil {
                             return f;
                         }
 
+                    private:
+                        
                         /* ate pairing */
 
                         struct extended_g2_projective {

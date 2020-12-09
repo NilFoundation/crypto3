@@ -90,6 +90,11 @@ namespace nil {
                         return policy_type::affine_ate_precompute_g2(Q);
                     }
 
+                    static inline GT_type affine_ate_miller_loop(const affine_ate_G1_precomp &prec_P,
+                                                                 const affine_ate_G2_precomp &prec_Q){
+                        return policy_type::affine_ate_miller_loop(prec_P, prec_Q);
+                    }
+
                     static inline G1_precomp precompute_g1(const G1_type &P) {
                         return policy_type::precompute_g1(P);
                     }

@@ -45,6 +45,14 @@ namespace nil {
             }
 
             template<typename PairingCurveType>
+            typename PairingCurveType::pairing_policy::GT_type affine_ate_miller_loop(
+                const typename PairingCurveType::pairing_policy::affine_ate_G1_precomp &prec_P,
+                const typename PairingCurveType::pairing_policy::affine_ate_G2_precomp &prec_Q){
+
+                return PairingCurveType::pairing_policy::affine_ate_miller_loop(prec_P, prec_Q);
+            }
+
+            template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::G1_precomp precompute_g1(
                 const typename PairingCurveType::pairing_policy::G1_type &P) {
 
@@ -60,7 +68,7 @@ namespace nil {
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::GT_type pairing(const typename PairingCurveType::pairing_policy::G1_type &v1,
-                                                                    const typename PairingCurveType::pairing_policy::G2_type &v2) {
+                                                                       const typename PairingCurveType::pairing_policy::G2_type &v2) {
                 return PairingCurveType::pairing_policy::pairing(v1, v2);
             }
 
