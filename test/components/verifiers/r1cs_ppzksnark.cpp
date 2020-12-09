@@ -28,9 +28,25 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
+
+
+#include <nil/crypto3/zk/snark/components/basic_components.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>

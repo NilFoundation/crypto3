@@ -65,7 +65,7 @@ namespace nil {
                         }
                         
                         G1_precomputation(blueprint<FieldType> &bp,
-                                          const typename other_curve<CurveType>::g1_type::value_type &P) {
+                                          const typename other_curve<CurveType>::g1_type::value_type &P_val) {
                             typename other_curve<CurveType>::g1_type::value_type P_val_copy = P_val.to_affine_coordinates();
                             P.reset(new G1_variable<CurveType>(bp, P_val_copy));
                             PY_twist_squared.reset(new Fqe_variable<CurveType>(
@@ -90,15 +90,12 @@ namespace nil {
                             blueprint<FieldType> &bp,
                             const G1_variable<CurveType> &P,
                             G1_precomputation<CurveType> &precomp,    // will allocate this inside
-                            typedef typename CurveType::pairing_policy::Fp_type FieldType;
-                            using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                            using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
-
                             const typename std::enable_if<
                                 other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 4,
                                 FieldType>::type & = typename FieldType::value_type()) :
                             component<FieldType>(bp),
                             precomp(precomp) {
+
                             blueprint_linear_combination<FieldType> c0, c1;
                             c0.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c0));
                             c1.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c1));
@@ -117,6 +114,7 @@ namespace nil {
                                 FieldType>::type & = typename FieldType::value_type()) :
                             component<FieldType>(bp),
                             precomp(precomp) {
+
                             blueprint_linear_combination<FieldType> c0, c1, c2;
                             c0.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c0));
                             c1.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c1));

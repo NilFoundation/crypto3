@@ -29,7 +29,7 @@
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_WEIERSTRASS_G2_COMPONENT_HPP
-#define CRYPTO3_ZK_WORD_VARIABLE_COMPONENT_HPP
+#define CRYPTO3_ZK_WEIERSTRASS_G2_COMPONENT_HPP
 
 #include <memory>
 
@@ -49,7 +49,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     struct G2_variable : public component<typename CurveType::scalar_field_type> {
-                        typename typename CurveType::pairing_policy::Fp_type field_type;
+                        using field_type = typename CurveType::pairing_policy::Fp_type;
 
                         using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                         using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
@@ -150,4 +150,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_WORD_VARIABLE_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_WEIERSTRASS_G2_COMPONENT_HPP

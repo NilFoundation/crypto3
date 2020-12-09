@@ -15,6 +15,24 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
+
+#include <nil/crypto3/zk/snark/components/basic_components.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+
 #include "weierstrass_miller_loop.hpp"
 
 using namespace nil::crypto3::zk::snark;
@@ -22,7 +40,28 @@ using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(weierstrass_miller_loop_components_test_suite)
 
-BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_components_test) {
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt4_miller_loop_components_test) {
+	test_mnt_miller_loop<curves::mnt4<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt6_miller_loop_components_test) {
+	test_mnt_miller_loop<curves::mnt6<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt4_e_over_e_miller_loop_components_test) {
+	test_mnt_e_over_e_miller_loop<curves::mnt4<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt6_e_over_e_miller_loop_components_test) {
+	test_mnt_e_over_e_miller_loop<curves::mnt6<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt4_e_times_e_miller_loop_components_test) {
+	test_mnt_e_times_e_miller_loop<curves::mnt4<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt6_e_times_e_miller_loop_components_test) {
+	test_mnt_e_times_e_miller_loop<curves::mnt6<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

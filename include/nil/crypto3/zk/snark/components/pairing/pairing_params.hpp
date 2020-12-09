@@ -89,7 +89,7 @@ namespace nil {
                      *
                      * Having done the above, my_ec_pp can be used as a template parameter.
                      *
-                     * See mnt_pairing_params.hpp for examples for the case of fixing
+                     * See params/mnt4.hpp and params/mnt6.hpp for examples for the case of fixing
                      * ec_ppT to "MNT4" and "MNT6".
                      *
                      */

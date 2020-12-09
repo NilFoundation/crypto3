@@ -92,7 +92,8 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_read_component.hpp
      include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_update_component.hpp
 
-     include/nil/crypto3/zk/snark/components/pairing/mnt_pairing_params.hpp
+     include/nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp
+     include/nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp
      include/nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp
      include/nil/crypto3/zk/snark/components/pairing/pairing_params.hpp
      include/nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp
