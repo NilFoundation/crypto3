@@ -94,7 +94,7 @@ namespace nil {
                 const typename PairingCurveType::pairing_policy::G1_precomp &prec_P,
                 const typename PairingCurveType::pairing_policy::G2_precomp &prec_Q) {
 
-                return PairingCurveType::pairing_policy::miller_loop(P, Q);
+                return PairingCurveType::pairing_policy::miller_loop(prec_P, prec_Q);
             }
 
         }    // namespace algebra

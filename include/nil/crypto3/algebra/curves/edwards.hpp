@@ -66,8 +66,8 @@ namespace nil {
                     typedef typename detail::edwards_g1<ModulusBits> g1_type;
                     typedef typename detail::edwards_g2<ModulusBits> g2_type;
 
-                    typedef typename pairing::pairing_policy<edwards<ModulusBits>,
-                                                             pairing::detail::edwards_pairing_functions<ModulusBits>>
+                    typedef typename pairings::pairing_policy<edwards<ModulusBits>,
+                                                             pairings::detail::edwards_pairing_functions<ModulusBits>>
                         pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
