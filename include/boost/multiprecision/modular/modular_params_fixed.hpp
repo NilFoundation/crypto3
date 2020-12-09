@@ -21,7 +21,6 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> 
 {
  protected:
    typedef cpp_int_backend<MinBits, MinBits, SignType, Checked, void> TemplateBackend;
-   typedef modular_params<TemplateBackend>                            self_type;
    typedef backends::modular_ops<TemplateBackend>                               modular_logic;
 
  public:
@@ -41,13 +40,9 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> 
    // TODO: add universal ref constructor
    constexpr modular_params() {}
 
-   // // template <typename BackendT>
-   // template <typename T>
-   // constexpr explicit modular_params(const T& m) : m_mod_obj(m) {}
+   constexpr modular_params(const number_type& m) : m_mod_obj(m) {}
 
-   constexpr explicit modular_params(const number_type& m) : m_mod_obj(m.backend()) {}
-
-   constexpr explicit modular_params(const self_type& o) : m_mod_obj(o.get_mod_obj()) {}
+   constexpr modular_params(const modular_params& o) : m_mod_obj(o.get_mod_obj()) {}
 
    // template <typename BackendT>
    template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
@@ -67,13 +62,6 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> 
    template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
    constexpr void adjust_modular(cpp_int_backend<MinBits1, MinBits1, SignType1, Checked1, void>& result)
    {
-      // TODO: maybe overflow here
-      // get_mod_obj().barret_reduce(result);
-      // if (check_montgomery_constraints(get_mod_obj()))
-      // {
-      //    eval_multiply(result, get_mod_obj().get_r2());
-      //    get_mod_obj().montgomery_reduce(result);
-      // }
       adjust_modular(result, result);
    }
 
@@ -141,65 +129,32 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> 
       }
    }
 
-   // // template <typename Backend1, typename Backend2>
-   // template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-   //           unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
-   // constexpr void mod_mul(cpp_int_backend<MinBits1, MinBits1, SignType1, Checked1, void>& result,
-   //                        const cpp_int_backend<MinBits2, MinBits2, SignType2, Checked2, void>& y) const
-   // {
-   //    if (check_montgomery_constraints(get_mod_obj()))
-   //    {
-   //       get_mod_obj().montgomery_mul(result, y);
-   //    }
-   //    else
-   //    {
-   //       get_mod_obj().regular_mul(result, y);
-   //    }
-   // }
-   //
-   // template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-   //           unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-   //           unsigned MinBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3>
-   // constexpr void mod_mul(cpp_int_backend<MinBits1, MinBits1, SignType1, Checked1, void>& result,
-   //                        const cpp_int_backend<MinBits2, MinBits2, SignType2, Checked2, void>& x,
-   //                        const cpp_int_backend<MinBits3, MinBits3, SignType3, Checked3, void>& y) const
-   // {
-   //    if (check_montgomery_constraints(get_mod_obj()))
-   //    {
-   //       get_mod_obj().montgomery_mul(result, x, y);
-   //    }
-   //    else
-   //    {
-   //       get_mod_obj().regular_mul(result, x, y);
-   //    }
-   // }
-
    template <typename BackendT, expression_template_option ExpressionTemplates>
    constexpr operator number<BackendT, ExpressionTemplates>()
    {
       return get_mod();
    };
 
-   constexpr int compare(const self_type& o) const
+   constexpr int compare(const modular_params& o) const
    {
       // They are either equal or not:
       return get_mod().compare(o.get_mod());
    }
 
-   constexpr void swap(self_type& o)
+   constexpr void swap(modular_params& o)
    {
       get_mod_obj().swap(o.get_mod_obj());
    }
 
-   constexpr self_type& operator=(const self_type& o)
+   constexpr modular_params& operator=(const modular_params& o)
    {
-      self_type tmp(o);
+      modular_params tmp(o);
       swap(tmp);
 
       return *this;
    }
 
-   constexpr self_type& operator=(const number_type& m)
+   constexpr modular_params& operator=(const number_type& m)
    {
       m_mod_obj = m;
 
@@ -207,7 +162,7 @@ class modular_params<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> 
    }
 
    // TODO: check function correctness
-   constexpr friend std::ostream& operator<<(std::ostream& o, const self_type& a)
+   constexpr friend std::ostream& operator<<(std::ostream& o, const modular_params& a)
    {
       o << a.get_mod();
       return o;

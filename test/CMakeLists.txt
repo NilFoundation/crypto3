@@ -1544,6 +1544,11 @@ target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_cpp
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_cpp_int no_eh_support)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_cpp_int PROPERTIES CXX_STANDARD 17)
 
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor_fixed.cpp)
+target_compile_definitions(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PUBLIC -DTEST_CPP_INT)
+target_link_libraries(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int no_eh_support)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PROPERTIES CXX_STANDARD 17)
+
 if(GMP_COMPILED)
     cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
     target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_gmp ${GMP_LIBRARIES})
