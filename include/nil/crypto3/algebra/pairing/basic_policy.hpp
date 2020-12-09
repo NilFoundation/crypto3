@@ -29,10 +29,10 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairing {
+            namespace pairings {
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy { };
-            }    // namespace pairing
+            }    // namespace pairings
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil

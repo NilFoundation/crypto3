@@ -38,7 +38,7 @@ namespace nil {
                 struct mnt6;
 
             }    // namespace curves
-            namespace pairing {
+            namespace pairings {
 
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy;
@@ -147,7 +147,7 @@ namespace nil {
                 constexpr typename pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::number_type const
                     pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_w1;
 
-            }    // namespace pairing
+            }    // namespace pairings
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil

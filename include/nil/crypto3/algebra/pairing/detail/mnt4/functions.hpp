@@ -30,12 +30,12 @@
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-//#include <boost/multiprecision/wnaf.hpp>
+#include <boost/multiprecision/wnaf.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairing {
+            namespace pairings {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 298>
@@ -627,7 +627,7 @@ namespace nil {
                     };
 
                 }    // namespace detail
-            }        // namespace pairing
+            }        // namespace pairings
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

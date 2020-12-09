@@ -35,7 +35,7 @@ namespace nil {
                 struct alt_bn128;
 
             }    // namespace curves
-            namespace pairing {
+            namespace pairings {
 
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy;
@@ -101,7 +101,7 @@ namespace nil {
                 template<std::size_t ModulusBits, typename PairingFunctions>
                 constexpr typename pairing_policy<curves::alt_bn128<ModulusBits>, PairingFunctions>::number_type const
                     pairing_policy<curves::alt_bn128<ModulusBits>, PairingFunctions>::pairing_loop_count;
-            }    // namespace pairing
+            }    // namespace pairings
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil

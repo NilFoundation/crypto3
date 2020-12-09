@@ -48,7 +48,7 @@
 #include <nil/crypto3/algebra/fields/detail/element/fp6_2over3.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp12_2over3over2.hpp>
 
-using namespace nil::crypto3::algebra::pairing;
+using namespace nil::crypto3::algebra::pairings;
 using namespace nil::crypto3::algebra;
 using namespace boost::multiprecision;
 
