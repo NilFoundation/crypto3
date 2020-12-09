@@ -1,7 +1,7 @@
 /** @file
  *****************************************************************************
 
- Implementation of interfaces for gadgets for Miller loops.
+ Implementation of interfaces for components for Miller loops.
 
  See weierstrass_miller_loop.hpp .
 
@@ -20,6 +20,7 @@
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
 
 #include <nil/crypto3/zk/snark/components/pairing/as_waksman.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pairing.hpp>
@@ -49,22 +50,18 @@ void test_mnt_miller_loop(){
     components::G1_precomputation<curve_type> prec_P;
     components::G2_precomputation<curve_type> prec_Q;
 
-    components::precompute_G1_gadget<curve_type> compute_prec_P(bp, P, prec_P);
-    components::precompute_G2_gadget<curve_type> compute_prec_Q(bp, Q, prec_Q);
+    components::precompute_G1_component<curve_type> compute_prec_P(bp, P, prec_P);
+    components::precompute_G2_component<curve_type> compute_prec_Q(bp, Q, prec_Q);
 
     components::Fqk_variable<curve_type> result(bp);
-    components::mnt_miller_loop_gadget<curve_type> miller(bp, prec_P, prec_Q, result);
+    components::mnt_miller_loop_component<curve_type> miller(bp, prec_P, prec_Q, result);
 
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_P.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_Q.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        miller.generate_r1cs_constraints();
-    }
-    PRINT_CONSTRAINT_PROFILING();
+    compute_prec_P.generate_r1cs_constraints();
+    
+    
+    compute_prec_Q.generate_r1cs_constraints();
+    
+    miller.generate_r1cs_constraints();
 
     P.generate_r1cs_witness(P_val);
     compute_prec_P.generate_r1cs_witness();
@@ -90,7 +87,7 @@ void test_mnt_e_over_e_miller_loop(){
     using curve_type = CurveType;
     using other_curve_type = components::other_curve<curve_type>;
     using curve_pairing_policy = typename curve_type::pairing_policy;
-    using other_curve_pairing_policy = typename other_curve<curve_type>::pairing_policy;
+    using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
     blueprint<typename curve_type::scalar_field_type> bp;
     typename other_curve_type::g1_type::value_type P1_val = 
@@ -113,30 +110,25 @@ void test_mnt_e_over_e_miller_loop(){
     components::G2_variable<curve_type> Q2(bp);
 
     components::G1_precomputation<curve_type> prec_P1;
-    components::precompute_G1_gadget<curve_type> compute_prec_P1(bp, P1, prec_P1);
+    components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);
     components::G1_precomputation<curve_type> prec_P2;
-    components::precompute_G1_gadget<curve_type> compute_prec_P2(bp, P2, prec_P2);
+    components::precompute_G1_component<curve_type> compute_prec_P2(bp, P2, prec_P2);
     components::G2_precomputation<curve_type> prec_Q1;
-    components::precompute_G2_gadget<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
+    components::precompute_G2_component<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
     components::G2_precomputation<curve_type> prec_Q2;
-    components::precompute_G2_gadget<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
+    components::precompute_G2_component<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
 
     components::Fqk_variable<curve_type> result(bp);
-    components::mnt_e_over_e_miller_loop_gadget<curve_type> miller(bp, prec_P1, prec_Q1, prec_P2, prec_Q2, result);
+    components::mnt_e_over_e_miller_loop_component<curve_type> miller(bp, prec_P1, prec_Q1, prec_P2, prec_Q2, result);
 
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_P1.generate_r1cs_constraints();
-        compute_prec_P2.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_Q1.generate_r1cs_constraints();
-        compute_prec_Q2.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        miller.generate_r1cs_constraints();
-    }
-    PRINT_CONSTRAINT_PROFILING();
+    compute_prec_P1.generate_r1cs_constraints();
+    compute_prec_P2.generate_r1cs_constraints();
 
+    compute_prec_Q1.generate_r1cs_constraints();
+    compute_prec_Q2.generate_r1cs_constraints();
+    
+    miller.generate_r1cs_constraints();
+    
     P1.generate_r1cs_witness(P1_val);
     compute_prec_P1.generate_r1cs_witness();
     Q1.generate_r1cs_witness(Q1_val);
@@ -170,28 +162,28 @@ void test_mnt_e_times_e_over_e_miller_loop(){
     using curve_type = CurveType;
     using other_curve_type = components::other_curve<curve_type>;
     using curve_pairing_policy = typename curve_type::pairing_policy;
-    using other_curve_pairing_policy = typename other_curve<curve_type>::pairing_policy;
+    using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
     blueprint<typename curve_type::scalar_field_type> bp;
     typename other_curve_type::g1_type::value_type P1_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g1_type::value_type::one();
     typename other_curve_type::g2_type::value_type Q1_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g2_type::value_type::one();
 
     typename other_curve_type::g1_type::value_type P2_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g1_type::value_type::one();
     typename other_curve_type::g2_type::value_type Q2_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g2_type::value_type::one();
 
     typename other_curve_type::g1_type::value_type P3_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g1_type::value_type::one();
     typename other_curve_type::g2_type::value_type Q3_val = 
-        random_element<typename other_curve_type::::scalar_field_type>() * 
+        random_element<typename other_curve_type::scalar_field_type>() * 
         other_curve_type::g2_type::value_type::one();
 
     components::G1_variable<curve_type> P1(bp);
@@ -202,38 +194,33 @@ void test_mnt_e_times_e_over_e_miller_loop(){
     components::G2_variable<curve_type> Q3(bp);
 
     components::G1_precomputation<curve_type> prec_P1;
-    components::precompute_G1_gadget<curve_type> compute_prec_P1(bp, P1, prec_P1);
+    components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);
     components::G1_precomputation<curve_type> prec_P2;
-    components::precompute_G1_gadget<curve_type> compute_prec_P2(bp, P2, prec_P2);
+    components::precompute_G1_component<curve_type> compute_prec_P2(bp, P2, prec_P2);
     components::G1_precomputation<curve_type> prec_P3;
-    components::precompute_G1_gadget<curve_type> compute_prec_P3(bp, P3, prec_P3);
+    components::precompute_G1_component<curve_type> compute_prec_P3(bp, P3, prec_P3);
     components::G2_precomputation<curve_type> prec_Q1;
-    components::precompute_G2_gadget<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
+    components::precompute_G2_component<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
     components::G2_precomputation<curve_type> prec_Q2;
-    components::precompute_G2_gadget<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
+    components::precompute_G2_component<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
     components::G2_precomputation<curve_type> prec_Q3;
-    components::precompute_G2_gadget<curve_type> compute_prec_Q3(bp, Q3, prec_Q3);
+    components::precompute_G2_component<curve_type> compute_prec_Q3(bp, Q3, prec_Q3);
 
     components::Fqk_variable<curve_type> result(bp);
-    components::mnt_e_times_e_over_e_miller_loop_gadget<curve_type> miller(bp, prec_P1, prec_Q1, 
+    components::mnt_e_times_e_over_e_miller_loop_component<curve_type> miller(bp, prec_P1, prec_Q1, 
                                                         prec_P2, prec_Q2, prec_P3, 
                                                         prec_Q3, result);
 
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_P1.generate_r1cs_constraints();
-        compute_prec_P2.generate_r1cs_constraints();
-        compute_prec_P3.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        compute_prec_Q1.generate_r1cs_constraints();
-        compute_prec_Q2.generate_r1cs_constraints();
-        compute_prec_Q3.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(bp){
-        miller.generate_r1cs_constraints();
-    }
-    PRINT_CONSTRAINT_PROFILING();
-
+    compute_prec_P1.generate_r1cs_constraints();
+    compute_prec_P2.generate_r1cs_constraints();
+    compute_prec_P3.generate_r1cs_constraints();
+    
+    compute_prec_Q1.generate_r1cs_constraints();
+    compute_prec_Q2.generate_r1cs_constraints();
+    compute_prec_Q3.generate_r1cs_constraints();
+    
+    miller.generate_r1cs_constraints();
+    
     P1.generate_r1cs_witness(P1_val);
     compute_prec_P1.generate_r1cs_witness();
     Q1.generate_r1cs_witness(Q1_val);

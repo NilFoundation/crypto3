@@ -57,11 +57,11 @@ BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt6_e_over_e_miller_loop_component
 }
 
 BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt4_e_times_e_miller_loop_components_test) {
-	test_mnt_e_times_e_miller_loop<curves::mnt4<298>>();
+	test_mnt_e_times_e_over_e_miller_loop<curves::mnt4<298>>();
 }
 
 BOOST_AUTO_TEST_CASE(weierstrass_miller_loop_mnt6_e_times_e_miller_loop_components_test) {
-	test_mnt_e_times_e_miller_loop<curves::mnt6<298>>();
+	test_mnt_e_times_e_over_e_miller_loop<curves::mnt6<298>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

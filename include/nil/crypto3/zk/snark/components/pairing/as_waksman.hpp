@@ -32,8 +32,7 @@
 
 #include <memory>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
 
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
@@ -78,6 +77,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class precompute_G1_component : public component<typename CurveType::scalar_field_type> {
+                        using curve_type = CurveType;
                     public:
                         using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
                         using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
@@ -91,14 +91,20 @@ namespace nil {
                             const G1_variable<CurveType> &P,
                             G1_precomputation<CurveType> &precomp,    // will allocate this inside
                             const typename std::enable_if<
-                                other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 4,
-                                FieldType>::type & = typename FieldType::value_type()) :
+                                other_curve<CurveType>::pairing_policy::Fqk_type::arity == 4,
+                                typename FieldType::value_type>::type & = typename FieldType::value_type()) :
                             component<FieldType>(bp),
                             precomp(precomp) {
 
                             blueprint_linear_combination<FieldType> c0, c1;
-                            c0.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c0));
-                            c1.assign(bp, P.Y * ((algebra::mnt4_twist).squared().c1));
+                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c0));
+                            // must be
+                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c0));
+                            // when constexpr ready
+                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c1));
+                            // must be
+                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c1));
+                            // when constexpr ready
 
                             precomp.P.reset(new G1_variable<CurveType>(P));
                             precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(bp, c0, c1));
@@ -110,15 +116,21 @@ namespace nil {
                             const G1_variable<CurveType> &P,
                             G1_precomputation<CurveType> &precomp,    // will allocate this inside
                             const typename std::enable_if<
-                                other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 6,
-                                FieldType>::type & = typename FieldType::value_type()) :
+                                other_curve<CurveType>::pairing_policy::Fqk_type::arity == 6,
+                                typename FieldType::value_type>::type & = typename FieldType::value_type()) :
                             component<FieldType>(bp),
                             precomp(precomp) {
 
                             blueprint_linear_combination<FieldType> c0, c1, c2;
-                            c0.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c0));
-                            c1.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c1));
-                            c2.assign(bp, P.Y * ((algebra::mnt6_twist).squared().c2));
+                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c0));
+                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c1));
+                            c2.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c2));
+                            // must be
+                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c0));
+                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c1));
+                            //c2.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c2));
+                            // when constexpr ready
+
 
                             precomp.P.reset(new G1_variable<CurveType>(P));
                             precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(bp, c0, c1, c2));
@@ -187,8 +199,8 @@ namespace nil {
                         G2_precomputation(blueprint<FieldType> &bp,
                                           const typename other_curve<CurveType>::g2_type::value_type &Q_val){
                             Q.reset(new G2_variable<CurveType>(bp, Q_val));
-                            const other_curve<CurveType>::pairing_policy::affine_ate_G2_precomp native_precomp =
-                                other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
+                            const typename other_curve<CurveType>::pairing_policy::affine_ate_G2_precomp native_precomp =
+                                affine_ate_precompute_G2<other_curve<CurveType>>(Q_val);
 
                             coeffs.resize(native_precomp.coeffs.size() +
                                           1);    // the last precomp remains for convenient programming
@@ -266,7 +278,7 @@ namespace nil {
                             compute_next_RX.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.gamma), *next_RX_plus_two_RX));
 
                             RX_minus_next_RX.reset(
-                                new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
+                                new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::one())));
                             RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                             compute_next_RY.reset(
                                 new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
@@ -358,11 +370,11 @@ namespace nil {
                             component<FieldType>(bp),
                             invert_Q(invert_Q), cur(cur), next(next), Q(Q) {
                             RY_minus_QY.reset(
-                                new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() :
-                                                                                              FieldType::value_type::zero())));
+                                new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::one() :
+                                                                                              FieldType::value_type::one())));
 
                             RX_minus_QX.reset(
-                                new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::value_type::zero())));
+                                new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::value_type::one())));
                             compute_gamma.reset(new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
                             compute_gamma_X.reset(new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
 
@@ -370,7 +382,7 @@ namespace nil {
                             compute_next_RX.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.gamma), *next_RX_plus_RX_plus_QX));
 
                             RX_minus_next_RX.reset(
-                                new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
+                                new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::one())));
                             RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                             compute_next_RY.reset(
                                 new Fqe_mul_component<CurveType>(bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
