@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
-#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/bls12.hpp>
 
@@ -42,6 +42,7 @@ namespace nil {
             template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
             struct bls_private_key {
                 typedef CurveType curve_type;
+                typedef SignatureHash signature_hash_type;
 
                 typedef typename curve_type::value_type value_type;
                 typedef typename curve_type::number_type number_type;
