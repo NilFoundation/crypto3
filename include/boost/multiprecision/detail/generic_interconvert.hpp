@@ -592,11 +592,13 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 
    generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
 }
-// TODO: make more unambiguous specialization
+
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/)
+constexpr void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/)
 {
-   auto tmp = from.base_data();
+   typedef typename From::value_type value_type;
+
+   value_type tmp;
    from.mod_data().adjust_regular(tmp, from.base_data());
    to = tmp;
 }

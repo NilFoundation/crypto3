@@ -48,7 +48,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
 template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/);
+constexpr void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/);
 
 } // namespace detail
 
