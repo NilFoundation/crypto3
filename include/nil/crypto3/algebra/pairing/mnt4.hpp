@@ -52,21 +52,19 @@ namespace nil {
 
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type pairing_loop_count =
-                        policy_type::ate_loop_count;
+                    constexpr static const number_type pairing_loop_count = policy_type::ate_loop_count;
 
-                    constexpr static const bool ate_is_loop_count_neg = 
-                        policy_type::ate_is_loop_count_neg;
+                    constexpr static const bool ate_is_loop_count_neg = policy_type::ate_is_loop_count_neg;
 
                     constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
                         policy_type::final_exponent_last_chunk_abs_of_w0;
-                    constexpr static const bool final_exponent_last_chunk_is_w0_neg = 
+                    constexpr static const bool final_exponent_last_chunk_is_w0_neg =
                         policy_type::final_exponent_last_chunk_is_w0_neg;
-                    constexpr static const number_type final_exponent_last_chunk_w1 = 
+                    constexpr static const number_type final_exponent_last_chunk_w1 =
                         policy_type::final_exponent_last_chunk_w1;
 
-                    /*constexpr static*/ const typename policy_type::g2_group::underlying_field_type::value_type 
-                            twist = policy_type::twist;
+                    /*constexpr static*/ const typename policy_type::g2_group::underlying_field_type::value_type twist =
+                        policy_type::twist;
 
                     typedef typename policy_type::Fp_field Fp_type;
                     using G1_type = typename policy_type::g1;
@@ -91,7 +89,7 @@ namespace nil {
                     }
 
                     static inline GT_type affine_ate_miller_loop(const affine_ate_G1_precomp &prec_P,
-                                                                 const affine_ate_G2_precomp &prec_Q){
+                                                                 const affine_ate_G2_precomp &prec_Q) {
                         return policy_type::affine_ate_miller_loop(prec_P, prec_Q);
                     }
 
@@ -122,8 +120,7 @@ namespace nil {
                         return policy_type::final_exponentiation(elt);
                     }
 
-                    static inline GT_type miller_loop(const G1_precomp &prec_P,
-                                                      const G2_precomp &prec_Q) {
+                    static inline GT_type miller_loop(const G1_precomp &prec_P, const G2_precomp &prec_Q) {
                         return policy_type::miller_loop(prec_P, prec_Q);
                     }
                 };
@@ -133,8 +130,7 @@ namespace nil {
                     pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::pairing_loop_count;
 
                 template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr bool const
-                    pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::ate_is_loop_count_neg;
+                constexpr bool const pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::ate_is_loop_count_neg;
 
                 template<std::size_t ModulusBits, typename PairingFunctions>
                 constexpr typename pairing_policy<curves::mnt4<ModulusBits>, PairingFunctions>::number_type const

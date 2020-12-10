@@ -66,7 +66,7 @@ namespace nil {
                     typedef typename detail::mnt6_g2<ModulusBits> g2_type;
 
                     typedef typename pairings::pairing_policy<mnt6<ModulusBits>,
-                                                             pairings::detail::mnt6_pairing_functions<ModulusBits>>
+                                                              pairings::detail::mnt6_pairing_functions<ModulusBits>>
                         pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;

@@ -63,13 +63,13 @@ namespace nil {
                         constexpr static const typename policy_type::number_type ate_loop_count =
                             policy_type::ate_loop_count;
 
-                        /*constexpr static*/ const typename g2_group::underlying_field_type::value_type 
-                            twist = g2::one().twist;
+                        /*constexpr static*/ const typename g2_group::underlying_field_type::value_type twist =
+                            g2::one().twist;
                         // must be
-                        //constexpr static const typename g2_group::underlying_field_type::value_type 
+                        // constexpr static const typename g2_group::underlying_field_type::value_type
                         //    twist = g2::one()::twist;
                         // when constexpr ready
-                        //but it's better to implent a structure pairing_params with such values
+                        // but it's better to implement a structure pairing_params with such values
 
                         struct affine_ate_g1_precomputation {
                             Fq PX;
@@ -330,7 +330,6 @@ namespace nil {
                         }
 
                     private:
-                        
                         /* ate pairing */
 
                         struct extended_g2_projective {

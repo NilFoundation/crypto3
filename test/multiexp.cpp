@@ -91,7 +91,8 @@ test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t si
 
     for (size_t i = 0; i < count; i++) {
 
-        typename GroupType::value_type x = curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+        typename GroupType::value_type x =
+            curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
 
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
@@ -117,21 +118,20 @@ test_instances_t<FieldType> generate_scalars(size_t count, std::size_t size) {
     return result;
 }
 
-long long get_nsec_time()
-{
+long long get_nsec_time() {
     auto timepoint = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
 }
 
 template<typename GroupType, typename FieldType, typename MultiexpMethod>
-run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
-                                         test_instances_t<FieldType> scalars) {
+run_result_t<GroupType>
+    profile_multiexp(test_instances_t<GroupType> group_elements, test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multiexp<GroupType, FieldType, MultiexpMethod>(group_elements[i].cbegin(), group_elements[i].cend(),
-                                                                  scalars[i].cbegin(), scalars[i].cend(), 1));
+        answers.push_back(multiexp<GroupType, FieldType, MultiexpMethod>(
+            group_elements[i].cbegin(), group_elements[i].cend(), scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
     long long time_delta = get_nsec_time() - start_time;
@@ -140,7 +140,8 @@ run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_eleme
 }
 
 template<typename GroupType, typename FieldType>
-void print_performance_csv(size_t expn_start, std::size_t expn_end_fast, std::size_t expn_end_naive, bool compare_answers) {
+void print_performance_csv(size_t expn_start, std::size_t expn_end_fast, std::size_t expn_end_naive,
+                           bool compare_answers) {
     for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
         printf("%ld", expn);
         fflush(stdout);

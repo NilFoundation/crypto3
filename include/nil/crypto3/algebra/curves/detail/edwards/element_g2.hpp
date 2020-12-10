@@ -25,7 +25,7 @@
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_ELEMENT_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>

@@ -215,13 +215,16 @@ namespace nil {
                 return res;
             }
 
-            template<typename GroupType, typename FieldType>
-            std::vector<typename GroupType::value_type>
-                batch_exp(const std::size_t scalar_size,
-                          const std::size_t window,
-                          const window_table<GroupType> &table,
-                          const std::vector<typename FieldType::value_type> &v) {
-                std::vector<typename GroupType::value_type> res(v.size(), table[0][0]);
+            template<typename GroupType,
+                     typename FieldType,
+                     typename InputRange,
+                     typename = typename std::enable_if<
+                         std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
+            std::vector<typename GroupType::value_type> batch_exp(const std::size_t scalar_size,
+                                                                  const std::size_t window,
+                                                                  const window_table<GroupType> &table,
+                                                                  const InputRange &v) {
+                std::vector<typename GroupType::value_type> res(std::distance(v.begin(), v.end()), table[0][0]);
 
                 for (std::size_t i = 0; i < v.size(); ++i) {
                     res[i] = windowed_exp<GroupType, FieldType>(scalar_size, window, table, v[i]);
@@ -230,14 +233,18 @@ namespace nil {
                 return res;
             }
 
-            template<typename GroupType, typename FieldType>
+            template<typename GroupType,
+                     typename FieldType,
+                     typename InputRange,
+                     typename = typename std::enable_if<
+                         std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
             std::vector<typename GroupType::value_type>
                 batch_exp_with_coeff(const std::size_t scalar_size,
                                      const std::size_t window,
                                      const window_table<GroupType> &table,
                                      const typename FieldType::value_type &coeff,
-                                     const std::vector<typename FieldType::value_type> &v) {
-                std::vector<typename GroupType::value_type> res(v.size(), table[0][0]);
+                                     const InputRange &v) {
+                std::vector<typename GroupType::value_type> res(std::distance(v.begin(), v.end()), table[0][0]);
 
                 for (std::size_t i = 0; i < v.size(); ++i) {
                     res[i] = windowed_exp<GroupType, FieldType>(scalar_size, window, table, coeff * v[i]);
@@ -246,8 +253,11 @@ namespace nil {
                 return res;
             }
 
-            template<typename GroupType>
-            void batch_to_special(std::vector<typename GroupType::value_type> &vec) {
+            template<typename GroupType, typename InputRange>
+            typename std::enable_if<
+                std::is_same<typename InputRange::value_type, typename GroupType::value_type>::value,
+                void>::type
+                batch_to_special(InputRange &vec) {
 
                 std::vector<typename GroupType::value_type> non_zero_vec;
                 for (std::size_t i = 0; i < vec.size(); ++i) {
@@ -269,7 +279,6 @@ namespace nil {
                     }
                 }
             }
-
         }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil

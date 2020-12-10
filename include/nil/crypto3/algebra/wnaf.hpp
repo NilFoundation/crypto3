@@ -76,7 +76,8 @@ namespace nil {
                 std::size_t best = 0;
                 for (long i =
                          curves::wnaf_params<typename CurveGroupValueType::group_type>::wnaf_window_table.size() - 1;
-                     i >= 0; --i) {
+                     i >= 0;
+                     --i) {
                     if (scalar_bits >=
                         curves::wnaf_params<typename CurveGroupValueType::group_type>::wnaf_window_table[i]) {
                         best = i + 1;
