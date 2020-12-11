@@ -603,7 +603,6 @@ constexpr void generic_interconvert(To& to, const From& from, const mpl::int_<nu
    to = tmp;
 }
 
-
 }
 }
 } // namespace boost::multiprecision::detail

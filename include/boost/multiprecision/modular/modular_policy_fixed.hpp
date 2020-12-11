@@ -18,13 +18,17 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
+// TODO: replace cpp_int_backend on this type everywhere in fixed modular_adaptor
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+using modular_fixed_cpp_int_backend = cpp_int_backend<MinBits, MinBits, SignType, Checked, void>;
+
 template <typename Backend>
 class modular_policy;
 
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-struct modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> >
+struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
-   typedef cpp_int_backend<MinBits, MinBits, SignType, Checked, void> Backend;
+   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
    static_assert(MinBits, "number of bits should be defined");
    static_assert(is_fixed_precision<Backend>::value, "fixed precision backend should be used");
@@ -57,24 +61,12 @@ struct modular_policy<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
    constexpr static auto BitsCount_doubled_limbs        = 2u * limbs_count * limb_bits;
    constexpr static auto BitsCount_doubled_padded_limbs = BitsCount_doubled_limbs + limb_bits;
 
-   typedef cpp_int_backend<BitsCount_doubled, BitsCount_doubled,
-                           SignType, Checked, void>
-       Backend_doubled;
-   typedef cpp_int_backend<BitsCount_doubled_1, BitsCount_doubled_1,
-                           SignType, Checked, void>
-       Backend_doubled_1;
-   typedef cpp_int_backend<BitsCount_quadruple_1, BitsCount_quadruple_1,
-                           SignType, Checked, void>
-       Backend_quadruple_1;
-   typedef cpp_int_backend<BitsCount_padded_limbs, BitsCount_padded_limbs,
-                           SignType, Checked, void>
-       Backend_padded_limbs;
-   typedef cpp_int_backend<BitsCount_doubled_limbs, BitsCount_doubled_limbs,
-                           SignType, Checked, void>
-       Backend_doubled_limbs;
-   typedef cpp_int_backend<BitsCount_doubled_padded_limbs, BitsCount_doubled_padded_limbs,
-                           SignType, Checked, void>
-       Backend_doubled_padded_limbs;
+   typedef modular_fixed_cpp_int_backend<BitsCount_doubled, SignType, Checked>              Backend_doubled;
+   typedef modular_fixed_cpp_int_backend<BitsCount_doubled_1, SignType, Checked>            Backend_doubled_1;
+   typedef modular_fixed_cpp_int_backend<BitsCount_quadruple_1, SignType, Checked>          Backend_quadruple_1;
+   typedef modular_fixed_cpp_int_backend<BitsCount_padded_limbs, SignType, Checked>         Backend_padded_limbs;
+   typedef modular_fixed_cpp_int_backend<BitsCount_doubled_limbs, SignType, Checked>        Backend_doubled_limbs;
+   typedef modular_fixed_cpp_int_backend<BitsCount_doubled_padded_limbs, SignType, Checked> Backend_doubled_padded_limbs;
 
    typedef number<Backend>               number_type;
    typedef number<Backend_doubled>       dbl_number_type;

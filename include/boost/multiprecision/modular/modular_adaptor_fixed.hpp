@@ -21,10 +21,10 @@ class modular_adaptor;
 
 // fixed precision modular backend which supports compile-time execution
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void> >
+class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
-   typedef cpp_int_backend<MinBits, MinBits, SignType, Checked, void> TemplateBackend;
+   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
 
  public:
    typedef modular_params<TemplateBackend> modulus_type;
@@ -32,11 +32,15 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
  protected:
    typedef typename modulus_type::policy_type          policy_type;
    typedef typename policy_type::Backend               Backend;
+   typedef typename policy_type::Backend_padded_limbs  Backend_padded_limbs;
    typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type           number_type;
 
  public:
-   typedef Backend_doubled_limbs value_type;
+   // typedef Backend_doubled_limbs value_type;
+   typedef Backend               value_type;
+   typedef Backend_padded_limbs  add_value_type;
+   typedef Backend_doubled_limbs mul_value_type;
 
    constexpr value_type& base_data() { return m_base; }
    constexpr const value_type& base_data() const { return m_base; }
@@ -189,18 +193,154 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
    modulus_type m_mod;
 };
 
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked,
+          class T, class V>
+constexpr void assign_components(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& result,
+                                 const T& a, const V& b)
+{
+   result.mod_data() = b;
+   result.mod_data().adjust_modular(result.base_data(), a);
 }
 
-using boost::multiprecision::backends::modular_adaptor;
-using boost::multiprecision::backends::cpp_int_backend;
+template <typename Backend_helper, typename T, typename U>
+constexpr void add_modular_helper(modular_adaptor<T>&       result,
+                                       const modular_adaptor<U>& o)
+{
+   using default_ops::eval_lt;
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
 
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-struct expression_template_default<modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> > >
+   Backend_helper tmp(result.base_data());
+   eval_add(tmp, o.base_data());
+   if (!eval_lt(tmp, result.mod_data().get_mod()))
+   {
+      eval_subtract(tmp, result.mod_data().get_mod().backend());
+   }
+   result.base_data() = tmp;
+}
+
+template <typename Backend_helper, typename T, typename U>
+constexpr void multiply_modular_helper(modular_adaptor<T>&       result,
+                                       const modular_adaptor<U>& o)
+{
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+
+   Backend_helper tmp(result.base_data());
+   eval_multiply(tmp, o.base_data());
+   eval_redc(tmp, result.mod_data());
+   result.base_data() = tmp;
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_add(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>&       result,
+                        const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using add_value_type = typename Backend::add_value_type;
+
+   add_modular_helper<add_value_type>(result, o);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename T>
+constexpr void eval_add(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>&       result,
+                        const modular_adaptor<T>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using add_value_type = typename Backend::add_value_type;
+
+   add_modular_helper<add_value_type>(result, o);
+}
+
+template <typename T, unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_add(modular_adaptor<T>&       result,
+                        const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using add_value_type = typename Backend::add_value_type;
+
+   add_modular_helper<add_value_type>(result, o);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_multiply(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& result,
+                             const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using mul_value_type = typename Backend::mul_value_type;
+
+   multiply_modular_helper<mul_value_type>(result, o);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename T>
+constexpr void eval_multiply(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& result,
+                             const modular_adaptor<T>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using mul_value_type = typename Backend::mul_value_type;
+
+   multiply_modular_helper<mul_value_type>(result, o);
+}
+
+template <typename T, unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_multiply(modular_adaptor<T>& result,
+                             const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& o)
+{
+   using Backend = modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>;
+   using mul_value_type = typename Backend::mul_value_type;
+
+   multiply_modular_helper<mul_value_type>(result, o);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename T>
+constexpr void eval_pow(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >&       result,
+                        const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& b,
+                        const T&                                                                     e)
+{
+   result.mod_data() = b.mod_data();
+   result.mod_data().mod_exp(result.base_data(), b.base_data(), e);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_pow(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >&       result,
+                        const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& b,
+                        const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& e)
+{
+   using Backend = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
+   using value_type = typename modular_adaptor<Backend>::value_type;
+
+   value_type exp;
+   e.mod_data().adjust_regular(exp, e.base_data());
+   eval_pow(result, b, exp);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename T>
+constexpr void eval_powm(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >&       result,
+                         const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& b,
+                         const T&                                                                     e)
+{
+   eval_pow(result, b, e);
+}
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_powm(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >&       result,
+                         const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& b,
+                         const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& e)
+{
+   eval_pow(result, b, e);
+}
+
+} // namespace backends
+
+using backends::cpp_int_backend;
+using backends::modular_adaptor;
+using backends::modular_fixed_cpp_int_backend;
+
+template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+struct expression_template_default<modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> > >
 {
    static const expression_template_option value = et_off;
 };
 
 }
-} // namespace boost::multiprecision::backends
+} // namespace boost::multiprecision
 
 #endif // BOOST_MULTIPRECISION_MODULAR_ADAPTOR_FIXED_PRECISION_HPP

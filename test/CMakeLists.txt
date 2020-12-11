@@ -1548,6 +1548,11 @@ cm_test(NAME ${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int SOURCES 
 target_compile_definitions(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PUBLIC -DTEST_CPP_INT)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int no_eh_support)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PROPERTIES CXX_STANDARD 17)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PRIVATE "-fconstexpr-steps=2147483647")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PRIVATE "-fconstexpr-ops-limit=4294967295")
+endif()
 
 if(GMP_COMPILED)
     cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_modular_adaptor_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
