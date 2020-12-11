@@ -459,6 +459,46 @@ constexpr void eval_pow(modular_adaptor<cpp_int_backend<MinBits, MinBits, SignTy
    eval_pow(result, b, exp);
 }
 
+template <class Backend>
+constexpr void eval_powm(modular_adaptor<Backend>&       result,
+                        const modular_adaptor<Backend>& b,
+                        const modular_adaptor<Backend>& e)
+{
+   typename modular_adaptor<Backend>::value_type exp;
+   e.mod_data().adjust_regular(exp, e.base_data());
+   find_modular_pow(result, b, exp);
+}
+
+template <class Backend1, typename Backend2>
+constexpr void eval_powm(modular_adaptor<Backend1>&       result,
+                        const modular_adaptor<Backend1>& b,
+                        const Backend2&                  e)
+{
+   find_modular_pow(result, b, e);
+}
+
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename Backend>
+constexpr void eval_powm(modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& result,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& b,
+                        const Backend& e)
+{
+   // BOOST_ASSERT(result.mod_data().get_mod() == b.mod_data().get_mod());
+   result.mod_data() = b.mod_data();
+   b.mod_data().mod_exp(result.base_data(), b.base_data(), e);
+}
+
+template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+constexpr void eval_powm(modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& result,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& b,
+                        const modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>>& e)
+{
+   using Backend = cpp_int_backend<MinBits, MinBits, SignType, Checked, void>;
+
+   typename modular_adaptor<Backend>::value_type exp;
+   e.mod_data().adjust_regular(exp, e.base_data());
+   eval_pow(result, b, exp);
+}
+
 template <class Backend, class UI>
 constexpr void eval_left_shift(modular_adaptor<Backend>& t, UI i)
 {

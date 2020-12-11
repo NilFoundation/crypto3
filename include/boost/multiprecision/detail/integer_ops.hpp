@@ -444,6 +444,12 @@ struct powm_func
    {
       eval_powm(result, b, p, m);
    }
+
+   template <class T, class U>
+   BOOST_MP_CXX14_CONSTEXPR void operator()(T& result, const T& b, const U& p) const
+   {
+      eval_powm(result, b, p);
+   }
 };
 
 } // namespace default_ops
@@ -477,6 +483,30 @@ powm(const T& b, const U& p, const V& mod)
 {
    return detail::expression<detail::function, default_ops::powm_func, T, U, V>(
        default_ops::powm_func(), b, p, mod);
+}
+
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<
+    mpl::and_<
+        mpl::bool_<number_category<T>::value == number_kind_modular>,
+        mpl::or_<
+            is_number<T>,
+            is_number_expression<T> >,
+        mpl::or_<
+            is_number<U>,
+            is_number_expression<U>,
+            is_integral<U> > >,
+    typename mpl::if_<
+        is_no_et_number<T>,
+        T,
+        typename mpl::if_<
+            is_no_et_number<U>,
+            U,
+            detail::expression<detail::function, default_ops::powm_func, T, U> >::type>::type>::type
+powm(const T& b, const U& p)
+{
+   return detail::expression<detail::function, default_ops::powm_func, T, U>(
+       default_ops::powm_func(), b, p);
 }
 
 }} // namespace boost::multiprecision

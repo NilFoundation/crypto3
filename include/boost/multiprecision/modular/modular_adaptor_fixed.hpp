@@ -190,6 +190,16 @@ class modular_adaptor<cpp_int_backend<MinBits, MinBits, SignType, Checked, void>
 };
 
 }
+
+using boost::multiprecision::backends::modular_adaptor;
+using boost::multiprecision::backends::cpp_int_backend;
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+struct expression_template_default<modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> > >
+{
+   static const expression_template_option value = et_off;
+};
+
 }
 } // namespace boost::multiprecision::backends
 

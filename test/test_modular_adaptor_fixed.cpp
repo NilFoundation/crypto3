@@ -129,8 +129,11 @@ int main()
    static_assert(static_cast<modular_number>(a2 | b2).convert_to<standard_number>() == (a2_s | b2_s), "or error");
    static_assert(static_cast<modular_number>(a2 ^ b2).convert_to<standard_number>() == (a2_s ^ b2_s), "xor error");
 
-
-   // static_assert(static_cast<modular_number>(pow(a1, b1)) == modular_number(powm(a1_s, b1_s, mod_s), mod_p), "pow error");
+   constexpr
+       standard_number a1_pow_b1_s = powm(a1_s, b1_s, mod_s);
+   constexpr
+       modular_number a1_pow_b1 = powm(a1, b1);
+   static_assert(static_cast<modular_number>(a1_pow_b1).convert_to<standard_number>() == a1_pow_b1_s, "pow error");
 
    // constexpr standard_number a_inv_s = 0x2d737afc03a2903fc9db7258fcd1d4147_cppui130;
    // constexpr standard_number a_inv_s = 0x8af50c75763b7a581c9b1df83a6f245a_cppui130;
