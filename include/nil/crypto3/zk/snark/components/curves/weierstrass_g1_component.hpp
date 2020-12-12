@@ -55,7 +55,7 @@ namespace nil {
                         blueprint_linear_combination_vector<FieldType> all_vars;
 
                         G1_variable(blueprint<FieldType> &bp) : component<FieldType>(bp) {
-                            variable<FieldType> X_var, Y_var;
+                            blueprint_variable<FieldType> X_var, Y_var;
 
                             X_var.allocate(bp);
                             Y_var.allocate(bp);
@@ -80,8 +80,7 @@ namespace nil {
                             all_vars.emplace_back(Y);
                         }
 
-                        template<typename CurveType1>
-                        void generate_r1cs_witness(const typename CurveType1::g1_type::value_type &el) {
+                        void generate_r1cs_witness(const typename other_curve<CurveType>::g1_type::value_type &el) {
                             typename other_curve<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
 
                             this->bp.lc_val(X) = el_normalized.X();
@@ -106,8 +105,8 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                         G1_variable<CurveType> P;
-                        variable<FieldType> P_X_squared;
-                        variable<FieldType> P_Y_squared;
+                        blueprint_variable<FieldType> P_X_squared;
+                        blueprint_variable<FieldType> P_Y_squared;
 
                         G1_checker_component(blueprint<FieldType> &bp, const G1_variable<CurveType> &P) :
                             component<FieldType>(bp), P(P) {
@@ -119,8 +118,8 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {P.X},
-                                {P_X_squared, variable<FieldType>(0) * other_curve<CurveType>::g1_type::a},
-                                {P_Y_squared, variable<FieldType>(0) * (-other_curve<CurveType>::g1_type::b)}));
+                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve<CurveType>::g1_type::a},
+                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve<CurveType>::g1_type::b)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(P_X_squared) = this->bp.lc_val(P.X).squared();
@@ -135,8 +134,8 @@ namespace nil {
                     struct G1_add_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
-                        variable<FieldType> lambda;
-                        variable<FieldType> inv;
+                        blueprint_variable<FieldType> lambda;
+                        blueprint_variable<FieldType> inv;
 
                         G1_variable<CurveType> A;
                         G1_variable<CurveType> B;
@@ -178,7 +177,7 @@ namespace nil {
                                 r1cs_constraint<FieldType>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
 
                             this->bp.add_r1cs_constraint(
-                                r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {variable<FieldType>(0)}));
+                                r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {blueprint_variable<FieldType>(0)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(inv) = (this->bp.lc_val(B.X) - this->bp.lc_val(A.X)).inversed();
@@ -197,8 +196,8 @@ namespace nil {
                     struct G1_dbl_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
-                        variable<FieldType> Xsquared;
-                        variable<FieldType> lambda;
+                        blueprint_variable<FieldType> Xsquared;
+                        blueprint_variable<FieldType> lambda;
 
                         G1_variable<CurveType> A;
                         G1_variable<CurveType> B;
@@ -217,7 +216,7 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {lambda * 2},
                                 {A.Y},
-                                {Xsquared * 3, variable<FieldType>(0x00) * other_curve<CurveType>::g1_type::a}));
+                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve<CurveType>::g1_type::a}));
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 

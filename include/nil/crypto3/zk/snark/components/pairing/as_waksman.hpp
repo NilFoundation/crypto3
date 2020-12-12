@@ -97,13 +97,13 @@ namespace nil {
                             precomp(precomp) {
 
                             blueprint_linear_combination<FieldType> c0, c1;
-                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c0));
+                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[0]));
                             // must be
-                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c0));
+                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[0]));
                             // when constexpr ready
-                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c1));
+                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[1]));
                             // must be
-                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c1));
+                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[1]));
                             // when constexpr ready
 
                             precomp.P.reset(new G1_variable<CurveType>(P));
@@ -122,13 +122,13 @@ namespace nil {
                             precomp(precomp) {
 
                             blueprint_linear_combination<FieldType> c0, c1, c2;
-                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c0));
-                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c1));
-                            c2.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().c2));
+                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[0]));
+                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[1]));
+                            c2.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[2]));
                             // must be
-                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c0));
-                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c1));
-                            //c2.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().c2));
+                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[0]));
+                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[1]));
+                            //c2.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[2]));
                             // when constexpr ready
 
 

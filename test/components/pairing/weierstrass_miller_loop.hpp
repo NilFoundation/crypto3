@@ -74,7 +74,7 @@ void test_mnt_miller_loop(){
         affine_ate_precompute_G1<other_curve_type>(P_val);
     typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q = 
         affine_ate_precompute_G2<other_curve_type>(Q_val);
-    typename other_curve_pairing_policy::Fqk_type native_result = 
+    typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
         affine_ate_miller_loop<other_curve_type>(native_prec_P, native_prec_Q);
 
     BOOST_CHECK(result.get_element() == native_result);
@@ -148,7 +148,7 @@ void test_mnt_e_over_e_miller_loop(){
         affine_ate_precompute_G1<other_curve_type>(P2_val);
     typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q2 = 
         affine_ate_precompute_G2<other_curve_type>(Q2_val);
-    typename other_curve_pairing_policy::Fqk_type native_result = 
+    typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
         (affine_ate_miller_loop<other_curve_type>(native_prec_P1, native_prec_Q1) *
             affine_ate_miller_loop<other_curve_type>(native_prec_P2, native_prec_Q2).inversed());
 
@@ -248,7 +248,7 @@ void test_mnt_e_times_e_over_e_miller_loop(){
         affine_ate_precompute_G1<other_curve_type>(P3_val);
     typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q3 = 
         affine_ate_precompute_G2<other_curve_type>(Q3_val);
-    typename other_curve_pairing_policy::Fqk native_result = 
+    typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
         (affine_ate_miller_loop<other_curve_type>(native_prec_P1, native_prec_Q1) *
         affine_ate_miller_loop<other_curve_type>(native_prec_P2, native_prec_Q2) *
         affine_ate_miller_loop<other_curve_type>(native_prec_P3, native_prec_Q3).inversed());
