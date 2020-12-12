@@ -72,9 +72,17 @@ namespace nil {
                     typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
+
+                    constexpr static const number_type a = policy_type::a;
+                    constexpr static const number_type b = policy_type::b;
                 };
 
                 typedef mnt6<298> mnt6_298;
+
+                template<std::size_t ModulusBits>
+                constexpr typename mnt6<ModulusBits>::number_type const mnt6<ModulusBits>::a;
+                template<std::size_t ModulusBits>
+                constexpr typename mnt6<ModulusBits>::number_type const mnt6<ModulusBits>::b;
 
             }    // namespace curves
         }        // namespace algebra
