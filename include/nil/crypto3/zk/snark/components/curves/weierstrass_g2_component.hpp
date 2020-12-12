@@ -71,8 +71,8 @@ namespace nil {
                             component<field_type>(bp) {
                             typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
 
-                            X.reset(new Fqe_variable<CurveType>(bp, Q_copy.X()));
-                            Y.reset(new Fqe_variable<CurveType>(bp, Q_copy.Y()));
+                            X.reset(new Fqe_variable<CurveType>(bp, Q_copy.X));
+                            Y.reset(new Fqe_variable<CurveType>(bp, Q_copy.Y));
 
                             all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                             all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
@@ -81,8 +81,8 @@ namespace nil {
                         void generate_r1cs_witness(const typename other_curve<CurveType>::g2_type::value_type &Q) {
                             typename other_curve<CurveType>::g2_type::value_type Qcopy = Q.to_affine_coordinates();
 
-                            X->generate_r1cs_witness(Qcopy.X());
-                            Y->generate_r1cs_witness(Qcopy.Y());
+                            X->generate_r1cs_witness(Qcopy.X);
+                            Y->generate_r1cs_witness(Qcopy.Y);
                         }
 
                         // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
@@ -124,9 +124,9 @@ namespace nil {
                             compute_Ysquared.reset(new Fqe_sqr_component<CurveType>(bp, *(Q.Y), *Ysquared));
 
                             Xsquared_plus_a.reset(
-                                new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::g2_type::a));
+                                new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::a));
                             Ysquared_minus_b.reset(
-                                new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::g2_type::b)));
+                                new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::b)));
 
                             curve_equation.reset(
                                 new Fqe_mul_component<CurveType>(bp, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));

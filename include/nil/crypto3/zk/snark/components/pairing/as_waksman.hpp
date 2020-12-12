@@ -34,6 +34,9 @@
 
 #include <nil/crypto3/algebra/algorithms/pairing.hpp>
 
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
@@ -96,14 +99,16 @@ namespace nil {
                             component<FieldType>(bp),
                             precomp(precomp) {
 
+                            using twist_curve_type = nil::crypto3::algebra::curves::mnt4<298>;
+
                             blueprint_linear_combination<FieldType> c0, c1;
-                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[0]));
+                            c0.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy().twist).squared().data[0]));
                             // must be
-                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[0]));
+                            //c0.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy::twist).squared().data[0]));
                             // when constexpr ready
-                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[1]));
+                            c1.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy().twist).squared().data[1]));
                             // must be
-                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[1]));
+                            //c1.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy::twist).squared().data[1]));
                             // when constexpr ready
 
                             precomp.P.reset(new G1_variable<CurveType>(P));
@@ -121,14 +126,16 @@ namespace nil {
                             component<FieldType>(bp),
                             precomp(precomp) {
 
+                            using twist_curve_type = nil::crypto3::algebra::curves::mnt6<298>;
+
                             blueprint_linear_combination<FieldType> c0, c1, c2;
-                            c0.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[0]));
-                            c1.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[1]));
-                            c2.assign(bp, P.Y * ((typename curve_type::pairing_policy().twist).squared().data[2]));
+                            c0.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy().twist).squared().data[0]));
+                            c1.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy().twist).squared().data[1]));
+                            c2.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy().twist).squared().data[2]));
                             // must be
-                            //c0.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[0]));
-                            //c1.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[1]));
-                            //c2.assign(bp, P.Y * ((typename curve_type::pairing_policy::twist).squared().data[2]));
+                            //c0.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy::twist).squared().data[0]));
+                            //c1.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy::twist).squared().data[1]));
+                            //c2.assign(bp, P.Y * ((typename twist_curve_type::pairing_policy::twist).squared().data[2]));
                             // when constexpr ready
 
 
@@ -265,7 +272,8 @@ namespace nil {
                             RXsquared.reset(new Fqe_variable<CurveType>(bp));
                             compute_RXsquared.reset(new Fqe_sqr_component<CurveType>(bp, *(cur.RX), *RXsquared));
                             three_RXsquared_plus_a.reset(new Fqe_variable<CurveType>(
-                                (*RXsquared) * typename FieldType::value_type(0x03) + other_curve<CurveType>::g2_type::a));
+                                (*RXsquared) * typename FieldType::value_type(0x03) + 
+                                typename FieldType::value_type(other_curve<CurveType>::a)));
                             two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(0x02)));
 
                             compute_gamma.reset(

@@ -311,7 +311,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_constraints() {
-                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
+                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::value_type::one());
 
                             for (std::size_t i = 0; i < dbl_count; ++i) {
                                 doubling_steps[i]->generate_r1cs_constraints();
@@ -325,7 +325,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_witness() {
-                            fs[0]->generate_r1cs_witness(fqk_type::one());
+                            fs[0]->generate_r1cs_witness(fqk_type::value_type::one());
 
                             std::size_t add_id = 0;
                             std::size_t dbl_id = 0;
@@ -491,7 +491,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_constraints() {
-                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
+                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::value_type::one());
 
                             for (std::size_t i = 0; i < dbl_count; ++i) {
                                 doubling_steps1[i]->generate_r1cs_constraints();
@@ -509,7 +509,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_witness() {
-                            fs[0]->generate_r1cs_witness(fqk_type::one());
+                            fs[0]->generate_r1cs_witness(fqk_type::value_type::one());
 
                             std::size_t add_id = 0;
                             std::size_t dbl_id = 0;
@@ -720,7 +720,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_constraints() {
-                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
+                            fs[0]->generate_r1cs_equals_const_constraints(fqk_type::value_type::one());
 
                             for (std::size_t i = 0; i < dbl_count; ++i) {
                                 doubling_steps1[i]->generate_r1cs_constraints();
@@ -742,7 +742,7 @@ namespace nil {
                             }
                         }
                         void generate_r1cs_witness() {
-                            fs[0]->generate_r1cs_witness(fqk_type::one());
+                            fs[0]->generate_r1cs_witness(fqk_type::value_type::one());
 
                             std::size_t add_id = 0;
                             std::size_t dbl_id = 0;

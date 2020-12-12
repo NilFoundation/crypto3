@@ -72,8 +72,8 @@ namespace nil {
                             component<FieldType>(bp) {
                             typename other_curve<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
 
-                            X.assign(bp, Pcopy.X());
-                            Y.assign(bp, Pcopy.Y());
+                            X.assign(bp, Pcopy.X);
+                            Y.assign(bp, Pcopy.Y);
                             X.evaluate(bp);
                             Y.evaluate(bp);
                             all_vars.emplace_back(X);
@@ -83,8 +83,8 @@ namespace nil {
                         void generate_r1cs_witness(const typename other_curve<CurveType>::g1_type::value_type &el) {
                             typename other_curve<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
 
-                            this->bp.lc_val(X) = el_normalized.X();
-                            this->bp.lc_val(Y) = el_normalized.Y();
+                            this->bp.lc_val(X) = el_normalized.X;
+                            this->bp.lc_val(Y) = el_normalized.Y;
                         }
 
                         // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
@@ -118,8 +118,8 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {P.X},
-                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve<CurveType>::g1_type::a},
-                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve<CurveType>::g1_type::b)}));
+                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve<CurveType>::a},
+                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve<CurveType>::b)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(P_X_squared) = this->bp.lc_val(P.X).squared();
@@ -216,7 +216,7 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {lambda * 2},
                                 {A.Y},
-                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve<CurveType>::g1_type::a}));
+                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve<CurveType>::a}));
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
@@ -226,7 +226,7 @@ namespace nil {
                         void generate_r1cs_witness() {
                             this->bp.val(Xsquared) = this->bp.lc_val(A.X).squared();
                             this->bp.val(lambda) = (typename FieldType::value_type(0x03) * this->bp.val(Xsquared) +
-                                                    other_curve<CurveType>::g1_type::a) *
+                                                    other_curve<CurveType>::a) *
                                                    (typename FieldType::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
                             this->bp.lc_val(B.X) = this->bp.val(lambda).squared() -
                                                    typename FieldType::value_type(0x02) * this->bp.lc_val(A.X);
