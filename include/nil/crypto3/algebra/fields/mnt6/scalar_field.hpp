@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
 
@@ -42,7 +44,7 @@ namespace nil {
                  * @brief IETF IPsec groups
                  * @tparam ModulusBits
                  */
-                template<std::size_t ModulusBits>
+                /*template<std::size_t ModulusBits>
                 struct mnt6_scalar_field : public field<ModulusBits> { };
 
                 template<>
@@ -73,6 +75,12 @@ namespace nil {
                 constexpr typename std::size_t const mnt6_scalar_field<298>::value_bits;
 
                 constexpr typename mnt6_scalar_field<298>::modulus_type const mnt6_scalar_field<298>::modulus;
+
+                template<std::size_t ModulusBits = 298>
+                using mnt6_fr = mnt6_scalar_field<ModulusBits>;*/
+
+                template<std::size_t ModulusBits = 298>
+                using mnt6_scalar_field = mnt4_base_field<ModulusBits>;
 
                 template<std::size_t ModulusBits = 298>
                 using mnt6_fr = mnt6_scalar_field<ModulusBits>;
