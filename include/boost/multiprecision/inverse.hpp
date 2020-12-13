@@ -28,14 +28,12 @@ constexpr number<Backend, ExpressionTemplates> inverse_extended_euclidean_algori
    return number<Backend, ExpressionTemplates>(backends::eval_inverse_extended_euclidean_algorithm(n.backend(), mod.backend()));
 }
 
-template <typename TemplateBackend, expression_template_option ExpressionTemplates>
-constexpr number<modular_adaptor<TemplateBackend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
-    const number<modular_adaptor<TemplateBackend>, ExpressionTemplates>& modular)
+template <typename Backend, expression_template_option ExpressionTemplates>
+constexpr number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+    const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
-   using Backend = typename modular_adaptor<TemplateBackend>::value_type;
-
    number<Backend, ExpressionTemplates> new_base, res;
-   number<modular_adaptor<TemplateBackend>, ExpressionTemplates> res_mod;
+   number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
 
    modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
    res = backends::eval_inverse_extended_euclidean_algorithm(new_base.backend(), modular.backend().mod_data().get_mod().backend());
