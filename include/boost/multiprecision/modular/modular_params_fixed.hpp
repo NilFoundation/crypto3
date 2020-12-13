@@ -23,18 +23,18 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
    typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
-   typedef backends::modular_ops<TemplateBackend>                               modular_logic;
+   typedef backends::modular_functions_fixed<TemplateBackend>        modular_logic;
 
  public:
    typedef typename modular_logic::policy_type policy_type;
 
  protected:
-   typedef typename policy_type::internal_limb_type        internal_limb_type;
+   typedef typename policy_type::internal_limb_type    internal_limb_type;
    typedef typename policy_type::Backend               Backend;
    typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type           number_type;
 
-   constexpr auto& get_mod_obj() { return m_mod_obj; }
+   constexpr auto&       get_mod_obj() { return m_mod_obj; }
    constexpr const auto& get_mod_obj() const { return m_mod_obj; }
 
  public:
@@ -47,9 +47,8 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 
    constexpr modular_params(const modular_params& o) : m_mod_obj(o.get_mod_obj()) {}
 
-   // template <typename BackendT>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
-   constexpr void reduce(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result) const
+   template <typename Backend1>
+   constexpr void reduce(Backend1& result) const
    {
       if (check_montgomery_constraints(get_mod_obj()))
       {
@@ -61,18 +60,17 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       }
    }
 
-   // template <typename BackendT>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
-   constexpr void adjust_modular(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result)
+   template <typename Backend1>
+   constexpr void adjust_modular(Backend1& result)
    {
       adjust_modular(result, result);
    }
 
-   // template <typename Backend1, typename Backend2>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
-   constexpr void adjust_modular(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2> input)
+   template <typename Backend1, typename Backend2,
+             typename = typename std::enable_if<
+                 /// result should fit in the output parameter
+                 backends::max_precision<Backend1>::value >= backends::max_precision<Backend>::value>::type>
+   constexpr void adjust_modular(Backend1& result, Backend2 input)
    {
       get_mod_obj().barrett_reduce(input);
       Backend_doubled_limbs tmp(input);
@@ -84,13 +82,11 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       result = tmp;
    }
 
-   // template <typename BackendT>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-             /// input number should fit in result
-             typename = typename std::enable_if<MinBits1 >= MinBits2>::type>
-   constexpr void adjust_regular(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& input) const
+   template <typename Backend1, typename Backend2,
+             typename = typename std::enable_if<
+                 /// input number should fit in result
+                 backends::max_precision<Backend1>::value >= backends::max_precision<Backend2>::value>::type>
+   constexpr void adjust_regular(Backend1& result, const Backend2& input) const
    {
       result = input;
       if (check_montgomery_constraints(get_mod_obj()))
@@ -99,28 +95,14 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       }
    }
 
-   // template <typename Backend1, typename Backend2>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, typename BackendT>
-   constexpr void mod_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                          const BackendT& exp) const
+   template <typename Backend1, typename T>
+   constexpr void mod_exp(Backend1& result, const T& exp) const
    {
-      if (check_montgomery_constraints(get_mod_obj()))
-      {
-         get_mod_obj().montgomery_exp(result, exp);
-      }
-      else
-      {
-         get_mod_obj().regular_exp(result, exp);
-      }
+      mod_exp(result, result, exp);
    }
 
-   // template <typename Backend1, typename Backend2, typename Backend3>
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-             typename BackendT>
-   constexpr void mod_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                          const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& a,
-                          const BackendT& exp) const
+   template <typename Backend1, typename Backend2, typename T>
+   constexpr void mod_exp(Backend1& result, const Backend2& a, const T& exp) const
    {
       if (check_montgomery_constraints(get_mod_obj()))
       {
@@ -132,8 +114,39 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       }
    }
 
-   template <typename BackendT, expression_template_option ExpressionTemplates>
-   constexpr operator number<BackendT, ExpressionTemplates>()
+   template <typename Backend1, typename Backend2>
+   constexpr void mod_mul(Backend1& result, const Backend2& y)
+   {
+      mod_mul(result, result, y);
+   }
+
+   template <typename Backend1, typename Backend2, typename Backend3>
+   constexpr void mod_mul(Backend1& result, const Backend2& x, const Backend3& y)
+   {
+      if (check_montgomery_constraints(get_mod_obj()))
+      {
+         get_mod_obj().montgomery_mul(result, x, y);
+      }
+      else
+      {
+         get_mod_obj().regular_mul(result, x, y);
+      }
+   }
+
+   template <typename Backend1, typename Backend2>
+   constexpr void mod_add(Backend1& result, const Backend2& y)
+   {
+      mod_add(result, result, y);
+   }
+
+   template <typename Backend1, typename Backend2, typename Backend3>
+   constexpr void mod_add(Backend1& result, const Backend2& x, const Backend3& y)
+   {
+      get_mod_obj().regular_add(result, x, y);
+   }
+
+   template <typename Backend1, expression_template_option ExpressionTemplates>
+   constexpr operator number<Backend1, ExpressionTemplates>()
    {
       return get_mod();
    };

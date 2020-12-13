@@ -425,18 +425,17 @@ constexpr void eval_pow(modular_adaptor<Backend>&       result,
    find_modular_pow(result, b, exp);
 }
 
-template <class Backend, typename T>
-constexpr void eval_powm(modular_adaptor<Backend>&       result,
-                         const modular_adaptor<Backend>& b,
-                         const T&                        e)
+template <typename Backend1, typename Backend2, typename T>
+constexpr void eval_powm(modular_adaptor<Backend1>&       result,
+                         const modular_adaptor<Backend2>& b, const T& e)
 {
    eval_pow(result, b, e);
 }
 
-template <class Backend>
-constexpr void eval_powm(modular_adaptor<Backend>&       result,
-                         const modular_adaptor<Backend>& b,
-                         const modular_adaptor<Backend>& e)
+template <typename Backend1, typename Backend2, typename Backend3>
+constexpr void eval_powm(modular_adaptor<Backend1>&       result,
+                         const modular_adaptor<Backend2>& b,
+                         const modular_adaptor<Backend3>& e)
 {
    eval_pow(result, b, e);
 }

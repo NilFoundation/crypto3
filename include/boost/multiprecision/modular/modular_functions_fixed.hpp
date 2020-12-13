@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MODULAR_OPS_FIXED_PRECISION_HPP
-#define BOOST_MULTIPRECISION_MODULAR_OPS_FIXED_PRECISION_HPP
+#ifndef BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
+#define BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 
 #include <boost/multiprecision/modular/modular_policy_fixed.hpp>
 
@@ -22,7 +22,7 @@ namespace multiprecision {
 namespace backends {
 
 template <typename Backend>
-class modular_ops;
+class modular_functions_fixed;
 
 //
 // the function works correctly only with consistent backend objects,
@@ -30,12 +30,12 @@ class modular_ops;
 // as it breaks backend logic of size determination
 // (or real size of such objects should be adjusted then)
 //
-template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+template <typename Backend>
 constexpr typename mpl::if_c<
-    is_trivial_cpp_int<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >::value,
-    typename trivial_limb_type<MinBits>::type,
+    is_trivial_cpp_int<Backend>::value,
+    typename trivial_limb_type<min_precision<Backend>::value>::type,
     limb_type>::type
-get_limb_value(const modular_fixed_cpp_int_backend<MinBits, SignType, Checked>& b, const std::size_t i)
+get_limb_value(const Backend& b, const std::size_t i)
 {
    if (i < b.size())
    {
@@ -44,23 +44,19 @@ get_limb_value(const modular_fixed_cpp_int_backend<MinBits, SignType, Checked>& 
    return 0;
 }
 
-template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-constexpr bool check_modulus_constraints(const modular_fixed_cpp_int_backend<MinBits, SignType, Checked>& m)
+template <typename Backend>
+constexpr bool check_modulus_constraints(const Backend& m)
 {
-   using Backend = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-
+   using ui_type = typename mpl::front<typename Backend::unsigned_types>::type;
    using default_ops::eval_lt;
 
    return !eval_lt(m, static_cast<ui_type>(0u));
 }
 
-template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-constexpr bool check_montgomery_constraints(const modular_fixed_cpp_int_backend<MinBits, SignType, Checked>& m)
+template <typename Backend>
+constexpr bool check_montgomery_constraints(const Backend& m)
 {
-   using Backend = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-
+   using ui_type = typename mpl::front<typename Backend::unsigned_types>::type;
    using default_ops::eval_eq;
    using default_ops::eval_modulus;
 
@@ -69,17 +65,17 @@ constexpr bool check_montgomery_constraints(const modular_fixed_cpp_int_backend<
    return !eval_eq(tmp, static_cast<ui_type>(0u));
 }
 
-template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-constexpr bool check_montgomery_constraints(const modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>>& mo)
+template <typename Backend>
+constexpr bool check_montgomery_constraints(const modular_functions_fixed<Backend>& mo)
 {
    return check_montgomery_constraints(mo.get_mod().backend());
 }
 
-template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-constexpr void custom_right_shift(modular_fixed_cpp_int_backend<MinBits, SignType, Checked>& b, unsigned s)
+template <typename Backend>
+constexpr void custom_right_shift(Backend& b, unsigned s)
 {
-   using default_ops::eval_right_shift;
    using default_ops::eval_left_shift;
+   using default_ops::eval_right_shift;
 
    if (!s)
    {
@@ -99,13 +95,13 @@ constexpr void custom_right_shift(modular_fixed_cpp_int_backend<MinBits, SignTyp
 }
 
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
+class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
    typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
 
  public:
-   typedef modular_policy<TemplateBackend>                            policy_type;
+   typedef modular_policy<TemplateBackend> policy_type;
 
  protected:
    typedef typename policy_type::internal_limb_type        internal_limb_type;
@@ -182,7 +178,7 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 
       BOOST_ASSERT(check_montgomery_constraints(get_mod().backend()) && check_modulus_constraints(get_mod().backend()));
 
-      get_p_dash()  = monty_inverse(get_mod().backend().limbs()[0]);
+      get_p_dash() = monty_inverse(get_mod().backend().limbs()[0]);
 
       Backend_doubled_padded_limbs r;
       eval_bit_set(r, get_mod().backend().size() * limb_bits);
@@ -219,27 +215,33 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
    constexpr const auto& get_p_dash() const { return m_montgomery_p_dash; }
    constexpr const auto& get_modulus_mask() const { return m_modulus_mask; }
 
-   constexpr modular_ops() {}
+   constexpr modular_functions_fixed() {}
 
-   constexpr modular_ops(const number_type& m)
+   constexpr modular_functions_fixed(const number_type& m)
    {
       initialize(m);
    }
 
-   constexpr modular_ops(const modular_ops& o)
+   constexpr modular_functions_fixed(const modular_functions_fixed& o)
    {
-      get_mod() = o.get_mod();
-
-      get_mu() = o.get_mu();
-
-      get_r2() = o.get_r2();
-      get_p_dash() = o.get_p_dash();
-
+      get_mod()          = o.get_mod();
+      get_mu()           = o.get_mu();
+      get_r2()           = o.get_r2();
+      get_p_dash()       = o.get_p_dash();
       get_modulus_mask() = o.get_modulus_mask();
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
-   constexpr void barrett_reduce(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result) const
+   template <typename Backend1>
+   constexpr void barrett_reduce(Backend1& result) const
+   {
+      barrett_reduce(result, result);
+   }
+
+   template <typename Backend1, typename Backend2,
+             typename = typename std::enable_if<
+                 /// result should fit in the output parameter
+                 max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void barrett_reduce(Backend1& result, Backend2 input) const
    {
       using default_ops::eval_add;
       using default_ops::eval_eq;
@@ -248,55 +250,54 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       using default_ops::eval_multiply;
       using default_ops::eval_subtract;
 
-      if (eval_lt(result, get_mod().backend()))
+      if (eval_lt(input, get_mod().backend()))
       {
-         while (eval_lt(result, 0))
+         while (eval_lt(input, 0))
          {
-            eval_add(result, get_mod().backend());
+            eval_add(input, get_mod().backend());
          }
       }
-      else if (eval_msb(result) < 2 * eval_msb(get_mod().backend()) + 1u)
+      else if (eval_msb(input) < 2 * eval_msb(get_mod().backend()) + 1u)
       {
-         Backend_quadruple_1 t1(result);
+         Backend_quadruple_1 t1(input);
 
          eval_multiply(t1, get_mu());
          custom_right_shift(t1, 2 * (1 + eval_msb(get_mod().backend())));
          eval_multiply(t1, get_mod().backend());
-         eval_subtract(result, t1);
+         eval_subtract(input, t1);
 
-         if (!eval_lt(result, get_mod().backend()))
+         if (!eval_lt(input, get_mod().backend()))
          {
-            eval_subtract(result, get_mod().backend());
+            eval_subtract(input, get_mod().backend());
          }
       }
       else
       {
-         eval_modulus(result, get_mod().backend());
+         eval_modulus(input, get_mod().backend());
       }
+      result = input;
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1>
-   constexpr void montgomery_reduce(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result) const
+   template <typename Backend1>
+   constexpr void montgomery_reduce(Backend1& result) const
    {
       montgomery_reduce(result, result);
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
+   template <typename Backend1, typename Backend2,
              typename = typename std::enable_if<
                  /// result should fit in the output parameter
-                 MinBits1 >= max_precision<Backend>::value &&
+                 max_precision<Backend1>::value >= max_precision<Backend>::value &&
                  /// input number should be represented by backend of appropriate size
-                 max_precision<Backend_doubled_limbs>::value >= MinBits2>::type>
-   constexpr void montgomery_reduce(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                    const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& input) const
+                 max_precision<Backend_doubled_limbs>::value >= max_precision<Backend2>::value>::type>
+   constexpr void montgomery_reduce(Backend1& result, const Backend2& input) const
    {
-      using default_ops::eval_lt;
       using default_ops::eval_add;
-      using default_ops::eval_subtract;
-      using default_ops::eval_multiply;
-      using default_ops::eval_left_shift;
       using default_ops::eval_bitwise_and;
+      using default_ops::eval_left_shift;
+      using default_ops::eval_lt;
+      using default_ops::eval_multiply;
+      using default_ops::eval_subtract;
 
       Backend_doubled_padded_limbs accum(input);
       Backend_doubled_padded_limbs prod;
@@ -318,26 +319,66 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       result = accum;
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
-   constexpr void montgomery_mul(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& y) const
+   template <typename Backend1, typename Backend2>
+   constexpr void regular_add(Backend1& result, const Backend2& y) const
+   {
+      regular_add(result, result, y);
+   }
+
+   template <typename Backend1, typename Backend2, typename Backend3,
+             /// result should fit in the output parameter
+             typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void regular_add(Backend1& result, const Backend2& x, const Backend3& y) const
+   {
+      using default_ops::eval_add;
+      using default_ops::eval_lt;
+
+      // TODO: maybe reduce input parameters
+      /// input parameters should be lesser than modulus
+      BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+
+      Backend_padded_limbs tmp(x);
+      eval_add(tmp, y);
+      barrett_reduce(result, tmp);
+   }
+
+   template <typename Backend1, typename Backend2>
+   constexpr void regular_mul(Backend1& result, const Backend2& y) const
+   {
+      regular_mul(result, result, y);
+   }
+
+   template <typename Backend1, typename Backend2, typename Backend3,
+             /// result should fit in the output parameter
+             typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void regular_mul(Backend1& result, const Backend2& x, const Backend3& y) const
+   {
+      using default_ops::eval_lt;
+      using default_ops::eval_multiply;
+
+      // TODO: maybe reduce input parameters
+      /// input parameters should be lesser than modulus
+      BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+
+      Backend_doubled_limbs tmp(x);
+      eval_multiply(tmp, y);
+      barrett_reduce(result, tmp);
+   }
+
+   template <typename Backend1, typename Backend2>
+   constexpr void montgomery_mul(Backend1& result, const Backend2& y) const
    {
       montgomery_mul(result, result, y);
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-             unsigned MinBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3,
+   template <typename Backend1, typename Backend2, typename Backend3,
              /// result should fit in the output parameter
-             typename = typename std::enable_if<MinBits1 >= max_precision<Backend>::value>::type>
-   constexpr void montgomery_mul(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& x,
-                                 const modular_fixed_cpp_int_backend<MinBits3, SignType3, Checked3>& y) const
+             typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void montgomery_mul(Backend1& result, const Backend2& x, const Backend3& y) const
    {
+      using default_ops::eval_bitwise_and;
       using default_ops::eval_lt;
       using default_ops::eval_subtract;
-      using default_ops::eval_bitwise_and;
 
       // TODO: maybe reduce input parameters
       /// input parameters should be lesser than modulus
@@ -376,7 +417,7 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
             k                = t >> std::numeric_limits<internal_limb_type>::digits;
             k2               = t2 >> std::numeric_limits<internal_limb_type>::digits;
          }
-         internal_double_limb_type tmp               = static_cast<internal_double_limb_type>(A.limbs()[get_mod().backend().size()]) + k + k2;
+         internal_double_limb_type tmp             = static_cast<internal_double_limb_type>(A.limbs()[get_mod().backend().size()]) + k + k2;
          A.limbs()[get_mod().backend().size() - 1] = tmp;
          A.limbs()[get_mod().backend().size()]     = tmp >> std::numeric_limits<internal_limb_type>::digits;
       }
@@ -386,88 +427,39 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       {
          eval_subtract(A, get_mod().backend());
       }
+      // TODO: maybe bitwise and is not necessary
       eval_bitwise_and(A, get_modulus_mask());
       result = A;
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, typename T>
-   constexpr void regular_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                              const T& exp) const
+   template <typename Backend1, typename T>
+   constexpr void regular_exp(Backend1& result, const T& exp) const
    {
       regular_exp(result, result, exp);
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-             typename T,
+   template <typename Backend1, typename Backend2, typename T,
              /// result should fit in the output parameter
-             typename = typename std::enable_if<MinBits1 >= max_precision<Backend>::value>::type>
-   constexpr void regular_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                              const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& a,
-                              T exp) const
+             typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void regular_exp(Backend1& result, Backend2& a, T exp) const
    {
       using default_ops::eval_powm;
 
+      // TODO: custom implementation may be more efficient because it uses barrett_reduction instead just eval_modulus
       eval_powm(result, a, exp, get_mod().backend());
-
-      // TODO: custom implementation may be more efficient because
-      //  it uses barrett_reduction instead simple eval_modulus
-      // using default_ops::eval_eq;
-      // using default_ops::eval_lt;
-      // using default_ops::eval_multiply;
-      //
-      // // TODO: maybe reduce input parameter
-      // /// input parameter should be lesser than modulus
-      // BOOST_ASSERT(eval_lt(a, get_mod().backend()));
-      //
-      // if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
-      // {
-      //    result = static_cast<internal_limb_type>(1u);
-      //    return;
-      // }
-      // if (eval_eq(get_mod().backend(), static_cast<internal_limb_type>(1u)))
-      // {
-      //    result = static_cast<internal_limb_type>(0u);
-      //    return;
-      // }
-      //
-      // Backend_doubled_limbs base(a), res(static_cast<internal_limb_type>(1u));
-      //
-      // while (true)
-      // {
-      //    internal_limb_type lsb = exp.limbs()[0] & 1u;
-      //    custom_right_shift(exp, static_cast<internal_limb_type>(1u));
-      //    if (lsb)
-      //    {
-      //       eval_multiply(res, base);
-      //       barrett_reduce(res);
-      //       if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
-      //       {
-      //          break;
-      //       }
-      //    }
-      //    eval_multiply(base, base);
-      //    barrett_reduce(base);
-      // }
-      // result = res;
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             typename BackendT>
-   constexpr void montgomery_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 const BackendT& exp) const
+   template <typename Backend1, typename T>
+   constexpr void montgomery_exp(Backend1& result,
+                                 const T&  exp) const
    {
       montgomery_exp(result, result, exp);
    }
 
-   template <unsigned MinBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
-             unsigned MinBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2,
-             typename BackendT,
+   template <typename Backend1, typename Backend2, typename T,
              /// result should fit in the output parameter
-             typename = typename std::enable_if<MinBits1 >= max_precision<Backend>::value>::type>
-   constexpr void montgomery_exp(modular_fixed_cpp_int_backend<MinBits1, SignType1, Checked1>& result,
-                                 const modular_fixed_cpp_int_backend<MinBits2, SignType2, Checked2>& a,
-                                 BackendT exp) const
+             typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+   constexpr void montgomery_exp(Backend1& result, const Backend2& a, T exp) const
    {
       using default_ops::eval_eq;
       using default_ops::eval_lt;
@@ -512,49 +504,45 @@ class modular_ops<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       result = R_mod_m;
    }
 
-   constexpr void swap(modular_ops& o)
+   constexpr void swap(modular_functions_fixed& o)
    {
       get_mod().swap(o.get_mod());
-
       get_mu().swap(o.get_mu());
-
       get_r2().swap(o.get_r2());
+
       auto tmp_p_dash = get_p_dash();
-      get_p_dash() = o.get_p_dash();
-      o.get_p_dash() = tmp_p_dash;
+      get_p_dash()    = o.get_p_dash();
+      o.get_p_dash()  = tmp_p_dash;
 
       get_modulus_mask().swap(o.get_modulus_mask());
    }
 
-   constexpr modular_ops& operator=(const modular_ops& o)
+   constexpr modular_functions_fixed& operator=(const modular_functions_fixed& o)
    {
-      modular_ops tmp(o);
+      modular_functions_fixed tmp(o);
       swap(tmp);
 
       return *this;
    }
 
-   constexpr modular_ops& operator=(const number_type& m)
+   constexpr modular_functions_fixed& operator=(const number_type& m)
    {
       initialize(m);
 
       return *this;
    }
 
-protected:
+ protected:
    // TODO: replace number_type on backend type
-   number_type m_mod;
-
-   Backend_doubled_1 m_barrett_mu;
-
-   Backend m_montgomery_r2;
-   internal_limb_type      m_montgomery_p_dash = 0;
-
+   number_type          m_mod;
+   Backend_doubled_1    m_barrett_mu;
+   Backend              m_montgomery_r2;
+   internal_limb_type   m_montgomery_p_dash = 0;
    Backend_padded_limbs m_modulus_mask;
 };
 
 }
 }
-} // namespace boost::multiprecision::backend
+} // namespace boost::multiprecision::backends
 
-#endif // BOOST_MULTIPRECISION_MODULAR_OPS_FIXED_PRECISION_HPP
+#endif // BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
