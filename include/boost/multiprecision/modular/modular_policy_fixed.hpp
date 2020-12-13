@@ -23,6 +23,34 @@ template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checke
 using modular_fixed_cpp_int_backend = cpp_int_backend<MinBits, MinBits, SignType, Checked, void>;
 
 template <typename Backend>
+constexpr typename std::enable_if<is_trivial_cpp_int<Backend>::value, std::size_t>::type
+get_limbs_count()
+{
+   return 1u;
+}
+
+template <typename Backend>
+constexpr typename std::enable_if<!is_trivial_cpp_int<Backend>::value, std::size_t>::type
+get_limbs_count()
+{
+   return Backend::internal_limb_count;
+}
+
+template <typename Backend>
+constexpr typename std::enable_if<is_trivial_cpp_int<Backend>::value, std::size_t>::type
+get_limb_bits()
+{
+   return sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) * CHAR_BIT;
+}
+
+template <typename Backend>
+constexpr typename std::enable_if<!is_trivial_cpp_int<Backend>::value, std::size_t>::type
+get_limb_bits()
+{
+   return Backend::limb_bits;
+}
+
+template <typename Backend>
 class modular_policy;
 
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
@@ -35,12 +63,8 @@ struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> 
    static_assert(!is_unsigned_number<Backend>::value, "number should be signed");
    static_assert(is_non_throwing_cpp_int<Backend>::value, "backend should be unchecked");
 
-   constexpr static auto limbs_count = is_trivial_cpp_int<Backend>::value
-                                           ? 1u
-                                           : Backend::internal_limb_count;
-   constexpr static auto limb_bits   = is_trivial_cpp_int<Backend>::value
-                                           ? sizeof(typename trivial_limb_type<MinBits>::type) * CHAR_BIT
-                                           : Backend::limb_bits;
+   constexpr static auto limbs_count = get_limbs_count<Backend>();
+   constexpr static auto limb_bits   = get_limb_bits<Backend>();
 
    /// real limb_type depending on is_trivial_cpp_int property
    /// such logic is necessary due to local_limb_type could be uint128

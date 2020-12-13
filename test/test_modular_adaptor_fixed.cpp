@@ -28,6 +28,7 @@
 #include <boost/multiprecision/cpp_int/literals.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(17);
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(130);
 
 using namespace boost::multiprecision;
@@ -129,12 +130,12 @@ template <typename Number>
 bool base_operations_test_mixed(const std::array<Number, test_set_len>& test_set)
 {
    typedef typename Number::backend_type                              Backend;
-   typedef typename cpp_int::backend_type                    Backend_dynamic;
+   typedef typename cpp_int::backend_type                             Backend_dynamic;
    typedef typename default_ops::double_precision_type<Backend>::type Backend_doubled;
    typedef number<modular_adaptor<Backend> >                          modular_number;
-   typedef number<modular_adaptor<Backend_dynamic> >                          dynamic_modular_number;
+   typedef number<modular_adaptor<Backend_dynamic> >                  dynamic_modular_number;
    typedef modular_params<Backend>                                    params_number;
-   typedef modular_params<Backend_dynamic>             dynamic_params_number;
+   typedef modular_params<Backend_dynamic>                            dynamic_params_number;
    typedef Number                                                     standard_number;
    typedef cpp_int                                                    dynamic_number;
 
@@ -143,25 +144,25 @@ bool base_operations_test_mixed(const std::array<Number, test_set_len>& test_set
    dynamic_number a_mul_b_s  = (static_cast<dynamic_number>(test_set[a_e]) * static_cast<dynamic_number>(test_set[b_e])) % test_set[mod_e];
    dynamic_number a_div_b_s  = (static_cast<dynamic_number>(test_set[a_e]) / static_cast<dynamic_number>(test_set[b_e])) % test_set[mod_e];
    dynamic_number a_mod_b_s  = (static_cast<dynamic_number>(test_set[a_e]) % static_cast<dynamic_number>(test_set[b_e])) % test_set[mod_e];
-   dynamic_number     a_and_b_s  = (test_set[a_e] & test_set[b_e]) % test_set[mod_e];
-   dynamic_number     a_or_b_s   = (test_set[a_e] | test_set[b_e]) % test_set[mod_e];
-   dynamic_number     a_xor_b_s  = (test_set[a_e] ^ test_set[b_e]) % test_set[mod_e];
-   dynamic_number     a_powm_b_s = powm(test_set[a_e], test_set[b_e], test_set[mod_e]);
+   dynamic_number a_and_b_s  = (test_set[a_e] & test_set[b_e]) % test_set[mod_e];
+   dynamic_number a_or_b_s   = (test_set[a_e] | test_set[b_e]) % test_set[mod_e];
+   dynamic_number a_xor_b_s  = (test_set[a_e] ^ test_set[b_e]) % test_set[mod_e];
+   dynamic_number a_powm_b_s = powm(test_set[a_e], test_set[b_e], test_set[mod_e]);
 
-   params_number  mod_p(test_set[mod_e]);
-   modular_number a(test_set[a_e], mod_p);
-   dynamic_modular_number b(test_set[b_e], mod_p);
+   params_number                                                            mod_p(test_set[mod_e]);
+   modular_number                                                           a(test_set[a_e], mod_p);
+   dynamic_modular_number                                                   b(test_set[b_e], mod_p);
    TD<boost::is_convertible<modular_number, dynamic_modular_number>::value> qwe;
-   modular_number a_add_b  = a + b;
-   modular_number a_sub_b  = a - b;
-   modular_number a_mul_b  = a * b;
-   modular_number a_div_b  = a / b;
-   modular_number a_mod_b  = a % b;
-   modular_number a_and_b  = a & b;
-   modular_number a_or_b   = a | b;
-   modular_number a_xor_b  = a ^ b;
-   modular_number a_powm_b = powm(a, b);
-   modular_number a_pow_b  = pow(a, b);
+   modular_number                                                           a_add_b  = a + b;
+   modular_number                                                           a_sub_b  = a - b;
+   modular_number                                                           a_mul_b  = a * b;
+   modular_number                                                           a_div_b  = a / b;
+   modular_number                                                           a_mod_b  = a % b;
+   modular_number                                                           a_and_b  = a & b;
+   modular_number                                                           a_or_b   = a | b;
+   modular_number                                                           a_xor_b  = a ^ b;
+   modular_number                                                           a_powm_b = powm(a, b);
+   modular_number                                                           a_pow_b  = pow(a, b);
 
    BOOST_ASSERT_MSG(a_add_b.template convert_to<standard_number>() == a_add_b_s, "addition error");
    BOOST_ASSERT_MSG(a_sub_b.template convert_to<standard_number>() == a_sub_b_s, "subtraction error");
@@ -195,7 +196,6 @@ bool base_operations_test_mixed(const std::array<std::array<Number, enum_len>, N
    }
    return true;
 }
-
 
 BOOST_AUTO_TEST_SUITE(static_tests)
 
@@ -359,8 +359,7 @@ BOOST_AUTO_TEST_CASE(base_ops_prime_mod_backend_130)
             0xc88c6b7366ae5740e6860d5f1c906c00_cppui130},
        }};
 
-   constexpr
-       bool res = base_operations_test(test_data);
+   constexpr bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_130)
@@ -523,12 +522,83 @@ BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_130)
             0x2b711aed3a4d108fd95d3a8c3338bf713_cppui130},
        }};
 
+   constexpr bool res = base_operations_test(test_data);
+}
+
+BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_17)
+{
+   using Backend         = cpp_int_backend<17, 17>;
+   using standard_number = number<Backend>;
+   using test_set        = std::array<standard_number, test_set_len>;
+   using test_data_t     = std::array<test_set, 20>;
    constexpr
-       bool res = base_operations_test(test_data);
+       test_data_t test_data = {{
+           {0x1e240_cppui17,
+            0x3a97_cppui17,
+            0xc070_cppui17},
+           {0x1e240_cppui17,
+            0x1dea7_cppui17,
+            0x1aaab_cppui17},
+           {0x1e240_cppui17,
+            0x1936f_cppui17,
+            0xfb0b_cppui17},
+           {0x1e240_cppui17,
+            0x13067_cppui17,
+            0x1566c_cppui17},
+           {0x1e240_cppui17,
+            0x1b960_cppui17,
+            0x1773f_cppui17},
+           {0x1e240_cppui17,
+            0x101e4_cppui17,
+            0x156ca_cppui17},
+           {0x1e240_cppui17,
+            0x167f3_cppui17,
+            0x13c52_cppui17},
+           {0x1e240_cppui17,
+            0xc536_cppui17,
+            0x14c8e_cppui17},
+           {0x1e240_cppui17,
+            0xed02_cppui17,
+            0x1dafc_cppui17},
+           {0x1e240_cppui17,
+            0x126a6_cppui17,
+            0x18a8b_cppui17},
+           {0x1e240_cppui17,
+            0x111ac_cppui17,
+            0x94c2_cppui17},
+           {0x1e240_cppui17,
+            0x3a03_cppui17,
+            0x89d8_cppui17},
+           {0x1e240_cppui17,
+            0x3add_cppui17,
+            0x101ae_cppui17},
+           {0x1e240_cppui17,
+            0x8db4_cppui17,
+            0x50e2_cppui17},
+           {0x1e240_cppui17,
+            0x1bab_cppui17,
+            0x1d5f6_cppui17},
+           {0x1e240_cppui17,
+            0x144dc_cppui17,
+            0x172f8_cppui17},
+           {0x1e240_cppui17,
+            0x1cd30_cppui17,
+            0x1a5c_cppui17},
+           {0x1e240_cppui17,
+            0x13c3d_cppui17,
+            0x4358_cppui17},
+           {0x1e240_cppui17,
+            0x18d68_cppui17,
+            0x1299d_cppui17},
+           {0x1e240_cppui17,
+            0x10153_cppui17,
+            0x2c8a_cppui17},
+       }};
+
+   constexpr bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 // BOOST_AUTO_TEST_SUITE(runtime_tests)
 //

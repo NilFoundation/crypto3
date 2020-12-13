@@ -76,7 +76,12 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       Backend_doubled_limbs tmp(input);
       if (check_montgomery_constraints(get_mod_obj()))
       {
-         eval_multiply(tmp, get_mod_obj().get_r2());
+         //
+         // to prevent problems with trivial cpp_int
+         //
+         Backend_doubled_limbs r2(get_mod_obj().get_r2());
+
+         eval_multiply(tmp, r2);
          get_mod_obj().montgomery_reduce(tmp);
       }
       result = tmp;

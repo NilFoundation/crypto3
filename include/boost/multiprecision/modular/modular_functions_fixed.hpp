@@ -192,7 +192,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
    {
       get_modulus_mask() = static_cast<internal_limb_type>(1u);
       eval_left_shift(get_modulus_mask(), get_mod().backend().size() * limb_bits);
-      eval_subtract(get_modulus_mask(), static_cast<internal_limb_type>(1u));
+      eval_subtract(get_modulus_mask(), decltype(m_modulus_mask)(static_cast<internal_limb_type>(1u)));
    }
 
    constexpr void initialize(const number_type& m)
@@ -240,7 +240,9 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
    template <typename Backend1, typename Backend2,
              typename = typename std::enable_if<
                  /// result should fit in the output parameter
-                 max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
+                 max_precision<Backend1>::value >= max_precision<Backend>::value &&
+                 /// to prevent problems with trivial cpp_int
+                 max_precision<Backend2>::value >= max_precision<Backend>::value>::type>
    constexpr void barrett_reduce(Backend1& result, Backend2 input) const
    {
       using default_ops::eval_add;
@@ -250,30 +252,35 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       using default_ops::eval_multiply;
       using default_ops::eval_subtract;
 
-      if (eval_lt(input, get_mod().backend()))
+      //
+      // to prevent problems with trivial cpp_int
+      //
+      Backend2 modulus(get_mod().backend());
+
+      if (eval_lt(input, modulus))
       {
          while (eval_lt(input, 0))
          {
-            eval_add(input, get_mod().backend());
+            eval_add(input, modulus);
          }
       }
-      else if (eval_msb(input) < 2 * eval_msb(get_mod().backend()) + 1u)
+      else if (eval_msb(input) < 2 * eval_msb(modulus) + 1u)
       {
          Backend_quadruple_1 t1(input);
 
          eval_multiply(t1, get_mu());
-         custom_right_shift(t1, 2 * (1 + eval_msb(get_mod().backend())));
-         eval_multiply(t1, get_mod().backend());
+         custom_right_shift(t1, 2 * (1 + eval_msb(modulus)));
+         eval_multiply(t1, modulus);
          eval_subtract(input, t1);
 
-         if (!eval_lt(input, get_mod().backend()))
+         if (!eval_lt(input, modulus))
          {
-            eval_subtract(input, get_mod().backend());
+            eval_subtract(input, modulus);
          }
       }
       else
       {
-         eval_modulus(input, get_mod().backend());
+         eval_modulus(input, modulus);
       }
       result = input;
    }
@@ -401,8 +408,8 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
          internal_double_limb_type z2 = static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), 0)) *
                                             static_cast<internal_double_limb_type>(u_i) +
                                         static_cast<internal_limb_type>(z) + k2;
-         k  = z >> std::numeric_limits<internal_limb_type>::digits;
-         k2 = z2 >> std::numeric_limits<internal_limb_type>::digits;
+         k  = static_cast<internal_limb_type>(z >> std::numeric_limits<internal_limb_type>::digits);
+         k2 = static_cast<internal_limb_type>(z2 >> std::numeric_limits<internal_limb_type>::digits);
 
          for (auto j = 1; j < get_mod().backend().size(); ++j)
          {
@@ -413,13 +420,13 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
             internal_double_limb_type t2 = static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), j)) *
                                                static_cast<internal_double_limb_type>(u_i) +
                                            static_cast<internal_limb_type>(t) + k2;
-            A.limbs()[j - 1] = t2;
-            k                = t >> std::numeric_limits<internal_limb_type>::digits;
-            k2               = t2 >> std::numeric_limits<internal_limb_type>::digits;
+            A.limbs()[j - 1] = static_cast<internal_limb_type>(t2);
+            k                = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
+            k2               = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
          }
          internal_double_limb_type tmp             = static_cast<internal_double_limb_type>(A.limbs()[get_mod().backend().size()]) + k + k2;
-         A.limbs()[get_mod().backend().size() - 1] = tmp;
-         A.limbs()[get_mod().backend().size()]     = tmp >> std::numeric_limits<internal_limb_type>::digits;
+         A.limbs()[get_mod().backend().size() - 1] = static_cast<internal_limb_type>(tmp);
+         A.limbs()[get_mod().backend().size()]     = static_cast<internal_limb_type>(tmp >> std::numeric_limits<internal_limb_type>::digits);
       }
       A.resize(get_mod().backend().size(), 1);
 
