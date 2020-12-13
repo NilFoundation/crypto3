@@ -272,14 +272,21 @@ template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checke
 constexpr void eval_powm(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& result,
                          const modular_adaptor<Backend>& b, const T& e)
 {
-   eval_pow(result, b, e);
+   BOOST_ASSERT(MinBits >= msb(b.mod_data().get_mod()) + 1);
+   result.mod_data() = b.mod_data();
+   result.mod_data().mod_exp(result.base_data(), b.base_data(), e);
 }
 
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename Backend1, typename Backend2>
 constexpr void eval_powm(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& result,
                          const modular_adaptor<Backend1>& b, const modular_adaptor<Backend2>& e)
 {
-   eval_pow(result, b, e);
+   using Backend    = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
+   using value_type = typename modular_adaptor<Backend>::value_type;
+
+   value_type exp;
+   e.mod_data().adjust_regular(exp, e.base_data());
+   eval_powm(result, b, exp);
 }
 
 } // namespace backends
