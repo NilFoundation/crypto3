@@ -10,7 +10,7 @@
 #ifndef BOOST_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
 #define BOOST_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
 
-#include <boost/multiprecision/modular/modular_ops.hpp>
+#include <boost/multiprecision/modular/modular_functions_fixed.hpp>
 
 namespace boost {
 namespace multiprecision {
