@@ -75,7 +75,10 @@ constexpr int eval_jacobi(const Backend& a, const Backend& n)
          J = -J;
       }
 
-      std::swap(x, y);
+      // std::swap(x, y);
+      auto tmp = x;
+      x = y;
+      y = tmp;
    }
    return J;
 }

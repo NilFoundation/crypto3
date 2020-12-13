@@ -34,6 +34,9 @@
 #endif
 
 #include <boost/multiprecision/jacobi.hpp>
+#include <boost/multiprecision/cpp_int/literals.hpp>
+
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256);
 
 template <typename T>
 void test()
@@ -60,6 +63,10 @@ int main()
 
 #if defined(TEST_CPP_INT)
    test<cpp_int>();
+
+   constexpr auto a = 0x4931a5f_cppui256;
+   constexpr auto b = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui256;
+   static_assert(jacobi(a, b) == -1, "jacobi error");
 #endif
 #if defined(TEST_MPZ)
    test<mpz_int>();
