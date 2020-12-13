@@ -124,7 +124,7 @@ constexpr void eval_monty_inverse(Backend& res, const Backend& a, const Backend&
    eval_subtract(k_negone, one);
    res = zero;
 
-   ui_type kn = cpp_int(k_negone);
+   // ui_type kn = cpp_int(k_negone);
 
    while (!eval_eq(i, k))
    {

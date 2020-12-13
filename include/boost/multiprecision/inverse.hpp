@@ -32,7 +32,8 @@ template <typename Backend, expression_template_option ExpressionTemplates>
 constexpr number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
     const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
-   number<Backend, ExpressionTemplates> new_base, res;
+   using Backend_value = typename modular_adaptor<Backend>::value_type;
+   number<Backend_value, ExpressionTemplates> new_base, res;
    number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
 
    modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
