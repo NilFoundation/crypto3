@@ -67,30 +67,46 @@ constexpr bool base_operations_test(std::array<Number, test_set_len> test_set)
    typedef Number                                                     standard_number;
    typedef number<Backend_doubled>                                    dbl_standard_number;
 
-   dbl_standard_number a_add_b_s  = (static_cast<dbl_standard_number>(test_set[a_e]) + static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
-   dbl_standard_number a_sub_b_s  = (static_cast<dbl_standard_number>(test_set[a_e]) - static_cast<dbl_standard_number>(test_set[b_e]) + test_set[mod_e]) % test_set[mod_e];
-   dbl_standard_number a_mul_b_s  = (static_cast<dbl_standard_number>(test_set[a_e]) * static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
-   dbl_standard_number a_div_b_s  = (static_cast<dbl_standard_number>(test_set[a_e]) / static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
-   dbl_standard_number a_mod_b_s  = (static_cast<dbl_standard_number>(test_set[a_e]) % static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
-   standard_number     a_and_b_s  = (test_set[a_e] & test_set[b_e]) % test_set[mod_e];
-   standard_number     a_or_b_s   = (test_set[a_e] | test_set[b_e]) % test_set[mod_e];
-   standard_number     a_xor_b_s  = (test_set[a_e] ^ test_set[b_e]) % test_set[mod_e];
-   standard_number     a_powm_b_s = powm(test_set[a_e], test_set[b_e], test_set[mod_e]);
+   dbl_standard_number a_add_b_s   = (static_cast<dbl_standard_number>(test_set[a_e]) + static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
+   dbl_standard_number a_sub_b_s   = (static_cast<dbl_standard_number>(test_set[a_e]) - static_cast<dbl_standard_number>(test_set[b_e]) + test_set[mod_e]) % test_set[mod_e];
+   dbl_standard_number a_mul_b_s   = (static_cast<dbl_standard_number>(test_set[a_e]) * static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
+   dbl_standard_number a_div_b_s   = (static_cast<dbl_standard_number>(test_set[a_e]) / static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
+   dbl_standard_number a_mod_b_s   = (static_cast<dbl_standard_number>(test_set[a_e]) % static_cast<dbl_standard_number>(test_set[b_e])) % test_set[mod_e];
+   standard_number     a_and_b_s   = (test_set[a_e] & test_set[b_e]) % test_set[mod_e];
+   standard_number     a_or_b_s    = (test_set[a_e] | test_set[b_e]) % test_set[mod_e];
+   standard_number     a_xor_b_s   = (test_set[a_e] ^ test_set[b_e]) % test_set[mod_e];
+   standard_number     a_powm_b_s  = powm(test_set[a_e], test_set[b_e], test_set[mod_e]);
+   standard_number     a_bit_set_s = test_set[a_e];
+   bit_set(a_bit_set_s, 1);
+   standard_number a_bit_unset_s = test_set[a_e];
+   bit_unset(a_bit_unset_s, 2);
+   standard_number a_bit_flip_s = test_set[a_e];
+   bit_flip(a_bit_flip_s, 3);
+   int b_msb_s = msb(test_set[b_e]);
+   int b_lsb_s = lsb(test_set[b_e]);
 
    params_number  mod_p(test_set[mod_e]);
    modular_number a(test_set[a_e], mod_p);
    modular_number b(test_set[b_e], mod_p);
 
-   modular_number a_add_b  = a + b;
-   modular_number a_sub_b  = a - b;
-   modular_number a_mul_b  = a * b;
-   modular_number a_div_b  = a / b;
-   modular_number a_mod_b  = a % b;
-   modular_number a_and_b  = a & b;
-   modular_number a_or_b   = a | b;
-   modular_number a_xor_b  = a ^ b;
-   modular_number a_powm_b = powm(a, b);
-   modular_number a_pow_b  = pow(a, b);
+   modular_number a_add_b   = a + b;
+   modular_number a_sub_b   = a - b;
+   modular_number a_mul_b   = a * b;
+   modular_number a_div_b   = a / b;
+   modular_number a_mod_b   = a % b;
+   modular_number a_and_b   = a & b;
+   modular_number a_or_b    = a | b;
+   modular_number a_xor_b   = a ^ b;
+   modular_number a_powm_b  = powm(a, b);
+   modular_number a_pow_b   = pow(a, b);
+   modular_number a_bit_set = a;
+   bit_set(a_bit_set, 1);
+   modular_number a_bit_unset = a;
+   bit_unset(a_bit_unset, 2);
+   modular_number a_bit_flip = a;
+   bit_flip(a_bit_flip, 3);
+   int b_msb = msb(test_set[b_e]);
+   int b_lsb = lsb(test_set[b_e]);
 
    BOOST_ASSERT_MSG(a_add_b.template convert_to<standard_number>() == a_add_b_s, "addition error");
    BOOST_ASSERT_MSG(a_sub_b.template convert_to<standard_number>() == a_sub_b_s, "subtraction error");
@@ -111,6 +127,13 @@ constexpr bool base_operations_test(std::array<Number, test_set_len> test_set)
 
    BOOST_ASSERT_MSG(a_powm_b.template convert_to<standard_number>() == a_powm_b_s, "powm error");
    BOOST_ASSERT_MSG(a_pow_b.template convert_to<standard_number>() == a_powm_b_s, "pow error");
+
+   BOOST_ASSERT_MSG(a_bit_set.template convert_to<standard_number>() == a_bit_set_s, "bit set error");
+   BOOST_ASSERT_MSG(a_bit_unset.template convert_to<standard_number>() == a_bit_unset_s, "bit unset error");
+   BOOST_ASSERT_MSG(a_bit_flip.template convert_to<standard_number>() == a_bit_flip_s, "bit flip error");
+
+   BOOST_ASSERT_MSG(b_msb_s == b_msb, "msb error");
+   BOOST_ASSERT_MSG(b_lsb_s == b_lsb, "lsb error");
 
    return true;
 }
@@ -359,7 +382,8 @@ BOOST_AUTO_TEST_CASE(base_ops_prime_mod_backend_130)
             0xc88c6b7366ae5740e6860d5f1c906c00_cppui130},
        }};
 
-   constexpr bool res = base_operations_test(test_data);
+   constexpr
+       bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_130)
@@ -522,7 +546,8 @@ BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_130)
             0x2b711aed3a4d108fd95d3a8c3338bf713_cppui130},
        }};
 
-   constexpr bool res = base_operations_test(test_data);
+   constexpr
+       bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_17)
@@ -595,7 +620,8 @@ BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_17)
             0x2c8a_cppui17},
        }};
 
-   constexpr bool res = base_operations_test(test_data);
+   constexpr
+       bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

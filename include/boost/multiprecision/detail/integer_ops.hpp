@@ -175,7 +175,7 @@ integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, unsigned>::type
 lsb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_lsb;
@@ -183,7 +183,7 @@ lsb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer || number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_modular, unsigned>::type
 lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -193,7 +193,7 @@ lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, unsigned>::type
 msb(const number<Backend, ExpressionTemplates>& x)
 {
    using default_ops::eval_msb;
@@ -201,7 +201,7 @@ msb(const number<Backend, ExpressionTemplates>& x)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer || number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_modular, unsigned>::type
 msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -211,7 +211,7 @@ msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, bool>::type
 bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_test;
@@ -219,7 +219,7 @@ bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer || number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_modular, bool>::type
 bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -229,7 +229,7 @@ bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsig
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, number<Backend, ExpressionTemplates>&>::type
 bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_set;
@@ -238,7 +238,7 @@ bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, number<Backend, ExpressionTemplates>&>::type
 bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_unset;
@@ -247,7 +247,7 @@ bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, number<Backend, ExpressionTemplates>&>::type
 bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
    using default_ops::eval_bit_flip;

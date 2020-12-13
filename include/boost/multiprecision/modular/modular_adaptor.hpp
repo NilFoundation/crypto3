@@ -490,9 +490,11 @@ template <class Backend>
 constexpr void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_and;
+   BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
+
    typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
-   result.mod_data().adjust_regular(tmp2, v.base_data());
+   v.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_and(tmp1, tmp1, tmp2);
    result.base_data() = tmp1;
    result.mod_data().adjust_modular(result.base_data());
@@ -502,9 +504,11 @@ template <class Backend>
 constexpr void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_or;
+   BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
+
    typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
-   result.mod_data().adjust_regular(tmp2, v.base_data());
+   v.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_or(tmp1, tmp1, tmp2);
    result.base_data() = tmp1;
    result.mod_data().adjust_modular(result.base_data());
@@ -514,12 +518,71 @@ template <class Backend>
 constexpr void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_xor;
+   BOOST_ASSERT(result.mod_data().get_mod() == v.mod_data().get_mod());
+
    typename modular_adaptor<Backend>::value_type tmp1, tmp2;
    result.mod_data().adjust_regular(tmp1, result.base_data());
-   result.mod_data().adjust_regular(tmp2, v.base_data());
+   v.mod_data().adjust_regular(tmp2, v.base_data());
    eval_bitwise_xor(tmp1, tmp1, tmp2);
    result.base_data() = tmp1;
    result.mod_data().adjust_modular(result.base_data());
+}
+
+template <typename Backend>
+constexpr int eval_msb(const modular_adaptor<Backend>& m)
+{
+   using default_ops::eval_msb;
+   typename modular_adaptor<Backend>::value_type tmp;
+   m.mod_data().adjust_regular(tmp, m.base_data());
+   return eval_msb(tmp);
+}
+
+template <typename Backend>
+constexpr unsigned eval_lsb(const modular_adaptor<Backend>& m)
+{
+   using default_ops::eval_lsb;
+   typename modular_adaptor<Backend>::value_type tmp;
+   m.mod_data().adjust_regular(tmp, m.base_data());
+   return eval_lsb(tmp);
+}
+
+template <typename Backend>
+constexpr bool eval_bit_test(const modular_adaptor<Backend>& m, unsigned index)
+{
+   using default_ops::eval_bit_test;
+   typename modular_adaptor<Backend>::value_type tmp;
+   m.mod_data().adjust_regular(tmp, m.base_data());
+   return eval_bit_test(tmp, index);
+}
+
+template <typename Backend>
+constexpr void eval_bit_set(modular_adaptor<Backend>& result, unsigned index)
+{
+   using default_ops::eval_bit_set;
+   typename modular_adaptor<Backend>::value_type tmp;
+   result.mod_data().adjust_regular(tmp, result.base_data());
+   eval_bit_set(tmp, index);
+   result.mod_data().adjust_modular(result.base_data(), tmp);
+}
+
+template <typename Backend>
+constexpr void eval_bit_unset(modular_adaptor<Backend>& result, unsigned index)
+{
+   using default_ops::eval_bit_unset;
+   typename modular_adaptor<Backend>::value_type tmp;
+   result.mod_data().adjust_regular(tmp, result.base_data());
+   eval_bit_unset(tmp, index);
+   result.mod_data().adjust_modular(result.base_data(), tmp);
+}
+
+template <typename Backend>
+constexpr void eval_bit_flip(modular_adaptor<Backend>& result, unsigned index)
+{
+   using default_ops::eval_bit_flip;
+   typename modular_adaptor<Backend>::value_type tmp;
+   result.mod_data().adjust_regular(tmp, result.base_data());
+   eval_bit_flip(tmp, index);
+   result.mod_data().adjust_modular(result.base_data(), tmp);
 }
 
 } // namespace backends
