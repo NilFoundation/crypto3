@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRING_ALGORITM_HPP
-#define CRYPTO3_ALGEBRA_PAIRING_ALGORITM_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRING_ALGORITHM_HPP
+#define CRYPTO3_ALGEBRA_PAIRING_ALGORITHM_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -105,7 +105,6 @@ namespace nil {
 
                 return PairingCurveType::pairing_policy::miller_loop(prec_P, prec_Q);
             }
-
         }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil
