@@ -1,6 +1,12 @@
 # =nil; Foundation's Algebraic Constructions Module
 
-=nil; Foundation's Algebraic Constructions (finite fields, curves) module.
+=nil; Foundation's Algebraic Constructions module.
+
+Contains: 
+* Finite fields
+* Curves
+* Pairing
+* Constexpr BLAS.
 
 ## Building
 
@@ -15,7 +21,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git) (branch `6-shanks-tonelli`).
+* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git) (branch `33-extended-inverse`).
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)

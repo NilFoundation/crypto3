@@ -18,8 +18,12 @@ macro(define_algebra_example name)
 endmacro()
 
 set(EXAMPLES_NAMES
+    "multiexp"
     "curves"
-    "fields")
+    "fields"
+    "pairing"
+    "random_element"
+    "hash_to_curve")
 
 foreach(EXAMPLE_NAME ${EXAMPLES_NAMES})
     define_algebra_example(${EXAMPLE_NAME})

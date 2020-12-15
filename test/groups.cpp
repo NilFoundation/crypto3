@@ -2,9 +2,25 @@
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE groups_algebra_test
@@ -13,75 +29,75 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/curves/edwards/edwards_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
-#include <nil/algebra/curves/bn128/bn128_pp.hpp>
+#include <nil/crypto3/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/crypto3/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <nil/crypto3/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+#include <nil/crypto3/algebra/curves/bn128/bn128_pp.hpp>
 #endif
 #include <sstream>
 
-#include <nil/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
 
 #include <boost/multiprecision/modular/base_params.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
-template<typename GroupT>
+template<typename GroupType>
 void test_mixed_add() {
-    GroupT base, el, result;
+    GroupType base, el, result;
 
-    base = GroupT::zero();
-    el = GroupT::zero();
+    base = GroupType::value_type::zero();
+    el = GroupType::value_type::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::zero();
-    el = GroupT::random_element();
+    base = GroupType::value_type::zero();
+    el = random_element<GroupType>();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
-    el = GroupT::zero();
+    base = random_element<GroupType>();
+    el = GroupType::value_type::zero();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
-    el = GroupT::random_element();
+    base = random_element<GroupType>();
+    el = random_element<GroupType>();
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base + el);
 
-    base = GroupT::random_element();
+    base = random_element<GroupType>();
     el = base;
     el.to_special();
     result = base.mixed_add(el);
     assert(result == base.dbl());
 }
 
-template<typename GroupT, typename NumberType>
+template<typename GroupType, typename NumberType>
 void test_group() {
     NumberType rand1 = NumberType("76749407");
     NumberType rand2 = NumberType("44410867");
     NumberType randsum = NumberType("121160274");
 
-    GroupT zero = GroupT::zero();
+    GroupType zero = GroupType::value_type::zero();
     assert(zero == zero);
-    GroupT one = GroupT::one();
+    GroupType one = GroupType::value_type::one();
     assert(one == one);
-    GroupT two = number_type<1>(2l) * GroupT::one();
+    GroupType two = number_type<1>(2l) * GroupType::value_type::one();
     assert(two == two);
-    GroupT five = number_type<1>(5l) * GroupT::one();
+    GroupType five = number_type<1>(5l) * GroupType::value_type::one();
 
-    GroupT three = number_type<1>(3l) * GroupT::one();
-    GroupT four = number_type<1>(4l) * GroupT::one();
+    GroupType three = number_type<1>(3l) * GroupType::value_type::one();
+    GroupType four = number_type<1>(4l) * GroupType::value_type::one();
 
     assert(two + five == three + four);
 
-    GroupT a = GroupT::random_element();
-    GroupT b = GroupT::random_element();
+    GroupType a = random_element<GroupType>();
+    GroupType b = random_element<GroupType>();
 
     assert(one != zero);
     assert(a != zero);
@@ -111,32 +127,32 @@ void test_group() {
 
     assert((rand1 * a) + (rand2 * a) == (randsum * a));
 
-    assert(GroupT::order() * a == zero);
-    assert(GroupT::order() * one == zero);
-    assert((GroupT::order() * a) - a != zero);
-    assert((GroupT::order() * one) - one != zero);
+    assert(GroupType::order() * a == zero);
+    assert(GroupType::order() * one == zero);
+    assert((GroupType::order() * a) - a != zero);
+    assert((GroupType::order() * one) - one != zero);
 
-    test_mixed_add<GroupT>();
+    test_mixed_add<GroupType>();
 }
 
-template<typename GroupT>
+template<typename GroupType>
 void test_mul_by_q() {
-    GroupT a = GroupT::random_element();
-    assert((GroupT::base_field_char() * a) == a.mul_by_q());
+    GroupType a = random_element<GroupType>();
+    assert((GroupType::base_field_char() * a) == a.mul_by_q());
 }
 
-template<typename GroupT>
+template<typename GroupType>
 void test_output() {
-    GroupT g = GroupT::zero();
+    GroupType g = GroupType::value_type::zero();
 
     for (size_t i = 0; i < 1000; ++i) {
         std::stringstream ss;
         ss << g;
-        GroupT gg;
+        GroupType gg;
         ss >> gg;
         assert(g == gg);
         /* use a random point in next iteration */
-        g = GroupT::random_element();
+        g = random_element<GroupType>();
     }
 }
 

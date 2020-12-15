@@ -2,9 +2,25 @@
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE multiexpr_test
@@ -15,30 +31,72 @@
 
 #include <cstdio>
 #include <vector>
+#include <chrono>
+#include <ctime>
 
-#include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
-using namespace nil::algebra;
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/p192.hpp>
+// #include <nil/crypto3/algebra/curves/p224.hpp>
+// #include <nil/crypto3/algebra/curves/p256.hpp>
+// #include <nil/crypto3/algebra/curves/p384.hpp>
+// #include <nil/crypto3/algebra/curves/p521.hpp>
+// #include <nil/crypto3/algebra/curves/secp.hpp>
+// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
-template<typename GroupT>
-using run_result_t = std::pair<long long, std::vector<GroupT>>;
+#include <nil/crypto3/algebra/curves/params/multiexp/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
+//#include <nil/crypto3/algebra/curves/params/multiexp/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p192.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p224.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p256.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p384.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/p521.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/secp.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/params/multiexp/x962_p.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
+
+using namespace nil::crypto3::algebra;
+
+template<typename GroupType>
+using run_result_t = std::pair<long long, std::vector<typename GroupType::value_type>>;
 
 template<typename T>
 using test_instances_t = std::vector<std::vector<T>>;
 
-template<typename GroupT>
-test_instances_t<GroupT> generate_group_elements(size_t count, size_t size) {
+template<typename GroupType>
+test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t size) {
     // generating a random group element is expensive,
     // so for now we only generate a single one and repeat it
-    test_instances_t<GroupT> result(count);
+    test_instances_t<GroupType> result(count);
 
     for (size_t i = 0; i < count; i++) {
-        GroupT x = GroupT::random_element();
-        x.to_special();    // djb requires input to be in special form
+
+        typename GroupType::value_type x =
+            curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
-            // result[i].push_back(GroupT::random_element());
+            // result[i].push_back(curve_random_element<GroupType>());
         }
     }
 
@@ -46,51 +104,58 @@ test_instances_t<GroupT> generate_group_elements(size_t count, size_t size) {
 }
 
 template<typename FieldType>
-test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
+test_instances_t<FieldType> generate_scalars(size_t count, std::size_t size) {
     // we use SHA512_rng because it is much faster than
     // FieldType::random_element()
     test_instances_t<FieldType> result(count);
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(SHA512_rng<FieldType>(i * size + j));
+            result[i].push_back(field_random_element<FieldType>(i * size + j));
         }
     }
 
     return result;
 }
 
-template<typename GroupT, typename FieldType, multi_exp_method Method>
-run_result_t<GroupT> profile_multiexp(test_instances_t<GroupT> group_elements, test_instances_t<FieldType> scalars) {
+long long get_nsec_time() {
+    auto timepoint = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(timepoint.time_since_epoch()).count();
+}
+
+template<typename GroupType, typename FieldType, typename MultiexpMethod>
+run_result_t<GroupType>
+    profile_multiexp(test_instances_t<GroupType> group_elements, test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
-    std::vector<GroupT> answers;
+    std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multi_exp<GroupT, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
-                                                               scalars[i].cbegin(), scalars[i].cend(), 1));
+        answers.push_back(multiexp<GroupType, FieldType, MultiexpMethod>(
+            group_elements[i].cbegin(), group_elements[i].cend(), scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
     long long time_delta = get_nsec_time() - start_time;
 
-    return run_result_t<GroupT>(time_delta, answers);
+    return run_result_t<GroupType>(time_delta, answers);
 }
 
-template<typename GroupT, typename FieldType>
-void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_end_naive, bool compare_answers) {
+template<typename GroupType, typename FieldType>
+void print_performance_csv(size_t expn_start, std::size_t expn_end_fast, std::size_t expn_end_naive,
+                           bool compare_answers) {
     for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
         printf("%ld", expn);
         fflush(stdout);
 
-        test_instances_t<GroupT> group_elements = generate_group_elements<GroupT>(10, 1 << expn);
+        test_instances_t<GroupType> group_elements = generate_group_elements<GroupType>(10, 1 << expn);
         test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
-        run_result_t<GroupT> result_bos_coster =
-            profile_multiexp<GroupT, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
+        run_result_t<GroupType> result_bos_coster =
+            profile_multiexp<GroupType, FieldType, policies::multiexp_method_bos_coster>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
-        run_result_t<GroupT> result_djb =
-            profile_multiexp<GroupT, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
+        run_result_t<GroupType> result_djb =
+            profile_multiexp<GroupType, FieldType, policies::multiexp_method_BDLO12>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -99,8 +164,8 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
         }
 
         if (expn <= expn_end_naive) {
-            run_result_t<GroupT> result_naive =
-                profile_multiexp<GroupT, FieldType, multi_exp_method_naive>(group_elements, scalars);
+            run_result_t<GroupType> result_naive =
+                profile_multiexp<GroupType, FieldType, policies::multiexp_method_naive_plain>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 
@@ -114,14 +179,12 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 }
 
 int main(void) {
-    print_compilation_info();
 
-    printf("Profiling BN128_G1\n");
-    bn128_pp::init_public_params();
-    print_performance_csv<G1<bn128_pp>, Fr<bn128_pp>>(2, 20, 14, true);
+    std::cout << "Testing BLS12-381 G1" << std::endl;
+    print_performance_csv<curves::bls12<381>::g1_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
-    printf("Profiling BN128_G2\n");
-    print_performance_csv<G2<bn128_pp>, Fr<bn128_pp>>(2, 20, 14, true);
+    std::cout << "Testing BLS12-381 G2" << std::endl;
+    print_performance_csv<curves::bls12<381>::g2_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
     return 0;
 }

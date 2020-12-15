@@ -28,7 +28,7 @@ macro(define_runtime_algebra_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -36,10 +36,6 @@ macro(define_runtime_algebra_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
-
-    cm_test(NAME algebra_${name}_examples_test SOURCES ../example/${name}.cpp)
-    target_link_libraries(algebra_${name}_examples_test)
-
 endmacro()
 
 macro(define_compile_time_algebra_test name)
@@ -64,8 +60,12 @@ endmacro()
 set(RUNTIME_TESTS_NAMES
     "curves"
     "fields"
-    #"groups"
-    #"bilinearity"
+    "pairing"
+    "hash_to_curve"
+    "wnaf"
+    "multiexp"
+    #    "groups"
+    #    "bilinearity"
     )
 
 set(COMPILE_TIME_TESTS_NAMES

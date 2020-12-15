@@ -2,28 +2,37 @@
 
 @tableofcontents
 
+The key idea of `algebra` is to provide usefull interfaces for basic cryptography math. It's based on NilFoundation fork of 
+boost::multiprecision and boost::integer modules as backend so that it can be used with boost cpp_int, gmp or other backends.
+
+We expanded boost::multiprecision with `modular_adaptor`, which is actually a multi-precision number by some modular. It contains 
+modular number-specific algorithms using Montgomery representation. It also supports compile-time computations, because it gives 
+us opportunity to implement algebra constructions as constexpr.
+
+For our purposes we needed the opportunity to use field and curve arithmetic in compile time, what became possible thanks to 
+compile-time `modular_adaptor`.
+
 Algebra library consists of several modules listed below:
 
 1. Fields arithmetic
 2. Elliptic curves arithmetic
 3. Pairings on elliptic curves
 4. Multiexponentiation algorithm (will be part of some other module after a while)
+5. Matricies and vectors
 
 This separation defines the implementation architecture.
 
-Some particular cases merge accumulation step with encryption step. This means 
-block gets encrypted as far as it is found filled with enough data.  
+
 
 ## Fields Architecture ## {#fields_architecture}
 
-Fields module architecture consists of several parts listed below:
+Fields were meant to be a wrapper over `multiprecision` module and concept of `modular_adaptor` number. So it basically consist 
+of several parts listed below:
 
-1. Field Extensions (e.g. Fp, Fp2, Fp4)
-2. Field Policies
+1. Field Policies
+2. Field Extensions (e.g. Fp2, Fp4)
 3. Field Parameters
-4. Field Element Algorithms
-5. Field Double-precision Algorithms
-
+4. Field Element Algorithms, which are actually wrappers over the `multiprecision` operations.
 
 @dot
 digraph fields_arch {
@@ -31,24 +40,26 @@ bgcolor="#222222"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Field Extensions" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_extensions"];
-  b [label="Field Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_policies"];
+  a [label="Field Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_policies"];
+  b [label="Field Extensions" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_extensions"];
   c [label="Field Parameters" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_parameters"];
   d [label="Field Element Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_element_algorithms"];
-  e [label="Field Double-precision Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref field_double_precision_algorithms"];
   
   a -> b;
   b -> c;
   c -> d;
-  d -> e;
 }
 @enddot
+
+### Field Policies ### {#field_policies}
+
+A field policy describes its essential parameters such as `modulus`, `arity` or `mul_generator` - multiply generator. 
 
 ### Field Extensions ### {#field_extensions}
 
 For the purposes of effictive field/elliptic curve operations and pairings evaluation fields are arranged as a field tower.
 
-For example, this is the tower used for bn128 and bls12_381 oparations and pairings evaluation:
+For example, this is the tower used for `bn128` and `bls12_381` operations and pairings evaluation:
 
 Fp -> Fp2 -> Fp6 -> Fp12;
 
@@ -109,31 +120,25 @@ node [shape="box"]
 }
 @enddot
 
-### Field Policies ### {#field_policies}
-
-A field policy describes its essential parameters such as `modulus`, `arity` or `mul_generator` - multiply generator. 
-
 ### Field Parameters ### {#field_parameters}
 
-Other field parameters are kept in the specific structures. All this structures inherit from basic `params` structure, containing all the basic parameters.
+Other field parameters are kept in the specific structures. All this structures inherit from basic `params` structure, containing all the 
+basic parameters.
 
-For example, `arithmetic_params` structure keeps all the parameters needed for arithmetical operation evaluations.
+For example, `extension_params` structure keeps all the parameters needed for field and field extensions arithmetical operation evaluations.
 
 ### Field Element Algorithms ### {#field_element_algorithms}
 
-Field element corresponds an element of the field and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms are also defined here. As the backend they use now Boost::multiprecision, but it can be easily changed.
-
-### Field Double-precision Algorithms ### {#field_double_precision_algorithms}
-
-For some elliptic curve operations and pairing algorithms its easier to provide intermediate evaluations using double-precision numbers. For these purposes we have specific structure with all the needed methods.
+Field element corresponds an element of the field and has all the needed methods and overloaded arithmetic operators. The corresponding 
+algorithms are also defined here. As the backend they use now Boost::multiprecision, but it can be easily changed.
 
 ## Elliptic Curves Architecture ## {#curves_architecture}
 
-Fields module architecture consists of several parts listed below:
+Curves were build upon the `fields`. So it basically consist of several parts listed below:
 
-1. Curve Type Policies (NIST/Weierstrass)
-2. Curve Policies
-3. Curve Element Algorithms
+1. Curve Policies
+2. Curve g1, g2 group element arithmetic
+3. Basic curve policies
 
 @dot
 digraph curves_arch {
@@ -141,28 +146,30 @@ bgcolor="#222222"
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Curve Type Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_type_policies"];
-  b [label="Curve Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_policies"];
-  c [label="Curve Element Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_element_algorithms"];
+  a [label="Curve Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_policies"];
+  b [label="Curve Element Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref curve_element_algorithms"];
+  c [label="Basic curve policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref basic_curve_policies"];
   
   a -> b;
   b -> c;
 }
 @enddot
 
-### Curve Type Policies ### {#curve_type_policies}
-
-Curves implemented at the moment are one of two types: NIST curves (such as p521 curve) and Weierstrass curves (such as BLS12-381 or BN-128). Curve type policy describes parameters general for all the curves of the particular type.
-
-We also intend to generalize curve algorithms by making it curve type-determinable.
-
 ### Curve Policies ### {#curve_policies}
 
-A field policy describes its parameters such as modulus `p`, coeffs `a` and `b` or generator coordinates `x`, `y`. It also contains elliptic curve `value_type` defining curve element type. 
+A curve policy describes its parameters such as base field modulus `p`, scalar field modulus `q`, group element types `g1_type` and `g2_type`. 
+It also contains `pairing_policy` type, needed for comfortable usage of curve pairing.
 
 ### Curve Element Algorithms ### {#curve_element_algorithms}
 
-Curve element corresponds an point of the curve and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms based on the underlying field algorithms are also defined here.
+Curve element corresponds an point of the curve and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms 
+are based on the underlying field algorithms are also defined here.
+
+### Basic Curve Policies ### {#basic_curve_policies}
+
+Main reason for existence of basic policyis is that we need some of it params using in group element and pairing arithmetic. 
+So it contains such parameters that are needed by group element arithmetic e.g. coeffs `a` and `b` or generator coordinates `x`, `y`. 
+It also contains all needed information about the underlying fields. 
 
 ## Pairing Architecture ## {#pairing_architecture}
 

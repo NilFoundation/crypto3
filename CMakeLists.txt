@@ -6,7 +6,7 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 cmake_policy(SET CMP0028 NEW)
 cmake_policy(SET CMP0042 NEW)
@@ -41,9 +41,6 @@ cm_project(algebra WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 cm_find_package(CM)
 include(CMDeploy)
 
-include(CheckSSE)
-include(CheckAVX)
-
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
@@ -70,6 +67,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+                      ${CMAKE_WORKSPACE_NAME}::hash
 
                       ${Boost_LIBRARIES})
 
