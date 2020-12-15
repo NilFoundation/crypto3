@@ -282,17 +282,17 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing_policy::G1_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::g1_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing_policy::G1_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::g1_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing_policy::G2_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::g2_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing_policy::G2_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::g2_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
@@ -314,26 +314,26 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::bls12<381>::pairing_policy::GT_type> {
+            struct print_log_value<curves::bls12<381>::pairing_policy::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::bls12<381>::pairing_policy::GT_type &e) {
+                                const typename curves::bls12<381>::pairing_policy::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing_policy::G1_type> {
+            struct print_log_value<curves::mnt4<298>::pairing_policy::g1_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing_policy::G1_type &e) {
+                                const typename curves::mnt4<298>::pairing_policy::g1_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing_policy::G2_type> {
+            struct print_log_value<curves::mnt4<298>::pairing_policy::g2_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing_policy::G2_type &e) {
+                                const typename curves::mnt4<298>::pairing_policy::g2_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
@@ -355,26 +355,26 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::mnt4<298>::pairing_policy::GT_type> {
+            struct print_log_value<curves::mnt4<298>::pairing_policy::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt4<298>::pairing_policy::GT_type &e) {
+                                const typename curves::mnt4<298>::pairing_policy::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing_policy::G1_type> {
+            struct print_log_value<curves::mnt6<298>::pairing_policy::g1_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing_policy::G1_type &e) {
+                                const typename curves::mnt6<298>::pairing_policy::g1_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing_policy::G2_type> {
+            struct print_log_value<curves::mnt6<298>::pairing_policy::g2_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing_policy::G2_type &e) {
+                                const typename curves::mnt6<298>::pairing_policy::g2_type::value_type &e) {
                     print_curve_group_element(os, e);
                 }
             };
@@ -396,9 +396,9 @@ namespace boost {
             };
 
             template<>
-            struct print_log_value<curves::mnt6<298>::pairing_policy::GT_type> {
+            struct print_log_value<curves::mnt6<298>::pairing_policy::gt_type::value_type> {
                 void operator()(std::ostream &os,
-                                const typename curves::mnt6<298>::pairing_policy::GT_type &e) {
+                                const typename curves::mnt6<298>::pairing_policy::gt_type::value_type &e) {
                     print_field_element(os, e);
                     std::cout << std::endl;
                 }
@@ -671,10 +671,10 @@ void pairing_test_Fr_init(std::vector<typename fields::detail::element_fp<FieldP
 }
 
 template<typename PairingT, typename TestSet>
-void pairing_test_G1_init(std::vector<typename PairingT::G1_type> &elements,
+void pairing_test_G1_init(std::vector<typename PairingT::g1_type::value_type> &elements,
                           const TestSet &test_set) {
     using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::G1_type;
+    using value_type = typename pairing_policy::g1_type::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G1")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
@@ -682,10 +682,10 @@ void pairing_test_G1_init(std::vector<typename PairingT::G1_type> &elements,
 }
 
 template<typename PairingT, typename TestSet>
-void pairing_test_G2_init(std::vector<typename PairingT::G2_type> &elements,
+void pairing_test_G2_init(std::vector<typename PairingT::g2_type::value_type> &elements,
                           const TestSet &test_set) {
     using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::G2_type;
+    using value_type = typename pairing_policy::g2_type::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G2")) {
         elements.emplace_back(curve_point_init<value_type>(elem_coords));
@@ -693,10 +693,10 @@ void pairing_test_G2_init(std::vector<typename PairingT::G2_type> &elements,
 }
 
 template<typename PairingT, typename TestSet>
-void pairing_test_GT_init(std::vector<typename PairingT::GT_type> &elements,
+void pairing_test_GT_init(std::vector<typename PairingT::gt_type::value_type> &elements,
                           const TestSet &test_set) {
     using pairing_policy = PairingT;
-    using value_type = typename pairing_policy::GT_type;
+    using value_type = typename pairing_policy::gt_type::value_type;
 
     for (auto &elem_GT : test_set.second.get_child("GT")) {
         elements.emplace_back(field_element_init<value_type>::process(elem_GT));
@@ -884,9 +884,9 @@ void pairing_test_init(std::vector<Fr_value_type> &Fr_elements,
 template<typename PairingT, typename TestSet>
 void pairing_operation_test(const TestSet &test_set) {
     std::vector<typename PairingT::Fp_type::value_type> Fr_elements;
-    std::vector<typename PairingT::G1_type> G1_elements;
-    std::vector<typename PairingT::G2_type> G2_elements;
-    std::vector<typename PairingT::GT_type> GT_elements;
+    std::vector<typename PairingT::g1_type::value_type> G1_elements;
+    std::vector<typename PairingT::g2_type::value_type> G2_elements;
+    std::vector<typename PairingT::gt_type::value_type> GT_elements;
     std::vector<typename PairingT::G1_precomp> G1_prec_elements;
     std::vector<typename PairingT::G2_precomp> G2_prec_elements;
 

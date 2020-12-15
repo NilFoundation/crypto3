@@ -50,49 +50,53 @@ namespace nil {
                     constexpr static const typename policy_type::number_type pairing_loop_count =
                         policy_type::ate_loop_count;
 
-                    typedef typename policy_type::Fp_field Fp_type;
-                    using G1_type = typename policy_type::g1;
-                    using G2_type = typename policy_type::g2;
-                    typedef typename policy_type::Fq_field Fq_type;
-                    typedef typename policy_type::Fqe_field Fqe_type;
-                    typedef typename policy_type::Fqk_field Fqk_type;
-                    typedef typename policy_type::gt GT_type;
+                    using Fp_type = typename policy_type::Fp_type;
+                    using Fq_type = typename policy_type::Fq_type ;
+                    using Fqe_type = typename policy_type::Fqe_type;
+                    using Fqk_type = typename policy_type::Fqk_type;
+
+                    using g1_type = typename policy_type::g1_type;
+                    using g2_type = typename policy_type::g2_type;
+                    using gt_type = typename policy_type::gt_type;
 
                     using G1_precomp = typename policy_type::g1_precomp;
                     using G2_precomp = typename policy_type::g2_precomp;
 
-                    static inline typename policy_type::g1_precomp precompute_g1(const typename policy_type::g1 &P) {
+                    /*constexpr static*/ const typename g2_type::underlying_field_type::value_type twist =
+                        policy_type().twist;
+
+                    static inline G1_precomp precompute_g1(const typename g1_type::value_type &P) {
                         return policy_type::precompute_g1(P);
                     }
 
-                    static inline typename policy_type::g2_precomp precompute_g2(const typename policy_type::g2 &Q) {
+                    static inline G2_precomp precompute_g2(const typename g2_type::value_type &Q) {
                         return policy_type::precompute_g2(Q);
                     }
 
-                    static inline typename policy_type::gt pairing(const typename policy_type::g1 &P,
-                                                                   const typename policy_type::g2 &Q) {
+                    static inline typename gt_type::value_type pairing(const typename g1_type::value_type &P,
+                                                                   const typename g2_type::value_type &Q) {
                         return policy_type::pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt reduced_pairing(const typename policy_type::g1 &P,
-                                                                           const typename policy_type::g2 &Q) {
+                    static inline typename gt_type::value_type reduced_pairing(const typename g1_type::value_type &P,
+                                                                           const typename g2_type::value_type &Q) {
                         return policy_type::reduced_pairing(P, Q);
                     }
 
-                    static inline typename policy_type::gt
-                        double_miller_loop(const typename policy_type::g1_precomp &prec_P1,
-                                           const typename policy_type::g2_precomp &prec_Q1,
-                                           const typename policy_type::g1_precomp &prec_P2,
-                                           const typename policy_type::g2_precomp &prec_Q2) {
+                    static inline typename gt_type::value_type
+                        double_miller_loop(const G1_precomp &prec_P1,
+                                           const G2_precomp &prec_Q1,
+                                           const G1_precomp &prec_P2,
+                                           const G2_precomp &prec_Q2) {
                         return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 
-                    static inline typename policy_type::gt final_exponentiation(const typename policy_type::gt &elt) {
+                    static inline typename gt_type::value_type final_exponentiation(const typename gt_type::value_type &elt) {
                         return policy_type::final_exponentiation(elt);
                     }
 
-                    static inline typename policy_type::gt miller_loop(const typename policy_type::g1_precomp &prec_P,
-                                                                       const typename policy_type::g2_precomp &prec_Q) {
+                    static inline typename gt_type::value_type miller_loop(const G1_precomp &prec_P,
+                                                                       const G2_precomp &prec_Q) {
                         return policy_type::miller_loop(prec_P, prec_Q);
                     }
                 };
