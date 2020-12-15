@@ -98,16 +98,15 @@ template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checke
 class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
-   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
+   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
  public:
-   typedef modular_policy<TemplateBackend> policy_type;
+   typedef modular_policy<Backend> policy_type;
 
  protected:
    typedef typename policy_type::internal_limb_type        internal_limb_type;
    typedef typename policy_type::internal_double_limb_type internal_double_limb_type;
 
-   typedef typename policy_type::Backend                      Backend;
    typedef typename policy_type::Backend_doubled_1            Backend_doubled_1;
    typedef typename policy_type::Backend_quadruple_1          Backend_quadruple_1;
    typedef typename policy_type::Backend_padded_limbs         Backend_padded_limbs;

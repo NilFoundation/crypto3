@@ -48,7 +48,9 @@ constexpr int eval_jacobi(const Backend& a, const Backend& n)
 
       if (eval_gt(x, yd2))
       {
-         eval_subtract(x, y, x);
+         Backend tmp(y);
+         eval_subtract(tmp, x);
+         x = tmp;
          if (eval_integer_modulus(y, 4) == 3)
          {
             J = -J;

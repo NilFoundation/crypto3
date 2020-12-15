@@ -24,23 +24,20 @@ template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checke
 class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
-   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
+   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
 
  public:
-   typedef modular_params<TemplateBackend> modulus_type;
+   typedef modular_params<Backend> modulus_type;
 
  protected:
    typedef typename modulus_type::policy_type          policy_type;
-   typedef typename policy_type::Backend               Backend;
    typedef typename policy_type::Backend_padded_limbs  Backend_padded_limbs;
    typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type           number_type;
 
  public:
-   typedef Backend value_type;
-
-   constexpr value_type& base_data() { return m_base; }
-   constexpr const value_type& base_data() const { return m_base; }
+   constexpr Backend& base_data() { return m_base; }
+   constexpr const Backend& base_data() const { return m_base; }
    constexpr modulus_type& mod_data() { return m_mod; }
    constexpr const modulus_type& mod_data() const { return m_mod; }
 
@@ -127,8 +124,8 @@ class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> 
       //
       BOOST_ASSERT(!mod_data().compare(o.mod_data()));
 
-      value_type tmp1 = base_data();
-      value_type tmp2 = o.base_data();
+      Backend tmp1 = base_data();
+      Backend tmp2 = o.base_data();
       mod_data().adjust_regular(tmp1, base_data());
       mod_data().adjust_regular(tmp2, o.base_data());
       return tmp1.compare(tmp2);
@@ -168,7 +165,7 @@ class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> 
 
    inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
-      value_type tmp;
+      Backend tmp;
       mod_data().adjust_regular(tmp, base_data());
       return tmp.str(dig, f);
    }
@@ -186,7 +183,7 @@ class modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> 
    };
 
  protected:
-   value_type   m_base;
+   Backend   m_base;
    modulus_type m_mod;
 };
 
@@ -261,9 +258,8 @@ constexpr void eval_pow(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, S
                         const modular_adaptor<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >& e)
 {
    using Backend    = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
-   using value_type = typename modular_adaptor<Backend>::value_type;
 
-   value_type exp;
+   Backend exp;
    e.mod_data().adjust_regular(exp, e.base_data());
    eval_pow(result, b, exp);
 }
@@ -282,9 +278,8 @@ constexpr void eval_powm(modular_adaptor<modular_fixed_cpp_int_backend<MinBits, 
                          const modular_adaptor<Backend1>& b, const modular_adaptor<Backend2>& e)
 {
    using Backend    = modular_fixed_cpp_int_backend<MinBits, SignType, Checked>;
-   using value_type = typename modular_adaptor<Backend>::value_type;
 
-   value_type exp;
+   Backend exp;
    e.mod_data().adjust_regular(exp, e.base_data());
    eval_powm(result, b, exp);
 }

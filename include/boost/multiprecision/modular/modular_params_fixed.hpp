@@ -22,15 +22,14 @@ template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checke
 class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
 {
  protected:
-   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> TemplateBackend;
-   typedef backends::modular_functions_fixed<TemplateBackend>        modular_logic;
+   typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
+   typedef backends::modular_functions_fixed<Backend>        modular_logic;
 
  public:
    typedef typename modular_logic::policy_type policy_type;
 
  protected:
    typedef typename policy_type::internal_limb_type    internal_limb_type;
-   typedef typename policy_type::Backend               Backend;
    typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
    typedef typename policy_type::number_type           number_type;
 

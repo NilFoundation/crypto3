@@ -38,6 +38,12 @@
 #endif
 
 #include <boost/multiprecision/ressol.hpp>
+#include <boost/multiprecision/cpp_int/literals.hpp>
+
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(65);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521);
+
+using namespace boost::multiprecision;
 
 template <typename T>
 void test()
@@ -141,6 +147,36 @@ int main()
 #if defined(TEST_TOMMATH)
    test<boost::multiprecision::tom_int>();
 #endif
+
+   constexpr auto a1 = 0x5_cppi521;
+   constexpr auto p1 = 0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppi521;
+   constexpr auto res1 = 0x17e76bd20bdb7664ba9117dd46c437ac50063e33390efa159b637a043df2fbfa55e97b9f7dc55968462121ec1b7a8d686ff263d511011f1b2ee6af5fa7726b97b18_cppi521;
+   static_assert(ressol(a1, p1) == res1, "ressol error");
+
+   constexpr auto a2 = 0x5_cppi65;
+   constexpr auto p2 = 0xb_cppi65;
+   constexpr auto res2 = 0x4_cppi65;
+   static_assert(ressol(a2, p2) == res2, "ressol error");
+
+   constexpr auto a3 = 0x4_cppi521;
+   constexpr auto p3 = 0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521;
+   static_assert(ressol(a3, p3) == -1, "ressol error");
+
+   constexpr auto a4_m = number<backends::modular_adaptor<backends::cpp_int_backend<65, 65>> >(0x5_cppi65, 0xb_cppi65);
+   static_assert(ressol(a4_m).template convert_to<number<backends::cpp_int_backend<65, 65>>>() == res2, "ressol error");
+
+   constexpr auto a5_m = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       0x5_cppi521,
+       0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppi521);
+   static_assert(ressol(a5_m).template convert_to<number<backends::cpp_int_backend<521, 521>>>() == res1, "ressol error");
+
+   constexpr auto a6_m = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       0x4_cppi521,
+       0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521);
+   constexpr auto negone = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       number<backends::cpp_int_backend<521, 521>>(-1),
+       0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521);
+   static_assert(ressol(a6_m) == negone, "ressol error");
 
    return boost::report_errors();
 }

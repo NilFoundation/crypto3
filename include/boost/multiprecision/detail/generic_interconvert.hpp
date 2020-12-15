@@ -596,11 +596,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 constexpr void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/)
 {
-   typedef typename From::value_type value_type;
-
-   value_type tmp;
-   from.mod_data().adjust_regular(tmp, from.base_data());
-   to = tmp;
+   from.mod_data().adjust_regular(to, from.base_data());
 }
 
 }
