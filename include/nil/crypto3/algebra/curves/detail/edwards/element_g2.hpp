@@ -354,14 +354,15 @@ namespace nil {
                             return element_edwards_g2(p_out[0], p_out[1], p_out[2]);
                         }
 
-                    private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
-
                         /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
                             g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one(),
                              g2_field_type_value::underlying_type::zero());
                         ;
+                        
+                    private:
+                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                        /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
+
                         /*constexpr static */ const g2_field_type_value twist_coeff_a = a * twist;
                         /*constexpr static */ const g2_field_type_value twist_coeff_d = d * twist;
 

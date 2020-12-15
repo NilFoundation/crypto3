@@ -45,20 +45,35 @@ namespace nil {
                         using policy_type = edwards_basic_policy<183>;
 
                     public:
-                        typedef typename policy_type::Fq Fq;
-                        using Fq3 = typename policy_type::Fq3;
-                        typedef typename policy_type::gt gt;
-                        using g1 = typename policy_type::g1;
-                        using g2 = typename policy_type::g2;
 
-                        typedef typename policy_type::Fp_field Fp_field;
-                        typedef typename policy_type::Fq_field Fq_field;
-                        typedef typename policy_type::Fqe_field Fqe_field;
-                        typedef typename policy_type::Fqk_field Fqk_field;
+                        using Fp_type = typename policy_type::Fp_type;
+                        using Fq_type = typename policy_type::Fq_type;
+                        using Fqe_type = typename policy_type::Fqe_type;
+                        using Fqk_type = typename policy_type::Fqk_type;
+
+                        using g1_type = typename policy_type::g1_type;
+                        using g2_type = typename policy_type::g2_type;
+                        using gt_type = typename policy_type::gt_type;
 
                         constexpr static const typename policy_type::number_type ate_loop_count =
                             policy_type::ate_loop_count;
 
+                        /*constexpr static*/ const typename g2_type::underlying_field_type::value_type twist =
+                            g2::one().twist;
+                        // must be
+                        // constexpr static const typename g2_type::underlying_field_type::value_type
+                        //    twist = g2::one()::twist;
+                        // when constexpr ready
+                        // but it's better to implement a structure pairing_params with such values
+
+                    private:
+                        using g1 = typename g1_type::value_type;
+                        using g2 = typename g2_type::value_type;
+                        using Fq = typename Fq_type::value_type;
+                        using Fq3 = typename Fqe_type::value_type;
+                        using gt = typename Fqk_type::value_type;
+                    public:
+                        
                         struct Fq_conic_coefficients {
 
                             Fq c_ZZ;

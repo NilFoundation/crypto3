@@ -29,42 +29,46 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
+            namespace pairings {
 
-            template<typename CurveType>
-            using fqk_type = typename CurveType::pairing_policy::fqk_type;    // TODO: better name when stable
+                template<typename CurveType>
+                using other_curve_type = typename CurveType::pairing_policy::other_curve_type;
 
-            using other_curve_type = curves::mnt6<ModulusBits>;
+                template<typename CurveType>
+                using Fp_type = typename CurveType::pairing_policy::Fp_type;
 
-            typedef typename policy_type::number_type number_type;
+                template<typename CurveType>
+                using Fq_type = typename CurveType::pairing_policy::Fq_type;
 
-            constexpr static const number_type pairing_loop_count = policy_type::ate_loop_count;
+                template<typename CurveType>
+                using Fqe_type = typename CurveType::pairing_policy::Fqe_type;
 
-            constexpr static const bool ate_is_loop_count_neg = policy_type::ate_is_loop_count_neg;
+                template<typename CurveType>
+                using Fqk_type = typename CurveType::pairing_policy::Fqk_type;
 
-            constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
-                policy_type::final_exponent_last_chunk_abs_of_w0;
-            constexpr static const bool final_exponent_last_chunk_is_w0_neg =
-                policy_type::final_exponent_last_chunk_is_w0_neg;
-            constexpr static const number_type final_exponent_last_chunk_w1 =
-                policy_type::final_exponent_last_chunk_w1;
+                template<typename CurveType>
+                using g1_type = typename CurveType::pairing_policy::g1_type;
 
-            /*constexpr static*/ const typename policy_type::g2_group::underlying_field_type::value_type twist =
-                policy_type().twist;
+                template<typename CurveType>
+                using g2_type = typename CurveType::pairing_policy::g2_type;
 
-            typedef typename policy_type::Fp_field Fp_type;
-            using G1_type = typename policy_type::g1;
-            using G2_type = typename policy_type::g2;
-            typedef typename policy_type::Fq_field Fq_type;
-            typedef typename policy_type::Fqe_field Fqe_type;
-            typedef typename policy_type::Fqk_field Fqk_type;
-            typedef typename policy_type::gt GT_type;
+                template<typename CurveType>
+                using gt_type = typename CurveType::pairing_policy::gt_type;
 
-            using G1_precomp = typename policy_type::g1_precomp;
-            using G2_precomp = typename policy_type::g2_precomp;
+                template<typename CurveType>
+                using G1_precomp = typename CurveType::pairing_policy::G1_precomp;
 
-            using affine_ate_G1_precomp = typename policy_type::affine_ate_g1_precomputation;
-            using affine_ate_G2_precomp = typename policy_type::affine_ate_g2_precomputation;
+                template<typename CurveType>
+                using G2_precomp = typename CurveType::pairing_policy::G2_precomp;
 
+                template<typename CurveType>
+                using affine_ate_G1_precomp = typename CurveType::pairing_policy::affine_ate_G1_precomp;
+
+                template<typename CurveType>
+                using affine_ate_G2_precomp = typename CurveType::pairing_policy::affine_ate_G2_precomp;
+
+
+            }    // namespace pairings    
         }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil
