@@ -33,6 +33,9 @@
 
 #include <memory>
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
@@ -44,6 +47,8 @@ namespace nil {
             namespace snark {
                 namespace components {
 
+                    using namespace nil::crypto3::algebra::pairings;
+
                     /**
                      * Gadget that represents a G2 variable.
                      */
@@ -51,8 +56,8 @@ namespace nil {
                     struct G2_variable : public component<typename CurveType::scalar_field_type> {
                         using field_type = typename CurveType::pairing_policy::Fp_type;
 
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
 
                         std::shared_ptr<Fqe_variable<CurveType>> X;
                         std::shared_ptr<Fqe_variable<CurveType>> Y;
@@ -67,9 +72,9 @@ namespace nil {
                             all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                         }
                         G2_variable(blueprint<field_type> &bp,
-                                    const typename other_curve<CurveType>::g2_type::value_type &Q) :
+                                    const typename other_curve_type<CurveType>::g2_type::value_type &Q) :
                             component<field_type>(bp) {
-                            typename other_curve<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
+                            typename other_curve_type<CurveType>::g2_type::value_type Q_copy = Q.to_affine_coordinates();
 
                             X.reset(new Fqe_variable<CurveType>(bp, Q_copy.X));
                             Y.reset(new Fqe_variable<CurveType>(bp, Q_copy.Y));
@@ -78,8 +83,8 @@ namespace nil {
                             all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                         }
 
-                        void generate_r1cs_witness(const typename other_curve<CurveType>::g2_type::value_type &Q) {
-                            typename other_curve<CurveType>::g2_type::value_type Qcopy = Q.to_affine_coordinates();
+                        void generate_r1cs_witness(const typename other_curve_type<CurveType>::g2_type::value_type &Q) {
+                            typename other_curve_type<CurveType>::g2_type::value_type Qcopy = Q.to_affine_coordinates();
 
                             X->generate_r1cs_witness(Qcopy.X);
                             Y->generate_r1cs_witness(Qcopy.Y);
@@ -101,8 +106,8 @@ namespace nil {
                     template<typename CurveType>
                     struct G2_checker_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
 
                         G2_variable<CurveType> Q;
 
@@ -124,9 +129,9 @@ namespace nil {
                             compute_Ysquared.reset(new Fqe_sqr_component<CurveType>(bp, *(Q.Y), *Ysquared));
 
                             Xsquared_plus_a.reset(
-                                new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::a));
+                                new Fqe_variable<CurveType>((*Xsquared) + other_curve_type<CurveType>::a));
                             Ysquared_minus_b.reset(
-                                new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::b)));
+                                new Fqe_variable<CurveType>((*Ysquared) + (-other_curve_type<CurveType>::b)));
 
                             curve_equation.reset(
                                 new Fqe_mul_component<CurveType>(bp, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));

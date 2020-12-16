@@ -280,15 +280,15 @@ void test_Frobenius() {
 template<typename CurveType>
 void test_full_pairing() {
     typedef typename CurveType::scalar_field_type FieldType;
-    typedef typename CurveType::pairing_policy::other_curve::pairing_policy pairing_policy;
+    typedef typename pairings::other_curve_type<CurveType>::pairing_policy pairing_policy;
 
     blueprint<FieldType> bp;
-    other_curve<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g1_type::value_type::one();
-    other_curve<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g2_type::value_type::one();
+    pairings::other_curve_type<CurveType>::g1_type::value_type P_val =
+        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g1_type::value_type::one();
+    pairings::other_curve_type<CurveType>::g2_type::value_type Q_val =
+        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g2_type::value_type::one();
 
     G1_variable<CurveType> P(bp);
     G2_variable<CurveType> Q(bp);
@@ -335,15 +335,15 @@ void test_full_pairing() {
 template<typename CurveType>
 void test_full_precomputed_pairing() {
     typedef typename CurveType::scalar_field_type FieldType;
-    typedef typename CurveType::pairing_policy::other_curve::pairing_policy pairing_policy;
+    typedef typename pairings::other_curve_type<CurveType>::pairing_policy pairing_policy;
 
     blueprint<FieldType> bp;
-    other_curve<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g1_type::value_type::one();
-    other_curve<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g2_type::value_type::one();
+    pairings::other_curve_type<CurveType>::g1_type::value_type P_val =
+        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g1_type::value_type::one();
+    pairings::other_curve_type<CurveType>::g2_type::value_type Q_val =
+        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g2_type::value_type::one();
 
     G1_precomputation<CurveType> prec_P(bp, P_val);
     G2_precomputation<CurveType> prec_Q(bp, Q_val);

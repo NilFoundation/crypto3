@@ -33,6 +33,9 @@
 
 #include <memory>
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/mnt_pairing_params.hpp>
 
@@ -139,7 +142,7 @@ namespace nil {
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                                pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_3_minus_1->generate_r1cs_constraints();
@@ -162,7 +165,7 @@ namespace nil {
                         }
 
                         void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                            one->generate_r1cs_witness(pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();
@@ -268,7 +271,7 @@ namespace nil {
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                                pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_2_minus_1->generate_r1cs_constraints();
@@ -285,7 +288,7 @@ namespace nil {
                         }
 
                         void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(other_curve<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                            one->generate_r1cs_witness(pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();

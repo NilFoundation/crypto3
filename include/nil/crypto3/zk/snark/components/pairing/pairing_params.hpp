@@ -40,7 +40,7 @@ namespace nil {
                      * a particular parameter choice; let 'my_ec_pp' denote this choice.
                      *
                      * Moreover, one must provide a template specialization for the class
-                     * pairing_selector (below), containing typedefs for the typenames
+                     * basic_pairing_component (below), containing typedefs for the typenames
                      * - FieldType
                      * - fqe_type
                      * - fqk_type
@@ -64,11 +64,11 @@ namespace nil {
                      *
                      *   class my_ec_pp;
                      *
-                     * Second, specialize pairing_selector<ec_ppT> for the
+                     * Second, specialize basic_pairing_component<ec_ppT> for the
                      * case ec_ppT = my_ec_pp, using the above types:
                      *
                      *   template<>
-                     *   class pairing_selector<my_ec_pp> {
+                     *   class basic_pairing_component<my_ec_pp> {
                      *       typedef my_Field FieldType;
                      *       typedef my_Fqe fqe_type;
                      *       typedef my_Fqk fqk_type;
@@ -94,44 +94,38 @@ namespace nil {
                      *
                      */
                     template<typename CurveType>
-                    class pairing_selector;
+                    class basic_pairing_component;
 
                     /**
                      * Below are various template aliases (used for convenience).
                      */
 
                     template<typename CurveType>
-                    using fqk_type = typename pairing_selector<CurveType>::fqk_type;    // TODO: better name when stable
+                    using Fqe_variable = typename basic_pairing_component<CurveType>::Fqe_variable_type;
+                    template<typename CurveType>
+                    using Fqe_mul_component = typename basic_pairing_component<CurveType>::Fqe_mul_component_type;
+                    template<typename CurveType>
+                    using Fqe_mul_by_lc_component = typename basic_pairing_component<CurveType>::Fqe_mul_by_lc_component_type;
+                    template<typename CurveType>
+                    using Fqe_sqr_component = typename basic_pairing_component<CurveType>::Fqe_sqr_component_type;
 
                     template<typename CurveType>
-                    using Fqe_variable = typename pairing_selector<CurveType>::Fqe_variable_type;
+                    using Fqk_variable = typename basic_pairing_component<CurveType>::Fqk_variable_type;
                     template<typename CurveType>
-                    using Fqe_mul_component = typename pairing_selector<CurveType>::Fqe_mul_component_type;
+                    using Fqk_mul_component = typename basic_pairing_component<CurveType>::Fqk_mul_component_type;
                     template<typename CurveType>
-                    using Fqe_mul_by_lc_component = typename pairing_selector<CurveType>::Fqe_mul_by_lc_component_type;
+                    using Fqk_special_mul_component = typename basic_pairing_component<CurveType>::Fqk_special_mul_component_type;
                     template<typename CurveType>
-                    using Fqe_sqr_component = typename pairing_selector<CurveType>::Fqe_sqr_component_type;
-
-                    template<typename CurveType>
-                    using Fqk_variable = typename pairing_selector<CurveType>::Fqk_variable_type;
-                    template<typename CurveType>
-                    using Fqk_mul_component = typename pairing_selector<CurveType>::Fqk_mul_component_type;
-                    template<typename CurveType>
-                    using Fqk_special_mul_component = typename pairing_selector<CurveType>::Fqk_special_mul_component_type;
-                    template<typename CurveType>
-                    using Fqk_sqr_component = typename pairing_selector<CurveType>::Fqk_sqr_component_type;
-
-                    template<typename CurveType>
-                    using other_curve = typename pairing_selector<CurveType>::other_curve_type;
+                    using Fqk_sqr_component = typename basic_pairing_component<CurveType>::Fqk_sqr_component_type;
 
                     template<typename CurveType>
                     using e_over_e_miller_loop_component =
-                        typename pairing_selector<CurveType>::e_over_e_miller_loop_component_type;
+                        typename basic_pairing_component<CurveType>::e_over_e_miller_loop_component_type;
                     template<typename CurveType>
                     using e_times_e_over_e_miller_loop_component =
-                        typename pairing_selector<CurveType>::e_times_e_over_e_miller_loop_component_type;
+                        typename basic_pairing_component<CurveType>::e_times_e_over_e_miller_loop_component_type;
                     template<typename CurveType>
-                    using final_exp_component = typename pairing_selector<CurveType>::final_exp_component_type;
+                    using final_exp_component = typename basic_pairing_component<CurveType>::final_exp_component_type;
 
                 }    // namespace components
             }    // namespace snark

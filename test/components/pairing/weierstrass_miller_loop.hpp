@@ -16,6 +16,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
 
@@ -32,7 +35,7 @@ template<typename CurveType>
 void test_mnt_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = components::other_curve<curve_type>;
+    using other_curve_type = pairings::other_curve_type<curve_type>;
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
@@ -85,7 +88,7 @@ template<typename CurveType>
 void test_mnt_e_over_e_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = components::other_curve<curve_type>;
+    using other_curve_type = pairings::other_curve_type<curve_type>;
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
@@ -160,7 +163,7 @@ template<typename CurveType>
 void test_mnt_e_times_e_over_e_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = components::other_curve<curve_type>;
+    using other_curve_type = pairings::other_curve_type<curve_type>;
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 

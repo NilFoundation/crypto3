@@ -22,9 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of specializations of pairing_selector<CurveType> to
-// - pairing_selector<curves::mnt4>, and
-// - pairing_selector<curves::mnt6>.
+// @file Declaration of specializations of basic_pairing_component<CurveType> to
+// - basic_pairing_component<curves::mnt4>, and
+// - basic_pairing_component<curves::mnt6>.
 //
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
@@ -60,15 +60,16 @@ namespace nil {
                      * Specialization for MNT6.
                      */
                     template<std::size_t ModulusBits>
-                    class pairing_selector<curves::mnt6<ModulusBits>> {
+                    class basic_pairing_component<curves::mnt6<ModulusBits>> {
                         using curve_type = typename curves::mnt6<ModulusBits>;
 
-                    public:
-                        typedef typename curve_type::pairing_policy::other_curve other_curve_type;    // mnt4
+                        typedef typename curve_type::pairing_policy::other_curve_type other_curve_type;    // mnt4
 
-                        typedef typename curve_type::pairing_policy::Fp_type field_type;
                         typedef typename other_curve_type::pairing_policy::Fqe_type fqe_type;
                         typedef typename other_curve_type::pairing_policy::Fqk_type fqk_type;
+
+                        typedef typename curve_type::pairing_policy::Fp_type field_type;
+                    public:
 
                         typedef Fp2_variable<fqe_type> Fqe_variable_type;
                         typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;

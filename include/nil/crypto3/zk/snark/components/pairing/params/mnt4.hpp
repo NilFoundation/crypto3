@@ -22,9 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of specializations of pairing_selector<CurveType> to
-// - pairing_selector<curves::mnt4>, and
-// - pairing_selector<curves::mnt6>.
+// @file Declaration of specializations of basic_pairing_component<CurveType> to
+// - basic_pairing_component<curves::mnt4>, and
+// - basic_pairing_component<curves::mnt6>.
 //
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
@@ -60,15 +60,16 @@ namespace nil {
                      * Specialization for MNT4.
                      */
                     template<std::size_t ModulusBits>
-                    class pairing_selector<curves::mnt4<ModulusBits>> {
+                    class basic_pairing_component<curves::mnt4<ModulusBits>> {
                         using curve_type = typename curves::mnt4<ModulusBits>;
 
-                    public:
-                        typedef typename curve_type::pairing_policy::other_curve other_curve_type;    // mnt6
-
-                        typedef typename curve_type::pairing_policy::Fp_type field_type;
+                        typedef typename curve_type::pairing_policy::other_curve_type other_curve_type;    // mnt6
+                        
                         typedef typename other_curve_type::pairing_policy::Fqe_type fqe_type;
                         typedef typename other_curve_type::pairing_policy::Fqk_type fqk_type;
+                        
+                        typedef typename curve_type::pairing_policy::Fp_type field_type;
+                    public:
 
                         typedef Fp3_variable<fqe_type> Fqe_variable_type;
                         typedef Fp3_mul_component<fqe_type> Fqe_mul_component_type;
@@ -87,6 +88,16 @@ namespace nil {
 
                         constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count =
                             curve_type::pairing_policy::pairing_loop_count;
+
+                        ///*constexpr static*/ const g1_coeff_a = typename curve_type::g1_type::underlying_field_type(curve_type::a);
+
+                        ///*constexpr static*/ const g1_coeff_b = typename curve_type::g1_type::underlying_field_type(curve_type::b);
+
+                        ///*constexpr static*/ const g1_coeff_a = typename curve_type::g2_type::underlying_field_type(
+                        //                                        curve_type::g1_type::underlying_field_type::underlying_field_type::value_type::zero(),
+                        //                                        curve_type::a);
+
+                        ///*constexpr static*/ const g1_coeff_b =
                     };
 
                 }    // namespace components

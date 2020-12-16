@@ -32,6 +32,9 @@
 
 #include <memory>
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/as_waksman.hpp>
 
@@ -40,6 +43,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace components {
+
+                    using namespace nil::crypto3::algebra::pairings;
 
                     /**
                      * Gadget for doubling step in the Miller loop.
@@ -57,8 +62,7 @@ namespace nil {
                     class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
                     public:
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
 
                         G1_precomputation<CurveType> prec_P;
                         precompute_G2_component_coeffs<CurveType> c;
@@ -79,7 +83,7 @@ namespace nil {
                             // prec_P.PX * c.gamma_twist = c.gamma_X - c.old_RY - g_RR_at_P_c1
                             if (gamma_twist->is_constant()) {
                                 gamma_twist->evaluate();
-                                const fqe_type gamma_twist_const = gamma_twist->get_element();
+                                const typename fqe_type::value_type gamma_twist_const = gamma_twist->get_element();
                                 g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(
                                     Fqe_variable<CurveType>(this->bp, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
                                     *(c.RY) * (-field_type::value_type::one())));
@@ -106,11 +110,11 @@ namespace nil {
 
                         void generate_r1cs_witness() {
                             gamma_twist->evaluate();
-                            const fqe_type gamma_twist_val = gamma_twist->get_element();
+                            const typename fqe_type::value_type gamma_twist_val = gamma_twist->get_element();
                             const typename field_type::value_type PX_val = this->bp.lc_val(prec_P.P->X);
-                            const fqe_type gamma_X_val = c.gamma_X->get_element();
-                            const fqe_type RY_val = c.RY->get_element();
-                            const fqe_type g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
+                            const typename fqe_type::value_type gamma_X_val = c.gamma_X->get_element();
+                            const typename fqe_type::value_type RY_val = c.RY->get_element();
+                            const typename fqe_type::value_type g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
                             g_RR_at_P_c1->generate_r1cs_witness(g_RR_at_P_c1_val);
 
                             if (!gamma_twist->is_constant() && !prec_P.P->X.is_constant()) {
@@ -136,8 +140,7 @@ namespace nil {
                     class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
                     public:
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
 
                         bool invert_Q;
                         G1_precomputation<CurveType> prec_P;
@@ -161,7 +164,7 @@ namespace nil {
                             // prec_P.PX * c.gamma_twist = c.gamma_X - prec_Q.QY - g_RQ_at_P_c1
                             if (gamma_twist->is_constant()) {
                                 gamma_twist->evaluate();
-                                const fqe_type gamma_twist_const = gamma_twist->get_element();
+                                const typename fqe_type::value_type gamma_twist_const = gamma_twist->get_element();
                                 g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
                                     Fqe_variable<CurveType>(this->bp, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
                                     *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
@@ -189,11 +192,11 @@ namespace nil {
                         }
                         void generate_r1cs_witness() {
                             gamma_twist->evaluate();
-                            const fqe_type gamma_twist_val = gamma_twist->get_element();
+                            const typename fqe_type::value_type gamma_twist_val = gamma_twist->get_element();
                             const typename field_type::value_type PX_val = this->bp.lc_val(prec_P.P->X);
-                            const fqe_type gamma_X_val = c.gamma_X->get_element();
-                            const fqe_type QY_val = Q.Y->get_element();
-                            const fqe_type g_RQ_at_P_c1_val =
+                            const typename fqe_type::value_type gamma_X_val = c.gamma_X->get_element();
+                            const typename fqe_type::value_type QY_val = Q.Y->get_element();
+                            const typename fqe_type::value_type g_RQ_at_P_c1_val =
                                 -PX_val * gamma_twist_val + gamma_X_val + (!invert_Q ? -QY_val : QY_val);
                             g_RQ_at_P_c1->generate_r1cs_witness(g_RQ_at_P_c1_val);
 
@@ -211,8 +214,7 @@ namespace nil {
                     class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                     public:
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
 
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_Ps;
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_Ps;
@@ -239,7 +241,7 @@ namespace nil {
                                                   const Fqk_variable<CurveType> &result) :
                             component<field_type>(bp),
                             prec_P(prec_P), prec_Q(prec_Q), result(result) {
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             f_count = add_count = dbl_count = 0;
 
@@ -330,7 +332,7 @@ namespace nil {
                             std::size_t add_id = 0;
                             std::size_t dbl_id = 0;
 
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             bool found_nonzero = false;
                             std::vector<long> NAF = find_wnaf(1, loop_count);
@@ -362,8 +364,8 @@ namespace nil {
                     class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                     public:
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
 
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -400,7 +402,7 @@ namespace nil {
                                                            const Fqk_variable<CurveType> &result) :
                             component<field_type>(bp),
                             prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), result(result) {
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             f_count = add_count = dbl_count = 0;
 
@@ -515,7 +517,7 @@ namespace nil {
                             std::size_t dbl_id = 0;
                             std::size_t f_id = 0;
 
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             bool found_nonzero = false;
                             std::vector<long> NAF = find_wnaf(1, loop_count);
@@ -563,8 +565,8 @@ namespace nil {
                         : public component<typename CurveType::scalar_field_type> {
                     public:
                         typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
+                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
 
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                         std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -612,7 +614,7 @@ namespace nil {
                             component<field_type>(bp),
                             prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), prec_P3(prec_P3),
                             prec_Q3(prec_Q3), result(result) {
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             f_count = add_count = dbl_count = 0;
 
@@ -748,7 +750,7 @@ namespace nil {
                             std::size_t dbl_id = 0;
                             std::size_t f_id = 0;
 
-                            const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
+                            const auto &loop_count = basic_pairing_component<CurveType>::pairing_loop_count;
 
                             bool found_nonzero = false;
                             std::vector<long> NAF = find_wnaf(1, loop_count);

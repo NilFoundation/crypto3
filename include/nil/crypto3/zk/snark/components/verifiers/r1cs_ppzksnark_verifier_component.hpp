@@ -36,6 +36,9 @@
 #ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
 #define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
@@ -48,6 +51,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace components {
+
+                    using namespace nil::crypto3::algebra::pairings;
 
                     template<typename CurveType>
                     class r1cs_ppzksnark_proof_variable : public component<typename CurveType::scalar_field_type> {
@@ -105,9 +110,9 @@ namespace nil {
                             G2_checker->generate_r1cs_constraints();
                         }
                         void generate_r1cs_witness(
-                            const typename r1cs_ppzksnark<other_curve<CurveType>>::proof_type &proof) {
-                            std::vector<other_curve<CurveType>::g1_type> G1_elems;
-                            std::vector<other_curve<CurveType>::g2_type> G2_elems;
+                            const typename r1cs_ppzksnark<other_curve_type<CurveType>>::proof_type &proof) {
+                            std::vector<other_curve_type<CurveType>::g1_type> G1_elems;
+                            std::vector<other_curve_type<CurveType>::g2_type> G2_elems;
 
                             G1_elems = {proof.g_A.g, proof.g_A.h, proof.g_B.h, proof.g_C.g,
                                         proof.g_C.h, proof.g_H,   proof.g_K};
@@ -226,9 +231,9 @@ namespace nil {
                             packer->generate_r1cs_constraints(enforce_bitness);
                         }
                         void generate_r1cs_witness(
-                            const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &vk) {
-                            std::vector<other_curve<CurveType>::g1_type> G1_elems;
-                            std::vector<other_curve<CurveType>::g2_type> G2_elems;
+                            const typename r1cs_ppzksnark<other_curve_type<CurveType>>::verification_key_type &vk) {
+                            std::vector<other_curve_type<CurveType>::g1_type> G1_elems;
+                            std::vector<other_curve_type<CurveType>::g2_type> G2_elems;
 
                             G1_elems = {vk.alphaB_g1, vk.gamma_beta_g1};
                             G2_elems = {vk.alphaA_g2, vk.alphaC_g2, vk.gamma_g2, vk.gamma_beta_g2, vk.rC_Z_g2};
@@ -271,7 +276,7 @@ namespace nil {
                         }
 
                         static std::vector<bool> get_verification_key_bits(
-                            const typename r1cs_ppzksnark<other_curve<CurveType>>::verification_key_type &r1cs_vk) {
+                            const typename r1cs_ppzksnark<other_curve_type<CurveType>>::verification_key_type &r1cs_vk) {
 
                             typedef typename CurveType::scalar_field_type FieldType;
 
@@ -316,7 +321,7 @@ namespace nil {
 
                         r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable(
                             blueprint<FieldType> &bp,
-                            const r1cs_ppzksnark<other_curve<CurveType>>::verification_key &r1cs_vk) {
+                            const r1cs_ppzksnark<other_curve_type<CurveType>>::verification_key &r1cs_vk) {
                                 
                             encoded_IC_base.reset(new G1_variable<CurveType>(bp, r1cs_vk.encoded_IC_query.first));
                             encoded_IC_query.resize(r1cs_vk.encoded_IC_query.rest.indices.size());
@@ -330,7 +335,7 @@ namespace nil {
                             vk_gamma_beta_g1_precomp.reset(new G1_precomputation<CurveType>(bp, r1cs_vk.gamma_beta_g1));
 
                             pp_G2_one_precomp.reset(
-                                new G2_precomputation<CurveType>(bp, other_curve<CurveType>::g2_type::value_type::one()));
+                                new G2_precomputation<CurveType>(bp, other_curve_type<CurveType>::g2_type::value_type::one()));
                             vk_alphaA_g2_precomp.reset(new G2_precomputation<CurveType>(bp, r1cs_vk.alphaA_g2));
                             vk_alphaC_g2_precomp.reset(new G2_precomputation<CurveType>(bp, r1cs_vk.alphaC_g2));
                             vk_gamma_beta_g2_precomp.reset(new G2_precomputation<CurveType>(bp, r1cs_vk.gamma_beta_g2));
@@ -383,7 +388,7 @@ namespace nil {
                                 new precompute_G1_component<CurveType>(bp, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
                             pvk.pp_G2_one_precomp.reset(
-                                new G2_precomputation<CurveType>(bp, other_curve<CurveType>::g2_type::value_type::one()));
+                                new G2_precomputation<CurveType>(bp, other_curve_type<CurveType>::g2_type::value_type::one()));
                             compute_vk_alphaA_g2_precomp.reset(
                                 new precompute_G2_component<CurveType>(bp, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                             compute_vk_alphaC_g2_precomp.reset(

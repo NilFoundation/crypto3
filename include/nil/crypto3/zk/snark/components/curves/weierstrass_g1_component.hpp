@@ -31,6 +31,9 @@
 #ifndef CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
 #define CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
 
+#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
+
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
@@ -41,6 +44,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace components {
+
+                    using namespace nil::crypto3::algebra::pairings;
 
                     /**
                      * Gadget that represents a G1 variable.
@@ -68,9 +73,9 @@ namespace nil {
                         }
 
                         G1_variable(blueprint<FieldType> &bp,
-                                    const typename other_curve<CurveType>::g1_type::value_type &P) :
+                                    const typename other_curve_type<CurveType>::g1_type::value_type &P) :
                             component<FieldType>(bp) {
-                            typename other_curve<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
+                            typename other_curve_type<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
 
                             X.assign(bp, Pcopy.X);
                             Y.assign(bp, Pcopy.Y);
@@ -80,8 +85,8 @@ namespace nil {
                             all_vars.emplace_back(Y);
                         }
 
-                        void generate_r1cs_witness(const typename other_curve<CurveType>::g1_type::value_type &el) {
-                            typename other_curve<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
+                        void generate_r1cs_witness(const typename other_curve_type<CurveType>::g1_type::value_type &el) {
+                            typename other_curve_type<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
 
                             this->bp.lc_val(X) = el_normalized.X;
                             this->bp.lc_val(Y) = el_normalized.Y;
@@ -118,8 +123,8 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {P.X},
-                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve<CurveType>::a},
-                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve<CurveType>::b)}));
+                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve_type<CurveType>::a},
+                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve_type<CurveType>::b)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(P_X_squared) = this->bp.lc_val(P.X).squared();
@@ -216,7 +221,7 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {lambda * 2},
                                 {A.Y},
-                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve<CurveType>::a}));
+                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve_type<CurveType>::a}));
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
@@ -226,7 +231,7 @@ namespace nil {
                         void generate_r1cs_witness() {
                             this->bp.val(Xsquared) = this->bp.lc_val(A.X).squared();
                             this->bp.val(lambda) = (typename FieldType::value_type(0x03) * this->bp.val(Xsquared) +
-                                                    other_curve<CurveType>::a) *
+                                                    other_curve_type<CurveType>::a) *
                                                    (typename FieldType::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
                             this->bp.lc_val(B.X) = this->bp.val(lambda).squared() -
                                                    typename FieldType::value_type(0x02) * this->bp.lc_val(A.X);

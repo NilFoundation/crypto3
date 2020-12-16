@@ -45,9 +45,9 @@ using namespace nil::crypto3::algebra;
 template<typename CurveType>
 void test_G1_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
-    typename other_curve<CurveType>::g1_type::value_type g_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g1_type::value_type::one();
+    typename pairings::other_curve_type<CurveType>::g1_type::value_type g_val =
+        algebra::random_element<typename pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g1_type::value_type::one();
 
     G1_variable<CurveType> g(bp);
     G1_precomputation<CurveType> precomp;
@@ -60,8 +60,8 @@ void test_G1_variable_precomp() {
 
     G1_precomputation<CurveType> const_precomp(bp, g_val);
 
-    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_precomp =
-        other_curve<CurveType>::affine_ate_precompute_G1(g_val);
+    algebra::affine_ate_G1_precomp<pairings::other_curve_type<CurveType>> native_precomp =
+        pairings::other_curve_type<CurveType>::affine_ate_precompute_G1(g_val);
     BOOST_CHECK(precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
     BOOST_CHECK(const_precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
 }
@@ -69,9 +69,9 @@ void test_G1_variable_precomp() {
 template<typename CurveType>
 void test_G2_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
-    typename other_curve<CurveType>::g2_type::value_type g_val =
-        algebra::random_element<typename other_curve<CurveType>::scalar_field_type>() *
-        other_curve<CurveType>::g2_type::value_type::one();
+    typename pairings::other_curve_type<CurveType>::g2_type::value_type g_val =
+        algebra::random_element<typename pairings::other_curve_type<CurveType>::scalar_field_type>() *
+        pairings::other_curve_type<CurveType>::g2_type::value_type::one();
 
     G2_variable<CurveType> g(bp);
     G2_precomputation<CurveType> precomp;
@@ -82,8 +82,8 @@ void test_G2_variable_precomp() {
     do_precomp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
-        other_curve<CurveType>::affine_ate_precompute_G2(g_val);
+    algebra::affine_ate_G2_precomp<pairings::other_curve_type<CurveType>> native_precomp =
+        pairings::other_curve_type<CurveType>::affine_ate_precompute_G2(g_val);
 
     BOOST_CHECK(precomp.coeffs.size() - 1 ==
            native_precomp.coeffs.size());    // the last precomp is unused, but remains for convenient programming
