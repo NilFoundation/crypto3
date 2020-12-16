@@ -59,8 +59,7 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       }
    }
 
-   template <typename Backend1>
-   constexpr void adjust_modular(Backend1& result)
+   constexpr void adjust_modular(Backend& result)
    {
       adjust_modular(result, result);
    }

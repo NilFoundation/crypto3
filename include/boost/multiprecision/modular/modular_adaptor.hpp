@@ -33,6 +33,7 @@ template <typename Backend>
 struct modular_adaptor
 {
    typedef modular_params<Backend> modulus_type;
+   typedef Backend backend_type;
 
  protected:
    Backend   m_base;
