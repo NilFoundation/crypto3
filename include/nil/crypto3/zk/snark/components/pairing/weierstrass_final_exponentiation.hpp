@@ -46,88 +46,95 @@ namespace nil {
                 namespace components {
 
                     /**
-                     * Gadget for final exponentiation with embedding degree 4.
+                     * Component for final exponentiation with embedding degree 4.
                      */
                     template<typename CurveType>
-                    struct mnt4_final_exp_component : public component<typename CurveType::scalar_field_type> {
+                    struct final_exp_component;
 
-                        typedef typename CurveType::scalar_field_type field_type;
+                    template<std::size_t Version>
+                    class final_exp_component<curves::mnt4<Version>> : 
+                        public component<typename curves::mnt4<Version>::scalar_field_type> {
 
-                        Fqk_variable<CurveType> el;
-                        std::shared_ptr<Fqk_variable<CurveType>> one;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_q_3;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_q_3_minus_1;
-                        std::shared_ptr<Fqk_variable<CurveType>> alpha;
-                        std::shared_ptr<Fqk_variable<CurveType>> beta;
-                        std::shared_ptr<Fqk_variable<CurveType>> beta_q;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv_q_3;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv_q_3_minus_1;
-                        std::shared_ptr<Fqk_variable<CurveType>> inv_alpha;
-                        std::shared_ptr<Fqk_variable<CurveType>> inv_beta;
-                        std::shared_ptr<Fqk_variable<CurveType>> w1;
-                        std::shared_ptr<Fqk_variable<CurveType>> w0;
-                        std::shared_ptr<Fqk_variable<CurveType>> result;
+                        using curve_type = curves::mnt4<Version>;
 
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_q_3_minus_1;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_beta;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv_q_3_minus_1;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_inv_beta;
+                    public:
+                        typedef typename curve_type::scalar_field_type field_type;
 
-                        std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                        Fqk_variable<curve_type> el;
+                        std::shared_ptr<Fqk_variable<curve_type>> one;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_q_3;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_q_3_minus_1;
+                        std::shared_ptr<Fqk_variable<curve_type>> alpha;
+                        std::shared_ptr<Fqk_variable<curve_type>> beta;
+                        std::shared_ptr<Fqk_variable<curve_type>> beta_q;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv_q_3;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv_q_3_minus_1;
+                        std::shared_ptr<Fqk_variable<curve_type>> inv_alpha;
+                        std::shared_ptr<Fqk_variable<curve_type>> inv_beta;
+                        std::shared_ptr<Fqk_variable<curve_type>> w1;
+                        std::shared_ptr<Fqk_variable<curve_type>> w0;
+                        std::shared_ptr<Fqk_variable<curve_type>> result;
+
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_q_3_minus_1;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_beta;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv_q_3_minus_1;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_inv_beta;
+
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                         Fp6_2over3_variable,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component,
                                         algebra::mnt6_q_limbs> > compute_w1;
-                        std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                         Fp6_2over3_variable,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component,
                                         algebra::mnt6_q_limbs> > compute_w0;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_result;
 
                         variable<field_type> result_is_one;
 
                         mnt4_final_exp_component(blueprint<field_type> &bp,
-                                                 const Fqk_variable<CurveType> &el,
+                                                 const Fqk_variable<curve_type> &el,
                                                  const variable<field_type> &result_is_one) :
                             component<field_type>(bp),
                             el(el), result_is_one(result_is_one) {
-                            one.reset(new Fqk_variable<CurveType>(bp));
-                            el_inv.reset(new Fqk_variable<CurveType>(bp));
-                            el_q_3.reset(new Fqk_variable<CurveType>(el.Frobenius_map(3)));
-                            el_q_3_minus_1.reset(new Fqk_variable<CurveType>(bp));
-                            alpha.reset(new Fqk_variable<CurveType>(el_q_3_minus_1->Frobenius_map(1)));
-                            beta.reset(new Fqk_variable<CurveType>(bp));
-                            beta_q.reset(new Fqk_variable<CurveType>(beta->Frobenius_map(1)));
+                            one.reset(new Fqk_variable<curve_type>(bp));
+                            el_inv.reset(new Fqk_variable<curve_type>(bp));
+                            el_q_3.reset(new Fqk_variable<curve_type>(el.Frobenius_map(3)));
+                            el_q_3_minus_1.reset(new Fqk_variable<curve_type>(bp));
+                            alpha.reset(new Fqk_variable<curve_type>(el_q_3_minus_1->Frobenius_map(1)));
+                            beta.reset(new Fqk_variable<curve_type>(bp));
+                            beta_q.reset(new Fqk_variable<curve_type>(beta->Frobenius_map(1)));
 
-                            el_inv_q_3.reset(new Fqk_variable<CurveType>(el_inv->Frobenius_map(3)));
-                            el_inv_q_3_minus_1.reset(new Fqk_variable<CurveType>(bp));
-                            inv_alpha.reset(new Fqk_variable<CurveType>(el_inv_q_3_minus_1->Frobenius_map(1)));
-                            inv_beta.reset(new Fqk_variable<CurveType>(bp));
-                            w1.reset(new Fqk_variable<CurveType>(bp));
-                            w0.reset(new Fqk_variable<CurveType>(bp));
-                            result.reset(new Fqk_variable<CurveType>(bp));
+                            el_inv_q_3.reset(new Fqk_variable<curve_type>(el_inv->Frobenius_map(3)));
+                            el_inv_q_3_minus_1.reset(new Fqk_variable<curve_type>(bp));
+                            inv_alpha.reset(new Fqk_variable<curve_type>(el_inv_q_3_minus_1->Frobenius_map(1)));
+                            inv_beta.reset(new Fqk_variable<curve_type>(bp));
+                            w1.reset(new Fqk_variable<curve_type>(bp));
+                            w0.reset(new Fqk_variable<curve_type>(bp));
+                            result.reset(new Fqk_variable<curve_type>(bp));
 
-                            compute_el_inv.reset(new Fqk_mul_component<CurveType>(bp, el, *el_inv, *one));
+                            compute_el_inv.reset(new Fqk_mul_component<curve_type>(bp, el, *el_inv, *one));
                             compute_el_q_3_minus_1.reset(
-                                new Fqk_mul_component<CurveType>(bp, *el_q_3, *el_inv, *el_q_3_minus_1));
-                            compute_beta.reset(new Fqk_mul_component<CurveType>(bp, *alpha, *el_q_3_minus_1, *beta));
+                                new Fqk_mul_component<curve_type>(bp, *el_q_3, *el_inv, *el_q_3_minus_1));
+                            compute_beta.reset(new Fqk_mul_component<curve_type>(bp, *alpha, *el_q_3_minus_1, *beta));
 
                             compute_el_inv_q_3_minus_1.reset(
-                                new Fqk_mul_component<CurveType>(bp, *el_inv_q_3, el, *el_inv_q_3_minus_1));
+                                new Fqk_mul_component<curve_type>(bp, *el_inv_q_3, el, *el_inv_q_3_minus_1));
                             compute_inv_beta.reset(
-                                new Fqk_mul_component<CurveType>(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
+                                new Fqk_mul_component<curve_type>(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
-                            compute_w1.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                            compute_w1.reset(new exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                              Fp6_2over3_variable,
                                              Fp6_2over3_mul_component,
                                              Fp6_2over3_cyclotomic_sqr_component,
                                              algebra::mnt6_q_limbs >
                                                  (bp, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
-                            compute_w0.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                            compute_w0.reset(new exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                              Fp6_2over3_variable,
                                              Fp6_2over3_mul_component,
                                              Fp6_2over3_cyclotomic_sqr_component,
@@ -137,12 +144,12 @@ namespace nil {
                                                   algebra::mnt6_final_exponent_last_chunk_abs_of_w0,
                                                   *w0));
 
-                            compute_result.reset(new Fqk_mul_component<CurveType>(bp, *w1, *w0, *result));
+                            compute_result.reset(new Fqk_mul_component<curve_type>(bp, *w1, *w0, *result));
                         }
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                                pairings::other_curve_type<curve_type>::pairing_policy::Fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_3_minus_1->generate_r1cs_constraints();
@@ -165,7 +172,7 @@ namespace nil {
                         }
 
                         void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                            one->generate_r1cs_witness(pairings::other_curve_type<curve_type>::pairing_policy::Fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();
@@ -193,70 +200,75 @@ namespace nil {
                     /**
                      * Gadget for final exponentiation with embedding degree 6.
                      */
-                    template<typename CurveType>
-                    struct mnt6_final_exp_component : public component<typename CurveType::scalar_field_type> {
+                    template<std::size_t Version>
+                    class final_exp_component<curves::mnt6<Version>> : 
+                        public component<typename curves::mnt6<Version>::scalar_field_type> {
 
-                        typedef typename CurveType::scalar_field_type field_type;
+                        using curve_type = curves::mnt6<Version>;
 
-                        Fqk_variable<CurveType> el;
-                        std::shared_ptr<Fqk_variable<CurveType>> one;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_q_2;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_q_2_minus_1;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_q_3_minus_q;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv_q_2;
-                        std::shared_ptr<Fqk_variable<CurveType>> el_inv_q_2_minus_1;
-                        std::shared_ptr<Fqk_variable<CurveType>> w1;
-                        std::shared_ptr<Fqk_variable<CurveType>> w0;
-                        std::shared_ptr<Fqk_variable<CurveType>> result;
+                    public:
 
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_q_2_minus_1;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv_q_2_minus_1;
+                        typedef typename curve_type::scalar_field_type field_type;
 
-                        std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                        Fqk_variable<curve_type> el;
+                        std::shared_ptr<Fqk_variable<curve_type>> one;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_q_2;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_q_2_minus_1;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_q_3_minus_q;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv_q_2;
+                        std::shared_ptr<Fqk_variable<curve_type>> el_inv_q_2_minus_1;
+                        std::shared_ptr<Fqk_variable<curve_type>> w1;
+                        std::shared_ptr<Fqk_variable<curve_type>> w0;
+                        std::shared_ptr<Fqk_variable<curve_type>> result;
+
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_q_2_minus_1;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv_q_2_minus_1;
+
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                         Fp4_variable,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component,
                                         algebra::mnt4_q_limbs> > compute_w1;
-                        std::shared_ptr<exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                         Fp4_variable,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component,
                                         algebra::mnt4_q_limbs> > compute_w0;
-                        std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
+                        std::shared_ptr<Fqk_mul_component<curve_type>> compute_result;
 
                         variable<field_type> result_is_one;
 
                         mnt6_final_exp_component(blueprint<field_type> &bp,
-                                                 const Fqk_variable<CurveType> &el,
+                                                 const Fqk_variable<curve_type> &el,
                                                  const variable<field_type> &result_is_one) :
                             component<field_type>(bp),
                             el(el), result_is_one(result_is_one) {
-                            one.reset(new Fqk_variable<CurveType>(bp));
-                            el_inv.reset(new Fqk_variable<CurveType>(bp));
-                            el_q_2.reset(new Fqk_variable<CurveType>(el.Frobenius_map(2)));
-                            el_q_2_minus_1.reset(new Fqk_variable<CurveType>(bp));
-                            el_q_3_minus_q.reset(new Fqk_variable<CurveType>(el_q_2_minus_1->Frobenius_map(1)));
-                            el_inv_q_2.reset(new Fqk_variable<CurveType>(el_inv->Frobenius_map(2)));
-                            el_inv_q_2_minus_1.reset(new Fqk_variable<CurveType>(bp));
-                            w1.reset(new Fqk_variable<CurveType>(bp));
-                            w0.reset(new Fqk_variable<CurveType>(bp));
-                            result.reset(new Fqk_variable<CurveType>(bp));
+                            one.reset(new Fqk_variable<curve_type>(bp));
+                            el_inv.reset(new Fqk_variable<curve_type>(bp));
+                            el_q_2.reset(new Fqk_variable<curve_type>(el.Frobenius_map(2)));
+                            el_q_2_minus_1.reset(new Fqk_variable<curve_type>(bp));
+                            el_q_3_minus_q.reset(new Fqk_variable<curve_type>(el_q_2_minus_1->Frobenius_map(1)));
+                            el_inv_q_2.reset(new Fqk_variable<curve_type>(el_inv->Frobenius_map(2)));
+                            el_inv_q_2_minus_1.reset(new Fqk_variable<curve_type>(bp));
+                            w1.reset(new Fqk_variable<curve_type>(bp));
+                            w0.reset(new Fqk_variable<curve_type>(bp));
+                            result.reset(new Fqk_variable<curve_type>(bp));
 
-                            compute_el_inv.reset(new Fqk_mul_component<CurveType>(bp, el, *el_inv, *one));
+                            compute_el_inv.reset(new Fqk_mul_component<curve_type>(bp, el, *el_inv, *one));
                             compute_el_q_2_minus_1.reset(
-                                new Fqk_mul_component<CurveType>(bp, *el_q_2, *el_inv, *el_q_2_minus_1));
+                                new Fqk_mul_component<curve_type>(bp, *el_q_2, *el_inv, *el_q_2_minus_1));
                             compute_el_inv_q_2_minus_1.reset(
-                                new Fqk_mul_component<CurveType>(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
+                                new Fqk_mul_component<curve_type>(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
-                            compute_w1.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                            compute_w1.reset(new exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                              Fp4_variable,
                                              Fp4_mul_component,
                                              Fp4_cyclotomic_sqr_component,
                                              algebra::mnt4_q_limbs >
                                                  (bp, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
-                            compute_w0.reset(new exponentiation_component<CurveType>::pairing_policy::Fqk_type,
+                            compute_w0.reset(new exponentiation_component<curve_type>::pairing_policy::Fqk_type,
                                              Fp4_variable,
                                              Fp4_mul_component,
                                              Fp4_cyclotomic_sqr_component,
@@ -266,12 +278,12 @@ namespace nil {
                                                                                                        *el_q_2_minus_1),
                                                   algebra::mnt4_final_exponent_last_chunk_abs_of_w0,
                                                   *w0));
-                            compute_result.reset(new Fqk_mul_component<CurveType>(bp, *w1, *w0, *result));
+                            compute_result.reset(new Fqk_mul_component<curve_type>(bp, *w1, *w0, *result));
                         }
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                                pairings::other_curve_type<curve_type>::pairing_policy::Fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_2_minus_1->generate_r1cs_constraints();
@@ -288,7 +300,7 @@ namespace nil {
                         }
 
                         void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(pairings::other_curve_type<CurveType>::pairing_policy::Fqk_type::value_type::one());
+                            one->generate_r1cs_witness(pairings::other_curve_type<curve_type>::pairing_policy::Fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();

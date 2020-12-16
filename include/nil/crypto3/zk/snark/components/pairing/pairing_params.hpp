@@ -118,15 +118,6 @@ namespace nil {
                     template<typename CurveType>
                     using Fqk_sqr_component = typename basic_pairing_component<CurveType>::Fqk_sqr_component_type;
 
-                    template<typename CurveType>
-                    using e_over_e_miller_loop_component =
-                        typename basic_pairing_component<CurveType>::e_over_e_miller_loop_component_type;
-                    template<typename CurveType>
-                    using e_times_e_over_e_miller_loop_component =
-                        typename basic_pairing_component<CurveType>::e_times_e_over_e_miller_loop_component_type;
-                    template<typename CurveType>
-                    using final_exp_component = typename basic_pairing_component<CurveType>::final_exp_component_type;
-
                 }    // namespace components
             }    // namespace snark
         }        // namespace zk
