@@ -258,7 +258,7 @@ constexpr backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void>
    size_t s = eval_lsb(p_negone);
 
    Backend q = p;
-   eval_right_shift(q, s);
+   backends::custom_right_shift(q, s);
    eval_subtract(q, posone);
    eval_right_shift(q, 1);
 

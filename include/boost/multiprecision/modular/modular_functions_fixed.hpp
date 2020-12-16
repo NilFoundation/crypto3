@@ -343,7 +343,10 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       for (auto i = 0; i < get_mod().backend().size(); ++i)
       {
-         eval_multiply(prod, get_mod().backend(), static_cast<internal_limb_type>(custom_get_limb_value<internal_limb_type>(accum, i) * get_p_dash()));
+         eval_multiply(prod, get_mod().backend(),
+                       static_cast<internal_limb_type>(custom_get_limb_value<internal_limb_type>(accum, i) *
+                           /// to prevent overflow error in constexpr
+                           static_cast<double_limb_type>(get_p_dash())));
          eval_left_shift(prod, i * limb_bits);
          eval_add(accum, prod);
       }
