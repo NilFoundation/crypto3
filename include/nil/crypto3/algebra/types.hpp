@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ALGEBRA_TYPES_HPP
 #define CRYPTO3_ALGEBRA_TYPES_HPP
 
-#include <nil/crypto3/algebra/pairing/usings.hpp>
+#include <nil/crypto3/algebra/pairing/types.hpp>
 
 namespace nil {
     namespace crypto3 {
