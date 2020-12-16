@@ -33,7 +33,7 @@ class modular_functions_fixed;
 template <typename Backend>
 constexpr typename mpl::if_c<
     is_trivial_cpp_int<Backend>::value,
-    typename trivial_limb_type<min_precision<Backend>::value>::type,
+    typename trivial_limb_type<max_precision<Backend>::value>::type,
     limb_type>::type
 get_limb_value(const Backend& b, const std::size_t i)
 {
@@ -42,6 +42,39 @@ get_limb_value(const Backend& b, const std::size_t i)
       return b.limbs()[i];
    }
    return 0;
+}
+
+template <typename, typename Backend>
+typename std::enable_if<!is_trivial_cpp_int<Backend>::value, limb_type>::type
+constexpr custom_get_limb_value(const Backend& b, const std::size_t i)
+{
+   return b.limbs()[i];
+}
+
+template <typename internal_limb_type, typename Backend>
+typename std::enable_if<is_trivial_cpp_int<Backend>::value &&
+                            sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >= sizeof(internal_limb_type),
+                        internal_limb_type>::type
+constexpr custom_get_limb_value(const Backend& b, const std::size_t i)
+{
+   return static_cast<internal_limb_type>(b.limbs()[0] >> (sizeof(internal_limb_type) * CHAR_BIT * i));
+}
+
+template <typename, typename Backend>
+typename std::enable_if<!is_trivial_cpp_int<Backend>::value>::type
+constexpr custom_set_limb_value(Backend& b, const std::size_t i, limb_type v)
+{
+   b.limbs()[i] = v;
+}
+
+template <typename internal_limb_type, typename Backend>
+typename std::enable_if<is_trivial_cpp_int<Backend>::value &&
+                        sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >= sizeof(internal_limb_type)>::type
+constexpr custom_set_limb_value(Backend& b, const std::size_t i, internal_limb_type v)
+{
+   using local_limb_type = typename trivial_limb_type<max_precision<Backend>::value>::type;
+
+   b.limbs()[0] |= (static_cast<local_limb_type>(v) << (sizeof(internal_limb_type) * CHAR_BIT * i));
 }
 
 template <typename Backend>
@@ -211,7 +244,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
    constexpr const auto& get_mod() const { return m_mod; }
    constexpr const auto& get_mu() const { return m_barrett_mu; }
    constexpr const auto& get_r2() const { return m_montgomery_r2; }
-   constexpr const auto& get_p_dash() const { return m_montgomery_p_dash; }
+   constexpr auto get_p_dash() const { return m_montgomery_p_dash; }
    constexpr const auto& get_modulus_mask() const { return m_modulus_mask; }
 
    constexpr modular_functions_fixed() {}
@@ -310,7 +343,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       for (auto i = 0; i < get_mod().backend().size(); ++i)
       {
-         eval_multiply(prod, get_mod().backend(), accum.limbs()[i] * get_p_dash());
+         eval_multiply(prod, get_mod().backend(), static_cast<internal_limb_type>(custom_get_limb_value<internal_limb_type>(accum, i) * get_p_dash()));
          eval_left_shift(prod, i * limb_bits);
          eval_add(accum, prod);
       }
@@ -423,9 +456,9 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
             k                = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
             k2               = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
          }
-         internal_double_limb_type tmp             = static_cast<internal_double_limb_type>(A.limbs()[get_mod().backend().size()]) + k + k2;
-         A.limbs()[get_mod().backend().size() - 1] = static_cast<internal_limb_type>(tmp);
-         A.limbs()[get_mod().backend().size()]     = static_cast<internal_limb_type>(tmp >> std::numeric_limits<internal_limb_type>::digits);
+         internal_double_limb_type tmp             = static_cast<internal_double_limb_type>(custom_get_limb_value<internal_limb_type>(A, get_mod().backend().size())) + k + k2;
+         custom_set_limb_value<internal_limb_type>(A, get_mod().backend().size() - 1, static_cast<internal_limb_type>(tmp));
+         custom_set_limb_value<internal_limb_type>(A, get_mod().backend().size(), static_cast<internal_limb_type>(tmp >> std::numeric_limits<internal_limb_type>::digits));
       }
       A.resize(get_mod().backend().size(), 1);
 
