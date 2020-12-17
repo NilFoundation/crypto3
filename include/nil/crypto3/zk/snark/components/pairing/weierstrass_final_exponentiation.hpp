@@ -37,7 +37,9 @@
 #include <nil/crypto3/algebra/pairing/types.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/mnt_pairing_params.hpp>
+
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -29,9 +29,6 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
 #include "weierstrass_miller_loop.hpp"
 

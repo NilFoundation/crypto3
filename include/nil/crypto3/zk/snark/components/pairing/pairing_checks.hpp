@@ -34,7 +34,9 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
+
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp>
 

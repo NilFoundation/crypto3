@@ -39,6 +39,8 @@ void test_mnt_miller_loop(){
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
+    using component_policy = components::basic_pairing_component_policy<CurveType>;
+
     blueprint<typename curve_type::scalar_field_type> bp;
     typename other_curve_type::g1_type::value_type P_val = 
         random_element<typename other_curve_type::scalar_field_type>() * 
@@ -56,7 +58,7 @@ void test_mnt_miller_loop(){
     components::precompute_G1_component<curve_type> compute_prec_P(bp, P, prec_P);
     components::precompute_G2_component<curve_type> compute_prec_Q(bp, Q, prec_Q);
 
-    components::Fqk_variable<curve_type> result(bp);
+    typename component_policy::Fqk_variable_type result(bp);
     components::mnt_miller_loop_component<curve_type> miller(bp, prec_P, prec_Q, result);
 
     compute_prec_P.generate_r1cs_constraints();
@@ -92,6 +94,8 @@ void test_mnt_e_over_e_miller_loop(){
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
+    using component_policy = components::basic_pairing_component_policy<CurveType>;
+
     blueprint<typename curve_type::scalar_field_type> bp;
     typename other_curve_type::g1_type::value_type P1_val = 
         random_element<typename other_curve_type::scalar_field_type>() * 
@@ -121,7 +125,7 @@ void test_mnt_e_over_e_miller_loop(){
     components::G2_precomputation<curve_type> prec_Q2;
     components::precompute_G2_component<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
 
-    components::Fqk_variable<curve_type> result(bp);
+    typename component_policy::Fqk_variable_type result(bp);
     components::mnt_e_over_e_miller_loop_component<curve_type> miller(bp, prec_P1, prec_Q1, prec_P2, prec_Q2, result);
 
     compute_prec_P1.generate_r1cs_constraints();
@@ -167,6 +171,8 @@ void test_mnt_e_times_e_over_e_miller_loop(){
     using curve_pairing_policy = typename curve_type::pairing_policy;
     using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
 
+    using component_policy = components::basic_pairing_component_policy<CurveType>;
+
     blueprint<typename curve_type::scalar_field_type> bp;
     typename other_curve_type::g1_type::value_type P1_val = 
         random_element<typename other_curve_type::scalar_field_type>() * 
@@ -209,7 +215,7 @@ void test_mnt_e_times_e_over_e_miller_loop(){
     components::G2_precomputation<curve_type> prec_Q3;
     components::precompute_G2_component<curve_type> compute_prec_Q3(bp, Q3, prec_Q3);
 
-    components::Fqk_variable<curve_type> result(bp);
+    typename component_policy::Fqk_variable_type result(bp);
     components::mnt_e_times_e_over_e_miller_loop_component<curve_type> miller(bp, prec_P1, prec_Q1, 
                                                         prec_P2, prec_Q2, prec_P3, 
                                                         prec_Q3, result);

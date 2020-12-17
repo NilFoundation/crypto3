@@ -22,17 +22,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of specializations of basic_pairing_component_policy<CurveType> to
-// - basic_pairing_component_policy<curves::mnt6>.
+// @file Declaration of specializations of basic_curve_component_policy<CurveType> to
+// - basic_curve_component_policy<curves::mnt6>.
 //
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MNT6_BASIC_PAIRING_HPP
-#define CRYPTO3_ZK_MNT6_BASIC_PAIRING_HPP
+#ifndef CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
+#define CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
-#include <nil/crypto3/zk/snark/components/curves/detail/mnt6.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp6_2over3_components.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -43,32 +46,32 @@ namespace nil {
                     using namespace nil::crypto3::algebra;
 
                     template<typename CurveType>
-                    class basic_pairing_component_policy;
+                    class basic_curve_component_policy;
                     
                     /**
                      * Specialization for MNT6.
                      */
                     template<std::size_t Version>
-                    class basic_pairing_component_policy<curves::mnt6<Version>> {
+                    class basic_curve_component_policy<curves::mnt6<Version>> {
                         using curve_type = typename curves::mnt6<Version>;
-                        using curve_component_policy = basic_curve_component_policy<curve_type>;
 
+                        typedef typename curve_type::pairing_policy::other_curve_type other_curve_type;    // mnt4
+
+                        typedef typename other_curve_type::pairing_policy::Fqe_type fqe_type;
+                        typedef typename other_curve_type::pairing_policy::Fqk_type fqk_type;
+
+                        typedef typename curve_type::pairing_policy::Fp_type field_type;
                     public:
 
-                        using Fqe_variable_type = typename basic_curve_component_policy<curve_type>::Fqe_variable_type;
-                        using Fqe_mul_component_type = typename basic_curve_component_policy<curve_type>::Fqe_mul_component_type;
-                        using Fqe_mul_by_lc_component_type = 
-                            typename basic_curve_component_policy<curve_type>::Fqe_mul_by_lc_component_type;
-                        using Fqe_sqr_component_type = typename basic_curve_component_policy<curve_type>::Fqe_sqr_component_type;
+                        typedef Fp2_variable<fqe_type> Fqe_variable_type;
+                        typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;
+                        typedef Fp2_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
+                        typedef Fp2_sqr_component<fqe_type> Fqe_sqr_component_type;
 
-                        using Fqk_variable_type = typename basic_curve_component_policy<curve_type>::Fqk_variable_type;
-                        using Fqk_mul_component_type = typename basic_curve_component_policy<curve_type>::Fqk_mul_component_type;
-                        using Fqk_special_mul_component_type = 
-                            typename basic_curve_component_policy<curve_type>::Fqk_special_mul_component_type;
-                        using Fqk_sqr_component_type = typename basic_curve_component_policy<curve_type>::Fqk_sqr_component_type;
-
-                        constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count =
-                            curve_type::pairing_policy::pairing_loop_count;
+                        typedef Fp4_variable<fqk_type> Fqk_variable_type;
+                        typedef Fp4_mul_component<fqk_type> Fqk_mul_component_type;
+                        typedef Fp4_mul_component<fqk_type> Fqk_special_mul_component_type;
+                        typedef Fp4_sqr_component<fqk_type> Fqk_sqr_component_type;
                     };
 
                 }    // namespace components
@@ -77,4 +80,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MNT6_BASIC_PAIRING_HPP
+#endif    // CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
