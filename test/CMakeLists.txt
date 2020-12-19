@@ -52,7 +52,7 @@ set(TESTS_NAMES
     "components/routing/benes"
 
     "components/pairing/weierstrass_miller_loop"
-    "components/pairing/weierstrass_precomputation"
+#    "components/pairing/weierstrass_precomputation"
 
     "components/verifiers/r1cs_ppzksnark"
     "components/basic_components"
