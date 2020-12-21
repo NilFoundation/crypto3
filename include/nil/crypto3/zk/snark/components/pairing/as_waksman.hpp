@@ -273,7 +273,14 @@ namespace nil {
                             RXsquared.reset(new typename component_policy::Fqe_variable_type(bp));
                             compute_RXsquared.reset(new typename component_policy::Fqe_sqr_component_type(bp, *(cur.RX), *RXsquared));
                             three_RXsquared_plus_a.reset(new typename component_policy::Fqe_variable_type(
-                                (*RXsquared) * typename FieldType::value_type(0x03) + other_curve_type<CurveType>::a));
+                                (*RXsquared) * typename FieldType::value_type(0x03) + 
+                                basic_pairing_component_policy<other_curve_type<CurveType>>().g2_coeff_a));
+                            // must be
+                            // three_RXsquared_plus_a.reset(new typename component_policy::Fqe_variable_type(
+                                //(*RXsquared) * typename FieldType::value_type(0x03) + 
+                                //basic_pairing_component_policy<other_curve_type<CurveType>>::g2_coeff_a));
+                            // when constexpr ready
+
                             two_RY.reset(new typename component_policy::Fqe_variable_type(*(cur.RY) * typename FieldType::value_type(0x02)));
 
                             compute_gamma.reset(

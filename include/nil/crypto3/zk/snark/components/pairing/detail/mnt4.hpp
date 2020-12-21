@@ -69,15 +69,21 @@ namespace nil {
                         constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count =
                             curve_type::pairing_policy::pairing_loop_count;
 
-                        ///*constexpr static*/ const g1_coeff_a = typename curve_type::g1_type::underlying_field_type(curve_type::a);
+                        /*constexpr static*/ const typename curve_type::g1_type::underlying_field_type::value_type g1_coeff_a = 
+                            typename curve_type::g1_type::underlying_field_type::value_type(curve_type::a);
 
-                        ///*constexpr static*/ const g1_coeff_b = typename curve_type::g1_type::underlying_field_type(curve_type::b);
+                        /*constexpr static*/ const typename curve_type::g1_type::underlying_field_type::value_type g1_coeff_b = 
+                            typename curve_type::g1_type::underlying_field_type::value_type(curve_type::b);
 
-                        ///*constexpr static*/ const g1_coeff_a = typename curve_type::g2_type::underlying_field_type(
-                        //                                        curve_type::g1_type::underlying_field_type::underlying_field_type::value_type::zero(),
-                        //                                        curve_type::a);
+                        /*constexpr static*/ const typename curve_type::g2_type::underlying_field_type::value_type g2_coeff_a = 
+                            typename curve_type::g2_type::underlying_field_type::value_type(
+                                g1_coeff_a * typename curve_type::g2_type::underlying_field_type::value_type().non_residue,
+                                curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero());
 
-                        ///*constexpr static*/ const g1_coeff_b =
+                        /*constexpr static*/ const typename curve_type::g2_type::underlying_field_type::value_type g2_coeff_b = 
+                            typename curve_type::g2_type::underlying_field_type::value_type(
+                                curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero(),
+                                g1_coeff_b * typename curve_type::g2_type::underlying_field_type::value_type().non_residue);
                     };
 
                 }    // namespace components
