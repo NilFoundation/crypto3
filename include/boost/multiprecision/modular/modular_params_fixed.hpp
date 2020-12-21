@@ -59,16 +59,16 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
       }
    }
 
-   constexpr void adjust_modular(Backend& result)
+   template <typename Backend1>
+   constexpr typename std::enable_if<std::is_same<Backend1, Backend>::value>::type
+   adjust_modular(Backend1& result)
    {
       adjust_modular(result, result);
    }
 
-   template <typename Backend1, typename Backend2,
-             typename = typename std::enable_if<
-                 /// result should fit in the output parameter
-                 backends::max_precision<Backend1>::value >= backends::max_precision<Backend>::value>::type>
-   constexpr void adjust_modular(Backend1& result, Backend2 input)
+   template <typename Backend1, typename Backend2>
+   constexpr typename std::enable_if<std::is_same<Backend1, Backend>::value>::type
+   adjust_modular(Backend1& result, Backend2 input)
    {
       get_mod_obj().barrett_reduce(input);
       Backend_doubled_limbs tmp(input);

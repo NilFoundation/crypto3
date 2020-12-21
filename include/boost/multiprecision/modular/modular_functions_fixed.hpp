@@ -283,6 +283,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       using default_ops::eval_msb;
       using default_ops::eval_multiply;
       using default_ops::eval_subtract;
+      using default_ops::eval_modulus;
 
       //
       // to prevent problems with trivial cpp_int
@@ -291,17 +292,17 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       if (eval_lt(input, modulus))
       {
-         while (eval_lt(input, 0))
+         while (eval_lt(input, 0u))
          {
             eval_add(input, modulus);
          }
       }
-      else if (eval_msb(input) < 2 * eval_msb(modulus) + 1u)
+      else if (eval_msb(input) < 2u * eval_msb(modulus) + 1u)
       {
          Backend_quadruple_1 t1(input);
 
          eval_multiply(t1, get_mu());
-         custom_right_shift(t1, 2 * (1 + eval_msb(modulus)));
+         custom_right_shift(t1, 2u * (1u + eval_msb(modulus)));
          eval_multiply(t1, modulus);
          eval_subtract(input, t1);
 
@@ -474,34 +475,68 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       result = A;
    }
 
-   template <typename Backend1, typename T>
-   constexpr void regular_exp(Backend1& result, const T& exp) const
+   template <typename Backend1, typename Backend2>
+   constexpr void regular_exp(Backend1& result, const Backend2& exp) const
    {
       regular_exp(result, result, exp);
    }
 
-   template <typename Backend1, typename Backend2, typename T,
+   template <typename Backend1, typename Backend2, typename Backend3,
              /// result should fit in the output parameter
              typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
-   constexpr void regular_exp(Backend1& result, Backend2& a, T exp) const
+   constexpr void regular_exp(Backend1& result, Backend2& a, Backend3 exp) const
    {
-      using default_ops::eval_powm;
+      using default_ops::eval_eq;
+      using default_ops::eval_lt;
+      using default_ops::eval_multiply;
 
-      // TODO: custom implementation may be more efficient because it uses barrett_reduction instead just eval_modulus
-      eval_powm(result, a, exp, get_mod().backend());
+      // TODO: maybe reduce input parameter
+      /// input parameter should be lesser than modulus
+      BOOST_ASSERT(eval_lt(a, get_mod().backend()));
+
+      if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
+      {
+         result = static_cast<internal_limb_type>(1u);
+         return;
+      }
+      if (eval_eq(get_mod().backend(), static_cast<internal_limb_type>(1u)))
+      {
+         result = static_cast<internal_limb_type>(0u);
+         return;
+      }
+
+      Backend_doubled_limbs base(a), res(static_cast<internal_limb_type>(1u));
+
+      while (true)
+      {
+         internal_limb_type lsb = exp.limbs()[0] & 1u;
+         custom_right_shift(exp, static_cast<internal_limb_type>(1u));
+         if (lsb)
+         {
+            eval_multiply(res, base);
+            barrett_reduce(res);
+            if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
+            {
+               break;
+            }
+         }
+         eval_multiply(base, base);
+         barrett_reduce(base);
+      }
+      result = res;
    }
 
-   template <typename Backend1, typename T>
+   template <typename Backend1, typename Backend2>
    constexpr void montgomery_exp(Backend1& result,
-                                 const T&  exp) const
+                                 const Backend2&  exp) const
    {
       montgomery_exp(result, result, exp);
    }
 
-   template <typename Backend1, typename Backend2, typename T,
+   template <typename Backend1, typename Backend2, typename Backend3,
              /// result should fit in the output parameter
              typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
-   constexpr void montgomery_exp(Backend1& result, const Backend2& a, T exp) const
+   constexpr void montgomery_exp(Backend1& result, const Backend2& a, Backend3 exp) const
    {
       using default_ops::eval_eq;
       using default_ops::eval_lt;

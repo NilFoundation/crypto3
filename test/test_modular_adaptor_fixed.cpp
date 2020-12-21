@@ -56,6 +56,39 @@ enum test_set_enum : std::size_t
    test_set_len
 };
 
+template <typename Backend, expression_template_option ExpressionTemplates>
+constexpr void pow_test(const number<Backend, ExpressionTemplates>& a,
+                        const number<Backend, ExpressionTemplates>& b,
+                        const number<Backend, ExpressionTemplates>& m)
+{
+   typedef number<Backend, ExpressionTemplates> standard_number;
+   typedef modular_params<Backend>              params_number;
+   typedef number<modular_adaptor<Backend> >    modular_number;
+
+   params_number  mod_p(m);
+   // modular_params constructor
+   modular_number a_m(a, mod_p);
+   // number constructor
+   modular_number b_m(b, m);
+
+   standard_number a_powm_b   = powm(a, b, m);
+   // pow could be used only with modular_numbers
+   modular_number  a_m_pow_b_m  = pow(a_m, b_m);
+   // powm could be used with mixed types
+   modular_number  a_m_powm_b_m = powm(a_m, b_m);
+   modular_number  a_m_powm_b = powm(a_m, b);
+   // if constexpr (backends::max_precision<Backend>::value <= bits_per_limb)
+   // {
+   //    limb_type e = b.template convert_to<limb_type>();
+   //    modular_number  a_m_powm_e = powm(a_m, e);
+   //    BOOST_ASSERT_MSG(a_m_powm_e.template convert_to<standard_number>() == a_powm_b, "powm error");
+   // }
+
+   BOOST_ASSERT_MSG(a_m_powm_b_m.template convert_to<standard_number>() == a_powm_b, "powm error");
+   BOOST_ASSERT_MSG(a_m_powm_b.template convert_to<standard_number>() == a_powm_b, "powm error");
+   BOOST_ASSERT_MSG(a_m_pow_b_m.template convert_to<standard_number>() == a_powm_b, "pow error");
+}
+
 // TODO: test_set is not ref because of constexpr error in gcc-10
 template <typename Number>
 constexpr bool base_operations_test(std::array<Number, test_set_len> test_set)
@@ -125,8 +158,9 @@ constexpr bool base_operations_test(std::array<Number, test_set_len> test_set)
    BOOST_ASSERT_MSG(a_or_b.template convert_to<standard_number>() == a_or_b_s, "or error");
    BOOST_ASSERT_MSG(a_xor_b.template convert_to<standard_number>() == a_xor_b_s, "xor error");
 
-   BOOST_ASSERT_MSG(a_powm_b.template convert_to<standard_number>() == a_powm_b_s, "powm error");
-   BOOST_ASSERT_MSG(a_pow_b.template convert_to<standard_number>() == a_powm_b_s, "pow error");
+   // BOOST_ASSERT_MSG(a_powm_b.template convert_to<standard_number>() == a_powm_b_s, "powm error");
+   // BOOST_ASSERT_MSG(a_pow_b.template convert_to<standard_number>() == a_powm_b_s, "pow error");
+   pow_test(test_set[a_e], test_set[b_e], test_set[mod_e]);
 
    BOOST_ASSERT_MSG(a_bit_set.template convert_to<standard_number>() == a_bit_set_s, "bit set error");
    BOOST_ASSERT_MSG(a_bit_unset.template convert_to<standard_number>() == a_bit_unset_s, "bit unset error");
@@ -620,8 +654,80 @@ BOOST_AUTO_TEST_CASE(base_ops_even_mod_backend_17)
             0x2c8a_cppui17},
        }};
 
+   constexpr bool res = base_operations_test(test_data);
+}
+
+BOOST_AUTO_TEST_CASE(base_ops_odd_mod_backend_17)
+{
+   using Backend         = cpp_int_backend<17, 17>;
+   using standard_number = number<Backend>;
+   using test_set        = std::array<standard_number, test_set_len>;
+   using test_data_t     = std::array<test_set, 20>;
    constexpr
-       bool res = base_operations_test(test_data);
+   test_data_t test_data = {{
+                                {0x1e241_cppui17,
+                                    0x3a97_cppui17,
+                                    0xc070_cppui17},
+                                {0x1e241_cppui17,
+                                    0x1dea7_cppui17,
+                                    0x1aaab_cppui17},
+                                {0x1e241_cppui17,
+                                    0x1936f_cppui17,
+                                    0xfb0b_cppui17},
+                                {0x1e241_cppui17,
+                                    0x13067_cppui17,
+                                    0x1566c_cppui17},
+                                {0x1e241_cppui17,
+                                    0x1b960_cppui17,
+                                    0x1773f_cppui17},
+                                {0x1e241_cppui17,
+                                    0x101e4_cppui17,
+                                    0x156ca_cppui17},
+                                {0x1e241_cppui17,
+                                    0x167f3_cppui17,
+                                    0x13c52_cppui17},
+                                {0x1e241_cppui17,
+                                    0xc536_cppui17,
+                                    0x14c8e_cppui17},
+                                {0x1e241_cppui17,
+                                    0xed02_cppui17,
+                                    0x1dafc_cppui17},
+                                {0x1e241_cppui17,
+                                    0x126a6_cppui17,
+                                    0x18a8b_cppui17},
+                                {0x1e241_cppui17,
+                                    0x111ac_cppui17,
+                                    0x94c2_cppui17},
+                                {0x1e241_cppui17,
+                                    0x3a03_cppui17,
+                                    0x89d8_cppui17},
+                                {0x1e241_cppui17,
+                                    0x3add_cppui17,
+                                    0x101ae_cppui17},
+                                {0x1e241_cppui17,
+                                    0x8db4_cppui17,
+                                    0x50e2_cppui17},
+                                {0x1e241_cppui17,
+                                    0x1bab_cppui17,
+                                    0x1d5f6_cppui17},
+                                {0x1e241_cppui17,
+                                    0x144dc_cppui17,
+                                    0x172f8_cppui17},
+                                {0x1e241_cppui17,
+                                    0x1cd30_cppui17,
+                                    0x1a5c_cppui17},
+                                {0x1e241_cppui17,
+                                    0x13c3d_cppui17,
+                                    0x4358_cppui17},
+                                {0x1e241_cppui17,
+                                    0x18d68_cppui17,
+                                    0x1299d_cppui17},
+                                {0x1e241_cppui17,
+                                    0x10153_cppui17,
+                                    0x2c8a_cppui17},
+                            }};
+
+   constexpr bool res = base_operations_test(test_data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
