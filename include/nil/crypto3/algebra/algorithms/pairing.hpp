@@ -32,20 +32,20 @@ namespace nil {
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::affine_ate_G1_precomp
-                affine_ate_precompute_G1(const typename PairingCurveType::pairing_policy::G1_type &P) {
+                affine_ate_precompute_G1(const typename PairingCurveType::pairing_policy::g1_type::value_type &P) {
 
                 return PairingCurveType::pairing_policy::affine_ate_precompute_g1(P);
             }
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::affine_ate_G2_precomp
-                affine_ate_precompute_G2(const typename PairingCurveType::pairing_policy::G2_type &P) {
+                affine_ate_precompute_G2(const typename PairingCurveType::pairing_policy::g2_type::value_type &P) {
 
                 return PairingCurveType::pairing_policy::affine_ate_precompute_g2(P);
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
+            typename PairingCurveType::pairing_policy::gt_type::value_type
                 affine_ate_miller_loop(const typename PairingCurveType::pairing_policy::affine_ate_G1_precomp &prec_P,
                                        const typename PairingCurveType::pairing_policy::affine_ate_G2_precomp &prec_Q) {
 
@@ -54,35 +54,35 @@ namespace nil {
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::G1_precomp
-                precompute_g1(const typename PairingCurveType::pairing_policy::G1_type &P) {
+                precompute_g1(const typename PairingCurveType::pairing_policy::g1_type::value_type &P) {
 
                 return PairingCurveType::pairing_policy::precompute_g1(P);
             }
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing_policy::G2_precomp
-                precompute_g2(const typename PairingCurveType::pairing_policy::G2_type &P) {
+                precompute_g2(const typename PairingCurveType::pairing_policy::g2_type::value_type &P) {
 
                 return PairingCurveType::pairing_policy::precompute_g2(P);
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
-                pairing(const typename PairingCurveType::pairing_policy::G1_type &v1,
-                        const typename PairingCurveType::pairing_policy::G2_type &v2) {
+            typename PairingCurveType::pairing_policy::gt_type::value_type
+                pairing(const typename PairingCurveType::pairing_policy::g1_type::value_type &v1,
+                        const typename PairingCurveType::pairing_policy::g2_type::value_type &v2) {
                 return PairingCurveType::pairing_policy::pairing(v1, v2);
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
-                reduced_pairing(const typename PairingCurveType::pairing_policy::G1_type &v1,
-                                const typename PairingCurveType::pairing_policy::G2_type &v2) {
+            typename PairingCurveType::pairing_policy::gt_type::value_type
+                reduced_pairing(const typename PairingCurveType::pairing_policy::g1_type::value_type &v1,
+                                const typename PairingCurveType::pairing_policy::g2_type::value_type &v2) {
 
                 return PairingCurveType::pairing_policy::reduced_pairing(v1, v2);
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
+            typename PairingCurveType::pairing_policy::gt_type::value_type
                 double_miller_loop(const typename PairingCurveType::pairing_policy::G1_precomp &prec_P1,
                                    const typename PairingCurveType::pairing_policy::G2_precomp &prec_Q1,
                                    const typename PairingCurveType::pairing_policy::G1_precomp &prec_P2,
@@ -92,14 +92,14 @@ namespace nil {
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
-                final_exponentiation(const typename PairingCurveType::pairing_policy::GT_type &elt) {
+            typename PairingCurveType::pairing_policy::gt_type::value_type
+                final_exponentiation(const typename PairingCurveType::pairing_policy::gt_type::value_type &elt) {
 
                 return PairingCurveType::pairing_policy::final_exponentiation(elt);
             }
 
             template<typename PairingCurveType>
-            typename PairingCurveType::pairing_policy::GT_type
+            typename PairingCurveType::pairing_policy::gt_type::value_type
                 miller_loop(const typename PairingCurveType::pairing_policy::G1_precomp &prec_P,
                             const typename PairingCurveType::pairing_policy::G2_precomp &prec_Q) {
 

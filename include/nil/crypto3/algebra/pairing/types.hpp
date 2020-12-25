@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_PAIRINGS_USINGS_HPP
-#define CRYPTO3_ALGEBRA_PAIRINGS_USINGS_HPP
+#ifndef CRYPTO3_ALGEBRA_PAIRINGS_TYPES_HPP
+#define CRYPTO3_ALGEBRA_PAIRINGS_TYPES_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -72,4 +72,4 @@ namespace nil {
         }    // namespace algebra
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_PAIRINGS_USINGS_HPP
+#endif    // CRYPTO3_ALGEBRA_PAIRINGS_TYPES_HPP

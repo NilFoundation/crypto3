@@ -27,7 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_MNT6_ARITHMETIC_PARAMS_HPP
 
 #include <nil/crypto3/algebra/fields/params.hpp>
-// #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>

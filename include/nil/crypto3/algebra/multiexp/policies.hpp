@@ -70,16 +70,22 @@ namespace nil {
                     using field_value_type = typename FieldType::value_type;
 
                 public:
-                    static inline base_value_type
-                        process(typename std::vector<base_value_type>::const_iterator vec_start,
-                                typename std::vector<base_value_type>::const_iterator vec_end,
-                                typename std::vector<field_value_type>::const_iterator scalar_start,
-                                typename std::vector<field_value_type>::const_iterator scalar_end) {
+                    template<typename InputBaseIterator, typename InputFieldIterator,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
+                                              base_value_type>::value>::type,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
+                                              field_value_type>::value>::type>
+                    static inline base_value_type process(InputBaseIterator vec_start,
+                                                          InputBaseIterator vec_end,
+                                                          InputFieldIterator scalar_start,
+                                                          InputFieldIterator scalar_end) {
 
                         base_value_type result(base_value_type::zero());
 
-                        typename std::vector<base_value_type>::const_iterator vec_it;
-                        typename std::vector<field_value_type>::const_iterator scalar_it;
+                        InputBaseIterator vec_it;
+                        InputFieldIterator scalar_it;
 
                         for (vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end; ++vec_it, ++scalar_it) {
                             result = result + (*scalar_it) * (*vec_it);
@@ -106,11 +112,17 @@ namespace nil {
                     using field_value_type = typename FieldType::value_type;
 
                 public:
-                    static inline base_value_type
-                        process(typename std::vector<base_value_type>::const_iterator bases,
-                                typename std::vector<base_value_type>::const_iterator bases_end,
-                                typename std::vector<field_value_type>::const_iterator exponents,
-                                typename std::vector<field_value_type>::const_iterator exponents_end) {
+                    template<typename InputBaseIterator, typename InputFieldIterator,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
+                                              base_value_type>::value>::type,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
+                                              field_value_type>::value>::type>
+                    static inline base_value_type process(InputBaseIterator bases,
+                                                          InputBaseIterator bases_end,
+                                                          InputFieldIterator exponents,
+                                                          InputFieldIterator exponents_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
@@ -219,11 +231,17 @@ namespace nil {
                     using field_value_type = typename FieldType::value_type;
 
                 public:
-                    static inline base_value_type
-                        process(typename std::vector<base_value_type>::const_iterator vec_start,
-                                typename std::vector<base_value_type>::const_iterator vec_end,
-                                typename std::vector<field_value_type>::const_iterator scalar_start,
-                                typename std::vector<field_value_type>::const_iterator scalar_end) {
+                    template<typename InputBaseIterator, typename InputFieldIterator,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
+                                              base_value_type>::value>::type,
+                             typename = typename std::enable_if<
+                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
+                                              field_value_type>::value>::type>
+                    static inline base_value_type process(InputBaseIterator vec_start,
+                                                          InputBaseIterator vec_end,
+                                                          InputFieldIterator scalar_start,
+                                                          InputFieldIterator scalar_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
@@ -245,8 +263,8 @@ namespace nil {
                         std::vector<base_value_type> g;
                         g.reserve(odd_vec_len);
 
-                        typename std::vector<base_value_type>::const_iterator vec_it;
-                        typename std::vector<field_value_type>::const_iterator scalar_it;
+                        InputBaseIterator vec_it;
+                        InputFieldIterator scalar_it;
                         std::size_t i;
                         for (i = 0, vec_it = vec_start, scalar_it = scalar_start; vec_it != vec_end;
                              ++vec_it, ++scalar_it, ++i) {
