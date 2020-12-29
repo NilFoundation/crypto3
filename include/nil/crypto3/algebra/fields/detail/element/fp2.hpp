@@ -55,102 +55,105 @@ namespace nil {
 
                         data_type data;
 
-                        element_fp2() {
+                        constexpr element_fp2() {
                             data = data_type({underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        element_fp2(int in_data0, int in_data1) {
+                        constexpr element_fp2(int in_data0, int in_data1) {
                             data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
-                        element_fp2(modulus_type in_data0, modulus_type in_data1) {
+                        constexpr element_fp2(modulus_type in_data0, modulus_type in_data1) {
                             data = data_type({underlying_type(in_data0), underlying_type(in_data1)});
                         }
 
-                        element_fp2(const data_type &in_data) {
+                        constexpr element_fp2(const data_type &in_data) {
                             data = data_type({in_data[0], in_data[1]});
                         };
 
-                        element_fp2(underlying_type in_data0, underlying_type in_data1) {
+                        constexpr element_fp2(underlying_type in_data0, underlying_type in_data1) {
                             data = data_type({in_data0, in_data1});
                         }
 
-                        element_fp2(const element_fp2 &B) {
+                        constexpr element_fp2(const element_fp2 &B) {
                             data[0] = underlying_type(B.data[0]);
                             data[1] = underlying_type(B.data[1]);
                         };
 
-                        inline static element_fp2 zero() {
+                        constexpr inline static element_fp2 zero() {
                             return element_fp2(underlying_type::zero(), underlying_type::zero());
                         }
 
-                        inline static element_fp2 one() {
+                        constexpr inline static element_fp2 one() {
                             return element_fp2(underlying_type::one(), underlying_type::zero());
                         }
 
-                        bool is_zero() const {
+                        constexpr bool is_zero() const {
                             return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero());
                         }
 
-                        bool is_one() const {
+                        constexpr bool is_one() const {
                             return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero());
                         }
 
-                        bool operator==(const element_fp2 &B) const {
+                        constexpr bool operator==(const element_fp2 &B) const {
                             return (data[0] == B.data[0]) && (data[1] == B.data[1]);
                         }
 
-                        bool operator!=(const element_fp2 &B) const {
+                        constexpr bool operator!=(const element_fp2 &B) const {
                             return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                         }
 
-                        element_fp2 &operator=(const element_fp2 &B) {
+                        constexpr element_fp2 &operator=(const element_fp2 &B) {
                             data[0] = B.data[0];
                             data[1] = B.data[1];
 
                             return *this;
                         }
 
-                        element_fp2 operator+(const element_fp2 &B) const {
+                        constexpr element_fp2 operator+(const element_fp2 &B) const {
                             return element_fp2(data[0] + B.data[0], data[1] + B.data[1]);
                         }
 
-                        element_fp2 operator-(const element_fp2 &B) const {
+                        constexpr element_fp2 operator-(const element_fp2 &B) const {
                             return element_fp2(data[0] - B.data[0], data[1] - B.data[1]);
                         }
 
-                        element_fp2 &operator-=(const element_fp2 &B) {
+                        constexpr element_fp2 &operator-=(const element_fp2 &B) {
                             data[0] -= B.data[0];
                             data[1] -= B.data[1];
 
                             return *this;
                         }
 
-                        element_fp2 &operator+=(const element_fp2 &B) {
+                        constexpr element_fp2 &operator+=(const element_fp2 &B) {
                             data[0] += B.data[0];
                             data[1] += B.data[1];
 
                             return *this;
                         }
 
-                        element_fp2 operator-() const {
+                        constexpr element_fp2 operator-() const {
                             return zero() - *this;
                         }
 
-                        element_fp2 operator*(const element_fp2 &B) const {
+                        constexpr element_fp2 operator*(const element_fp2 &B) const {
+                            // TODO: the use of data and B.data directly in return statement addition cause constexpr error for gcc
+                            const underlying_type A0 = data[0], A1 = data[1],
+                                                  B0 = B.data[0], B1 = B.data[1];
                             const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
                             return element_fp2(A0B0 + non_residue * A1B1,
-                                               (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1);
+                                               (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
                         }
 
-                        element_fp2 &operator*=(const element_fp2 &B) {
+                        constexpr element_fp2 &operator*=(const element_fp2 &B) {
                             *this = *this * B;
 
                             return *this;
                         }
 
-                        element_fp2 operator/(const element_fp2 &B) const {
+                        constexpr element_fp2 operator/(const element_fp2 &B) const {
                             return *this * B.inversed();
                         }
 
@@ -172,12 +175,12 @@ namespace nil {
 
                         1 * Fp neg
                         */
-                        element_fp2 mul_x() {
+                        constexpr element_fp2 mul_x() {
                             return element_fp2(-data[1], data[0]);
                         }
 
                         // z = x * b
-                        element_fp2 mul_Fp_0(const underlying_type &b) {
+                        constexpr element_fp2 mul_Fp_0(const underlying_type &b) {
                             return element_fp2(data[0] * b, data[1] * b);
                         }
 
@@ -188,27 +191,27 @@ namespace nil {
                             2 * Fp mul
                             1 * Fp neg
                         */
-                        element_fp2 mul_Fp_1(const underlying_type &y_b) {
+                        constexpr element_fp2 mul_Fp_1(const underlying_type &y_b) {
                             return element_fp2(-(data[1] * y_b), data[0] * y_b);
                         }
 
-                        element_fp2 _2z_add_3x() {
+                        constexpr element_fp2 _2z_add_3x() {
                             return element_fp2(data[0]._2z_add_3x(), data[1]._2z_add_3x());
                         }
 
-                        element_fp2 divBy2() const {
+                        constexpr element_fp2 divBy2() const {
                             return element_fp2(divBy2(data[0]), divBy2(data[1]));
                         }
 
-                        element_fp2 divBy4() const {
+                        constexpr element_fp2 divBy4() const {
                             return element_fp2(divBy4(data[0]), divBy4(data[1]));
                         }
 
-                        element_fp2 doubled() const {
+                        constexpr element_fp2 doubled() const {
                             return element_fp2(data[0].doubled(), data[1].doubled());
                         }
 
-                        element_fp2 sqrt() const {
+                        constexpr element_fp2 sqrt() const {
 
                             element_fp2 one = this->one();
 
@@ -246,28 +249,29 @@ namespace nil {
                             return x;
                         }
 
-                        element_fp2 squared() const {
+                        constexpr element_fp2 squared() const {
                             // return (*this) * (*this);    // maybe can be done more effective
 
                             /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly
                              * Fields.pdf; Section 3 (Complex squaring) */
-                            const underlying_type &A = data[0], &B = data[1];
+                            // TODO: reference here could cause error in constexpr for gcc
+                            const underlying_type A = data[0], B = data[1];
                             const underlying_type AB = A * B;
 
                             return element_fp2((A + B) * (A + non_residue * B) - AB - non_residue * AB, AB + AB);
                         }
 
-                        bool is_square() const {
+                        constexpr bool is_square() const {
                             element_fp2 tmp = this->pow(policy_type::group_order);
                             return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
                         }
 
                         template<typename PowerType>
-                        element_fp2 pow(const PowerType &pwr) const {
+                        constexpr element_fp2 pow(const PowerType &pwr) const {
                             return element_fp2(power(*this, pwr));
                         }
 
-                        element_fp2 inversed() const {
+                        constexpr element_fp2 inversed() const {
 
                             /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                              * Curves"; Algorithm 8 */
@@ -285,7 +289,7 @@ namespace nil {
                         }
 
                         template<typename PowerType>
-                        element_fp2 Frobenius_map(const PowerType &pwr) const {
+                        constexpr element_fp2 Frobenius_map(const PowerType &pwr) const {
                             return element_fp2(
                                 data[0],
                                 typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 2]) *
@@ -295,25 +299,25 @@ namespace nil {
                     };
 
                     template<typename FieldParams>
-                    element_fp2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
-                                                       const element_fp2<FieldParams> &rhs) {
+                    constexpr element_fp2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
+                                                                 const element_fp2<FieldParams> &rhs) {
                         return element_fp2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
                     }
 
                     template<typename FieldParams>
-                    element_fp2<FieldParams> operator*(const element_fp2<FieldParams> &lhs,
-                                                       const typename FieldParams::underlying_type &rhs) {
+                    constexpr element_fp2<FieldParams> operator*(const element_fp2<FieldParams> &lhs,
+                                                                 const typename FieldParams::underlying_type &rhs) {
                         return rhs * lhs;
                     }
 
                     template<typename FieldParams>
-                    element_fp2<FieldParams> addNC(const element_fp2<FieldParams> &A,
-                                                   const element_fp2<FieldParams> &B) {
+                    constexpr element_fp2<FieldParams> addNC(const element_fp2<FieldParams> &A,
+                                                             const element_fp2<FieldParams> &B) {
                     }
 
                     template<typename FieldParams>
-                    element_fp2<FieldParams> subNC(const element_fp2<FieldParams> &A,
-                                                   const element_fp2<FieldParams> &B) {
+                    constexpr element_fp2<FieldParams> subNC(const element_fp2<FieldParams> &A,
+                                                             const element_fp2<FieldParams> &B) {
                     }
 
                 }    // namespace detail

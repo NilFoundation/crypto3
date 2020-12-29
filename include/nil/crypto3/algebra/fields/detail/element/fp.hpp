@@ -167,7 +167,7 @@ namespace nil {
                         }
 
                         // TODO: complete method
-                        element_fp _2z_add_3x() {
+                        constexpr element_fp _2z_add_3x() {
                         }
 
                         constexpr element_fp squared() const {
