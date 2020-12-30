@@ -47,7 +47,7 @@ namespace nil {
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    GroupValueType
+                    constexpr GroupValueType
                         scalar_mul(const GroupValueType &base,
                                    const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         GroupValueType result;
@@ -70,7 +70,7 @@ namespace nil {
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    GroupValueType operator*(const GroupValueType &left,
+                    constexpr GroupValueType operator*(const GroupValueType &left,
                                              const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
@@ -79,7 +79,7 @@ namespace nil {
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    GroupValueType operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
+                    constexpr GroupValueType operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
                                              const GroupValueType &right) {
 
                         return right * left;

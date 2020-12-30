@@ -84,7 +84,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        element_bls12_g1() :
+                        constexpr element_bls12_g1() :
                             element_bls12_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
                                              underlying_field_value_type::zero()) {};
                         // must be
@@ -95,7 +95,7 @@ namespace nil {
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
-                        element_bls12_g1(underlying_field_value_type X,
+                        constexpr element_bls12_g1(underlying_field_value_type X,
                                          underlying_field_value_type Y,
                                          underlying_field_value_type Z) {
                             this->X = X;
@@ -106,14 +106,14 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        static element_bls12_g1 zero() {
+                        constexpr static element_bls12_g1 zero() {
                             return element_bls12_g1();
                         }
 
                         /** @brief Get the generator of group G1
                          *
                          */
-                        static element_bls12_g1 one() {
+                        constexpr static element_bls12_g1 one() {
                             return element_bls12_g1(
                                 underlying_field_value_type(
                                     0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB_cppui381),
@@ -127,7 +127,7 @@ namespace nil {
 
                         /*************************  Comparison operations  ***********************************/
 
-                        bool operator==(const element_bls12_g1 &other) const {
+                        constexpr bool operator==(const element_bls12_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -162,21 +162,21 @@ namespace nil {
                             return true;
                         }
 
-                        bool operator!=(const element_bls12_g1 &other) const {
+                        constexpr bool operator!=(const element_bls12_g1 &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
                          *
                          * @return true if element from group G1 is the point at infinity
                          */
-                        bool is_zero() const {
+                        constexpr bool is_zero() const {
                             return (this->Z.is_zero());
                         }
                         /** @brief
                          *
                          * @return true if element from group G1 in affine coordinates
                          */
-                        bool is_special() const {
+                        constexpr bool is_special() const {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
@@ -184,7 +184,7 @@ namespace nil {
                          *
                          * @return true if element from group G1 lies on the elliptic curve
                          */
-                        bool is_well_formed() const {
+                        constexpr bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
                             } else {
@@ -211,7 +211,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        element_bls12_g1 operator=(const element_bls12_g1 &other) {
+                        constexpr element_bls12_g1 operator=(const element_bls12_g1 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -220,7 +220,7 @@ namespace nil {
                             return *this;
                         }
 
-                        element_bls12_g1 operator+(const element_bls12_g1 &other) const {
+                        constexpr element_bls12_g1 operator+(const element_bls12_g1 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -237,18 +237,18 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        element_bls12_g1 operator-() const {
+                        constexpr element_bls12_g1 operator-() const {
                             return element_bls12_g1(this->X, -(this->Y), this->Z);
                         }
 
-                        element_bls12_g1 operator-(const element_bls12_g1 &other) const {
+                        constexpr element_bls12_g1 operator-(const element_bls12_g1 &other) const {
                             return (*this) + (-other);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        element_bls12_g1 doubled() const {
+                        constexpr element_bls12_g1 doubled() const {
 
                             // handle point at infinity
                             if (this->is_zero()) {
@@ -283,7 +283,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        element_bls12_g1 mixed_add(const element_bls12_g1 &other) const {
+                        constexpr element_bls12_g1 mixed_add(const element_bls12_g1 &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -343,7 +343,7 @@ namespace nil {
                         }
 
                     private:
-                        element_bls12_g1 add(const element_bls12_g1 &other) const {
+                        constexpr element_bls12_g1 add(const element_bls12_g1 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
@@ -376,7 +376,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_bls12_g1 to_affine_coordinates() const {
+                        constexpr element_bls12_g1 to_affine_coordinates() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -399,12 +399,12 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_bls12_g1 to_special() const {
+                        constexpr element_bls12_g1 to_special() const {
                             return this->to_affine_coordinates();
                         }
 
                     private:
-                        /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
                         /*constexpr static const underlying_field_value_type zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
