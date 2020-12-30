@@ -815,148 +815,148 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(fields_manual_static_tests)
 
-// BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fr) {
-//     using policy_type = fields::bls12_fr<381>;
-//     using value_type = typename policy_type::value_type;
-//     using test_set_t = std::array<value_type, elements_set_size>;
-//     using const_set_t = std::array<constant_type, constants_set_size>;
-//
-//     // TODO: scalar field precision could be less than for base field
-//     constexpr test_set_t elements1 = {0x209a9bf596288853d71eb5a070164b2d81fe36e956f8f70376712767fabb15d9_cppui381,
-//                                       0x661ad4fb4d130b7afaea293348f2107d9f4a62308af88282297733628cfc5ae7_cppui381,
-//                                       0x12c7c99db99e16869ecf06cbaf6683a5cd8af516e1f31d869fe85acb87b770bf_cppui381,
-//                                       0x2e6d6e4d72b2fa210f6e647530c612b5367178bbcbfed0804cf9f4046dbebaf3_cppui381,
-//                                       0x65915fd6511eb3afcf0648a4b4b1c3f298433ecaee3cdd97254aa3ce8a67303d_cppui381,
-//                                       0x413537eb2c5110a7ae3d6b40e02c965b03fc6dd2adf1ee06ece24ecff5762bb2_cppui381,
-//                                       0x1c40f7a911c57190db5382d3fc2d96473780452b78e60474add8fb7f1eddda6_cppui381,
-//                                       0x49757b377fe2a1de10c484db929a74ae02fdfae3aaab6098ea2ab8accfe613f0_cppui381,
-//                                       0x363f979f222c9970dc4291b62bc3e8d77c31c1b2caa88afeb414f3584b952000_cppui381,
-//                                       0x661ad4fb4d130b7afaea293348f2107d9f4a62308af88282297733628cfc5ae7_cppui381,
-//                                       0x53530b5d9374f4f45c1b2267998b8cd7d1bf6d19a90564fb898ed8970544ea28_cppui381};
-//     constexpr const_set_t constants1 = {811706348};
-//
-//     // TODO: the reason of the error "function parameter 'elements' with unknown value cannot be used in a constant
-//     // expression" constexpr
-//     //     bool res = check_field_operations_static(elements1, constants1);
-//
-//     static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
-//     static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
-//     static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
-//     static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
-//     static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
-//     static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
-//     static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
-//     static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
-//     static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
-// }
-//
-// BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq) {
-//     using policy_type = fields::bls12_fq<381>;
-//     using value_type = typename policy_type::value_type;
-//     using test_set_t = std::array<value_type, elements_set_size>;
-//     using const_set_t = std::array<constant_type, constants_set_size>;
-//
-//     constexpr test_set_t elements1 = {
-//         0x3d9cb62ebac9d6c7b94245d2d6144d500f218bb90a16a1e4f70d98fd44b4b9ee274de15a0a3d231dac1eaa449d31404_cppui381,
-//         0x15c88779fc8a30cca95ec4bbf71aa4c302bccf7dc571e6e45fbf1ed24989ec23dff741ca00597f4ab1fc628304e8761b_cppui381,
-//         0x19a252dce836ce3924f2e919247be99803aee83956135102af2ff8621dd537c2c26c1fdfa0fd517c8cbe4d274ebb8a1f_cppui381,
-//         0x81255d328a2533a1d51075779924ce962ac94c2beb495f956e28d5e8172559f21299c4a519e52e6e2c4882144ea4894_cppui381,
-//         0x4e02d210a60d52212c21056e050b7f7b6aa45c2fb85e692b1fef9e3e6fb43b2bf8103105f43daca458e4dccc9f5236c_cppui381,
-//         0x7b396c5d7593ad8f72848ba5ac289aa01e431772142d43c9ee1b31fa896973dc4e9bc2b4147a463b583d54893a62808_cppui381,
-//         0x68241cb698160ee94897ec6600bc997de3fed563dfc36a758334c71dc76a2473571cfbc0f674038ee748add41e4277a_cppui381,
-//         0xbb4588b98237fefeba65f928e69da9106c690e02c70361947b39d0f5a6d462096431d375d4b66ae7e4daef9f2400a09_cppui381,
-//         0x2e7ebd9b39f65a9485b32b52269baa84b2d33a80c8747c994b1e58c0caa09b4acf7685583898549db1029a1de657d8a_cppui381,
-//         0x4388a703cf5b5cda1bce2fa4c31081461ba7c072e132bdb0771b3cead270a003eb4be34b0fa80b508029d7cfb173490_cppui381,
-//         0x162746874dd3492dcf87835915ea6802638532c962e3a8a117bff9112265aa853c3721e910b02dcddf3d155bb62c96a7_cppui381};
-//     constexpr const_set_t constants1 = {865433380};
-//
-//     static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
-//     static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
-//     static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
-//     static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
-//     static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
-//     static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
-//     static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
-//     static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
-//     static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
-//
-//     constexpr value_type not_square1 = {
-//         0x122ca301fc65d4c9fd02b7d919e691c448b3209081835c99fab65c12c0e60a25f7eabe1b506e494b45175b95a4a9ebfe_cppui381,
-//     };
-//     static_assert(not_square1.is_square() == false, "not square error");
-//     static_assert(not_square1.pow(2).is_square() == true, "square error");
-// }
-//
-// BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq2) {
-//     using policy_type = fields::fp2<fields::bls12_fq<381>>;
-//     using value_type = typename policy_type::value_type;
-//     using test_set_t = std::array<value_type, elements_set_size>;
-//     using const_set_t = std::array<constant_type, constants_set_size>;
-//
-//     constexpr test_set_t elements1 = {
-//         {{
-//              0x5aa9d5160c21229d4c73871dab039631da3722131b00713055854b2e6ff4f8abe4430358fc70ba351fda87dc9abdbb2_cppui381,
-//              0x2ccc1503d823ead782507cf3eb7c6b03ec4503bf8bb725111abe86ce8809f9c52ed32fa7178cdeb057f8ddb351b2de4_cppui381,
-//          },
-//          {
-//              0xe9042dd6be3a4248432d05bdf942a3b7574fa29fabc16dd474af9b64aea7d6e66d5be0bb505a97d67105d045d5e533d_cppui381,
-//              0x79d8473ab5a748a8321a5f996ddde6cbaa2f723bfffcf3da67045bd122fbb639f1ea54d5bc7c7dcc9cec9834c666f37_cppui381,
-//          },
-//          {
-//              0x143ae02ecca5b64e58fa08cdba44639e93186c4b2c6c1df04ca34e6931e9ccf92519ee4144ccb520b90e0582270a2eef_cppui381,
-//              0xa6a45c3e8dcb337fb46adc8d595a51cf967475fb8bb418eb81c2e29fab05afff20bd847cd4095c7cf4e575e81819d1b_cppui381,
-//          },
-//          {
-//              0x111b6c5e2e5e549f9bb00fcc3e67bbff0ca5c37c2a7902f5253e2d9d92c5c840761a72288c156225a4ec4b796c4d3320_cppui381,
-//              0x15304ec6cba7b0bd401f098beb25951ae898a49d2c40b5d2d26c7550cd01da5cd27a8dabc705060df5afc457e8b46958_cppui381,
-//          },
-//          {
-//              0x16c00305e0c73e7c87eff62ffcadc3b54e06d73bc6ba13bf64a6e12881b3be9a8bd441e174fa59bb75287609946ad160_cppui381,
-//              0x121e6a16e0b5a24b03bbb18ffb108c934781f5ecde689729b47c69a575592c4f6e3cf19d34140428cbf71a48dfef8bcb_cppui381,
-//          },
-//          {
-//              0xb553aa2c1842453a98e70e3b56072c63b46e44263600e260ab0a965cdfe9f157c88606b1f8e1746a3fb50fb9357b764_cppui381,
-//              0x59982a07b047d5af04a0f9e7d6f8d607d88a077f176e4a22357d0d9d1013f38a5da65f4e2f19bd60aff1bb66a365bc8_cppui381,
-//          },
-//          {
-//              0x1004f42fded04e85fa8e21b945dc955abd3b349e52494a628d102e1240123038bdadd47f92750bdb8355b798d119a030_cppui381,
-//              0xe7eeef4fb0a1d7470dad9548096233fcf664d7178e62b8c8d716197b84e31d7da79bbf5be757d63519b997c81d5c95e_cppui381,
-//          },
-//          {
-//              0xef716581f3a2e7e2bf0f2850ea9bd3bbccf4933d4f4dcf616b181e1a894eb07e194b611cf5a2d532637b6ae800e33b6_cppui381,
-//              0x2054d1d319feb67161dcd0ba4ab91a498197d89f44158513b8ddee4e46a8b50b6752621e17a61e0952d6daf2e0d9e8a_cppui381,
-//          },
-//          {
-//              0x9f218e6d8b2f410874af5f7a8290dfa6ba23f059630fc7afe87138081863aed2730b5b19c3945c3bf5a03780d276861_cppui381,
-//              0x120c0b9fea1fdde517eee773dc43ba6c0f14b8594a7fd86e93b40a71e7ae9b118444713de4606eedc4391acfab10218a_cppui381,
-//          },
-//          {
-//              0xe9042dd6be3a4248432d05bdf942a3b7574fa29fabc16dd474af9b64aea7d6e66d5be0bb505a97d67105d045d5e533d_cppui381,
-//              0x79d8473ab5a748a8321a5f996ddde6cbaa2f723bfffcf3da67045bd122fbb639f1ea54d5bc7c7dcc9cec9834c666f37_cppui381,
-//          },
-//          {
-//              0x14567498d8bdd47076546f44689b737446d3d963c1d50bac61d87dee0fb1a6996067cfc9218cf45c680157823653cef9_cppui381,
-//              0x17345099fbfda7ecd2f69fe70493e62725b2fb48fac9a06e5584ea340e305687cbbecd043fdb3214b47f7224cae47cc7_cppui381,
-//          }}};
-//     constexpr const_set_t constants1 = {928943650};
-//
-//     static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
-//     static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
-//     static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
-//     static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
-//     static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
-//     static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
-//     static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
-//     static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
-//     static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
-//
-//     constexpr value_type not_square1 = {
-//         0x72076a0fb063f674c504b550525707cbea30259021a274bc9dcba7a9fdaf9e36011466eea87f70870c4b91a400d3395_cppui381,
-//         0x1127508c363a11a7b6f6572124fe882786e91ad0a2ce25e139949d37b8a3d6f6392920c23b07e3896dd4e8f743c2567f_cppui381,
-//     };
-//     static_assert(not_square1.is_square() == false, "not square error");
-//     static_assert(not_square1.pow(2).is_square() == true, "square error");
-// }
+BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fr) {
+    using policy_type = fields::bls12_fr<381>;
+    using value_type = typename policy_type::value_type;
+    using test_set_t = std::array<value_type, elements_set_size>;
+    using const_set_t = std::array<constant_type, constants_set_size>;
+
+    // TODO: scalar field precision could be less than for base field
+    constexpr test_set_t elements1 = {0x209a9bf596288853d71eb5a070164b2d81fe36e956f8f70376712767fabb15d9_cppui381,
+                                      0x661ad4fb4d130b7afaea293348f2107d9f4a62308af88282297733628cfc5ae7_cppui381,
+                                      0x12c7c99db99e16869ecf06cbaf6683a5cd8af516e1f31d869fe85acb87b770bf_cppui381,
+                                      0x2e6d6e4d72b2fa210f6e647530c612b5367178bbcbfed0804cf9f4046dbebaf3_cppui381,
+                                      0x65915fd6511eb3afcf0648a4b4b1c3f298433ecaee3cdd97254aa3ce8a67303d_cppui381,
+                                      0x413537eb2c5110a7ae3d6b40e02c965b03fc6dd2adf1ee06ece24ecff5762bb2_cppui381,
+                                      0x1c40f7a911c57190db5382d3fc2d96473780452b78e60474add8fb7f1eddda6_cppui381,
+                                      0x49757b377fe2a1de10c484db929a74ae02fdfae3aaab6098ea2ab8accfe613f0_cppui381,
+                                      0x363f979f222c9970dc4291b62bc3e8d77c31c1b2caa88afeb414f3584b952000_cppui381,
+                                      0x661ad4fb4d130b7afaea293348f2107d9f4a62308af88282297733628cfc5ae7_cppui381,
+                                      0x53530b5d9374f4f45c1b2267998b8cd7d1bf6d19a90564fb898ed8970544ea28_cppui381};
+    constexpr const_set_t constants1 = {811706348};
+
+    // TODO: the reason of the error "function parameter 'elements' with unknown value cannot be used in a constant
+    // expression" constexpr
+    //     bool res = check_field_operations_static(elements1, constants1);
+
+    static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
+    static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
+    static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
+    static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
+    static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
+    static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
+    static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
+    static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
+    static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
+}
+
+BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq) {
+    using policy_type = fields::bls12_fq<381>;
+    using value_type = typename policy_type::value_type;
+    using test_set_t = std::array<value_type, elements_set_size>;
+    using const_set_t = std::array<constant_type, constants_set_size>;
+
+    constexpr test_set_t elements1 = {
+        0x3d9cb62ebac9d6c7b94245d2d6144d500f218bb90a16a1e4f70d98fd44b4b9ee274de15a0a3d231dac1eaa449d31404_cppui381,
+        0x15c88779fc8a30cca95ec4bbf71aa4c302bccf7dc571e6e45fbf1ed24989ec23dff741ca00597f4ab1fc628304e8761b_cppui381,
+        0x19a252dce836ce3924f2e919247be99803aee83956135102af2ff8621dd537c2c26c1fdfa0fd517c8cbe4d274ebb8a1f_cppui381,
+        0x81255d328a2533a1d51075779924ce962ac94c2beb495f956e28d5e8172559f21299c4a519e52e6e2c4882144ea4894_cppui381,
+        0x4e02d210a60d52212c21056e050b7f7b6aa45c2fb85e692b1fef9e3e6fb43b2bf8103105f43daca458e4dccc9f5236c_cppui381,
+        0x7b396c5d7593ad8f72848ba5ac289aa01e431772142d43c9ee1b31fa896973dc4e9bc2b4147a463b583d54893a62808_cppui381,
+        0x68241cb698160ee94897ec6600bc997de3fed563dfc36a758334c71dc76a2473571cfbc0f674038ee748add41e4277a_cppui381,
+        0xbb4588b98237fefeba65f928e69da9106c690e02c70361947b39d0f5a6d462096431d375d4b66ae7e4daef9f2400a09_cppui381,
+        0x2e7ebd9b39f65a9485b32b52269baa84b2d33a80c8747c994b1e58c0caa09b4acf7685583898549db1029a1de657d8a_cppui381,
+        0x4388a703cf5b5cda1bce2fa4c31081461ba7c072e132bdb0771b3cead270a003eb4be34b0fa80b508029d7cfb173490_cppui381,
+        0x162746874dd3492dcf87835915ea6802638532c962e3a8a117bff9112265aa853c3721e910b02dcddf3d155bb62c96a7_cppui381};
+    constexpr const_set_t constants1 = {865433380};
+
+    static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
+    static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
+    static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
+    static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
+    static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
+    static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
+    static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
+    static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
+    static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
+
+    constexpr value_type not_square1 = {
+        0x122ca301fc65d4c9fd02b7d919e691c448b3209081835c99fab65c12c0e60a25f7eabe1b506e494b45175b95a4a9ebfe_cppui381,
+    };
+    static_assert(not_square1.is_square() == false, "not square error");
+    static_assert(not_square1.pow(2).is_square() == true, "square error");
+}
+
+BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq2) {
+    using policy_type = fields::fp2<fields::bls12_fq<381>>;
+    using value_type = typename policy_type::value_type;
+    using test_set_t = std::array<value_type, elements_set_size>;
+    using const_set_t = std::array<constant_type, constants_set_size>;
+
+    constexpr test_set_t elements1 = {
+        {{
+             0x5aa9d5160c21229d4c73871dab039631da3722131b00713055854b2e6ff4f8abe4430358fc70ba351fda87dc9abdbb2_cppui381,
+             0x2ccc1503d823ead782507cf3eb7c6b03ec4503bf8bb725111abe86ce8809f9c52ed32fa7178cdeb057f8ddb351b2de4_cppui381,
+         },
+         {
+             0xe9042dd6be3a4248432d05bdf942a3b7574fa29fabc16dd474af9b64aea7d6e66d5be0bb505a97d67105d045d5e533d_cppui381,
+             0x79d8473ab5a748a8321a5f996ddde6cbaa2f723bfffcf3da67045bd122fbb639f1ea54d5bc7c7dcc9cec9834c666f37_cppui381,
+         },
+         {
+             0x143ae02ecca5b64e58fa08cdba44639e93186c4b2c6c1df04ca34e6931e9ccf92519ee4144ccb520b90e0582270a2eef_cppui381,
+             0xa6a45c3e8dcb337fb46adc8d595a51cf967475fb8bb418eb81c2e29fab05afff20bd847cd4095c7cf4e575e81819d1b_cppui381,
+         },
+         {
+             0x111b6c5e2e5e549f9bb00fcc3e67bbff0ca5c37c2a7902f5253e2d9d92c5c840761a72288c156225a4ec4b796c4d3320_cppui381,
+             0x15304ec6cba7b0bd401f098beb25951ae898a49d2c40b5d2d26c7550cd01da5cd27a8dabc705060df5afc457e8b46958_cppui381,
+         },
+         {
+             0x16c00305e0c73e7c87eff62ffcadc3b54e06d73bc6ba13bf64a6e12881b3be9a8bd441e174fa59bb75287609946ad160_cppui381,
+             0x121e6a16e0b5a24b03bbb18ffb108c934781f5ecde689729b47c69a575592c4f6e3cf19d34140428cbf71a48dfef8bcb_cppui381,
+         },
+         {
+             0xb553aa2c1842453a98e70e3b56072c63b46e44263600e260ab0a965cdfe9f157c88606b1f8e1746a3fb50fb9357b764_cppui381,
+             0x59982a07b047d5af04a0f9e7d6f8d607d88a077f176e4a22357d0d9d1013f38a5da65f4e2f19bd60aff1bb66a365bc8_cppui381,
+         },
+         {
+             0x1004f42fded04e85fa8e21b945dc955abd3b349e52494a628d102e1240123038bdadd47f92750bdb8355b798d119a030_cppui381,
+             0xe7eeef4fb0a1d7470dad9548096233fcf664d7178e62b8c8d716197b84e31d7da79bbf5be757d63519b997c81d5c95e_cppui381,
+         },
+         {
+             0xef716581f3a2e7e2bf0f2850ea9bd3bbccf4933d4f4dcf616b181e1a894eb07e194b611cf5a2d532637b6ae800e33b6_cppui381,
+             0x2054d1d319feb67161dcd0ba4ab91a498197d89f44158513b8ddee4e46a8b50b6752621e17a61e0952d6daf2e0d9e8a_cppui381,
+         },
+         {
+             0x9f218e6d8b2f410874af5f7a8290dfa6ba23f059630fc7afe87138081863aed2730b5b19c3945c3bf5a03780d276861_cppui381,
+             0x120c0b9fea1fdde517eee773dc43ba6c0f14b8594a7fd86e93b40a71e7ae9b118444713de4606eedc4391acfab10218a_cppui381,
+         },
+         {
+             0xe9042dd6be3a4248432d05bdf942a3b7574fa29fabc16dd474af9b64aea7d6e66d5be0bb505a97d67105d045d5e533d_cppui381,
+             0x79d8473ab5a748a8321a5f996ddde6cbaa2f723bfffcf3da67045bd122fbb639f1ea54d5bc7c7dcc9cec9834c666f37_cppui381,
+         },
+         {
+             0x14567498d8bdd47076546f44689b737446d3d963c1d50bac61d87dee0fb1a6996067cfc9218cf45c680157823653cef9_cppui381,
+             0x17345099fbfda7ecd2f69fe70493e62725b2fb48fac9a06e5584ea340e305687cbbecd043fdb3214b47f7224cae47cc7_cppui381,
+         }}};
+    constexpr const_set_t constants1 = {928943650};
+
+    static_assert(elements1[e1] + elements1[e2] == elements1[e1_plus_e2], "add error");
+    static_assert(elements1[e1] - elements1[e2] == elements1[e1_minus_e2], "sub error");
+    static_assert(elements1[e1] * elements1[e2] == elements1[e1_mul_e2], "mul error");
+    static_assert(elements1[e1].doubled() == elements1[e1_dbl], "dbl error");
+    static_assert(elements1[e2].inversed() == elements1[e2_inv], "inv error");
+    static_assert(elements1[e1].pow(constants1[C1]) == elements1[e1_pow_C1], "pow error");
+    static_assert(elements1[e2].squared() == elements1[e2_pow_2], "sqr error");
+    static_assert((elements1[e2].squared()).sqrt() == elements1[e2_pow_2_sqrt], "sqrt error");
+    static_assert(-elements1[e1] == elements1[minus_e1], "neg error");
+
+    constexpr value_type not_square1 = {
+        0x72076a0fb063f674c504b550525707cbea30259021a274bc9dcba7a9fdaf9e36011466eea87f70870c4b91a400d3395_cppui381,
+        0x1127508c363a11a7b6f6572124fe882786e91ad0a2ce25e139949d37b8a3d6f6392920c23b07e3896dd4e8f743c2567f_cppui381,
+    };
+    static_assert(not_square1.is_square() == false, "not square error");
+    static_assert(not_square1.pow(2).is_square() == true, "square error");
+}
 
 BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq6) {
     using policy_type = fields::fp6_3over2<fields::bls12_fq<381>>;
