@@ -11,6 +11,7 @@
 
 #include <boost/random/detail/sobol_table.hpp>
 #include <boost/random/detail/gray_coded_qrng.hpp>
+#include <boost/assert.hpp>
 
 namespace boost {
 namespace random {
@@ -61,7 +62,7 @@ public:
       if (poly > std::numeric_limits<value_type>::max()) {
         boost::throw_exception( std::range_error("sobol: polynomial value outside the given value type range") );
       }
-      const unsigned degree = multiprecision::msb(poly); // integer log2(poly)
+      const unsigned degree = qrng_detail::msb(poly); // integer log2(poly)
 
       // set initial values of m from table
       for (unsigned k = 0; k != degree; ++k)
