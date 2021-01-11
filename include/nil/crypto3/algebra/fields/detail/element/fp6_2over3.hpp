@@ -50,77 +50,77 @@ namespace nil {
 
                         data_type data;
 
-                        element_fp6_2over3() {
+                        constexpr element_fp6_2over3() {
                             data = data_type({underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        element_fp6_2over3(underlying_type in_data0, underlying_type in_data1) {
+                        constexpr element_fp6_2over3(underlying_type in_data0, underlying_type in_data1) {
                             data = data_type({in_data0, in_data1});
                         }
 
-                        element_fp6_2over3(const data_type &in_data) {
+                        constexpr element_fp6_2over3(const data_type &in_data) {
                             data = data_type({in_data[0], in_data[1]});
                         };
 
-                        element_fp6_2over3(const element_fp6_2over3 &other) {
+                        constexpr element_fp6_2over3(const element_fp6_2over3 &other) {
                             data[0] = underlying_type(other.data[0]);
                             data[1] = underlying_type(other.data[1]);
                         };
 
-                        inline static element_fp6_2over3 zero() {
+                        constexpr inline static element_fp6_2over3 zero() {
                             return element_fp6_2over3(underlying_type::zero(), underlying_type::zero());
                         }
 
-                        inline static element_fp6_2over3 one() {
+                        constexpr inline static element_fp6_2over3 one() {
                             return element_fp6_2over3(underlying_type::one(), underlying_type::zero());
                         }
 
-                        bool operator==(const element_fp6_2over3 &B) const {
+                        constexpr bool operator==(const element_fp6_2over3 &B) const {
                             return (data[0] == B.data[0]) && (data[1] == B.data[1]);
                         }
 
-                        bool operator!=(const element_fp6_2over3 &B) const {
+                        constexpr bool operator!=(const element_fp6_2over3 &B) const {
                             return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                         }
 
-                        element_fp6_2over3 &operator=(const element_fp6_2over3 &B) {
+                        constexpr element_fp6_2over3 &operator=(const element_fp6_2over3 &B) {
                             data[0] = B.data[0];
                             data[1] = B.data[1];
 
                             return *this;
                         }
 
-                        element_fp6_2over3 operator+(const element_fp6_2over3 &B) const {
+                        constexpr element_fp6_2over3 operator+(const element_fp6_2over3 &B) const {
                             return element_fp6_2over3(data[0] + B.data[0], data[1] + B.data[1]);
                         }
 
-                        element_fp6_2over3 doubled() const {
+                        constexpr element_fp6_2over3 doubled() const {
                             return element_fp6_2over3(data[0].doubled(), data[1].doubled());
                         }
 
-                        element_fp6_2over3 operator-(const element_fp6_2over3 &B) const {
+                        constexpr element_fp6_2over3 operator-(const element_fp6_2over3 &B) const {
                             return element_fp6_2over3(data[0] - B.data[0], data[1] - B.data[1]);
                         }
 
-                        element_fp6_2over3 &operator-=(const element_fp6_2over3 &B) {
+                        constexpr element_fp6_2over3 &operator-=(const element_fp6_2over3 &B) {
                             data[0] -= B.data[0];
                             data[1] -= B.data[1];
 
                             return *this;
                         }
 
-                        element_fp6_2over3 &operator+=(const element_fp6_2over3 &B) {
+                        constexpr element_fp6_2over3 &operator+=(const element_fp6_2over3 &B) {
                             data[0] += B.data[0];
                             data[1] += B.data[1];
 
                             return *this;
                         }
 
-                        element_fp6_2over3 operator-() const {
+                        constexpr element_fp6_2over3 operator-() const {
                             return zero() - *this;
                         }
 
-                        element_fp6_2over3 operator*(const element_fp6_2over3 &B) const {
+                        constexpr element_fp6_2over3 operator*(const element_fp6_2over3 &B) const {
                             const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
                             return element_fp6_2over3(A0B0 + mul_by_non_residue(A1B1),
@@ -132,7 +132,7 @@ namespace nil {
                             // compute squared root with Tonelli--Shanks
                         }
 
-                        element_fp6_2over3 squared() const {
+                        constexpr element_fp6_2over3 squared() const {
                             // return (*this) * (*this);    // maybe can be done more effective
 
                             /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly
@@ -145,11 +145,11 @@ namespace nil {
                         }
 
                         template<typename PowerType>
-                        element_fp6_2over3 pow(const PowerType &pwr) const {
+                        constexpr element_fp6_2over3 pow(const PowerType &pwr) const {
                             return element_fp6_2over3(power(*this, pwr));
                         }
 
-                        element_fp6_2over3 inversed() const {
+                        constexpr element_fp6_2over3 inversed() const {
 
                             /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                              * Curves"; Algorithm 8 */
@@ -167,7 +167,7 @@ namespace nil {
                         }
 
                         template<typename PowerType>
-                        element_fp6_2over3 Frobenius_map(const PowerType &pwr) const {
+                        constexpr element_fp6_2over3 Frobenius_map(const PowerType &pwr) const {
                             // return element_fp6_2over3(data[0].Frobenius_map(pwr),
                             //                           policy_type::Frobenius_coeffs_c1[pwr % 6] *
                             //                           data[1].Frobenius_map(pwr)});
@@ -177,7 +177,7 @@ namespace nil {
                                     data[1].Frobenius_map(pwr));
                         }
 
-                        element_fp6_2over3 unitary_inversed() const {
+                        constexpr element_fp6_2over3 unitary_inversed() const {
                             return element_fp6_2over3(data[0], -data[1]);
                         }
 
@@ -263,7 +263,7 @@ namespace nil {
                             return res;
                         }
 
-                        /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
+                        constexpr /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
                             return underlying_type(non_residue * A.data[2], A.data[0], A.data[1]);
                         }
 
@@ -284,7 +284,7 @@ namespace nil {
                     };
 
                     template<typename FieldParams>
-                    element_fp6_2over3<FieldParams>
+                    constexpr element_fp6_2over3<FieldParams>
                         operator*(const typename FieldParams::underlying_type::underlying_type &lhs,
                                   const element_fp6_2over3<FieldParams> &rhs) {
 
@@ -292,7 +292,7 @@ namespace nil {
                     }
 
                     template<typename FieldParams>
-                    element_fp6_2over3<FieldParams>
+                    constexpr element_fp6_2over3<FieldParams>
                         operator*(const element_fp6_2over3<FieldParams> &lhs,
                                   const typename FieldParams::underlying_type::underlying_type &rhs) {
 
