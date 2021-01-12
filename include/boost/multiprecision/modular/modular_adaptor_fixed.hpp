@@ -193,9 +193,9 @@ constexpr void assign_components(modular_adaptor<modular_fixed_cpp_int_backend<M
                                  const Backend1& a, const Backend2& b)
 {
    // BOOST_ASSERT_MSG(MinBits == eval_msb(b) + 1, "modulus precision should match used backend");
-   result.base_data() = a;
+   // result.base_data() = a;
    result.mod_data() = b;
-   result.mod_data().adjust_modular(result.base_data());
+   result.mod_data().adjust_modular(result.base_data(), a);
 }
 
 template <unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>

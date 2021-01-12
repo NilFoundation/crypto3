@@ -316,6 +316,17 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       barrett_reduce(result, result);
    }
 
+   template <typename Backend1>
+   constexpr void barrett_reduce(Backend1& result, std::size_t input) const
+   {
+      using in_number_type = typename mpl::if_c<bool(sizeof(std::size_t) * CHAR_BIT > MinBits),
+          number<modular_fixed_cpp_int_backend<sizeof(std::size_t) * CHAR_BIT, SignType, Checked>>,
+          number_type>::type;
+
+      in_number_type input_b(input);
+      barrett_reduce(result, input_b.backend());
+   }
+
    template <typename Backend1, typename Backend2,
              typename = typename std::enable_if<
                  /// result should fit in the output parameter

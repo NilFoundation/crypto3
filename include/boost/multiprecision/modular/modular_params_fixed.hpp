@@ -70,8 +70,8 @@ class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked> >
    constexpr typename std::enable_if<std::is_same<Backend1, Backend>::value>::type
    adjust_modular(Backend1& result, Backend2 input)
    {
-      get_mod_obj().barrett_reduce(input);
-      Backend_doubled_limbs tmp(input);
+      Backend_doubled_limbs tmp;
+      get_mod_obj().barrett_reduce(tmp, input);
       if (check_montgomery_constraints(get_mod_obj()))
       {
          //
