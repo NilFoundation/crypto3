@@ -45,7 +45,8 @@ namespace nil {
 
                     // template<typename SeedType, typename KeyInfoType>
                     // static inline private_key_type key_gen(const SeedType &seed,
-                    //                                        const KeyInfoType &key_info = std::array<std::uint8_t, 0> {}) {
+                    //                                        const KeyInfoType &key_info = std::array<std::uint8_t, 0>
+                    //                                        {}) {
                     //     return bls_functions::key_gen(seed, key_info);
                     // }
 
@@ -74,7 +75,7 @@ namespace nil {
                     typedef typename bls_functions::public_key_type public_key_type;
 
                     static inline public_key_type key_gen(const private_key_type &private_key) {
-                        return bls_functions::sk_to_pk();
+                        return bls_functions::sk_to_pk(private_key);
                     }
 
                     static inline bool key_validate(const public_key_type &public_key) {
@@ -82,14 +83,15 @@ namespace nil {
                     }
 
                     template<typename MsgType, typename DstType>
-                    static inline bool verify(const public_key_type &public_key, const MsgType &message, const DstType &dst,
-                                              const signature_type &signature) {
+                    static inline bool verify(const public_key_type &public_key, const MsgType &message,
+                                              const DstType &dst, const signature_type &signature) {
                         return bls_functions::core_verify(public_key, message, dst, signature);
                     }
 
                     template<typename PubkeyRangeType, typename MsgRangeType, typename DstType>
-                    static inline bool aggregate_verify(const PubkeyRangeType &public_keys, const MsgRangeType &messages,
-                                                        const DstType &dst, const signature_type &signature) {
+                    static inline bool aggregate_verify(const PubkeyRangeType &public_keys,
+                                                        const MsgRangeType &messages, const DstType &dst,
+                                                        const signature_type &signature) {
                         return bls_functions::core_aggregate_verify(public_keys, messages, dst, signature);
                     }
                 };

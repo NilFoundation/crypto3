@@ -37,31 +37,39 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            //
+            // Minimal-signature-size
+            // Random oracle version of hash-to-point
+            //
             template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
             struct bls_signature_mss_ro_policy {
                 typedef CurveType curve_type;
                 typedef HashType hash_type;
 
-                typedef detail::bls_policy_mss_ro<curve_type, hash_type> bls_policy;
+                typedef detail::bls_policy_mss_ro<curve_type, hash_type> policy_type;
 
-                typedef detail::bls_public_key_policy<bls_policy> public_key_policy_type;
-                typedef detail::bls_private_key_policy<bls_policy> private_key_policy_type;
+                typedef detail::bls_public_key_policy<policy_type> public_key_policy_type;
+                typedef detail::bls_private_key_policy<policy_type> private_key_policy_type;
             };
 
+            //
+            // Minimal-pubkey-size
+            // Random oracle version of hash-to-point
+            //
             template<typename CurveType = algebra::curves::bls12_381, typename HashType = hashes::sha2<256>>
             struct bls_signature_mps_ro_policy {
                 typedef CurveType curve_type;
                 typedef HashType hash_type;
 
-                typedef detail::bls_policy_mps_ro<curve_type, hash_type> bls_policy;
+                typedef detail::bls_policy_mps_ro<curve_type, hash_type> policy_type;
 
-                typedef detail::bls_public_key_policy<bls_policy> public_key_policy_type;
-                typedef detail::bls_private_key_policy<bls_policy> private_key_policy_type;
+                typedef detail::bls_public_key_policy<policy_type> public_key_policy_type;
+                typedef detail::bls_private_key_policy<policy_type> private_key_policy_type;
             };
 
             namespace modes {
                 template<typename bls_signature_policy>
-                struct bls_basic_signature_scheme {
+                struct bls_basic_scheme {
                     typedef typename bls_signature_policy::private_key_policy_type private_key_policy_type;
                     typedef typename bls_signature_policy::public_key_policy_type public_key_policy_type;
 
@@ -97,7 +105,7 @@ namespace nil {
                 // Message augmentation
                 // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
                 template<typename bls_signature_policy>
-                struct bls_augmentation_signature_scheme {
+                struct bls_augmentation_scheme {
                     typedef typename bls_signature_policy::public_key_policy_type public_key_policy_type;
                     typedef typename bls_signature_policy::private_key_policy_type private_key_policy_type;
                 };
@@ -105,7 +113,7 @@ namespace nil {
                 // Proof of possession
                 // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
                 template<typename bls_signature_policy>
-                struct bls_pop_signature_scheme {
+                struct bls_pop_scheme {
                     typedef typename bls_signature_policy::public_key_policy_type public_key_policy_type;
                     typedef typename bls_signature_policy::private_key_policy_type private_key_policy_type;
                 };

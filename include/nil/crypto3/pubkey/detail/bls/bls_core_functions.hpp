@@ -44,24 +44,24 @@ namespace nil {
                 using namespace boost::multiprecision;
                 using namespace nil::crypto3::algebra::curves::detail;
 
-                template<typename bls_policy>
-                struct bls_core_functions : bls_policy {
-                    using typename bls_policy::private_key_type;
-                    using typename bls_policy::public_key_type;
-                    using typename bls_policy::signature_type;
-                    using typename bls_policy::gt_value_type;
-                    using typename bls_policy::hash_type;
-                    using typename bls_policy::number_type;
+                template<typename policy_type>
+                struct bls_core_functions {
+                    typedef typename policy_type::gt_value_type gt_value_type;
+                    typedef typename policy_type::hash_type hash_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                    using bls_policy::hash_to_point;
-                    using bls_policy::pairing;
+                    typedef typename policy_type::private_key_type private_key_type;
+                    typedef typename policy_type::public_key_type public_key_type;
+                    typedef typename policy_type::signature_type signature_type;
 
-                    using bls_policy::private_key_bits;
+                    // using policy_type::hash_to_point;
+                    // using policy_type::pairing;
 
-                    constexpr static std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
+                    constexpr static const std::size_t private_key_bits = policy_type::private_key_bits;
+                    constexpr static const std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
                                                      static_cast<std::size_t>((3 * private_key_bits) % 16 != 0);
                     static_assert(L < 0x10000, "L is required to fit in 2 octets");
-                    constexpr static std::array<std::uint8_t, 2> L_os = {static_cast<std::uint8_t>(L >> 8u),
+                    constexpr static const std::array<std::uint8_t, 2> L_os = {static_cast<std::uint8_t>(L >> 8u),
                                                                          static_cast<std::uint8_t>(L % 0x100)};
 
                     // template<typename IkmType, typename KeyInfoType,
@@ -80,7 +80,7 @@ namespace nil {
                     //                                          73, 71, 45, 75, 69,
                     //                                          89, 71, 69, 78, 45,
                     //                                          83, 65, 76, 84, 45};
-                    //     number_type sk(0);
+                    //     modulus_type sk(0);
                     //     cpp_int e;
                     //
                     //     // TODO: use accumulators when they will be fixed
@@ -98,7 +98,7 @@ namespace nil {
                     //         import_bits(e, okm.begin(),okm.end());
                     //     }
                     //     // TODO: via modular type
-                    //     return private_key_type(static_cast<number_type>(e));
+                    //     return private_key_type(static_cast<modulus_type>(e));
                     // }
 
                     static inline bool private_key_validate(const private_key_type &sk) {
@@ -130,7 +130,7 @@ namespace nil {
                                                            const DstType &dst) {
                         assert(private_key_validate(sk));
 
-                        signature_type Q = hash_to_point(msg, dst);
+                        signature_type Q = policy_type::hash_to_point(msg, dst);
                         return sk * Q;
                     }
 
@@ -138,8 +138,8 @@ namespace nil {
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline bool core_verify(const public_key_type &pk, const MsgType &msg,
-                                                   const DstType &dst, const signature_type &sig) {
+                    static inline bool core_verify(const public_key_type &pk, const MsgType &msg, const DstType &dst,
+                                                   const signature_type &sig) {
                         // TODO: subgroup_check should be reimplemented as class method
                         if (!subgroup_check(sig)) {
                             return false;
@@ -147,14 +147,15 @@ namespace nil {
                         if (!key_validate(pk)) {
                             return false;
                         }
-                        signature_type Q = hash_to_point(msg, dst);
-                        auto C1 = pairing(Q, pk);
-                        auto C2 = pairing(sig, public_key_type::one());
+                        signature_type Q = policy_type::hash_to_point(msg, dst);
+                        auto C1 = policy_type::pairing(Q, pk);
+                        auto C2 = policy_type::pairing(sig, public_key_type::one());
                         return C1 == C2;
                     }
 
-                    template<typename SignatureRangeType, typename = typename std::enable_if<
-                        std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
+                    template<typename SignatureRangeType,
+                             typename = typename std::enable_if<
+                                 std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
                     static inline signature_type aggregate(const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
 
@@ -174,8 +175,7 @@ namespace nil {
                                  std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n,
-                                                             const MsgRangeType &msg_n,
+                    static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
                                                              const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
@@ -195,10 +195,10 @@ namespace nil {
                             if (!key_validate(*pk_n_iter)) {
                                 return false;
                             }
-                            signature_type Q = hash_to_point(*msg_n_iter++, dst);
-                            C1 = C1 * pairing(Q, *pk_n_iter++);
+                            signature_type Q = policy_type::hash_to_point(*msg_n_iter++, dst);
+                            C1 = C1 * policy_type::pairing(Q, *pk_n_iter++);
                         }
-                        return C1 == pairing(sig, public_key_type::one());
+                        return C1 == policy_type::pairing(sig, public_key_type::one());
                     }
                 };
             }    // namespace detail
@@ -206,4 +206,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
+#endif    // CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP

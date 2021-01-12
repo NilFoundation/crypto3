@@ -222,6 +222,8 @@ namespace nil {
             GENERATE_HAS_MEMBER_FUNCTION(generate)
             GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
 
+            GENERATE_HAS_MEMBER_TYPE(extension_policy)
+            GENERATE_HAS_MEMBER_TYPE(curve_type)
             GENERATE_HAS_MEMBER_TYPE(underlying_field_type)
             GENERATE_HAS_MEMBER_TYPE(value_type)
             GENERATE_HAS_MEMBER_TYPE(modulus_type)
@@ -241,6 +243,10 @@ namespace nil {
             GENERATE_HAS_MEMBER(arity)
             GENERATE_HAS_MEMBER(p)
             GENERATE_HAS_MEMBER(q)
+
+            GENERATE_HAS_MEMBER_FUNCTION(to_affine_coordinates)
+            GENERATE_HAS_MEMBER_FUNCTION(to_special)
+            GENERATE_HAS_MEMBER_FUNCTION(is_special)
 
             template<typename T>
             struct is_iterator {
@@ -349,7 +355,7 @@ namespace nil {
             template<typename T> //TODO: we should add some other params to curve group policy to identify it more clearly
             struct is_curve_group {
                 static const bool value = has_value_type<T>::value && has_underlying_field_type<T>::value &&
-                                          has_value_bits<T>::value;
+                                          has_value_bits<T>::value && has_curve_type<T>::value;
                 typedef T type;
             };
 
@@ -362,11 +368,11 @@ namespace nil {
             };
 
             template<typename T>
-            struct is_fp_field {
+            struct is_extended_field {
                 static const bool value = has_value_type<T>::value && has_value_bits<T>::value &&
                                           has_modulus_type<T>::value && has_modulus_bits<T>::value &&
                                           has_number_type<T>::value && has_arity<T>::value &&
-                                          T::arity == 1;
+                                          has_extension_policy<T>::value;
                 typedef T type;
             };
 

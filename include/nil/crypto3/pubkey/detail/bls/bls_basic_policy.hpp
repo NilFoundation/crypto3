@@ -48,27 +48,35 @@ namespace nil {
                     typedef typename curve_type::pairing_policy pairing_type;
                     typedef typename curve_type::scalar_field_type field_type;
                     typedef typename field_type::value_type private_key_type;
-                    typedef typename field_type::modulus_type number_type;
-                    typedef typename pairing_type::GT_type gt_value_type;
+                    typedef typename private_key_type::modulus_type modulus_type;
+                    typedef typename pairing_type::gt_type gt_value_type;
 
                     constexpr static std::size_t private_key_bits = field_type::modulus_bits;
-                    constexpr static number_type r = curve_type::q;
+                    constexpr static modulus_type r = curve_type::q;
                 };
 
-                /// Minimal-signature-size
-                /// Random oracle version of hash-to-point
+                //
+                // Minimal-signature-size
+                // Random oracle version of hash-to-point
+                //
                 template<typename CurveType, typename HashType>
-                struct bls_policy_mss_ro : bls_basic_policy<CurveType, HashType> {
-                    using typename bls_basic_policy<CurveType, HashType>::curve_type;
-                    using typename bls_basic_policy<CurveType, HashType>::gt_value_type;
-                    using typename bls_basic_policy<CurveType, HashType>::pairing_type;
+                struct bls_policy_mss_ro {
+                    typedef bls_basic_policy<CurveType, HashType> basic_policy;
+
+                    typedef typename basic_policy::curve_type curve_type;
+                    typedef typename basic_policy::hash_type hash_type;
+                    typedef typename basic_policy::gt_value_type gt_value_type;
+                    typedef typename basic_policy::pairing_type pairing_type;
+                    typedef typename basic_policy::modulus_type modulus_type;
 
                     typedef typename curve_type::g2_type public_key_group_type;
                     typedef typename curve_type::g1_type signature_group_type;
 
+                    typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
 
+                    constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
@@ -88,20 +96,28 @@ namespace nil {
                     }
                 };
 
-                /// Minimal-pubkey-size
-                /// Random oracle version of hash-to-point
+                //
+                // Minimal-pubkey-size
+                // Random oracle version of hash-to-point
+                //
                 template<typename CurveType, typename HashType>
-                struct bls_policy_mps_ro : bls_basic_policy<CurveType, HashType> {
-                    using typename bls_basic_policy<CurveType, HashType>::curve_type;
-                    using typename bls_basic_policy<CurveType, HashType>::gt_value_type;
-                    using typename bls_basic_policy<CurveType, HashType>::pairing_type;
+                struct bls_policy_mps_ro {
+                    typedef bls_basic_policy<CurveType, HashType> basic_policy;
+
+                    typedef typename basic_policy::curve_type curve_type;
+                    typedef typename basic_policy::hash_type hash_type;
+                    typedef typename basic_policy::gt_value_type gt_value_type;
+                    typedef typename basic_policy::pairing_type pairing_type;
+                    typedef typename basic_policy::modulus_type modulus_type;
 
                     typedef typename curve_type::g1_type public_key_group_type;
                     typedef typename curve_type::g2_type signature_group_type;
 
+                    typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
 
+                    constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
@@ -125,4 +141,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_BLS_BASIC_POLICY_HPP
+#endif    // CRYPTO3_PUBKEY_BLS_BASIC_POLICY_HPP
