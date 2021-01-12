@@ -44,6 +44,9 @@ get_limb_value(const Backend& b, const std::size_t i)
    return 0;
 }
 
+//
+// function return real limb of nontrivial backend.
+//
 template <typename, typename Backend>
 typename std::enable_if<!is_trivial_cpp_int<Backend>::value, limb_type>::type
 constexpr custom_get_limb_value(const Backend& b, const std::size_t i)
@@ -51,6 +54,10 @@ constexpr custom_get_limb_value(const Backend& b, const std::size_t i)
    return b.limbs()[i];
 }
 
+//
+// function works with trivial backend.
+// return value of logical limb as if trivial backend consists of several logical limbs.
+//
 template <typename internal_limb_type, typename Backend>
 typename std::enable_if<is_trivial_cpp_int<Backend>::value &&
                             sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >= sizeof(internal_limb_type),
@@ -60,6 +67,9 @@ constexpr custom_get_limb_value(const Backend& b, const std::size_t i)
    return static_cast<internal_limb_type>(b.limbs()[0] >> (sizeof(internal_limb_type) * CHAR_BIT * i));
 }
 
+//
+// function set limb value of nontrivial backend.
+//
 template <typename, typename Backend>
 typename std::enable_if<!is_trivial_cpp_int<Backend>::value>::type
 constexpr custom_set_limb_value(Backend& b, const std::size_t i, limb_type v)
@@ -67,6 +77,14 @@ constexpr custom_set_limb_value(Backend& b, const std::size_t i, limb_type v)
    b.limbs()[i] = v;
 }
 
+//
+// WARNING: using of this function is correct in current implementation of modular adaptor
+// DO NOT USE THIS FUNCTION IN GENERAL CASE
+//
+// function works with trivial backend.
+// set value of logical limb as if trivial backend consists of several logical limbs.
+// modified logical limb is supposed to have zero value.
+//
 template <typename internal_limb_type, typename Backend>
 typename std::enable_if<is_trivial_cpp_int<Backend>::value &&
                         sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) >= sizeof(internal_limb_type)>::type
@@ -74,6 +92,31 @@ constexpr custom_set_limb_value(Backend& b, const std::size_t i, internal_limb_t
 {
    using local_limb_type = typename trivial_limb_type<max_precision<Backend>::value>::type;
 
+   //
+   // commented part seems to be correct in general case
+   //
+   // std::size_t upper_bytes_count = sizeof(local_limb_type) - sizeof(internal_limb_type) * (i + 1);
+   // std::size_t lower_bytes_count = sizeof(internal_limb_type) * i;
+   // unsigned char byte_mask = ~0;
+   //
+   // local_limb_type mask = 0;
+   // for (std::size_t j = 0; j < upper_bytes_count; j++)
+   // {
+   //    mask |= byte_mask;
+   //    mask <<= CHAR_BIT;
+   // }
+   // mask <<= (sizeof(internal_limb_type) - 1) * CHAR_BIT;
+   // if (lower_bytes_count)
+   // {
+   //    for (std::size_t j = 0; j < lower_bytes_count - 1; j++)
+   //    {
+   //       mask |= byte_mask;
+   //       mask <<= CHAR_BIT;
+   //    }
+   //    mask |= byte_mask;
+   // }
+   //
+   // b.limbs()[0] &= mask;
    b.limbs()[0] |= (static_cast<local_limb_type>(v) << (sizeof(internal_limb_type) * CHAR_BIT * i));
 }
 
@@ -104,6 +147,10 @@ constexpr bool check_montgomery_constraints(const modular_functions_fixed<Backen
    return check_montgomery_constraints(mo.get_mod().backend());
 }
 
+//
+// a little trick to prevent error in constexpr execution of eval_right_shift
+// due to non-constexpr nature of right_shift_byte
+//
 template <typename Backend>
 constexpr void custom_right_shift(Backend& b, unsigned s)
 {
@@ -378,7 +425,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       // TODO: maybe reduce input parameters
       /// input parameters should be lesser than modulus
-      BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+      // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
 
       Backend_padded_limbs tmp(x);
       eval_add(tmp, y);
@@ -401,7 +448,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       // TODO: maybe reduce input parameters
       /// input parameters should be lesser than modulus
-      BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+      // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
 
       Backend_doubled_limbs tmp(x);
       eval_multiply(tmp, y);
@@ -414,6 +461,9 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       montgomery_mul(result, result, y);
    }
 
+   //
+   // WARNING: could be errors here due to trivial backend -- more tests needed
+   //
    template <typename Backend1, typename Backend2, typename Backend3,
              /// result should fit in the output parameter
              typename = typename std::enable_if<max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
@@ -425,7 +475,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       // TODO: maybe reduce input parameters
       /// input parameters should be lesser than modulus
-      BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
+      // BOOST_ASSERT(eval_lt(x, get_mod().backend()) && eval_lt(y, get_mod().backend()));
 
       Backend_padded_limbs A(internal_limb_type(0u));
 
@@ -440,7 +490,6 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
          internal_double_limb_type z = static_cast<internal_double_limb_type>(get_limb_value(y, 0)) *
                                            static_cast<internal_double_limb_type>(get_limb_value(x, i)) +
                                        A.limbs()[0] + k;
-         // TODO: maybe error here in static_cast<internal_limb_type>(z) if internal_double_limb_type is multiprecision::number
          internal_double_limb_type z2 = static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), 0)) *
                                             static_cast<internal_double_limb_type>(u_i) +
                                         static_cast<internal_limb_type>(z) + k2;
@@ -452,7 +501,6 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
             internal_double_limb_type t = static_cast<internal_double_limb_type>(get_limb_value(y, j)) *
                                               static_cast<internal_double_limb_type>(get_limb_value(x, i)) +
                                           A.limbs()[j] + k;
-            // TODO: maybe error here in static_cast<internal_limb_type>(t) if internal_double_limb_type is multiprecision::number
             internal_double_limb_type t2 = static_cast<internal_double_limb_type>(get_limb_value(get_mod().backend(), j)) *
                                                static_cast<internal_double_limb_type>(u_i) +
                                            static_cast<internal_limb_type>(t) + k2;
@@ -470,8 +518,8 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       {
          eval_subtract(A, get_mod().backend());
       }
-      // TODO: maybe bitwise and is not necessary
-      eval_bitwise_and(A, get_modulus_mask());
+      // TODO: maybe bitwise AND is not necessary
+      // eval_bitwise_and(A, get_modulus_mask());
       result = A;
    }
 
@@ -492,7 +540,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       // TODO: maybe reduce input parameter
       /// input parameter should be lesser than modulus
-      BOOST_ASSERT(eval_lt(a, get_mod().backend()));
+      // BOOST_ASSERT(eval_lt(a, get_mod().backend()));
 
       if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
       {
@@ -544,7 +592,7 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
 
       // TODO: maybe reduce input parameter
       /// input parameter should be lesser than modulus
-      BOOST_ASSERT(eval_lt(a, get_mod().backend()));
+      // BOOST_ASSERT(eval_lt(a, get_mod().backend()));
 
       Backend_doubled_limbs tmp(static_cast<internal_limb_type>(1u));
       eval_multiply(tmp, get_r2());

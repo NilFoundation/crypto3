@@ -11,6 +11,8 @@
 
 #include <boost/multiprecision/detail/default_ops.hpp>
 
+#include <boost/multiprecision/modular/modular_functions_fixed.hpp>
+
 namespace boost {
 namespace multiprecision {
 
@@ -62,7 +64,7 @@ constexpr int eval_jacobi(const Backend& a, const Backend& n)
       }
 
       size_t shifts = eval_lsb(x);
-      eval_right_shift(x, shifts);
+      backends::custom_right_shift(x, shifts);
       if (shifts & 1)
       {
          std::size_t y_mod_8 = eval_integer_modulus(y, 8);
