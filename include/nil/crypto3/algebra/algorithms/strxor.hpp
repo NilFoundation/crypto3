@@ -43,9 +43,12 @@ namespace nil {
                        OutputIterator out) {
                 BOOST_ASSERT(std::distance(first1, last1) == std::distance(first2, last2));
 
-                while (first1 != last1 && first2 != last2) {
-                    *out++ = *first1++ ^ *first2++;
+                for (auto i = 0; i < std::distance(first1, last1); i++) {
+                    out[i] = first1[i] ^ first2[i];
                 }
+                // while (first1 != last1 && first2 != last2) {
+                //     *out++ = *first1++ ^ *first2++;
+                // }
             }
 
             template<typename InputType, typename OutputType>
@@ -57,7 +60,10 @@ namespace nil {
                 BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()) &&
                              std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
 
-                strxor(in1.begin(), in1.end(), in2.begin(), in2.end(), out.begin());
+                // strxor(in1.begin(), in1.end(), in2.begin(), in2.end(), out.begin());
+                for (auto i = 0; i < std::distance(in1.begin(), in1.end()); i++) {
+                    out[i] = in1[i] ^ in2[i];
+                }
             }
         }    // namespace algebra
     }        // namespace crypto3
