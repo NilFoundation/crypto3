@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_SIMPLE_EXAMPLE_HPP
@@ -21,7 +37,7 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_example<FieldType> gen_r1cs_example_from_blueprint(const std::size_t num_constraints,
-                                                                      const std::size_t num_inputs);
+                                                                        const std::size_t num_inputs);
 
                 /* NOTE: all examples here actually generate one constraint less to account for soundness constraint in
                  * QAP */
@@ -31,33 +47,34 @@ namespace nil {
                     const std::size_t new_num_constraints = num_constraints - 1;
 
                     /* construct dummy example: inner products of two vectors */
-                    blueprint<FieldType> pb;
+                    blueprint<FieldType> bp;
                     blueprint_variable_vector<FieldType> A;
                     blueprint_variable_vector<FieldType> B;
                     variable<FieldType> res;
 
-                    // the variables on the protoboard are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
+                    // the variables on the blueprint are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
                     // B[0], ..., B[num_constraints-1])
-                    res.allocate(pb);
-                    A.allocate(pb, new_num_constraints);
-                    B.allocate(pb, new_num_constraints);
+                    res.allocate(bp);
+                    A.allocate(bp, new_num_constraints);
+                    B.allocate(bp, new_num_constraints);
 
-                    inner_product_component<FieldType> compute_inner_product(pb, A, B, res, "compute_inner_product");
+                    inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
                     compute_inner_product.generate_r1cs_constraints();
 
                     /* fill in random example */
                     for (std::size_t i = 0; i < new_num_constraints; ++i) {
-                        pb.val(A[i]) = field_random_element<FieldType>();
-                        pb.val(B[i]) = field_random_element<FieldType>();
+                        bp.val(A[i]) = algebra::random_element<FieldType>();
+                        bp.val(B[i]) = algebra::random_element<FieldType>();
                     }
 
                     compute_inner_product.generate_r1cs_witness();
-                    return r1cs_example<FieldType>(pb.get_constraint_system(), pb.primary_input(), pb.auxiliary_input());
+                    return r1cs_example<FieldType>(
+                        bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
                 }
 
-            }
-        }    // namespace zk
-    }        // namespace crypto3
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_SIMPLE_EXAMPLE_HPP

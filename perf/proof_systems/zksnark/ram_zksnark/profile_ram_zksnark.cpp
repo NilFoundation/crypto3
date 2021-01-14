@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #include <boost/program_options.hpp>
@@ -26,7 +42,7 @@ void simulate_random_memory_contents(const tinyram_architecture_params &ap, cons
     memory_contents init_random =
         random_memory_contents(num_addresses, value_size, program_size + (input_size + 1) / 2);
 
-    std::cout << "Initialize random delegated memory" <<std::endl;
+    std::cout << "Initialize random delegated memory" << std::endl;
     delegated_ra_memory<FieldType> dm_random(num_addresses, value_size, init_random);
 }
 
@@ -42,7 +58,7 @@ void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const s
     ram_zksnark_proof<CurveType> pi;
     ram_zksnark_verification_key<CurveType> vk = ram_zksnark_verification_key<CurveType>::dummy_verification_key(ap);
 
-    std::cout << "Verify fake proof" <<std::endl;
+    std::cout << "Verify fake proof" << std::endl;
     ram_zksnark_verifier<CurveType>(vk, example.boot_trace, time_bound, pi);
 }
 
@@ -65,9 +81,12 @@ void print_ram_zksnark_verifier_profiling() {
                 const double total = algebra::last_times["Call to ram_zksnark_verifier"];
                 const double rest = total - (input_map + preprocessing + accumulate + pairings);
 
-                const double delegated_ra_memory_init = algebra::last_times["Construct delegated_ra_memory from memory map"];
-                simulate_random_memory_contents<algebra::Fr<typename CurveType::curve_A_pp>>(ap, input_size, program_size);
-                const double delegated_ra_memory_init_random = algebra::last_times["Initialize random delegated memory"];
+                const double delegated_ra_memory_init =
+                    algebra::last_times["Construct delegated_ra_memory from memory map"];
+                simulate_random_memory_contents<algebra::Fr<typename CurveType::curve_A_pp>>(ap, input_size,
+                                                                                             program_size);
+                const double delegated_ra_memory_init_random =
+                    algebra::last_times["Initialize random delegated memory"];
                 const double input_map_random = input_map - delegated_ra_memory_init + delegated_ra_memory_init_random;
                 const double total_random = total - delegated_ra_memory_init + delegated_ra_memory_init_random;
 
@@ -83,8 +102,8 @@ void print_ram_zksnark_verifier_profiling() {
 }
 
 template<typename CurveType>
-void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_t program_size, const std::size_t input_size,
-                         const std::size_t time_bound) {
+void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_t program_size,
+                         const std::size_t input_size, const std::size_t time_bound) {
     typedef ram_zksnark_machine_pp<CurveType> RAMType;
 
     const std::size_t boot_trace_size_bound = program_size + input_size;
@@ -95,8 +114,8 @@ void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_
 
 namespace po = boost::program_options;
 
-bool process_command_line(const int argc, const char **argv, bool &profile_gp, std::size_t &w, std::size_t &k, bool &profile_v,
-                          std::size_t &l) {
+bool process_command_line(const int argc, const char **argv, bool &profile_gp, std::size_t &w, std::size_t &k,
+                          bool &profile_v, std::size_t &l) {
     try {
         po::options_description desc("Usage");
         desc.add_options()("help", "print this help message")("profile_gp", "profile generator and prover")(

@@ -2,16 +2,32 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a RAM example, as well as functions to sample
 // RAM examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_EXAMPLES_HPP_
-#define CRYPTO3_ZK_RAM_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_RAM_EXAMPLES_HPP
+#define CRYPTO3_ZK_RAM_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 
@@ -34,8 +50,8 @@ namespace nil {
                  */
                 template<typename RAMType>
                 ram_example<RAMType> gen_ram_example_simple(const ram_architecture_params<RAMType> &ap,
-                                                         std::size_t boot_trace_size_bound, std::size_t time_bound,
-                                                         bool satisfiable = true) {
+                                                            std::size_t boot_trace_size_bound, std::size_t time_bound,
+                                                            bool satisfiable = true) {
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
 
@@ -78,8 +94,8 @@ namespace nil {
                  */
                 template<typename RAMType>
                 ram_example<RAMType> gen_ram_example_complex(const ram_architecture_params<RAMType> &ap,
-                                                          std::size_t boot_trace_size_bound, std::size_t time_bound,
-                                                          bool satisfiable = true) {
+                                                             std::size_t boot_trace_size_bound, std::size_t time_bound,
+                                                             bool satisfiable = true) {
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
 
@@ -153,4 +169,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_EXAMPLES_HPP_
+#endif    // RAM_EXAMPLES_HPP

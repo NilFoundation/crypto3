@@ -2,13 +2,29 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KC_MULTIEXP_HPP_
-#define CRYPTO3_ZK_KC_MULTIEXP_HPP_
+#ifndef CRYPTO3_ZK_KC_MULTIEXP_HPP
+#define CRYPTO3_ZK_KC_MULTIEXP_HPP
 
 /*
   Split out from multiexp to prevent cyclical
@@ -19,7 +35,7 @@
   Will probably go away in more general exp refactoring.
 */
 
-//#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 
@@ -29,40 +45,40 @@ namespace nil {
             namespace snark {
                 template<typename T1, typename T2, typename Backend,
                          boost::multiprecision::expression_template_option ExpressionTemplates>
-                knowledge_commitment<T1, T2>
-                    opt_window_wnaf_exp(const knowledge_commitment<T1, T2> &base,
+                typename knowledge_commitment<T1, T2>::value_type
+                    opt_window_wnaf_exp(const typename knowledge_commitment<T1, T2>::value_type &base,
                                         const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
                                         const std::size_t scalar_bits) {
-                    return knowledge_commitment<T1, T2>(opt_window_wnaf_exp(base.g, scalar, scalar_bits),
-                                                        opt_window_wnaf_exp(base.h, scalar, scalar_bits));
+                    return typename knowledge_commitment<T1, T2>::value_type(
+                        opt_window_wnaf_exp(base.g, scalar, scalar_bits),
+                        opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
-                template<typename T1, typename T2, typename FieldType, algebra::multi_exp_method Method>
-                knowledge_commitment<T1, T2> kc_multi_exp_with_mixed_addition(
+                template<typename T1, typename T2, typename FieldType, typename MultiexpMethod>
+                typename knowledge_commitment<T1, T2>::value_type kc_multiexp_with_mixed_addition(
                     const knowledge_commitment_vector<T1, T2> &vec,
                     const std::size_t min_idx,
                     const std::size_t max_idx,
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
                     const std::size_t chunks) {
+
+                    const size_t scalar_length = std::distance(scalar_start, scalar_end);
+                    assert((size_t)(scalar_length) <= vec.domain_size_);
+
                     auto index_it = std::lower_bound(vec.indices.begin(), vec.indices.end(), min_idx);
                     const std::size_t offset = index_it - vec.indices.begin();
 
                     auto value_it = vec.values.begin() + offset;
 
                     const typename FieldType::value_type zero = FieldType::value_type::zero();
-                    const typename FieldType::value_type one = FieldType::value_type::zero();
+                    const typename FieldType::value_type one = FieldType::value_type::one();
 
                     std::vector<typename FieldType::value_type> p;
-                    std::vector<knowledge_commitment<T1, T2>> g;
+                    std::vector<typename knowledge_commitment<T1, T2>::value_type> g;
 
-                    knowledge_commitment<T1, T2> acc = knowledge_commitment<T1, T2>::zero();
-
-                    std::size_t num_skip = 0;
-                    std::size_t num_add = 0;
-                    std::size_t num_other = 0;
-
-                    const std::size_t scalar_length = std::distance(scalar_start, scalar_end);
+                    typename knowledge_commitment<T1, T2>::value_type acc =
+                        knowledge_commitment<T1, T2>::value_type::zero();
 
                     while (index_it != vec.indices.end() && *index_it < max_idx) {
                         const std::size_t scalar_position = (*index_it) - min_idx;
@@ -72,7 +88,6 @@ namespace nil {
 
                         if (scalar == zero) {
                             // do nothing
-                            ++num_skip;
                         } else if (scalar == one) {
 #ifdef USE_MIXED_ADDITION
                             acc.g = acc.g.mixed_add(value_it->g);
@@ -81,18 +96,16 @@ namespace nil {
                             acc.g = acc.g + value_it->g;
                             acc.h = acc.h + value_it->h;
 #endif
-                            ++num_add;
                         } else {
                             p.emplace_back(scalar);
                             g.emplace_back(*value_it);
-                            ++num_other;
                         }
 
                         ++index_it;
                         ++value_it;
                     }
 
-                    return acc + algebra::multi_exp<knowledge_commitment<T1, T2>, FieldType, Method>(
+                    return acc + algebra::multiexp<knowledge_commitment<T1, T2>, FieldType, MultiexpMethod>(
                                      g.begin(), g.end(), p.begin(), p.end(), chunks);
                 }
 
@@ -116,9 +129,9 @@ namespace nil {
 
                     for (std::size_t pos = start_pos; pos != end_pos; ++pos) {
                         if (!v[pos].is_zero()) {
-                            res.values.emplace_back(knowledge_commitment<T1, T2>(
-                                windowed_exp(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
-                                windowed_exp(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
+                            res.values.emplace_back(typename knowledge_commitment<T1, T2>::value_type(
+                                windowed_exp<T1, FieldType>(scalar_size, T1_window, T1_table, T1_coeff * v[pos]),
+                                windowed_exp<T2, FieldType>(scalar_size, T2_window, T2_table, T2_coeff * v[pos])));
                             res.indices.emplace_back(pos);
                         }
                     }
@@ -176,7 +189,7 @@ namespace nil {
                             scalar_size, T1_window, T2_window, T1_table, T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
                             chunk_pos[i + 1], i == num_chunks - 1 ? last_chunk : chunk_size);
 #ifdef USE_MIXED_ADDITION
-                        algebra::batch_to_special<knowledge_commitment<T1, T2>>(tmp[i].values);
+                        algebra::batch_to_special<typename knowledge_commitment<T1, T2>::value_type>(tmp[i].values);
 #endif
                     }
 
@@ -197,4 +210,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // KC_MULTIEXP_HPP_
+#endif    // KC_MULTIEXP_HPP

@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for:
 // - a variable (i.e., x_i),
@@ -77,7 +93,7 @@ namespace nil {
                     }
 
                     linear_term<FieldType> operator-() const {
-                        return linear_term<FieldType>(*this, -FieldType::value_type::zero());
+                        return linear_term<FieldType>(*this, -FieldType::value_type::one());
                     }
 
                     bool operator==(const variable<FieldType> &other) const {
@@ -126,47 +142,47 @@ namespace nil {
                  * A linear term represents a formal expression of the form "coeff * x_{index}".
                  */
                 template<typename FieldType>
-                struct linear_term {
+                class linear_term {
                     typedef FieldType field_type;
-                    typedef typename field_type::value_type value_type;
+                    typedef typename field_type::value_type field_value_type;
 
+                public:
                     var_index_t index;
-                    value_type coeff;
+                    field_value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<FieldType> &var) :
-                        index(var.index), coeff(FieldType::value_type::zero()) {
+                    linear_term(const variable<field_type> &var) : index(var.index), coeff(field_value_type::one()) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const integer_coeff_t int_coeff) :
-                        index(var.index), coeff(value_type(int_coeff)) {
+                    linear_term(const variable<field_type> &var, const integer_coeff_t int_coeff) :
+                        index(var.index), coeff(field_value_type(int_coeff)) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const value_type &field_coeff) :
+                    linear_term(const variable<field_type> &var, const field_value_type &field_coeff) :
                         index(var.index), coeff(field_coeff) {
                     }
 
-                    linear_term<FieldType> operator*(const integer_coeff_t int_coeff) const {
-                        return (this->operator*(typename FieldType::value_type(int_coeff)));
+                    linear_term<field_type> operator*(const integer_coeff_t int_coeff) const {
+                        return (this->operator*(field_value_type(int_coeff)));
                     }
 
-                    linear_term<FieldType> operator*(const value_type &field_coeff) const {
-                        return linear_term<FieldType>(this->index, field_coeff * this->coeff);
+                    linear_term<field_type> operator*(const field_value_type &field_coeff) const {
+                        return linear_term<field_type>(this->index, field_coeff * this->coeff);
                     }
 
-                    linear_combination<FieldType> operator+(const linear_combination<FieldType> &other) const {
-                        return linear_combination<FieldType>(*this) + other;
+                    linear_combination<field_type> operator+(const linear_combination<field_type> &other) const {
+                        return linear_combination<field_type>(*this) + other;
                     }
 
-                    linear_combination<FieldType> operator-(const linear_combination<FieldType> &other) const {
+                    linear_combination<field_type> operator-(const linear_combination<field_type> &other) const {
                         return (*this) + (-other);
                     }
 
-                    linear_term<FieldType> operator-() const {
-                        return linear_term<FieldType>(this->index, -this->coeff);
+                    linear_term<field_type> operator-() const {
+                        return linear_term<field_type>(this->index, -this->coeff);
                     }
 
-                    bool operator==(const linear_term<FieldType> &other) const {
+                    bool operator==(const linear_term<field_type> &other) const {
                         return (this->index == other.index && this->coeff == other.coeff);
                     }
                 };
@@ -212,18 +228,18 @@ namespace nil {
                  * A linear combination represents a formal expression of the form "sum_i coeff_i * x_{index_i}".
                  */
                 template<typename FieldType>
-                struct linear_combination {
-
+                class linear_combination {
                     typedef FieldType field_type;
-                    typedef typename field_type::value_type value_type;
+                    typedef typename field_type::value_type field_value_type;
 
+                public:
                     std::vector<linear_term<FieldType>> terms;
 
                     linear_combination() {};
                     linear_combination(const integer_coeff_t int_coeff) {
                         this->add_term(linear_term<FieldType>(0, int_coeff));
                     }
-                    linear_combination(const value_type &field_coeff) {
+                    linear_combination(const field_value_type &field_coeff) {
                         this->add_term(linear_term<FieldType>(0, field_coeff));
                     }
                     linear_combination(const variable<FieldType> &var) {
@@ -262,30 +278,30 @@ namespace nil {
                     }
 
                     void add_term(const variable<FieldType> &var) {
-                        this->terms.emplace_back(linear_term<FieldType>(var.index, value_type::zero()));
+                        this->terms.emplace_back(linear_term<FieldType>(var.index, field_value_type::one()));
                     }
                     void add_term(const variable<FieldType> &var, integer_coeff_t int_coeff) {
                         this->terms.emplace_back(linear_term<FieldType>(var.index, int_coeff));
                     }
-                    void add_term(const variable<FieldType> &var, const value_type &field_coeff) {
+                    void add_term(const variable<FieldType> &var, const field_value_type &field_coeff) {
                         this->terms.emplace_back(linear_term<FieldType>(var.index, field_coeff));
                     }
                     void add_term(const linear_term<FieldType> &lt) {
                         this->terms.emplace_back(lt);
                     }
 
-                    value_type evaluate(const std::vector<value_type> &assignment) const {
-                        value_type acc = value_type::zero();
+                    field_value_type evaluate(const std::vector<field_value_type> &assignment) const {
+                        field_value_type acc = field_value_type::zero();
                         for (auto &lt : terms) {
-                            acc += (lt.index == 0 ? value_type::zero() : assignment[lt.index - 1]) * lt.coeff;
+                            acc += (lt.index == 0 ? field_value_type::one() : assignment[lt.index - 1]) * lt.coeff;
                         }
                         return acc;
                     }
 
                     linear_combination operator*(integer_coeff_t int_coeff) const {
-                        return (*this) * value_type(int_coeff);
+                        return (*this) * field_value_type(int_coeff);
                     }
-                    linear_combination operator*(const value_type &field_coeff) const {
+                    linear_combination operator*(const field_value_type &field_coeff) const {
                         linear_combination result;
                         result.terms.reserve(this->terms.size());
                         for (const linear_term<FieldType> &lt : this->terms) {
@@ -299,7 +315,8 @@ namespace nil {
                         auto it1 = this->terms.begin();
                         auto it2 = other.terms.begin();
 
-                        /* invariant: it1 and it2 always point to unprocessed items in the corresponding linear combinations
+                        /* invariant: it1 and it2 always point to unprocessed items in the corresponding linear
+                         * combinations
                          */
                         while (it1 != this->terms.end() && it2 != other.terms.end()) {
                             if (it1->index < it2->index) {
@@ -329,7 +346,7 @@ namespace nil {
                         return (*this) + (-other);
                     }
                     linear_combination operator-() const {
-                        return (*this) * (-value_type::zero());
+                        return (*this) * (-field_value_type::one());
                     }
 
                     bool operator==(const linear_combination &other) const {

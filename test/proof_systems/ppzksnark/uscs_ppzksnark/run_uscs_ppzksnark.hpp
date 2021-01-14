@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of functionality that runs the USCS ppzkSNARK for
 // a given USCS example.
@@ -41,7 +57,8 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example) {
-                    uscs_ppzksnark_keypair<CurveType> keypair = uscs_ppzksnark_generator<CurveType>(example.constraint_system);
+                    uscs_ppzksnark_keypair<CurveType> keypair =
+                        uscs_ppzksnark_generator<CurveType>(example.constraint_system);
 
                     uscs_ppzksnark_processed_verification_key<CurveType> pvk =
                         uscs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
@@ -49,9 +66,11 @@ namespace nil {
                     uscs_ppzksnark_proof<CurveType> proof =
                         uscs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    bool ans = uscs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    bool ans = uscs_ppzksnark_verifier_strong_input_consistency<CurveType>(
+                        keypair.vk, example.primary_input, proof);
 
-                    bool ans2 = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    bool ans2 = uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
+                        pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

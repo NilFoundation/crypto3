@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for functionality for routing on a Benes network.
 //
@@ -22,8 +38,8 @@
 // Academic Press 1965
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
-#define CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP
+#define CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP
 
 #include <vector>
 
@@ -105,7 +121,7 @@ namespace nil {
                  * For example, all cross edges in the 0-th column flip the most
                  * significant bit of row_idx.
                  */
-                std::size_t benes_cross_edge_mask(size_t dimension, size_t column_idx) {
+                std::size_t benes_cross_edge_mask(size_t dimension, std::size_t column_idx) {
                     return (column_idx < dimension ? 1ul << (dimension - 1 - column_idx) :
                                                      1ul << (column_idx - dimension));
                 }
@@ -125,7 +141,8 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx+1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_lhs_packet_destination(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
+                std::size_t benes_lhs_packet_destination(size_t dimension, std::size_t column_idx, std::size_t row_idx,
+                                                         bool use_top) {
                     const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return (use_top ? row_idx & ~mask : row_idx | mask);
                 }
@@ -145,8 +162,8 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx-1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                std::size_t benes_rhs_packet_source(size_t dimension, size_t column_idx, size_t row_idx,
-                                               bool use_top) {
+                std::size_t benes_rhs_packet_source(size_t dimension, std::size_t column_idx, std::size_t row_idx,
+                                                    bool use_top) {
                     return benes_lhs_packet_destination(dimension, column_idx - 1, row_idx, use_top); /* by symmetry */
                 }
 
@@ -155,7 +172,8 @@ namespace nil {
                  * return the switch setting that would route its packet using the top
                  * subnetwork.
                  */
-                bool benes_get_switch_setting_from_subnetwork(size_t dimension, size_t column_idx, size_t row_idx, bool use_top) {
+                bool benes_get_switch_setting_from_subnetwork(size_t dimension, std::size_t column_idx,
+                                                              std::size_t row_idx, bool use_top) {
                     return (row_idx != benes_lhs_packet_destination(dimension, column_idx, row_idx, use_top));
                 }
 
@@ -165,7 +183,8 @@ namespace nil {
                  * benes_cross_edge_mask), this returns row_idx' of the "cross"
                  * destination.
                  */
-                std::size_t benes_packet_cross_destination(size_t dimension, size_t column_idx, size_t row_idx) {
+                std::size_t benes_packet_cross_destination(size_t dimension, std::size_t column_idx,
+                                                           std::size_t row_idx) {
                     const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return row_idx ^ mask;
                 }
@@ -176,7 +195,8 @@ namespace nil {
                  * comment by benes_cross_edge_mask), this returns row_idx' of the
                  * "cross" source packet.
                  */
-                std::size_t benes_packet_cross_source(size_t dimension, size_t column_idx, size_t packet_idx) {
+                std::size_t benes_packet_cross_source(size_t dimension, std::size_t column_idx,
+                                                      std::size_t packet_idx) {
                     return benes_packet_cross_destination(dimension, column_idx - 1, packet_idx); /* by symmetry */
                 }
 
@@ -220,10 +240,10 @@ namespace nil {
                 void route_benes_inner(size_t dimension,
                                        const integer_permutation &permutation,
                                        const integer_permutation &permutation_inv,
-                                       size_t column_idx_start,
-                                       size_t column_idx_end,
-                                       size_t subnetwork_offset,
-                                       size_t subnetwork_size,
+                                       std::size_t column_idx_start,
+                                       std::size_t column_idx_end,
+                                       std::size_t subnetwork_offset,
+                                       std::size_t subnetwork_size,
                                        benes_routing &routing) {
                     assert(permutation.size() == subnetwork_size);
                     assert(permutation.is_valid());
@@ -382,4 +402,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BENES_ROUTING_ALGORITHM_HPP_
+#endif    // BENES_ROUTING_ALGORITHM_HPP

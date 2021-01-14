@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE ssp_test
@@ -40,15 +56,16 @@ void test_ssp(const std::size_t num_constraints, const std::size_t num_inputs, c
 
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = field_random_element<FieldType>(), d = field_random_element<FieldType>();
+    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
+                                         d = algebra::random_element<FieldType>();
 
-    ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp_instance_map(example.constraint_system);
+    ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp::instance_map(example.constraint_system);
 
     ssp_instance_evaluation<FieldType> ssp_inst_2 =
-        uscs_to_ssp_instance_map_with_evaluation(example.constraint_system, t);
+        uscs_to_ssp::instance_map_with_evaluation(example.constraint_system, t);
 
     ssp_witness<FieldType> ssp_wit =
-        uscs_to_ssp_witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
+        uscs_to_ssp::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
 
     BOOST_CHECK(ssp_inst_1.is_satisfied(ssp_wit));
     BOOST_CHECK(ssp_inst_2.is_satisfied(ssp_wit));

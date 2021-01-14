@@ -2,18 +2,35 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a USCS example, as well as functions to sample
 // USCS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_USCS_EXAMPLES_HPP_
-#define CRYPTO3_ZK_USCS_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_USCS_EXAMPLES_HPP
+#define CRYPTO3_ZK_USCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -32,13 +49,13 @@ namespace nil {
                     uscs_example<FieldType>() = default;
                     uscs_example<FieldType>(const uscs_example<FieldType> &other) = default;
                     uscs_example<FieldType>(const uscs_constraint_system<FieldType> &constraint_system,
-                                         const uscs_primary_input<FieldType> &primary_input,
-                                         const uscs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const uscs_primary_input<FieldType> &primary_input,
+                                            const uscs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {};
                     uscs_example<FieldType>(uscs_constraint_system<FieldType> &&constraint_system,
-                                         uscs_primary_input<FieldType> &&primary_input,
-                                         uscs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            uscs_primary_input<FieldType> &&primary_input,
+                                            uscs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
@@ -77,7 +94,8 @@ namespace nil {
 
                         const typename FieldType::value_type x_coeff = FieldType::value_type(std::rand());
                         const typename FieldType::value_type y_coeff = FieldType::value_type(std::rand());
-                        const typename FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
+                        const typename FieldType::value_type val =
+                            (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
                         const typename FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inversed();
@@ -92,9 +110,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     BOOST_CHECK(cs.num_variables() == full_variable_assignment.size());
@@ -149,9 +167,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     BOOST_CHECK(cs.num_variables() == full_variable_assignment.size());
@@ -167,4 +185,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // USCS_EXAMPLES_HPP_
+#endif    // USCS_EXAMPLES_HPP

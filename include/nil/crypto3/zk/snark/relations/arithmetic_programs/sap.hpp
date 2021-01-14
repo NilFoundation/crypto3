@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a SAP ("Square Arithmetic Program").
 //
@@ -28,6 +44,7 @@
 #include <vector>
 
 #include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/multiexp/inner_product.hpp>
 
 #include <nil/crypto3/fft/domains/evaluation_domain.hpp>
 #include <nil/crypto3/fft/make_evaluation_domain.hpp>
@@ -69,23 +86,25 @@ namespace nil {
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis;
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
-                    sap_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
+                    sap_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
                         num_variables(num_variables),
-                        degree(degree), num_inputs(num_inputs), domain(domain), A_in_Lagrange_basis(A_in_Lagrange_basis),
-                        C_in_Lagrange_basis(C_in_Lagrange_basis) {
+                        degree(degree), num_inputs(num_inputs), domain(domain),
+                        A_in_Lagrange_basis(A_in_Lagrange_basis), C_in_Lagrange_basis(C_in_Lagrange_basis) {
                     }
 
-                    sap_instance(const std::shared_ptr<evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
+                    sap_instance(
+                        const std::shared_ptr<evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)),
@@ -98,7 +117,7 @@ namespace nil {
                     sap_instance &operator=(sap_instance<FieldType> &&other) = default;
 
                     bool is_satisfied(const sap_witness<FieldType> &witness) const {
-                        const typename FieldType::value_type t = field_random_element<FieldType>();
+                        const typename FieldType::value_type t = algebra::random_element<FieldType>();
 
                         std::vector<typename FieldType::value_type> At(this->num_variables + 1,
                                                                        typename FieldType::value_type::zero());
@@ -108,7 +127,8 @@ namespace nil {
 
                         const typename FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
 
-                        const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
+                        const std::vector<typename FieldType::value_type> u =
+                            this->domain->evaluate_all_lagrange_polynomials(t);
 
                         for (std::size_t i = 0; i < this->num_variables + 1; ++i) {
                             for (auto &el : A_in_Lagrange_basis[i]) {
@@ -140,7 +160,7 @@ namespace nil {
                 };
 
                 /*************************  INSTATNCE  EVALUATION ***********************************/
-                
+
                 /**
                  * A SAP instance evaluation is a SAP instance that is evaluated at a field element t.
                  *
@@ -245,11 +265,11 @@ namespace nil {
                                                                           witness.coefficients_for_ACs.begin(),
                                                                           witness.coefficients_for_ACs.begin() +
                                                                               this->num_variables);
-                        ans_H = ans_H +
-                                algebra::inner_product<FieldType>(this->Ht.begin(),
-                                                                  this->Ht.begin() + this->degree + 1,
-                                                                  witness.coefficients_for_H.begin(),
-                                                                  witness.coefficients_for_H.begin() + this->degree + 1);
+                        ans_H = ans_H + algebra::inner_product<FieldType>(this->Ht.begin(),
+                                                                          this->Ht.begin() + this->degree + 1,
+                                                                          witness.coefficients_for_H.begin(),
+                                                                          witness.coefficients_for_H.begin() +
+                                                                              this->degree + 1);
 
                         if (ans_A * ans_A - ans_C != ans_H * this->Zt) {
                             return false;

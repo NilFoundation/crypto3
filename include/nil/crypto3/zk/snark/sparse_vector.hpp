@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a sparse vector.
 //---------------------------------------------------------------------------//
@@ -16,6 +32,9 @@
 #include <vector>
 #include <numeric>
 
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -25,31 +44,34 @@ namespace nil {
                  * A sparse vector is a list of indices along with corresponding values.
                  * The indices are selected from the set {0,1,...,domain_size-1}.
                  */
-                template<typename T>
-                struct sparse_vector {
+                template<typename Type>
+                class sparse_vector {
+                    using underlying_value_type = typename Type::value_type;
 
+                public:
                     std::vector<std::size_t> indices;
-                    std::vector<T> values;
+                    std::vector<underlying_value_type> values;
                     std::size_t domain_size_;
 
                     sparse_vector() = default;
-                    sparse_vector(const sparse_vector<T> &other) = default;
-                    sparse_vector(sparse_vector<T> &&other) = default;
-                    sparse_vector(std::vector<T> &&v) :
+                    sparse_vector(const sparse_vector<Type> &other) = default;
+                    sparse_vector(sparse_vector<Type> &&other) = default;
+                    sparse_vector(std::vector<underlying_value_type> &&v) :
                         values(std::move(v)), domain_size_(values.size()) {
                         indices.resize(domain_size_);
                         std::iota(indices.begin(), indices.end(), 0);
                     }
 
-                    sparse_vector<T> &operator=(const sparse_vector<T> &other) = default;
-                    sparse_vector<T> &operator=(sparse_vector<T> &&other) = default;
+                    sparse_vector<Type> &operator=(const sparse_vector<Type> &other) = default;
+                    sparse_vector<Type> &operator=(sparse_vector<Type> &&other) = default;
 
-                    T operator[](const std::size_t idx) const {
+                    underlying_value_type operator[](const std::size_t idx) const {
                         auto it = std::lower_bound(indices.begin(), indices.end(), idx);
-                        return (it != indices.end() && *it == idx) ? values[it - indices.begin()] : T();
+                        return (it != indices.end() && *it == idx) ? values[it - indices.begin()] :
+                                                                     underlying_value_type();
                     }
 
-                    bool operator==(const sparse_vector<T> &other) const {
+                    bool operator==(const sparse_vector<Type> &other) const {
                         if (this->domain_size_ != other.domain_size_) {
                             return false;
                         }
@@ -93,7 +115,7 @@ namespace nil {
                         return true;
                     }
 
-                    bool operator==(const std::vector<T> &other) const {
+                    bool operator==(const std::vector<underlying_value_type> &other) const {
                         if (this->domain_size_ < other.size()) {
                             return false;
                         }
@@ -146,35 +168,37 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return indices.size() * (sizeof(std::size_t) * 8 + T::size_in_bits());
+                        return indices.size() * (sizeof(std::size_t) * 8 + Type::value_bits);
                     }
 
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
-                    template<typename InputIterator>
-                    std::pair<T, sparse_vector<T>>
-                        accumulate(InputIterator it_begin, InputIterator it_end, std::size_t offset) const {
+                    template<typename BaseInputType>
+                    std::pair<underlying_value_type, sparse_vector<Type>> accumulate(
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_begin,
+                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_end,
+                        std::size_t offset) const {
 #ifdef MULTICORE
-                        const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or
-                                                                             // call omp_set_num_threads()
+                        const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
+                                                                             // or call omp_set_num_threads()
 #else
                         const std::size_t chunks = 1;
 #endif
 
-                        T accumulated_value = T::zero();
-                        sparse_vector<T> resulting_vector;
+                        underlying_value_type accumulated_value = underlying_value_type::zero();
+                        sparse_vector<Type> resulting_vector;
                         resulting_vector.domain_size_ = domain_size_;
 
                         const std::size_t range_len = it_end - it_begin;
                         bool in_block = false;
-                        std::size_t
-                            first_pos = -1,
-                            last_pos =
-                                -1;    // g++ -flto emits unitialized warning, even though in_block guards for such cases.
+                        std::size_t first_pos = -1,
+                                    last_pos = -1;    // g++ -flto emits unitialized warning, even though in_block
+                        // guards for such cases.
 
                         for (std::size_t i = 0; i < indices.size(); ++i) {
                             const bool matching_pos = (offset <= indices[i] && indices[i] < offset + range_len);
-                            // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset, w_size);
+                            // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset,
+                            // w_size);
                             bool copy_over;
 
                             if (in_block) {
@@ -188,18 +212,13 @@ namespace nil {
                                     copy_over = true;
 
                                     accumulated_value =
-                                        accumulated_value /*+
-                                        algebra::multi_exp<
-                                            T,
-                                            typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                            algebra::multi_exp_method_bos_coster>(values.begin() + first_pos,
-                                                                                  values.begin() + last_pos + 1,
-                                                                                  it_begin + (indices[first_pos] - offset),
-                                                                                  it_begin + (indices[last_pos] - offset) +
-                                                                                      1,
-                                                                                  chunks)*/;
-                                    // uncomment when multiexp
-                                    // will be ready
+                                        accumulated_value +
+                                        algebra::multiexp<
+                                            Type, BaseInputType,
+                                            algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
+                                            values.begin() + first_pos, values.begin() + last_pos + 1,
+                                            it_begin + (indices[first_pos] - offset),
+                                            it_begin + (indices[last_pos] - offset) + 1, chunks);
                                 }
                             } else {
                                 if (matching_pos) {
@@ -221,24 +240,19 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value /*+
-                                algebra::multi_exp<T,
-                                                   typename std::iterator_traits<InputIterator>::value_type::field_type,
-                                                   algebra::multi_exp_method_bos_coster>(
+                                accumulated_value +
+                                algebra::multiexp<Type, BaseInputType,
+                                                  algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
                                     values.begin() + first_pos,
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks)*/;
-                            // uncomment when multiexp
-                            // will be ready
+                                    chunks);
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);
                     }
-
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

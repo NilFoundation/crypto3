@@ -2,15 +2,33 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_USCS_EXAMPLES_HPP
 #define CRYPTO3_USCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -29,13 +47,13 @@ namespace nil {
                     uscs_example<FieldType>() = default;
                     uscs_example<FieldType>(const uscs_example<FieldType> &other) = default;
                     uscs_example<FieldType>(const uscs_constraint_system<FieldType> &constraint_system,
-                                         const uscs_primary_input<FieldType> &primary_input,
-                                         const uscs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const uscs_primary_input<FieldType> &primary_input,
+                                            const uscs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {};
                     uscs_example<FieldType>(uscs_constraint_system<FieldType> &&constraint_system,
-                                         uscs_primary_input<FieldType> &&primary_input,
-                                         uscs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            uscs_primary_input<FieldType> &&primary_input,
+                                            uscs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
@@ -50,7 +68,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs);
+                                                                               const std::size_t num_inputs);
 
                 /**
                  * Generate a USCS example such that:
@@ -61,12 +79,11 @@ namespace nil {
                  */
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs);
+                                                                                const std::size_t num_inputs);
 
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
-                                                                            const std::size_t num_inputs) {
-
+                                                                               const std::size_t num_inputs) {
 
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
@@ -94,9 +111,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const field_value_type x_coeff = random_element <FieldType> ();
-                        const field_value_type y_coeff = random_element <FieldType> ();
-                        const field_value_type val = (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
+                        const field_value_type x_coeff = algebra::random_element<FieldType>();
+                        const field_value_type y_coeff = algebra::random_element<FieldType>();
+                        const field_value_type val =
+                            (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
                         const field_value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inversed();
@@ -111,9 +129,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());
@@ -127,7 +145,7 @@ namespace nil {
 
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
-                                                                             const std::size_t num_inputs) {
+                                                                                const std::size_t num_inputs) {
                     std::cout << "Call to generate_uscs_example_with_binary_input" << std::endl;
 
                     assert(num_inputs >= 1);
@@ -163,9 +181,9 @@ namespace nil {
 
                     /* split variable assignment */
                     uscs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
-                        full_variable_assignment.begin() + num_inputs);
+                                                                full_variable_assignment.begin() + num_inputs);
                     uscs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
-                        full_variable_assignment.end());
+                                                                  full_variable_assignment.end());
 
                     /* sanity checks */
                     assert(cs.num_variables() == full_variable_assignment.size());

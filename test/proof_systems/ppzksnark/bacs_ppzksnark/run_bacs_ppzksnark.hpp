@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_RUN_BACS_PPZKSNARK_HPP
@@ -41,22 +57,25 @@ namespace nil {
                     std::cout << "Call to run_bacs_ppzksnark" std::endl;
 
                     std::cout << "BACS ppzkSNARK Generator" << std::endl;
-                    bacs_ppzksnark_keypair<CurveType> keypair = bacs_ppzksnark_generator<CurveType>(example.circuit);
+                    typename bacs_ppzksnark<CurveType>::keypair_type keypair =
+                        bacs_ppzksnark<CurveType>::generator(example.circuit);
 
                     std::cout << "Preprocess verification key" << std::endl;
-                    bacs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        bacs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename bacs_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                        bacs_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
                     std::cout << "BACS ppzkSNARK Prover" << std::endl;
-                    bacs_ppzksnark_proof<CurveType> proof =
-                        bacs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename bacs_ppzksnark<CurveType>::proof_type proof =
+                        bacs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     std::cout << "BACS ppzkSNARK Verifier" << std::endl;
-                    bool ans = bacs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    bool ans = bacs_ppzksnark<CurveType>::verifier_strong_input_consistency(
+                        keypair.vk, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
-                    std::cout << "BACS ppzkSNARK Online Verifier" <<std::endl;
-                    bool ans2 = bacs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    std::cout << "BACS ppzkSNARK Online Verifier" << std::endl;
+                    bool ans2 = bacs_ppzksnark<CurveType>::online_verifier_strong_input_consistency(
+                        pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

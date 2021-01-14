@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE sap_test
@@ -23,7 +39,6 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
-
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -48,14 +63,17 @@ void test_sap(const std::size_t sap_degree, const std::size_t num_inputs, const 
     }
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = field_random_element<FieldType>(), d1 = field_random_element<FieldType>(), d2 = field_random_element<FieldType>();
+    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
+                                         d1 = algebra::random_element<FieldType>(),
+                                         d2 = algebra::random_element<FieldType>();
 
-    sap_instance<FieldType> sap_inst_1 = r1cs_to_sap_instance_map(example.constraint_system);
+    sap_instance<FieldType> sap_inst_1 = r1cs_to_sap::instance_map(example.constraint_system);
 
-    sap_instance_evaluation<FieldType> sap_inst_2 = r1cs_to_sap_instance_map_with_evaluation(example.constraint_system, t);
+    sap_instance_evaluation<FieldType> sap_inst_2 =
+        r1cs_to_sap::instance_map_with_evaluation(example.constraint_system, t);
 
     sap_witness<FieldType> sap_wit =
-        r1cs_to_sap_witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2);
+        r1cs_to_sap::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2);
 
     BOOST_CHECK(sap_inst_1.is_satisfied(sap_wit));
     BOOST_CHECK(sap_inst_2.is_satisfied(sap_wit));

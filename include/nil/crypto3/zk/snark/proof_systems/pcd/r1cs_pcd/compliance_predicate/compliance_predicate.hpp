@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a compliance predicate for R1CS PCD.
 //
@@ -14,8 +30,8 @@
 // other auxiliary information), and then either accepts or rejects.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
-#define CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP
+#define CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP
 
 #include <memory>
 
@@ -124,16 +140,17 @@ namespace nil {
                     r1cs_pcd_compliance_predicate() = default;
                     r1cs_pcd_compliance_predicate(r1cs_pcd_compliance_predicate<FieldType> &&other) = default;
                     r1cs_pcd_compliance_predicate(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;
-                    r1cs_pcd_compliance_predicate(std::size_t name,
-                                                  std::size_t type,
-                                                  const r1cs_constraint_system<FieldType> &constraint_system,
-                                                  std::size_t outgoing_message_payload_length,
-                                                  std::size_t max_arity,
-                                                  const std::vector<std::size_t> &incoming_message_payload_lengths,
-                                                  std::size_t local_data_length,
-                                                  std::size_t witness_length,
-                                                  bool relies_on_same_type_inputs,
-                                                  const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
+                    r1cs_pcd_compliance_predicate(
+                        std::size_t name,
+                        std::size_t type,
+                        const r1cs_constraint_system<FieldType> &constraint_system,
+                        std::size_t outgoing_message_payload_length,
+                        std::size_t max_arity,
+                        const std::vector<std::size_t> &incoming_message_payload_lengths,
+                        std::size_t local_data_length,
+                        std::size_t witness_length,
+                        bool relies_on_same_type_inputs,
+                        const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
 
                     r1cs_pcd_compliance_predicate<FieldType> &
                         operator=(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;
@@ -265,4 +282,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // COMPLIANCE_PREDICATE_HPP_
+#endif    // COMPLIANCE_PREDICATE_HPP

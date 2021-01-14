@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_BACS_EXAMPLES_HPP
@@ -32,15 +48,15 @@ namespace nil {
                     bacs_example<FieldType>() = default;
                     bacs_example<FieldType>(const bacs_example<FieldType> &other) = default;
                     bacs_example<FieldType>(const bacs_circuit<FieldType> &circuit,
-                                         const bacs_primary_input<FieldType> &primary_input,
-                                         const bacs_auxiliary_input<FieldType> &auxiliary_input) :
+                                            const bacs_primary_input<FieldType> &primary_input,
+                                            const bacs_auxiliary_input<FieldType> &auxiliary_input) :
                         circuit(circuit),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {
                     }
 
                     bacs_example<FieldType>(bacs_circuit<FieldType> &&circuit,
-                                         bacs_primary_input<FieldType> &&primary_input,
-                                         bacs_auxiliary_input<FieldType> &&auxiliary_input) :
+                                            bacs_primary_input<FieldType> &&primary_input,
+                                            bacs_auxiliary_input<FieldType> &&auxiliary_input) :
                         circuit(std::move(circuit)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {
                     }
@@ -64,9 +80,9 @@ namespace nil {
                  */
                 template<typename FieldType>
                 bacs_example<FieldType> generate_bacs_example(std::size_t primary_input_size,
-                                                           std::size_t auxiliary_input_size,
-                                                           std::size_t num_gates,
-                                                           std::size_t num_outputs);
+                                                              std::size_t auxiliary_input_size,
+                                                              std::size_t num_gates,
+                                                              std::size_t num_outputs);
 
                 template<typename FieldType>
                 linear_combination<FieldType> random_linear_combination(const std::size_t num_variables) {
@@ -78,7 +94,7 @@ namespace nil {
                     linear_combination<FieldType> result;
 
                     for (std::size_t i = 0; i < terms; ++i) {
-                        const field_value_type coeff = field_random_element<FieldType>();
+                        const field_value_type coeff = algebra::random_element<FieldType>();
                         result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
                     }
 
@@ -87,20 +103,20 @@ namespace nil {
 
                 template<typename FieldType>
                 bacs_example<FieldType> generate_bacs_example(std::size_t primary_input_size,
-                                                           std::size_t auxiliary_input_size,
-                                                           std::size_t num_gates,
-                                                           std::size_t num_outputs) {
+                                                              std::size_t auxiliary_input_size,
+                                                              std::size_t num_gates,
+                                                              std::size_t num_outputs) {
 
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
 
                     bacs_example<FieldType> example;
                     for (std::size_t i = 0; i < primary_input_size; ++i) {
-                        example.primary_input.emplace_back(field_random_element<FieldType>());
+                        example.primary_input.emplace_back(algebra::random_element<FieldType>());
                     }
 
                     for (std::size_t i = 0; i < auxiliary_input_size; ++i) {
-                        example.auxiliary_input.emplace_back(field_random_element<FieldType>());
+                        example.auxiliary_input.emplace_back(algebra::random_element<FieldType>());
                     }
 
                     example.circuit.primary_input_size = primary_input_size;
@@ -122,7 +138,8 @@ namespace nil {
                             gate.is_circuit_output = true;
                             const var_index_t var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
-                            const field_value_type var_val = (var_idx == 0 ? field_value_type::one() : all_vals[var_idx - 1]);
+                            const field_value_type var_val =
+                                (var_idx == 0 ? field_value_type::one() : all_vals[var_idx - 1]);
 
                             if (std::rand() % 2 == 0) {
                                 const field_value_type lhs_val = gate.lhs.evaluate(all_vals);

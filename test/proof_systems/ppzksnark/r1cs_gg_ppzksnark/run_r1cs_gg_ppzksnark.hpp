@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of functionality that runs the R1CS GG-ppzkSNARK for
 // a given R1CS example.
@@ -13,10 +29,14 @@
 #ifndef CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
-#include "r1cs_examples.hpp"
+#include "../r1cs_examples.hpp"
+
+#include <nil/crypto3/zk/snark/algorithms/algorithms.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -27,24 +47,25 @@ namespace nil {
                  * Runs the ppzkSNARK (generator, prover, and verifier) for a given
                  * R1CS example (specified by a constraint system, input, and witness).
                  */
-                template<typename CurveType>
-                bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example);
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                         const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                         const r1cs_gg_ppzksnark_proof<CurveType> &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
-                    const bool answer = r1cs_gg_ppzksnark_affine_verifier_weak_IC<CurveType>(vk, primary_input, proof);
+                    const bool answer =
+                        r1cs_gg_ppzksnark<CurveType,
+                                          policies::r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<
+                                              CurveType>>::verifier(vk, primary_input, proof);
                     BOOST_CHECK(answer == expected_answer);
                 }
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                         const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                         const r1cs_gg_ppzksnark_proof<CurveType> &proof,
+                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                 }
@@ -63,23 +84,71 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    r1cs_gg_ppzksnark_keypair<CurveType> keypair =
-                        r1cs_gg_ppzksnark_generator<CurveType>(example.constraint_system);
 
-                    r1cs_gg_ppzksnark_processed_verification_key<CurveType> pvk =
-                        r1cs_gg_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    using basic_proof_system = r1cs_gg_ppzksnark<CurveType>;
 
-                    r1cs_gg_ppzksnark_proof<CurveType> proof =
-                        r1cs_gg_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    std::cout << "Starting generator" << std::endl;
+                    typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
+                        generator<basic_proof_system>(example.constraint_system);
 
-                    const bool ans =
-                        r1cs_gg_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    std::cout << "Starting verification key processing" << std::endl;
 
-                    const bool ans2 =
-                        r1cs_gg_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                        r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.vk);
+
+                    std::cout << "Starting prover" << std::endl;
+
+                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = 
+                        prover<basic_proof_system>(keypair.pk, example.primary_input, example.auxiliary_input);
+
+                    /*const bool ans =
+                        r1cs_gg_ppzksnark<CurveType,
+                       policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk,
+                       example.primary_input, proof);*/
+
+                    std::cout << "Starting verifier" << std::endl;
+                    
+                    const bool ans = verifier<basic_proof_system>(keypair.vk, example.primary_input, proof);
+
+                    std::cout << "Verifier finished, result: " << ans << std::endl;
+
+                    std::cout << "Starting online verifier" << std::endl;
+
+                    const bool ans2 = online_verifier<basic_proof_system>(pvk, example.primary_input, proof);
+
+                    std::cout << "Online verifier finished, result: " << ans2 << std::endl;
+
                     BOOST_CHECK(ans == ans2);
 
-                    test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);
+                    std::cout << "Starting weak verifier" << std::endl;
+
+                    const bool ans3 = r1cs_gg_ppzksnark<
+                        CurveType,
+                        typename policies::r1cs_gg_ppzksnark_generator<CurveType>,
+                        typename policies::r1cs_gg_ppzksnark_prover<CurveType>,
+                        typename policies::r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>,
+                        typename policies::r1cs_gg_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::
+                        verifier(keypair.vk, example.primary_input, proof);
+
+                    std::cout << "Weak verifier finished, result: " << ans3 << std::endl;
+
+                    BOOST_CHECK(ans == ans3);
+
+                    std::cout << "Starting online weak verifier" << std::endl;
+
+                    const bool ans4 =
+                        r1cs_gg_ppzksnark<CurveType,
+                                          policies::r1cs_gg_ppzksnark_generator<CurveType>,
+                                          policies::r1cs_gg_ppzksnark_prover<CurveType>,
+                                          policies::r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>,
+                                          policies::r1cs_gg_ppzksnark_online_verifier_weak_input_consistency<
+                                              CurveType>>::online_verifier(pvk, example.primary_input, proof);
+
+                    std::cout << "Online weak verifier finished, result: " << ans4 << std::endl;
+
+                    BOOST_CHECK(ans == ans4);
+
+                    /*test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);*/
 
                     return ans;
                 }

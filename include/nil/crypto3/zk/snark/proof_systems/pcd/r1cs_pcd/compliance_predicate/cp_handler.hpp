@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for a compliance predicate handler.
 //
@@ -12,8 +28,8 @@
 // It relies on classes declared in components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_CP_HANDLER_HPP_
-#define CRYPTO3_ZK_CP_HANDLER_HPP_
+#ifndef CRYPTO3_ZK_CP_HANDLER_HPP
+#define CRYPTO3_ZK_CP_HANDLER_HPP
 
 #include <numeric>
 
@@ -41,7 +57,7 @@ namespace nil {
 
                     blueprint_variable_vector<FieldType> all_vars;
 
-                    r1cs_pcd_message_variable(blueprint<FieldType> &pb);
+                    r1cs_pcd_message_variable(blueprint<FieldType> &bp);
                     void update_all_vars();
 
                     void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_message<FieldType>> &message);
@@ -62,7 +78,7 @@ namespace nil {
                 public:
                     blueprint_variable_vector<FieldType> all_vars;
 
-                    r1cs_pcd_local_data_variable(blueprint<FieldType> &pb);
+                    r1cs_pcd_local_data_variable(blueprint<FieldType> &bp);
                     void update_all_vars();
 
                     void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data);
@@ -78,7 +94,7 @@ namespace nil {
                 template<typename FieldType, typename BlueprintType>
                 class compliance_predicate_handler {
                 protected:
-                    BlueprintType pb;
+                    BlueprintType bp;
 
                     std::shared_ptr<r1cs_pcd_message_variable<FieldType>> outgoing_message;
                     blueprint_variable<FieldType> arity;
@@ -92,12 +108,13 @@ namespace nil {
                     const bool relies_on_same_type_inputs;
                     const std::set<std::size_t> accepted_input_types;
 
-                    compliance_predicate_handler(const BlueprintType &pb,
-                                                 const std::size_t name,
-                                                 const std::size_t type,
-                                                 const std::size_t max_arity,
-                                                 const bool relies_on_same_type_inputs,
-                                                 const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
+                    compliance_predicate_handler(
+                        const BlueprintType &bp,
+                        const std::size_t name,
+                        const std::size_t type,
+                        const std::size_t max_arity,
+                        const bool relies_on_same_type_inputs,
+                        const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
                     virtual void generate_r1cs_constraints() = 0;
                     virtual void generate_r1cs_witness(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
@@ -108,18 +125,19 @@ namespace nil {
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_outgoing_message() const;
                     std::size_t get_arity() const;
-                    std::shared_ptr<r1cs_pcd_message<FieldType>> get_incoming_message(const std::size_t message_idx) const;
+                    std::shared_ptr<r1cs_pcd_message<FieldType>>
+                        get_incoming_message(const std::size_t message_idx) const;
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> get_local_data() const;
                     r1cs_variable_assignment<FieldType> get_witness() const;
                 };
 
                 template<typename FieldType>
-                r1cs_pcd_message_variable<FieldType>::r1cs_pcd_message_variable(blueprint<FieldType> &pb) :
-                    component<FieldType>(pb) {
-                    type.allocate(pb);
+                r1cs_pcd_message_variable<FieldType>::r1cs_pcd_message_variable(blueprint<FieldType> &bp) :
+                    component<FieldType>(bp) {
+                    type.allocate(bp);
                     all_vars.emplace_back(type);
 
-                    num_vars_at_construction = pb.num_variables();
+                    num_vars_at_construction = bp.num_variables();
                 }
 
                 template<typename FieldType>
@@ -128,7 +146,7 @@ namespace nil {
                      * only component allocating variables on the protoboard and needs to
                      * be updated, e.g., in multicore variable allocation scenario. */
 
-                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
+                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->bp.num_variables();
                          ++var_idx) {
                         all_vars.emplace_back(blueprint_variable<FieldType>(var_idx));
                     }
@@ -137,20 +155,20 @@ namespace nil {
                 template<typename FieldType>
                 void r1cs_pcd_message_variable<FieldType>::generate_r1cs_witness(
                     const std::shared_ptr<r1cs_pcd_message<FieldType>> &message) {
-                    all_vars.fill_with_field_elements(this->pb, message->as_r1cs_variable_assignment());
+                    all_vars.fill_with_field_elements(this->bp, message->as_r1cs_variable_assignment());
                 }
 
                 template<typename FieldType>
-                r1cs_pcd_local_data_variable<FieldType>::r1cs_pcd_local_data_variable(blueprint<FieldType> &pb) :
-                    component<FieldType>(pb) {
-                    num_vars_at_construction = pb.num_variables();
+                r1cs_pcd_local_data_variable<FieldType>::r1cs_pcd_local_data_variable(blueprint<FieldType> &bp) :
+                    component<FieldType>(bp) {
+                    num_vars_at_construction = bp.num_variables();
                 }
 
                 template<typename FieldType>
                 void r1cs_pcd_local_data_variable<FieldType>::update_all_vars() {
                     /* (the same NOTE as for r1cs_message_variable applies) */
 
-                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
+                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->bp.num_variables();
                          ++var_idx) {
                         all_vars.emplace_back(blueprint_variable<FieldType>(var_idx));
                     }
@@ -159,18 +177,18 @@ namespace nil {
                 template<typename FieldType>
                 void r1cs_pcd_local_data_variable<FieldType>::generate_r1cs_witness(
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data) {
-                    all_vars.fill_with_field_elements(this->pb, local_data->as_r1cs_variable_assignment());
+                    all_vars.fill_with_field_elements(this->bp, local_data->as_r1cs_variable_assignment());
                 }
 
                 template<typename FieldType, typename BlueprintType>
                 compliance_predicate_handler<FieldType, BlueprintType>::compliance_predicate_handler(
-                    const BlueprintType &pb,
+                    const BlueprintType &bp,
                     const std::size_t name,
                     const std::size_t type,
                     const std::size_t max_arity,
                     const bool relies_on_same_type_inputs,
                     const std::set<std::size_t> &accepted_input_types) :
-                    pb(pb),
+                    bp(bp),
                     name(name), type(type), max_arity(max_arity),
                     relies_on_same_type_inputs(relies_on_same_type_inputs), accepted_input_types(accepted_input_types) {
                     incoming_messages.resize(max_arity);
@@ -180,9 +198,9 @@ namespace nil {
                 void compliance_predicate_handler<FieldType, BlueprintType>::generate_r1cs_witness(
                     const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value) {
-                    pb.clear_values();
-                    pb.val(outgoing_message->type) = typename FieldType::value_type(type);
-                    pb.val(arity) = typename FieldType::value_type(incoming_message_values.size());
+                    bp.clear_values();
+                    bp.val(outgoing_message->type) = typename FieldType::value_type(type);
+                    bp.val(arity) = typename FieldType::value_type(incoming_message_values.size());
 
                     for (std::size_t i = 0; i < incoming_message_values.size(); ++i) {
                         incoming_messages[i]->generate_r1cs_witness(incoming_message_values[i]);
@@ -212,11 +230,11 @@ namespace nil {
                          (max_arity + std::accumulate(incoming_message_payload_lengths.begin(),
                                                       incoming_message_payload_lengths.end(), 0)) +
                          local_data_length);
-                    const std::size_t witness_length = pb.num_variables() - all_but_witness_length;
+                    const std::size_t witness_length = bp.num_variables() - all_but_witness_length;
 
-                    r1cs_constraint_system<FieldType> constraint_system = pb.get_constraint_system();
+                    r1cs_constraint_system<FieldType> constraint_system = bp.get_constraint_system();
                     constraint_system.primary_input_size = 1 + outgoing_message_payload_length;
-                    constraint_system.auxiliary_input_size = pb.num_variables() - constraint_system.primary_input_size;
+                    constraint_system.auxiliary_input_size = bp.num_variables() - constraint_system.primary_input_size;
 
                     return r1cs_pcd_compliance_predicate<FieldType>(name,
                                                                     type,
@@ -233,7 +251,7 @@ namespace nil {
                 template<typename FieldType, typename BlueprintType>
                 r1cs_variable_assignment<FieldType>
                     compliance_predicate_handler<FieldType, BlueprintType>::get_full_variable_assignment() const {
-                    return pb.full_variable_assignment();
+                    return bp.full_variable_assignment();
                 }
 
                 template<typename FieldType, typename BlueprintType>
@@ -244,7 +262,7 @@ namespace nil {
 
                 template<typename FieldType, typename BlueprintType>
                 std::size_t compliance_predicate_handler<FieldType, BlueprintType>::get_arity() const {
-                    return pb.val(arity).as_ulong();
+                    return bp.val(arity).as_ulong();
                 }
 
                 template<typename FieldType, typename BlueprintType>
@@ -262,8 +280,9 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename BlueprintType>
-                r1cs_pcd_witness<FieldType> compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
-                    const r1cs_variable_assignment<FieldType> va = pb.full_variable_assignment();
+                r1cs_pcd_witness<FieldType>
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
+                    const r1cs_variable_assignment<FieldType> va = bp.full_variable_assignment();
                     // outgoing_message + arity + incoming_messages + local_data
                     const std::size_t witness_pos =
                         (outgoing_message->all_vars.size() + 1 +
@@ -281,4 +300,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CP_HANDLER_HPP_
+#endif    // CP_HANDLER_HPP

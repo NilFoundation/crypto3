@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of functionality that runs the R1CS SEppzkSNARK for
 // a given R1CS example.
@@ -13,8 +29,7 @@
 #ifndef CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp>
 
 #include "r1cs_examples.hpp"
 
@@ -44,20 +59,20 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    r1cs_se_ppzksnark_keypair<CurveType> keypair =
-                        r1cs_se_ppzksnark_generator<CurveType>(example.constraint_system);
+                    typename r1cs_se_ppzksnark<CurveType>::keypair_type keypair =
+                        r1cs_se_ppzksnark<CurveType>::generator(example.constraint_system);
 
-                    r1cs_se_ppzksnark_processed_verification_key<CurveType> pvk =
-                        r1cs_se_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename r1cs_se_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                        r1cs_se_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
 
-                    r1cs_se_ppzksnark_proof<CurveType> proof =
-                        r1cs_se_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof = r1cs_se_ppzksnark<CurveType>::prover(
+                        keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    const bool ans =
-                        r1cs_se_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
+                    const bool ans = r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(
+                        keypair.vk, example.primary_input, proof);
 
-                    const bool ans2 =
-                        r1cs_se_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
+                    const bool ans2 = r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(
+                        pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;
