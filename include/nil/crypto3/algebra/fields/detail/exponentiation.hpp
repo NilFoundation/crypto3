@@ -38,7 +38,7 @@ namespace nil {
             namespace fields {
                 namespace detail {
                     template<typename FieldValueType, typename NumberType>
-                    FieldValueType power(const FieldValueType &base, const NumberType &exponent) {
+                    constexpr FieldValueType power(const FieldValueType &base, const NumberType &exponent) {
                         FieldValueType result = FieldValueType::one();
 
                         if (exponent == 0)

@@ -55,64 +55,64 @@ namespace nil {
 
                         data_type data;
 
-                        element_fp3() {
+                        constexpr element_fp3() {
                             data =
                                 data_type({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        element_fp3(int in_data0, int in_data1, int in_data2) {
+                        constexpr element_fp3(int in_data0, int in_data1, int in_data2) {
                             data = data_type(
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
 
-                        element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
+                        constexpr element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
                             data = data_type(
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
 
-                        element_fp3(const data_type &in_data) {
+                        constexpr element_fp3(const data_type &in_data) {
                             data = data_type({in_data[0], in_data[1], in_data[2]});
                         };
 
-                        element_fp3(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
+                        constexpr element_fp3(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 
-                        element_fp3(const element_fp3 &other) {
+                        constexpr element_fp3(const element_fp3 &other) {
                             data[0] = underlying_type(other.data[0]);
                             data[1] = underlying_type(other.data[1]);
                             data[2] = underlying_type(other.data[2]);
                         };
 
-                        inline static element_fp3 zero() {
+                        constexpr inline static element_fp3 zero() {
                             return element_fp3(
                                 underlying_type::zero(), underlying_type::zero(), underlying_type::zero());
                         }
 
-                        inline static element_fp3 one() {
+                        constexpr inline static element_fp3 one() {
                             return element_fp3(
                                 underlying_type::one(), underlying_type::zero(), underlying_type::zero());
                         }
 
-                        bool is_zero() const {
+                        constexpr bool is_zero() const {
                             return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero()) &&
                                    (data[2] == underlying_type::zero());
                         }
 
-                        bool is_one() const {
+                        constexpr bool is_one() const {
                             return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero()) &&
                                    (data[2] == underlying_type::zero());
                         }
 
-                        bool operator==(const element_fp3 &B) const {
+                        constexpr bool operator==(const element_fp3 &B) const {
                             return (data[0] == B.data[0]) && (data[1] == B.data[1]) && (data[2] == B.data[2]);
                         }
 
-                        bool operator!=(const element_fp3 &B) const {
+                        constexpr bool operator!=(const element_fp3 &B) const {
                             return (data[0] != B.data[0]) || (data[1] != B.data[1]) || (data[2] != B.data[2]);
                         }
 
-                        element_fp3 &operator=(const element_fp3 &B) {
+                        constexpr element_fp3 &operator=(const element_fp3 &B) {
                             data[0] = B.data[0];
                             data[1] = B.data[1];
                             data[2] = B.data[2];
@@ -120,37 +120,37 @@ namespace nil {
                             return *this;
                         }
 
-                        element_fp3 operator+(const element_fp3 &B) const {
+                        constexpr element_fp3 operator+(const element_fp3 &B) const {
                             return element_fp3(data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]);
                         }
 
-                        element_fp3 doubled() const {
+                        constexpr element_fp3 doubled() const {
                             return element_fp3(data[0].doubled(), data[1].doubled(), data[2].doubled());
                         }
 
-                        element_fp3 operator-(const element_fp3 &B) const {
+                        constexpr element_fp3 operator-(const element_fp3 &B) const {
                             return element_fp3(data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]);
                         }
 
-                        element_fp3 &operator-=(const element_fp3 &B) {
+                        constexpr element_fp3 &operator-=(const element_fp3 &B) {
                             data[0] -= B.data[0];
                             data[1] -= B.data[1];
 
                             return *this;
                         }
 
-                        element_fp3 &operator+=(const element_fp3 &B) {
+                        constexpr element_fp3 &operator+=(const element_fp3 &B) {
                             data[0] += B.data[0];
                             data[1] += B.data[1];
 
                             return *this;
                         }
 
-                        element_fp3 operator-() const {
+                        constexpr element_fp3 operator-() const {
                             return zero() - *this;
                         }
 
-                        element_fp3 operator*(const element_fp3 &B) const {
+                        constexpr element_fp3 operator*(const element_fp3 &B) const {
                             const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
                                                   A2B2 = data[2] * B.data[2];
 
@@ -160,7 +160,7 @@ namespace nil {
                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
                         }
 
-                        element_fp3 sqrt() const {
+                        constexpr element_fp3 sqrt() const {
 
                             element_fp3 one = this->one();
 
@@ -198,21 +198,21 @@ namespace nil {
                             return x;
                         }
 
-                        element_fp3 squared() const {
+                        constexpr element_fp3 squared() const {
                             return (*this) * (*this);    // maybe can be done more effective
                         }
 
-                        bool is_square() const {
+                        constexpr bool is_square() const {
                             element_fp3 tmp = this->pow((policy_type::group_order - 1) / 2);
                             return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
                         }
 
                         template<typename PowerType>
-                        element_fp3 pow(const PowerType &pwr) const {
+                        constexpr element_fp3 pow(const PowerType &pwr) const {
                             return element_fp3(power(*this, pwr));
                         }
 
-                        element_fp3 inversed() const {
+                        constexpr element_fp3 inversed() const {
 
                             /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                              * Curves"; Algorithm 17 */
@@ -234,7 +234,7 @@ namespace nil {
                         }
 
                         template<typename PowerType>
-                        element_fp3 Frobenius_map(const PowerType &pwr) const {
+                        constexpr element_fp3 Frobenius_map(const PowerType &pwr) const {
                             return element_fp3(
                                 data[0],
                                 typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 3]) *
@@ -248,13 +248,13 @@ namespace nil {
                     };
 
                     template<typename FieldParams>
-                    element_fp3<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
+                    constexpr element_fp3<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
                                                        const element_fp3<FieldParams> &rhs) {
                         return element_fp3<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]);
                     }
 
                     template<typename FieldParams>
-                    element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs,
+                    constexpr element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs,
                                                        const typename FieldParams::underlying_type &rhs) {
                         return rhs * lhs;
                     }

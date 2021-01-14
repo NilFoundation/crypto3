@@ -36,6 +36,12 @@ macro(define_runtime_algebra_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(algebra_${name}_test PRIVATE "-fconstexpr-steps=2147483647")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(algebra_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
 endmacro()
 
 macro(define_compile_time_algebra_test name)
