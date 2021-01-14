@@ -156,7 +156,6 @@ namespace nil {
                         return next_free_lc++;
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

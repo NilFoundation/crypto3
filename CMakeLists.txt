@@ -110,12 +110,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/basic_components.hpp
      include/nil/crypto3/zk/snark/components/component_from_r1cs.hpp
 
-     include/nil/crypto3/zk/snark/relations/variable.hpp
-     include/nil/crypto3/zk/snark/routing/as_waksman.hpp
-     include/nil/crypto3/zk/snark/routing/benes.hpp
-     include/nil/crypto3/zk/snark/constraint_profiling.hpp
      include/nil/crypto3/zk/snark/component.hpp
-     include/nil/crypto3/zk/snark/integer_permutation.hpp
      include/nil/crypto3/zk/snark/merkle_tree.hpp
      include/nil/crypto3/zk/snark/blueprint_variable.hpp
      include/nil/crypto3/zk/snark/blueprint.hpp)
