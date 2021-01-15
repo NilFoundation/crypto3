@@ -38,6 +38,20 @@
 #endif
 
 #include <boost/multiprecision/ressol.hpp>
+#include <boost/multiprecision/cpp_int/literals.hpp>
+
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(4);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(7);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(8);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(13);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(15);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(16);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(18);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(315);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521);
+
+using namespace boost::multiprecision;
 
 template <typename T>
 void test()
@@ -126,7 +140,176 @@ void test_backend()
    modular = number<backends::modular_adaptor<T> >(120846049, "0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff");
    modular.backend().mod_data().adjust_regular(res.backend(), ressol(modular).backend().base_data());
    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int("0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e"));
+}
 
+constexpr
+    bool test_static()
+{
+   constexpr auto a1 = 0x5_cppi4;
+   constexpr auto p1 = 0xb_cppi4;
+   constexpr auto res1 = 0x4_cppi4;
+   static_assert(ressol(a1, p1) == res1, "ressol error");
+
+   constexpr auto a2 = 0x5_cppi521;
+   constexpr auto p2 = 0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppi521;
+   constexpr auto res2 = 0x17e76bd20bdb7664ba9117dd46c437ac50063e33390efa159b637a043df2fbfa55e97b9f7dc55968462121ec1b7a8d686ff263d511011f1b2ee6af5fa7726b97b18_cppi521;
+   static_assert(ressol(a2, p2) == res2, "ressol error");
+
+   constexpr auto a3 = 0x4_cppi521;
+   constexpr auto p3 = 0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521;
+   static_assert(ressol(a3, p3) == -1, "ressol error");
+
+   constexpr auto a4 = 0xc5067ee5d80302e0561545a8467c6d5c98bc4d37672eb301c38ce9a9_cppi224;
+   constexpr auto p4 = 0xffffffffffffffffffffffffffffffff000000000000000000000001_cppi224;
+   constexpr auto res4 = 0x115490c2141baa1c2407abe908fcf3416b0cb0d290dcd3960c3ec7a7_cppi224;
+   static_assert(ressol(a4, p4) == res4, "ressol error");
+
+   constexpr auto a5 = 0x40_cppi7;
+   constexpr auto p5 = 0x55_cppi7;
+   static_assert(ressol(a5, p5) == -1, "ressol error");
+
+   constexpr auto a6 = 0xb5_cppi8;
+   constexpr auto p6 = 0xd9_cppi8;
+   static_assert(ressol(a6, p6) == -1, "ressol error");
+
+   constexpr auto a7 = 0x1081_cppi16;
+   constexpr auto p7 = 0x8181_cppi16;
+   static_assert(ressol(a7, p7) == -1, "ressol error");
+
+   constexpr auto a8 = 0x800_cppi15;
+   constexpr auto p8 = 0x7ab9_cppi15;
+   static_assert(ressol(a8, p8) == -1, "ressol error");
+
+   constexpr auto a9 = 0x2_cppi13;
+   constexpr auto p9 = 0x1111_cppi13;
+   static_assert(ressol(a9, p9) == -1, "ressol error");
+
+   constexpr auto a10 = 0x400_cppi315;
+   constexpr auto p10 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315;
+   constexpr auto res10 = 0x20_cppi315;
+   static_assert(ressol(a10, p10) == res10, "ressol error");
+
+   constexpr auto a11 = 0x400_cppi18;
+   constexpr auto p11 = 0x2aaab_cppi18;
+   constexpr auto res11 = 0x2aa8b_cppi18;
+   static_assert(ressol(a11, p11) == res11, "ressol error");
+
+   constexpr auto a12 = 0x401_cppi315;
+   constexpr auto p12 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315;
+   constexpr auto res12 = 0xdcc6506af06fe9e142cacb7b5ff56c1864fe7a0b2f7fb10739990aed564e07beb533b5edd95fa3_cppi315;
+   static_assert(ressol(a12, p12) == res12, "ressol error");
+
+   constexpr auto a13 = 0x10_cppi315;
+   constexpr auto p13 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315;
+   constexpr auto res13 = 0x4_cppi315;
+   static_assert(ressol(a13, p13) == res13, "ressol error");
+
+   constexpr auto a14 = 0x733f6e1_cppi315;
+   constexpr auto p14 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315;
+   constexpr auto res14 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e_cppi315;
+   static_assert(ressol(a14, p14) == res14, "ressol error");
+
+   return true;
+}
+
+constexpr
+    bool test_backend_static()
+{
+   constexpr auto a1_m = number<backends::modular_adaptor<backends::cpp_int_backend<4, 4>> >(0x5_cppi4, 0xb_cppi4);
+   constexpr auto res1 = 0x4_cppi4;
+   static_assert(ressol(a1_m).template convert_to<number<backends::cpp_int_backend<4, 4>>>() == res1, "ressol error");
+
+   constexpr auto a2_m = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       0x5_cppi521,
+       0x1ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppi521);
+   constexpr auto res2 = 0x17e76bd20bdb7664ba9117dd46c437ac50063e33390efa159b637a043df2fbfa55e97b9f7dc55968462121ec1b7a8d686ff263d511011f1b2ee6af5fa7726b97b18_cppi521;
+   static_assert(ressol(a2_m).template convert_to<number<backends::cpp_int_backend<521, 521>>>() == res2, "ressol error");
+
+   constexpr auto a3_m = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       0x4_cppi521,
+       0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521);
+   constexpr auto negone_3 = number<backends::modular_adaptor<backends::cpp_int_backend<521, 521>> >(
+       number<backends::cpp_int_backend<521, 521>>(-1),
+       0x1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd_cppi521);
+   static_assert(ressol(a3_m) == negone_3, "ressol error");
+
+   constexpr auto a4_m = number<backends::modular_adaptor<backends::cpp_int_backend<224, 224>> >(
+       0xc5067ee5d80302e0561545a8467c6d5c98bc4d37672eb301c38ce9a9_cppi224,
+       0xffffffffffffffffffffffffffffffff000000000000000000000001_cppi224);
+   constexpr auto res4 = 0x115490c2141baa1c2407abe908fcf3416b0cb0d290dcd3960c3ec7a7_cppi224;
+   static_assert(ressol(a4_m).template convert_to<number<backends::cpp_int_backend<224, 224>>>() == res4, "ressol error");
+
+   constexpr auto a5_m = number<backends::modular_adaptor<backends::cpp_int_backend<7, 7>> >(
+       0x40_cppi7,
+       0x55_cppi7);
+   constexpr auto negone_5 = number<backends::modular_adaptor<backends::cpp_int_backend<7, 7>> >(
+       number<backends::cpp_int_backend<7, 7>>(-1),
+       0x55_cppi7);
+   static_assert(ressol(a5_m) == negone_5, "ressol error");
+
+   constexpr auto a6_m = number<backends::modular_adaptor<backends::cpp_int_backend<8, 8>> >(
+       0xb5_cppi8,
+       0xd9_cppi8);
+   constexpr auto negone_6 = number<backends::modular_adaptor<backends::cpp_int_backend<8, 8>> >(
+       number<backends::cpp_int_backend<8, 8>>(-1),
+       0xd9_cppi8);
+   static_assert(ressol(a6_m) == negone_6, "ressol error");
+
+   constexpr auto a7_m = number<backends::modular_adaptor<backends::cpp_int_backend<16, 16>> >(
+       0x1081_cppi16,
+       0x8181_cppi16);
+   constexpr auto negone_7 = number<backends::modular_adaptor<backends::cpp_int_backend<16, 16>> >(
+       number<backends::cpp_int_backend<16, 16>>(-1),
+       0x8181_cppi16);
+   static_assert(ressol(a7_m) == negone_7, "ressol error");
+
+   constexpr auto a8_m = number<backends::modular_adaptor<backends::cpp_int_backend<15, 15>> >(
+       0x800_cppi15,
+       0x7ab9_cppi15);
+   constexpr auto negone_8 = number<backends::modular_adaptor<backends::cpp_int_backend<15, 15>> >(
+       number<backends::cpp_int_backend<15, 15>>(-1),
+       0x7ab9_cppi15);
+   static_assert(ressol(a8_m) == negone_8, "ressol error");
+
+   constexpr auto a9_m = number<backends::modular_adaptor<backends::cpp_int_backend<13, 13>> >(
+       0x2_cppi13,
+       0x1111_cppi13);
+   constexpr auto negone_9 = number<backends::modular_adaptor<backends::cpp_int_backend<13, 13>> >(
+       number<backends::cpp_int_backend<13, 13>>(-1),
+       0x1111_cppi13);
+   static_assert(ressol(a9_m) == negone_9, "ressol error");
+
+   constexpr auto a10_m = number<backends::modular_adaptor<backends::cpp_int_backend<315, 315>> >(
+       0x400_cppi315,
+       0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315);
+   constexpr auto res10 = 0x20_cppi315;
+   static_assert(ressol(a10_m).template convert_to<number<backends::cpp_int_backend<315, 315>>>() == res10, "ressol error");
+
+   constexpr auto a11_m = number<backends::modular_adaptor<backends::cpp_int_backend<18, 18>> >(
+       0x400_cppi18,
+       0x2aaab_cppi18);
+   constexpr auto res11 = 0x2aa8b_cppi18;
+   static_assert(ressol(a11_m).template convert_to<number<backends::cpp_int_backend<18, 18>>>() == res11, "ressol error");
+
+   constexpr auto a12_m = number<backends::modular_adaptor<backends::cpp_int_backend<315, 315>> >(
+       0x401_cppi315,
+       0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315);
+   constexpr auto res12 = 0xdcc6506af06fe9e142cacb7b5ff56c1864fe7a0b2f7fb10739990aed564e07beb533b5edd95fa3_cppi315;
+   static_assert(ressol(a12_m).template convert_to<number<backends::cpp_int_backend<315, 315>>>() == res12, "ressol error");
+
+   constexpr auto a13_m = number<backends::modular_adaptor<backends::cpp_int_backend<315, 315>> >(
+       0x10_cppi315,
+       0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315);
+   constexpr auto res13 = 0x4_cppi315;
+   static_assert(ressol(a13_m).template convert_to<number<backends::cpp_int_backend<315, 315>>>() == res13, "ressol error");
+
+   constexpr auto a14_m = number<backends::modular_adaptor<backends::cpp_int_backend<315, 315>> >(
+       0x733f6e1_cppi315,
+       0x40000000000000000000000000000000000000000000000000000000000c100000000000000ffff_cppi315);
+   constexpr auto res14 = 0x40000000000000000000000000000000000000000000000000000000000c100000000000000d50e_cppi315;
+   static_assert(ressol(a14_m).template convert_to<number<backends::cpp_int_backend<315, 315>>>() == res14, "ressol error");
+
+   return true;
 }
 
 int main()
@@ -134,6 +317,10 @@ int main()
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
    test_backend<boost::multiprecision::cpp_int_backend<>>();
+   constexpr
+       bool res1 = test_static();
+   constexpr
+       bool res2 = test_backend_static();
 #endif
 #ifdef TEST_MPZ
    test<boost::multiprecision::mpz_int>();

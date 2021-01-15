@@ -7,6 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#define BOOST_TEST_MODULE inverse_multiprecision_test
+
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
+
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
 #endif
@@ -26,6 +32,26 @@
 #include <boost/multiprecision/modular/modular_params.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_modular.hpp>
+
+#include <boost/multiprecision/cpp_int/literals.hpp>
+
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(585);
+
+using namespace boost::multiprecision;
+
+namespace boost {
+namespace test_tools {
+namespace tt_detail {
+template <template <typename, typename> class P, typename K, typename V>
+struct print_log_value<P<K, V> >
+{
+   void operator()(std::ostream&, P<K, V> const&)
+   {
+   }
+};
+}
+}
+} // namespace boost::test_tools::tt_detail
 
 template <typename T>
 void test_cpp_int()
@@ -119,13 +145,57 @@ void test_cpp_int_backend()
    BOOST_CHECK_EQUAL(cpp_int(res.backend()), cpp_int(140404367363));
 }
 
-int main()
+BOOST_AUTO_TEST_SUITE(runtime_tests)
+
+BOOST_AUTO_TEST_CASE(cpp_int_test)
 {
 #ifdef TEST_CPP_INT
    test_cpp_int<boost::multiprecision::cpp_int>();
-   test_cpp_int_backend<boost::multiprecision::cpp_int_backend<>>();
+   test_cpp_int_backend<boost::multiprecision::cpp_int_backend<> >();
 #endif
-
-   return boost::report_errors();
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(static_tests)
+
+BOOST_AUTO_TEST_CASE(cpp_int_fixed_test)
+{
+   using Backend = cpp_int_backend<585, 585>;
+   using Backend_modular = modular_adaptor<Backend>;
+   using modular_number = number<Backend_modular>;
+
+   constexpr auto mod = 0x100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000_cppui585;
+   constexpr auto a = 0xfeff_cppui585;
+   constexpr auto a_inv = 0x565eb513c8dca58227a9d17b4cc814dcf1cec08f4fdf2f0e3d4b88d45d318ec04f0f5e6dcc3a06404686cd542175970ca3b05404585cb511c6d89f78178fa736de14f307fb02fe00ff_cppui585;
+   static_assert(a_inv == inverse_extended_euclidean_algorithm(a, mod), "inverse error");
+
+   constexpr modular_number a_m(a, mod);
+   constexpr modular_number a_inv_m(a_inv, mod);
+   static_assert(a_inv_m == inverse_extended_euclidean_algorithm(a_m), "inverse error");
+
+   using T = number<Backend>;
+
+   static_assert(inverse_extended_euclidean_algorithm(T(3), T(8))==T(3));
+   static_assert(inverse_extended_euclidean_algorithm(T(46), T(207))==T(0));
+   static_assert(inverse_extended_euclidean_algorithm(T(2), T(2))==T(0));
+   static_assert(inverse_extended_euclidean_algorithm(T(0), T(2))==T(0));
+   static_assert(inverse_extended_euclidean_algorithm(T(46), T(46))== T(0));
+   static_assert(inverse_extended_euclidean_algorithm(T(1), T(7))== T(1));
+   static_assert(inverse_extended_euclidean_algorithm(T(35), T(118))== T(27));
+   static_assert(inverse_extended_euclidean_algorithm(T(37), T(37))==T(0));
+   static_assert(inverse_extended_euclidean_algorithm(T(32), T(247))== T(193));
+   static_assert(inverse_extended_euclidean_algorithm(T(3), T(232))== T(155));
+
+   static_assert(monty_inverse(T(12), T(5), T(5))==T(1823));
+   static_assert(monty_inverse(T(10), T(37), T(1))==T(26));
+   static_assert(monty_inverse(T(3), T(2), T(3))==T(3));
+   static_assert(monty_inverse(T(3), T(4), T(2))==T(11));
+   static_assert(monty_inverse(T(4), T(7), T(2))==T(37));
+   static_assert(monty_inverse(T(32), T(247), T(1))==T(193));
+   static_assert(monty_inverse(T(3), T(7), T(7))==T(549029));
+   static_assert(monty_inverse(T(5317589), T(23), T(8))==T(32104978469));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

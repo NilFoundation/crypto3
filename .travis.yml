@@ -49,8 +49,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-    - 33-extended-inverse
-    - 30-jacobi-symbol
+    - 6-shanks-tonelli
 
 env:
   matrix:

@@ -11,11 +11,13 @@
 
 #include <boost/multiprecision/detail/default_ops.hpp>
 
+#include <boost/multiprecision/modular/modular_functions_fixed.hpp>
+
 namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline int eval_jacobi(const Backend& a, const Backend& n)
+constexpr int eval_jacobi(const Backend& a, const Backend& n)
 {
    using default_ops::eval_divide;
    using default_ops::eval_get_sign;
@@ -48,7 +50,9 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
 
       if (eval_gt(x, yd2))
       {
-         eval_subtract(x, y, x);
+         Backend tmp(y);
+         eval_subtract(tmp, x);
+         x = tmp;
          if (eval_integer_modulus(y, 4) == 3)
          {
             J = -J;
@@ -60,7 +64,7 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
       }
 
       size_t shifts = eval_lsb(x);
-      eval_right_shift(x, shifts);
+      backends::custom_right_shift(x, shifts);
       if (shifts & 1)
       {
          std::size_t y_mod_8 = eval_integer_modulus(y, 8);
@@ -75,7 +79,10 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
          J = -J;
       }
 
-      std::swap(x, y);
+      // std::swap(x, y);
+      auto tmp = x;
+      x = y;
+      y = tmp;
    }
    return J;
 }
@@ -90,7 +97,7 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
  * @return (n / m)
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
+constexpr typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
     const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 {
    return eval_jacobi(a.backend(), n.backend());

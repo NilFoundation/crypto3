@@ -22,7 +22,7 @@ namespace multiprecision {
 namespace backends {
 
 template <typename Backend>
-Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y)
+constexpr Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y)
 {
    if (eval_is_zero(a))
    {
@@ -44,8 +44,10 @@ Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Ba
 }
 
 template <typename Backend>
-Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m)
+constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m)
 {
+   using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
+
    Backend                                                             aa = a, mm = m, x, y, g;
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
    g = eval_extended_euclidean_algorithm(aa, mm, x, y);
@@ -57,14 +59,15 @@ Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backen
    else
    {
       eval_modulus(x, m);
-      eval_add(x, m);
-      eval_modulus(x, m);
-      return x;
+      Backend_doubled tmp(x);
+      eval_add(tmp, m);
+      eval_modulus(tmp, m);
+      return static_cast<Backend>(tmp);
    }
 }
 
 template <typename Backend>
-typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typename mpl::front<typename Backend::signed_types>::type a)
+constexpr typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typename mpl::front<typename Backend::signed_types>::type a)
 {
    typedef typename mpl::front<typename Backend::signed_types>::type si_type;
 
@@ -98,7 +101,7 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
 }
 
 template <typename Backend>
-void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k)
+constexpr void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k)
 {
 
    using default_ops::eval_modulus;
@@ -124,7 +127,7 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
    eval_subtract(k_negone, one);
    res = zero;
 
-   ui_type kn = cpp_int(k_negone);
+   // ui_type kn = cpp_int(k_negone);
 
    while (!eval_eq(i, k))
    {
