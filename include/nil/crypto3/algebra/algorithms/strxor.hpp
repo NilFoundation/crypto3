@@ -57,7 +57,12 @@ namespace nil {
                 BOOST_ASSERT(std::distance(in1.begin(), in1.end()) == std::distance(in2.begin(), in2.end()) &&
                              std::distance(in1.begin(), in1.end()) == std::distance(out.begin(), out.end()));
 
-                strxor(in1.begin(), in1.end(), in2.begin(), in2.end(), out.begin());
+                auto in1_i = in1.begin();
+                auto in2_i = in2.begin();
+                auto out_i = out.begin();
+                while (in1_i != in1.end() && in2_i != in2.end()) {
+                    *out_i++ = *in1_i++ ^ *in2_i++;
+                }
             }
         }    // namespace algebra
     }        // namespace crypto3
