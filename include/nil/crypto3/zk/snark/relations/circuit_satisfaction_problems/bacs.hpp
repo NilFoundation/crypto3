@@ -62,6 +62,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 struct bacs_gate {
+                    typedef FieldType field_type;
 
                     linear_combination<FieldType> lhs;
                     linear_combination<FieldType> rhs;
@@ -106,8 +107,9 @@ namespace nil {
                  * Thus, the 0-th variable is not included in num_variables.
                  */
                 template<typename FieldType>
-                class bacs_circuit {
-                public:
+                struct bacs_circuit {
+                    typedef FieldType field_type;
+
                     std::size_t primary_input_size;
                     std::size_t auxiliary_input_size;
                     std::vector<bacs_gate<FieldType>> gates;

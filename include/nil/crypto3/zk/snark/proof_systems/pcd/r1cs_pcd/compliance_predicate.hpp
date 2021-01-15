@@ -52,8 +52,7 @@ namespace nil {
                  * - a payload (a vector of field elements).
                  */
                 template<typename FieldType>
-                class r1cs_pcd_message {
-                public:
+                struct r1cs_pcd_message {
                     std::size_t type;
 
                     r1cs_pcd_message(std::size_t type) : type(type) {
@@ -74,8 +73,7 @@ namespace nil {
                  * A local data for R1CS PCD.
                  */
                 template<typename FieldType>
-                class r1cs_pcd_local_data {
-                public:
+                struct r1cs_pcd_local_data {
                     r1cs_pcd_local_data() = default;
                     virtual r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const = 0;
                     virtual ~r1cs_pcd_local_data() = default;

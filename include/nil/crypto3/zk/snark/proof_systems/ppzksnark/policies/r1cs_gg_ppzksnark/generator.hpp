@@ -83,7 +83,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_generator {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                         typedef typename CurveType::pairing_policy pairing_policy;
                         typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -92,16 +92,16 @@ namespace nil {
                         typedef typename CurveType::gt_type gt_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
                         typedef typename types_policy::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline keypair_type process(const constraint_system_type &cs) {
 
@@ -266,7 +266,6 @@ namespace nil {
                             return keypair_type(std::move(pk), std::move(vk));
                         }
                     };
-
                 }    // namespace policies
             }        // namespace snark
         }            // namespace zk
