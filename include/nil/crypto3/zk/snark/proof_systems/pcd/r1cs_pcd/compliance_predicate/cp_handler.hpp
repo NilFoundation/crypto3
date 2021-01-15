@@ -49,7 +49,7 @@ namespace nil {
                  * A variable to represent an r1cs_pcd_message.
                  */
                 template<typename FieldType>
-                class r1cs_pcd_message_variable : public component<FieldType> {
+                class r1cs_pcd_message_variable : public components::component<FieldType> {
                 protected:
                     std::size_t num_vars_at_construction;
 
@@ -72,7 +72,7 @@ namespace nil {
                  * A variable to represent an r1cs_pcd_local_data.
                  */
                 template<typename FieldType>
-                class r1cs_pcd_local_data_variable : public component<FieldType> {
+                class r1cs_pcd_local_data_variable : public components::component<FieldType> {
                 protected:
                     std::size_t num_vars_at_construction;
 
@@ -115,7 +115,7 @@ namespace nil {
                         const std::size_t type,
                         const std::size_t max_arity,
                         const bool relies_on_same_type_inputs,
-                        const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
+                        const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
                     virtual void generate_r1cs_constraints() = 0;
                     virtual void generate_r1cs_witness(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
@@ -134,7 +134,7 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_pcd_message_variable<FieldType>::r1cs_pcd_message_variable(blueprint<FieldType> &bp) :
-                    component<FieldType>(bp) {
+                    components::component<FieldType>(bp) {
                     type.allocate(bp);
                     all_vars.emplace_back(type);
 
@@ -161,7 +161,7 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_pcd_local_data_variable<FieldType>::r1cs_pcd_local_data_variable(blueprint<FieldType> &bp) :
-                    component<FieldType>(bp) {
+                    components::component<FieldType>(bp) {
                     num_vars_at_construction = bp.num_variables();
                 }
 
