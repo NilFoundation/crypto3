@@ -899,11 +899,11 @@ void pairing_operation_test(const TestSet &test_set) {
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
 // TODO: fix reduced_pairing
-// BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {
-//     using pairing_policy = typename curves::bls12<381>::pairing_policy;
-//
-//     pairing_operation_test<pairing_policy>(data_set);
-// }
+BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {
+    using pairing_policy = typename curves::bls12<381>::pairing_policy;
+
+    pairing_operation_test<pairing_policy>(data_set);
+}
 
 BOOST_DATA_TEST_CASE(pairing_operation_test_mnt4_298, string_data("pairing_operation_test_mnt4_298"), data_set) {
     using pairing_policy = typename curves::mnt4<298>::pairing_policy;

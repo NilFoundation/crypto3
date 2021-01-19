@@ -39,7 +39,7 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
-                        /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
+                        constexpr static const typename policy_type::non_residue_type non_residue =
                             typename policy_type::non_residue_type(policy_type::non_residue[0],
                                                                    policy_type::non_residue[1]);
 

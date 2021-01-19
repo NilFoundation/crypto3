@@ -28,6 +28,9 @@
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -39,7 +42,7 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
-                        /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
+                        constexpr static const typename policy_type::non_residue_type non_residue =
                             typename policy_type::non_residue_type(policy_type::non_residue[0],
                                                                    policy_type::non_residue[1]);
 
@@ -177,9 +180,9 @@ namespace nil {
 
                         element_fp12_2over3over2 cyclotomic_squared() const {
                             // naive implementation
-                            return this->squared();
+                            // return this->squared();
 
-                            /*typename underlying_type::underlying_type z0 = data[0].data[0];
+                            typename underlying_type::underlying_type z0 = data[0].data[0];
                             typename underlying_type::underlying_type z4 = data[0].data[1];
                             typename underlying_type::underlying_type z3 = data[0].data[2];
 
@@ -238,29 +241,30 @@ namespace nil {
                             z5 = z5 + z5;
                             z5 = z5 + t3;
 
-                            return element_fp12_2over3over2(my_Fp6(z0,z4,z3),my_Fp6(z2,z1,z5));*/
+                            return element_fp12_2over3over2(underlying_type(z0,z4,z3),underlying_type(z2,z1,z5));
                         }
 
                         template<typename PowerType>
                         element_fp12_2over3over2 cyclotomic_exp(const PowerType &exponent) const {
-                            /*element_fp12_2over3over2 res = one();
+                            element_fp12_2over3over2 res = one();
+
+                            if (exponent == 0)
+                                return res;
 
                             bool found_one = false;
-                            for (long i = m-1; i >= 0; --i) {
-                                for (long j = GMP_NUMB_BITS - 1; j >= 0; --j) {
-                                    if (found_one) {
-                                        res = res.cyclotomic_squared();
-                                    }
+                            for (long i = boost::multiprecision::msb(exponent); i >= 0; --i) {
+                                if (found_one) {
+                                    res = res.cyclotomic_squared();
+                                }
 
-                                    if (exponent.data[i] & (1ul<<j)) {
-                                        found_one = true;
-                                        res = res * (*this);
-                                    }
+                                if (boost::multiprecision::bit_test(exponent, i)) {
+                                    found_one = true;
+                                    res = res * (*this);
                                 }
                             }
 
-                            return res;*/
-                            return *this;
+                            return res;
+                            // return *this;
                         }
 
                         element_fp12_2over3over2
