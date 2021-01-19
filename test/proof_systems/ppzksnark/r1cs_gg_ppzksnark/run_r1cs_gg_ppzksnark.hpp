@@ -29,6 +29,8 @@
 #ifndef CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
+#include <boost/config.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
@@ -98,7 +100,7 @@ namespace nil {
 
                     std::cout << "Starting prover" << std::endl;
 
-                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = 
+                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof =
                         prover<basic_proof_system>(keypair.pk, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
@@ -107,7 +109,7 @@ namespace nil {
                        example.primary_input, proof);*/
 
                     std::cout << "Starting verifier" << std::endl;
-                    
+
                     const bool ans = verifier<basic_proof_system>(keypair.vk, example.primary_input, proof);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;

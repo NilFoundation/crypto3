@@ -61,6 +61,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/proving_key.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,6 +71,7 @@ namespace nil {
 
                     template<typename CurveType>
                     struct r1cs_gg_ppzksnark_basic_policy {
+                        typedef CurveType curve_type;
 
                         /******************************** Params ********************************/
 
@@ -77,25 +79,25 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system;
+                        typedef r1cs_constraint_system<typename curve_type::scalar_field_type> constraint_system;
 
-                        typedef r1cs_primary_input<typename CurveType::scalar_field_type> primary_input;
+                        typedef r1cs_primary_input<typename curve_type::scalar_field_type> primary_input;
 
-                        typedef r1cs_auxiliary_input<typename CurveType::scalar_field_type> auxiliary_input;
+                        typedef r1cs_auxiliary_input<typename curve_type::scalar_field_type> auxiliary_input;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_proving_key<CurveType> proving_key;
+                        typedef r1cs_gg_ppzksnark_proving_key<curve_type, constraint_system> proving_key;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the R1CS GG-ppzkSNARK.
                          */
-                        typedef r1cs_gg_ppzksnark_verification_key<CurveType> verification_key;
+                        typedef r1cs_gg_ppzksnark_verification_key<curve_type> verification_key;
 
                         /************************ Processed verification key *************************/
 
@@ -106,7 +108,7 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        typedef r1cs_gg_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
+                        typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type> processed_verification_key;
 
                         /********************************** Key pair *********************************/
 
@@ -124,45 +126,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        struct proof {
-
-                            typename CurveType::g1_type::value_type g_A;
-                            typename CurveType::g2_type::value_type g_B;
-                            typename CurveType::g1_type::value_type g_C;
-
-                            proof() {
-                                // invalid proof with valid curve points
-                                this->g_A = CurveType::g1_type::value_type::one();
-                                this->g_B = CurveType::g2_type::value_type::one();
-                                this->g_C = CurveType::g1_type::value_type::one();
-                            }
-                            proof(typename CurveType::g1_type::value_type &&g_A,
-                                  typename CurveType::g2_type::value_type &&g_B,
-                                  typename CurveType::g1_type::value_type &&g_C) :
-                                g_A(std::move(g_A)),
-                                g_B(std::move(g_B)), g_C(std::move(g_C)) {};
-
-                            std::size_t G1_size() const {
-                                return 2;
-                            }
-
-                            std::size_t G2_size() const {
-                                return 1;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return G1_size() * CurveType::g1_type::value_bits +
-                                       G2_size() * CurveType::g2_type::value_bits;
-                            }
-
-                            bool is_well_formed() const {
-                                return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
-                            }
-
-                            bool operator==(const proof &other) const {
-                                return (this->g_A == other.g_A && this->g_B == other.g_B && this->g_C == other.g_C);
-                            }
-                        };
+                        typedef r1cs_gg_ppzksnark_proof<CurveType> proof;
                     };
                 }    // namespace detail
             }        // namespace snark

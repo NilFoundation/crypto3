@@ -13,13 +13,14 @@ cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::algebra
+                       ${CMAKE_WORKSPACE_NAME}::blueprint
                        ${CMAKE_WORKSPACE_NAME}::fft
                        ${CMAKE_WORKSPACE_NAME}::zk
 
-                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
-                       $<TARGET_NAME_IF_EXISTS:boost_math>
+                       ${Boost_LIBRARIES}
 
-                       ${Boost_LIBRARIES})
+                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+                       $<TARGET_NAME_IF_EXISTS:boost_math>)
 
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)

@@ -67,7 +67,7 @@
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -98,7 +98,7 @@ namespace nil {
 
                         typedef typename policy_type::proving_key proving_key_type;
                         typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
                         typedef typename policy_type::keypair keypair_type;
                         typedef typename policy_type::proof proof_type;

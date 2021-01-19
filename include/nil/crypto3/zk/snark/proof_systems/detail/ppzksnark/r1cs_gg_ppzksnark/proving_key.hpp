@@ -39,9 +39,11 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace detail {
-                    template<typename CurveType>
+                    template<typename CurveType,
+                             typename ConstraintSystem = r1cs_constraint_system<typename CurveType::scalar_field_type>>
                     struct r1cs_gg_ppzksnark_proving_key {
                         typedef CurveType curve_type;
+                        typedef ConstraintSystem constraint_system_type;
 
                         typename CurveType::g1_type::value_type alpha_g1;
                         typename CurveType::g1_type::value_type beta_g1;
@@ -55,7 +57,7 @@ namespace nil {
                         typename std::vector<typename CurveType::g1_type::value_type> H_query;
                         typename std::vector<typename CurveType::g1_type::value_type> L_query;
 
-                        constraint_system cs;
+                        constraint_system_type cs;
 
                         r1cs_gg_ppzksnark_proving_key() {};
                         r1cs_gg_ppzksnark_proving_key &operator=(const r1cs_gg_ppzksnark_proving_key &other) = default;
@@ -73,7 +75,7 @@ namespace nil {
                                 &&B_query,
                             typename std::vector<typename CurveType::g1_type::value_type> &&H_query,
                             typename std::vector<typename CurveType::g1_type::value_type> &&L_query,
-                            constraint_system &&cs) :
+                            constraint_system_type &&cs) :
                             alpha_g1(std::move(alpha_g1)),
                             beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
                             delta_g2(std::move(delta_g2)), A_query(std::move(A_query)), B_query(std::move(B_query)),

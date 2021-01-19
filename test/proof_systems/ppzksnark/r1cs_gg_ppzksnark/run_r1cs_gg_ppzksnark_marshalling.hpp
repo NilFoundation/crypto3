@@ -45,13 +45,12 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template <typename ProofSystem>
-                bool run_verifier_with_byte_input (std::vector<std::uint8_t> data){
+                template<typename ProofSystem>
+                bool run_verifier_with_byte_input(std::vector<std::uint8_t> data) {
                     using proof_system_policy = ProofSystem;
 
-                    typename detail::verifier_data_from_bits<proof_system_policy>::verifier_data vd = 
-                        detail::verifier_data_from_bits<
-                            proof_system_policy>::process(data);
+                    typename detail::verifier_data_from_bits<proof_system_policy>::verifier_data vd =
+                        detail::verifier_data_from_bits<proof_system_policy>::process(data);
 
                     std::cout << "Data converted from byte blob" << std::endl;
 
@@ -71,7 +70,8 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_r1cs_gg_ppzksnark_marshalling(const r1cs_example<typename CurveType::scalar_field_type> &example) {
+                bool run_r1cs_gg_ppzksnark_marshalling(
+                    const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
                     using proof_system_policy = r1cs_gg_ppzksnark<CurveType>;
 
@@ -82,16 +82,16 @@ namespace nil {
 
                     std::cout << "Starting prover" << std::endl;
 
-                    typename proof_system_policy::proof_type proof = 
+                    typename proof_system_policy::proof_type proof =
                         prover<proof_system_policy>(keypair.pk, example.primary_input, example.auxiliary_input);
 
-                    std::vector<std::uint8_t> data = detail::verifier_data_to_bits<
-                        proof_system_policy>::process(keypair.vk, example.primary_input, proof);
+                    std::vector<std::uint8_t> data = detail::verifier_data_to_bits<proof_system_policy>::process(
+                        keypair.vk, example.primary_input, proof);
 
                     std::cout << "Data converted to byte blob" << std::endl;
 
                     std::cout << "Starting verifier" << std::endl;
-                    
+
                     const bool ans = run_verifier_with_byte_input<proof_system_policy>(data);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;

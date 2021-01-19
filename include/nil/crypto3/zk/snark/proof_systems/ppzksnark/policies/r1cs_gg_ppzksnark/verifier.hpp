@@ -58,7 +58,7 @@
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,21 +70,21 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_verifier_process_vk {
-                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                     typedef typename CurveType::pairing_policy pairing_policy;
 
                 public:
-                    typedef typename types_policy::constraint_system constraint_system_type;
-                    typedef typename types_policy::primary_input primary_input_type;
-                    typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::constraint_system constraint_system_type;
+                    typedef typename policy_type::primary_input primary_input_type;
+                    typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                    typedef typename types_policy::proving_key proving_key_type;
-                    typedef typename types_policy::verification_key verification_key_type;
-                    typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key proving_key_type;
+                    typedef typename policy_type::verification_key verification_key_type;
+                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                    typedef typename types_policy::keypair keypair_type;
-                    typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair keypair_type;
+                    typedef typename policy_type::proof proof_type;
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
@@ -124,7 +124,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_online_verifier_weak_input_consistency {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                         typedef typename CurveType::pairing_policy pairing_policy;
                         typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -135,16 +135,16 @@ namespace nil {
                         typedef typename pairing_policy::Fqk_type Fqk_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                    const primary_input_type &primary_input,
@@ -192,19 +192,19 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_verifier_weak_input_consistency {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline bool process(const verification_key_type &verification_key,
                                                    const primary_input_type &primary_input,
@@ -224,19 +224,19 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_online_verifier_strong_input_consistency {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                    const primary_input_type &primary_input,
@@ -261,19 +261,19 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_verifier_strong_input_consistency {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline bool process(const verification_key_type &verification_key,
                                                    const primary_input_type &primary_input,
@@ -297,7 +297,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                         typedef typename CurveType::pairing_policy pairing_policy;
                         typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -308,16 +308,16 @@ namespace nil {
                         typedef typename pairing_policy::Fqk_type Fqk_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline bool process(const verification_key_type &verification_key,
                                                    const primary_input_type &primary_input,

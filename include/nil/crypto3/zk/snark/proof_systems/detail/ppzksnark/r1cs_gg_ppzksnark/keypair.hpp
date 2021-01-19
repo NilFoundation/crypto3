@@ -23,10 +23,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_VERIFICATION_KEY_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_VERIFICATION_KEY_HPP
+#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
+#define CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
 
 #include <memory>
+#include <tuple>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>

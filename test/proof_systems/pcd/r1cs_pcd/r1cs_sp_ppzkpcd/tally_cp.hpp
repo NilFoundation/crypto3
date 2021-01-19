@@ -39,7 +39,7 @@
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
@@ -93,13 +93,13 @@ namespace nil {
                     blueprint_variable_vector<FieldType> sum_in_packed_aux;
                     blueprint_variable_vector<FieldType> count_in_packed_aux;
 
-                    std::shared_ptr<packing_component<FieldType>> unpack_sum_out;
-                    std::shared_ptr<packing_component<FieldType>> unpack_count_out;
-                    std::vector<packing_component<FieldType>> pack_sum_in;
-                    std::vector<packing_component<FieldType>> pack_count_in;
+                    std::shared_ptr<components::packing_component<FieldType>> unpack_sum_out;
+                    std::shared_ptr<components::packing_component<FieldType>> unpack_count_out;
+                    std::vector<components::packing_component<FieldType>> pack_sum_in;
+                    std::vector<components::packing_component<FieldType>> pack_count_in;
 
                     blueprint_variable<FieldType> type_val_inner_product;
-                    std::shared_ptr<inner_product_component<FieldType>> compute_type_val_inner_product;
+                    std::shared_ptr<components::inner_product_component<FieldType>> compute_type_val_inner_product;
 
                     blueprint_variable_vector<FieldType> arity_indicators;
 
@@ -243,27 +243,27 @@ namespace nil {
                         incoming_types.emplace_back(msg->type);
                     }
 
-                    compute_type_val_inner_product.reset(new inner_product_component<FieldType>(
+                    compute_type_val_inner_product.reset(new components::inner_product_component<FieldType>(
                         this->bp, incoming_types, sum_in_packed, type_val_inner_product));
 
-                    unpack_sum_out.reset(new packing_component<FieldType>(
+                    unpack_sum_out.reset(new components::packing_component<FieldType>(
                         this->bp,
                         std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)
                             ->sum_bits,
                         sum_out_packed));
-                    unpack_count_out.reset(new packing_component<FieldType>(
+                    unpack_count_out.reset(new components::packing_component<FieldType>(
                         this->bp,
                         std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)
                             ->count_bits,
                         count_out_packed));
 
                     for (std::size_t i = 0; i < max_arity; ++i) {
-                        pack_sum_in.emplace_back(packing_component<FieldType>(
+                        pack_sum_in.emplace_back(components::packing_component<FieldType>(
                             this->bp,
                             std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->incoming_messages[i])
                                 ->sum_bits,
                             sum_in_packed[i]));
-                        pack_count_in.emplace_back(packing_component<FieldType>(
+                        pack_count_in.emplace_back(components::packing_component<FieldType>(
                             this->bp,
                             std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->incoming_messages[i])
                                 ->sum_bits,
@@ -377,7 +377,6 @@ namespace nil {
 
                     return result;
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

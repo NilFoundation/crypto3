@@ -67,7 +67,7 @@
 #include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -85,7 +85,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class r1cs_gg_ppzksnark_prover {
-                        using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::r1cs_gg_ppzksnark_basic_policy<CurveType>;
 
                         typedef typename CurveType::scalar_field_type scalar_field_type;
                         typedef typename CurveType::g1_type g1_type;
