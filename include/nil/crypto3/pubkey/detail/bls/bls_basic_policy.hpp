@@ -49,7 +49,7 @@ namespace nil {
                     typedef typename curve_type::scalar_field_type field_type;
                     typedef typename field_type::value_type private_key_type;
                     typedef typename private_key_type::modulus_type modulus_type;
-                    typedef typename pairing_type::gt_type gt_value_type;
+                    typedef typename pairing_type::gt_type::value_type gt_value_type;
 
                     constexpr static std::size_t private_key_bits = field_type::modulus_bits;
                     constexpr static modulus_type r = curve_type::q;
@@ -92,7 +92,7 @@ namespace nil {
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         // TODO: or reduced_pairing
-                        return pairing_type::pairing(U, V);
+                        return pairing_type::reduced_pairing(U, V);
                     }
                 };
 
@@ -133,7 +133,7 @@ namespace nil {
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         // TODO: or reduced_pairing
-                        return pairing_type::pairing(V, U);
+                        return pairing_type::reduced_pairing(V, U);
                     }
                 };
             }    // namespace detail

@@ -33,7 +33,6 @@
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_key_policy.hpp>
 
-
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -95,9 +94,10 @@ namespace nil {
                     }
 
                     template<typename PubkeyRangeType, typename MsgRangeType, typename DstType>
-                    static inline bool aggregate_verify(const PubkeyRangeType &public_keys, const MsgRangeType &messages,
-                                                        const DstType &dst, const signature_type &signature) {
-
+                    static inline bool aggregate_verify(const PubkeyRangeType &public_keys,
+                                                        const MsgRangeType &messages, const DstType &dst,
+                                                        const signature_type &signature) {
+                        // TODO: add check - If any two input messages are equal, return INVALID.
                         return public_key_policy_type::aggregate_verify(public_keys, messages, dst, signature);
                     }
                 };
@@ -108,6 +108,10 @@ namespace nil {
                 struct bls_augmentation_scheme {
                     typedef typename bls_signature_policy::public_key_policy_type public_key_policy_type;
                     typedef typename bls_signature_policy::private_key_policy_type private_key_policy_type;
+
+                    typedef typename private_key_policy_type::private_key_type private_key_type;
+                    typedef typename public_key_policy_type::public_key_type public_key_type;
+                    typedef typename public_key_policy_type::signature_type signature_type;
                 };
 
                 // Proof of possession
@@ -116,10 +120,46 @@ namespace nil {
                 struct bls_pop_scheme {
                     typedef typename bls_signature_policy::public_key_policy_type public_key_policy_type;
                     typedef typename bls_signature_policy::private_key_policy_type private_key_policy_type;
+
+                    typedef typename private_key_policy_type::private_key_type private_key_type;
+                    typedef typename public_key_policy_type::public_key_type public_key_type;
+                    typedef typename public_key_policy_type::signature_type signature_type;
+
+                    template<typename MsgType, typename DstType>
+                    static inline signature_type sign(const private_key_type &private_key, const MsgType &message,
+                                                      const DstType &dst) {
+                        return private_key_policy_type::sign(private_key, message, dst);
+                    }
+
+                    template<typename MsgType, typename DstType>
+                    static inline bool verify(const public_key_type &public_key, const MsgType &message,
+                                              const DstType &dst, const signature_type &signature) {
+                        return public_key_policy_type::verify(public_key, message, dst, signature);
+                    }
+
+                    template<typename SignatureRangeType>
+                    static inline signature_type aggregate(const SignatureRangeType &signatures) {
+                        return private_key_policy_type::aggregate(signatures);
+                    }
+
+                    template<typename PubkeyRangeType, typename MsgRangeType, typename DstType>
+                    static inline bool aggregate_verify(const PubkeyRangeType &public_keys,
+                                                        const MsgRangeType &messages, const DstType &dst,
+                                                        const signature_type &signature) {
+                        return public_key_policy_type::aggregate_verify(public_keys, messages, dst, signature);
+                    }
+
+                    template<typename DstType>
+                    static inline signature_type pop_prove(const private_key_type &private_key, const DstType &dst) {
+                        public_key_type public_key = public_key_policy_type::key_gen(private_key);
+
+
+                    }
+
                 };
-            }    // modes
+            }    // namespace modes
         }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_BLS_HPP
+#endif    // CRYPTO3_PUBKEY_BLS_HPP

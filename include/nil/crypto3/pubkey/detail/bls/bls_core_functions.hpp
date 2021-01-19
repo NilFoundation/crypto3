@@ -54,8 +54,7 @@ namespace nil {
                     typedef typename policy_type::public_key_type public_key_type;
                     typedef typename policy_type::signature_type signature_type;
 
-                    // using policy_type::hash_to_point;
-                    // using policy_type::pairing;
+                    // typedef std::array<std::uint8_t, > pubkey_octets_type;
 
                     constexpr static const std::size_t private_key_bits = policy_type::private_key_bits;
                     constexpr static const std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
@@ -144,7 +143,7 @@ namespace nil {
                         if (!subgroup_check(sig)) {
                             return false;
                         }
-                        if (!key_validate(pk)) {
+                        if (!public_key_validate(pk)) {
                             return false;
                         }
                         signature_type Q = policy_type::hash_to_point(msg, dst);
@@ -190,9 +189,9 @@ namespace nil {
 
                         auto pk_n_iter = pk_n.begin();
                         auto msg_n_iter = msg_n.begin();
-                        gt_value_type C1 = gt_value_type::zero();
+                        gt_value_type C1 = gt_value_type::one();
                         while (pk_n_iter != pk_n.end() && msg_n_iter != msg_n.end()) {
-                            if (!key_validate(*pk_n_iter)) {
+                            if (!public_key_validate(*pk_n_iter)) {
                                 return false;
                             }
                             signature_type Q = policy_type::hash_to_point(*msg_n_iter++, dst);
@@ -200,6 +199,24 @@ namespace nil {
                         }
                         return C1 == policy_type::pairing(sig, public_key_type::one());
                     }
+
+                    template<typename DstType>
+                    static inline signature_type hash_pubkey_to_point(const public_key_type &private_key, const DstType &dst) {
+                        // TODO: serialization lib should be used
+                    }
+
+                private:
+
+
+                    // Serialization procedure according to
+                    // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.1
+                    template<unsigned N, typename PointValueType>
+                    static inline std::array<std::uint8_t, N> point_to_octets(const PointValueType& point) {}
+
+                    // Deserialization procedure according to
+                    // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.2
+                    template<typename PointValueType, typename PointOctetsType>
+                    static inline PointValueType point_to_octets(const PointOctetsType& point_octets) {}
                 };
             }    // namespace detail
         }        // namespace pubkey

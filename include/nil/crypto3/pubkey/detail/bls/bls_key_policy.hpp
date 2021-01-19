@@ -64,6 +64,11 @@ namespace nil {
                     static inline signature_type aggregate(const SignatureRangeType &signatures) {
                         return bls_functions::aggregate(signatures);
                     }
+
+                    template<typename DstType>
+                    static inline signature_type hash_pubkey_to_point(const public_key_type &private_key, const DstType &dst) {
+                        return bls_functions::hash_pubkey_to_point(private_key, dst);
+                    }
                 };
 
                 template<typename bls_policy>
