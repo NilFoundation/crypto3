@@ -34,13 +34,12 @@ There is no mailing-list specific to Boost Multiprecision, although you can use 
 
 ## Development ##
 
-Clone the whole boost project, which includes the individual Boost projects as submodules ([see boost+git doc](https://github.com/boostorg/boost/wiki/Getting-Started)): 
+Clone the module repository project:
 
-    git clone https://github.com/boostorg/boost
-    cd boost
+    git clone https://github.com/nilfoundation/crypto3-multiprecision
+    cd crypto3-multiprecision
     git submodule update --init
-
-The =nil; Foundation's Multiprecision Library is located in `libs/multiprecision/`. 
+    mkdir build && cmake ..
 
 ### Running tests ###
 First, make sure you are in `libs/multiprecision/test`. 
