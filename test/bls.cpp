@@ -35,6 +35,7 @@
 // #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 // #include <nil/crypto3/pubkey/detail/bls/bls_core_functions.hpp>
 #include <nil/crypto3/pubkey/bls.hpp>
+#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -96,6 +97,118 @@ const std::vector<std::uint8_t> BasicSchemeDstMss(BasicSchemeDstMss_str.begin(),
 const std::string BasicSchemeDstMps_str = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_";
 const std::vector<std::uint8_t> BasicSchemeDstMps(BasicSchemeDstMps_str.begin(), BasicSchemeDstMps_str.end());
 
+BOOST_AUTO_TEST_SUITE(bls_serialization)
+
+BOOST_AUTO_TEST_CASE(g1_serialization_test) {
+    using nil::crypto3::pubkey::detail::serializer;
+    using curve_type = curves::bls12_381;
+    using group_type = typename curve_type::g1_type;
+    using group_value_type = typename group_type::value_type;
+    using modulus_type = typename group_value_type::g1_field_type_value::modulus_type;
+    using serializer_bls = serializer<curve_type>;
+
+    // Affine point
+    group_value_type p1 = group_value_type(
+        modulus_type("3604356284473401589952441283763873345227059496255462321551435982658302670661662992"
+                     "473691215983035545839478217804772"),
+        modulus_type("1327250267123059730920952227120753767562776844810778978087227730380440847250307685"
+                     "059082654296549055086001069530253"),
+        1);
+    BOOST_ASSERT(p1.is_well_formed());
+    auto p1_octets = serializer_bls::point_to_octets(p1);
+    auto p1_octets_compressed = serializer_bls::point_to_octets_compress(p1);
+    group_value_type p1_restored = serializer_bls::octets_to_g1_point(p1_octets);
+    group_value_type p1_restored_c = serializer_bls::octets_to_g1_point(p1_octets_compressed);
+    BOOST_CHECK_EQUAL(p1, p1_restored);
+    BOOST_CHECK_EQUAL(p1, p1_restored_c);
+
+    // Point at infinity
+    group_value_type p2;
+    BOOST_ASSERT(p2.is_well_formed());
+    auto p2_octets = serializer_bls::point_to_octets(p2);
+    auto p2_octets_compressed = serializer_bls::point_to_octets_compress(p2);
+    group_value_type p2_restored = serializer_bls::octets_to_g1_point(p2_octets);
+    group_value_type p2_restored_c = serializer_bls::octets_to_g1_point(p2_octets_compressed);
+    BOOST_CHECK_EQUAL(p2, p2_restored);
+    BOOST_CHECK_EQUAL(p2, p2_restored_c);
+
+    // Not affine point
+    group_value_type p3 = group_value_type(modulus_type("22084667108196577588735774911639564274189527381579300109027515"
+                                                        "83108281379986810985262913684437872498514441158400394"),
+                                           modulus_type("12406587907457130429434069344825464684261259614486728581982359"
+                                                        "85082377053414117332539588331993386548779151154859825"),
+                                           modulus_type("29038518576972662592822044837006359977182512190287782275798717"
+                                                        "38931918971045982981178959474623545838060738545723395"));
+    BOOST_ASSERT(p3.is_well_formed());
+    auto p3_octets = serializer_bls::point_to_octets(p3);
+    auto p3_octets_compressed = serializer_bls::point_to_octets_compress(p3);
+    group_value_type p3_restored = serializer_bls::octets_to_g1_point(p3_octets);
+    group_value_type p3_restored_c = serializer_bls::octets_to_g1_point(p3_octets_compressed);
+    BOOST_CHECK_EQUAL(p3, p3_restored);
+    BOOST_CHECK_EQUAL(p3, p3_restored_c);
+}
+
+BOOST_AUTO_TEST_CASE(g2_serialization_test) {
+    using nil::crypto3::pubkey::detail::serializer;
+    using curve_type = curves::bls12_381;
+    using group_type = typename curve_type::g2_type;
+    using group_value_type = typename group_type::value_type;
+    using modulus_type = typename group_value_type::g1_field_type_value::modulus_type;
+    using serializer_bls = serializer<curve_type>;
+
+    // Affine point
+    group_value_type p1 = group_value_type(
+        {{modulus_type("85911141189038341422217999965810909168006256466381521648082748107372745388299551"
+                       "9337819063587669418425211221549283"),
+          modulus_type("38652946747836373505232449343138682065351453822989118701578533663043001622363102"
+                       "79903647373322307985974413380042255")}},
+        {{modulus_type("11185637828916832078768174243254972746778201844765270288305164561940707627068745"
+                       "97608097527159814883098414084023916"),
+          modulus_type("24808054598506349709552229822047321779605439703657724013272122538247253994600104"
+                       "08048001497870419741858246203802842")}},
+        {{1, 0}});
+    BOOST_ASSERT(p1.is_well_formed());
+    auto p1_octets = serializer_bls::point_to_octets(p1);
+    auto p1_octets_compressed = serializer_bls::point_to_octets_compress(p1);
+    group_value_type p1_restored = serializer_bls::octets_to_g2_point(p1_octets);
+    group_value_type p1_restored_c = serializer_bls::octets_to_g2_point(p1_octets_compressed);
+    BOOST_CHECK_EQUAL(p1, p1_restored);
+    BOOST_CHECK_EQUAL(p1, p1_restored_c);
+
+    // Point at infinity
+    group_value_type p2;
+    BOOST_ASSERT(p2.is_well_formed());
+    auto p2_octets = serializer_bls::point_to_octets(p2);
+    auto p2_octets_compressed = serializer_bls::point_to_octets_compress(p2);
+    group_value_type p2_restored = serializer_bls::octets_to_g2_point(p2_octets);
+    group_value_type p2_restored_c = serializer_bls::octets_to_g2_point(p2_octets_compressed);
+    BOOST_CHECK_EQUAL(p2, p2_restored);
+    BOOST_CHECK_EQUAL(p2, p2_restored_c);
+
+    // Not affine point
+    group_value_type p3 = group_value_type({{modulus_type("290953753847619202533108629578949989188583860516563349688436"
+                                                          "1019865954182721618711143316934175637891431477491613012"),
+                                             modulus_type("368137581722696064589677955863335336277512129551843496644195"
+                                                          "2529453263026919297432456777936746126473663181000071326")}},
+                                           {{modulus_type("380942359543145707855843939767390378902254098363111911764743"
+                                                          "0337095281824700234046387711064098816968180821028280990"),
+                                             modulus_type("242844158649419580306404578813978370873620848181595711466624"
+                                                          "627022441036207994945966265054808015025632487127506616")}},
+                                           {{modulus_type("436672409349779794890553748509232825356025978203835354321194"
+                                                          "85577859579140548640413235169124507251907021664872300"),
+                                             modulus_type("583765897940425051133327959880548965930101581874240474476036"
+                                                          "503438461199993852443675110705859721269143034948933658")}});
+    BOOST_ASSERT(p3.is_well_formed());
+    auto p3_octets = serializer_bls::point_to_octets(p3);
+    auto p3_octets_compressed = serializer_bls::point_to_octets_compress(p3);
+    group_value_type p3_restored = serializer_bls::octets_to_g2_point(p3_octets);
+    group_value_type p3_restored_c = serializer_bls::octets_to_g2_point(p3_octets_compressed);
+    BOOST_CHECK_EQUAL(p3, p3_restored);
+    BOOST_CHECK_EQUAL(p3, p3_restored_c);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(bls_signature_manual_tests)
 
 BOOST_AUTO_TEST_CASE(bls_basic_mps_private_interface_manual_test) {
@@ -130,7 +243,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps_private_interface_manual_test) {
     signature_type sig = basic_scheme::sign(sk, msg, BasicSchemeDstMps);
     BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), etalon_sig);
 
-    // Agregate
+    // Agregate...
 }
 
 BOOST_AUTO_TEST_CASE(bls_basic_mss_private_interface_manual_test) {

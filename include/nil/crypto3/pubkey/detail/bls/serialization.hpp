@@ -33,17 +33,19 @@
 
 #include <iterator>
 
-using boost::multiprecision;
+using namespace boost::multiprecision;
+using namespace nil::crypto3::algebra::curves;
 
 namespace nil {
     namespace crypto3 {
-        namespace algebra {
-            namespace curves {
-                template<typename CurveValueType>
+        namespace pubkey {
+            namespace detail {
+                template<typename CurveType>
                 struct serializer { };
 
                 // ZCash serialization format for BLS12-381
                 // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C
+                template<>
                 struct serializer<bls12_381> {
                     typedef bls12_381 curve_type;
 
@@ -52,6 +54,9 @@ namespace nil {
 
                     typedef typename g1_value_type::underlying_field_value_type g1_field_value_type;
                     typedef typename g2_value_type::underlying_field_value_type g2_field_value_type;
+
+                    typedef typename g1_field_value_type::modulus_type modulus_type;
+                    // typedef number<>
 
                     constexpr static const unsigned sizeof_field_element = 48;
                     typedef std::array<std::uint8_t, sizeof_field_element> compressed_g1_octets;
@@ -63,10 +68,12 @@ namespace nil {
                     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.1
                     static inline compressed_g1_octets point_to_octets_compress(const g1_value_type &point) {
                         compressed_g1_octets result = {0};
-                        auto m_byte = evaluate_m_byte(point, true);
+                        g1_value_type point_affine = point.to_affine_coordinates();
+                        auto m_byte = evaluate_m_byte(point_affine, true);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
-                            export_bits(point.to_affine_coordinates().X, result.rbegin(), 8, false);
+                            export_bits(
+                                point_affine.X.data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
                         }
                         result[0] |= m_byte;
                         return result;
@@ -74,12 +81,16 @@ namespace nil {
 
                     static inline uncompressed_g1_octets point_to_octets(const g1_value_type &point) {
                         uncompressed_g1_octets result = {0};
-                        auto m_byte = evaluate_m_byte(point, true);
                         g1_value_type point_affine = point.to_affine_coordinates();
+                        auto m_byte = evaluate_m_byte(point_affine, false);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
-                            export_bits(point_affine.Y, result.rbegin(), 8, false);
-                            export_bits(point_affine.X, result.rbegin() + sizeof_field_element, 8, false);
+                            export_bits(
+                                point_affine.Y.data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
+                            export_bits(point_affine.X.data.template convert_to<modulus_type>(),
+                                        result.rbegin() + sizeof_field_element,
+                                        8,
+                                        false);
                         }
                         result[0] |= m_byte;
                         return result;
@@ -87,12 +98,18 @@ namespace nil {
 
                     static inline compressed_g2_octets point_to_octets_compress(const g2_value_type &point) {
                         compressed_g2_octets result = {0};
-                        auto m_byte = evaluate_m_byte(point, true);
                         g2_value_type point_affine = point.to_affine_coordinates();
+                        auto m_byte = evaluate_m_byte(point_affine, true);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
-                            export_bits(point_affine.X.data[0], result.rbegin(), 8, false);
-                            export_bits(point_affine.X.data[1], result.rbegin() + sizeof_field_element, 8, false);
+                            export_bits(point_affine.X.data[0].data.template convert_to<modulus_type>(),
+                                        result.rbegin(),
+                                        8,
+                                        false);
+                            export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
+                                        result.rbegin() + sizeof_field_element,
+                                        8,
+                                        false);
                         }
                         result[0] |= m_byte;
                         return result;
@@ -100,14 +117,26 @@ namespace nil {
 
                     static inline uncompressed_g2_octets point_to_octets(const g2_value_type &point) {
                         uncompressed_g2_octets result = {0};
-                        auto m_byte = evaluate_m_byte(point, true);
                         g2_value_type point_affine = point.to_affine_coordinates();
+                        auto m_byte = evaluate_m_byte(point_affine, false);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
-                            export_bits(point_affine.Y.data[0], result.rbegin(), 8, false);
-                            export_bits(point_affine.Y.data[1], result.rbegin() + sizeof_field_element, 8, false);
-                            export_bits(point_affine.X.data[0], result.rbegin() + 2 * sizeof_field_element, 8, false);
-                            export_bits(point_affine.X.data[1], result.rbegin() + 3 * sizeof_field_element, 8, false);
+                            export_bits(point_affine.Y.data[0].data.template convert_to<modulus_type>(),
+                                        result.rbegin(),
+                                        8,
+                                        false);
+                            export_bits(point_affine.Y.data[1].data.template convert_to<modulus_type>(),
+                                        result.rbegin() + sizeof_field_element,
+                                        8,
+                                        false);
+                            export_bits(point_affine.X.data[0].data.template convert_to<modulus_type>(),
+                                        result.rbegin() + 2 * sizeof_field_element,
+                                        8,
+                                        false);
+                            export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
+                                        result.rbegin() + 3 * sizeof_field_element,
+                                        8,
+                                        false);
                         }
                         result[0] |= m_byte;
                         return result;
@@ -122,15 +151,16 @@ namespace nil {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PointOctetsRange>));
 
                         const std::uint8_t m_byte = *octets.begin() & 0xE0;
-                        BOOST_ASSERT(m_byte == 0x20 || m_byte == 0x60 || m_byte == 0xE0);
+                        BOOST_ASSERT(m_byte != 0x20 && m_byte != 0x60 && m_byte != 0xE0);
 
-                        PointOctetsRange point_octets(octets.begin(), octets.end());
+                        PointOctetsRange point_octets;
+                        std::copy(octets.begin(), octets.end(), point_octets.begin());
                         *point_octets.begin() &= 0x1F;
 
                         if (m_byte & C_bit) {
-                            return compressed_to_g1_point(point_octets);
+                            return compressed_to_g1_point(point_octets, m_byte);
                         }
-                        return uncompressed_to_g1_point(point_octets);
+                        return uncompressed_to_g1_point(point_octets, m_byte);
                     }
 
                     template<typename PointOctetsRange,
@@ -140,18 +170,19 @@ namespace nil {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PointOctetsRange>));
 
                         const std::uint8_t m_byte = *octets.begin() & 0xE0;
-                        BOOST_ASSERT(m_byte == 0x20 || m_byte == 0x60 || m_byte == 0xE0);
+                        BOOST_ASSERT(m_byte != 0x20 && m_byte != 0x60 && m_byte != 0xE0);
 
-                        PointOctetsRange point_octets(octets.begin(), octets.end());
+                        PointOctetsRange point_octets;
+                        std::copy(octets.begin(), octets.end(), point_octets.begin());
                         *point_octets.begin() &= 0x1F;
 
                         if (m_byte & C_bit) {
-                            return compressed_to_g2_point(point_octets);
+                            return compressed_to_g2_point(point_octets, m_byte);
                         }
-                        return uncompressed_to_g2_point(point_octets);
+                        return uncompressed_to_g2_point(point_octets, m_byte);
                     }
 
-                private:
+                protected:
                     constexpr static const std::uint8_t C_bit = 0x80;
                     constexpr static const std::uint8_t I_bit = 0x40;
                     constexpr static const std::uint8_t S_bit = 0x20;
@@ -161,23 +192,22 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets) {
+                    static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == sizeof_field_element);
 
-                        const std::uint8_t m_byte = *point_octets.begin() & 0xE0;
                         if (m_byte & I_bit) {
                             BOOST_ASSERT(point_octets.end() ==
                                          std::find(point_octets.begin(), point_octets.end(), true));
                             return g1_value_type();    // point at infinity
                         }
 
-                        cpp_int x;
+                        modulus_type x;
                         import_bits(x, point_octets.rbegin(), point_octets.rend(), 8, false);
                         g1_field_value_type x_mod(x);
                         g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
                         BOOST_ASSERT(y2_mod.is_square());
                         g1_field_value_type y_mod = y2_mod.sqrt();
-                        bool Y_bit = sign_GF_p(y_mod);
+                        bool Y_bit = sign_gf_p(y_mod);
                         if (Y_bit == bool(m_byte & S_bit)) {
                             g1_value_type result(x_mod, y_mod, g1_field_value_type::one());
                             BOOST_ASSERT(result.is_well_formed());
@@ -191,41 +221,46 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets) {
+                    static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      2 * sizeof_field_element);
 
-                        const std::uint8_t m_byte = *point_octets.begin() & 0xE0;
                         if (m_byte & I_bit) {
                             BOOST_ASSERT(point_octets.end() ==
                                          std::find(point_octets.begin(), point_octets.end(), true));
                             return g1_value_type();    // point at infinity
                         }
 
-                        cpp_int x, y;
+                        modulus_type x, y;
                         import_bits(y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                         import_bits(x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
-                        g1_value_type p(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
+                        g1_value_type result(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
                         // TODO: check function is_well_formed
-                        BOOST_ASSERT(p.is_well_formed());
-                        return p;
+                        BOOST_ASSERT(result.is_well_formed());
+                        return result;
                     }
 
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets) {
+                    static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      2 * sizeof_field_element);
 
-                        cpp_int x_0, x_1;
+                        if (m_byte & I_bit) {
+                            BOOST_ASSERT(point_octets.end() ==
+                                         std::find(point_octets.begin(), point_octets.end(), true));
+                            return g2_value_type();    // point at infinity
+                        }
+
+                        modulus_type x_0, x_1;
                         import_bits(x_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                         import_bits(x_1, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
                         g2_field_value_type x_mod(x_0, x_1);
                         g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
                         BOOST_ASSERT(y2_mod.is_square());
                         g2_field_value_type y_mod = y2_mod.sqrt();
-                        bool Y_bit = sign_GF_p(y_mod);
+                        bool Y_bit = sign_gf_p(y_mod);
                         if (Y_bit == bool(m_byte & S_bit)) {
                             g2_value_type result(x_mod, y_mod, g2_field_value_type::one());
                             BOOST_ASSERT(result.is_well_formed());
@@ -239,37 +274,36 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets) {
+                    static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      4 * sizeof_field_element);
 
-                        const std::uint8_t m_byte = *point_octets.begin() & 0xE0;
                         if (m_byte & I_bit) {
                             BOOST_ASSERT(point_octets.end() ==
                                          std::find(point_octets.begin(), point_octets.end(), true));
                             return g2_value_type();    // point at infinity
                         }
 
-                        cpp_int x_0, x_1, y_0, y_1;
-                        import_bits(y_1, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                        import_bits(y_0,
+                        modulus_type x_0, x_1, y_0, y_1;
+                        import_bits(y_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
+                        import_bits(y_1,
                                     point_octets.rbegin() + sizeof_field_element,
                                     point_octets.rbegin() + 2 * sizeof_field_element,
                                     8,
                                     false);
-                        import_bits(x_1,
+                        import_bits(x_0,
                                     point_octets.rbegin() + 2 * sizeof_field_element,
                                     point_octets.rbegin() + 3 * sizeof_field_element,
                                     8,
                                     false);
                         import_bits(
-                            x_0, point_octets.rbegin() + 3 * sizeof_field_element, point_octets.rend(), 8, false);
-                        g2_value_type p(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
+                            x_1, point_octets.rbegin() + 3 * sizeof_field_element, point_octets.rend(), 8, false);
+                        g2_value_type result(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
                                         g2_field_value_type(g1_field_value_type(y_0), g1_field_value_type(y_1)),
                                         g2_field_value_type::one());
                         // TODO: check function is_well_formed
-                        BOOST_ASSERT(p.is_well_formed());
-                        return p;
+                        BOOST_ASSERT(result.is_well_formed());
+                        return result;
                     }
 
                     static inline bool sign_gf_p(const g1_field_value_type &v) {
@@ -295,14 +329,14 @@ namespace nil {
                         // TODO: check condition of infinite point
                         if (point.Z.is_zero()) {
                             result |= I_bit;
-                        } else if (compression && sign_gf_p(point)) {
+                        } else if (compression && sign_gf_p(point.Y)) {
                             result |= S_bit;
                         }
                         return result;
                     }
                 };
-            }    // namespace curves
-        }        // namespace algebra
+            }    // namespace detail
+        }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 
