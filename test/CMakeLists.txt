@@ -1401,10 +1401,12 @@ set_target_properties(${CURRENT_PROJECT_NAME}_test_test_float_conversions PROPER
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_bug11922 SOURCES ${CURRENT_TEST_SOURCES_DIR}/bug11922.cpp COMPILE_ONLY)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_misc ${CURRENT_PROJECT_NAME}_test_bug11922)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_bug11922 PROPERTIES CXX_STANDARD 14)
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_bug12039 SOURCES ${CURRENT_TEST_SOURCES_DIR}/bug12039.cpp)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_bug12039 no_eh_support)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_misc ${CURRENT_PROJECT_NAME}_test_bug12039)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_bug12039 PROPERTIES CXX_STANDARD 14)
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_git_issue_30 SOURCES ${CURRENT_TEST_SOURCES_DIR}/git_issue_30.cpp COMPILE_ONLY)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_misc ${CURRENT_PROJECT_NAME}_test_git_issue_30)
@@ -1437,6 +1439,7 @@ endif()
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_optional_compat SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_optional_compat.cpp)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_misc ${CURRENT_PROJECT_NAME}_test_test_optional_compat)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_test_optional_compat PROPERTIES CXX_STANDARD 14)
 
 # TODO: Fix this
 #[[
