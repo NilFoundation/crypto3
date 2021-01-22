@@ -9,9 +9,9 @@
 
 #include "test.hpp"
 
-#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
+#if !defined(TEST_GMP) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
 #define TEST_TOMMATH
-#define TEST_MPZ
+#define TEST_GMP
 #define TEST_CPP_INT
 
 #ifdef _MSC_VER
@@ -23,7 +23,7 @@
 
 #endif
 
-#if defined(TEST_MPZ)
+#if defined(TEST_GMP)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_TOMMATH)
@@ -41,7 +41,7 @@ int main()
 
 #if defined(TEST_CPP_INT)
 #endif
-#if defined(TEST_MPZ)
+#if defined(TEST_GMP)
 #endif
 #if defined(TEST_TOMMATH)
 #endif
