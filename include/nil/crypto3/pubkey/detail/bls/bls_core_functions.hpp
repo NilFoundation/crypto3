@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/subgroup_check.hpp>
+#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -46,22 +46,21 @@ namespace nil {
 
                 template<typename policy_type>
                 struct bls_core_functions {
-                    typedef typename policy_type::gt_value_type gt_value_type;
+                    typedef typename policy_type::curve_type curve_type;
                     typedef typename policy_type::hash_type hash_type;
                     typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::gt_value_type gt_value_type;
 
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
                     typedef typename policy_type::signature_type signature_type;
 
-                    // typedef std::array<std::uint8_t, > pubkey_octets_type;
-
                     constexpr static const std::size_t private_key_bits = policy_type::private_key_bits;
                     constexpr static const std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
-                                                     static_cast<std::size_t>((3 * private_key_bits) % 16 != 0);
+                                                           static_cast<std::size_t>((3 * private_key_bits) % 16 != 0);
                     static_assert(L < 0x10000, "L is required to fit in 2 octets");
                     constexpr static const std::array<std::uint8_t, 2> L_os = {static_cast<std::uint8_t>(L >> 8u),
-                                                                         static_cast<std::uint8_t>(L % 0x100)};
+                                                                               static_cast<std::uint8_t>(L % 0x100)};
 
                     // template<typename IkmType, typename KeyInfoType,
                     //          typename = typename std::enable_if<
@@ -114,8 +113,7 @@ namespace nil {
                         if (pk.is_zero()) {
                             return false;
                         }
-                        // TODO: subgroup_check should be reimplemented as class method
-                        if (!subgroup_check(pk)) {
+                        if (!pk.is_well_formed()) {
                             return false;
                         }
                         return true;
@@ -139,8 +137,7 @@ namespace nil {
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool core_verify(const public_key_type &pk, const MsgType &msg, const DstType &dst,
                                                    const signature_type &sig) {
-                        // TODO: subgroup_check should be reimplemented as class method
-                        if (!subgroup_check(sig)) {
+                        if (!sig.is_well_formed()) {
                             return false;
                         }
                         if (!public_key_validate(pk)) {
@@ -155,9 +152,8 @@ namespace nil {
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type aggregate(const SignatureRangeType &sig_n) {
+                    static inline signature_type core_aggregate(const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
-
                         assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
                         auto sig_n_iter = sig_n.begin();
@@ -178,15 +174,12 @@ namespace nil {
                                                              const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
-
                         assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
                                std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
 
-                        // TODO: subgroup_check should be reimplemented as class method
-                        if (!subgroup_check(sig)) {
+                        if (!sig.is_well_formed()) {
                             return false;
                         }
-
                         auto pk_n_iter = pk_n.begin();
                         auto msg_n_iter = msg_n.begin();
                         gt_value_type C1 = gt_value_type::one();
@@ -200,23 +193,58 @@ namespace nil {
                         return C1 == policy_type::pairing(sig, public_key_type::one());
                     }
 
-                    template<typename DstType>
-                    static inline signature_type hash_pubkey_to_point(const public_key_type &private_key, const DstType &dst) {
-                        // TODO: serialization lib should be used
+                    template<typename DstType, typename = typename std::enable_if<std::is_same<
+                                                   std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline signature_type pop_prove(const private_key_type &sk, const DstType &dst) {
+                        assert(private_key_validate(sk));
+
+                        public_key_type pk = sk_to_pk(sk);
+                        signature_type Q = hash_pubkey_to_point(pk, dst);
+                        return sk * Q;
                     }
 
-                private:
+                    template<typename DstType, typename = typename std::enable_if<std::is_same<
+                                                   std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline bool pop_verify(const public_key_type &pk, const DstType &dst,
+                                                  const signature_type &sig) {
+                        if (!sig.is_well_formed()) {
+                            return false;
+                        }
+                        if (!public_key_validate(pk)) {
+                            return false;
+                        }
+                        signature_type Q = hash_pubkey_to_point(pk, dst);
+                        auto C1 = policy_type::pairing(Q, pk);
+                        auto C2 = policy_type::pairing(sig, public_key_type::one());
+                        return C1 == C2;
+                    }
 
+                    template<typename PubkeyRangeType, typename MsgType, typename DstType,
+                             typename = typename std::enable_if<
+                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline bool fast_aggregate_verify(const PubkeyRangeType &pk_n, const MsgType &msg,
+                                                             const DstType &dst, const signature_type &sig) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
+                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0);
 
-                    // Serialization procedure according to
-                    // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.1
-                    template<unsigned N, typename PointValueType>
-                    static inline std::array<std::uint8_t, N> point_to_octets(const PointValueType& point) {}
+                        auto pk_n_iter = pk_n.begin();
+                        public_key_type aggregate_p = *pk_n_iter++;
+                        while (pk_n_iter != pk_n.end()) {
+                            public_key_type next_p = *pk_n_iter++;
+                            aggregate_p = aggregate_p + next_p;
+                        }
+                        return core_verify(aggregate_p, msg, dst, sig);
+                    }
 
-                    // Deserialization procedure according to
-                    // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.2
-                    template<typename PointValueType, typename PointOctetsType>
-                    static inline PointValueType point_to_octets(const PointOctetsType& point_octets) {}
+                protected:
+                    template<typename DstType>
+                    static inline signature_type hash_pubkey_to_point(const public_key_type &public_key,
+                                                                      const DstType &dst) {
+                        using bls_serializer = serializer<curve_type>;
+                        return hash_to_point(serializer<curve_type>::point_to_octets_compress(public_key), dst);
+                    }
                 };
             }    // namespace detail
         }        // namespace pubkey

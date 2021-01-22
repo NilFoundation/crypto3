@@ -235,7 +235,6 @@ namespace nil {
                         import_bits(y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                         import_bits(x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
                         g1_value_type result(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
-                        // TODO: check function is_well_formed
                         BOOST_ASSERT(result.is_well_formed());
                         return result;
                     }
@@ -301,7 +300,6 @@ namespace nil {
                         g2_value_type result(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
                                         g2_field_value_type(g1_field_value_type(y_0), g1_field_value_type(y_1)),
                                         g2_field_value_type::one());
-                        // TODO: check function is_well_formed
                         BOOST_ASSERT(result.is_well_formed());
                         return result;
                     }

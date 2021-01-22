@@ -60,7 +60,7 @@ namespace nil {
                 // Random oracle version of hash-to-point
                 //
                 template<typename CurveType, typename HashType>
-                struct bls_policy_mss_ro {
+                struct bls_mss_ro_policy {
                     typedef bls_basic_policy<CurveType, HashType> basic_policy;
 
                     typedef typename basic_policy::curve_type curve_type;
@@ -80,18 +80,13 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    // typedef ep_map<signature_group_type> hash_to_point;
-                    // typedef ep2_map<public_key_group_type> hash_pubkey_to_point;
-
                     template<typename MsgType, typename DstType>
                     static inline signature_type hash_to_point(const MsgType &msg, const DstType &dst) {
                         using hash_to_point_type = ep_map<signature_group_type>;
-
                         return hash_to_point_type::hash_to_curve(msg, dst);
                     }
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        // TODO: or reduced_pairing
                         return pairing_type::reduced_pairing(U, V);
                     }
                 };
@@ -101,7 +96,7 @@ namespace nil {
                 // Random oracle version of hash-to-point
                 //
                 template<typename CurveType, typename HashType>
-                struct bls_policy_mps_ro {
+                struct bls_mps_ro_policy {
                     typedef bls_basic_policy<CurveType, HashType> basic_policy;
 
                     typedef typename basic_policy::curve_type curve_type;
@@ -121,18 +116,13 @@ namespace nil {
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
 
-                    // typedef ep2_map<signature_group_type> hash_to_point;
-                    // typedef ep_map<public_key_group_type> hash_pubkey_to_point;
-
                     template<typename MsgType, typename DstType>
                     static inline signature_type hash_to_point(const MsgType &msg, const DstType &dst) {
                         using hash_to_point_type = ep2_map<signature_group_type>;
-
                         return hash_to_point_type::hash_to_curve(msg, dst);
                     }
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        // TODO: or reduced_pairing
                         return pairing_type::reduced_pairing(V, U);
                     }
                 };
