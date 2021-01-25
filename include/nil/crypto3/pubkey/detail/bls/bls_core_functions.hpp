@@ -206,8 +206,8 @@ namespace nil {
                     template<typename DstType, typename = typename std::enable_if<std::is_same<
                                                    std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool pop_verify(const public_key_type &pk, const DstType &dst,
-                                                  const signature_type &sig) {
-                        if (!sig.is_well_formed()) {
+                                                  const signature_type &pop) {
+                        if (!pop.is_well_formed()) {
                             return false;
                         }
                         if (!public_key_validate(pk)) {
@@ -215,7 +215,7 @@ namespace nil {
                         }
                         signature_type Q = hash_pubkey_to_point(pk, dst);
                         auto C1 = policy_type::pairing(Q, pk);
-                        auto C2 = policy_type::pairing(sig, public_key_type::one());
+                        auto C2 = policy_type::pairing(pop, public_key_type::one());
                         return C1 == C2;
                     }
 
@@ -243,7 +243,7 @@ namespace nil {
                     static inline signature_type hash_pubkey_to_point(const public_key_type &public_key,
                                                                       const DstType &dst) {
                         using bls_serializer = serializer<curve_type>;
-                        return hash_to_point(serializer<curve_type>::point_to_octets_compress(public_key), dst);
+                        return policy_type::hash_to_point(serializer<curve_type>::point_to_octets_compress(public_key), dst);
                     }
                 };
             }    // namespace detail

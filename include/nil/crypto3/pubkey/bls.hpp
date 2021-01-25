@@ -172,8 +172,8 @@ namespace nil {
 
                     template<typename PopDstType>
                     static inline bool pop_verify(const public_key_type &public_key, const PopDstType &dst,
-                                                  const signature_type &signature) {
-                        return bls_functions::pop_verify(public_key, dst, signature);
+                                                  const signature_type &proof) {
+                        return bls_functions::pop_verify(public_key, dst, proof);
                     }
 
                     template<typename PubkeyRangeType, typename MsgType, typename DstType>
