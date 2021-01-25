@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
-
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include <boost/concept/assert.hpp>
@@ -193,6 +191,34 @@ namespace nil {
                         return C1 == policy_type::pairing(sig, public_key_type::one());
                     }
 
+                    template<typename PubkeyRangeType, typename MsgRangeType, typename DstType,
+                        typename = typename std::enable_if<
+                            std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
+                            std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
+                            std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                    static inline bool aug_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
+                                                             const DstType &dst, const signature_type &sig) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
+                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
+                               std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
+
+                        if (!sig.is_well_formed()) {
+                            return false;
+                        }
+                        auto pk_n_iter = pk_n.begin();
+                        auto msg_n_iter = msg_n.begin();
+                        gt_value_type C1 = gt_value_type::one();
+                        while (pk_n_iter != pk_n.end() && msg_n_iter != msg_n.end()) {
+                            if (!public_key_validate(*pk_n_iter)) {
+                                return false;
+                            }
+                            signature_type Q = policy_type::hash_to_point(pk_conc_msg(*pk_n_iter, *msg_n_iter++), dst);
+                            C1 = C1 * policy_type::pairing(Q, *pk_n_iter++);
+                        }
+                        return C1 == policy_type::pairing(sig, public_key_type::one());
+                    }
+
                     template<typename DstType, typename = typename std::enable_if<std::is_same<
                                                    std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline signature_type pop_prove(const private_key_type &sk, const DstType &dst) {
@@ -238,12 +264,20 @@ namespace nil {
                         return core_verify(aggregate_p, msg, dst, sig);
                     }
 
+                    template<typename MsgType, typename = typename std::enable_if<std::is_same<
+                                                   std::uint8_t, typename MsgType::value_type>::value>::type>
+                    static inline std::vector<std::uint8_t> pk_conc_msg(const public_key_type &pk, const MsgType &msg) {
+                        auto PK = policy_type::point_to_pubkey(pk);
+                        std::vector<std::uint8_t> result(PK.begin(), PK.end());
+                        std::copy(result.end(), msg.begin(), msg.end());
+                        return result;
+                    }
+
                 protected:
                     template<typename DstType>
                     static inline signature_type hash_pubkey_to_point(const public_key_type &public_key,
                                                                       const DstType &dst) {
-                        using bls_serializer = serializer<curve_type>;
-                        return policy_type::hash_to_point(serializer<curve_type>::point_to_octets_compress(public_key), dst);
+                        return policy_type::hash_to_point(policy_type::point_to_pubkey(public_key), dst);
                     }
                 };
             }    // namespace detail

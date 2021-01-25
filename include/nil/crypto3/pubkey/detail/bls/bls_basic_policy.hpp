@@ -29,6 +29,8 @@
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
 
+#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
+
 #include <cstddef>
 
 namespace nil {
@@ -76,6 +78,8 @@ namespace nil {
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
 
+                    typedef serializer<curve_type> bls_serializer;
+
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
@@ -88,6 +92,14 @@ namespace nil {
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         return pairing_type::reduced_pairing(U, V);
+                    }
+
+                    static inline typename bls_serializer::compressed_g2_octets point_to_pubkey(const public_key_type &pubkey) {
+                        return bls_serializer::point_to_octets_compress(pubkey);
+                    }
+
+                    static inline typename bls_serializer::compressed_g1_octets point_to_signature(const signature_type &sig) {
+                        return bls_serializer::point_to_octets_compress(sig);
                     }
                 };
 
@@ -112,6 +124,8 @@ namespace nil {
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
 
+                    typedef serializer<curve_type> bls_serializer;
+
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
                     constexpr static const std::size_t signature_bits = signature_type::value_bits;
@@ -124,6 +138,14 @@ namespace nil {
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
                         return pairing_type::reduced_pairing(V, U);
+                    }
+
+                    static inline typename bls_serializer::compressed_g1_octets point_to_pubkey(const public_key_type &pubkey) {
+                        return bls_serializer::point_to_octets_compress(pubkey);
+                    }
+
+                    static inline typename bls_serializer::compressed_g2_octets point_to_signature(const signature_type &sig) {
+                        return bls_serializer::point_to_octets_compress(sig);
                     }
                 };
             }    // namespace detail
