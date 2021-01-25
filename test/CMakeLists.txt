@@ -221,6 +221,7 @@ if(GMP_COMPILED)
     target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpz_br ${GMP_LIBRARIES} no_eh_support)
     target_include_directories(${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpz_br PRIVATE ${GMP_INCLUDE_DIRS})
     add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_arithmetic_tests ${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpz_br)
+    set_target_properties(${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpz_br PROPERTIES CXX_STANDARD 14)
 
     cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpq SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_mpq.cpp)
     target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_arithmetic_mpq ${GMP_LIBRARIES} no_eh_support)
