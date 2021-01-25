@@ -192,12 +192,12 @@ namespace nil {
                     }
 
                     template<typename PubkeyRangeType, typename MsgRangeType, typename DstType,
-                        typename = typename std::enable_if<
-                            std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
-                            std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
-                            std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
+                             typename = typename std::enable_if<
+                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
+                                 std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool aug_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
-                                                             const DstType &dst, const signature_type &sig) {
+                                                            const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
                         assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
@@ -269,7 +269,7 @@ namespace nil {
                     static inline std::vector<std::uint8_t> pk_conc_msg(const public_key_type &pk, const MsgType &msg) {
                         auto PK = policy_type::point_to_pubkey(pk);
                         std::vector<std::uint8_t> result(PK.begin(), PK.end());
-                        std::copy(result.end(), msg.begin(), msg.end());
+                        std::copy(msg.begin(), msg.end(), std::back_insert_iterator(result));
                         return result;
                     }
 

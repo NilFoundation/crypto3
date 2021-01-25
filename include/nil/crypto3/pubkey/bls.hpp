@@ -131,13 +131,15 @@ namespace nil {
                     static inline signature_type sign(const private_key_type &private_key, const MsgType &message,
                                                       const DstType &dst) {
                         public_key_type public_key = generate_public_key(private_key);
-                        return bls_functions::core_sign(private_key, bls_functions::pk_conc_msg(public_key, message), dst);
+                        return bls_functions::core_sign(private_key, bls_functions::pk_conc_msg(public_key, message),
+                                                        dst);
                     }
 
                     template<typename MsgType, typename DstType>
                     static inline bool verify(const public_key_type &public_key, const MsgType &message,
                                               const DstType &dst, const signature_type &signature) {
-                        return bls_functions::core_verify(public_key, bls_functions::pk_conc_msg(public_key, message), dst, signature);
+                        return bls_functions::core_verify(public_key, bls_functions::pk_conc_msg(public_key, message),
+                                                          dst, signature);
                     }
 
                     template<typename SignatureRangeType>
@@ -151,7 +153,6 @@ namespace nil {
                                                         const signature_type &signature) {
                         return bls_functions::aug_aggregate_verify(public_keys, messages, dst, signature);
                     }
-
                 };
 
                 //

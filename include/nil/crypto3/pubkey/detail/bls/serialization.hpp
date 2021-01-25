@@ -56,7 +56,6 @@ namespace nil {
                     typedef typename g2_value_type::underlying_field_value_type g2_field_value_type;
 
                     typedef typename g1_field_value_type::modulus_type modulus_type;
-                    // typedef number<>
 
                     constexpr static const unsigned sizeof_field_element = 48;
                     typedef std::array<std::uint8_t, sizeof_field_element> compressed_g1_octets;
@@ -186,8 +185,8 @@ namespace nil {
                     constexpr static const std::uint8_t C_bit = 0x80;
                     constexpr static const std::uint8_t I_bit = 0x40;
                     constexpr static const std::uint8_t S_bit = 0x20;
-                    constexpr static const typename g1_field_value_type::modulus_type half_p =
-                        (g1_field_value_type::modulus - 1) / 2;
+                    // constexpr static const typename g1_field_value_type::modulus_type half_p =
+                    //     (g1_field_value_type::modulus - modulus_type(1)) / modulus_type(2);
 
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
@@ -305,6 +304,9 @@ namespace nil {
                     }
 
                     static inline bool sign_gf_p(const g1_field_value_type &v) {
+                        static const typename g1_field_value_type::modulus_type half_p =
+                            (g1_field_value_type::modulus - modulus_type(1)) / modulus_type(2);
+
                         if (v > half_p) {
                             return true;
                         }
