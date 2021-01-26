@@ -36,7 +36,8 @@ namespace backends {
 template <typename Backend>
 class montgomery_params : public base_params<Backend>
 {
-   typedef number<Backend> number_type;
+   typedef number<Backend>                                             number_type;
+   typedef typename mpl::front<typename Backend::unsigned_types>::type limb_type;
 
  protected:
    template <typename Number>
