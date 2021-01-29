@@ -31,11 +31,33 @@ namespace nil {
             template<typename Scheme>
             struct public_key {
                 typedef Scheme scheme_type;
+                typedef public_key<scheme_type> self_type;
+                typedef typename scheme_type::public_key_type public_key_policy_type;
 
-                typedef typename scheme_type::public_key_policy_type public_key_policy_type;
-                typedef typename public_key_policy_type::key_type public_key_type;
+                typedef typename public_key_policy_type::public_key_type public_key_type;
+                typedef typename public_key_policy_type::private_key_type private_key_type;
+                typedef typename public_key_policy_type::signature_type signature_type;
+                typedef typename public_key_policy_type::public_params public_params;
 
-                explicit public_key(const public_key_type &key) : pubkey(key) {}
+                public_key(const public_key_type &key) : pubkey(key) {
+                }
+
+                template<typename MsgType>
+                inline bool verify(const MsgType &message, const signature_type &signature, const public_params &pp) {
+                    return public_key_policy_type::verify(pubkey, message, signature, pp);
+                }
+
+                template<typename PubkeyRangeType, typename MsgRangeType,
+                         typename = typename std::enable_if<
+                             std::is_same<self_type, typename PubkeyRangeType::value>::value>::type>
+                inline bool aggregate_verify(const PubkeyRangeType &pubkeys, const MsgRangeType &messages,
+                                             const signature_type &signature, const public_params &pp) {
+                    return public_key_policy_type::aggregate_verify(pubkeys, messages, pp.dst, signature);
+                }
+
+                operator public_key_type &() {
+                    return pubkey;
+                }
 
             protected:
                 public_key_type pubkey;

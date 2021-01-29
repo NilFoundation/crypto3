@@ -36,19 +36,25 @@ namespace nil {
             struct private_key : public public_key<Scheme> {
                 typedef typename public_key<Scheme>::scheme_type scheme_type;
                 typedef typename public_key<Scheme>::public_key_policy_type public_key_policy_type;
-                typedef typename public_key<Scheme>::public_key_type public_key_type;
+                typedef typename scheme_type::private_key_type private_key_policy_type;
 
-                typedef typename scheme_type::private_key_policy_type private_key_policy_type;
-                typedef typename private_key_policy_type::key_type private_key_type;
+                typedef typename private_key_policy_type::public_key_type public_key_type;
+                typedef typename private_key_policy_type::private_key_type private_key_type;
+                typedef typename private_key_policy_type::signature_type signature_type;
+                typedef typename private_key_policy_type::public_params public_params;
 
-                explicit private_key(const private_key_type &key) : privkey(key) {
-                    this->pubkey = public_key_policy_type::key_gen(privkey);
+                private_key(const private_key_type &key) :
+                    privkey(key), public_key<Scheme>(public_key_policy_type::key_gen(key)) {
                 }
 
-                template<typename ...Args>
-                explicit private_key(const Args&... args) {
-                    privkey = private_key_policy_type::key_gen(args...);
-                    this->pubkey = public_key_policy_type::key_gen(privkey);
+                template<typename MsgType>
+                inline signature_type sign(const MsgType &msg, const public_params &pp) {
+                    return private_key_policy_type::sign(privkey, msg, pp);
+                }
+
+                template<typename SignatureRangeType>
+                inline signature_type aggregate(const SignatureRangeType &signatures, const public_params &pp) {
+                    return private_key_policy_type::aggregate(signatures, pp);
                 }
 
             protected:
