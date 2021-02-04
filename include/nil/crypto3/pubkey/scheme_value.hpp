@@ -33,7 +33,11 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/apply.hpp>
+
+#include <nil/crypto3/pubkey/accumulators/private_key.hpp>
+#include <nil/crypto3/pubkey/accumulators/public_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,8 +49,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename PubkeyAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::scheme_type scheme_type;
 
                     ref_scheme_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }
@@ -60,8 +64,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename PubkeyAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::scheme_type scheme_type;
 
                     value_scheme_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }
@@ -77,7 +81,7 @@ namespace nil {
                     typedef typename pubkey_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename pubkey_state_impl_type::mode_type mode_type;
-                    typedef typename pubkey_state_impl_type::cipher_type cipher_type;
+                    typedef typename pubkey_state_impl_type::scheme_type scheme_type;
 
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
@@ -90,7 +94,7 @@ namespace nil {
                         typedef
                             typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
                             std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
                             stream_processor;
@@ -105,7 +109,7 @@ namespace nil {
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
                             std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
                             stream_processor;
@@ -169,7 +173,7 @@ namespace nil {
                     typedef typename pubkey_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename pubkey_state_impl_type::mode_type mode_type;
-                    typedef typename pubkey_state_impl_type::cipher_type cipher_type;
+                    typedef typename pubkey_state_impl_type::scheme_type scheme_type;
 
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
@@ -182,7 +186,7 @@ namespace nil {
                         typedef
                             typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
                             std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
                             stream_processor;
@@ -199,7 +203,7 @@ namespace nil {
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
                             std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
                             stream_processor;

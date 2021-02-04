@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,19 +23,27 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
-#define CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
-
-#include <boost/parameter/keyword.hpp>
-#include <boost/accumulators/accumulators_fwd.hpp>
+#ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
+#define CRYPTO3_PUBKEY_NO_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, cipher)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(cipher)
-        }    // namespace accumulators
+        namespace pubkey {
+            template<typename Scheme>
+            struct no_key {
+                typedef Scheme scheme_type;
+                typedef no_key<scheme_type> self_type;
+                typedef typename scheme_type::no_key_policy_type no_key_policy_type;
+
+                typedef typename no_key_policy_type::signature_type signature_type;
+
+                template<typename SignatureRangeType>
+                static inline signature_type aggregate(const SignatureRangeType &signatures) {
+                    return no_key_policy_type::aggregate(signatures);
+                }
+            };
+        }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BITS_HPP
+#endif    // CRYPTO3_PUBKEY_NO_KEY_HPP

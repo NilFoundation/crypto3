@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -27,34 +28,36 @@
 
 #include <nil/crypto3/pubkey/public_key.hpp>
 
-#include <type_traits>
-
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
             struct private_key : public public_key<Scheme> {
-                typedef typename public_key<Scheme>::scheme_type scheme_type;
-                typedef typename public_key<Scheme>::public_key_policy_type public_key_policy_type;
-                typedef typename scheme_type::private_key_type private_key_policy_type;
+                typedef Scheme scheme_type;
+
+                typedef typename public_key<scheme_type>::public_key_policy_type public_key_policy_type;
+                typedef typename scheme_type::private_key_policy_type private_key_policy_type;
 
                 typedef typename private_key_policy_type::public_key_type public_key_type;
                 typedef typename private_key_policy_type::private_key_type private_key_type;
                 typedef typename private_key_policy_type::signature_type signature_type;
                 typedef typename private_key_policy_type::public_params public_params;
 
-                private_key(const private_key_type &key) :
-                    privkey(key), public_key<Scheme>(public_key_policy_type::key_gen(key)) {
+                constexpr static const auto input_block_bits = private_key_policy_type::input_block_bits;
+                typedef typename private_key_policy_type::input_block_type input_block_type;
+
+                constexpr static const auto input_value_bits = private_key_policy_type::input_value_bits;
+                typedef typename private_key_policy_type::input_value_type input_value_type;
+
+                typedef signature_type result_type;
+
+                private_key(const private_key_type &key, const public_params &pp) :
+                    privkey(key), public_key<scheme_type>(private_key_policy_type::key_gen(key), pp) {
                 }
 
                 template<typename MsgType>
-                inline signature_type sign(const MsgType &msg, const public_params &pp) {
-                    return private_key_policy_type::sign(privkey, msg, pp);
-                }
-
-                template<typename SignatureRangeType>
-                inline signature_type aggregate(const SignatureRangeType &signatures, const public_params &pp) {
-                    return private_key_policy_type::aggregate(signatures, pp);
+                inline signature_type sign(const MsgType &msg) const {
+                    return private_key_policy_type::sign(msg, privkey, this->pp);
                 }
 
             protected:

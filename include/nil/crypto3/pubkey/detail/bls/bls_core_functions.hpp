@@ -163,9 +163,25 @@ namespace nil {
                         return aggregate_p;
                     }
 
+                    template<typename SignatureRangeType,
+                             typename = typename std::enable_if<
+                                 std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
+                    static inline signature_type core_aggregate(const signature_type &sig,
+                                                                const SignatureRangeType &sig_n) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
+                        assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
+
+                        auto sig_n_iter = sig_n.begin();
+                        signature_type aggregate_p = sig;
+                        while (sig_n_iter != sig_n.end()) {
+                            signature_type next_p = *sig_n_iter++;
+                            aggregate_p = aggregate_p + next_p;
+                        }
+                        return aggregate_p;
+                    }
+
                     template<typename PubkeyRangeType, typename MsgRangeType, typename DstType,
                              typename = typename std::enable_if<
-                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
@@ -193,7 +209,6 @@ namespace nil {
 
                     template<typename PubkeyRangeType, typename MsgRangeType, typename DstType,
                              typename = typename std::enable_if<
-                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool aug_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
@@ -247,7 +262,6 @@ namespace nil {
 
                     template<typename PubkeyRangeType, typename MsgType, typename DstType,
                              typename = typename std::enable_if<
-                                 std::is_same<public_key_type, typename PubkeyRangeType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline bool fast_aggregate_verify(const PubkeyRangeType &pk_n, const MsgType &msg,

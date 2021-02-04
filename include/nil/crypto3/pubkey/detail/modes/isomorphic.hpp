@@ -29,6 +29,7 @@
 #include <nil/crypto3/detail/stream_endian.hpp>
 
 #include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/no_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -81,24 +82,60 @@ namespace nil {
                 template<typename Scheme, typename Padding>
                 struct isomorphic_signing_policy : public isomorphic_policy<Scheme, Padding> {
                     typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename isomorphic_policy<Scheme, Padding>::number_type number_type;
 
                     typedef private_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::sign(key, plaintext);
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    typedef typename key_type::result_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.sign(args...);
                     }
                 };
 
                 template<typename Scheme, typename Padding>
                 struct isomorphic_verification_policy : public isomorphic_policy<Scheme, Padding> {
                     typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename isomorphic_policy<Scheme, Padding>::number_type number_type;
 
                     typedef public_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::verify(key, plaintext);
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    typedef typename key_type::result_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.verify(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_aggregate_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef no_key<Scheme> key_type;
+
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    typedef typename key_type::result_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return key_type::aggregate(args...);
                     }
                 };
 
@@ -107,22 +144,22 @@ namespace nil {
                     typedef Policy policy_type;
 
                 public:
-                    typedef typename policy_type::number_type number_type;
-
-                    typedef typename policy_type::policy_type scheme_type;
+                    typedef typename policy_type::scheme_type scheme_type;
                     typedef typename policy_type::padding_type padding_type;
+                    typedef typename policy_type::key_type key_type;
 
-                    typedef typename scheme_type::key_type key_type;
+                    constexpr static const auto input_block_bits = policy_type::input_block_bits;
+                    typedef typename policy_type::input_block_type input_block_type;
 
-                    isomorphic(const scheme_type &cipher) : cipher(cipher) {
+                    constexpr static const auto input_value_bits = policy_type::input_value_bits;
+                    typedef typename policy_type::input_value_type input_value_type;
+
+                    typedef typename policy_type::result_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return policy_type::process(args...);
                     }
-
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return policy_type::process(key, plaintext);
-                    }
-
-                protected:
-                    scheme_type cipher;
                 };
             }    // namespace detail
 

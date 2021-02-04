@@ -28,27 +28,39 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
+#include <nil/crypto3/pubkey/accumulators/private_key.hpp>
+#include <nil/crypto3/pubkey/accumulators/public_key.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             /*!
-             * @brief Accumulator set with pre-defined block cipher accumulator params.
+             * @brief Accumulator set with pre-defined private key accumulator params.
              *
              * Meets the requirements of AccumulatorSet
              *
-             * @ingroup block
+             * @ingroup pubkey
              *
-             * @tparam Mode Cipher state preprocessing mode type (e.g. isomorphic_encryption_mode<aes128>)
-             * @tparam Endian
-             * @tparam ValueBits
-             * @tparam LengthBits
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_signing_policy<bls, nop_padding>)
              */
-            template<typename ProcessingMode>
-            using accumulator_set = boost::accumulators::accumulator_set<
-                digest<ProcessingMode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::scheme<ProcessingMode>>>;
+            template<typename Mode>
+            using private_key_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::result_type,
+                boost::accumulators::features<accumulators::tag::private_key<Mode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined public key accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_signing_policy<bls, nop_padding>)
+             */
+            template<typename Mode>
+            using public_key_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::result_type,
+                boost::accumulators::features<accumulators::tag::public_key<Mode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
