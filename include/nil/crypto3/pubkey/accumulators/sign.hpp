@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PUBLIC_KEY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PUBLIC_KEY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP
 
 #include <boost/parameter/value_type.hpp>
 
@@ -33,9 +33,6 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/parameters/pubkeys.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/signatures.hpp>
-
 #include <nil/crypto3/pubkey/agreement_key.hpp>
 
 namespace nil {
@@ -43,7 +40,7 @@ namespace nil {
         namespace accumulators {
             namespace impl {
                 template<typename Mode>
-                struct public_key_impl : boost::accumulators::accumulator_base {
+                struct sign_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
                     typedef typename mode_type::scheme_type scheme_type;
@@ -56,14 +53,11 @@ namespace nil {
                     constexpr static const auto value_bits = mode_type::input_value_bits;
                     typedef typename mode_type::input_value_type value_type;
 
-                    typedef std::vector<block_type> cache_type;
-
                 public:
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    public_key_impl(const Args &args) : key(args[boost::accumulators::sample]) {
-                        cache.emplace_back(block_type());
+                    sign_impl(const Args &args) : key(args[boost::accumulators::sample]) {
                     }
 
                     template<typename Args>
@@ -77,39 +71,39 @@ namespace nil {
 
                 protected:
                     inline void resolve_type(const block_type &value) {
-                        cache.emplace_back(value);
+                        std::copy(value.cbegin(), value.cend(), std::back_inserter(cache));
                     }
 
                     inline void resolve_type(const value_type &value) {
-                        cache.back().emplace_back(value);
+                        cache.emplace_back(value);
                     }
 
                     key_type key;
-                    cache_type cache;
+                    block_type cache;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename Mode>
-                struct public_key : boost::accumulators::depends_on<> {
+                struct sign : boost::accumulators::depends_on<> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::public_key_impl<mode_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::sign_impl<mode_type>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::public_key<Mode>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::sign<Mode>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::public_key<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::sign<Mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PUBLIC_KEY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP

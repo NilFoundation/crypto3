@@ -55,8 +55,10 @@ namespace nil {
                     privkey(key), public_key<scheme_type>(private_key_policy_type::key_gen(key), pp) {
                 }
 
-                template<typename MsgType>
-                inline signature_type sign(const MsgType &msg) const {
+                template<typename MsgRange>
+                inline signature_type sign(const MsgRange &msg) const {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
+
                     return private_key_policy_type::sign(msg, privkey, this->pp);
                 }
 

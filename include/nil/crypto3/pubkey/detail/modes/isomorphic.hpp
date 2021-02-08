@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -120,7 +121,7 @@ namespace nil {
                 };
 
                 template<typename Scheme, typename Padding>
-                struct isomorphic_aggregate_policy : public isomorphic_policy<Scheme, Padding> {
+                struct isomorphic_aggregation_policy : public isomorphic_policy<Scheme, Padding> {
                     typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
 
                     typedef no_key<Scheme> key_type;
@@ -134,8 +135,8 @@ namespace nil {
                     typedef typename key_type::result_type result_type;
 
                     template<typename... Args>
-                    inline static result_type process(const Args &...args) {
-                        return key_type::aggregate(args...);
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.aggregate(args...);
                     }
                 };
 
@@ -188,6 +189,7 @@ namespace nil {
                     typedef detail::isomorphic_decryption_policy<scheme_type, padding_type> decryption_policy;
                     typedef detail::isomorphic_signing_policy<scheme_type, padding_type> signing_policy;
                     typedef detail::isomorphic_verification_policy<scheme_type, padding_type> verification_policy;
+                    typedef detail::isomorphic_aggregation_policy<scheme_type, padding_type> aggregation_policy;
 
                     template<typename Policy>
                     struct bind {

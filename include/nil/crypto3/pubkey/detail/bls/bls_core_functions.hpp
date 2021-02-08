@@ -52,6 +52,7 @@ namespace nil {
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
                     typedef typename policy_type::signature_type signature_type;
+                    typedef typename policy_type::pubkey_id_type pubkey_id_type;
 
                     constexpr static const std::size_t private_key_bits = policy_type::private_key_bits;
                     constexpr static const std::size_t L = static_cast<std::size_t>((3 * private_key_bits) / 16) +
@@ -285,6 +286,10 @@ namespace nil {
                         std::vector<std::uint8_t> result(PK.begin(), PK.end());
                         std::copy(msg.begin(), msg.end(), std::back_insert_iterator(result));
                         return result;
+                    }
+
+                    static inline pubkey_id_type get_pubkey_id(const public_key_type &public_key) {
+                        return policy_type::point_to_pubkey(public_key);
                     }
 
                 protected:

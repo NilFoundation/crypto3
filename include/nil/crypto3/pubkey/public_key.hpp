@@ -28,12 +28,25 @@
 
 #include <vector>
 #include <type_traits>
+#include <iterator>
+#include <utility>
+#include <unordered_map>
 
 #include <boost/range/concepts.hpp>
+
+// #include <boost/multi_index_container.hpp>
+// #include <boost/multi_index/hashed_index.hpp>
+// #include <boost/multi_index/member.hpp>
+
+#include <boost/container_hash/hash.hpp>
+
+// using namespace boost::multi_index;
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename T>
+            class TD;
             template<typename Scheme>
             struct public_key {
                 typedef Scheme scheme_type;
@@ -44,6 +57,7 @@ namespace nil {
                 typedef typename public_key_policy_type::private_key_type private_key_type;
                 typedef typename public_key_policy_type::signature_type signature_type;
                 typedef typename public_key_policy_type::public_params public_params;
+                typedef typename public_key_policy_type::pubkey_id_type pubkey_id_type;
 
                 constexpr static const auto input_block_bits = public_key_policy_type::input_block_bits;
                 typedef typename public_key_policy_type::input_block_type input_block_type;
@@ -51,56 +65,105 @@ namespace nil {
                 constexpr static const auto input_value_bits = public_key_policy_type::input_value_bits;
                 typedef typename public_key_policy_type::input_value_type input_value_type;
 
+                typedef std::
+                    unordered_map<pubkey_id_type, std::pair<self_type, input_block_type>, boost::hash<pubkey_id_type>>
+                        aggregate_verification_type;
+
                 typedef bool result_type;
 
-                typedef std::vector<public_key_type> public_keys_type;
-
-                public_key(const public_key_type &key, const public_params &pp) : pp(pp) {
-                    pubkeys.emplace_back(key);
+                public_key(const public_key_type &key, const public_params &pp) :
+                    pubkey(key), pp(pp), pubkey_id(public_key_policy_type::get_id(pubkey)) {
                 }
 
-                public_key(const public_key_type &key, const signature_type &signature, const public_params &pp) :
-                    pp(pp), sig(signature) {
-                    pubkeys.emplace_back(key);
+                public_key(const public_key_type &key, const public_params &pp, const signature_type &signature) :
+                    pubkey(key), pp(pp), sig(signature), pubkey_id(public_key_policy_type::get_id(pubkey)) {
                 }
 
-                template<typename PubkeyRange>
-                public_key(const PubkeyRange &keys, const public_params &pp) : pp(pp) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PubkeyRange>));
+                // template<typename MsgRange>
+                // inline bool verify(const MsgRange &msg) const {
+                //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
+                //
+                //     return public_key_policy_type::verify(msg, pubkey, sig, pp);
+                // }
 
-                    for (const auto &key : keys) {
-                        pubkeys.emplace_back(key);
+                //
+                // Aggregate verify
+                //
+                inline bool verify(const aggregate_verification_type &in_data) const {
+                    assert(!in_data.empty());
+
+                    if (in_data.size() == 1) {
+                        // TD<decltype(in_data.cbegin()->second.second)> a;
+                        return public_key_policy_type::verify(in_data.cbegin()->second.second, pubkey, sig, pp);
+                    } else {
+                        std::vector<public_key_type> pubkeys;
+                        std::vector<input_block_type> msgs;
+                        for (const auto &[key, value] : in_data) {
+                            pubkeys.emplace_back(value.first.get_raw_pubkey());
+                            msgs.emplace_back(value.second);
+                        }
+                        return public_key_policy_type::aggregate_verify(msgs, pubkeys, sig, pp);
                     }
                 }
 
-                template<typename PubkeyRange>
-                public_key(const PubkeyRange &keys, const signature_type &signature, const public_params &pp) :
-                    pp(pp), sig(signature) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PubkeyRange>));
-
-                    for (const auto &key : keys) {
-                        pubkeys.emplace_back(key);
-                    }
-                }
-
-                template<typename MsgType>
-                inline bool verify(const MsgType &msg) const {
-                    return public_key_policy_type::verify(msg, pubkeys.front(), sig, pp);
-                }
-
-                template<typename MsgRange>
-                inline bool aggregate_verify(const MsgRange &msgs) {
-                    return public_key_policy_type::aggregate_verify(msgs, pubkeys, sig, pp);
-                }
+                // template<typename Value, typename IndexSpecifierList, typename Allocator,
+                //          typename = typename std::enable_if<
+                //              std::is_same<Value, std::pair<self_type, input_block_type>>::value>::type>
+                // inline bool
+                //     verify(const boost::multi_index_container<Value, IndexSpecifierList, Allocator> &in_data) const {
+                //     std::vector<public_key_type> pubkeys;
+                //     std::vector<input_block_type> msgs;
+                //
+                //     auto in_data_iter = in_data.cbegin();
+                //     while (in_data_iter != in_data.cend()) {
+                //         pubkeys.emplace_back(std::get<0>(*in_data_iter).pubkey);
+                //         msgs.emplace_back(std::get<1>(*in_data_iter));
+                //         in_data_iter++;
+                //     }
+                //
+                //     return public_key_policy_type::aggregate_verify(msgs, pubkeys, sig, pp);
+                // }
 
                 inline void set_signature(const signature_type &signature) {
                     sig = signature;
                 }
 
-                public_keys_type pubkeys;
+                inline void append_aggregated_msg(aggregate_verification_type &agg_data,
+                                                  const input_block_type &block = input_block_type()) const {
+                    if (!agg_data.count(pubkey_id)) {
+                        agg_data.emplace(pubkey_id, std::make_pair(*this, block));
+                    } else {
+                        // TD<decltype(agg_data[pubkey_id])> a;
+                        std::copy(block.cbegin(), block.cend(), std::back_inserter(agg_data.at(pubkey_id).second));
+                    }
+                }
+
+                inline void append_aggregated_msg(aggregate_verification_type &agg_data,
+                                                  const input_value_type &value) const {
+                    if (!agg_data.count(pubkey_id)) {
+                        agg_data.emplace(pubkey_id, std::make_pair(*this, input_block_type()));
+                    }
+                    agg_data.at(pubkey_id).second.emplace_back(value);
+                }
+
+                inline const public_key_type &get_raw_pubkey() const {
+                    return pubkey;
+                }
+
+                inline const pubkey_id_type &get_pubkey_id() const {
+                    return pubkey_id;
+                }
+
+                public_key_type pubkey;
                 signature_type sig;
                 public_params pp;
+                pubkey_id_type pubkey_id;
             };
+
+            // template<typename Scheme, typename ValueType = public_key<Scheme>>
+            // using aggregate_verification_type = boost::multi_index_container<
+            //     ValueType, indexed_by<hashed_unique<
+            //                    member<ValueType, typename ValueType::pubkey_id_type, &ValueType::pubkey_id>>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

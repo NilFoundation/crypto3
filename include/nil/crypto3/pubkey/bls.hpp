@@ -36,7 +36,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/pubkey/private_key.hpp>
+#include <nil/crypto3/pubkey/agreement_key.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_core_functions.hpp>
 #include <nil/crypto3/pubkey/detail/stream_processor.hpp>
@@ -59,6 +59,7 @@ namespace nil {
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
                     typedef typename policy_type::signature_type signature_type;
+                    typedef typename policy_type::pubkey_id_type pubkey_id_type;
 
                     template<typename MsgType>
                     static inline signature_type sign(const private_key_type &privkey, const MsgType &message,
@@ -88,6 +89,10 @@ namespace nil {
                     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &messages,
                                               const signature_type &signature, const public_params &pp) {
                         return aggregate_verify(pubkeys, messages, pp.dst, signature);
+                    }
+
+                    static inline pubkey_id_type get_pubkey_id(const public_key_type &pubkey) {
+                        return core_functions::get_pubkey_id(pubkey);
                     }
 
                     // template<typename SignatureRange>
@@ -347,6 +352,7 @@ namespace nil {
                 typedef typename bls_scheme_type::public_key_type public_key_type;
                 typedef typename bls_scheme_type::signature_type signature_type;
                 typedef typename bls_scheme_type::public_params public_params;
+                typedef typename bls_scheme_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<std::uint8_t> input_block_type;
                 constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
@@ -356,16 +362,20 @@ namespace nil {
 
                 typedef public_key_type key_type;
 
-                template<typename MsgRange, typename PubkeyRange>
-                static inline bool aggregate_verify(const MsgRange &msgs, const PubkeyRange &pubkeys, const signature_type &sig,
+                template<typename MsgRange>
+                static inline bool verify(const MsgRange &msg, const public_key_type &pubkey, const signature_type &sig,
+                                          const public_params &pp) {
+                    return bls_scheme_type::verify(pubkey, msg, sig, pp);
+                }
+
+                template<typename MsgsRange, typename PubkeyRange>
+                static inline bool aggregate_verify(const MsgsRange &msgs, const PubkeyRange &pubkeys, const signature_type &sig,
                                           const public_params &pp) {
                     return bls_scheme_type::aggregate_verify(pubkeys, msgs, sig, pp);
                 }
 
-                template<typename MsgType>
-                static inline bool verify(const MsgType &msg, const public_key_type &pubkeys, const signature_type &sig,
-                                          const public_params &pp) {
-                    return bls_scheme_type::verify(pubkeys, msg, sig, pp);
+                static inline pubkey_id_type get_id(const public_key_type &pubkey) {
+                    return bls_scheme_type::get_pubkey_id(pubkey);
                 }
             };
 

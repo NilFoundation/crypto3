@@ -36,8 +36,8 @@
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/apply.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/private_key.hpp>
-#include <nil/crypto3/pubkey/accumulators/public_key.hpp>
+#include <nil/crypto3/pubkey/accumulators/sign.hpp>
+#include <nil/crypto3/pubkey/accumulators/verify.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -86,7 +86,10 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename SinglePassRange>
+                    template<typename SinglePassRange,
+                             typename ValueType =
+                                 typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                             typename = typename std::enable_if<std::numeric_limits<ValueType>::is_specialized>::type>
                     range_scheme_impl(const SinglePassRange &range, const accumulator_set_type &ise) :
                         PubkeySchemeStateImpl(ise) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
@@ -102,7 +105,9 @@ namespace nil {
                         stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
-                    template<typename InputIterator>
+                    template<typename InputIterator,
+                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                             typename = typename std::enable_if<std::numeric_limits<ValueType>::is_specialized>::type>
                     range_scheme_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise) :
                         PubkeySchemeStateImpl(ise) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
@@ -116,6 +121,37 @@ namespace nil {
 
                         stream_processor(this->accumulator_set)(first, last);
                     }
+
+                    // template<typename SinglePassRange>
+                    // range_scheme_impl(const SinglePassRange &range, const accumulator_set_type &ise) :
+                    //     PubkeySchemeStateImpl(ise) {
+                    //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                    //
+                    //     typedef
+                    //         typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
+                    //     BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                    //     typedef typename scheme_type::template stream_processor<
+                    //         mode_type, accumulator_set_type,
+                    //         std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                    //         stream_processor;
+                    //
+                    //     stream_processor(this->accumulator_set)(range.begin(), range.end());
+                    // }
+                    //
+                    // template<typename InputIterator>
+                    // range_scheme_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise) :
+                    //     PubkeySchemeStateImpl(ise) {
+                    //     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                    //
+                    //     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
+                    //     BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                    //     typedef typename scheme_type::template stream_processor<
+                    //         mode_type, accumulator_set_type,
+                    //         std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                    //         stream_processor;
+                    //
+                    //     stream_processor(this->accumulator_set)(first, last);
+                    // }
 
                     template<typename T, std::size_t Size>
                     inline operator std::array<T, Size>() const {

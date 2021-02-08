@@ -74,11 +74,12 @@ namespace nil {
                     typedef typename curve_type::g2_type public_key_group_type;
                     typedef typename curve_type::g1_type signature_group_type;
 
+                    typedef serializer<curve_type> bls_serializer;
+
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
-
-                    typedef serializer<curve_type> bls_serializer;
+                    typedef typename bls_serializer::compressed_g2_octets pubkey_id_type;
 
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
@@ -120,11 +121,12 @@ namespace nil {
                     typedef typename curve_type::g1_type public_key_group_type;
                     typedef typename curve_type::g2_type signature_group_type;
 
+                    typedef serializer<curve_type> bls_serializer;
+
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
                     typedef typename signature_group_type::value_type signature_type;
-
-                    typedef serializer<curve_type> bls_serializer;
+                    typedef typename bls_serializer::compressed_g1_octets pubkey_id_type;
 
                     constexpr static const std::size_t private_key_bits = basic_policy::private_key_bits;
                     constexpr static const std::size_t public_key_bits = public_key_type::value_bits;
