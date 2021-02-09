@@ -57,6 +57,9 @@ namespace nil {
                     constexpr static const auto value_bits = mode_type::input_value_bits;
                     typedef typename mode_type::input_value_type value_type;
 
+                    // TODO: is it necessary
+                    typedef typename scheme_type::signature_type signature_type;
+
                     typedef typename key_type::aggregate_verification_type cache_type;
 
                 public:
@@ -85,6 +88,10 @@ namespace nil {
 
                     inline void resolve_type(const value_type &value, const key_type &key) {
                         key.append_aggregated_msg(cache, value);
+                    }
+
+                    inline void resolve_type(const signature_type &sig, const key_type &) {
+                        init_key.set_signature(sig);
                     }
 
                     key_type init_key;

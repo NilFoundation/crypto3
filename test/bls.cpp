@@ -2014,11 +2014,14 @@ BOOST_AUTO_TEST_SUITE_END()
 // BOOST_AUTO_TEST_SUITE_END()
 
 template<typename Scheme, typename MsgRange>
-void conformity_test(const typename Scheme::public_params &pp, const std::vector<private_key<Scheme>> &sks, const std::vector<MsgRange> &msgs, const std::vector<typename Scheme::signature_type> &etalon_sigs) {
+void conformity_test(const typename Scheme::public_params &pp,
+                     std::vector<private_key<Scheme>> &sks,
+                     const std::vector<MsgRange> &msgs,
+                     const std::vector<typename Scheme::signature_type> &etalon_sigs) {
     using scheme_type = Scheme;
     using mode_type =
-    typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
-    template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
+        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
+            template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
     using accumulator_set_type = verification_accumulator_set<mode_type>;
     using accumulator_type = typename boost::mpl::front<typename accumulator_set_type::features_type>::type;
 
@@ -2048,18 +2051,18 @@ void conformity_test(const typename Scheme::public_params &pp, const std::vector
     etalon_sigs_iter++;
 
     // Agregate
-    std::vector<public_key_type &> pks;
+    std::vector<public_key_type *> pks;
     std::vector<_signature_type> sigs;
 
-    pks.emplace_back(*sks_iter);
+    pks.emplace_back(&*sks_iter);
     sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
 
     BOOST_CHECK_EQUAL(sigs.back().to_affine_coordinates(), *etalon_sigs_iter);
 
-    pks.back().set_signature(sigs.back());
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pks.back())), true);
+    pks.back()->set_signature(sigs.back());
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
 
-    auto acc = accumulator_set_type(pks.back());
+    auto acc = accumulator_set_type(*pks.back());
     ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
 
     sks_iter++;
@@ -2067,15 +2070,15 @@ void conformity_test(const typename Scheme::public_params &pp, const std::vector
     etalon_sigs_iter++;
 
     while (sks_iter != sks.end() && msgs_iter != msgs.end() && etalon_sigs_iter != (etalon_sigs.end() - 1)) {
-        pks.emplace_back(*sks_iter);
+        pks.emplace_back(&*sks_iter);
         sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
 
         BOOST_CHECK_EQUAL(sigs.back().to_affine_coordinates(), *etalon_sigs_iter);
 
-        pks.back().set_signature(sigs.back());
-        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pks.back())), true);
+        pks.back()->set_signature(sigs.back());
+        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
 
-        acc(*msgs_iter, nil::crypto3::accumulators::key = pks.back());
+        acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
 
         sks_iter++;
         msgs_iter++;
@@ -2085,23 +2088,16 @@ void conformity_test(const typename Scheme::public_params &pp, const std::vector
     _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
     BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), *etalon_sigs_iter);
 
-    pks.begin()->set_signature(agg_sig);
+    acc(agg_sig);
     auto res = boost::accumulators::extract_result<accumulator_type>(acc);
     BOOST_CHECK_EQUAL(res, true);
 }
 
-void self_test() {
-
-}
-
-
-BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
-
-BOOST_AUTO_TEST_CASE(bls_basic_mps) {
-    using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+template<typename Scheme, typename MsgRange>
+void self_test(const typename Scheme::public_params &pp,
+               std::vector<private_key<Scheme>> &sks,
+               const std::vector<MsgRange> &msgs) {
+    using scheme_type = Scheme;
     using mode_type =
         typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
             template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
@@ -2111,41 +2107,81 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
     using _private_key_type = typename scheme_type::private_key_type;
     using _public_key_type = typename scheme_type::public_key_type;
     using _signature_type = typename scheme_type::signature_type;
+    using public_params = typename scheme_type::public_params;
+
+    using modulus_type = typename _private_key_type::modulus_type;
 
     using private_key_type = private_key<scheme_type>;
     using public_key_type = public_key<scheme_type>;
-    using public_params = typename private_key_type::public_params;
 
+    auto sks_iter = sks.begin();
+    auto msgs_iter = msgs.begin();
+
+    _signature_type sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
+
+    public_key_type &pubkey = *sks_iter;
+    pubkey.set_signature(sig);
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pubkey)), true);
+
+    sks_iter++;
+    msgs_iter++;
+
+    // Agregate
+    std::vector<public_key_type *> pks;
+    std::vector<_signature_type> sigs;
+
+    pks.emplace_back(&*sks_iter);
+    sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+
+    pks.back()->set_signature(sigs.back());
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
+
+    auto acc = accumulator_set_type(*pks.back());
+    ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
+
+    sks_iter++;
+    msgs_iter++;
+
+    while (sks_iter != sks.end() && msgs_iter != msgs.end()) {
+        pks.emplace_back(&*sks_iter);
+        sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+
+        pks.back()->set_signature(sigs.back());
+        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
+
+        acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
+
+        sks_iter++;
+        msgs_iter++;
+    }
+
+    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
+
+    acc(agg_sig);
+    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
+    BOOST_CHECK_EQUAL(res, true);
+}
+
+BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
+
+BOOST_AUTO_TEST_CASE(bls_basic_mps) {
+    using curve_type = curves::bls12_381;
+    using hash_type = sha2<256>;
+    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
+    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+
+    using public_params = typename scheme_type::public_params;
+    using _private_key_type = typename scheme_type::private_key_type;
+    using _signature_type = typename scheme_type::signature_type;
+    using private_key_type = private_key<scheme_type>;
     using modulus_type = typename _private_key_type::modulus_type;
 
     public_params pp(BasicSchemeDstMps);
 
-    _private_key_type sk = _private_key_type(
-        modulus_type("40584678435858019826189226852568167523058602168344608386410664029843289288788"));
-    const std::string msg_str = "hello foo";
-    const std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-
-    _signature_type etalon_sig = _signature_type(
-        {{modulus_type("85911141189038341422217999965810909168006256466381521648082748107372745388299551"
-                       "9337819063587669418425211221549283"),
-          modulus_type("38652946747836373505232449343138682065351453822989118701578533663043001622363102"
-                       "79903647373322307985974413380042255")}},
-        {{modulus_type("11185637828916832078768174243254972746778201844765270288305164561940707627068745"
-                       "97608097527159814883098414084023916"),
-          modulus_type("24808054598506349709552229822047321779605439703657724013272122538247253994600104"
-                       "08048001497870419741858246203802842")}},
-        {{1, 0}});
-
-    private_key_type privkey(sk, pp);
-
-    _signature_type sig = ::nil::crypto3::sign(msg.begin(), msg.end(), privkey);
-    BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), etalon_sig);
-
-    public_key_type &pubkey = privkey;
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg, pubkey)), true);
-
-    // Agregate
+    private_key_type sk =
+        private_key_type(_private_key_type(modulus_type(
+                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
+                         pp);
     private_key_type sk0 =
         private_key_type(_private_key_type(modulus_type(
                              "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
@@ -2185,18 +2221,43 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
         private_key_type(_private_key_type(modulus_type(
                              "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
                          pp);
+    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
 
-    public_key_type &pk0 = sk0;
-    public_key_type &pk1 = sk1;
-    public_key_type &pk2 = sk2;
-    public_key_type &pk3 = sk3;
-    public_key_type &pk4 = sk4;
-    public_key_type &pk5 = sk5;
-    public_key_type &pk6 = sk6;
-    public_key_type &pk7 = sk7;
-    public_key_type &pk8 = sk8;
-    public_key_type &pk9 = sk9;
+    using msg_type = std::vector<std::uint8_t>;
+    const std::string msg_str = "hello foo";
+    msg_type msg(msg_str.begin(), msg_str.end());
+    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
+                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
+    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
+                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
+    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
+                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
+    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
+    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
+                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
+                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
+    msg_type msg5 = {196};
+    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
+                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
+    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
+                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
+                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
+    msg_type msg8 = {246, 33};
+    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
+                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
+                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
+    std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
 
+    _signature_type etalon_sig = _signature_type(
+        {{modulus_type("85911141189038341422217999965810909168006256466381521648082748107372745388299551"
+                       "9337819063587669418425211221549283"),
+          modulus_type("38652946747836373505232449343138682065351453822989118701578533663043001622363102"
+                       "79903647373322307985974413380042255")}},
+        {{modulus_type("11185637828916832078768174243254972746778201844765270288305164561940707627068745"
+                       "97608097527159814883098414084023916"),
+          modulus_type("24808054598506349709552229822047321779605439703657724013272122538247253994600104"
+                       "08048001497870419741858246203802842")}},
+        {{1, 0}});
     _signature_type etalon_sig0 = _signature_type(
         {{modulus_type("20367499301549630664794509143514612141767176044319343973582778132616836810060515"
                        "3615593024400226467409507465298708"),
@@ -2297,73 +2358,6 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("15245316264031841516784228058567442189765531096216009069579788284961451254290981"
                        "21669836210232968245470706286353809")}},
         {{1, 0}});
-
-    using msg_type = std::vector<std::uint8_t>;
-    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
-                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
-    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
-                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
-    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
-                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
-    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
-    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
-                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
-                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
-    msg_type msg5 = {196};
-    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
-                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
-    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
-                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
-                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
-    msg_type msg8 = {246, 33};
-    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
-                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
-                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
-
-    _signature_type sig0 = ::nil::crypto3::sign(msg0, sk0);
-    _signature_type sig1 = ::nil::crypto3::sign(msg1, sk1);
-    _signature_type sig2 = ::nil::crypto3::sign(msg2, sk2);
-    _signature_type sig3 = ::nil::crypto3::sign(msg3, sk3);
-    _signature_type sig4 = ::nil::crypto3::sign(msg4, sk4);
-    _signature_type sig5 = ::nil::crypto3::sign(msg5, sk5);
-    _signature_type sig6 = ::nil::crypto3::sign(msg6, sk6);
-    _signature_type sig7 = ::nil::crypto3::sign(msg7, sk7);
-    _signature_type sig8 = ::nil::crypto3::sign(msg8, sk8);
-    _signature_type sig9 = ::nil::crypto3::sign(msg9, sk9);
-
-    BOOST_CHECK_EQUAL(sig0.to_affine_coordinates(), etalon_sig0);
-    BOOST_CHECK_EQUAL(sig1.to_affine_coordinates(), etalon_sig1);
-    BOOST_CHECK_EQUAL(sig2.to_affine_coordinates(), etalon_sig2);
-    BOOST_CHECK_EQUAL(sig3.to_affine_coordinates(), etalon_sig3);
-    BOOST_CHECK_EQUAL(sig4.to_affine_coordinates(), etalon_sig4);
-    BOOST_CHECK_EQUAL(sig5.to_affine_coordinates(), etalon_sig5);
-    BOOST_CHECK_EQUAL(sig6.to_affine_coordinates(), etalon_sig6);
-    BOOST_CHECK_EQUAL(sig7.to_affine_coordinates(), etalon_sig7);
-    BOOST_CHECK_EQUAL(sig8.to_affine_coordinates(), etalon_sig8);
-    BOOST_CHECK_EQUAL(sig9.to_affine_coordinates(), etalon_sig9);
-
-    pk0.set_signature(sig0);
-    pk1.set_signature(sig1);
-    pk2.set_signature(sig2);
-    pk3.set_signature(sig3);
-    pk4.set_signature(sig4);
-    pk5.set_signature(sig5);
-    pk6.set_signature(sig6);
-    pk7.set_signature(sig7);
-    pk8.set_signature(sig8);
-    pk9.set_signature(sig9);
-
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg0, pk0)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg1, pk1)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg2, pk2)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg3, pk3)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg4, pk4)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg5, pk5)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg6, pk6)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg7, pk7)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg8, pk8)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg9, pk9)), true);
-
     _signature_type etalon_agg_sig = _signature_type(
         {{modulus_type("18220404422387103573016815419543106211555329938444713749473054663814783182546339"
                        "92897017937660322039699444351331382"),
@@ -2374,26 +2368,11 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("34110737309389519223382510182418054823170371615385370448247187212612775099543648"
                        "82537962124670376518393059481359811")}},
         {{1, 0}});
+    std::vector<_signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
+                                                etalon_sig3, etalon_sig4, etalon_sig5, etalon_sig6,
+                                                etalon_sig7, etalon_sig8, etalon_sig9, etalon_agg_sig};
 
-    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(
-        std::vector<_signature_type>({sig0, sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8, sig9}));
-    BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), etalon_agg_sig);
-
-    pk0.set_signature(agg_sig);
-    auto acc = accumulator_set_type(pk0);
-    ::nil::crypto3::verify<scheme_type>(msg0, acc);
-    acc(msg1, nil::crypto3::accumulators::key = pk1);
-    acc(msg2, nil::crypto3::accumulators::key = pk2);
-    acc(msg3, nil::crypto3::accumulators::key = pk3);
-    acc(msg4, nil::crypto3::accumulators::key = pk4);
-    acc(msg5, nil::crypto3::accumulators::key = pk5);
-    acc(msg6, nil::crypto3::accumulators::key = pk6);
-    acc(msg7, nil::crypto3::accumulators::key = pk7);
-    acc(msg8, nil::crypto3::accumulators::key = pk8);
-    acc(msg9, nil::crypto3::accumulators::key = pk9);
-    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
-
-    BOOST_CHECK_EQUAL(res, true);
+    conformity_test<scheme_type>(pp, sks, msgs, etalon_sigs);
 }
 
 BOOST_AUTO_TEST_CASE(bls_basic_mss) {
@@ -2401,48 +2380,19 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
     using hash_type = sha2<256>;
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
-    using mode_type =
-        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
-            template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using accumulator_set_type = verification_accumulator_set<mode_type>;
-    using accumulator_type = typename boost::mpl::front<typename accumulator_set_type::features_type>::type;
 
+    using public_params = typename scheme_type::public_params;
     using _private_key_type = typename scheme_type::private_key_type;
-    using _public_key_type = typename scheme_type::public_key_type;
     using _signature_type = typename scheme_type::signature_type;
-
     using private_key_type = private_key<scheme_type>;
-    using public_key_type = public_key<scheme_type>;
-    using public_params = typename private_key_type::public_params;
-
     using modulus_type = typename _private_key_type::modulus_type;
 
     public_params pp(BasicSchemeDstMps);
 
-    // Sign
-    _private_key_type sk = _private_key_type(
-        modulus_type("40584678435858019826189226852568167523058602168344608386410664029843289288788"));
-
-    const std::string msg_str = "hello foo";
-    const std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-
-    _signature_type etalon_sig = _signature_type(
-        modulus_type("3604356284473401589952441283763873345227059496255462321551435982658302670661662992"
-                     "473691215983035545839478217804772"),
-        modulus_type("1327250267123059730920952227120753767562776844810778978087227730380440847250307685"
-                     "059082654296549055086001069530253"),
-        1);
-
-    private_key_type privkey(sk, pp);
-
-    _signature_type sig = ::nil::crypto3::sign(msg.begin(), msg.end(), privkey);
-    BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), etalon_sig);
-
-    public_key_type &pubkey = privkey;
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg, pubkey)), true);
-
-    // Agregate
+    private_key_type sk =
+        private_key_type(_private_key_type(modulus_type(
+                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
+                         pp);
     private_key_type sk0 =
         private_key_type(_private_key_type(modulus_type(
                              "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
@@ -2482,18 +2432,39 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
         private_key_type(_private_key_type(modulus_type(
                              "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
                          pp);
+    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
 
-    public_key_type &pk0 = sk0;
-    public_key_type &pk1 = sk1;
-    public_key_type &pk2 = sk2;
-    public_key_type &pk3 = sk3;
-    public_key_type &pk4 = sk4;
-    public_key_type &pk5 = sk5;
-    public_key_type &pk6 = sk6;
-    public_key_type &pk7 = sk7;
-    public_key_type &pk8 = sk8;
-    public_key_type &pk9 = sk9;
+    using msg_type = std::vector<std::uint8_t>;
+    const std::string msg_str = "hello foo";
+    msg_type msg(msg_str.begin(), msg_str.end());
+    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
+                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
+    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
+                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
+    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
+                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
+    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
+    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
+                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
+                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
+    msg_type msg5 = {196};
+    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
+                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
+    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
+                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
+                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
+    msg_type msg8 = {246, 33};
+    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
+                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
+                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
+    std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
 
+    _signature_type etalon_sig = _signature_type(
+        modulus_type("3604356284473401589952441283763873345227059496255462321551435982658302670661662992"
+                     "473691215983035545839478217804772"),
+        modulus_type("1327250267123059730920952227120753767562776844810778978087227730380440847250307685"
+                     "059082654296549055086001069530253"),
+        1);
     _signature_type etalon_sig0 = _signature_type(
         modulus_type("2247162578336307790300117844468947468720835189503626092261065265284788376322645855"
                      "042715828480095761644405233051874"),
@@ -2554,140 +2525,36 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
         modulus_type("3666516296905512856019726406051933303243313687988121908994579574714110113701386717"
                      "232936250509350140704196795339498"),
         1);
-
-    using msg_type = std::vector<std::uint8_t>;
-    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
-                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
-    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
-                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
-    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
-                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
-    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
-    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
-                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
-                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
-    msg_type msg5 = {196};
-    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
-                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
-    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
-                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
-                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
-    msg_type msg8 = {246, 33};
-    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
-                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
-                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
-
-    _signature_type sig0 = ::nil::crypto3::sign(msg0, sk0);
-    _signature_type sig1 = ::nil::crypto3::sign(msg1, sk1);
-    _signature_type sig2 = ::nil::crypto3::sign(msg2, sk2);
-    _signature_type sig3 = ::nil::crypto3::sign(msg3, sk3);
-    _signature_type sig4 = ::nil::crypto3::sign(msg4, sk4);
-    _signature_type sig5 = ::nil::crypto3::sign(msg5, sk5);
-    _signature_type sig6 = ::nil::crypto3::sign(msg6, sk6);
-    _signature_type sig7 = ::nil::crypto3::sign(msg7, sk7);
-    _signature_type sig8 = ::nil::crypto3::sign(msg8, sk8);
-    _signature_type sig9 = ::nil::crypto3::sign(msg9, sk9);
-
-    BOOST_CHECK_EQUAL(sig0.to_affine_coordinates(), etalon_sig0);
-    BOOST_CHECK_EQUAL(sig1.to_affine_coordinates(), etalon_sig1);
-    BOOST_CHECK_EQUAL(sig2.to_affine_coordinates(), etalon_sig2);
-    BOOST_CHECK_EQUAL(sig3.to_affine_coordinates(), etalon_sig3);
-    BOOST_CHECK_EQUAL(sig4.to_affine_coordinates(), etalon_sig4);
-    BOOST_CHECK_EQUAL(sig5.to_affine_coordinates(), etalon_sig5);
-    BOOST_CHECK_EQUAL(sig6.to_affine_coordinates(), etalon_sig6);
-    BOOST_CHECK_EQUAL(sig7.to_affine_coordinates(), etalon_sig7);
-    BOOST_CHECK_EQUAL(sig8.to_affine_coordinates(), etalon_sig8);
-    BOOST_CHECK_EQUAL(sig9.to_affine_coordinates(), etalon_sig9);
-
-    pk0.set_signature(sig0);
-    pk1.set_signature(sig1);
-    pk2.set_signature(sig2);
-    pk3.set_signature(sig3);
-    pk4.set_signature(sig4);
-    pk5.set_signature(sig5);
-    pk6.set_signature(sig6);
-    pk7.set_signature(sig7);
-    pk8.set_signature(sig8);
-    pk9.set_signature(sig9);
-
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg0, pk0)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg1, pk1)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg2, pk2)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg3, pk3)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg4, pk4)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg5, pk5)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg6, pk6)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg7, pk7)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg8, pk8)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg9, pk9)), true);
-
     _signature_type etalon_agg_sig = _signature_type(
         modulus_type("1347890076939912845745386708815835780163588356335929090894089616427726245503639652"
                      "126316979340877114260832647740757"),
         modulus_type("3055112058004854338590166655340093414620546693806824954758338468746323342336631148"
                      "81983910742368460029728081685283"),
         1);
+    std::vector<_signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
+                                                etalon_sig3, etalon_sig4, etalon_sig5, etalon_sig6,
+                                                etalon_sig7, etalon_sig8, etalon_sig9, etalon_agg_sig};
 
-    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(
-        std::vector<_signature_type>({sig0, sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8, sig9}));
-    BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), etalon_agg_sig);
-
-    pk0.set_signature(agg_sig);
-    auto acc = accumulator_set_type(pk0);
-    ::nil::crypto3::verify<scheme_type>(msg0, acc);
-    acc(msg1, nil::crypto3::accumulators::key = pk1);
-    acc(msg2, nil::crypto3::accumulators::key = pk2);
-    acc(msg3, nil::crypto3::accumulators::key = pk3);
-    acc(msg4, nil::crypto3::accumulators::key = pk4);
-    acc(msg5, nil::crypto3::accumulators::key = pk5);
-    acc(msg6, nil::crypto3::accumulators::key = pk6);
-    acc(msg7, nil::crypto3::accumulators::key = pk7);
-    acc(msg8, nil::crypto3::accumulators::key = pk8);
-    acc(msg9, nil::crypto3::accumulators::key = pk9);
-    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
-
-    BOOST_CHECK_EQUAL(res, true);
+    conformity_test<scheme_type>(pp, sks, msgs, etalon_sigs);
 }
 
 BOOST_AUTO_TEST_CASE(bls_aug_mss) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::aug>;
-    using mode_type =
-        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
-            template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using accumulator_set_type = verification_accumulator_set<mode_type>;
-    using accumulator_type = typename boost::mpl::front<typename accumulator_set_type::features_type>::type;
+    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
 
+    using public_params = typename scheme_type::public_params;
     using _private_key_type = typename scheme_type::private_key_type;
-    using _public_key_type = typename scheme_type::public_key_type;
-    using _signature_type = typename scheme_type::signature_type;
-
     using private_key_type = private_key<scheme_type>;
-    using public_key_type = public_key<scheme_type>;
-    using public_params = typename private_key_type::public_params;
-
     using modulus_type = typename _private_key_type::modulus_type;
 
     public_params pp(BasicSchemeDstMps);
 
-    // Sign
-    _private_key_type sk = _private_key_type(
-        modulus_type("40584678435858019826189226852568167523058602168344608386410664029843289288788"));
-
-    const std::string msg_str = "hello foo";
-    const std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-
-    private_key_type privkey(sk, pp);
-
-    _signature_type sig = ::nil::crypto3::sign(msg.begin(), msg.end(), privkey);
-
-    public_key_type &pubkey = privkey;
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg, pubkey)), true);
-
-    // Agregate
+    private_key_type sk =
+        private_key_type(_private_key_type(modulus_type(
+                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
+                         pp);
     private_key_type sk0 =
         private_key_type(_private_key_type(modulus_type(
                              "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
@@ -2727,19 +2594,11 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
         private_key_type(_private_key_type(modulus_type(
                              "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
                          pp);
-
-    public_key_type &pk0 = sk0;
-    public_key_type &pk1 = sk1;
-    public_key_type &pk2 = sk2;
-    public_key_type &pk3 = sk3;
-    public_key_type &pk4 = sk4;
-    public_key_type &pk5 = sk5;
-    public_key_type &pk6 = sk6;
-    public_key_type &pk7 = sk7;
-    public_key_type &pk8 = sk8;
-    public_key_type &pk9 = sk9;
+    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
 
     using msg_type = std::vector<std::uint8_t>;
+    const std::string msg_str = "hello foo";
+    msg_type msg(msg_str.begin(), msg_str.end());
     msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
                      212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
     msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
@@ -2760,58 +2619,9 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
     msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
                      231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
                      100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
+    std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
 
-    _signature_type sig0 = ::nil::crypto3::sign(msg0, sk0);
-    _signature_type sig1 = ::nil::crypto3::sign(msg1, sk1);
-    _signature_type sig2 = ::nil::crypto3::sign(msg2, sk2);
-    _signature_type sig3 = ::nil::crypto3::sign(msg3, sk3);
-    _signature_type sig4 = ::nil::crypto3::sign(msg4, sk4);
-    _signature_type sig5 = ::nil::crypto3::sign(msg5, sk5);
-    _signature_type sig6 = ::nil::crypto3::sign(msg6, sk6);
-    _signature_type sig7 = ::nil::crypto3::sign(msg7, sk7);
-    _signature_type sig8 = ::nil::crypto3::sign(msg8, sk8);
-    _signature_type sig9 = ::nil::crypto3::sign(msg9, sk9);
-
-    pk0.set_signature(sig0);
-    pk1.set_signature(sig1);
-    pk2.set_signature(sig2);
-    pk3.set_signature(sig3);
-    pk4.set_signature(sig4);
-    pk5.set_signature(sig5);
-    pk6.set_signature(sig6);
-    pk7.set_signature(sig7);
-    pk8.set_signature(sig8);
-    pk9.set_signature(sig9);
-
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg0, pk0)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg1, pk1)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg2, pk2)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg3, pk3)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg4, pk4)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg5, pk5)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg6, pk6)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg7, pk7)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg8, pk8)), true);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msg9, pk9)), true);
-
-    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(
-        std::vector<_signature_type>({sig0, sig1, sig2, sig3, sig4, sig5, sig6, sig7, sig8, sig9}));
-
-    pk0.set_signature(agg_sig);
-    auto acc = accumulator_set_type(pk0);
-    ::nil::crypto3::verify<scheme_type>(msg0, acc);
-    acc(msg1, nil::crypto3::accumulators::key = pk1);
-    acc(msg2, nil::crypto3::accumulators::key = pk2);
-    acc(msg3, nil::crypto3::accumulators::key = pk3);
-    acc(msg4, nil::crypto3::accumulators::key = pk4);
-    acc(msg5, nil::crypto3::accumulators::key = pk5);
-    acc(msg6, nil::crypto3::accumulators::key = pk6);
-    acc(msg7, nil::crypto3::accumulators::key = pk7);
-    acc(msg8, nil::crypto3::accumulators::key = pk8);
-    acc(msg9, nil::crypto3::accumulators::key = pk9);
-    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
-
-    BOOST_CHECK_EQUAL(res, true);
+    self_test<scheme_type>(pp, sks, msgs);
 }
 
 BOOST_AUTO_TEST_CASE(bls_aug_mps) {
@@ -2819,7 +2629,6 @@ BOOST_AUTO_TEST_CASE(bls_aug_mps) {
 }
 
 BOOST_AUTO_TEST_CASE(bls_pop_mss) {
-
 }
 
 BOOST_AUTO_TEST_CASE(bls_pop_mps) {
