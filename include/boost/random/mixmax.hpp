@@ -62,8 +62,8 @@ public:
     typedef boost::uint64_t result_type ;
     BOOST_STATIC_CONSTANT(boost::uint64_t,mixmax_min=0);
     BOOST_STATIC_CONSTANT(boost::uint64_t,mixmax_max=((1ULL<<61)-1));
-    BOOST_STATIC_CONSTEXPR result_type min() {return mixmax_min;}
-    BOOST_STATIC_CONSTEXPR result_type max() {return mixmax_max;}
+    BOOST_STATIC_CONSTEXPR result_type min BOOST_PREVENT_MACRO_SUBSTITUTION() {return mixmax_min;}
+    BOOST_STATIC_CONSTEXPR result_type max BOOST_PREVENT_MACRO_SUBSTITUTION() {return mixmax_max;}
     static const bool has_fixed_range = false;
     BOOST_STATIC_CONSTANT(int,N=Ndim);     ///< The main internal parameter, size of the defining MIXMAX matrix
     // CONSTRUCTORS:
