@@ -63,7 +63,7 @@ namespace nil {
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    verify_impl(const Args &args) : init_key(args[boost::accumulators::sample])//, cache(cache_type{{init_key.pubkey_id, std::make_pair(init_key, block_type())}})
+                    verify_impl(const Args &args) : init_key(args[boost::accumulators::sample])
                     {
                         init_key.append_aggregated_msg(cache);
                     }

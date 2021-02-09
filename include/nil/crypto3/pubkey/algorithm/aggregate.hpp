@@ -450,7 +450,7 @@ namespace nil {
                      typename pubkey::aggregation_accumulator_set<typename pubkey::modes::isomorphic<
                          Scheme, pubkey::nop_padding>::template bind<pubkey::aggregation_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            sign(const SinglePassRange &r) {
+            aggregate(const SinglePassRange &r) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::aggregation_policy<Scheme>>::type Mode;

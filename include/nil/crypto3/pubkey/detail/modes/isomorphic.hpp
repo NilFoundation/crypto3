@@ -92,7 +92,7 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
-                    typedef typename key_type::result_type result_type;
+                    typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {
@@ -112,7 +112,7 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
-                    typedef typename key_type::result_type result_type;
+                    typedef bool result_type;
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {
@@ -132,7 +132,7 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
-                    typedef typename key_type::result_type result_type;
+                    typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {

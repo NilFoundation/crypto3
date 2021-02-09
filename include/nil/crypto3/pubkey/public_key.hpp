@@ -32,21 +32,11 @@
 #include <utility>
 #include <unordered_map>
 
-#include <boost/range/concepts.hpp>
-
-// #include <boost/multi_index_container.hpp>
-// #include <boost/multi_index/hashed_index.hpp>
-// #include <boost/multi_index/member.hpp>
-
 #include <boost/container_hash/hash.hpp>
-
-// using namespace boost::multi_index;
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename T>
-            class TD;
             template<typename Scheme>
             struct public_key {
                 typedef Scheme scheme_type;
@@ -69,7 +59,7 @@ namespace nil {
                     unordered_map<pubkey_id_type, std::pair<self_type, input_block_type>, boost::hash<pubkey_id_type>>
                         aggregate_verification_type;
 
-                typedef bool result_type;
+                // typedef bool result_type;
 
                 public_key(const public_key_type &key, const public_params &pp) :
                     pubkey(key), pp(pp), pubkey_id(public_key_policy_type::get_id(pubkey)) {
@@ -79,50 +69,21 @@ namespace nil {
                     pubkey(key), pp(pp), sig(signature), pubkey_id(public_key_policy_type::get_id(pubkey)) {
                 }
 
-                // template<typename MsgRange>
-                // inline bool verify(const MsgRange &msg) const {
-                //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
-                //
-                //     return public_key_policy_type::verify(msg, pubkey, sig, pp);
-                // }
-
-                //
-                // Aggregate verify
-                //
                 inline bool verify(const aggregate_verification_type &in_data) const {
                     assert(!in_data.empty());
 
                     if (in_data.size() == 1) {
-                        // TD<decltype(in_data.cbegin()->second.second)> a;
                         return public_key_policy_type::verify(in_data.cbegin()->second.second, pubkey, sig, pp);
                     } else {
                         std::vector<public_key_type> pubkeys;
                         std::vector<input_block_type> msgs;
                         for (const auto &[key, value] : in_data) {
-                            pubkeys.emplace_back(value.first.get_raw_pubkey());
+                            pubkeys.emplace_back(value.first.pubkey);
                             msgs.emplace_back(value.second);
                         }
                         return public_key_policy_type::aggregate_verify(msgs, pubkeys, sig, pp);
                     }
                 }
-
-                // template<typename Value, typename IndexSpecifierList, typename Allocator,
-                //          typename = typename std::enable_if<
-                //              std::is_same<Value, std::pair<self_type, input_block_type>>::value>::type>
-                // inline bool
-                //     verify(const boost::multi_index_container<Value, IndexSpecifierList, Allocator> &in_data) const {
-                //     std::vector<public_key_type> pubkeys;
-                //     std::vector<input_block_type> msgs;
-                //
-                //     auto in_data_iter = in_data.cbegin();
-                //     while (in_data_iter != in_data.cend()) {
-                //         pubkeys.emplace_back(std::get<0>(*in_data_iter).pubkey);
-                //         msgs.emplace_back(std::get<1>(*in_data_iter));
-                //         in_data_iter++;
-                //     }
-                //
-                //     return public_key_policy_type::aggregate_verify(msgs, pubkeys, sig, pp);
-                // }
 
                 inline void set_signature(const signature_type &signature) {
                     sig = signature;
@@ -133,7 +94,6 @@ namespace nil {
                     if (!agg_data.count(pubkey_id)) {
                         agg_data.emplace(pubkey_id, std::make_pair(*this, block));
                     } else {
-                        // TD<decltype(agg_data[pubkey_id])> a;
                         std::copy(block.cbegin(), block.cend(), std::back_inserter(agg_data.at(pubkey_id).second));
                     }
                 }
@@ -159,11 +119,6 @@ namespace nil {
                 public_params pp;
                 pubkey_id_type pubkey_id;
             };
-
-            // template<typename Scheme, typename ValueType = public_key<Scheme>>
-            // using aggregate_verification_type = boost::multi_index_container<
-            //     ValueType, indexed_by<hashed_unique<
-            //                    member<ValueType, typename ValueType::pubkey_id_type, &ValueType::pubkey_id>>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

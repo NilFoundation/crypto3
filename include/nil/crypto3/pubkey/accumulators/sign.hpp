@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP
 
 #include <boost/parameter/value_type.hpp>
 
@@ -106,4 +106,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PRIVATE_KEY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP

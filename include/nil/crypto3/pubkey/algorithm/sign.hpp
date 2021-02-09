@@ -439,20 +439,20 @@ namespace nil {
          *
          * @return
          */
-        // template<typename Scheme, typename SinglePassRange,
-        //          typename SchemeAccumulator = typename pubkey::signing_accumulator_set<typename pubkey::modes::isomorphic<
-        //              Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
-        // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        //     sign(const SinglePassRange &r, const pubkey::private_key<Scheme> &key) {
-        //
-        //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::signing_policy<Scheme>>::type Mode;
-        //
-        //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-        //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-        //
-        //     return SignerImpl(r, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
-        // }
+        template<typename Scheme, typename SinglePassRange,
+                 typename SchemeAccumulator = typename pubkey::signing_accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+            sign(const SinglePassRange &r, const pubkey::private_key<Scheme> &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::signing_policy<Scheme>>::type Mode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(r, SchemeAccumulator(pubkey::private_key<Scheme>(key)));
+        }
     }    // namespace crypto3
 }    // namespace nil
 

@@ -385,9 +385,15 @@ namespace nil {
 
                 typedef typename bls_scheme_type::signature_type signature_type;
 
+                typedef std::vector<signature_type> input_block_type;
+                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
+
+                typedef typename input_block_type::value_type input_value_type;
+                constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
+
                 template<typename SignatureRange>
-                static inline signature_type aggregate(const SignatureRange &signatures) {
-                    return bls_scheme_type::agregate(signatures);
+                static inline signature_type aggregate(const SignatureRange &sigs) {
+                    return bls_scheme_type::aggregate(sigs);
                 }
             };
 
@@ -404,10 +410,9 @@ namespace nil {
                 typedef typename private_key_policy_type::public_key_type public_key_type;
                 typedef typename private_key_policy_type::signature_type signature_type;
 
-                template<typename Mode, typename AccumulatorSet, std::size_t ValueBits>
+                template<typename Mode, typename AccumulatorSet, std::size_t ValueBits = 0>
                 struct stream_processor {
                     struct params_type {
-                        // TODO: endian type
                         typedef stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;

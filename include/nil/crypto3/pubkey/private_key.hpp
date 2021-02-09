@@ -49,7 +49,7 @@ namespace nil {
                 constexpr static const auto input_value_bits = private_key_policy_type::input_value_bits;
                 typedef typename private_key_policy_type::input_value_type input_value_type;
 
-                typedef signature_type result_type;
+                // typedef signature_type result_type;
 
                 private_key(const private_key_type &key, const public_params &pp) :
                     privkey(key), public_key<scheme_type>(private_key_policy_type::key_gen(key), pp) {

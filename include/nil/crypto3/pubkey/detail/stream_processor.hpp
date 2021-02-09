@@ -27,9 +27,9 @@
 #ifndef CRYPTO3_PUBKEY_STREAM_PROCESSOR_HPP
 #define CRYPTO3_PUBKEY_STREAM_PROCESSOR_HPP
 
-#include <array>
 #include <iterator>
 #include <type_traits>
+#include <algorithm>
 
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/digest.hpp>
@@ -64,14 +64,34 @@ namespace nil {
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
 
+            private:
+                constexpr static const bool enable_packer = value_bits > 0;
+
+            public:
                 stream_processor(accumulator_set_type &s) : acc(s) {
                 }
 
-                template<typename InputIterator>
+                template<typename InputIterator, bool ep = enable_packer,
+                         typename std::enable_if<ep, bool>::type = true>
                 inline void operator()(InputIterator first, InputIterator last) {
                     input_block_type block {};
                     ::nil::crypto3::detail::pack_to<endian_type, value_bits, input_value_bits>(
                         first, last, std::back_inserter(block));
+                    acc(block);
+                }
+
+                template<typename InputIterator, bool ep = enable_packer,
+                         typename std::enable_if<!ep, bool>::type = true>
+                inline void operator()(InputIterator first, InputIterator last) {
+                    input_block_type block {};
+                    std::copy(first, last, std::back_inserter(block));
+                    acc(block);
+                }
+
+                template<typename SinglePassRange, bool ep = enable_packer,
+                         typename std::enable_if<!ep && std::is_same<input_block_type, SinglePassRange>::value,
+                                                 bool>::type = true>
+                inline void operator()(const SinglePassRange &block) {
                     acc(block);
                 }
 
@@ -93,4 +113,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
+#endif    // CRYPTO3_PUBKEY_STREAM_PROCESSOR_HPP

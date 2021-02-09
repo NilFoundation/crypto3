@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -35,7 +36,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             /*!
-             * @brief Accumulator set with pre-defined private key accumulator params.
+             * @brief Accumulator set with pre-defined signing accumulator params.
              *
              * Meets the requirements of AccumulatorSet
              *
@@ -49,13 +50,13 @@ namespace nil {
                                                      boost::accumulators::features<accumulators::tag::sign<Mode>>>;
 
             /*!
-             * @brief Accumulator set with pre-defined public key accumulator params.
+             * @brief Accumulator set with pre-defined verification accumulator params.
              *
              * Meets the requirements of AccumulatorSet
              *
              * @ingroup pubkey
              *
-             * @tparam Mode Scheme processing mode type (e.g. isomorphic_signing_policy<bls, nop_padding>)
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_verification_policy<bls, nop_padding>)
              */
             template<typename Mode>
             using verification_accumulator_set =
@@ -63,7 +64,7 @@ namespace nil {
                                                      boost::accumulators::features<accumulators::tag::verify<Mode>>>;
 
             /*!
-             * @brief Accumulator set with pre-defined public key accumulator params.
+             * @brief Accumulator set with pre-defined aggregation accumulator params.
              *
              * Meets the requirements of AccumulatorSet
              *

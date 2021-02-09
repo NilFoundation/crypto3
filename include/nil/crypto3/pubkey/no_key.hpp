@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
 #define CRYPTO3_PUBKEY_NO_KEY_HPP
 
+#include <boost/range/concepts.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -35,11 +37,19 @@ namespace nil {
                 typedef no_key<scheme_type> self_type;
                 typedef typename scheme_type::no_key_policy_type no_key_policy_type;
 
+                constexpr static const auto input_block_bits = no_key_policy_type::input_block_bits;
+                typedef typename no_key_policy_type::input_block_type input_block_type;
+
+                constexpr static const auto input_value_bits = no_key_policy_type::input_value_bits;
+                typedef typename no_key_policy_type::input_value_type input_value_type;
+
                 typedef typename no_key_policy_type::signature_type signature_type;
 
-                template<typename SignatureRangeType>
-                static inline signature_type aggregate(const SignatureRangeType &signatures) {
-                    return no_key_policy_type::aggregate(signatures);
+                template<typename SignatureRange>
+                static inline signature_type aggregate(const SignatureRange &sigs) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
+
+                    return no_key_policy_type::aggregate(sigs);
                 }
             };
         }    // namespace pubkey
