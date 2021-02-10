@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP
 #define CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP
 
+#include <iterator>
+#include <type_traits>
+
 #include <boost/parameter/value_type.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
@@ -33,7 +36,7 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -62,7 +65,8 @@ namespace nil {
 
                     template<typename Args>
                     inline void operator()(const Args &args) {
-                        resolve_type(args[boost::accumulators::sample]);
+                        resolve_type(args[boost::accumulators::sample],
+                                     args[::nil::crypto3::accumulators::iterator_last | typename block_type::iterator()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
@@ -70,12 +74,21 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const block_type &value) {
+                    template<typename InputIterator>
+                    inline void resolve_type(const block_type &value, InputIterator) {
                         std::copy(value.cbegin(), value.cend(), std::back_inserter(cache));
                     }
 
-                    inline void resolve_type(const value_type &value) {
+                    template<typename InputIterator>
+                    inline void resolve_type(const value_type &value, InputIterator) {
                         cache.emplace_back(value);
+                    }
+
+                    template<typename InputIterator,
+                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                             typename = typename std::enable_if<std::is_same<value_type, ValueType>::value>::type>
+                    inline void resolve_type(InputIterator first, InputIterator last) {
+                        std::copy(first, last, std::back_inserter(cache));
                     }
 
                     key_type key;

@@ -38,6 +38,7 @@
 #include <nil/crypto3/pubkey/public_key.hpp>
 
 #include <nil/crypto3/pubkey/accumulators/parameters/key.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -66,15 +67,16 @@ namespace nil {
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    verify_impl(const Args &args) : init_key(args[boost::accumulators::sample])
-                    {
+                    verify_impl(const Args &args) : init_key(args[boost::accumulators::sample]) {
                         init_key.append_aggregated_msg(cache);
                     }
 
                     template<typename Args>
                     inline void operator()(const Args &args) {
-                        resolve_type(args[boost::accumulators::sample],
-                                     args[::nil::crypto3::accumulators::key | init_key]);
+                        resolve_type(
+                            args[boost::accumulators::sample],
+                            args[::nil::crypto3::accumulators::iterator_last | typename block_type::iterator()],
+                            args[::nil::crypto3::accumulators::key | init_key]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
@@ -82,15 +84,25 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const block_type &block, const key_type &key) {
+                    template<typename InputIterator>
+                    inline void resolve_type(const block_type &block, InputIterator, const key_type &key) {
                         key.append_aggregated_msg(cache, block);
                     }
 
-                    inline void resolve_type(const value_type &value, const key_type &key) {
+                    template<typename InputIterator>
+                    inline void resolve_type(const value_type &value, InputIterator, const key_type &key) {
                         key.append_aggregated_msg(cache, value);
                     }
 
-                    inline void resolve_type(const signature_type &sig, const key_type &) {
+                    template<typename InputIterator,
+                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                             typename = typename std::enable_if<std::is_same<value_type, ValueType>::value>::type>
+                    inline void resolve_type(InputIterator first, InputIterator last, const key_type &key) {
+                        key.append_aggregated_msg(cache, first, last);
+                    }
+
+                    template<typename InputIterator>
+                    inline void resolve_type(const signature_type &sig, InputIterator, const key_type &) {
                         init_key.set_signature(sig);
                     }
 

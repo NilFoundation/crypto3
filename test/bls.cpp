@@ -44,6 +44,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <random>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::pubkey;
@@ -2019,11 +2020,23 @@ void conformity_test(const typename Scheme::public_params &pp,
                      const std::vector<MsgRange> &msgs,
                      const std::vector<typename Scheme::signature_type> &etalon_sigs) {
     using scheme_type = Scheme;
-    using mode_type =
+
+    using signing_mode =
+        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
+            template bind<::nil::crypto3::pubkey::signing_policy<Scheme>>::type;
+    using verification_mode =
         typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
             template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using accumulator_set_type = verification_accumulator_set<mode_type>;
-    using accumulator_type = typename boost::mpl::front<typename accumulator_set_type::features_type>::type;
+    using aggregation_mode =
+        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
+            template bind<::nil::crypto3::pubkey::aggregation_policy<Scheme>>::type;
+
+    using verification_acc_set = verification_accumulator_set<verification_mode>;
+    using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
+    using signing_acc_set = signing_accumulator_set<signing_mode>;
+    using signing_acc = typename boost::mpl::front<typename signing_acc_set::features_type>::type;
+    using aggregation_acc_set = aggregation_accumulator_set<aggregation_mode>;
+    using aggregation_acc = typename boost::mpl::front<typename aggregation_acc_set::features_type>::type;
 
     using _private_key_type = typename scheme_type::private_key_type;
     using _public_key_type = typename scheme_type::public_key_type;
@@ -2034,22 +2047,94 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     using private_key_type = private_key<scheme_type>;
     using public_key_type = public_key<scheme_type>;
+    using no_key_type = no_key<scheme_type>;
 
+    using msg_type = MsgRange;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Sign
     auto sks_iter = sks.begin();
     auto msgs_iter = msgs.begin();
     auto etalon_sigs_iter = etalon_sigs.begin();
 
-    _signature_type sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
+    // sign(range, privkey)
+    // verify(range, pubkey)
+    _signature_type sig = ::nil::crypto3::sign(*msgs_iter, *sks_iter);
     BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), *etalon_sigs_iter);
-
     public_key_type &pubkey = *sks_iter;
     pubkey.set_signature(sig);
     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pubkey)), true);
+
+    // sign(first, last, privkey)
+    // verify(first, last, pubkey)
+    sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
+    BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), *etalon_sigs_iter);
+    pubkey.set_signature(sig);
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), pubkey)), true);
+
+    // sign(first, last, acc)
+    // verify(first, last, acc)
+    std::uniform_int_distribution<> distrib(0, msgs_iter->size() - 1);
+    ;
+    signing_acc_set sign_acc0(*sks_iter);
+    auto part_msg_iter = msgs_iter->begin() + distrib(gen);
+    ::nil::crypto3::sign<scheme_type>(msgs_iter->begin(), part_msg_iter, sign_acc0);
+    sign_acc0(part_msg_iter, nil::crypto3::accumulators::iterator_last = msgs_iter->end());
+    sig = boost::accumulators::extract_result<signing_acc>(sign_acc0);
+    BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
+    pubkey.set_signature(sig);
+    verification_acc_set verify_acc0(pubkey);
+    ::nil::crypto3::verify<scheme_type>(msgs_iter->begin(), part_msg_iter, verify_acc0);
+    verify_acc0(part_msg_iter, nil::crypto3::accumulators::iterator_last = msgs_iter->end());
+    BOOST_CHECK_EQUAL(boost::accumulators::extract_result<verification_acc>(verify_acc0), true);
+
+    // sign(range, acc)
+    // verify(range, acc)
+    signing_acc_set sign_acc1(*sks_iter);
+    msg_type part_msg;
+    std::copy(msgs_iter->begin(), part_msg_iter, std::back_inserter(part_msg));
+    ::nil::crypto3::sign<scheme_type>(part_msg, sign_acc1);
+    part_msg.clear();
+    std::copy(part_msg_iter, msgs_iter->end(), std::back_inserter(part_msg));
+    sign_acc1(part_msg);
+    sig = boost::accumulators::extract_result<signing_acc>(sign_acc1);
+    BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
+    pubkey.set_signature(sig);
+    verification_acc_set verify_acc1(pubkey);
+    part_msg.clear();
+    std::copy(msgs_iter->begin(), part_msg_iter, std::back_inserter(part_msg));
+    ::nil::crypto3::verify<scheme_type>(part_msg, verify_acc1);
+    part_msg.clear();
+    std::copy(part_msg_iter, msgs_iter->end(), std::back_inserter(part_msg));
+    verify_acc1(part_msg);
+    BOOST_CHECK_EQUAL(boost::accumulators::extract_result<verification_acc>(verify_acc1), true);
+
+    // sign(range, privkey, out)
+    // verify(range, pubkey, out)
+    std::vector<_signature_type> sig_out;
+    ::nil::crypto3::sign(*msgs_iter, *sks_iter, std::back_inserter(sig_out));
+    BOOST_CHECK_EQUAL(sig_out.back(), *etalon_sigs_iter);
+    std::vector<bool> bool_out;
+    pubkey.set_signature(sig);
+    ::nil::crypto3::verify(*msgs_iter, pubkey, std::back_inserter(bool_out));
+    BOOST_CHECK_EQUAL(bool_out.back(), true);
+
+    // sign(first, last, privkey, out)
+    // verify(first, last, pubkey, out)
+    ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter, std::back_inserter(sig_out));
+    BOOST_CHECK_EQUAL(sig_out.back(), *etalon_sigs_iter);
+    pubkey.set_signature(sig);
+    ::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), pubkey, std::back_inserter(bool_out));
+    BOOST_CHECK_EQUAL(bool_out.back(), true);
 
     sks_iter++;
     msgs_iter++;
     etalon_sigs_iter++;
 
+    ///////////////////////////////////////////////////////////////////////////////
     // Agregate
     std::vector<public_key_type *> pks;
     std::vector<_signature_type> sigs;
@@ -2062,8 +2147,14 @@ void conformity_test(const typename Scheme::public_params &pp,
     pks.back()->set_signature(sigs.back());
     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
 
-    auto acc = accumulator_set_type(*pks.back());
+    auto acc = verification_acc_set(*pks.back());
     ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
+
+    // TODO: add aggregate call with iterator output
+    no_key_type agg_key;
+    auto agg_acc = aggregation_acc_set(agg_key);
+    // ::nil::crypto3::aggregate<scheme_type>(sigs, agg_acc);
+    ::nil::crypto3::aggregate<scheme_type>(sigs.end() - 1, sigs.end(), agg_acc);
 
     sks_iter++;
     msgs_iter++;
@@ -2080,6 +2171,8 @@ void conformity_test(const typename Scheme::public_params &pp,
 
         acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
 
+        agg_acc(sigs.end() - 1, nil::crypto3::accumulators::iterator_last = sigs.end());
+
         sks_iter++;
         msgs_iter++;
         etalon_sigs_iter++;
@@ -2087,9 +2180,10 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
     BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(boost::accumulators::extract_result<aggregation_acc>(agg_acc), *etalon_sigs_iter);
 
     acc(agg_sig);
-    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
+    auto res = boost::accumulators::extract_result<verification_acc>(acc);
     BOOST_CHECK_EQUAL(res, true);
 }
 
@@ -2098,11 +2192,11 @@ void self_test(const typename Scheme::public_params &pp,
                std::vector<private_key<Scheme>> &sks,
                const std::vector<MsgRange> &msgs) {
     using scheme_type = Scheme;
-    using mode_type =
+    using verification_mode =
         typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
             template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using accumulator_set_type = verification_accumulator_set<mode_type>;
-    using accumulator_type = typename boost::mpl::front<typename accumulator_set_type::features_type>::type;
+    using verification_acc_set = verification_accumulator_set<verification_mode>;
+    using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
 
     using _private_key_type = typename scheme_type::private_key_type;
     using _public_key_type = typename scheme_type::public_key_type;
@@ -2136,7 +2230,7 @@ void self_test(const typename Scheme::public_params &pp,
     pks.back()->set_signature(sigs.back());
     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
 
-    auto acc = accumulator_set_type(*pks.back());
+    auto acc = verification_acc_set(*pks.back());
     ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
 
     sks_iter++;
@@ -2158,7 +2252,7 @@ void self_test(const typename Scheme::public_params &pp,
     _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
 
     acc(agg_sig);
-    auto res = boost::accumulators::extract_result<accumulator_type>(acc);
+    auto res = boost::accumulators::extract_result<verification_acc>(acc);
     BOOST_CHECK_EQUAL(res, true);
 }
 
