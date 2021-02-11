@@ -101,8 +101,12 @@ namespace nil {
                     }
                 }
 
+                template<
+                    typename SinglePassRange,
+                    typename ValueType = typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                    typename = typename std::enable_if<std::is_same<input_value_type, ValueType>::value>::type>
                 inline void append_aggregated_msg(aggregate_verification_type &agg_data,
-                                                  const input_block_type &block = input_block_type()) const {
+                                                  const SinglePassRange &block) const {
                     append_aggregated_msg(agg_data, block.begin(), block.end());
                 }
 

@@ -2153,8 +2153,8 @@ void conformity_test(const typename Scheme::public_params &pp,
     // TODO: add aggregate call with iterator output
     no_key_type agg_key;
     auto agg_acc = aggregation_acc_set(agg_key);
-    // ::nil::crypto3::aggregate<scheme_type>(sigs, agg_acc);
-    ::nil::crypto3::aggregate<scheme_type>(sigs.end() - 1, sigs.end(), agg_acc);
+    ::nil::crypto3::aggregate<scheme_type>(sigs, agg_acc);
+    // ::nil::crypto3::aggregate<scheme_type>(sigs.end() - 1, sigs.end(), agg_acc);
 
     sks_iter++;
     msgs_iter++;
@@ -2179,7 +2179,10 @@ void conformity_test(const typename Scheme::public_params &pp,
     }
 
     _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
+    std::vector<_signature_type> agg_sig_out;
+    ::nil::crypto3::aggregate<scheme_type>(sigs, std::back_inserter(agg_sig_out));
     BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(agg_sig_out.back(), *etalon_sigs_iter);
     BOOST_CHECK_EQUAL(boost::accumulators::extract_result<aggregation_acc>(agg_acc), *etalon_sigs_iter);
 
     acc(agg_sig);

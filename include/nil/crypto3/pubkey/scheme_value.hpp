@@ -249,7 +249,7 @@ namespace nil {
                         typename ValueType =
                             typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
                         typename std::enable_if<!std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
-                    itr_scheme_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise) :
+                    itr_scheme_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
                         PubkeyStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
                         BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));

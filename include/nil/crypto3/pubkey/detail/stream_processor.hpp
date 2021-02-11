@@ -34,6 +34,8 @@
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/digest.hpp>
 
+#include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
+
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -80,17 +82,18 @@ namespace nil {
                     acc(block);
                 }
 
-                template<typename InputIterator, bool ep = enable_packer,
-                         typename std::enable_if<!ep, bool>::type = true>
+                template<
+                    typename InputIterator, bool ep = enable_packer,
+                    typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                    typename std::enable_if<!ep && std::is_same<input_value_type, ValueType>::value, bool>::type = true>
                 inline void operator()(InputIterator first, InputIterator last) {
-                    input_block_type block {};
-                    std::copy(first, last, std::back_inserter(block));
-                    acc(block);
+                    acc(first, nil::crypto3::accumulators::iterator_last = last);
                 }
 
-                template<typename SinglePassRange, bool ep = enable_packer,
-                         typename std::enable_if<!ep && std::is_same<input_block_type, SinglePassRange>::value,
-                                                 bool>::type = true>
+                template<
+                    typename SinglePassRange, bool ep = enable_packer,
+                    typename ValueType = typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                    typename std::enable_if<!ep && std::is_same<input_value_type, ValueType>::value, bool>::type = true>
                 inline void operator()(const SinglePassRange &block) {
                     acc(block);
                 }

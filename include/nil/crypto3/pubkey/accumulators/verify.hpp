@@ -68,7 +68,7 @@ namespace nil {
 
                     template<typename Args>
                     verify_impl(const Args &args) : init_key(args[boost::accumulators::sample]) {
-                        init_key.append_aggregated_msg(cache);
+                        init_key.append_aggregated_msg(cache, block_type());
                     }
 
                     template<typename Args>
