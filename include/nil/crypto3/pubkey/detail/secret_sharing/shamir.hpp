@@ -54,18 +54,19 @@ namespace nil {
                     typedef std::vector<scalar_field_value_type> shares_type;
 
                     template<typename CoeffsRange, typename Number,
-                             std::enable_if<std::is_same<scalar_field_type, typename CoeffsRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename CoeffsRange::value_type>::value,
+                                 bool>::type = true>
                     static inline scalar_field_value_type get_share(const CoeffsRange &coeffs, const Number &i) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
 
-                        scalar_field_value_type in(i);
+                        scalar_field_value_type e_i(i);
                         scalar_field_value_type temp = scalar_field_value_type::one();
                         scalar_field_value_type share = scalar_field_value_type::zero();
 
                         for (const auto &c : coeffs) {
                             share = share + c * temp;
-                            temp = temp * in;
+                            temp = temp * e_i;
                         }
                         return share;
                     }
@@ -92,11 +93,12 @@ namespace nil {
                     }
 
                     template<typename SharesRange, typename Number1, typename Number2,
-                             std::enable_if<std::is_same<scalar_field_type, typename SharesRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename SharesRange::value_type>::value,
+                                 bool>::type = true>
                     static inline scalar_field_value_type recover_secret(const SharesRange &shares, const Number1 &t,
                                                                          const Number2 &n) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
 
                         auto shares_len = std::distance(shares.begin(), shares.end());
                         assert(shares_len >= t);
@@ -106,8 +108,9 @@ namespace nil {
                     }
 
                     template<typename SharesRange, typename Number,
-                             std::enable_if<std::is_same<scalar_field_type, typename SharesRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename SharesRange::value_type>::value,
+                                 bool>::type = true>
                     static inline scalar_field_value_type recover_secret(const SharesRange &shares, const Number &n) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
 
@@ -124,8 +127,9 @@ namespace nil {
                     }
 
                     template<typename CoeffsRange,
-                             std::enable_if<std::is_same<scalar_field_type, typename CoeffsRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename CoeffsRange::value_type>::value,
+                                 bool>::type = true>
                     static inline scalar_field_value_type get_secret(const CoeffsRange &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
 
@@ -133,19 +137,28 @@ namespace nil {
                     }
 
                     template<typename CoeffsRange, typename Number,
-                             std::enable_if<std::is_same<scalar_field_type, typename CoeffsRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename CoeffsRange::value_type>::value,
+                                 bool>::type = true>
                     static inline shares_type get_shares(const CoeffsRange &coeffs, const Number &n) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
 
+                        auto t = std::distance(coeffs.begin(), coeffs.end());
                         assert(n > 0);
-                        assert(check_t(coeffs.size(), n));
+                        assert(check_t(t, n));
 
                         shares_type shares;
                         for (Number i = 1; i <= n; i++) {
                             shares.emplace_back(get_share(coeffs, i));
                         }
                         return shares;
+                    }
+
+                    template<typename Number1, typename Number2>
+                    static inline coeffs_type get_poly(const Number1 &t, const Number2 &n) {
+                        assert(check_t(t, n));
+
+                        return get_poly(t);
                     }
 
                     template<typename Number>
@@ -171,8 +184,9 @@ namespace nil {
                     // }
 
                     template<typename CoeffsRange,
-                             std::enable_if<std::is_same<scalar_field_type, typename CoeffsRange::value_type>::value,
-                                            bool>::type = true>
+                             typename std::enable_if<
+                                 std::is_same<scalar_field_value_type, typename CoeffsRange::value_type>::value,
+                                 bool>::type = true>
                     static inline public_coeffs_type get_public_poly(const CoeffsRange &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
 
@@ -190,7 +204,7 @@ namespace nil {
                     }
 
                     template<typename Number>
-                    static inline std::size_t get_minimum_t(const Number &n) {
+                    static inline Number get_minimum_t(const Number &n) {
                         assert(n > 0);
 
                         return (n + 1) / 2;

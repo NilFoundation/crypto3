@@ -38,6 +38,7 @@ endmacro()
 set(TESTS_NAMES
     "ecdsa"
     "bls"
+    "secret_sharing"
 )
 
 foreach(TEST_NAME ${TESTS_NAMES})
