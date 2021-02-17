@@ -16,6 +16,7 @@
 #include <stdexcept>
 
 #include <functional> // bit_xor
+#include <algorithm>
 
 #include <boost/type_traits/conditional.hpp>
 
@@ -162,7 +163,7 @@ private:
     // the count is advanced.
     // Xor'ing with max() has the effect of flipping all the bits in seq,
     // except for the sign bit.
-    unsigned r = qrng_detail::lsb(seq ^ (self_t::max)());
+    unsigned r = qrng_detail::lsb(static_cast<size_type>(seq ^ (self_t::max)()));
     check_bit_range_t::bit_pos(r);
     update_quasi(r);
   }
