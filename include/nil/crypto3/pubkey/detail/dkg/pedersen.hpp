@@ -23,18 +23,27 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_FELDMAN_SSS_HPP
-#define CRYPTO3_PUBKEY_FELDMAN_SSS_HPP
+#ifndef CRYPTO3_PUBKEY_PEDERSEN_DKG_HPP
+#define CRYPTO3_PUBKEY_PEDERSEN_DKG_HPP
 
-#include <nil/crypto3/pubkey/detail/secret_sharing/shamir.hpp>
+#include <numeric>
+
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/sum.hpp>
+
+#include <nil/crypto3/pubkey/detail/secret_sharing/feldman.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
+                //
+                // "A threshold cryptosystem without a trusted party" by Torben Pryds Pedersen.
+                // https://dl.acm.org/citation.cfm?id=1754929
+                //
                 template<typename Group>
-                struct feldman_sss : shamir_sss<Group> {
-                    typedef shamir_sss<Group> base_type;
+                struct pedersen_dkg : feldman_sss<Group> {
+                    typedef feldman_sss<Group> base_type;
 
                     typedef typename base_type::group_type group_type;
                     typedef typename base_type::base_field_type base_field_type;
@@ -44,34 +53,40 @@ namespace nil {
                     typedef typename base_type::base_field_value_type base_field_value_type;
                     typedef typename base_type::scalar_field_value_type scalar_field_value_type;
 
+                    typedef boost::accumulators::accumulator_set<
+                        scalar_field_value_type, boost::accumulators::features<boost::accumulators::tag::sum>>
+                        share_reducing_acc_type;
+
+                    typedef boost::accumulators::accumulator_set<
+                        group_value_type, boost::accumulators::features<boost::accumulators::tag::sum>>
+                        public_coeffs_reducing_acc_type;
+
                     template<typename PublicCoeffsRange,
                              typename std::enable_if<
                                  std::is_same<group_value_type, typename PublicCoeffsRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const scalar_field_value_type &s_i, std::size_t i,
-                                                    const PublicCoeffsRange &public_coeffs) {
+                    static inline group_value_type reduce_public_coeffs(const PublicCoeffsRange &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
 
-                        return verify_share(base_type::get_public_share(s_i), i, public_coeffs);
+                        return std::accumulate(coeffs.begin(), coeffs.end(), group_value_type::zero());
                     }
 
-                    template<typename PublicCoeffsRange,
+                    static inline group_value_type reduce_public_coeffs(public_coeffs_reducing_acc_type &&acc) {
+                        return boost::accumulators::sum(acc);
+                    }
+
+                    template<typename SharesRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<scalar_field_value_type, typename SharesRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const group_value_type &gs_i, std::size_t i,
-                                                    const PublicCoeffsRange &public_coeffs) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
+                    static inline scalar_field_value_type reduce_shares(const SharesRange &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
 
-                        scalar_field_value_type e_i(i);
-                        scalar_field_value_type temp_mul = scalar_field_value_type::one();
-                        group_value_type temp_s_i = group_value_type::zero();
+                        return std::accumulate(shares.begin(), shares.end(), scalar_field_value_type::zero());
+                    }
 
-                        for (const auto &c : public_coeffs) {
-                            temp_s_i = temp_s_i + c * temp_mul;
-                            temp_mul = temp_mul * e_i;
-                        }
-                        return gs_i == temp_s_i;
+                    static inline scalar_field_value_type reduce_shares(share_reducing_acc_type &&acc) {
+                        return boost::accumulators::sum(acc);
                     }
                 };
             }    // namespace detail
@@ -79,4 +94,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_FELDMAN_SSS_HPP
+#endif CRYPTO3_PUBKEY_PEDERSEN_DKG_HPP
