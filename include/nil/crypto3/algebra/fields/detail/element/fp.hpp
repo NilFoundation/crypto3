@@ -140,17 +140,47 @@ namespace nil {
                             return element_fp(data * B.data);
                         }
 
-                        constexpr const element_fp operator/(const element_fp &B) const {
+                        constexpr element_fp operator/(const element_fp &B) const {
                             //                        return element_fp(data / B.data);
                             return element_fp(data * B.inversed().data);
                         }
 
-                        constexpr const bool operator<(const element_fp &B) const {
+                        constexpr bool operator<(const element_fp &B) const {
                             return data < B.data;
                         }
 
-                        constexpr const bool operator>(const element_fp &B) const {
+                        constexpr bool operator>(const element_fp &B) const {
                             return data > B.data;
+                        }
+
+                        constexpr bool operator<=(const element_fp &B) const {
+                            return data <= B.data;
+                        }
+
+                        constexpr bool operator>=(const element_fp &B) const {
+                            return data >= B.data;
+                        }
+
+                        constexpr element_fp & operator++() {
+                            data = data + data_type(1, modulus);
+                            return *this;
+                        }
+
+                        constexpr element_fp operator++(int) {
+                            element_fp temp(*this);
+                            ++*this;
+                            return temp;
+                        }
+
+                        constexpr element_fp & operator--() {
+                            data = data - data_type(1, modulus);
+                            return *this;
+                        }
+
+                        constexpr element_fp operator--(int) {
+                            element_fp temp(*this);
+                            --*this;
+                            return temp;
                         }
 
                         constexpr element_fp doubled() const {
