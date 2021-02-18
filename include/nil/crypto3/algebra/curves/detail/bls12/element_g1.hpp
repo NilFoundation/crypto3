@@ -244,6 +244,17 @@ namespace nil {
                         constexpr element_bls12_g1 operator-(const element_bls12_g1 &other) const {
                             return (*this) + (-other);
                         }
+
+                        constexpr element_bls12_g1 &operator+=(const element_bls12_g1 &other) {
+                            *this = *this + other;
+                            return *this;
+                        }
+
+                        constexpr element_bls12_g1 &operator-=(const element_bls12_g1 &other) {
+                            *this = *this - other;
+                            return *this;
+                        }
+
                         /** @brief
                          *
                          * @return doubled element from group G1
