@@ -615,6 +615,12 @@ class modular_functions_fixed<modular_fixed_cpp_int_backend<MinBits, SignType, C
       if (eval_eq(exp, static_cast<internal_limb_type>(0u)))
       {
          result = static_cast<internal_limb_type>(1u);
+         //
+         // TODO: restructure code
+         // adjust_modular
+         //
+         eval_multiply(result, get_r2());
+         montgomery_reduce(result);
          return;
       }
       if (eval_eq(get_mod().backend(), static_cast<internal_limb_type>(1u)))
