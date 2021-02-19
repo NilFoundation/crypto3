@@ -45,47 +45,42 @@ namespace nil {
                 struct pedersen_dkg : feldman_sss<Group> {
                     typedef feldman_sss<Group> base_type;
 
-                    typedef typename base_type::group_type group_type;
-                    typedef typename base_type::base_field_type base_field_type;
-                    typedef typename base_type::scalar_field_type scalar_field_type;
-
-                    typedef typename base_type::group_value_type group_value_type;
-                    typedef typename base_type::base_field_value_type base_field_value_type;
-                    typedef typename base_type::scalar_field_value_type scalar_field_value_type;
+                    typedef typename base_type::private_element_type private_element_type;
+                    typedef typename base_type::public_element_type public_element_type;
 
                     typedef boost::accumulators::accumulator_set<
-                        scalar_field_value_type, boost::accumulators::features<boost::accumulators::tag::sum>>
-                        share_reducing_acc_type;
+                        private_element_type, boost::accumulators::features<boost::accumulators::tag::sum>>
+                        private_elements_sum_acc_type;
 
                     typedef boost::accumulators::accumulator_set<
-                        group_value_type, boost::accumulators::features<boost::accumulators::tag::sum>>
-                        public_coeffs_reducing_acc_type;
+                        public_element_type, boost::accumulators::features<boost::accumulators::tag::sum>>
+                        public_elements_sum_acc_type;
 
                     template<typename PublicCoeffsRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
                                  bool>::type = true>
-                    static inline group_value_type reduce_public_coeffs(const PublicCoeffsRange &coeffs) {
+                    static inline public_element_type reduce_public_coeffs(const PublicCoeffsRange &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
 
-                        return std::accumulate(coeffs.begin(), coeffs.end(), group_value_type::zero());
+                        return std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero());
                     }
 
-                    static inline group_value_type reduce_public_coeffs(public_coeffs_reducing_acc_type &&acc) {
+                    static inline public_element_type reduce_public_coeffs(public_elements_sum_acc_type &&acc) {
                         return boost::accumulators::sum(acc);
                     }
 
                     template<typename SharesRange,
                              typename std::enable_if<
-                                 std::is_same<scalar_field_value_type, typename SharesRange::value_type>::value,
+                                 std::is_same<private_element_type, typename SharesRange::value_type>::value,
                                  bool>::type = true>
-                    static inline scalar_field_value_type reduce_shares(const SharesRange &shares) {
+                    static inline private_element_type reduce_shares(const SharesRange &shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
 
-                        return std::accumulate(shares.begin(), shares.end(), scalar_field_value_type::zero());
+                        return std::accumulate(shares.begin(), shares.end(), private_element_type::zero());
                     }
 
-                    static inline scalar_field_value_type reduce_shares(share_reducing_acc_type &&acc) {
+                    static inline private_element_type reduce_shares(private_elements_sum_acc_type &&acc) {
                         return boost::accumulators::sum(acc);
                     }
                 };
@@ -94,4 +89,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif CRYPTO3_PUBKEY_PEDERSEN_DKG_HPP
+#endif // CRYPTO3_PUBKEY_PEDERSEN_DKG_HPP

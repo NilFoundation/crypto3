@@ -36,42 +36,43 @@ namespace nil {
                 struct feldman_sss : shamir_sss<Group> {
                     typedef shamir_sss<Group> base_type;
 
-                    typedef typename base_type::group_type group_type;
-                    typedef typename base_type::base_field_type base_field_type;
-                    typedef typename base_type::scalar_field_type scalar_field_type;
-
-                    typedef typename base_type::group_value_type group_value_type;
-                    typedef typename base_type::base_field_value_type base_field_value_type;
-                    typedef typename base_type::scalar_field_value_type scalar_field_value_type;
+                    typedef typename base_type::private_element_type private_element_type;
+                    typedef typename base_type::public_element_type public_element_type;
 
                     template<typename PublicCoeffsRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const scalar_field_value_type &s_i, std::size_t i,
+                    static inline bool verify_share(const private_element_type &s_i, std::size_t i,
                                                     const PublicCoeffsRange &public_coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
 
-                        return verify_share(base_type::get_public_share(s_i), i, public_coeffs);
+                        return verify_share(base_type::get_public_element(s_i), i, public_coeffs);
                     }
 
                     template<typename PublicCoeffsRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const group_value_type &gs_i, std::size_t i,
+                    static inline bool verify_share(const public_element_type &gs_i, std::size_t i,
                                                     const PublicCoeffsRange &public_coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
 
-                        scalar_field_value_type e_i(i);
-                        scalar_field_value_type temp_mul = scalar_field_value_type::one();
-                        group_value_type temp_s_i = group_value_type::zero();
+                        private_element_type e_i(i);
+                        private_element_type temp_mul = private_element_type::one();
+                        public_element_type temp_s_i = public_element_type::zero();
 
                         for (const auto &c : public_coeffs) {
                             temp_s_i = temp_s_i + c * temp_mul;
                             temp_mul = temp_mul * e_i;
                         }
                         return gs_i == temp_s_i;
+                    }
+
+                    static inline public_element_type eval_partial_verification_value(
+                        const public_element_type &public_coeff, const private_element_type &e_i, std::size_t k,
+                        const public_element_type &init_value = public_element_type::zero()) {
+                        return init_value + public_coeff * e_i.pow(k);
                     }
                 };
             }    // namespace detail

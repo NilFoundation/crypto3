@@ -40,41 +40,35 @@ namespace nil {
                 struct wong_resharing : pedersen_dkg<Group> {
                     typedef pedersen_dkg<Group> base_type;
 
-                    typedef typename base_type::group_type group_type;
-                    typedef typename base_type::base_field_type base_field_type;
-                    typedef typename base_type::scalar_field_type scalar_field_type;
-
-                    typedef typename base_type::group_value_type group_value_type;
-                    typedef typename base_type::base_field_value_type base_field_value_type;
-                    typedef typename base_type::scalar_field_value_type scalar_field_value_type;
-
-                    typedef typename base_type::coeffs_type coeffs_type;
-                    typedef typename base_type::indexed_shares_type indexed_shares_type;
+                    typedef typename base_type::private_element_type private_element_type;
+                    typedef typename base_type::public_element_type public_element_type;
+                    typedef typename base_type::private_elements_type private_elements_type;
+                    typedef typename base_type::indexed_private_elements_type indexed_private_elements_type;
 
                     //===========================================================================
                     // implicitly ordered in/out
 
                     template<typename OldPublicSharesRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename OldPublicSharesRange::value_type>::value,
+                                 std::is_same<public_element_type, typename OldPublicSharesRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_old_secret(const scalar_field_value_type &old_secret,
+                    static inline bool verify_old_secret(const private_element_type &old_secret,
                                                          const OldPublicSharesRange &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const OldPublicSharesRange>));
 
-                        return verify_old_secret(base_type::get_public_share(old_secret), old_public_shares);
+                        return verify_old_secret(base_type::get_public_element(old_secret), old_public_shares);
                     }
 
                     template<typename OldPublicSharesRange,
                              typename std::enable_if<
-                                 std::is_same<group_value_type, typename OldPublicSharesRange::value_type>::value,
+                                 std::is_same<public_element_type, typename OldPublicSharesRange::value_type>::value,
                                  bool>::type = true>
-                    static inline bool verify_old_secret(const group_value_type &old_public_secret,
+                    static inline bool verify_old_secret(const public_element_type &old_public_secret,
                                                          const OldPublicSharesRange &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const OldPublicSharesRange>));
 
                         std::size_t shares_len = std::distance(old_public_shares.begin(), old_public_shares.end());
-                        group_value_type temp = group_value_type::zero();
+                        public_element_type temp = public_element_type::zero();
                         std::size_t i = 1;
 
                         for (const auto &gs_i : old_public_shares) {
@@ -88,31 +82,31 @@ namespace nil {
 
                     template<
                         typename OldPublicSharesContainer,
-                        typename std::enable_if<
-                            std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
-                                std::is_same<group_value_type, typename OldPublicSharesContainer::mapped_type>::value,
-                            bool>::type = true>
-                    static inline bool verify_old_secret(const scalar_field_value_type &old_secret,
+                        typename std::enable_if<std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
+                                                    std::is_same<public_element_type,
+                                                                 typename OldPublicSharesContainer::mapped_type>::value,
+                                                bool>::type = true>
+                    static inline bool verify_old_secret(const private_element_type &old_secret,
                                                          const OldPublicSharesContainer &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const OldPublicSharesContainer>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::PairAssociativeContainer<const OldPublicSharesContainer>));
 
-                        return verify_old_secret(base_type::get_public_share(old_secret), old_public_shares);
+                        return verify_old_secret(base_type::get_public_element(old_secret), old_public_shares);
                     }
 
                     template<
                         typename OldPublicSharesContainer,
-                        typename std::enable_if<
-                            std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
-                                std::is_same<group_value_type, typename OldPublicSharesContainer::mapped_type>::value,
-                            bool>::type = true>
-                    static inline bool verify_old_secret(const group_value_type &old_public_secret,
+                        typename std::enable_if<std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
+                                                    std::is_same<public_element_type,
+                                                                 typename OldPublicSharesContainer::mapped_type>::value,
+                                                bool>::type = true>
+                    static inline bool verify_old_secret(const public_element_type &old_public_secret,
                                                          const OldPublicSharesContainer &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const OldPublicSharesContainer>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::PairAssociativeContainer<const OldPublicSharesContainer>));
 
                         std::size_t shares_len = std::distance(old_public_shares.begin(), old_public_shares.end());
-                        group_value_type temp = group_value_type::zero();
+                        public_element_type temp = public_element_type::zero();
 
                         for (const auto &[i, gs_i] : old_public_shares) {
                             temp = temp + gs_i * base_type::eval_basis_poly(shares_len, i);
@@ -123,19 +117,19 @@ namespace nil {
                     //===========================================================================
                     // general functions
 
-                    static inline coeffs_type get_new_poly(scalar_field_value_type old_share, std::size_t new_t,
-                                                           std::size_t new_n) {
+                    static inline private_elements_type get_new_poly(private_element_type old_share, std::size_t new_t,
+                                                                     std::size_t new_n) {
                         assert(check_t(new_t, new_n));
 
                         return get_poly(new_t);
                     }
 
                     // TODO: add custom random generation
-                    static inline coeffs_type get_new_poly(const scalar_field_value_type &old_share,
-                                                           std::size_t new_t) {
+                    static inline private_elements_type get_new_poly(const private_element_type &old_share,
+                                                                     std::size_t new_t) {
                         assert(new_t > 0);
 
-                        coeffs_type coeffs;
+                        private_elements_type coeffs;
 
                         coeffs.emplace_back(old_share);
                         for (std::size_t i = 1; i < new_t; i++) {
