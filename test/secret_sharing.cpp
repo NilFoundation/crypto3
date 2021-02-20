@@ -98,7 +98,9 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     using group_type = typename curve_type::g1_type;
     using scheme_type = nil::crypto3::pubkey::detail::feldman_sss<group_type>;
     using shares_dealing_acc_type = shares_dealing_accumulator_set<scheme_type>;
+    using indexed_shares_dealing_acc_type = indexed_shares_dealing_accumulator_set<scheme_type>;
     using share_verification_acc_type = share_verification_accumulator_set<scheme_type>;
+    using secret_recovering_acc_type = secret_recovering_accumulator_set<scheme_type>;
 
     auto t = 5;
     auto n = 10;
@@ -106,9 +108,10 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     auto coeffs = scheme_type::get_poly(t, n);
     auto pub_coeffs = scheme_type::get_public_poly(coeffs);
     auto shares = scheme_type::deal_shares(coeffs, n);
+    auto indexed_shares = scheme_type::deal_indexed_shares(coeffs, n);
 
     //===========================================================================
-    // check shares dealing accumulator
+    // shares dealing accumulator
 
     shares_dealing_acc_type deal_shares_acc(n);
     for (const auto &c : coeffs) {
@@ -118,10 +121,22 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     BOOST_CHECK_EQUAL(shares, acc_shares);
 
     //===========================================================================
+    // indexed shares dealing accumulator
+
+    indexed_shares_dealing_acc_type deal_indexed_shares_acc(n);
+    for (const auto &c : coeffs) {
+        deal_indexed_shares_acc(c);
+    }
+    auto acc_indexed_shares = nil::crypto3::accumulators::extract::scheme<scheme_type>(deal_indexed_shares_acc);
+    BOOST_CHECK(indexed_shares == acc_indexed_shares);
+
+    //===========================================================================
     // each participant check its share using accumulator
+
     std::size_t i = 1;
     for (const auto &s_i : shares) {
-        share_verification_acc_type verification_acc(typename scheme_type::indexed_public_element_type(i++, scheme_type::get_public_element(s_i)));
+        share_verification_acc_type verification_acc(
+            typename scheme_type::indexed_public_element_type(i++, scheme_type::get_public_element(s_i)));
         for (const auto &pc : pub_coeffs) {
             verification_acc(pc);
         }
@@ -129,13 +144,59 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     }
 
     //===========================================================================
+    // recovering secret using accumulator
+
+    secret_recovering_acc_type recovering_acc(t);
+    i = 1;
+    for (auto shares_it = shares.begin(); shares_it != shares.begin() + t; shares_it++) {
+        recovering_acc(typename scheme_type::indexed_private_element_type(i++, *shares_it));
+    }
+    BOOST_CHECK_EQUAL(nil::crypto3::accumulators::extract::scheme<scheme_type>(recovering_acc), coeffs[0]);
+
+    //===========================================================================
+    // recover secret with vector
+
+    BOOST_CHECK_EQUAL(scheme_type::recover_secret(t, std::vector<typename decltype(indexed_shares)::value_type>(
+                                                         indexed_shares.begin(),
+                                                         [t, &indexed_shares]() {
+                                                             auto it = indexed_shares.begin();
+                                                             for (auto i = 0; i < t; i++) {
+                                                                 it++;
+                                                             }
+                                                             return it;
+                                                         }())),
+                      coeffs[0]);
+
+    //===========================================================================
+    // recover secret with unordered_map
 
     BOOST_CHECK_EQUAL(scheme_type::recover_secret(
-                          t, std::vector<typename decltype(shares)::value_type>(shares.begin(), shares.begin() + t)),
+                          t, typename scheme_type::indexed_private_elements_type(indexed_shares.begin(),
+                                                                                 [t, &indexed_shares]() {
+                                                                                     auto it = indexed_shares.begin();
+                                                                                     for (auto i = 0; i < t; i++) {
+                                                                                         it++;
+                                                                                     }
+                                                                                     return it;
+                                                                                 }())),
                       coeffs[0]);
+
+    //===========================================================================
+    // check impossibility of secret recovering with group size less than threshold value
+
     BOOST_CHECK_NE(scheme_type::recover_secret(
-                       std::vector<typename decltype(shares)::value_type>(shares.begin(), shares.begin() + t - 1)),
+                       typename scheme_type::indexed_private_elements_type(indexed_shares.begin(),
+                                                                           [t, &indexed_shares]() {
+                                                                               auto it = indexed_shares.begin();
+                                                                               for (auto i = 0; i < t - 1; i++) {
+                                                                                   it++;
+                                                                               }
+                                                                               return it;
+                                                                           }())),
                    coeffs[0]);
+
+    //===========================================================================
+    //
 
     BOOST_CHECK(scheme_type::verify_share(shares[0], 1, pub_coeffs));
 }
@@ -145,8 +206,8 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
     using group_type = typename curve_type::g1_type;
     using scheme_type = nil::crypto3::pubkey::detail::pedersen_dkg<group_type>;
 
-    auto t = 10;
-    auto n = 20;
+    auto t = 5;
+    auto n = 10;
 
     //===========================================================================
     // every participant generates polynomial
@@ -170,12 +231,22 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
     std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_generated_shares),
                    [n](const auto &poly_i) { return scheme_type::deal_shares(poly_i, n); });
 
+    std::vector<typename scheme_type::indexed_private_elements_type> P_generated_indexed_shares;
+    std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_generated_indexed_shares),
+                   [n](const auto &poly_i) { return scheme_type::deal_indexed_shares(poly_i, n); });
+
     //===========================================================================
     // each participant verify shares received from other parties
 
     for (auto i = 1; i <= n; i++) {
         for (auto j = 1; j <= n; j++) {
             BOOST_CHECK(scheme_type::verify_share(P_generated_shares[i - 1][j - 1], j, P_public_polys[i - 1]));
+        }
+    }
+
+    for (auto i = 1; i <= n; i++) {
+        for (const auto &j_generated_indexed_shares : P_generated_indexed_shares[i - 1]) {
+            BOOST_CHECK(scheme_type::verify_share(j_generated_indexed_shares, P_public_polys[i - 1]));
         }
     }
 
@@ -196,6 +267,14 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
     std::transform(P_shares_acc.begin(), P_shares_acc.end(), std::back_inserter(P_shares), [](auto &&acc) {
         return scheme_type::reduce_shares(std::forward<typename scheme_type::private_elements_sum_acc_type>(acc));
     });
+
+    std::size_t index = 1;
+    std::vector<typename scheme_type::indexed_private_element_type> P_indexed_shares;
+    std::transform(P_shares_acc.begin(), P_shares_acc.end(), std::back_inserter(P_indexed_shares),
+                   [&index](auto &&acc) {
+                       return scheme_type::reduce_shares(
+                           std::forward<typename scheme_type::private_elements_sum_acc_type>(acc), index++);
+                   });
 
     //===========================================================================
     // calculation of public values representing coefficients of real polynomial
@@ -224,6 +303,10 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
         BOOST_CHECK(scheme_type::verify_share(P_shares[i - 1], i, P_public_poly));
     }
 
+    for (const auto &i_indexed_share : P_indexed_shares) {
+        BOOST_CHECK(scheme_type::verify_share(i_indexed_share, P_public_poly));
+    }
+
     //===========================================================================
     // calculation of actual secret
     // (which is not calculated directly by the parties in real application)
@@ -232,15 +315,17 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
     for (const auto &i_poly : P_polys) {
         secret_acc(i_poly.front());
     }
-    auto secret = scheme_type::reduce_shares(std::forward<typename scheme_type::private_elements_sum_acc_type>(secret_acc));
+    auto secret =
+        scheme_type::reduce_shares(std::forward<typename scheme_type::private_elements_sum_acc_type>(secret_acc));
 
     //===========================================================================
 
-    BOOST_CHECK_EQUAL(scheme_type::recover_secret(
-                          std::vector<typename decltype(P_shares)::value_type>(P_shares.begin(), P_shares.begin() + t)),
+    BOOST_CHECK_EQUAL(scheme_type::recover_secret(t, std::vector<typename decltype(P_indexed_shares)::value_type>(
+                                                         P_indexed_shares.begin(), P_indexed_shares.begin() + t)),
                       secret);
-    BOOST_CHECK_NE(scheme_type::recover_secret(std::vector<typename decltype(P_shares)::value_type>(
-                       P_shares.begin(), P_shares.begin() + t - 1)),
+
+    BOOST_CHECK_NE(scheme_type::recover_secret(std::vector<typename decltype(P_indexed_shares)::value_type>(
+                       P_indexed_shares.begin(), P_indexed_shares.begin() + t - 1)),
                    secret);
 }
 

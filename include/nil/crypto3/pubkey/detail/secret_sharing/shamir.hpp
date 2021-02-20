@@ -49,6 +49,9 @@ namespace nil {
                     typedef typename base_field_type::value_type base_field_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
 
+                    //===========================================================================
+                    // secret sharing scheme logical types
+
                     typedef scalar_field_value_type private_element_type;
                     typedef group_value_type public_element_type;
                     typedef std::vector<private_element_type> private_elements_type;
@@ -56,9 +59,31 @@ namespace nil {
                     typedef std::pair<std::size_t, private_element_type> indexed_private_element_type;
                     typedef std::pair<std::size_t, public_element_type> indexed_public_element_type;
                     typedef std::unordered_map<std::size_t, private_element_type> indexed_private_elements_type;
+                    typedef std::set<std::size_t> indexes_type;
 
                     //===========================================================================
-                    // implicitly ordered in/out
+                    // constraints checking meta-functions
+
+                    // TODO: indexes sufficiently to be integral according to checks,
+                    //  however in code unsigned type is used, so overflows could appear
+                    template<typename IndexedPrivateElement,
+                             typename Index = typename IndexedPrivateElement::first_type,
+                             typename std::enable_if<std::is_integral<Index>::value, bool>::type = true>
+                    using get_indexed_private_element_type = std::pair<Index, private_element_type>;
+
+                    template<typename IndexedPublicElement, typename Index = typename IndexedPublicElement::first_type,
+                             typename std::enable_if<std::is_integral<Index>::value, bool>::type = true>
+                    using get_indexed_public_element_type = std::pair<Index, public_element_type>;
+
+                    template<typename IndexedPrivateElementsContainer>
+                    using check_indexed_private_elements_container_type = typename std::enable_if<
+                        std::is_same<
+                            get_indexed_private_element_type<typename IndexedPrivateElementsContainer::value_type>,
+                            typename IndexedPrivateElementsContainer::value_type>::value,
+                        bool>::type;
+
+                    //===========================================================================
+                    // shares dealing functions
 
                     template<typename CoeffsRange,
                              typename std::enable_if<
@@ -76,39 +101,6 @@ namespace nil {
                         }
                         return shares;
                     }
-
-                    template<typename SharesRange,
-                             typename std::enable_if<
-                                 std::is_same<private_element_type, typename SharesRange::value_type>::value,
-                                 bool>::type = true>
-                    static inline private_element_type recover_secret(std::size_t t, const SharesRange &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
-
-                        std::size_t shares_len = std::distance(shares.begin(), shares.end());
-                        assert(shares_len >= t);
-
-                        return recover_secret(shares);
-                    }
-
-                    template<typename SharesRange,
-                             typename std::enable_if<
-                                 std::is_same<private_element_type, typename SharesRange::value_type>::value,
-                                 bool>::type = true>
-                    static inline private_element_type recover_secret(const SharesRange &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
-
-                        std::size_t shares_len = std::distance(shares.begin(), shares.end());
-                        private_element_type result = private_element_type::zero();
-                        std::size_t i = 1;
-
-                        for (const auto &s_i : shares) {
-                            result = result + s_i * eval_basis_poly(shares_len, i++);
-                        }
-                        return result;
-                    }
-
-                    //===========================================================================
-                    // explicitly ordered in/out
 
                     template<typename CoeffsRange,
                              typename std::enable_if<
@@ -128,14 +120,43 @@ namespace nil {
                         return shares;
                     }
 
-                    template<typename SharesContainer,
+                    template<typename CoeffsRange,
                              typename std::enable_if<
-                                 std::is_integral<typename SharesContainer::key_type>::value &&
-                                     std::is_same<private_element_type, typename SharesContainer::mapped_type>::value,
+                                 std::is_same<private_element_type, typename CoeffsRange::value_type>::value,
                                  bool>::type = true>
-                    static inline private_element_type recover_secret(std::size_t t, const SharesContainer &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const SharesContainer>));
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::PairAssociativeContainer<const SharesContainer>));
+                    static inline private_element_type deal_share(const CoeffsRange &coeffs, std::size_t i) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
+                        assert(check_participant_index(i));
+
+                        private_element_type e_i(i);
+                        private_element_type temp = private_element_type::one();
+                        private_element_type share = private_element_type::zero();
+
+                        for (const auto &c : coeffs) {
+                            share = share + c * temp;
+                            temp = temp * e_i;
+                        }
+                        return share;
+                    }
+
+                    //
+                    //  0 <= k < t
+                    //
+                    static inline private_element_type eval_partial_share(
+                        const private_element_type &coeff, std::size_t i, std::size_t k,
+                        const private_element_type &init_share_value = private_element_type::zero()) {
+                        assert(check_participant_index(i));
+                        return init_share_value + coeff * private_element_type(i).pow(k);
+                    }
+
+                    //===========================================================================
+                    // secret recovering functions
+
+                    template<typename IndexedSharesContainer,
+                             check_indexed_private_elements_container_type<IndexedSharesContainer> = true>
+                    static inline private_element_type recover_secret(std::size_t t,
+                                                                      const IndexedSharesContainer &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedSharesContainer>));
 
                         std::size_t shares_len = std::distance(shares.begin(), shares.end());
                         assert(shares_len >= t);
@@ -143,26 +164,38 @@ namespace nil {
                         return recover_secret(shares);
                     }
 
-                    template<typename SharesContainer,
-                             typename std::enable_if<
-                                 std::is_integral<typename SharesContainer::key_type>::value &&
-                                     std::is_same<private_element_type, typename SharesContainer::mapped_type>::value,
-                                 bool>::type = true>
-                    static inline private_element_type recover_secret(const SharesContainer &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const SharesContainer>));
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::PairAssociativeContainer<const SharesContainer>));
+                    template<typename IndexedSharesContainer,
+                             check_indexed_private_elements_container_type<IndexedSharesContainer> = true>
+                    static inline private_element_type recover_secret(const IndexedSharesContainer &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedSharesContainer>));
 
                         std::size_t shares_len = std::distance(shares.begin(), shares.end());
                         private_element_type result = private_element_type::zero();
+                        indexes_type indexes = get_indexes(shares);
 
                         for (const auto &[i, s_i] : shares) {
-                            result = result + s_i * eval_basis_poly(shares_len, i);
+                            result = result + s_i * eval_basis_poly(indexes, i);
+                        }
+                        return result;
+                    }
+
+                    static inline private_element_type eval_basis_poly(const indexes_type &indexes, std::size_t i) {
+                        assert(check_participant_index(i));
+                        assert(indexes.count(i));
+
+                        private_element_type e_i(i);
+                        private_element_type result = private_element_type::one();
+
+                        for (auto j : indexes) {
+                            if (j != i) {
+                                result = result * (private_element_type(j) / (private_element_type(j) - e_i));
+                            }
                         }
                         return result;
                     }
 
                     //===========================================================================
-                    // general functions
+                    // polynomial generation functions
 
                     static inline private_elements_type get_poly(const std::size_t &t, const std::size_t &n) {
                         assert(check_t(t, n));
@@ -172,7 +205,7 @@ namespace nil {
 
                     // TODO: add custom random generation
                     static inline private_elements_type get_poly(const std::size_t &t) {
-                        assert(t > 0);
+                        assert(check_minimal_size(t));
 
                         private_elements_type coeffs;
 
@@ -197,64 +230,43 @@ namespace nil {
                         return public_coeffs;
                     }
 
-                    template<typename CoeffsRange,
-                             typename std::enable_if<
-                                 std::is_same<private_element_type, typename CoeffsRange::value_type>::value,
-                                 bool>::type = true>
-                    static inline private_element_type deal_share(const CoeffsRange &coeffs, std::size_t i) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
+                    //===========================================================================
+                    // general purposes functions
 
-                        private_element_type e_i(i);
-                        private_element_type temp = private_element_type::one();
-                        private_element_type share = private_element_type::zero();
+                    template<typename IndexedSharesContainer,
+                             check_indexed_private_elements_container_type<IndexedSharesContainer> = true>
+                    static inline indexes_type get_indexes(const IndexedSharesContainer &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedSharesContainer>));
 
-                        for (const auto &c : coeffs) {
-                            share = share + c * temp;
-                            temp = temp * e_i;
+                        indexes_type indexes;
+                        for (const auto &s : shares) {
+                            assert(check_participant_index(s.first) && indexes.emplace(s.first).second);
                         }
-                        return share;
-                    }
-
-                    //
-                    //  0 <= k < t
-                    //
-                    static inline private_element_type eval_partial_share(
-                        const private_element_type &coeff, const private_element_type &e_i, std::size_t k,
-                        const private_element_type &init_share_value = private_element_type::zero()) {
-                        return init_share_value + coeff * e_i.pow(k);
+                        return indexes;
                     }
 
                     static inline public_element_type get_public_element(const private_element_type &s_i) {
                         return s_i * public_element_type::one();
                     }
 
-                    static inline private_element_type eval_basis_poly(std::size_t n, std::size_t i) {
-                        assert(n > 0);
-                        assert(i > 0 && i <= n);
-
-                        private_element_type e_n(n), e_i(i);
-                        private_element_type result = private_element_type::one();
-
-                        for (private_element_type e_j = 1; e_j < e_i; e_j++) {
-                            result = result * (e_j / (e_j - e_i));
-                        }
-                        for (private_element_type e_j = i + 1; e_j <= e_n; e_j++) {
-                            result = result * (e_j / (e_j - e_i));
-                        }
-                        return result;
+                    static inline bool check_minimal_size(std::size_t size) {
+                        return size >= 2;
                     }
 
                     static inline bool check_t(std::size_t t, std::size_t n) {
-                        // return n > 0 && t > 0 && n >= 2 * t - 1;
-                        return t >= 2 && t <= n;
+                        return check_minimal_size(t) && t <= n;
                     }
 
                     static inline bool strong_check_t(std::size_t t, std::size_t n) {
-                        return check_t(t, n) && t >= get_minimum_t(n);
+                        return check_t(t, n) && t >= get_minimal_t(n);
                     }
 
-                    static inline std::size_t get_minimum_t(std::size_t n) {
-                        assert(n > 0);
+                    static inline bool check_participant_index(std::size_t i) {
+                        return i > 0;
+                    }
+
+                    static inline std::size_t get_minimal_t(std::size_t n) {
+                        assert(check_minimal_size(n));
                         return (n + 1) / 2;
                     }
                 };
