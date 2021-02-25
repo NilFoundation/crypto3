@@ -59,6 +59,8 @@ namespace nil {
                     typedef std::pair<std::size_t, private_element_type> indexed_private_element_type;
                     typedef std::pair<std::size_t, public_element_type> indexed_public_element_type;
                     typedef std::unordered_map<std::size_t, private_element_type> indexed_private_elements_type;
+                    typedef std::unordered_map<std::size_t, indexed_private_elements_type>
+                        indexed_weighted_private_elements_type;
                     typedef std::set<std::size_t> indexes_type;
 
                     //===========================================================================
@@ -68,11 +70,11 @@ namespace nil {
                     //  however in code unsigned type is used, so overflows could appear
                     template<typename IndexedPrivateElement,
                              typename Index = typename IndexedPrivateElement::first_type,
-                             typename std::enable_if<std::is_integral<Index>::value, bool>::type = true>
+                             typename std::enable_if<std::is_unsigned<Index>::value, bool>::type = true>
                     using get_indexed_private_element_type = std::pair<Index, private_element_type>;
 
                     template<typename IndexedPublicElement, typename Index = typename IndexedPublicElement::first_type,
-                             typename std::enable_if<std::is_integral<Index>::value, bool>::type = true>
+                             typename std::enable_if<std::is_unsigned<Index>::value, bool>::type = true>
                     using get_indexed_public_element_type = std::pair<Index, public_element_type>;
 
                     template<typename IndexedPrivateElementsContainer>
@@ -120,6 +122,58 @@ namespace nil {
                         return shares;
                     }
 
+                    template<typename CoeffsRange, typename WeightsRange,
+                             typename std::enable_if<
+                                 std::is_same<private_element_type, typename CoeffsRange::value_type>::value &&
+                                     std::is_unsigned<typename WeightsRange::value_type>::value,
+                                 bool>::type = true>
+                    static inline indexed_weighted_private_elements_type
+                        deal_indexed_weighted_shares(const CoeffsRange &coeffs, const WeightsRange &weights) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightsRange>));
+
+                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
+                        std::size_t n = std::distance(weights.begin(), weights.end());
+                        assert(check_t(t, n));
+
+                        std::size_t i = 1;
+                        indexed_weighted_private_elements_type indexed_weighted_shares;
+                        for (auto w_i : weights) {
+                            assert(w_i > 0);
+                            indexed_private_elements_type i_shares;
+                            for (std::size_t j = 1; j <= w_i; j++) {
+                                std::size_t id_ij = i * t + j;
+                                assert(i_shares.emplace(id_ij, deal_share(coeffs, id_ij)).second);
+                            }
+                            assert(indexed_weighted_shares.emplace(i, i_shares).second);
+                            ++i;
+                        }
+                        return indexed_weighted_shares;
+                    }
+
+                    template<typename CoeffsRange, typename WeightsRange,
+                             typename std::enable_if<
+                                 std::is_same<private_element_type, typename CoeffsRange::value_type>::value &&
+                                     std::is_unsigned<typename WeightsRange::value_type>::value,
+                                 bool>::type = true>
+                    static inline indexed_private_elements_type
+                        deal_indexed_weighted_shares_with_additional_step(const CoeffsRange &coeffs,
+                                                                          const WeightsRange &weights) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const CoeffsRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightsRange>));
+
+                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
+                        indexed_weighted_private_elements_type indexed_weighted_shares =
+                            deal_indexed_weighted_shares(coeffs, weights);
+
+                        indexed_private_elements_type indexed_weighted_joined_shares;
+                        for (const auto &[i, i_shares] : indexed_weighted_shares) {
+                            assert(
+                                indexed_weighted_joined_shares.emplace(join_weighted_shares(i_shares, i)).second);
+                        }
+                        return indexed_weighted_joined_shares;
+                    }
+
                     template<typename CoeffsRange,
                              typename std::enable_if<
                                  std::is_same<private_element_type, typename CoeffsRange::value_type>::value,
@@ -149,6 +203,16 @@ namespace nil {
                         return init_share_value + coeff * private_element_type(i).pow(k);
                     }
 
+                    template<typename WeightedSharesContainer,
+                             check_indexed_private_elements_container_type<WeightedSharesContainer> = true>
+                    static inline indexed_private_element_type
+                        join_weighted_shares(const WeightedSharesContainer &i_shares, std::size_t i) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightedSharesContainer>));
+                        assert(check_participant_index(i));
+
+                        return indexed_private_element_type(i, recover_secret(i_shares));
+                    }
+
                     //===========================================================================
                     // secret recovering functions
 
@@ -159,6 +223,7 @@ namespace nil {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedSharesContainer>));
 
                         std::size_t shares_len = std::distance(shares.begin(), shares.end());
+                        assert(check_minimal_size(t));
                         assert(shares_len >= t);
 
                         return recover_secret(shares);

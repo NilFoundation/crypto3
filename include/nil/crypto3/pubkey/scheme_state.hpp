@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CIPHER_STATE_HPP
-#define CRYPTO3_PUBKEY_CIPHER_STATE_HPP
+#ifndef CRYPTO3_PUBKEY_SCHEME_STATE_HPP
+#define CRYPTO3_PUBKEY_SCHEME_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/pubkey/accumulators/sign.hpp>
 #include <nil/crypto3/pubkey/accumulators/verify.hpp>
-#include <nil/crypto3/pubkey/accumulators/secret_sharing.hpp>
+#include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -77,28 +77,8 @@ namespace nil {
             using aggregation_accumulator_set =
                 boost::accumulators::accumulator_set<typename Mode::result_type,
                                                      boost::accumulators::features<accumulators::tag::sign<Mode>>>;
-
-            template<typename Scheme>
-            using shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::deal_shares<Scheme>>>;
-
-            template<typename Scheme>
-            using indexed_shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::deal_shares_indexed<Scheme>>>;
-
-            template<typename Scheme>
-            using secret_recovering_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::indexed_public_element_type,
-                boost::accumulators::features<accumulators::tag::recover_secret<Scheme>>>;
-
-            template<typename Scheme>
-            using share_verification_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::indexed_public_element_type,
-                boost::accumulators::features<accumulators::tag::verify_share<Scheme>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_CIPHER_STATE_HPP
+#endif    // CRYPTO3_PUBKEY_SCHEME_STATE_HPP
