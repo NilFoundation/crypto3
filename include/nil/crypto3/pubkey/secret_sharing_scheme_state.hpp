@@ -42,12 +42,12 @@ namespace nil {
             template<typename Scheme>
             using indexed_shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
                 typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::deal_shares_indexed<Scheme>>>;
+                boost::accumulators::features<accumulators::tag::deal_indexed_shares<Scheme>>>;
 
             template<typename Scheme>
             using secret_recovering_accumulator_set = boost::accumulators::accumulator_set<
                 typename Scheme::indexed_public_element_type,
-                boost::accumulators::features<accumulators::tag::recover_secret<Scheme>>>;
+                boost::accumulators::features<accumulators::tag::recover_private_element<Scheme>>>;
 
             template<typename Scheme>
             using share_verification_accumulator_set = boost::accumulators::accumulator_set<

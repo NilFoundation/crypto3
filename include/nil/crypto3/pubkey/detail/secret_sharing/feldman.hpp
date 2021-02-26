@@ -44,13 +44,17 @@ namespace nil {
                     //===========================================================================
                     // share verification functions
 
-                    template<typename PublicCoeffsRange,
+                    //
+                    //  verify public share
+                    //
+                    template<typename PublicCoeffs, typename Number,
                              typename std::enable_if<
-                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffs::value_type>::value &&
+                                     std::is_integral<Number>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const public_element_type &gs_i, std::size_t i,
-                                                    const PublicCoeffsRange &public_coeffs) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
+                    static inline bool verify_share(const public_element_type &gs_i, Number i,
+                                                    const PublicCoeffs &public_coeffs) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
                         assert(base_type::check_participant_index(i));
 
                         private_element_type e_i(i);
@@ -64,43 +68,58 @@ namespace nil {
                         return gs_i == temp_s_i;
                     }
 
-                    template<typename PublicCoeffsRange,
+                    //
+                    //  verify private share
+                    //
+                    template<typename PublicCoeffs, typename Number,
                              typename std::enable_if<
-                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffs::value_type>::value &&
+                                     std::is_integral<Number>::value,
                                  bool>::type = true>
-                    static inline bool verify_share(const private_element_type &s_i, std::size_t i,
-                                                    const PublicCoeffsRange &public_coeffs) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
+                    static inline bool verify_share(const private_element_type &s_i, Number i,
+                                                    const PublicCoeffs &public_coeffs) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
 
                         return verify_share(base_type::get_public_element(s_i), i, public_coeffs);
                     }
 
-                    template<typename IndexedPublicElement, typename PublicCoeffsRange,
-                             typename std::enable_if<
-                                 std::is_same<IndexedPublicElement,
-                                              typename base_type::template get_indexed_public_element_type<
-                                                  IndexedPublicElement>>::value &&
-                                     std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
-                                 bool>::type = true>
+                    //
+                    //  verify indexed public share
+                    //
+                    template<
+                        typename IndexedPublicElement, typename PublicCoeffs,
+                        typename base_type::template check_indexed_public_element_type<IndexedPublicElement> = true,
+                        typename std::enable_if<
+                            std::is_same<public_element_type, typename PublicCoeffs::value_type>::value, bool>::type =
+                            true>
                     static inline bool verify_share(const IndexedPublicElement &s_i,
-                                                    const PublicCoeffsRange &public_coeffs) {
+                                                    const PublicCoeffs &public_coeffs) {
                         return verify_share(s_i.second, s_i.first, public_coeffs);
                     }
 
-                    template<typename IndexedPrivateElement, typename PublicCoeffsRange,
-                             typename std::enable_if<
-                                 std::is_same<IndexedPrivateElement,
-                                              typename base_type::template get_indexed_private_element_type<
-                                                  IndexedPrivateElement>>::value &&
-                                     std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
-                                 bool>::type = true>
+                    //
+                    //  verify indexed private share
+                    //
+                    template<
+                        typename IndexedPrivateElement, typename PublicCoeffs,
+                        typename base_type::template check_indexed_private_element_type<IndexedPrivateElement> = true,
+                        typename std::enable_if<
+                            std::is_same<public_element_type, typename PublicCoeffs::value_type>::value, bool>::type =
+                            true>
                     static inline bool verify_share(const IndexedPrivateElement &s_i,
-                                                    const PublicCoeffsRange &public_coeffs) {
+                                                    const PublicCoeffs &public_coeffs) {
                         return verify_share(s_i.second, s_i.first, public_coeffs);
                     }
 
+                    //
+                    //  partial computing of verification value
+                    //
+                    template<
+                        typename Number1, typename Number2,
+                        typename std::enable_if<std::is_integral<Number1>::value && std::is_integral<Number2>::value,
+                                                bool>::type = true>
                     static inline public_element_type eval_partial_verification_value(
-                        const public_element_type &public_coeff, std::size_t i, std::size_t k,
+                        const public_element_type &public_coeff, Number1 i, Number2 k,
                         const public_element_type &init_value = public_element_type::zero()) {
                         assert(base_type::check_participant_index(i));
                         return init_value + public_coeff * private_element_type(i).pow(k);

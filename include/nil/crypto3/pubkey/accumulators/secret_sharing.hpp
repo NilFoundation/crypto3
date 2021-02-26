@@ -49,8 +49,9 @@ namespace nil {
                     typedef private_elements_type result_type;
 
                     template<typename Args>
-                    deal_shares_impl(const Args &args) : n(args[boost::accumulators::sample]), seen_coeffs(0) {
-                        assert(scheme_type::check_minimal_size(n));
+                    deal_shares_impl(const Args &args) : seen_coeffs(0) {
+                        assert(scheme_type::check_minimal_size(args[boost::accumulators::sample]));
+                        n = args[boost::accumulators::sample];
                         std::fill_n(std::back_inserter(shares), n, private_element_type::zero());
                     }
 
@@ -73,7 +74,7 @@ namespace nil {
                         std::size_t i = 1;
                         private_element_type e_i = private_element_type::one();
                         while (shares_it != shares.end()) {
-                            *shares_it = scheme_type::eval_partial_share(coeff, i++, seen_coeffs, *shares_it);
+                            *shares_it = scheme_type::eval_partial_private_element(coeff, i++, seen_coeffs, *shares_it);
                             ++shares_it;
                         }
                         seen_coeffs++;
@@ -85,7 +86,7 @@ namespace nil {
                 };
 
                 template<typename Scheme>
-                struct deal_shares_indexed_impl : boost::accumulators::accumulator_base {
+                struct deal_indexed_shares_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Scheme scheme_type;
 
@@ -97,8 +98,9 @@ namespace nil {
                     typedef indexed_private_elements_type result_type;
 
                     template<typename Args>
-                    deal_shares_indexed_impl(const Args &args) : n(args[boost::accumulators::sample]), seen_coeffs(0) {
-                        assert(scheme_type::check_minimal_size(n));
+                    deal_indexed_shares_impl(const Args &args) : seen_coeffs(0) {
+                        assert(scheme_type::check_minimal_size(args[boost::accumulators::sample]));
+                        n = args[boost::accumulators::sample];
                         std::size_t i = 1;
                         std::generate_n(std::inserter(indexed_shares, indexed_shares.end()), n, [&i]() {
                             return indexed_private_element_type(i++, private_element_type::zero());
@@ -123,7 +125,7 @@ namespace nil {
                         auto indexed_shares_it = indexed_shares.begin();
                         private_element_type e_i = private_element_type::one();
                         while (indexed_shares_it != indexed_shares.end()) {
-                            indexed_shares_it->second = scheme_type::eval_partial_share(
+                            indexed_shares_it->second = scheme_type::eval_partial_private_element(
                                 coeff, indexed_shares_it->first, seen_coeffs, indexed_shares_it->second);
                             indexed_shares_it++;
                         }
@@ -135,8 +137,73 @@ namespace nil {
                     result_type indexed_shares;
                 };
 
+                // template<typename Scheme>
+                // struct deal_weighted_shares_impl : boost::accumulators::accumulator_base {
+                // protected:
+                //     typedef Scheme scheme_type;
+                //
+                //     typedef typename scheme_type::private_element_type private_element_type;
+                //     typedef typename scheme_type::indexed_private_element_type indexed_private_element_type;
+                //     typedef typename scheme_type::indexed_private_elements_type indexed_private_elements_type;
+                //     typedef typename scheme_type::indexed_weighted_private_elements_type
+                //         indexed_weighted_private_elements_type;
+                //
+                // public:
+                //     typedef indexed_weighted_private_elements_type result_type;
+                //
+                //     template<typename Args>
+                //     deal_weighted_shares_impl(const Args &args) : seen_coeffs(0) {
+                //         assert(scheme_type::check_minimal_size(args[boost::accumulators::sample]));
+                //         n = args[boost::accumulators::sample];
+                //         std::size_t i = 1;
+                //         std::generate_n(std::inserter(weighted_shares, weighted_shares.end()), n, [&i]() {
+                //             return indexed_private_elements_type(i++, indexed_private_element_type(0, private_element_type::zero()));
+                //         });
+                //     }
+                //
+                //     inline result_type result(boost::accumulators::dont_care) const {
+                //         assert(scheme_type::check_t(seen_coeffs, n));
+                //         return weighted_shares;
+                //     }
+                //
+                //     //
+                //     // input coefficients should be supplied in increasing term degrees order
+                //     //
+                //     template<typename Args>
+                //     inline void operator()(const Args &args) {
+                //         resolve_type(args[boost::accumulators::sample]);
+                //     }
+                //
+                // protected:
+                //     inline void resolve_type(const private_element_type &coeff) {
+                //
+                //     }
+                //
+                //     template<typename IndexedWeight,
+                //         typename scheme_type::template check_indexed_weight_type<IndexedWeight> = true>
+                //     inline void resolve_type(const IndexedWeight &w_i) {
+                //         assert(0 < w_i.first && w_i.first <= n);
+                //         assert(0 < w_i.second);
+                //
+                //         //
+                //         // delete
+                //         //
+                //         if (weighted_shares.at(w_i.first).size() > w_i.second) {
+                //
+                //         }
+                //         //
+                //         //
+                //         //
+                //         else if (weighted_shares.at(w_i.first).size() < w_i.second)
+                //     }
+                //
+                //     std::size_t n;
+                //     std::size_t seen_coeffs;
+                //     result_type weighted_shares;
+                // };
+
                 template<typename Scheme>
-                struct recover_secret_impl : boost::accumulators::accumulator_base {
+                struct recover_private_element_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Scheme scheme_type;
 
@@ -148,12 +215,12 @@ namespace nil {
                     typedef private_element_type result_type;
 
                     template<typename Args>
-                    recover_secret_impl(const Args &args) : seen_shares(0) {
+                    recover_private_element_impl(const Args &args) : seen_shares(0) {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         assert(scheme_type::check_minimal_size(seen_shares));
-                        return scheme_type::recover_secret(indexed_shares);
+                        return scheme_type::recover_private_element(indexed_shares);
                     }
 
                     template<typename Args>
@@ -185,7 +252,7 @@ namespace nil {
                     template<typename Args>
                     verify_share_impl(const Args &args) :
                         gs_i(args[boost::accumulators::sample]), seen_coeffs(0),
-                        share_verification(public_element_type::zero()) {
+                        share_verification_value(public_element_type::zero()) {
                     }
 
                     //
@@ -197,19 +264,19 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return gs_i.second == share_verification;
+                        return gs_i.second == share_verification_value;
                     }
 
                 protected:
                     inline void resolve_type(const public_element_type &public_coeff) {
-                        share_verification = scheme_type::eval_partial_verification_value(
-                            public_coeff, gs_i.first, seen_coeffs, share_verification);
+                        share_verification_value = scheme_type::eval_partial_verification_value(
+                            public_coeff, gs_i.first, seen_coeffs, share_verification_value);
                         seen_coeffs++;
                     }
 
                     std::size_t seen_coeffs;
                     indexed_public_element_type gs_i;
-                    public_element_type share_verification;
+                    public_element_type share_verification_value;
                 };
             }    // namespace impl
 
@@ -225,13 +292,13 @@ namespace nil {
                 };
 
                 template<typename Scheme>
-                struct deal_shares_indexed : boost::accumulators::depends_on<> {
+                struct deal_indexed_shares : boost::accumulators::depends_on<> {
                     typedef Scheme scheme_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::deal_shares_indexed_impl<scheme_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::deal_indexed_shares_impl<scheme_type>> impl;
                 };
 
                 template<typename Scheme>
@@ -245,13 +312,13 @@ namespace nil {
                 };
 
                 template<typename Scheme>
-                struct recover_secret : boost::accumulators::depends_on<> {
+                struct recover_private_element : boost::accumulators::depends_on<> {
                     typedef Scheme scheme_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::recover_secret_impl<scheme_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::recover_private_element_impl<scheme_type>> impl;
                 };
             }    // namespace tag
 
@@ -263,9 +330,9 @@ namespace nil {
                 }
 
                 template<typename Scheme, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::deal_shares_indexed<Scheme>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::deal_indexed_shares<Scheme>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::deal_shares_indexed<Scheme>>(acc);
+                    return boost::accumulators::extract_result<tag::deal_indexed_shares<Scheme>>(acc);
                 }
 
                 template<typename Scheme, typename AccumulatorSet>
@@ -275,9 +342,9 @@ namespace nil {
                 }
 
                 template<typename Scheme, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::recover_secret<Scheme>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::recover_private_element<Scheme>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::recover_secret<Scheme>>(acc);
+                    return boost::accumulators::extract_result<tag::recover_private_element<Scheme>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

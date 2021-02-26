@@ -57,6 +57,8 @@ void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement 
     os << std::hex << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
        << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
 }
+template<typename T>
+class TD;
 
 namespace boost {
     namespace test_tools {
@@ -91,9 +93,9 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_AUTO_TEST_SUITE(base_functional_test)
+BOOST_AUTO_TEST_SUITE(base_functional_self_tests)
 
-BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
+BOOST_AUTO_TEST_CASE(feldman_sss) {
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type;
     using scheme_type = nil::crypto3::pubkey::detail::feldman_sss<group_type>;
@@ -106,7 +108,7 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     auto n = 10;
 
     auto coeffs = scheme_type::get_poly(t, n);
-    auto pub_coeffs = scheme_type::get_public_poly(coeffs);
+    auto pub_coeffs = scheme_type::get_public_elements(coeffs);
     auto shares = scheme_type::deal_shares(coeffs, n);
     auto indexed_shares = scheme_type::deal_indexed_shares(coeffs, n);
 
@@ -156,7 +158,7 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     //===========================================================================
     // recover secret with vector
 
-    BOOST_CHECK_EQUAL(scheme_type::recover_secret(t, std::vector<typename decltype(indexed_shares)::value_type>(
+    BOOST_CHECK_EQUAL(scheme_type::recover_private_element(t, std::vector<typename decltype(indexed_shares)::value_type>(
                                                          indexed_shares.begin(),
                                                          [t, &indexed_shares]() {
                                                              auto it = indexed_shares.begin();
@@ -170,7 +172,7 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     //===========================================================================
     // recover secret with unordered_map
 
-    BOOST_CHECK_EQUAL(scheme_type::recover_secret(
+    BOOST_CHECK_EQUAL(scheme_type::recover_private_element(
                           t, typename scheme_type::indexed_private_elements_type(indexed_shares.begin(),
                                                                                  [t, &indexed_shares]() {
                                                                                      auto it = indexed_shares.begin();
@@ -184,7 +186,7 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     //===========================================================================
     // check impossibility of secret recovering with group size less than threshold value
 
-    BOOST_CHECK_NE(scheme_type::recover_secret(
+    BOOST_CHECK_NE(scheme_type::recover_private_element(
                        typename scheme_type::indexed_private_elements_type(indexed_shares.begin(),
                                                                            [t, &indexed_shares]() {
                                                                                auto it = indexed_shares.begin();
@@ -201,7 +203,62 @@ BOOST_AUTO_TEST_CASE(feldman_sss_self_scheme) {
     BOOST_CHECK(scheme_type::verify_share(shares[0], 1, pub_coeffs));
 }
 
-BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
+BOOST_AUTO_TEST_CASE(feldman_sss_weighted) {
+    using curve_type = curves::bls12_381;
+    using group_type = typename curve_type::g1_type;
+    using scheme_type = nil::crypto3::pubkey::detail::feldman_sss<group_type>;
+    using shares_dealing_acc_type = shares_dealing_accumulator_set<scheme_type>;
+    using indexed_shares_dealing_acc_type = indexed_shares_dealing_accumulator_set<scheme_type>;
+    using share_verification_acc_type = share_verification_accumulator_set<scheme_type>;
+    using secret_recovering_acc_type = secret_recovering_accumulator_set<scheme_type>;
+
+    auto t = 50;
+    auto n = 100;
+    auto i = 1;
+
+    //===========================================================================
+    // polynomial generation
+
+    auto coeffs = scheme_type::get_poly(t, n);
+    auto pub_coeffs = scheme_type::get_public_elements(coeffs);
+
+    //===========================================================================
+    // participants weights generation
+
+    std::vector<std::size_t> weights;
+    std::generate_n(std::back_inserter(weights), n, [&i, t]() {
+        i = i >= t ? 1 : i;
+        return i++;
+    });
+
+    std::vector<std::size_t> weights_one(n, 1);
+
+    //===========================================================================
+    // shares dealing
+
+    auto weighted_shares = scheme_type::deal_indexed_weighted_shares(coeffs, weights);
+    auto weighted_joined_shares = scheme_type::deal_indexed_weighted_joined_shares(coeffs, weights);
+
+    auto weighted_one_shares = scheme_type::deal_indexed_weighted_shares(coeffs, weights_one);
+    auto weighted_one_joined_shares = scheme_type::deal_indexed_weighted_joined_shares(coeffs, weights_one);
+
+    //===========================================================================
+    // check shares verification values (not in protocol)
+
+    for (const auto &[i, w_s_i] : weighted_shares) {
+        auto weighted_public_shares = scheme_type::get_indexed_public_elements(w_s_i);
+        auto joined_public_share = scheme_type::recover_public_element(weighted_public_shares);
+        auto public_share = scheme_type::get_public_element(weighted_joined_shares.at(i));
+        BOOST_CHECK_EQUAL(public_share, joined_public_share);
+    }
+
+    //===========================================================================
+    // check shares verification values (not in protocol)
+
+
+}
+
+BOOST_AUTO_TEST_CASE(pedersen_dkg) {
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type;
     using scheme_type = nil::crypto3::pubkey::detail::pedersen_dkg<group_type>;
@@ -221,7 +278,7 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
 
     std::vector<typename scheme_type::public_elements_type> P_public_polys;
     std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_public_polys),
-                   [](const auto &poly_i) { return scheme_type::get_public_poly(poly_i); });
+                   [](const auto &poly_i) { return scheme_type::get_public_elements(poly_i); });
 
     //===========================================================================
     // every participant generates shares for each participant in group,
@@ -320,11 +377,11 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg_self_scheme) {
 
     //===========================================================================
 
-    BOOST_CHECK_EQUAL(scheme_type::recover_secret(t, std::vector<typename decltype(P_indexed_shares)::value_type>(
+    BOOST_CHECK_EQUAL(scheme_type::recover_private_element(t, std::vector<typename decltype(P_indexed_shares)::value_type>(
                                                          P_indexed_shares.begin(), P_indexed_shares.begin() + t)),
                       secret);
 
-    BOOST_CHECK_NE(scheme_type::recover_secret(std::vector<typename decltype(P_indexed_shares)::value_type>(
+    BOOST_CHECK_NE(scheme_type::recover_private_element(std::vector<typename decltype(P_indexed_shares)::value_type>(
                        P_indexed_shares.begin(), P_indexed_shares.begin() + t - 1)),
                    secret);
 }

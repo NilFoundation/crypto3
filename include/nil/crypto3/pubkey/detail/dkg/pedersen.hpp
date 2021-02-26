@@ -60,22 +60,22 @@ namespace nil {
                         boost::accumulators::features<boost::accumulators::tag::sum>>
                         public_elements_sum_acc_type;
 
-                    template<typename PublicCoeffsRange,
+                    template<typename PublicCoeffs,
                              typename std::enable_if<
-                                 std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
+                                 std::is_same<public_element_type, typename PublicCoeffs::value_type>::value,
                                  bool>::type = true>
-                    static inline public_element_type reduce_public_coeffs(const PublicCoeffsRange &coeffs) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
+                    static inline public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
                         return std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero());
                     }
 
-                    // template<typename PublicCoeffsRange,
+                    // template<typename PublicCoeffs,
                     //          typename std::enable_if<
-                    //              std::is_same<public_element_type, typename PublicCoeffsRange::value_type>::value,
+                    //              std::is_same<public_element_type, typename PublicCoeffs::value_type>::value,
                     //              bool>::type = true>
-                    // static inline indexed_public_element_type reduce_public_coeffs(const PublicCoeffsRange &coeffs,
+                    // static inline indexed_public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs,
                     //                                                                std::size_t i) {
-                    //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffsRange>));
+                    //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
                     //     assert(base_type::check_participant_index(i));
                     //     return indexed_public_element_type(
                     //         i, std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero()));
@@ -92,21 +92,23 @@ namespace nil {
                     //     return indexed_public_element_type(i, boost::accumulators::sum(acc));
                     // }
 
-                    template<typename SharesRange,
-                             typename std::enable_if<
-                                 std::is_same<private_element_type, typename SharesRange::value_type>::value,
-                                 bool>::type = true>
-                    static inline private_element_type reduce_shares(const SharesRange &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
+                    template<
+                        typename Shares,
+                        typename std::enable_if<std::is_same<private_element_type, typename Shares::value_type>::value,
+                                                bool>::type = true>
+                    static inline private_element_type reduce_shares(const Shares &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                         return std::accumulate(shares.begin(), shares.end(), private_element_type::zero());
                     }
 
-                    template<typename SharesRange,
+                    template<typename Shares,
+                             typename Number,
                              typename std::enable_if<
-                                 std::is_same<private_element_type, typename SharesRange::value_type>::value,
+                                 std::is_same<private_element_type, typename Shares::value_type>::value &&
+                                     std::is_integral<Number>::value,
                                  bool>::type = true>
-                    static inline indexed_private_element_type reduce_shares(const SharesRange &shares, std::size_t i) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SharesRange>));
+                    static inline indexed_private_element_type reduce_shares(const Shares &shares, Number i) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                         assert(base_type::check_participant_index(i));
                         return indexed_private_element_type(
                             i, std::accumulate(shares.begin(), shares.end(), private_element_type::zero()));
@@ -116,8 +118,10 @@ namespace nil {
                         return boost::accumulators::sum(acc);
                     }
 
+                    template<typename Number,
+                             typename std::enable_if<std::is_integral<Number>::value, bool>::type = true>
                     static inline indexed_private_element_type reduce_shares(private_elements_sum_acc_type &&acc,
-                                                                             std::size_t i) {
+                                                                             Number i) {
                         assert(base_type::check_participant_index(i));
                         return indexed_private_element_type(i, boost::accumulators::sum(acc));
                     }
