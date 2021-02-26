@@ -41,6 +41,7 @@ doxygen_files =
     linear_feedback_shift
     lognormal_distribution
     mersenne_twister
+    mixmax
     negative_binomial_distribution
     niederreiter_base2
     non_central_chi_squared_distribution
@@ -111,6 +112,7 @@ doxygen reference :
         rand48=\"@xmlonly <classname alt=\\\"boost::random::rand48\\\">rand48</classname> @endxmlonly\" \\
         mt11213b=\"@xmlonly <classname alt=\\\"boost::random::mt11213b\\\">mt11213b</classname> @endxmlonly\" \\
         mt19937=\"@xmlonly <classname alt=\\\"boost::random::mt19937\\\">mt19937</classname> @endxmlonly\" \\
+        mixmax=\"@xmlonly <classname alt=\\\"boost::random::mixmax\\\">mixmax</classname> @endxmlonly\" \\
         niederreiter_base2_engine=\"@xmlonly <classname alt=\\\"boost::random::niederreiter_base2_engine\\\">niederreiter_base2_engine</classname> @endxmlonly\" \\
         sobol_engine=\"@xmlonly <classname alt=\\\"boost::random::sobol_engine\\\">sobol_engine</classname> @endxmlonly\" \\
         faure_engine=\"@xmlonly <classname alt=\\\"boost::random::faure_engine\\\">faure_engine</classname> @endxmlonly\" \\

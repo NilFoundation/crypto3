@@ -352,6 +352,8 @@ int main(int argc, char*argv[])
 #if !defined(BOOST_NO_INT64_T)
   run(iter, "mt19937_64", boost::mt19937_64());
 #endif
+  
+    run(iter, "mixmax", boost::random::mixmax());
 
   run(iter, "lagged_fibonacci607", boost::lagged_fibonacci607());
   run(iter, "lagged_fibonacci1279", boost::lagged_fibonacci1279());
@@ -394,6 +396,8 @@ int main(int argc, char*argv[])
   distrib(iter, "kreutzer1986", boost::kreutzer1986());
 
   distrib(iter, "mt19937", boost::mt19937());
+  
+  distrib(iter, "mixmax", boost::random::mixmax());
   
   distrib(iter, "lagged_fibonacci607", boost::lagged_fibonacci607());
 }

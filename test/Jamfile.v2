@@ -23,6 +23,7 @@ run test_rand48.cpp /boost//unit_test_framework ;
 run test_mt11213b.cpp /boost//unit_test_framework ;
 run test_mt19937.cpp /boost//unit_test_framework ;
 run test_mt19937_64.cpp /boost//unit_test_framework ;
+run test_mixmax.cpp /boost//unit_test_framework ;
 run test_ecuyer1988.cpp /boost//unit_test_framework ;
 run test_hellekalek1995.cpp /boost//unit_test_framework ;
 run test_linear_feedback_shift.cpp /boost//unit_test_framework ;
