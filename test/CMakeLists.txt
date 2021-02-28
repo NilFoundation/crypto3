@@ -67,6 +67,7 @@ set(RUNTIME_TESTS_NAMES
     "curves"
     "curves_static"
     "fields"
+    "fields_static"
     "pairing"
     "hash_to_curve"
     "wnaf"
