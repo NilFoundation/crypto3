@@ -427,6 +427,18 @@ namespace nil {
                             underlying_field_value_type::one()};*/
                     };
 
+                    template <>
+                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                        element_mnt6_g2<298>::twist;
+
+                    template <>
+                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                        element_mnt6_g2<298>::twist_coeff_a;
+
+                    template <>
+                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                        element_mnt6_g2<298>::twist_coeff_b;
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

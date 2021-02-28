@@ -400,6 +400,13 @@ namespace nil {
                             underlying_field_value_type::one()};*/
                     };
 
+                    template <>
+                    constexpr element_mnt4_g1<298>::g1_field_type_value const
+                        element_mnt4_g1<298>::a;
+                    template <>
+                    constexpr element_mnt4_g1<298>::g1_field_type_value const
+                        element_mnt4_g1<298>::b;
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
