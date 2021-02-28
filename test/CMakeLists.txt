@@ -65,6 +65,7 @@ endmacro()
 
 set(RUNTIME_TESTS_NAMES
     "curves"
+    "curves_static"
     "fields"
     "pairing"
     "hash_to_curve"
