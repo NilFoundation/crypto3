@@ -122,19 +122,6 @@ namespace nil {
                     using check_indexed_elements_type =
                         check_indexed_element_type<typename IndexedElements::value_type>;
 
-                    template<typename IndexedWeightedPrivateElement,
-                             typename Index = typename IndexedWeightedPrivateElement::first_type,
-                             typename WeightedPrivateElement = typename IndexedWeightedPrivateElement::second_type,
-                             check_index_type<Index> = true,
-                             check_indexed_private_elements_type<WeightedPrivateElement> = true>
-                    using get_indexed_weighted_private_element_type = std::pair<Index, WeightedPrivateElement>;
-
-                    template<typename IndexedWeightedPrivateElement>
-                    using check_indexed_weighted_private_element_type = typename std::enable_if<
-                        std::is_same<get_indexed_weighted_private_element_type<IndexedWeightedPrivateElement>,
-                                     IndexedWeightedPrivateElement>::value,
-                        bool>::type;
-
                     //===========================================================================
                     // shares dealing functions
 
