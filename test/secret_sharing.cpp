@@ -35,6 +35,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/pubkey/detail/dkg/pedersen.hpp>
+#include <nil/crypto3/pubkey/detail/secret_sharing/weighted_shamir.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
@@ -204,10 +205,10 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     BOOST_CHECK(scheme_type::verify_share(shares[0], 1, pub_coeffs));
 }
 
-BOOST_AUTO_TEST_CASE(feldman_weighted_sss) {
+BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type;
-    using scheme_type = nil::crypto3::pubkey::detail::feldman_sss<group_type>;
+    using scheme_type = nil::crypto3::pubkey::detail::weighted_shamir_sss<group_type>;
     using shares_dealing_acc_type = shares_dealing_accumulator_set<scheme_type>;
     using indexed_shares_dealing_acc_type = indexed_shares_dealing_accumulator_set<scheme_type>;
     using indexed_weighted_shares_dealing_acc_type = indexed_weighted_shares_dealing_accumulator_set<scheme_type>;
@@ -293,9 +294,6 @@ BOOST_AUTO_TEST_CASE(feldman_weighted_sss) {
         auto public_share = scheme_type::get_public_element(weighted_joined_shares.at(i));
         BOOST_CHECK_EQUAL(public_share, joined_public_share);
     }
-
-    //===========================================================================
-    // check shares verification values (not in protocol)
 }
 
 BOOST_AUTO_TEST_CASE(pedersen_dkg) {

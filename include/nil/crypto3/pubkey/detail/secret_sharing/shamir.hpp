@@ -56,13 +56,10 @@ namespace nil {
                     typedef group_value_type public_element_type;
                     typedef std::vector<private_element_type> private_elements_type;
                     typedef std::vector<public_element_type> public_elements_type;
-                    typedef std::vector<std::size_t> weights_type;
                     typedef std::pair<std::size_t, private_element_type> indexed_private_element_type;
                     typedef std::pair<std::size_t, public_element_type> indexed_public_element_type;
                     typedef std::unordered_map<std::size_t, private_element_type> indexed_private_elements_type;
                     typedef std::unordered_map<std::size_t, public_element_type> indexed_public_elements_type;
-                    typedef std::unordered_map<std::size_t, indexed_private_elements_type>
-                        indexed_weighted_private_elements_type;
                     typedef std::set<std::size_t> indexes_type;
 
                     //===========================================================================
@@ -75,9 +72,6 @@ namespace nil {
 
                     template<typename Index>
                     using check_index_type = check_number_type<Index>;
-
-                    template<typename Weight>
-                    using check_weight_type = check_number_type<Weight>;
 
                     template<typename PrivateElement>
                     using check_private_element_type =
@@ -100,11 +94,6 @@ namespace nil {
                              check_index_type<Index> = true>
                     using get_indexed_element_type = std::pair<Index, typename IndexedElement::second_type>;
 
-                    template<typename IndexedWeight, typename Index = typename IndexedWeight::first_type,
-                             typename Weight = typename IndexedWeight::second_type, check_index_type<Index> = true,
-                             check_weight_type<Weight> = true>
-                    using get_indexed_weight_type = std::pair<Index, Weight>;
-
                     template<typename IndexedPrivateElement>
                     using check_indexed_private_element_type =
                         typename std::enable_if<std::is_same<get_indexed_private_element_type<IndexedPrivateElement>,
@@ -120,10 +109,6 @@ namespace nil {
                     template<typename IndexedElement>
                     using check_indexed_element_type = typename std::enable_if<
                         std::is_same<get_indexed_element_type<IndexedElement>, IndexedElement>::value, bool>::type;
-
-                    template<typename IndexedWeight>
-                    using check_indexed_weight_type = typename std::enable_if<
-                        std::is_same<get_indexed_weight_type<IndexedWeight>, IndexedWeight>::value, bool>::type;
 
                     template<typename IndexedPrivateElements>
                     using check_indexed_private_elements_type =
@@ -185,52 +170,6 @@ namespace nil {
                         return shares;
                     }
 
-                    template<typename Coeffs, typename WeightsRange,
-                             check_private_element_type<typename Coeffs::value_type> = true,
-                             check_weight_type<typename WeightsRange::value_type> = true>
-                    static inline indexed_weighted_private_elements_type
-                        deal_indexed_weighted_shares(const Coeffs &coeffs, const WeightsRange &weights) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightsRange>));
-
-                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
-                        std::size_t n = std::distance(weights.begin(), weights.end());
-                        assert(check_t(t, n));
-
-                        std::size_t i = 1;
-                        indexed_weighted_private_elements_type indexed_weighted_shares;
-                        for (auto w_i : weights) {
-                            assert(w_i > 0);
-                            indexed_private_elements_type i_shares;
-                            for (std::size_t j = 1; j <= w_i; j++) {
-                                std::size_t id_ij = i * t + j;
-                                assert(i_shares.emplace(id_ij, deal_share(coeffs, id_ij)).second);
-                            }
-                            assert(indexed_weighted_shares.emplace(i, i_shares).second);
-                            ++i;
-                        }
-                        return indexed_weighted_shares;
-                    }
-
-                    template<typename Coeffs, typename WeightsRange,
-                             check_private_element_type<typename Coeffs::value_type> = true,
-                             check_weight_type<typename WeightsRange::value_type> = true>
-                    static inline indexed_private_elements_type
-                        deal_indexed_weighted_joined_shares(const Coeffs &coeffs, const WeightsRange &weights) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightsRange>));
-
-                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
-                        indexed_weighted_private_elements_type indexed_weighted_shares =
-                            deal_indexed_weighted_shares(coeffs, weights);
-
-                        indexed_private_elements_type indexed_weighted_joined_shares;
-                        for (const auto &[i, i_shares] : indexed_weighted_shares) {
-                            assert(indexed_weighted_joined_shares.emplace(join_weighted_share(i_shares, i)).second);
-                        }
-                        return indexed_weighted_joined_shares;
-                    }
-
                     template<typename Coeffs, typename Number,
                              check_private_element_type<typename Coeffs::value_type> = true,
                              check_number_type<Number> = true>
@@ -259,17 +198,6 @@ namespace nil {
                         const private_element_type &init_share_value = private_element_type::zero()) {
                         assert(check_participant_index(i));
                         return init_share_value + coeff * private_element_type(i).pow(k);
-                    }
-
-                    template<typename WeightedShare, typename Number,
-                             check_indexed_private_elements_type<WeightedShare> = true,
-                             check_number_type<Number> = true>
-                    static inline indexed_private_element_type join_weighted_share(const WeightedShare &i_share,
-                                                                                   Number i) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const WeightedShare>));
-                        assert(check_participant_index(i));
-
-                        return indexed_private_element_type(i, recover_private_element(i_share));
                     }
 
                     //===========================================================================
