@@ -48,10 +48,9 @@ namespace nil {
                     //  verify public share
                     //
                     template<typename PublicCoeffs, typename Number,
-                             typename std::enable_if<
-                                 std::is_same<public_element_type, typename PublicCoeffs::value_type>::value &&
-                                     std::is_integral<Number>::value,
-                                 bool>::type = true>
+                             typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
+                                 true,
+                             typename base_type::template check_number_type<Number> = true>
                     static inline bool verify_share(const public_element_type &gs_i, Number i,
                                                     const PublicCoeffs &public_coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
@@ -72,10 +71,9 @@ namespace nil {
                     //  verify private share
                     //
                     template<typename PublicCoeffs, typename Number,
-                             typename std::enable_if<
-                                 std::is_same<public_element_type, typename PublicCoeffs::value_type>::value &&
-                                     std::is_integral<Number>::value,
-                                 bool>::type = true>
+                             typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
+                                 true,
+                             typename base_type::template check_number_type<Number> = true>
                     static inline bool verify_share(const private_element_type &s_i, Number i,
                                                     const PublicCoeffs &public_coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
@@ -89,8 +87,7 @@ namespace nil {
                     template<
                         typename IndexedPublicElement, typename PublicCoeffs,
                         typename base_type::template check_indexed_public_element_type<IndexedPublicElement> = true,
-                        typename std::enable_if<
-                            std::is_same<public_element_type, typename PublicCoeffs::value_type>::value, bool>::type =
+                        typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
                             true>
                     static inline bool verify_share(const IndexedPublicElement &s_i,
                                                     const PublicCoeffs &public_coeffs) {
@@ -103,8 +100,7 @@ namespace nil {
                     template<
                         typename IndexedPrivateElement, typename PublicCoeffs,
                         typename base_type::template check_indexed_private_element_type<IndexedPrivateElement> = true,
-                        typename std::enable_if<
-                            std::is_same<public_element_type, typename PublicCoeffs::value_type>::value, bool>::type =
+                        typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
                             true>
                     static inline bool verify_share(const IndexedPrivateElement &s_i,
                                                     const PublicCoeffs &public_coeffs) {
@@ -114,10 +110,9 @@ namespace nil {
                     //
                     //  partial computing of verification value
                     //
-                    template<
-                        typename Number1, typename Number2,
-                        typename std::enable_if<std::is_integral<Number1>::value && std::is_integral<Number2>::value,
-                                                bool>::type = true>
+                    template<typename Number1, typename Number2,
+                             typename base_type::template check_number_type<Number1> = true,
+                             typename base_type::template check_number_type<Number2> = true>
                     static inline public_element_type eval_partial_verification_value(
                         const public_element_type &public_coeff, Number1 i, Number2 k,
                         const public_element_type &init_value = public_element_type::zero()) {
