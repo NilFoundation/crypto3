@@ -418,6 +418,14 @@ namespace nil {
                     };
 
                     template <>
+                    constexpr element_mnt4_g2<298>::underlying_field_value_type const
+                        element_mnt4_g2<298>::a;
+
+                    template <>
+                    constexpr element_mnt4_g2<298>::underlying_field_value_type const
+                        element_mnt4_g2<298>::b;
+
+                    template <>
                     constexpr element_mnt4_g2<298>::g2_field_type_value const
                         element_mnt4_g2<298>::twist;
 
