@@ -40,8 +40,8 @@ if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
                           ${CMAKE_WORKSPACE_NAME}::multiprecision)
 
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE crypto3::hash crypto3::mac
-                          crypto3::stream)
+    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE 
+        crypto3::hash crypto3::mac crypto3::stream)
 
 else()
     cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")

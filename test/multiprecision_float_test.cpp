@@ -15,17 +15,17 @@
 #include <boost/test/unit_test.hpp>
 
 #include <boost/core/ignore_unused.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/debug_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/debug_adaptor.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/random.hpp>
 #include <sstream>
 
 
-typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float_100::backend_type, boost::multiprecision::et_on > big_float;
+typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float_100::backend_type, nil::crypto3::multiprecision::et_on > big_float;
 typedef boost::random::subtract_with_carry_01_engine<big_float, 48, 10, 24 > ranlux_big_base_01;
-typedef boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::uint1024_t> large_int_generator;
+typedef boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::uint1024_t> large_int_generator;
 
 typedef boost::mpl::list <
    boost::random::lagged_fibonacci_01_engine<big_float, 48, 44497, 21034 >,

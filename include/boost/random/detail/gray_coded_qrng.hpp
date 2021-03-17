@@ -11,7 +11,7 @@
 
 #include <boost/random/detail/qrng_base.hpp>
 
-#include <boost/multiprecision/integer.hpp> // lsb
+#include <nil/crypto3/multiprecision/integer.hpp> // lsb
 
 #include <functional> // bit_xor
 

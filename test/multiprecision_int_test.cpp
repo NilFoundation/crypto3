@@ -21,9 +21,9 @@
 #include <boost/test/unit_test.hpp>
 
 #include <boost/core/ignore_unused.hpp>
-#include <boost/multiprecision/debug_adaptor.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/debug_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <boost/random/independent_bits.hpp>
 #include <boost/random/discard_block.hpp>
 #include <boost/random/xor_combine.hpp>
@@ -35,16 +35,16 @@
 #include <sstream>
 
 typedef boost::mpl::list <
-   boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::uint1024_t >,
-   boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::int1024_t >,
-   boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::checked_uint1024_t >,
-   boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::checked_int1024_t >,
-   boost::random::independent_bits_engine<boost::random::mt19937, 30000, boost::multiprecision::cpp_int >,
-   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::uint1024_t >, 20, 10>,
-   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::int1024_t >, 20, 10>,
-   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::checked_uint1024_t >, 20, 10>,
-   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, boost::multiprecision::checked_int1024_t >, 20, 10>,
-   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 600, boost::multiprecision::cpp_int >, 20, 10>
+   boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::uint1024_t >,
+   boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::int1024_t >,
+   boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::checked_uint1024_t >,
+   boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::checked_int1024_t >,
+   boost::random::independent_bits_engine<boost::random::mt19937, 30000, nil::crypto3::multiprecision::cpp_int >,
+   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::uint1024_t >, 20, 10>,
+   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::int1024_t >, 20, 10>,
+   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::checked_uint1024_t >, 20, 10>,
+   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 1024, nil::crypto3::multiprecision::checked_int1024_t >, 20, 10>,
+   boost::random::discard_block_engine<boost::random::independent_bits_engine<boost::random::mt19937, 600, nil::crypto3::multiprecision::cpp_int >, 20, 10>
 > engines;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(generator_test, engine_type, engines)
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(xor_combine_test)
    // As above but with a few things missing which don't work - for example we have no 
    // way to drill down and get the seed-type of the underlying generator.
    //
-   typedef boost::random::xor_combine_engine<boost::random::independent_bits_engine<boost::random::mt19937, 512, boost::multiprecision::uint1024_t >, 512, boost::random::independent_bits_engine<boost::random::mt19937, 512, boost::multiprecision::uint1024_t >, 10> engine_type;
+   typedef boost::random::xor_combine_engine<boost::random::independent_bits_engine<boost::random::mt19937, 512, nil::crypto3::multiprecision::uint1024_t >, 512, boost::random::independent_bits_engine<boost::random::mt19937, 512, nil::crypto3::multiprecision::uint1024_t >, 10> engine_type;
    typedef engine_type::result_type test_type;
 
    engine_type gen;
@@ -117,9 +117,9 @@ BOOST_AUTO_TEST_CASE(xor_combine_test)
 }
 
 typedef boost::mpl::list <
-   boost::random::random_number_generator<boost::random::mt19937, boost::multiprecision::cpp_int>,
-   boost::random::random_number_generator<boost::random::mt19937, boost::multiprecision::uint1024_t>,
-   boost::random::random_number_generator<boost::random::mt19937, boost::multiprecision::checked_uint1024_t>
+   boost::random::random_number_generator<boost::random::mt19937, nil::crypto3::multiprecision::cpp_int>,
+   boost::random::random_number_generator<boost::random::mt19937, nil::crypto3::multiprecision::uint1024_t>,
+   boost::random::random_number_generator<boost::random::mt19937, nil::crypto3::multiprecision::checked_uint1024_t>
 > generators;
 
 
@@ -139,12 +139,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(random_number_generator, generator_type, generator
 }
 
 typedef boost::mpl::list <
-   boost::random::uniform_int_distribution<boost::multiprecision::cpp_int>,
-   boost::random::uniform_int_distribution<boost::multiprecision::uint1024_t>,
-   boost::random::uniform_int_distribution<boost::multiprecision::checked_uint1024_t>,
-   boost::random::uniform_smallint<boost::multiprecision::cpp_int>,
-   boost::random::uniform_smallint<boost::multiprecision::uint1024_t>,
-   boost::random::uniform_smallint<boost::multiprecision::checked_uint1024_t>
+   boost::random::uniform_int_distribution<nil::crypto3::multiprecision::cpp_int>,
+   boost::random::uniform_int_distribution<nil::crypto3::multiprecision::uint1024_t>,
+   boost::random::uniform_int_distribution<nil::crypto3::multiprecision::checked_uint1024_t>,
+   boost::random::uniform_smallint<nil::crypto3::multiprecision::cpp_int>,
+   boost::random::uniform_smallint<nil::crypto3::multiprecision::uint1024_t>,
+   boost::random::uniform_smallint<nil::crypto3::multiprecision::checked_uint1024_t>
 > uniform_distributions;
 
 
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(distributions, distribution_type, uniform_distribu
    ss >> d2;
    BOOST_CHECK(d == d2);
 
-   boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<boost::multiprecision::uint1024_t>::digits, boost::multiprecision::uint1024_t > big_random;
+   boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<nil::crypto3::multiprecision::uint1024_t>::digits, nil::crypto3::multiprecision::uint1024_t > big_random;
    for(unsigned i = 0; i < 200; ++i)
    {
       result_type r = d(big_random);
@@ -189,8 +189,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(distributions, distribution_type, uniform_distribu
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 
 typedef boost::mpl::list <
-   boost::random::discrete_distribution < boost::multiprecision::cpp_int, double>,
-   boost::random::discrete_distribution <unsigned int, boost::multiprecision::cpp_bin_float_100>
+   boost::random::discrete_distribution < nil::crypto3::multiprecision::cpp_int, double>,
+   boost::random::discrete_distribution <unsigned int, nil::crypto3::multiprecision::cpp_bin_float_100>
 > other_distributions;
 
 
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(discrete_distributions, distribution_type, other_d
    ss >> d2;
    BOOST_CHECK(d == d2);
 
-   boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<boost::multiprecision::uint1024_t>::digits, boost::multiprecision::uint1024_t > big_random;
+   boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<nil::crypto3::multiprecision::uint1024_t>::digits, nil::crypto3::multiprecision::uint1024_t > big_random;
    for(unsigned i = 0; i < 200; ++i)
    {
       result_type r = d(big_random);
