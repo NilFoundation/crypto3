@@ -13,11 +13,7 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
-                       $<TARGET_NAME_IF_EXISTS:boost_config>
-                       $<TARGET_NAME_IF_EXISTS:boost_predef>
-
+                       ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                        ${Boost_LIBRARIES})
 
