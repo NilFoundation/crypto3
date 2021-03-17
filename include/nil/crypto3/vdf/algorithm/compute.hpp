@@ -26,8 +26,8 @@
 #define CRYPTO3_VDF_COMPUTE_HPP
 
 #ifdef CRYPTO3_VDF_BOOST
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/detail/number_base.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #endif
 
 namespace nil {
@@ -43,7 +43,7 @@ namespace nil {
 
 #else
 
-            using namespace boost::multiprecision;
+            using namespace nil::crypto3::multiprecision;
 
             template<typename Vdf,
                      typename SinglePassRange,

@@ -14,7 +14,7 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                       boost::multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                        ${Boost_LIBRARIES})
 

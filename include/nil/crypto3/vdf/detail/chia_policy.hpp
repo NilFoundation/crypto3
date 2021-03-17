@@ -39,7 +39,7 @@
 
 #elif defined(CRYPTO3_VDF_BOOST)
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 #endif
 
@@ -47,7 +47,7 @@ namespace nil {
     namespace crypto3 {
         namespace vdf {
 #ifdef CRYPTO3_VDF_BOOST
-            using namespace boost::multiprecision;
+            using namespace nil::crypto3::multiprecision;
 #endif
 
             /*!

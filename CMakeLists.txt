@@ -69,11 +69,11 @@ if(CRYPTO3_VDF_MPIR OR CRYPTO3_VDF_GMP OR CRYPTO3_VDF_FLINT)
         cm_find_package(MPFR REQUIRED)
     endif()
 elseif(CRYPTO3_VDF_BOOST)
-    if(NOT TARGET boost::multiprecision)
+    if(NOT TARGET ${CMAKE_WORKSPACE_NAME}::multiprecision)
         if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
             cm_find_package(${CMAKE_WORKSPACE_NAME}_multiprecision)
         else()
-            cm_find_package(boost::multiprecision)
+            find_package(Boost)
         endif()
     endif()
 
@@ -219,9 +219,9 @@ elseif(CRYPTO3_VDF_BOOST)
 
                                ${Boost_INCLUDE_DIRS})
 
-    if(TARGET boost::multiprecision)
+    if(TARGET nil::crypto3::multiprecision)
         target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                              boost::multiprecision
+                              nil::crypto3::multiprecision
 
                               ${CMAKE_WORKSPACE_NAME}_block
                               ${CMAKE_WORKSPACE_NAME}_hash

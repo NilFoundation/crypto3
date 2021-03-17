@@ -35,10 +35,10 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #ifdef CRYPTO3_VDF_BOOST
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/tommath.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
 namespace std {
@@ -53,7 +53,7 @@ namespace std {
 using namespace nil::crypto3;
 
 #ifdef CRYPTO3_VDF_BOOST
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 #endif
 
 constexpr static const std::size_t default_chia_itr = 2097152;
