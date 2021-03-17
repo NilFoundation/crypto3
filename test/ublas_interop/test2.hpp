@@ -16,14 +16,18 @@
 #pragma warning(disable : 4800 4996 4127 4100 4018)
 #endif
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 
 #ifdef TEST_ET
-typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_on> mp_test_type;
+typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<50>,
+                                             nil::crypto3::multiprecision::et_on>
+    mp_test_type;
 #else
-typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_off> mp_test_type;
+typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<50>,
+                                             nil::crypto3::multiprecision::et_off>
+    mp_test_type;
 #endif
-//typedef double mp_test_type;
+// typedef double mp_test_type;
 
 #define USE_RANGE
 #define USE_SLICE
@@ -53,29 +57,26 @@ namespace ublas = boost::numeric::ublas;
 
 #include "common/init.hpp"
 
-template <class V, int N>
-struct test_blas_1
-{
-   typedef typename V::value_type                             value_type;
-   typedef typename ublas::type_traits<value_type>::real_type real_type;
+template<class V, int N>
+struct test_blas_1 {
+    typedef typename V::value_type value_type;
+    typedef typename ublas::type_traits<value_type>::real_type real_type;
 
-   void test();
+    void test();
 };
 
-template <class V, class M, int N>
-struct test_blas_2
-{
-   typedef typename V::value_type value_type;
+template<class V, class M, int N>
+struct test_blas_2 {
+    typedef typename V::value_type value_type;
 
-   void test();
+    void test();
 };
 
-template <class M, int N>
-struct test_blas_3
-{
-   typedef typename M::value_type value_type;
+template<class M, int N>
+struct test_blas_3 {
+    typedef typename M::value_type value_type;
 
-   void test();
+    void test();
 };
 
 #endif

@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_MPFR)
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #endif
 
-void test38()
-{
+void test38() {
 #ifdef TEST_MPFR
-   test<boost::multiprecision::mpfr_float_500>("mpfr_float", 500);
+    test<nil::crypto3::multiprecision::mpfr_float_500>("mpfr_float", 500);
 #endif
 }

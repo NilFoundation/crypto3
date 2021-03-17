@@ -9,48 +9,49 @@
 // Contains Quickbook markup in comments.
 
 //[float128_eg
-#include <boost/multiprecision/float128.hpp>
+#include <nil/crypto3/multiprecision/float128.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <iostream>
 
-int main()
-{
-   using namespace boost::multiprecision; // Potential to cause name collisions?
-   // using boost::multiprecision::float128; // is safer.
+int main() {
+    using namespace nil::crypto3::multiprecision;    // Potential to cause name collisions?
+    // using nil::crypto3::multiprecision::float128; // is safer.
 
-/*`The type float128 provides operations at 128-bit precision with
-[@https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format#IEEE_754_quadruple-precision_binary_floating-point_format:_binary128 Quadruple-precision floating-point format]
-and have full `std::numeric_limits` support:
-*/
-   float128 b = 2;
-//` There are  15 bits of (biased) binary exponent and 113-bits of significand precision
-   std::cout << std::numeric_limits<float128>::digits << std::endl;
-//` or 33 decimal places:
-   std::cout << std::numeric_limits<float128>::digits10 << std::endl;
-   //` We can use any C++ std library function, so let's show all the at-most 36 potentially significant digits, and any trailing zeros, as well:
-    std::cout.setf(std::ios_base::showpoint); // Include any trailing zeros.
-   std::cout << std::setprecision(std::numeric_limits<float128>::max_digits10)
-      << log(b) << std::endl; // Shows log(2) = 0.693147180559945309417232121458176575
-   //` We can also use any function from Boost.Math, for example, the 'true gamma' function `tgamma`:
-   std::cout << boost::math::tgamma(b) << std::endl;
-   /*` And since we have an extended exponent range, we can generate some really large
-    numbers here (4.02387260077093773543702433923004111e+2564):
-   */
-   std::cout << boost::math::tgamma(float128(1000)) << std::endl;
-   /*` We can declare constants using GCC or Intel's native types, and literals with the Q suffix, and these can be declared `constexpr` if required:
-   */
-   /*<-*/
+    /*`The type float128 provides operations at 128-bit precision with
+    [@https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format#IEEE_754_quadruple-precision_binary_floating-point_format:_binary128
+    Quadruple-precision floating-point format] and have full `std::numeric_limits` support:
+    */
+    float128 b = 2;
+    //` There are  15 bits of (biased) binary exponent and 113-bits of significand precision
+    std::cout << std::numeric_limits<float128>::digits << std::endl;
+    //` or 33 decimal places:
+    std::cout << std::numeric_limits<float128>::digits10 << std::endl;
+    //` We can use any C++ std library function, so let's show all the at-most 36 potentially significant digits, and
+    //any trailing zeros, as well:
+    std::cout.setf(std::ios_base::showpoint);    // Include any trailing zeros.
+    std::cout << std::setprecision(std::numeric_limits<float128>::max_digits10) << log(b)
+              << std::endl;    // Shows log(2) = 0.693147180559945309417232121458176575
+    //` We can also use any function from Boost.Math, for example, the 'true gamma' function `tgamma`:
+    std::cout << boost::math::tgamma(b) << std::endl;
+    /*` And since we have an extended exponent range, we can generate some really large
+     numbers here (4.02387260077093773543702433923004111e+2564):
+    */
+    std::cout << boost::math::tgamma(float128(1000)) << std::endl;
+    /*` We can declare constants using GCC or Intel's native types, and literals with the Q suffix, and these can be
+     * declared `constexpr` if required:
+     */
+    /*<-*/
 #ifndef BOOST_NO_CXX11_CONSTEXPR
-   /*->*/
-   // std::numeric_limits<float128>::max_digits10 = 36
-   constexpr float128 pi = 3.14159265358979323846264338327950288Q;
-   std::cout.precision(std::numeric_limits<float128>::max_digits10);
-   std::cout << "pi = " << pi << std::endl; //pi = 3.14159265358979323846264338327950280
-   /*<-*/
+    /*->*/
+    // std::numeric_limits<float128>::max_digits10 = 36
+    constexpr float128 pi = 3.14159265358979323846264338327950288Q;
+    std::cout.precision(std::numeric_limits<float128>::max_digits10);
+    std::cout << "pi = " << pi << std::endl;    // pi = 3.14159265358979323846264338327950280
+    /*<-*/
 #endif
-   /*->*/
-//] [/float128_eg]
-   return 0;
+    /*->*/
+    //] [/float128_eg]
+    return 0;
 }
 
 /*
@@ -61,10 +62,10 @@ GCC 8.1.0
 Type name is float128_t:
 Type is g
 std::is_fundamental<> = true
-std::is_signed<> = true
-std::is_unsigned<> = false
-std::is_integral<> = false
-std::is_arithmetic<> = true
+boost::is_signed<> = true
+boost::is_unsigned<> = false
+boost::is_integral<> = false
+boost::is_arithmetic<> = true
 std::is_const<> = false
 std::is_trivial<> = true
 std::is_standard_layout<> = true
@@ -94,5 +95,4 @@ std::numeric_limits::<>infinity = inf
 
 //] [/float128_numeric_limits]
 */
-
 

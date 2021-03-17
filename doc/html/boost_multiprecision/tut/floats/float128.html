@@ -155,7 +155,7 @@
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
 <span class="special">{</span>
    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span> <span class="comment">// Potential to cause name collisions?</span>
-   <span class="comment">// using boost::multiprecision::float128; // is safer.</span>
+   <span class="comment">// using nil::crypto3::multiprecision::float128; // is safer.</span>
 </pre>
 <p>
           The type float128 provides operations at 128-bit precision with <a href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format#IEEE_754_quadruple-precision_binary_floating-point_format:_binary128" target="_top">Quadruple-precision
@@ -214,10 +214,10 @@
 <span class="identifier">Type</span> <span class="identifier">name</span> <span class="identifier">is</span> <span class="identifier">float128_t</span><span class="special">:</span>
 <span class="identifier">Type</span> <span class="identifier">is</span> <span class="identifier">g</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_fundamental</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">is_signed</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">is_unsigned</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">false</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">is_integral</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">false</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">is_arithmetic</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">boost::is_signed</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">boost::is_unsigned</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">false</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">boost::is_integral</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">false</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">boost::is_arithmetic</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_const</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">false</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_trivial</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">is_standard_layout</span><span class="special">&lt;&gt;</span> <span class="special">=</span> <span class="keyword">true</span>

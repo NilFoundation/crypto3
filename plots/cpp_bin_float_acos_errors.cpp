@@ -6,15 +6,15 @@
 #include <iostream>
 #include <boost/math/tools/ulps_plot.hpp>
 #include <boost/core/demangle.hpp>
-#include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 
 using boost::math::tools::ulps_plot;
 
 int main() 
 {
-   using PreciseReal = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<300> >;
-   using CoarseReal = boost::multiprecision::cpp_bin_float_50;
+   using PreciseReal = nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<300> >;
+   using CoarseReal = nil::crypto3::multiprecision::cpp_bin_float_50;
 
    typedef boost::math::policies::policy<
       boost::math::policies::promote_float<false>,

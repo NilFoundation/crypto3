@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_BIN_FLOAT)
-#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #endif
 
-void test32()
-{
+void test32() {
 #ifdef TEST_CPP_BIN_FLOAT
-   test<boost::multiprecision::cpp_bin_float_50>("cpp_bin_float", 50);
+    test<nil::crypto3::multiprecision::cpp_bin_float_50>("cpp_bin_float", 50);
 #endif
 }

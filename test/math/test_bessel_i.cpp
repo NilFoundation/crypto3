@@ -14,50 +14,45 @@
 #include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_bessel_i.hpp"
 
-void expected_results()
-{
-   //
-   // Define the max and mean errors expected for
-   // various compilers and platforms.
-   //
+void expected_results() {
+    //
+    // Define the max and mean errors expected for
+    // various compilers and platforms.
+    //
 
-   //
-   // Catch all cases come last:
-   //
-   add_expected_result(
-       ".*", // compiler
-       ".*", // stdlib
-       ".*", // platform
-       ".*", // test type(s)
-       ".*", // test data group
-       ".*", // test function
-       500,  // Max Peek error
-       200); // Max mean error
+    //
+    // Catch all cases come last:
+    //
+    add_expected_result(".*",    // compiler
+                        ".*",    // stdlib
+                        ".*",    // platform
+                        ".*",    // test type(s)
+                        ".*",    // test data group
+                        ".*",    // test function
+                        500,     // Max Peek error
+                        200);    // Max mean error
 
-   //
-   // Finish off by printing out the compiler/stdlib/platform names,
-   // we do this to make it easier to mark up expected error rates.
-   //
-   std::cout << "Tests run with " << BOOST_COMPILER << ", "
-             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+    //
+    // Finish off by printing out the compiler/stdlib/platform names,
+    // we do this to make it easier to mark up expected error rates.
+    //
+    std::cout << "Tests run with " << BOOST_COMPILER << ", " << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
-template <class T>
-void test(T t, const char* p)
-{
-   test_bessel(t, p);
+template<class T>
+void test(T t, const char* p) {
+    test_bessel(t, p);
 }
 
-BOOST_AUTO_TEST_CASE(test_main)
-{
-   using namespace boost::multiprecision;
-   expected_results();
-   //
-   // Test at:
-   //  9 decimal digits: tests the least wide arbitrary precision code
-   // 18 decimal digits: tests 80-bit long double approximations
-   // 30 decimal digits: tests 128-bit long double approximations
-   // 35 decimal digits: tests arbitrary precision code
-   //
-   ALL_SMALL_TESTS
+BOOST_AUTO_TEST_CASE(test_main) {
+    using namespace nil::crypto3::multiprecision;
+    expected_results();
+    //
+    // Test at:
+    //  9 decimal digits: tests the least wide arbitrary precision code
+    // 18 decimal digits: tests 80-bit long double approximations
+    // 30 decimal digits: tests 128-bit long double approximations
+    // 35 decimal digits: tests arbitrary precision code
+    //
+    ALL_SMALL_TESTS
 }

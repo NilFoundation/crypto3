@@ -10,8 +10,7 @@
 #include "skeleton_backend.hpp"
 #include "test_arithmetic.hpp"
 
-int main()
-{
-   test<boost::multiprecision::skeleton_number>();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::skeleton_number>();
+    return boost::report_errors();
 }

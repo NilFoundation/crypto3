@@ -5,9 +5,8 @@
 
 #include "../sf_performance.hpp"
 
-void bessel_tests_08()
-{
+void bessel_tests_08() {
 #ifdef TEST_CPP_BIN_FLOAT
-   time_proc("Bessel Functions (50 digit precision)", "cpp_bin_float_50", test_bessel<cpp_bin_float_50>, 3);
+    time_proc("Bessel Functions (50 digit precision)", "cpp_bin_float_50", test_bessel<cpp_bin_float_50>, 3);
 #endif
 }

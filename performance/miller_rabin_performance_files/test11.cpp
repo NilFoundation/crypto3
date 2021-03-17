@@ -5,10 +5,9 @@
 
 #include "../miller_rabin_performance.hpp"
 
-void test11()
-{
-   using namespace boost::multiprecision;
+void test11() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST_TOMMATH
-   test_miller_rabin<number<boost::multiprecision::tommath_int, et_off> >("tom_int (no Expression templates)");
+    test_miller_rabin<number<nil::crypto3::multiprecision::tommath_int, et_off>>("tom_int (no Expression templates)");
 #endif
 }

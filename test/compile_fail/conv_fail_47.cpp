@@ -5,16 +5,15 @@
 
 #ifdef TEST_GMP
 
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
 void foo(mpf_float_50);
 
-int main()
-{
-   mpf_float_100 f(2);
-   foo(f);
+int main() {
+    mpf_float_100 f(2);
+    foo(f);
 }
 
 #else

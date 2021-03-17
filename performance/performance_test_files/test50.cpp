@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_MPZ)
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 
-void test50()
-{
+void test50() {
 #ifdef TEST_MPZ
-   test<boost::multiprecision::mpz_int>("gmp_int", 1024*8);
+    test<nil::crypto3::multiprecision::mpz_int>("gmp_int", 1024 * 8);
 #endif
 }

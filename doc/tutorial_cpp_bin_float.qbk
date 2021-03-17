@@ -10,7 +10,7 @@
 
 [section:cpp_bin_float cpp_bin_float]
 
-`#include <boost/multiprecision/cpp_bin_float.hpp>`
+`#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>`
 
    namespace boost{ namespace multiprecision{
 

@@ -7,18 +7,16 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #define TEST_MPFR
 #include "test_arithmetic.hpp"
 
-template <unsigned D>
-struct related_type<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D> > >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D / 2> > type;
+template<unsigned D>
+struct related_type<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<D>>> {
+    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<D / 2>> type;
 };
 
-int main()
-{
-   test<boost::multiprecision::mpfr_float>();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::mpfr_float>();
+    return boost::report_errors();
 }

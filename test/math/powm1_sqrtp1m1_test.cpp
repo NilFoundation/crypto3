@@ -38,58 +38,52 @@
 // test.
 //
 
-void expected_results()
-{
-   //
-   // Define the max and mean errors expected for
-   // various compilers and platforms.
-   //
+void expected_results() {
+    //
+    // Define the max and mean errors expected for
+    // various compilers and platforms.
+    //
 
-   //
-   // Catch all cases come last:
-   //
-   add_expected_result(
-       ".*",                         // compiler
-       ".*",                         // stdlib
-       ".*",                         // platform
-       ".*mpfr_float_backend<18>.*", // test type(s)
-       ".*",                         // test data group
-       ".*",                         // test function
-       300,                          // Max Peek error
-       50);                          // Max mean error
-   add_expected_result(
-       ".*", // compiler
-       ".*", // stdlib
-       ".*", // platform
-       ".*", // test type(s)
-       ".*", // test data group
-       ".*", // test function
-       15,   // Max Peek error
-       5);   // Max mean error
+    //
+    // Catch all cases come last:
+    //
+    add_expected_result(".*",                            // compiler
+                        ".*",                            // stdlib
+                        ".*",                            // platform
+                        ".*mpfr_float_backend<18>.*",    // test type(s)
+                        ".*",                            // test data group
+                        ".*",                            // test function
+                        300,                             // Max Peek error
+                        50);                             // Max mean error
+    add_expected_result(".*",                            // compiler
+                        ".*",                            // stdlib
+                        ".*",                            // platform
+                        ".*",                            // test type(s)
+                        ".*",                            // test data group
+                        ".*",                            // test function
+                        15,                              // Max Peek error
+                        5);                              // Max mean error
 
-   //
-   // Finish off by printing out the compiler/stdlib/platform names,
-   // we do this to make it easier to mark up expected error rates.
-   //
-   std::cout << "Tests run with " << BOOST_COMPILER << ", "
-             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+    //
+    // Finish off by printing out the compiler/stdlib/platform names,
+    // we do this to make it easier to mark up expected error rates.
+    //
+    std::cout << "Tests run with " << BOOST_COMPILER << ", " << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
-template <class T>
-void test(T t, const char* p)
-{
-   test_powm1_sqrtp1m1(t, p);
+template<class T>
+void test(T t, const char* p) {
+    test_powm1_sqrtp1m1(t, p);
 }
 
-BOOST_AUTO_TEST_CASE(test_main)
-{
-   using namespace boost::multiprecision;
-   expected_results();
-   //
-   // We test two different precisions:
-   // 18 decimal digits triggers Boost.Math's 64-bit long double support.
-   // 30 decimal digits triggers Boost.Math's 128-bit long double support.
-   // 35 decimal digits triggers true arbitrary precision support.
-   //
-   ALL_SMALL_TESTS
+BOOST_AUTO_TEST_CASE(test_main) {
+    using namespace nil::crypto3::multiprecision;
+    expected_results();
+    //
+    // We test two different precisions:
+    // 18 decimal digits triggers Boost.Math's 64-bit long double support.
+    // 30 decimal digits triggers Boost.Math's 128-bit long double support.
+    // 35 decimal digits triggers true arbitrary precision support.
+    //
+    ALL_SMALL_TESTS
 }

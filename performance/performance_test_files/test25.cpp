@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_TOMMATH)
-#include <boost/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
 
-void test25()
-{
+void test25() {
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::tom_int>("tommath_int", 128);
+    test<nil::crypto3::multiprecision::tom_int>("tommath_int", 128);
 #endif
 }

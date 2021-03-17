@@ -10,7 +10,7 @@
 
 [section:float128 float128]
 
-`#include <boost/multiprecision/float128.hpp>`
+`#include <nil/crypto3/multiprecision/float128.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -26,7 +26,7 @@ a 113 bit mantissa, and compatible with FORTRAN's 128-bit QUAD real.
 
 All the usual standard library and `std::numeric_limits` support are available, performance should be equivalent
 to the underlying native types: for example the LINPACK benchmarks for GCC's `__float128` and
-`boost::multiprecision::float128` both achieved 5.6 MFLOPS[footnote On 64-bit Ubuntu 11.10, GCC-4.8.0, Intel Core 2 Duo T5800.].
+`nil::crypto3::multiprecision::float128` both achieved 5.6 MFLOPS[footnote On 64-bit Ubuntu 11.10, GCC-4.8.0, Intel Core 2 Duo T5800.].
 
 As well as the usual conversions from arithmetic and string types, instances of `float128` are
 copy constructible and assignable from GCC's `__float128` and Intel's `_Quad` data types.

@@ -5,9 +5,8 @@
 
 #include "../sf_performance.hpp"
 
-void nct_tests_16()
-{
+void nct_tests_16() {
 #ifdef TEST_MPREAL
-   mpfr::mpreal::set_default_prec(100 * 1000L / 301L);
+    mpfr::mpreal::set_default_prec(100 * 1000L / 301L);
 #endif
 }

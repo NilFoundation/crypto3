@@ -27,12 +27,12 @@ writing a new backend then simplifies to:
 To test the new backend, start with a basic arithmetic test, this is a test case under `libs/math/test`
 that looks something like:
 
-   #include <boost/multiprecision/my_new_number_type.hpp>
+   #include <nil/crypto3/multiprecision/my_new_number_type.hpp>
    #include "test_arithmetic.hpp"
 
    int main()
    {
-      test<boost::multiprecision::my_new_number_type>();
+      test<nil::crypto3::multiprecision::my_new_number_type>();
       return boost::report_errors();
    }
 

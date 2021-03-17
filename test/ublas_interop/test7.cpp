@@ -27,10 +27,9 @@
 
 // this testcase requires fix of task #2473
 
-int main()
-{
-   test_vector();
-   test_matrix_vector();
-   test_matrix();
-   return 0;
+int main() {
+    test_vector();
+    test_matrix_vector();
+    test_matrix();
+    return 0;
 }

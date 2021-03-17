@@ -45,13 +45,13 @@ We also have a small utility class for controlling the current precision of mpfr
 
 */
 //<-
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #include <boost/math/special_functions/beta.hpp>
 #include <boost/math/special_functions/relative_difference.hpp>
 #include <iostream>
 #include <chrono>
 
-using boost::multiprecision::mpfr_float;
+using nil::crypto3::multiprecision::mpfr_float;
 using boost::math::ibeta_inv;
 using namespace boost::math::policies;
 

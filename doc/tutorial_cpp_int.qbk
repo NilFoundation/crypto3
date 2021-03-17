@@ -10,7 +10,7 @@
 
 [section:cpp_int cpp_int]
 
-`#include <boost/multiprecision/cpp_int.hpp>`
+`#include <nil/crypto3/multiprecision/cpp_int.hpp>`
 
    namespace boost{ namespace multiprecision{
 

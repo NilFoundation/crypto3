@@ -5,11 +5,10 @@
 
 #include "../sf_performance.hpp"
 
-void basic_tests_1()
-{
+void basic_tests_1() {
 
-   std::cout << "Allocation Counts for Horner Evaluation:\n";
+    std::cout << "Allocation Counts for Horner Evaluation:\n";
 #ifdef TEST_MPFR
-   basic_allocation_test("mpfr_float_50", mpfr_float_50(2));
+    basic_allocation_test("mpfr_float_50", mpfr_float_50(2));
 #endif
 }

@@ -5,15 +5,14 @@
 
 #ifdef TEST_MPFR
 
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
-int main()
-{
-   mpfr_float_100 f(2);
-   mpfr_float_50  f2;
-   f2 = f;
+int main() {
+    mpfr_float_100 f(2);
+    mpfr_float_50 f2;
+    f2 = f;
 }
 
 #else

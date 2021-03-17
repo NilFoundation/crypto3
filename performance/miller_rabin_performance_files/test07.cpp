@@ -5,10 +5,9 @@
 
 #include "../miller_rabin_performance.hpp"
 
-void test07()
-{
-   using namespace boost::multiprecision;
+void test07() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST_CPP_INT
-   test_miller_rabin<uint1024_t>("uint1024_t");
+    test_miller_rabin<uint1024_t>("uint1024_t");
 #endif
 }

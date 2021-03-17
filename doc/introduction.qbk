@@ -68,36 +68,36 @@ then use a fully Boost-licensed number type, and skip to one of more of :
 * __cpp_complex for complex types.
 
 The library is very often used via one of the predefined convenience `typedef`s 
-like `boost::multiprecision::int128_t` or `boost::multiprecision::cpp_bin_float_quad`.
+like `nil::crypto3::multiprecision::int128_t` or `nil::crypto3::multiprecision::cpp_bin_float_quad`.
 
 For example, if you want a signed, 128-bit fixed size integer:
 
-   #include <boost/multiprecision/cpp_int.hpp>  //  Integer types.
+   #include <nil/crypto3/multiprecision/cpp_int.hpp>  //  Integer types.
    
-   boost::multiprecision::int128_t my_128_bit_int;
+   nil::crypto3::multiprecision::int128_t my_128_bit_int;
 
 Alternatively, and more adventurously, if you wanted an
 [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer type using [gmp] as the underlying implementation then you could use:
 
-   #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
+   #include <nil/crypto3/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
 
-   boost::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
+   nil::crypto3::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
    
 Or for a simple, portable 128-bit floating-point close to a drop-in for a __fundamental_type like `double`, usually 64-bit   
 
-   #include <boost/multiprecision/cpp_bin_float.hpp>
+   #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
    
-   boost::multiprecision::cpp_bin_float_quad my_quad_real;  
+   nil::crypto3::multiprecision::cpp_bin_float_quad my_quad_real;  
 
 Alternatively, you can compose your own 'custom' multiprecision type, by combining `number` with one of the
 predefined back-end types.  For example, suppose you wanted a 300 decimal digit floating-point type
 based on the [mpfr] library. In this case, there's no predefined `typedef` with that level of precision,
 so instead we compose our own:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
+   #include <nil/crypto3/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
-   namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+   namespace mp = nil::crypto3::multiprecision;     // Reduce the typing a bit later...
 
    typedef mp::number<mp::mpfr_float_backend<300> >  my_float;
 
@@ -106,9 +106,9 @@ so instead we compose our own:
 We can repeat the above example, but with the expression templates disabled (for faster compile times, but slower runtimes)
 by passing a second template argument to `number`:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
+   #include <nil/crypto3/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
-   namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+   namespace mp = nil::crypto3::multiprecision;     // Reduce the typing a bit later...
 
    typedef mp::number<mp::mpfr_float_backend<300>, et_off>  my_float;
 
@@ -117,9 +117,9 @@ by passing a second template argument to `number`:
 We can also mix arithmetic operations between different types, provided there is an unambiguous implicit conversion from one
 type to the other:
 
-   #include <boost/multiprecision/cpp_int.hpp>
+   #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-   namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+   namespace mp = nil::crypto3::multiprecision;     // Reduce the typing a bit later...
 
    mp::int128_t a(3), b(4);
    mp::int512_t c(50), d;

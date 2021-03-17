@@ -12,43 +12,41 @@
 #endif
 
 #ifdef TEST_GMP
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_MPFR
-#include <boost/multiprecision/mpfr.hpp>
+#include <nil/crypto3/multiprecision/mpfr.hpp>
 #endif
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #include "test.hpp"
 
-template <class Number, class BigNumber>
-void test()
-{
-   using namespace boost::multiprecision;
-   typedef Number test_type;
+template<class Number, class BigNumber>
+void test() {
+    using namespace nil::crypto3::multiprecision;
+    typedef Number test_type;
 
-   test_type a = 1;
-   a /= 3;
-   test_type b = -a;
+    test_type a = 1;
+    a /= 3;
+    test_type b = -a;
 
-   BigNumber r;
-   BOOST_CHECK_EQUAL(add(r, a, a), BigNumber(a) + BigNumber(a));
-   BOOST_CHECK_EQUAL(subtract(r, a, b), BigNumber(a) - BigNumber(b));
-   BOOST_CHECK_EQUAL(subtract(r, b, a), BigNumber(b) - BigNumber(a));
-   BOOST_CHECK_EQUAL(multiply(r, a, a), BigNumber(a) * BigNumber(a));
+    BigNumber r;
+    BOOST_CHECK_EQUAL(add(r, a, a), BigNumber(a) + BigNumber(a));
+    BOOST_CHECK_EQUAL(subtract(r, a, b), BigNumber(a) - BigNumber(b));
+    BOOST_CHECK_EQUAL(subtract(r, b, a), BigNumber(b) - BigNumber(a));
+    BOOST_CHECK_EQUAL(multiply(r, a, a), BigNumber(a) * BigNumber(a));
 }
 
-int main()
-{
-   using namespace boost::multiprecision;
+int main() {
+    using namespace nil::crypto3::multiprecision;
 
-   test<cpp_dec_float_50, cpp_dec_float_100>();
+    test<cpp_dec_float_50, cpp_dec_float_100>();
 
 #ifdef TEST_GMP
-   test<mpf_float_50, mpf_float_100>();
+    test<mpf_float_50, mpf_float_100>();
 #endif
 #ifdef TEST_MPFR
-   test<mpfr_float_50, mpfr_float_100>();
+    test<mpfr_float_50, mpfr_float_100>();
 #endif
 
-   return boost::report_errors();
+    return boost::report_errors();
 }
