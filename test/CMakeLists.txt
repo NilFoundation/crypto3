@@ -13,10 +13,7 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       ${Boost_LIBRARIES}
-
-                       $<TARGET_NAME_IF_EXISTS:boost_config>
-                       $<TARGET_NAME_IF_EXISTS:boost_predef>)
+                       ${Boost_LIBRARIES})
 
 macro(define_block_cipher_test name)
     cm_test(NAME block_${name}_test SOURCES ${name}.cpp)
@@ -46,8 +43,7 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "shacal"
-    "shacal2"
-    )
+    "shacal2")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_block_cipher_test(${TEST_NAME})
