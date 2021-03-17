@@ -14,9 +14,8 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
-
                        ${CMAKE_WORKSPACE_NAME}::algebra
+                       ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                        ${Boost_LIBRARIES})
 
