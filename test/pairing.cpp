@@ -24,7 +24,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE curves_algebra_test
+#define BOOST_TEST_MODULE algebra_curves_test
 
 #include <iostream>
 #include <vector>

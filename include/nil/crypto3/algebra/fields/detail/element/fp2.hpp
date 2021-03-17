@@ -75,10 +75,7 @@ namespace nil {
                             data = data_type({in_data0, in_data1});
                         }
 
-                        constexpr element_fp2(const element_fp2 &B) {
-                            data[0] = underlying_type(B.data[0]);
-                            data[1] = underlying_type(B.data[1]);
-                        };
+                        constexpr element_fp2(const element_fp2 &B) : data{B.data}{};
 
                         constexpr inline static element_fp2 zero() {
                             return element_fp2(underlying_type::zero(), underlying_type::zero());
