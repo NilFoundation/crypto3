@@ -40,61 +40,55 @@
 // test.
 //
 
-void expected_results()
-{
-   //
-   // Define the max and mean errors expected for
-   // various compilers and platforms.
-   //
+void expected_results() {
+    //
+    // Define the max and mean errors expected for
+    // various compilers and platforms.
+    //
 
-   //
-   // Catch all cases come last:
-   //
-   add_expected_result(
-       ".*",                // compiler
-       ".*",                // stdlib
-       ".*",                // platform
-       ".*gmp_float<18>.*", // test type(s)
-       ".*",                // test data group
-       ".*",                // test function
-       500,                 // Max Peek error
-       100);                // Max mean error
-   add_expected_result(
-       ".*",                         // compiler
-       ".*",                         // stdlib
-       ".*",                         // platform
-       ".*mpfr_float_backend<18>.*", // test type(s)
-       ".*",                         // test data group
-       ".*",                         // test function
-       500,                          // Max Peek error
-       100);                         // Max mean error
-   add_expected_result(
-       ".*", // compiler
-       ".*", // stdlib
-       ".*", // platform
-       ".*", // test type(s)
-       ".*", // test data group
-       ".*", // test function
-       8,    // Max Peek error
-       5);   // Max mean error
+    //
+    // Catch all cases come last:
+    //
+    add_expected_result(".*",                            // compiler
+                        ".*",                            // stdlib
+                        ".*",                            // platform
+                        ".*gmp_float<18>.*",             // test type(s)
+                        ".*",                            // test data group
+                        ".*",                            // test function
+                        500,                             // Max Peek error
+                        100);                            // Max mean error
+    add_expected_result(".*",                            // compiler
+                        ".*",                            // stdlib
+                        ".*",                            // platform
+                        ".*mpfr_float_backend<18>.*",    // test type(s)
+                        ".*",                            // test data group
+                        ".*",                            // test function
+                        500,                             // Max Peek error
+                        100);                            // Max mean error
+    add_expected_result(".*",                            // compiler
+                        ".*",                            // stdlib
+                        ".*",                            // platform
+                        ".*",                            // test type(s)
+                        ".*",                            // test data group
+                        ".*",                            // test function
+                        8,                               // Max Peek error
+                        5);                              // Max mean error
 
-   //
-   // Finish off by printing out the compiler/stdlib/platform names,
-   // we do this to make it easier to mark up expected error rates.
-   //
-   std::cout << "Tests run with " << BOOST_COMPILER << ", "
-             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+    //
+    // Finish off by printing out the compiler/stdlib/platform names,
+    // we do this to make it easier to mark up expected error rates.
+    //
+    std::cout << "Tests run with " << BOOST_COMPILER << ", " << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_main)
-{
-   using namespace boost::multiprecision;
-   expected_results();
-   //
-   // Test at:
-   // 18 decimal digits: tests 80-bit long double approximations
-   // 30 decimal digits: tests 128-bit long double approximations
-   // 35 decimal digits: tests arbitrary precision code
-   //
-   ALL_TESTS
+BOOST_AUTO_TEST_CASE(test_main) {
+    using namespace nil::crypto3::multiprecision;
+    expected_results();
+    //
+    // Test at:
+    // 18 decimal digits: tests 80-bit long double approximations
+    // 30 decimal digits: tests 128-bit long double approximations
+    // 35 decimal digits: tests arbitrary precision code
+    //
+    ALL_TESTS
 }

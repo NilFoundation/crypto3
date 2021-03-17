@@ -12,11 +12,11 @@
 #endif
 
 //[mixed_eg
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 int main()
 {
-   using namespace boost::multiprecision;
+   using namespace nil::crypto3::multiprecision;
 
    boost::uint64_t i = (std::numeric_limits<boost::uint64_t>::max)();
    boost::uint64_t j = 1;

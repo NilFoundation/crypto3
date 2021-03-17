@@ -5,9 +5,9 @@
 
 #include "../sf_performance.hpp"
 
-void poly_tests_03()
-{
+void poly_tests_03() {
 #ifdef TEST_MPFR
-   time_proc("Polynomial Evaluation (50 digit precision)", "static_mpfr_float_50", test_polynomial<static_mpfr_float_50>);
+    time_proc("Polynomial Evaluation (50 digit precision)", "static_mpfr_float_50",
+              test_polynomial<static_mpfr_float_50>);
 #endif
 }

@@ -5,52 +5,51 @@
 
 //[logged_adaptor
 
-#include <boost/multiprecision/mpfi.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
+#include <nil/crypto3/multiprecision/mpfi.hpp>
+#include <nil/crypto3/multiprecision/logged_adaptor.hpp>
 #include <iostream>
 #include <iomanip>
 //
 // Begin by overloading log_postfix_event so we can capture each arithmetic event as it happens:
 //
-namespace boost{ namespace multiprecision{
+namespace nil {
+    namespace crypto3 {
+        namespace multiprecision {
 
-template <unsigned D>
-inline void log_postfix_event(const mpfi_float_backend<D>& val, const char* event_description)
-{
-   // Print out the (relative) diameter of the interval:
-   using namespace boost::multiprecision;
-   number<mpfr_float_backend<D> > diam;
-   mpfi_diam(diam.backend().data(), val.data());
-   std::cout << "Diameter was " << diam << " after operation: " << event_description << std::endl;
-}
-template <unsigned D, class T>
-inline void log_postfix_event(const mpfi_float_backend<D>&, const T&, const char* event_description)
-{
-   // This version is never called in this example.
-}
+            template<unsigned D>
+            inline void log_postfix_event(const mpfi_float_backend<D>& val, const char* event_description) {
+                // Print out the (relative) diameter of the interval:
+                using namespace nil::crypto3::multiprecision;
+                number<mpfr_float_backend<D>> diam;
+                mpfi_diam(diam.backend().data(), val.data());
+                std::cout << "Diameter was " << diam << " after operation: " << event_description << std::endl;
+            }
+            template<unsigned D, class T>
+            inline void log_postfix_event(const mpfi_float_backend<D>&, const T&, const char* event_description) {
+                // This version is never called in this example.
+            }
 
-}}
+        }    // namespace multiprecision
+    }        // namespace crypto3
+}    // namespace nil
 
+int main() {
+    using namespace nil::crypto3::multiprecision;
+    typedef number<logged_adaptor<mpfi_float_backend<17>>> logged_type;
+    //
+    // Test case deliberately introduces cancellation error, relative size of interval
+    // gradually gets larger after each operation:
+    //
+    logged_type a = 1;
+    a /= 10;
 
-int main()
-{
-   using namespace boost::multiprecision;
-   typedef number<logged_adaptor<mpfi_float_backend<17> > > logged_type;
-   //
-   // Test case deliberately introduces cancellation error, relative size of interval
-   // gradually gets larger after each operation:
-   //
-   logged_type a = 1;
-   a /= 10;
-
-   for(unsigned i = 0; i < 13; ++i)
-   {
-      logged_type b = a * 9;
-      b /= 10;
-      a -= b;
-   }
-   std::cout << "Final value was: " << a << std::endl;
-   return 0;
+    for (unsigned i = 0; i < 13; ++i) {
+        logged_type b = a * 9;
+        b /= 10;
+        a -= b;
+    }
+    std::cout << "Final value was: " << a << std::endl;
+    return 0;
 }
 
 //]

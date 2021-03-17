@@ -7,18 +7,16 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <>
-struct related_type<boost::multiprecision::mpq_rational>
-{
-   typedef boost::multiprecision::mpz_int type;
+template<>
+struct related_type<nil::crypto3::multiprecision::mpq_rational> {
+    typedef nil::crypto3::multiprecision::mpz_int type;
 };
 
-int main()
-{
-   test<boost::multiprecision::mpq_rational>();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::mpq_rational>();
+    return boost::report_errors();
 }

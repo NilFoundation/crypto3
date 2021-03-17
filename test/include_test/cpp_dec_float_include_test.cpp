@@ -3,11 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
-int main()
-{
-   cpp_dec_float<50> a;
+int main() {
+    cpp_dec_float<50> a;
 }

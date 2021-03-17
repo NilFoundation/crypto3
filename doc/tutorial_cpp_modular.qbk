@@ -9,7 +9,7 @@
 
 [section:cpp_modular cpp_modular]
 
-`#include <boost/multiprecision/cpp_modular.hpp>`
+`#include <nil/crypto3/multiprecision/cpp_modular.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -76,7 +76,7 @@
     }} // namespaces
 
 
-The `cpp_mod` and `cpp_mod_params` are used via the typedef boost::multiprecision::cpp_modular.
+The `cpp_mod` and `cpp_mod_params` are used via the typedef nil::crypto3::multiprecision::cpp_modular.
 It provides a number type for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic] with unlimited precision. 
 As well as the usual conversions from arithmetic and string types, instances of cpp_modular are copy-constructible and assignable from type cpp_int. 
 

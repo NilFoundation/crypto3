@@ -45,8 +45,8 @@ this language binding.
 #include <boost/config.hpp>
 
 // May need extra includes for other types, for example:
-#include <boost/multiprecision/cpp_dec_float.hpp> // is decimal.
-#include <boost/multiprecision/cpp_bin_float.hpp> // is binary.
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp> // is decimal.
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp> // is binary.
 
 
 // Assume that this will be run on MSVC to get the 32 or 64 bit info.
@@ -409,7 +409,7 @@ int main()
 
   try
   {
-    using namespace boost::multiprecision;
+    using namespace nil::crypto3::multiprecision;
 
     std::cout << versions() << std::endl;
 

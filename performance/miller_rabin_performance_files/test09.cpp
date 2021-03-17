@@ -5,10 +5,9 @@
 
 #include "../miller_rabin_performance.hpp"
 
-void test09()
-{
-   using namespace boost::multiprecision;
+void test09() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST_MPZ
-   test_miller_rabin<number<gmp_int, et_off> >("mpz_int (no Expression templates)");
+    test_miller_rabin<number<gmp_int, et_off>>("mpz_int (no Expression templates)");
 #endif
 }

@@ -5,14 +5,20 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_INT)
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
-void test09()
-{
+void test09() {
 #ifdef TEST_CPP_INT
-   //test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>, boost::multiprecision::et_off> >("cpp_int(unsigned, fixed)", 64);
-   //test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, boost::multiprecision::et_off> >("cpp_int(fixed)", 64);
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<128, 128, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, boost::multiprecision::et_off> >("cpp_int(fixed)", 128);
+    // test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<64, 64,
+    // nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::unchecked, void>,
+    // nil::crypto3::multiprecision::et_off> >("cpp_int(unsigned, fixed)", 64);
+    // test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<64, 64,
+    // nil::crypto3::multiprecision::signed_magnitude, nil::crypto3::multiprecision::unchecked, void>,
+    // nil::crypto3::multiprecision::et_off> >("cpp_int(fixed)", 64);
+    test<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::cpp_int_backend<128, 128, nil::crypto3::multiprecision::signed_magnitude,
+                                                      nil::crypto3::multiprecision::unchecked, void>,
+        nil::crypto3::multiprecision::et_off>>("cpp_int(fixed)", 128);
 #endif
 }

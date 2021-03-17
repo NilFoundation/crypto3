@@ -10,7 +10,7 @@
 
 [section:mpfr_float mpfr_float]
 
-`#include <boost/multiprecision/mpfr.hpp>`
+`#include <nil/crypto3/multiprecision/mpfr.hpp>`
 
    namespace boost{ namespace multiprecision{
 

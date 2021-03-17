@@ -11,7 +11,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #include "test_float_serial.hpp"
 
 #if !defined(TEST1) && !defined(TEST2)
@@ -19,14 +19,13 @@
 #define TEST2
 #endif
 
-int main()
-{
-   using namespace boost::multiprecision;
+int main() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST1
-   test<cpp_dec_float_50>();
+    test<cpp_dec_float_50>();
 #endif
 #ifdef TEST2
-   test<number<cpp_dec_float<100, boost::int64_t, std::allocator<char> > > >();
+    test<number<cpp_dec_float<100, boost::int64_t, std::allocator<char>>>>();
 #endif
-   return boost::report_errors();
+    return boost::report_errors();
 }

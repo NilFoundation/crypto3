@@ -10,7 +10,7 @@
 
 [section:cpp_complex cpp_complex]
 
-`#include <boost/multiprecision/cpp_complex.hpp>`
+`#include <nil/crypto3/multiprecision/cpp_complex.hpp>`
 
    namespace boost{ namespace multiprecision{
 

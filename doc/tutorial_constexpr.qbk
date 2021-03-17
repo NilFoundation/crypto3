@@ -22,11 +22,11 @@ There are two backend types which are literals:
 
 * __float128__ (which requires GCC), and
 * Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`.
-In addition, prior to C++14 the Checked parameter must be `boost::multiprecision::unchecked`.
+In addition, prior to C++14 the Checked parameter must be `nil::crypto3::multiprecision::unchecked`.
 
 For example:
 
-   using namespace boost::multiprecision;
+   using namespace nil::crypto3::multiprecision;
 
    constexpr float128            f = 0.1Q   // OK, float128's are always literals in C++11
 
@@ -55,10 +55,10 @@ In each case, use of these suffixes with hexadecimal values produces a `constexp
 Examples:
 
    // Any use of user defined literals requires that we import the literal-operators into current scope first:
-   using namespace boost::multiprecision::literals;
+   using namespace nil::crypto3::multiprecision::literals;
    //
    // To keep things simple in the example, we'll make our types used visible to this scope as well:
-   using namespace boost::multiprecision;
+   using namespace nil::crypto3::multiprecision;
    //
    // The value zero as a number<cpp_int_backend<4,4,signed_magnitude,unchecked,void> >:
    constexpr auto a = 0x0_cppi;

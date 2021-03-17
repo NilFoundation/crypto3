@@ -3,18 +3,17 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <unsigned D>
-struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D> > >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D / 2> > type;
+template<unsigned D>
+struct related_type<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<D>>> {
+    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<D / 2>> type;
 };
 
-int main()
-{
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long>, boost::multiprecision::et_off> >();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<100, long long>,
+                                              nil::crypto3::multiprecision::et_off>>();
+    return boost::report_errors();
 }

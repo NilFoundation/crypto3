@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_INT)
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
-void test47()
-{
+void test47() {
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", 1024 * 16);
+    test<nil::crypto3::multiprecision::cpp_int>("cpp_int", 1024 * 16);
 #endif
 }

@@ -5,12 +5,11 @@
 
 #include "../performance_test.hpp"
 #if defined(TEST_CPP_INT_RATIONAL)
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #endif
 
-void test17()
-{
+void test17() {
 #ifdef TEST_CPP_INT_RATIONAL
-   test<boost::multiprecision::cpp_rational>("cpp_rational", 128);
+    test<nil::crypto3::multiprecision::cpp_rational>("cpp_rational", 128);
 #endif
 }

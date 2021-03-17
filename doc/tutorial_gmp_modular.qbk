@@ -4,16 +4,16 @@
 
 [section:gmp_modular gmp_modular]
 
-`#include <boost/multiprecision/gmp.hpp>`
-`#include <boost/multiprecision/modular/modular_adaptor.hpp>`
-`#include <boost/multiprecision/modular/modular_params_gmp.hpp>`
+`#include <nil/crypto3/multiprecision/gmp.hpp>`
+`#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>`
+`#include <nil/crypto3/multiprecision/modular/modular_params_gmp.hpp>`
 
     namespace boost {
     namespace multiprecision {
     typedef modular_params<gmp_int>           mpz_int_mod_params;
     typedef number<modular_adaptor<gmp_int> > mpz_int_mod;
     }
-    } // namespace boost::multiprecision
+    } // namespace nil::crypto3::multiprecision
 
 The `mpz_int_mod_params` and `mpz_int_mod`  acts as a thin wrapper around the [gmp] `mpz_t`
 to provide a modular type that is a drop-in replacement for the native C++ integer types but with unlimited precision.

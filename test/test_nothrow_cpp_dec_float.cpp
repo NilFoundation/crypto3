@@ -3,7 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #include <boost/type_traits/is_nothrow_move_constructible.hpp>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #include <boost/type_traits/has_nothrow_constructor.hpp>
@@ -17,7 +17,7 @@
 //
 // Move construct:
 //
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::cpp_dec_float_100>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<nil::crypto3::multiprecision::cpp_dec_float_100>::value);
 
 #endif
 
@@ -25,7 +25,7 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::
 //
 // Move assign:
 //
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::cpp_dec_float_100>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<nil::crypto3::multiprecision::cpp_dec_float_100>::value);
 
 #endif
 
@@ -33,19 +33,19 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::cpp
 // Construct:
 //
 #ifdef BOOST_HAS_NOTHROW_CONSTRUCTOR
-BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::cpp_dec_float_100>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<nil::crypto3::multiprecision::cpp_dec_float_100>::value);
 #endif
 //
 // Copy construct:
 //
 #ifdef BOOST_HAS_NOTHROW_COPY
-BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::cpp_dec_float_100>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_copy<nil::crypto3::multiprecision::cpp_dec_float_100>::value);
 #endif
 //
 // Assign:
 //
 #ifdef BOOST_HAS_NOTHROW_ASSIGN
-BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::cpp_dec_float_100>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_assign<nil::crypto3::multiprecision::cpp_dec_float_100>::value);
 #endif
 
-#endif // noexcept
+#endif    // noexcept

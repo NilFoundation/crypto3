@@ -5,10 +5,9 @@
 
 #include "../miller_rabin_performance.hpp"
 
-void test12()
-{
-   using namespace boost::multiprecision;
+void test12() {
+    using namespace nil::crypto3::multiprecision;
 #ifdef TEST_TOMMATH
-   test_miller_rabin<boost::multiprecision::tom_int>("tom_int");
+    test_miller_rabin<nil::crypto3::multiprecision::tom_int>("tom_int");
 #endif
 }

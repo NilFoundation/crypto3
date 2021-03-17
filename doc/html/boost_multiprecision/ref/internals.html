@@ -44,7 +44,7 @@
       </p>
 <p>
         For compilers that support C++11 SFINAE-expressions this trait should "just
-        work". Otherwise it inherits from <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">From</span><span class="special">,</span> <span class="identifier">To</span><span class="special">&gt;::</span><span class="identifier">type</span></code>, and will need to be specialised for
+        work". Otherwise it inherits from <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">boost::is_convertible</span><span class="special">&lt;</span><span class="identifier">From</span><span class="special">,</span> <span class="identifier">To</span><span class="special">&gt;::</span><span class="identifier">type</span></code>, and will need to be specialised for
         Backends that have constructors marked as <code class="computeroutput"><span class="keyword">explicit</span></code>.
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">From</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">To</span><span class="special">&gt;</span>

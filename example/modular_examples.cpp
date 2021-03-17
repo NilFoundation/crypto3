@@ -9,7 +9,7 @@
 
 //[cpp_modular_eg
 #include <iostream>
-#include <boost/multiprecision/cpp_modular.hpp>
+#include <nil/crypto3/multiprecision/cpp_modular.hpp>
 
 template <class Modular, class Params>
 void modular_number_examples()
@@ -54,7 +54,7 @@ void modular_number_examples()
 
 int main()
 {
-   modular_number_examples<boost::multiprecision::cpp_mod, boost::multiprecision::cpp_mod_params>();
+   modular_number_examples<nil::crypto3::multiprecision::cpp_mod, nil::crypto3::multiprecision::cpp_mod_params>();
    return 0;
 }
 

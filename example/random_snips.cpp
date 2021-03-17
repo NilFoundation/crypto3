@@ -3,54 +3,53 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #include <boost/random.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
 #include <iomanip>
 
-void t1()
-{
-//[random_eg1
-//=#include <boost/multiprecision/cpp_int.hpp>
-//=#include <boost/random.hpp>
-//=
-//=int main()
-//={
-   using namespace boost::multiprecision;
-   using namespace boost::random;
+void t1() {
+    //[random_eg1
+    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <boost/random.hpp>
+    //=
+    //=int main()
+    //={
+    using namespace nil::crypto3::multiprecision;
+    using namespace boost::random;
 
-   //
-   // Declare our random number generator type, the underlying generator
-   // is the Mersenne twister mt19937 engine, and we'll generate 256 bit
-   // random values, independent_bits_engine will make multiple calls
-   // to the underlying engine until we have the requested number of bits:
-   //
-   typedef independent_bits_engine<mt19937, 256, cpp_int> generator_type;
-   generator_type gen;
-   //
-   // Generate some values:
-   //
-   std::cout << std::hex << std::showbase;
-   for(unsigned i = 0; i < 10; ++i)
-      std::cout << gen() << std::endl;
-   //
-   // Alternatively if we wish to generate random values in a fixed-precision
-   // type, then we must use an unsigned type in order to adhere to the
-   // conceptual requirements of the generator:
-   //
-   typedef independent_bits_engine<mt19937, 512, uint512_t> generator512_type;
-   generator512_type gen512;
-   //
-   // Generate some 1024-bit unsigned values:
-   //
-   std::cout << std::hex << std::showbase;
-   for(unsigned i = 0; i < 10; ++i)
-      std::cout << gen512() << std::endl;
-   //=   return 0;
-//=}
-//]
+    //
+    // Declare our random number generator type, the underlying generator
+    // is the Mersenne twister mt19937 engine, and we'll generate 256 bit
+    // random values, independent_bits_engine will make multiple calls
+    // to the underlying engine until we have the requested number of bits:
+    //
+    typedef independent_bits_engine<mt19937, 256, cpp_int> generator_type;
+    generator_type gen;
+    //
+    // Generate some values:
+    //
+    std::cout << std::hex << std::showbase;
+    for (unsigned i = 0; i < 10; ++i)
+        std::cout << gen() << std::endl;
+    //
+    // Alternatively if we wish to generate random values in a fixed-precision
+    // type, then we must use an unsigned type in order to adhere to the
+    // conceptual requirements of the generator:
+    //
+    typedef independent_bits_engine<mt19937, 512, uint512_t> generator512_type;
+    generator512_type gen512;
+    //
+    // Generate some 1024-bit unsigned values:
+    //
+    std::cout << std::hex << std::showbase;
+    for (unsigned i = 0; i < 10; ++i)
+        std::cout << gen512() << std::endl;
+    //=   return 0;
+    //=}
+    //]
 }
 
 //
@@ -81,35 +80,33 @@ void t1()
 */
 //]
 
+void t2() {
+    std::cout << std::dec;
+    //[random_eg2
+    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <boost/random.hpp>
+    //=
+    //=int main()
+    //={
+    using namespace nil::crypto3::multiprecision;
+    using namespace boost::random;
 
-void t2()
-{
-   std::cout << std::dec;
-//[random_eg2
-//=#include <boost/multiprecision/cpp_int.hpp>
-//=#include <boost/random.hpp>
-//=
-//=int main()
-//={
-   using namespace boost::multiprecision;
-   using namespace boost::random;
+    //
+    // Generate integers in a given range using uniform_int,
+    // the underlying generator is invoked multiple times
+    // to generate enough bits:
+    //
+    mt19937 mt;
+    uniform_int_distribution<cpp_int> ui(-(cpp_int(1) << 256), cpp_int(1) << 256);
+    //
+    // Generate the numbers:
+    //
+    for (unsigned i = 0; i < 10; ++i)
+        std::cout << ui(mt) << std::endl;
 
-   //
-   // Generate integers in a given range using uniform_int,
-   // the underlying generator is invoked multiple times
-   // to generate enough bits:
-   //
-   mt19937 mt;
-   uniform_int_distribution<cpp_int> ui(-(cpp_int(1) << 256), cpp_int(1) << 256);
-   //
-   // Generate the numbers:
-   //
-   for(unsigned i = 0; i < 10; ++i)
-      std::cout << ui(mt) << std::endl;
-
-//=   return 0;
-//=}
-//]
+    //=   return 0;
+    //=}
+    //]
 }
 //[random_eg2_out
 /*`
@@ -130,27 +127,27 @@ Program output is
 */
 //]
 
-void t3()
-{
-//[random_eg3
-//=#include <boost/multiprecision/cpp_bin_float.hpp>
-//=#include <boost/random.hpp>
-//=
-//=int main()
-//={
-   using namespace boost::multiprecision;
-   using namespace boost::random;
+void t3() {
+    //[random_eg3
+    //=#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+    //=#include <boost/random.hpp>
+    //=
+    //=int main()
+    //={
+    using namespace nil::crypto3::multiprecision;
+    using namespace boost::random;
 
-   mt19937 gen;
-   //
-   // Generate the values:
-   //
-   std::cout << std::setprecision(50);
-   for(unsigned i = 0; i < 20; ++i)
-      std::cout << generate_canonical<cpp_bin_float_50, std::numeric_limits<cpp_bin_float_50>::digits>(gen) << std::endl;
-//=   return 0;
-//=}
-//]
+    mt19937 gen;
+    //
+    // Generate the values:
+    //
+    std::cout << std::setprecision(50);
+    for (unsigned i = 0; i < 20; ++i)
+        std::cout << generate_canonical<cpp_bin_float_50, std::numeric_limits<cpp_bin_float_50>::digits>(gen)
+                  << std::endl;
+    //=   return 0;
+    //=}
+    //]
 }
 
 //[random_eg3_out
@@ -182,35 +179,34 @@ Which produces the following output:
 */
 //]
 
-void t4()
-{
-   std::cout << std::endl;
-//[random_eg4
-//=#include <boost/multiprecision/cpp_bin_float.hpp>
-//=#include <boost/multiprecision/cpp_int.hpp>
-//=#include <boost/random.hpp>
-//=
-//=int main()
-//={
-   using namespace boost::multiprecision;
-   using namespace boost::random;
-   //
-   // Generate some distruted values:
-   //
-   uniform_real_distribution<cpp_bin_float_50> ur(-20, 20);
-   gamma_distribution<cpp_bin_float_50> gd(20);
-   independent_bits_engine<mt19937, std::numeric_limits<cpp_bin_float_50>::digits, cpp_int> gen;
-   //
-   // Generate some values:
-   //
-   std::cout << std::setprecision(50);
-   for(unsigned i = 0; i < 20; ++i)
-      std::cout << ur(gen) << std::endl;
-   for(unsigned i = 0; i < 20; ++i)
-      std::cout << gd(gen) << std::endl;
-//=   return 0;
-//=}
-//]
+void t4() {
+    std::cout << std::endl;
+    //[random_eg4
+    //=#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <boost/random.hpp>
+    //=
+    //=int main()
+    //={
+    using namespace nil::crypto3::multiprecision;
+    using namespace boost::random;
+    //
+    // Generate some distruted values:
+    //
+    uniform_real_distribution<cpp_bin_float_50> ur(-20, 20);
+    gamma_distribution<cpp_bin_float_50> gd(20);
+    independent_bits_engine<mt19937, std::numeric_limits<cpp_bin_float_50>::digits, cpp_int> gen;
+    //
+    // Generate some values:
+    //
+    std::cout << std::setprecision(50);
+    for (unsigned i = 0; i < 20; ++i)
+        std::cout << ur(gen) << std::endl;
+    for (unsigned i = 0; i < 20; ++i)
+        std::cout << gd(gen) << std::endl;
+    //=   return 0;
+    //=}
+    //]
 }
 
 //[random_eg4_out
@@ -262,54 +258,53 @@ Which produces the following output:
 */
 //]
 
-void t5()
-{
-//[random_eg5
-//=#include <boost/multiprecision/cpp_bin_float.hpp>
-//=#include <boost/random.hpp>
-//=#include <boost/scoped_ptr.hpp>
-//=
-//=int main()
-//={
-   using namespace boost::multiprecision;
-   using namespace boost::random;
-   //
-   // Generate some multiprecision values, note that the generator is so large
-   // that we have to allocate it on the heap, otherwise we may run out of
-   // stack space!  We could avoid this by using a floating point type which
-   // allocates it's internal storage on the heap - cpp_bin_float will do
-   // this with the correct template parameters, as will the GMP or MPFR
-   // based reals.
-   //
-   typedef lagged_fibonacci_01_engine<cpp_bin_float_50, 48, 44497, 21034 > big_fib_gen;
-   boost::scoped_ptr<big_fib_gen> pgen(new big_fib_gen);
-   //
-   // Generate some values:
-   //
-   std::cout << std::setprecision(50);
-   for(unsigned i = 0; i < 20; ++i)
-      std::cout << (*pgen)() << std::endl;
-   //
-   // try again with a ranlux generator, this is not quite so large
-   // so we can use the heap this time:
-   //
-   typedef subtract_with_carry_01_engine<cpp_bin_float_50, std::numeric_limits<cpp_bin_float_50>::digits - 5, 10, 24 > ranlux_big_base_01;
-   typedef discard_block_engine< ranlux_big_base_01, 389, 24 > big_ranlux;
-   big_ranlux rg;
-   for(unsigned i = 0; i < 20; ++i)
-      std::cout << rg() << std::endl;
-//=   return 0;
-//=}
-//]
+void t5() {
+    //[random_eg5
+    //=#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+    //=#include <boost/random.hpp>
+    //=#include <boost/scoped_ptr.hpp>
+    //=
+    //=int main()
+    //={
+    using namespace nil::crypto3::multiprecision;
+    using namespace boost::random;
+    //
+    // Generate some multiprecision values, note that the generator is so large
+    // that we have to allocate it on the heap, otherwise we may run out of
+    // stack space!  We could avoid this by using a floating point type which
+    // allocates it's internal storage on the heap - cpp_bin_float will do
+    // this with the correct template parameters, as will the GMP or MPFR
+    // based reals.
+    //
+    typedef lagged_fibonacci_01_engine<cpp_bin_float_50, 48, 44497, 21034> big_fib_gen;
+    boost::scoped_ptr<big_fib_gen> pgen(new big_fib_gen);
+    //
+    // Generate some values:
+    //
+    std::cout << std::setprecision(50);
+    for (unsigned i = 0; i < 20; ++i)
+        std::cout << (*pgen)() << std::endl;
+    //
+    // try again with a ranlux generator, this is not quite so large
+    // so we can use the heap this time:
+    //
+    typedef subtract_with_carry_01_engine<cpp_bin_float_50, std::numeric_limits<cpp_bin_float_50>::digits - 5, 10, 24>
+        ranlux_big_base_01;
+    typedef discard_block_engine<ranlux_big_base_01, 389, 24> big_ranlux;
+    big_ranlux rg;
+    for (unsigned i = 0; i < 20; ++i)
+        std::cout << rg() << std::endl;
+    //=   return 0;
+    //=}
+    //]
 }
 
-int main()
-{
-   t1();
-   t2();
-   t3();
-   t4();
-   t5();
-   return 0;
+int main() {
+    t1();
+    t2();
+    t3();
+    t4();
+    t5();
+    return 0;
 }
 

@@ -13,7 +13,7 @@
 namespace boost {
 namespace multiprecision {
     template <typename Backend, expression_template_option ExpressionTemplates>
-    inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
+    inline typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
         const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 }
 }
@@ -29,7 +29,7 @@ namespace multiprecision {
 
 [h2:api Jacobi Symbol API]
 
-[#jacobi] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
+[#jacobi] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
 
 Computes [@http://mathworld.wolfram.com/JacobiSymbol.html Jacobi symbol]. 
 

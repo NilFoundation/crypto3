@@ -211,7 +211,7 @@ Converts both `result` and `b` to a regular numbers, evaluates "bitwise xor" ope
 Stores the result in `result` with its original modulus value.
 
 [#eval_convert_to] 
-[role blue `template <class Result, class Backend> inline typename disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const modular_adaptor<Backend>& val)`]
+[role blue `template <class Result, class Backend> inline typename boost::disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const modular_adaptor<Backend>& val)`]
 
 Converts a residue class handed by `modular_adaptor` (see [link base_data `base_data()`]) to the type of `result`.
 
@@ -224,7 +224,7 @@ Divides `result` base value by `o` base value (see [link base_data `base_data()`
 Modulus values of the both `modular_adaptor` have to be equal. 
 The result is reduced by modulo.
 
-[#eval_eq] [role blue `template <class Backend, class T> inline typename enable_if<is_arithmetic<T>, bool> ::type eval_eq(const modular_adaptor<Backend>& a, const T& b)`]
+[#eval_eq] [role blue `template <class Backend, class T> inline typename boost::enable_if<boost::is_arithmetic<T>, bool> ::type eval_eq(const modular_adaptor<Backend>& a, const T& b)`]
 
 Returns `true` if `a` and `b` are equal in value.
 

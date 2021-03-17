@@ -7,12 +7,11 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/float128.hpp>
+#include <nil/crypto3/multiprecision/float128.hpp>
 
 #include "test_arithmetic.hpp"
 
-int main()
-{
-   test<boost::multiprecision::float128>();
-   return boost::report_errors();
+int main() {
+    test<nil::crypto3::multiprecision::float128>();
+    return boost::report_errors();
 }
