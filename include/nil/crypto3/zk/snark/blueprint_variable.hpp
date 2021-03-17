@@ -30,13 +30,13 @@
 #include <string>
 #include <vector>
 
-#include <boost/multiprecision/integer.hpp>
+#include <nil/crypto3/multiprecision/integer.hpp>
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 // temporary includes begin
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 // temporary includes end
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
@@ -125,7 +125,7 @@ namespace nil {
 
                     void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.val((*this)[i]) = boost::multiprecision::bit_test(r, i) ? field_value_type::one() :
+                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r, i) ? field_value_type::one() :
                                                                                          field_value_type::zero();
                         }
                     }
@@ -299,12 +299,12 @@ namespace nil {
                     void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_modulus_type;
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.lc_val((*this)[i]) =
-                                boost::multiprecision::bit_test(non_fixed_precision_modulus_type(r.data), i) ?
+                                nil::crypto3::multiprecision::bit_test(non_fixed_precision_modulus_type(r.data), i) ?
                                     field_value_type::one() :
                                     field_value_type::zero();
                         }

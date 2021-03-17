@@ -31,7 +31,7 @@
 #include <memory>
 #include <vector>
 
-#include <boost/multiprecision/wnaf.hpp>
+#include <nil/crypto3/multiprecision/wnaf.hpp>
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
@@ -75,14 +75,14 @@ namespace nil {
                         std::size_t dbl_count;
 
                         template<typename Backend,
-                                 typename boost::multiprecision::expression_template_option ExpressionTemplates>
+                                 typename nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
                         exponentiation_component(blueprint<FieldType> &bp,
                                                  const Fpk_variableT<FpkT> &elt,
-                                                 const boost::multiprecision::number<Backend, ExpressionTemplates> &power,
+                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &power,
                                                  const Fpk_variableT<FpkT> &result) :
                             component<FieldType>(bp),
                             elt(elt), power(power), result(result) {
-                            NAF = boost::multiprecision::find_wnaf(1, power);
+                            NAF = nil::crypto3::multiprecision::find_wnaf(1, power);
 
                             intermed_count = 0;
                             add_count = 0;

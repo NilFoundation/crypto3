@@ -322,7 +322,7 @@ namespace nil {
                         void generate_r1cs_witness() {
 
                             // temporary added until fixed-precision modular adaptor is ready:
-                            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                            typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                                 non_fixed_precision_modulus_type;
 
                             using modulus_type = typename FieldType::modulus_type;

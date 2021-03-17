@@ -31,11 +31,11 @@
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 // temporary includes begin
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 // temporary includes end
 
 namespace nil {
@@ -89,11 +89,11 @@ namespace nil {
                             packed.evaluate(this->bp);
 
                             // temporary added until fixed-precision modular adaptor is ready:
-                            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                            typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                                 non_fixed_precision_modulus_type;
 
                             assert(
-                                boost::multiprecision::msb(non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) +
+                                nil::crypto3::multiprecision::msb(non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) +
                                     1 <=
                                 bits.size());    // `bits` is large enough to represent this packed value
                             bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
@@ -610,8 +610,8 @@ namespace nil {
                         void generate_r1cs_witness() {
 
                             // temporary added until fixed-precision modular adaptor is ready:
-                            typedef boost::multiprecision::number<
-                                boost::multiprecision::backends::cpp_int_backend<>> 
+                            typedef nil::crypto3::multiprecision::number<
+                                nil::crypto3::multiprecision::backends::cpp_int_backend<>> 
                                 non_fixed_precision_modulus_type;
 
                             /* assumes that idx can be fit in ulong; true for our purposes for now */
