@@ -383,11 +383,8 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::mac
                       ${CMAKE_WORKSPACE_NAME}::modes
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
                       ${CMAKE_WORKSPACE_NAME}::pkpad
-
-                      $<TARGET_NAME_IF_EXISTS:boost_predef>
-                      $<TARGET_NAME_IF_EXISTS:boost_config>
-                      $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
                       ${Boost_LIBRARIES})
 

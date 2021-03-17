@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_PUBKEY_ECDSA_KEY_HPP
 #define CRYPTO3_PUBKEY_ECDSA_KEY_HPP
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/crypto3/pubkey/detail/consistency.hpp>
 #include <nil/crypto3/pubkey/detail/modes/rfc6979.hpp>

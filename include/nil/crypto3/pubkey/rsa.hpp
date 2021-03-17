@@ -27,8 +27,8 @@
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/detail/number_base.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/detail/number_base.hpp>
 
 namespace nil {
     namespace crypto3 {

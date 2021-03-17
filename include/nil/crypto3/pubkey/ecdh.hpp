@@ -67,9 +67,9 @@ namespace nil {
                             inverse_mod(m_group.get_cofactor(), m_group.get_order()) * key.private_value();
                     //---------------
                     const ec_group m_group;
-                    boost::multiprecision::number<Backend, ExpressionTemplates> m_l_times_priv;
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> m_l_times_priv;
                     random_number_generator &m_rng;
-                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
+                    std::vector<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                     //--------------
 
                     point_gfp input_point = m_group.get_cofactor() * m_group.os2ecp(w, w_len);
@@ -80,7 +80,7 @@ namespace nil {
                     if (!S.on_the_curve()) {
                         throw internal_error("ECDH agreed value was not on the curve");
                     }
-                    return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(
+                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(
                         S.get_affine_x(), m_group.get_p_bytes());
                 }
             };

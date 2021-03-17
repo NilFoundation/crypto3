@@ -57,9 +57,9 @@ namespace nil {
                         m_prefix()
 
                         //-----------------
-                        const boost::multiprecision::number<Backend, ExpressionTemplates>
+                        const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
                             public_point_x = m_public_point.get_affine_x();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_y =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> public_point_y =
                         m_public_point.get_affine_y();
 
                     m_prefix.resize(public_point_x.bytes() + public_point_y.bytes());
@@ -83,7 +83,7 @@ namespace nil {
                     secure_vector<uint8_t> r(sig, sig + size_r);
 
                     // check that 0 < s < q
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + size_r, order_bytes);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + size_r, order_bytes);
 
                     if (s <= 0 || s >= m_group.get_order()) {
                         return false;
@@ -91,11 +91,11 @@ namespace nil {
 
                     secure_vector<uint8_t> r_xor_e(r);
                     xor_buf(r_xor_e, msg, r.size());
-                    boost::multiprecision::number<Backend, ExpressionTemplates> w(r_xor_e.data(), r_xor_e.size());
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> w(r_xor_e.data(), r_xor_e.size());
                     w = m_group.mod_order(w);
 
                     const point_gfp q = m_group.point_multiply(w, m_public_point, s);
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> q_x = q.get_affine_x();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> q_x = q.get_affine_x();
                     secure_vector<uint8_t> c(q_x.bytes());
                     q_x.binary_encode(c.data());
                     std::unique_ptr<emsa> emsa = this->clone_emsa();
@@ -126,9 +126,9 @@ namespace nil {
 
                 inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
                     const ec_group m_group;
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &m_x;
                     secure_vector<uint8_t> m_prefix;
-                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
+                    std::vector<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
 
                     //----------------
 
@@ -136,9 +136,9 @@ namespace nil {
                         m_prefix()
 
                         //-----------------
-                        const boost::multiprecision::number<Backend, ExpressionTemplates>
+                        const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
                             public_point_x = eckcdsa.public_point().get_affine_x();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_y =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> public_point_y =
                         eckcdsa.public_point().get_affine_y();
 
                     m_prefix.resize(public_point_x.bytes() + public_point_y.bytes());
@@ -148,8 +148,8 @@ namespace nil {
                                         ->hash_block_size());    // use only the "hash input block size" leftmost bits
                                                                  //---------------------
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> k_times_P_x =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k_times_P_x =
                         m_group.blinded_base_point_multiply_x(k, rng, m_ws);
 
                     secure_vector<uint8_t> to_be_hashed(k_times_P_x.bytes());
@@ -160,21 +160,21 @@ namespace nil {
                     secure_vector<uint8_t> c = emsa->raw_data();
                     c = emsa->encoding_of(c, max_input_bits(), rng);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> r(c.data(), c.size());
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r(c.data(), c.size());
 
                     xor_buf(c, msg, c.size());
-                    boost::multiprecision::number<Backend, ExpressionTemplates> w(c.data(), c.size());
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> w(c.data(), c.size());
                     w = m_group.mod_order(w);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> s =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s =
                         m_group.multiply_mod_order(m_x, k - w);
                     if (s.is_zero()) {
                         throw internal_error("During ECKCDSA signature generation created zero s");
                     }
 
                     secure_vector<uint8_t> output =
-                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(r, c.size());
-                    output += boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(
+                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(r, c.size());
+                    output += nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(
                         s, m_group.get_order_bytes());
                     return output;
                 }

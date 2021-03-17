@@ -25,8 +25,8 @@
 #ifndef CRYPTO3_PUBKEY_BLINDER_HPP
 #define CRYPTO3_PUBKEY_BLINDER_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/modular_reduce.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/modular_reduce.hpp>
 
 #include <functional>
 
@@ -34,7 +34,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
 
-            using namespace boost::multiprecision;
+            using namespace nil::crypto3::multiprecision;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             number<Backend, ExpressionTemplates> blind(const number<Backend, ExpressionTemplates> &x,
