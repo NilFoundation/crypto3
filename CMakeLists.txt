@@ -77,11 +77,9 @@ cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${Boost_LIBRARIES}
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
 
-                      $<TARGET_NAME_IF_EXISTS:boost_config>
-                      $<TARGET_NAME_IF_EXISTS:boost_predef>
-                      $<TARGET_NAME_IF_EXISTS:boost_multiprecision>)
+                      ${Boost_LIBRARIES})
 
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})

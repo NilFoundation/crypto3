@@ -32,12 +32,12 @@
 
 #include <boost/container/small_vector.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/integer.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/integer.hpp>
 
 #include <nil/crypto3/detail/inline_variable.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
 namespace nil {
     namespace crypto3 {
