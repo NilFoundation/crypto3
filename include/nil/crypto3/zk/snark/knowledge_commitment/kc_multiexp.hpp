@@ -44,10 +44,10 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename T1, typename T2, typename Backend,
-                         boost::multiprecision::expression_template_option ExpressionTemplates>
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
                 typename knowledge_commitment<T1, T2>::value_type
                     opt_window_wnaf_exp(const typename knowledge_commitment<T1, T2>::value_type &base,
-                                        const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar,
+                                        const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &scalar,
                                         const std::size_t scalar_bits) {
                     return typename knowledge_commitment<T1, T2>::value_type(
                         opt_window_wnaf_exp(base.g, scalar, scalar_bits),
