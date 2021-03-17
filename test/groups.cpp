@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
 
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/crypto3/multiprecision/modular/base_params.hpp>
 
 using namespace nil::crypto3::algebra;
 

@@ -53,7 +53,7 @@
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 using namespace nil::crypto3::algebra;
 
@@ -201,7 +201,7 @@ enum curve_operation_test_points : std::size_t {
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
                             const std::vector<std::size_t> &constants) {
-    using boost::multiprecision::cpp_int;
+    using nil::crypto3::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);

@@ -28,8 +28,8 @@
 
 #include <nil/crypto3/algebra/pairing/detail/bls12/basic_policy.hpp>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -282,7 +282,7 @@ namespace nil {
                             ate_ell_coeffs c;
 
                             for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -313,7 +313,7 @@ namespace nil {
                             ate_ell_coeffs c;
 
                             for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -352,7 +352,7 @@ namespace nil {
                             const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
                             for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;

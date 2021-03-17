@@ -36,7 +36,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
@@ -50,7 +50,7 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra::curves::detail;
 using namespace nil::crypto3::algebra::curves;

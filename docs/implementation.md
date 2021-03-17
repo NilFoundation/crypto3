@@ -3,9 +3,9 @@
 @tableofcontents
 
 The key idea of `algebra` is to provide usefull interfaces for basic cryptography math. It's based on NilFoundation fork of 
-boost::multiprecision and boost::integer modules as backend so that it can be used with boost cpp_int, gmp or other backends.
+nil::crypto3::multiprecision and boost::integer modules as backend so that it can be used with boost cpp_int, gmp or other backends.
 
-We expanded boost::multiprecision with `modular_adaptor`, which is actually a multi-precision number by some modular. It contains 
+We expanded nil::crypto3::multiprecision with `modular_adaptor`, which is actually a multi-precision number by some modular. It contains 
 modular number-specific algorithms using Montgomery representation. It also supports compile-time computations, because it gives 
 us opportunity to implement algebra constructions as constexpr.
 

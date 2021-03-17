@@ -37,7 +37,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -50,7 +50,7 @@
 
 using namespace nil::crypto3::algebra::pairings;
 using namespace nil::crypto3::algebra;
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {

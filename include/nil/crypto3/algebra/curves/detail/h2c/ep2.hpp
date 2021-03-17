@@ -32,14 +32,14 @@
 
 #include <type_traits>
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    using namespace boost::multiprecision;
+                    using namespace nil::crypto3::multiprecision;
 
                     template<typename GroupType>
                     struct ep2_map {

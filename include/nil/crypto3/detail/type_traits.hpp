@@ -343,16 +343,16 @@ namespace nil {
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_base_field_bits<T>::value && has_base_field_type<T>::value &&
-                                          has_number_type<T>::value && has_base_field_modulus<T>::value &&
-                                          has_scalar_field_bits<T>::value && has_scalar_field_type<T>::value &&
-                                          has_scalar_field_modulus<T>::value && has_g1_type<T>::value &&
-                                          has_g2_type<T>::value && has_gt_type<T>::value && has_p<T>::value &&
-                                          has_q<T>::value;
+                static const bool value =
+                    has_base_field_bits<T>::value && has_base_field_type<T>::value && has_number_type<T>::value &&
+                    has_base_field_modulus<T>::value && has_scalar_field_bits<T>::value &&
+                    has_scalar_field_type<T>::value && has_scalar_field_modulus<T>::value && has_g1_type<T>::value &&
+                    has_g2_type<T>::value && has_gt_type<T>::value && has_p<T>::value && has_q<T>::value;
                 typedef T type;
             };
 
-            template<typename T> //TODO: we should add some other params to curve group policy to identify it more clearly
+            template<typename T>    // TODO: we should add some other params to curve group policy to identify it more
+                                    // clearly
             struct is_curve_group {
                 static const bool value = has_value_type<T>::value && has_underlying_field_type<T>::value &&
                                           has_value_bits<T>::value && has_curve_type<T>::value;

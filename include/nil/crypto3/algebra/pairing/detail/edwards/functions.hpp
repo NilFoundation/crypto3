@@ -28,8 +28,8 @@
 
 #include <nil/crypto3/algebra/pairing/detail/edwards/basic_policy.hpp>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -280,7 +280,7 @@ namespace nil {
 
                             bool found_one = false;
                             for (long i = policy_type::scalar_field_bits; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -311,7 +311,7 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
                             for (long i = policy_type::scalar_field_bits - 1; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -499,7 +499,7 @@ namespace nil {
 
                             bool found_one = false;
                             for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -526,7 +526,7 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
                             for (long i = number_type_max_bits - 1; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -561,7 +561,7 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
                             for (long i = number_type_max_bits - 1; i >= 0; --i) {
-                                const bool bit = boost::multiprecision::bit_test(loop_count, i);
+                                const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;

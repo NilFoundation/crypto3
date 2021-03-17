@@ -33,7 +33,7 @@
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/literals.hpp>
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 namespace nil {
     namespace crypto3 {

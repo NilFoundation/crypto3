@@ -29,11 +29,11 @@
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 // temporary includes begin
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 // temporary includes end
 
 #include <cstdint>
@@ -46,19 +46,19 @@ namespace nil {
 
                     template<typename GroupValueType,
                              typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType
                         scalar_mul(const GroupValueType &base,
-                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
+                                   const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         GroupValueType result;
 
                         bool found_one = false;
-                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
+                        for (auto i = static_cast<std::int64_t>(nil::crypto3::multiprecision::msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }
 
-                            if (boost::multiprecision::bit_test(scalar, i)) {
+                            if (nil::crypto3::multiprecision::bit_test(scalar, i)) {
                                 found_one = true;
                                 result = result + base;
                             }
@@ -69,17 +69,17 @@ namespace nil {
 
                     template<typename GroupValueType,
                              typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType operator*(const GroupValueType &left,
-                                             const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
+                                             const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
                              typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
+                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                    constexpr GroupValueType operator*(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &left,
                                              const GroupValueType &right) {
 
                         return right * left;
@@ -115,7 +115,7 @@ namespace nil {
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_modulus_type;
 
                         return left * non_fixed_precision_modulus_type(right.data);

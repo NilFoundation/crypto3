@@ -26,9 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,21 +46,21 @@ namespace nil {
                 struct field {
 
                     constexpr static const std::size_t modulus_bits = ModulusBits;
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                        modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
-                        boost::multiprecision::unchecked, void>>
+                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<
+                        modulus_bits, modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>
                         modulus_type;
 
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                        16 * modulus_bits, 16 * modulus_bits, boost::multiprecision::unsigned_magnitude,
-                        boost::multiprecision::unchecked, void>>
+                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<
+                        16 * modulus_bits, 16 * modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>
                         extended_modulus_type;
 
                     constexpr static const std::size_t number_bits = ModulusBits;
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::modular_adaptor<
-                        boost::multiprecision::backends::cpp_int_backend<
-                            modulus_bits, modulus_bits, boost::multiprecision::signed_magnitude,
-                            boost::multiprecision::unchecked, void
+                    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<
+                        nil::crypto3::multiprecision::backends::cpp_int_backend<
+                            modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
+                            nil::crypto3::multiprecision::unchecked, void
                             >>>
                         number_type;
                 };

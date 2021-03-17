@@ -27,10 +27,10 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
-#include <boost/multiprecision/ressol.hpp>
-#include <boost/multiprecision/inverse.hpp>
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/ressol.hpp>
+#include <nil/crypto3/multiprecision/inverse.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <boost/type_traits/is_integral.hpp>
 
@@ -212,14 +212,14 @@ namespace nil {
                         template<typename PowerType,
                             typename = typename std::enable_if<boost::is_integral<PowerType>::value>::type>
                         constexpr element_fp pow(const PowerType pwr) const {
-                            using boost::multiprecision::powm;
-                            using boost::multiprecision::uint128_t;
+                            using nil::crypto3::multiprecision::powm;
+                            using nil::crypto3::multiprecision::uint128_t;
                             return element_fp(powm(data, uint128_t(pwr)));
                         }
 
-                        template <typename Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr element_fp pow(const boost::multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
-                            using boost::multiprecision::powm;
+                        template <typename Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr element_fp pow(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
+                            using nil::crypto3::multiprecision::powm;
                             return element_fp(powm(data, pwr));
                         }
                     };

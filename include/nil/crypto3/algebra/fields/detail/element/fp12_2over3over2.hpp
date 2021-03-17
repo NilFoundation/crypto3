@@ -28,8 +28,8 @@
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -252,12 +252,12 @@ namespace nil {
                                 return res;
 
                             bool found_one = false;
-                            for (long i = boost::multiprecision::msb(exponent); i >= 0; --i) {
+                            for (long i = nil::crypto3::multiprecision::msb(exponent); i >= 0; --i) {
                                 if (found_one) {
                                     res = res.cyclotomic_squared();
                                 }
 
-                                if (boost::multiprecision::bit_test(exponent, i)) {
+                                if (nil::crypto3::multiprecision::bit_test(exponent, i)) {
                                     found_one = true;
                                     res = res * (*this);
                                 }

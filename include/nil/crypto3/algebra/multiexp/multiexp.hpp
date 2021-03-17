@@ -29,8 +29,8 @@
 
 #include <vector>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/curves/params.hpp>
@@ -192,7 +192,7 @@ namespace nil {
 
                 typedef typename FieldType::number_type number_type;
                 // temporary added until fixed-precision modular adaptor is ready:
-                typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                     non_fixed_precision_number_type;
 
                 const std::size_t outerc = (scalar_size + window - 1) / window;
@@ -203,7 +203,7 @@ namespace nil {
                 for (std::size_t outer = 0; outer < outerc; ++outer) {
                     std::size_t inner = 0;
                     for (std::size_t i = 0; i < window; ++i) {
-                        if (boost::multiprecision::bit_test(non_fixed_precision_number_type(pow_val),
+                        if (nil::crypto3::multiprecision::bit_test(non_fixed_precision_number_type(pow_val),
                                                             outer * window + i)) {
                             inner |= 1u << i;
                         }

@@ -26,9 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_MP_DEFINES_HPP
 #define CRYPTO3_ALGEBRA_MP_DEFINES_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/cpp_modular.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_modular.hpp>
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(64)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(92)

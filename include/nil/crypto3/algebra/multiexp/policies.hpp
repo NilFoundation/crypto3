@@ -29,8 +29,8 @@
 
 #include <vector>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
@@ -125,7 +125,7 @@ namespace nil {
                                                           InputFieldIterator exponents_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_number_type;
 
                         std::size_t length = std::distance(bases, bases_end);
@@ -139,7 +139,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i < length; i++) {
                             bn_exponents[i] = non_fixed_precision_number_type(exponents[i].data);
-                            std::size_t bn_exponents_i_msb = boost::multiprecision::msb(bn_exponents[i]) + 1;
+                            std::size_t bn_exponents_i_msb = nil::crypto3::multiprecision::msb(bn_exponents[i]) + 1;
                             num_bits = std::max(num_bits, bn_exponents_i_msb);
                         }
 
@@ -161,7 +161,7 @@ namespace nil {
                             for (std::size_t i = 0; i < length; i++) {
                                 std::size_t id = 0;
                                 for (std::size_t j = 0; j < c; j++) {
-                                    if (boost::multiprecision::bit_test(bn_exponents[i], k * c + j)) {
+                                    if (nil::crypto3::multiprecision::bit_test(bn_exponents[i], k * c + j)) {
                                         id |= 1 << j;
                                     }
                                 }
@@ -244,7 +244,7 @@ namespace nil {
                                                           InputFieldIterator scalar_end) {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_number_type;
 
                         if (vec_start == vec_end) {
@@ -291,7 +291,7 @@ namespace nil {
                             detail::ordered_exponent<non_fixed_precision_number_type> &b =
                                 (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
 
-                            const std::size_t abits = boost::multiprecision::msb(a.r) + 1;
+                            const std::size_t abits = nil::crypto3::multiprecision::msb(a.r) + 1;
 
                             if (b.r.is_zero()) {
                                 // opt_result = opt_result + (a.r * g[a.idx]);
@@ -299,7 +299,7 @@ namespace nil {
                                 break;
                             }
 
-                            const std::size_t bbits = boost::multiprecision::msb(b.r) + 1;
+                            const std::size_t bbits = nil::crypto3::multiprecision::msb(b.r) + 1;
                             const std::size_t limit = (abits - bbits >= 20 ? 20 : abits - bbits);
 
                             if (bbits < 1ul << limit) {
