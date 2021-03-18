@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_HASH_DETAIL_MD5_POLICY_HPP
@@ -44,8 +60,9 @@ namespace nil {
                     constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
                     typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x20, 0x30, 0x0C, 0x06, 0x08, 0x2A, 0x86, 0x48,
-                                                                   0x86, 0xF7, 0x0D, 0x02, 0x05, 0x05, 0x00, 0x04, 0x10};
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x20, 0x30, 0x0C, 0x06, 0x08,
+                                                                   0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D,
+                                                                   0x02, 0x05, 0x05, 0x00, 0x04, 0x10};
 
                     struct iv_generator {
                         state_type const &operator()() const {

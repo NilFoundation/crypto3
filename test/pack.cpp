@@ -2,9 +2,25 @@
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE hash_pack_test
@@ -23,7 +39,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::detail;
 using namespace nil::crypto3::stream_endian;
-
 
 BOOST_AUTO_TEST_SUITE(pack_imploder_test_suite)
 
@@ -50,7 +65,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
     std::array<uint8_t, 4> in = {{0x12, 0x34, 0x56, 0x78}};
     std::array<uint32_t, 1> out {};
-    std::array<uint32_t, 1> res = {{0x482c6a1e}}; 
+    std::array<uint32_t, 1> res = {{0x482c6a1e}};
 
     pack<big_octet_big_bit, big_octet_little_bit, 8, 32>(in.begin(), in.end(), out.begin());
 
@@ -74,7 +89,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 
     pack<big_octet_big_bit, little_octet_big_bit, 8, 64>(in.begin(), in.end(), out.begin());
 
-    BOOST_CHECK(out == res);    
+    BOOST_CHECK(out == res);
 }
 
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
@@ -188,8 +203,8 @@ BOOST_AUTO_TEST_CASE(lubb_to_lulb_2) {
 }
 
 BOOST_AUTO_TEST_CASE(bulb_to_bubb_1) {
-    std::array<uint8_t, 16> in = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 
-                                   0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
+    std::array<uint8_t, 16> in = {
+        {0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
     std::array<uint64_t, 2> out {};
     std::array<uint64_t, 2> res = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}};
 
@@ -350,7 +365,6 @@ BOOST_AUTO_TEST_CASE(lulb_to_lulb_2) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
 BOOST_AUTO_TEST_SUITE(pack_exploder_test_suite)
 
 BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
@@ -376,7 +390,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
     std::array<uint32_t, 1> in = {{0x482c6a1e}};
     std::array<uint8_t, 4> out {};
-    std::array<uint8_t, 4> res = {{0x12, 0x34, 0x56, 0x78}}; 
+    std::array<uint8_t, 4> res = {{0x12, 0x34, 0x56, 0x78}};
 
     pack<big_octet_big_bit, big_octet_little_bit, 32, 8>(in.begin(), in.end(), out.begin());
 
@@ -400,7 +414,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 
     pack<big_octet_big_bit, little_octet_big_bit, 64, 8>(in.begin(), in.end(), out.begin());
 
-    BOOST_CHECK(out == res);    
+    BOOST_CHECK(out == res);
 }
 
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
@@ -514,10 +528,10 @@ BOOST_AUTO_TEST_CASE(lubb_to_lulb_2) {
 }
 
 BOOST_AUTO_TEST_CASE(bulb_to_bubb_1) {
-    std::array<uint64_t, 2> in = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}}; 
+    std::array<uint64_t, 2> in = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}};
     std::array<uint8_t, 16> out {};
-    std::array<uint8_t, 16> res = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 
-                                    0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
+    std::array<uint8_t, 16> res = {
+        {0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
 
     pack<big_octet_little_bit, big_octet_big_bit, 64, 8>(in.begin(), in.end(), out.begin());
 
@@ -675,7 +689,6 @@ BOOST_AUTO_TEST_CASE(lulb_to_lulb_2) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(pack_equal_test_suite)
 
