@@ -192,9 +192,9 @@ namespace nil {
                     BOOST_THROW_EXCEPTION(std::invalid_argument("ressol: value to solve for must be less than p"));
                 }
 
-                if (eval_eq(p, 2)) {
+                if (eval_eq(p, 2ul)) {
                     return a;
-                } else if (!eval_gt(p, 1)) {
+                } else if (!eval_gt(p, 1ul)) {
                     BOOST_THROW_EXCEPTION(std::invalid_argument("ressol: prime must be > 1 a"));
                 } else if (eval_integer_modulus(p, 2) == 0) {
                     BOOST_THROW_EXCEPTION(std::invalid_argument("ressol: invalid prime"));
@@ -259,14 +259,14 @@ namespace nil {
                 eval_pow(c_mod, z_mod, q);
                 n_mod.mod_data().adjust_regular(n, n_mod.base_data());
 
-                while (eval_gt(n, 1)) {
+                while (eval_gt(n, 1ul)) {
                     Backend q;
                     size_t i = 0;
 
                     q_mod = n_mod;
                     q_mod.mod_data().adjust_regular(q, q_mod.base_data());
 
-                    while (!eval_eq(q, 1)) {
+                    while (!eval_eq(q, 1ul)) {
                         eval_pow(res_mod, q_mod, two);
                         q_mod = res_mod;
                         ++i;

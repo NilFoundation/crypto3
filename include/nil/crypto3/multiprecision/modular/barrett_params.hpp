@@ -67,7 +67,7 @@ namespace nil {
                         using default_ops::eval_subtract;
 
                         if (eval_lt(result, this->m_mod.backend())) {
-                            if (eval_lt(result, 0)) {
+                            if (eval_lt(result, 0ul)) {
                                 eval_add(result, this->m_mod.backend());
                                 return;
                             }
