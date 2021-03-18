@@ -9,13 +9,15 @@
 #ifndef CRYPTO3_HASH_POSEIDON_LFSR_HPP
 #define CRYPTO3_HASH_POSEIDON_LFSR_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
+                using namespace nil::crypto3::multiprecision;
+
                 template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
                 struct poseidon_lfsr {
                     typedef poseidon_policy<FieldType, Arity, PartRounds> policy_type;
@@ -29,9 +31,9 @@ namespace nil {
                     constexpr static const modulus_type modulus = FieldType::modulus;
 
                     constexpr static const std::size_t lfsr_state_bits = 80;
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                        lfsr_state_bits, lfsr_state_bits, boost::multiprecision::cpp_integer_type::unsigned_magnitude,
-                        boost::multiprecision::cpp_int_check_type::unchecked, void>>
+                    typedef number<backends::cpp_int_backend<
+                        lfsr_state_bits, lfsr_state_bits, cpp_integer_type::unsigned_magnitude,
+                        cpp_int_check_type::unchecked, void>>
                         lfsr_state_type;
 
                     constexpr static const std::size_t constants_number = (full_rounds + part_rounds) * state_words;
