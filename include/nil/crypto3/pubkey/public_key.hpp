@@ -38,9 +38,9 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            struct public_key {
+            struct _public_key {
                 typedef Scheme scheme_type;
-                typedef public_key<scheme_type> self_type;
+                typedef _public_key<scheme_type> self_type;
                 typedef typename scheme_type::public_key_policy_type public_key_policy_type;
 
                 typedef typename public_key_policy_type::public_key_type public_key_type;
@@ -61,11 +61,11 @@ namespace nil {
 
                 // typedef bool result_type;
 
-                public_key(const public_key_type &key, const public_params &pp) :
+                _public_key(const public_key_type &key, const public_params &pp) :
                     pubkey(key), pp(pp), pubkey_id(public_key_policy_type::get_id(pubkey)) {
                 }
 
-                public_key(const public_key_type &key, const public_params &pp, const signature_type &signature) :
+                _public_key(const public_key_type &key, const public_params &pp, const signature_type &signature) :
                     pubkey(key), pp(pp), sig(signature), pubkey_id(public_key_policy_type::get_id(pubkey)) {
                 }
 

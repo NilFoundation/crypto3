@@ -29,6 +29,11 @@
 #include <iterator>
 #include <type_traits>
 
+#include <boost/assert.hpp>
+#include <boost/concept_check.hpp>
+
+#include <boost/range/concepts.hpp>
+
 #include <boost/parameter/value_type.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
@@ -37,6 +42,7 @@
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/public_params.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,48 +57,63 @@ namespace nil {
                     typedef typename mode_type::key_type key_type;
 
                     constexpr static const auto block_bits = mode_type::input_block_bits;
-                    typedef typename mode_type::input_block_type block_type;
+                    typedef typename mode_type::input_block_type input_block_type;
 
                     constexpr static const auto value_bits = mode_type::input_value_bits;
-                    typedef typename mode_type::input_value_type value_type;
+                    typedef typename mode_type::input_value_type input_value_type;
+
+                    typedef typename key_type::public_key_type public_key_type;
+                    typedef typename key_type::private_key_type private_key_type;
+                    typedef typename key_type::signature_type signature_type;
+                    typedef typename key_type::public_params_type public_params_type;
 
                 public:
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    sign_impl(const Args &args) : key(args[boost::accumulators::sample]) {
+                    sign_impl(const Args &args) :
+                        private_key(args[boost::accumulators::sample]),
+                        pp(args[::nil::crypto3::accumulators::public_params]) {
                     }
 
                     template<typename Args>
                     inline void operator()(const Args &args) {
-                        resolve_type(args[boost::accumulators::sample],
-                                     args[::nil::crypto3::accumulators::iterator_last | typename block_type::iterator()]);
+                        resolve_type(
+                            args[boost::accumulators::sample],
+                            args[::nil::crypto3::accumulators::iterator_last | typename input_block_type::iterator()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(key, cache);
+                        return mode_type::process(private_key, cache, pp);
                     }
 
                 protected:
-                    template<typename InputIterator>
-                    inline void resolve_type(const block_type &value, InputIterator) {
-                        std::copy(value.cbegin(), value.cend(), std::back_inserter(cache));
+                    template<typename InputBlock, typename InputIterator>
+                    inline void resolve_type(const InputBlock &block, InputIterator) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
+                        resolve_type(block.cbegin(), block.cend());
                     }
 
-                    template<typename InputIterator>
-                    inline void resolve_type(const value_type &value, InputIterator) {
+                    template<
+                        typename ValueType,
+                        typename InputIterator,
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    inline void resolve_type(const ValueType &value, InputIterator) {
                         cache.emplace_back(value);
                     }
 
-                    template<typename InputIterator,
-                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                             typename = typename std::enable_if<std::is_same<value_type, ValueType>::value>::type>
+                    template<
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
                     inline void resolve_type(InputIterator first, InputIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
                         std::copy(first, last, std::back_inserter(cache));
                     }
 
-                    key_type key;
-                    block_type cache;
+                    key_type private_key;
+                    input_block_type cache;
+                    public_params_type pp;
                 };
             }    // namespace impl
 

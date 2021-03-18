@@ -26,9 +26,19 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
-#include <boost/mpl/vector.hpp>
+#include <map>
+#include <vector>
+#include <iterator>
+#include <type_traits>
+#include <utility>
+#include <functional>
+
+#include <boost/assert.hpp>
+#include <boost/concept_check.hpp>
 
 #include <boost/range/concepts.hpp>
+
+#include <boost/mpl/vector.hpp>
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 
@@ -36,10 +46,10 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_basic_policy.hpp>
 #include <nil/crypto3/pubkey/detail/bls/bls_core_functions.hpp>
 #include <nil/crypto3/pubkey/detail/stream_processor.hpp>
+#include <nil/crypto3/pubkey/pk_keys.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -87,7 +97,7 @@ namespace nil {
                     typedef SignatureVariant signature_variant;
                     typedef typename signature_variant::policy_type policy_type;
                     typedef typename signature_variant::core_functions core_functions;
-                    typedef bls_public_params public_params;
+                    typedef bls_public_params public_params_type;
 
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
@@ -96,7 +106,7 @@ namespace nil {
 
                     template<typename MsgRange>
                     static inline signature_type sign(const private_key_type &privkey, const MsgRange &message,
-                                                      const public_params &pp) {
+                                                      const public_params_type &pp) {
                         return sign(privkey, message, pp.dst);
                     }
 
@@ -105,24 +115,25 @@ namespace nil {
                     // //
                     // template<typename MsgRange, typename SignatureRange>
                     // static inline signature_type sign(const private_key_type &privkey, const MsgRange &message,
-                    //                                   const SignatureRange &signatures, const public_params &pp) {
+                    //                                   const SignatureRange &signatures, const public_params_type &pp)
+                    //                                   {
                     //     return aggregate(sign(privkey, message, pp), signatures);
                     // }
 
                     template<typename MsgRange>
                     static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
-                                              const signature_type &signature, const public_params &pp) {
+                                              const signature_type &signature, const public_params_type &pp) {
                         return verify(pubkey, message, pp.dst, signature);
                     }
 
                     template<typename PubkeyRange, typename MsgRange>
                     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &messages,
-                                                        const signature_type &signature, const public_params &pp) {
+                                                        const signature_type &signature, const public_params_type &pp) {
                         return aggregate_verify(pubkeys, messages, pp.dst, signature);
                     }
 
-                    static inline pubkey_id_type get_pubkey_id(const public_key_type &pubkey) {
-                        return core_functions::get_pubkey_id(pubkey);
+                    static inline pubkey_id_type get_pubkey_bits(const public_key_type &pubkey) {
+                        return core_functions::get_pubkey_bits(pubkey);
                     }
 
                     static inline public_key_type generate_public_key(const private_key_type &privkey) {
@@ -142,15 +153,20 @@ namespace nil {
                         return core_functions::core_verify(pubkey, message, dst, signature);
                     }
 
+                    static inline signature_type aggregate(const signature_type &init_signature,
+                                                           const signature_type &signature) {
+                        return core_functions::core_aggregate(init_signature, signature);
+                    }
+
                     template<typename SignatureRange>
                     static inline signature_type aggregate(const SignatureRange &signatures) {
                         return core_functions::core_aggregate(signatures);
                     }
 
                     template<typename SignatureRange>
-                    static inline signature_type aggregate(const signature_type &signature,
+                    static inline signature_type aggregate(const signature_type &init_signature,
                                                            const SignatureRange &signatures) {
-                        return core_functions::core_aggregate(signature, signatures);
+                        return core_functions::core_aggregate(init_signature, signatures);
                     }
 
                     template<typename PubkeyRange, typename MsgsRange, typename DstRange>
@@ -170,7 +186,7 @@ namespace nil {
                     typedef SignatureVariant signature_variant;
                     typedef typename signature_variant::policy_type policy_type;
                     typedef typename signature_variant::core_functions core_functions;
-                    typedef bls_public_params public_params;
+                    typedef bls_public_params public_params_type;
 
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
@@ -179,24 +195,24 @@ namespace nil {
 
                     template<typename MsgRange>
                     static inline signature_type sign(const private_key_type &privkey, const MsgRange &message,
-                                                      const public_params &pp) {
+                                                      const public_params_type &pp) {
                         return sign(privkey, message, pp.dst);
                     }
 
                     template<typename MsgRange>
                     static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
-                                              const signature_type &signature, const public_params &pp) {
+                                              const signature_type &signature, const public_params_type &pp) {
                         return verify(pubkey, message, pp.dst, signature);
                     }
 
                     template<typename PubkeyRange, typename MsgRange>
                     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &messages,
-                                                        const signature_type &signature, const public_params &pp) {
+                                                        const signature_type &signature, const public_params_type &pp) {
                         return aggregate_verify(pubkeys, messages, pp.dst, signature);
                     }
 
-                    static inline pubkey_id_type get_pubkey_id(const public_key_type &pubkey) {
-                        return core_functions::get_pubkey_id(pubkey);
+                    static inline pubkey_id_type get_pubkey_bits(const public_key_type &pubkey) {
+                        return core_functions::get_pubkey_bits(pubkey);
                     }
 
                     static inline public_key_type generate_public_key(const private_key_type &privkey) {
@@ -224,6 +240,12 @@ namespace nil {
                         return core_functions::core_aggregate(signatures);
                     }
 
+                    template<typename SignatureRange>
+                    static inline signature_type aggregate(const signature_type &init_signature,
+                                                           const SignatureRange &signatures) {
+                        return core_functions::core_aggregate(init_signature, signatures);
+                    }
+
                     template<typename PubkeyRange, typename MsgsRange, typename DstRange>
                     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
                                                         const DstRange &dst, const signature_type &signature) {
@@ -240,7 +262,7 @@ namespace nil {
                     typedef SignatureVariant signature_variant;
                     typedef typename signature_variant::policy_type policy_type;
                     typedef typename signature_variant::core_functions core_functions;
-                    typedef bls_pop_public_params public_params;
+                    typedef bls_pop_public_params public_params_type;
 
                     typedef typename policy_type::private_key_type private_key_type;
                     typedef typename policy_type::public_key_type public_key_type;
@@ -249,42 +271,44 @@ namespace nil {
 
                     template<typename MsgRange>
                     static inline signature_type sign(const private_key_type &privkey, const MsgRange &message,
-                                                      const public_params &pp) {
+                                                      const public_params_type &pp) {
                         return sign(privkey, message, pp.dst);
                     }
 
                     template<typename MsgRange>
                     static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
-                                              const signature_type &signature, const public_params &pp) {
+                                              const signature_type &signature, const public_params_type &pp) {
                         return verify(pubkey, message, pp.dst, signature);
                     }
 
                     template<typename PubkeyRange, typename MsgRange>
                     static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &messages,
-                                                        const signature_type &signature, const public_params &pp) {
+                                                        const signature_type &signature, const public_params_type &pp) {
                         return aggregate_verify(pubkeys, messages, pp.dst, signature);
                     }
 
-                    static inline pubkey_id_type get_pubkey_id(const public_key_type &pubkey) {
-                        return core_functions::get_pubkey_id(pubkey);
+                    static inline pubkey_id_type get_pubkey_bits(const public_key_type &pubkey) {
+                        return core_functions::get_pubkey_bits(pubkey);
                     }
 
                     static inline public_key_type generate_public_key(const private_key_type &privkey) {
                         return core_functions::sk_to_pk(privkey);
                     }
 
-                    static inline signature_type pop_prove(const private_key_type &privkey, const public_params &pp) {
+                    static inline signature_type pop_prove(const private_key_type &privkey,
+                                                           const public_params_type &pp) {
                         return core_functions::pop_prove(privkey, pp.pop_dst);
                     }
 
-                    static inline bool pop_verify(const public_key_type &pubkey, const public_params &pp,
+                    static inline bool pop_verify(const public_key_type &pubkey, const public_params_type &pp,
                                                   const signature_type &proof) {
                         return core_functions::pop_verify(pubkey, pp.pop_dst, proof);
                     }
 
                     template<typename PubkeyRange, typename MsgRange>
                     static inline bool fast_aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &message,
-                                                             const public_params &pp, const signature_type &signature) {
+                                                             const public_params_type &pp,
+                                                             const signature_type &signature) {
                         return core_functions::fast_aggregate_verify(pubkeys, message, pp.dst, signature);
                     }
 
@@ -304,6 +328,12 @@ namespace nil {
                     template<typename SignatureRange>
                     static inline signature_type aggregate(const SignatureRange &signatures) {
                         return core_functions::core_aggregate(signatures);
+                    }
+
+                    template<typename SignatureRange>
+                    static inline signature_type aggregate(const signature_type &init_signature,
+                                                           const SignatureRange &signatures) {
+                        return core_functions::core_aggregate(init_signature, signatures);
                     }
 
                     template<typename PubkeyRange, typename MsgsRange, typename DstRange>
@@ -378,102 +408,12 @@ namespace nil {
                 typedef detail::bls_pop_scheme<SignatureVariant> bls_scheme_type;
             };
 
-            // TODO: add specialization for pop scheme
-            template<typename BlsScheme>
-            struct bls_private_key {
-                typedef BlsScheme bls_scheme_type;
-
-                typedef typename bls_scheme_type::private_key_type private_key_type;
-                typedef typename bls_scheme_type::public_key_type public_key_type;
-                typedef typename bls_scheme_type::signature_type signature_type;
-                typedef typename bls_scheme_type::public_params public_params;
-
-                typedef std::vector<std::uint8_t> input_block_type;
-                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
-
-                typedef typename input_block_type::value_type input_value_type;
-                constexpr static const std::size_t input_value_bits = 8;
-
-                typedef private_key_type key_type;
-
-                static inline public_key_type key_gen(const private_key_type &privkey) {
-                    return bls_scheme_type::generate_public_key(privkey);
-                }
-
-                template<typename MsgRange>
-                static inline signature_type sign(const MsgRange &msg, const private_key_type &privkey,
-                                                  const public_params &pp) {
-                    return bls_scheme_type::sign(privkey, msg, pp);
-                }
-            };
-
-            // TODO: add specialization for pop scheme
-            template<typename BlsScheme>
-            struct bls_public_key {
-                typedef BlsScheme bls_scheme_type;
-
-                typedef typename bls_scheme_type::private_key_type private_key_type;
-                typedef typename bls_scheme_type::public_key_type public_key_type;
-                typedef typename bls_scheme_type::signature_type signature_type;
-                typedef typename bls_scheme_type::public_params public_params;
-                typedef typename bls_scheme_type::pubkey_id_type pubkey_id_type;
-
-                typedef std::vector<std::uint8_t> input_block_type;
-                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
-
-                typedef typename input_block_type::value_type input_value_type;
-                constexpr static const std::size_t input_value_bits = 8;
-
-                typedef public_key_type key_type;
-
-                template<typename MsgRange>
-                static inline bool verify(const MsgRange &msg, const public_key_type &pubkey, const signature_type &sig,
-                                          const public_params &pp) {
-                    return bls_scheme_type::verify(pubkey, msg, sig, pp);
-                }
-
-                template<typename MsgsRange, typename PubkeyRange>
-                static inline bool aggregate_verify(const MsgsRange &msgs, const PubkeyRange &pubkeys,
-                                                    const signature_type &sig, const public_params &pp) {
-                    return bls_scheme_type::aggregate_verify(pubkeys, msgs, sig, pp);
-                }
-
-                static inline pubkey_id_type get_id(const public_key_type &pubkey) {
-                    return bls_scheme_type::get_pubkey_id(pubkey);
-                }
-            };
-
-            template<typename BlsScheme>
-            struct bls_no_key {
-                typedef BlsScheme bls_scheme_type;
-
-                typedef typename bls_scheme_type::signature_type signature_type;
-
-                typedef std::vector<signature_type> input_block_type;
-                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
-
-                typedef typename input_block_type::value_type input_value_type;
-                constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
-
-                template<typename SignatureRange>
-                static inline signature_type aggregate(const SignatureRange &sigs) {
-                    return bls_scheme_type::aggregate(sigs);
-                }
-            };
-
             template<typename SignatureVariant, bls_scheme_enum bls_scheme = bls_scheme_enum::basic>
-            class bls {
+            struct bls {
                 typedef typename bls_scheme_trait<bls_scheme, SignatureVariant>::bls_scheme_type bls_scheme_type;
 
-            public:
-                typedef bls_private_key<bls_scheme_type> private_key_policy_type;
-                typedef bls_public_key<bls_scheme_type> public_key_policy_type;
-                typedef bls_no_key<bls_scheme_type> no_key_policy_type;
-
-                typedef typename private_key_policy_type::private_key_type private_key_type;
-                typedef typename private_key_policy_type::public_key_type public_key_type;
-                typedef typename private_key_policy_type::signature_type signature_type;
-                typedef typename private_key_policy_type::public_params public_params;
+                typedef typename bls_scheme_type::signature_type signature_type;
+                typedef typename bls_scheme_type::public_params_type public_params_type;
 
                 template<typename Mode, typename AccumulatorSet, std::size_t ValueBits = 0>
                 struct stream_processor {
@@ -484,6 +424,199 @@ namespace nil {
                     };
                     typedef ::nil::crypto3::pubkey::stream_processor<Mode, AccumulatorSet, params_type> type;
                 };
+            };
+
+            // TODO: add specialization for pop scheme
+            template<typename SignatureVariant, bls_scheme_enum bls_scheme>
+            struct public_key<bls<SignatureVariant, bls_scheme>> {
+                typedef bls<SignatureVariant, bls_scheme> scheme_type;
+                typedef typename scheme_type::bls_scheme_type bls_scheme_type;
+
+                typedef typename bls_scheme_type::private_key_type private_key_type;
+                typedef typename bls_scheme_type::public_key_type public_key_type;
+                typedef typename bls_scheme_type::signature_type signature_type;
+                typedef typename bls_scheme_type::public_params_type public_params_type;
+                typedef typename bls_scheme_type::pubkey_id_type pubkey_id_type;
+
+                typedef std::vector<std::uint8_t> input_block_type;
+                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
+
+                typedef typename input_block_type::value_type input_value_type;
+                constexpr static const std::size_t input_value_bits = 8;
+
+                typedef std::pair<public_key, input_block_type> aggregate_value_type;
+                typedef std::map<public_key, input_block_type> aggregate_type;
+
+                template<typename AggregateValueType, typename Pubkey = typename AggregateValueType::first_type,
+                         typename BlockType = typename AggregateValueType::second_type,
+                         typename std::enable_if<std::is_same<public_key, typename std::remove_cv<Pubkey>::type>::value,
+                                                 bool>::type = true,
+                         typename std::enable_if<std::is_same<input_value_type, typename BlockType::value_type>::value,
+                                                 bool>::type = true>
+                using check_aggregate_value_type =
+                    typename std::enable_if<std::is_same<std::pair<Pubkey, BlockType>, AggregateValueType>::value,
+                                            bool>::type;
+
+                template<typename AggregateData>
+                using check_aggregate_type = check_aggregate_value_type<typename AggregateData::value_type>;
+
+                public_key() {
+                }
+
+                public_key(const public_key_type &pubkey) : pubkey(pubkey) {
+                }
+
+                template<typename MsgRange,
+                         typename std::enable_if<std::is_same<input_value_type, typename MsgRange::value_type>::value,
+                                                 bool>::type = true>
+                inline bool verify(const MsgRange &msg, const signature_type &sig, const public_params_type &pp) const {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
+                    return bls_scheme_type::verify(pubkey, msg, sig, pp);
+                }
+
+                template<typename AggregateData, check_aggregate_type<AggregateData> = true>
+                static inline bool aggregate_verify(const AggregateData &agg_data, const signature_type &sig,
+                                                    const public_params_type &pp) {
+                    using BlockType = typename AggregateData::value_type::second_type;
+                    std::vector<std::reference_wrapper<const public_key_type>> pubkeys;
+                    std::vector<std::reference_wrapper<const BlockType>> msgs;
+                    for (const auto &pubkey_msg : agg_data) {
+                        pubkeys.emplace_back(pubkey_msg.first.get_pubkey());
+                        msgs.emplace_back(pubkey_msg.second);
+                    }
+                    return bls_scheme_type::aggregate_verify(pubkeys, msgs, sig, pp);
+                }
+
+                inline pubkey_id_type get_pubkey_bits() const {
+                    return bls_scheme_type::get_pubkey_bits(pubkey);
+                }
+
+                inline const public_key_type &get_pubkey() const {
+                    return pubkey;
+                }
+
+                inline bool operator<(const public_key &other) const {
+                    return get_pubkey_bits() < other.get_pubkey_bits();
+                }
+
+                template<typename AggregateData, typename InputIterator,
+                         typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                         check_aggregate_type<AggregateData> = true,
+                         typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                inline void append_aggregate_data(AggregateData &agg_data, InputIterator first,
+                                                  InputIterator last) const {
+                    BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                    auto count = agg_data.count(pubkey);
+                    assert(0 == count || 1 == count);
+                    if (!count) {
+                        agg_data.emplace(*this, input_block_type(first, last));
+                    } else if (1 == count) {
+                        std::copy(first, last, std::back_inserter(agg_data.at(*this)));
+                    }
+                }
+
+                template<typename AggregateData, typename InputBlock, check_aggregate_type<AggregateData> = true,
+                         typename std::enable_if<std::is_same<input_value_type, typename InputBlock::value_type>::value,
+                                                 bool>::type = true>
+                inline void append_aggregate_data(AggregateData &agg_data, const InputBlock &block) const {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
+                    append_aggregate_data(agg_data, block.cbegin(), block.cend());
+                }
+
+                template<typename AggregateData, typename ValueType, check_aggregate_type<AggregateData> = true,
+                         typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                inline void append_aggregate_data(AggregateData &agg_data, const ValueType &value) const {
+                    auto count = agg_data.count(pubkey);
+                    assert(0 == count || 1 == count);
+                    if (!count) {
+                        agg_data.emplace(*this, input_block_type());
+                    }
+                    agg_data.at(*this).emplace_back(value);
+                }
+
+            protected:
+                public_key_type pubkey;
+            };
+
+            // TODO: add specialization for pop scheme
+            template<typename SignatureVariant, bls_scheme_enum bls_scheme>
+            struct private_key<bls<SignatureVariant, bls_scheme>> : public_key<bls<SignatureVariant, bls_scheme>> {
+                typedef bls<SignatureVariant, bls_scheme> scheme_type;
+                typedef typename scheme_type::bls_scheme_type bls_scheme_type;
+                typedef public_key<scheme_type> base_type;
+
+                typedef typename base_type::private_key_type private_key_type;
+                typedef typename base_type::public_key_type public_key_type;
+                typedef typename base_type::signature_type signature_type;
+                typedef typename base_type::public_params_type public_params_type;
+
+                typedef std::vector<std::uint8_t> input_block_type;
+                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
+
+                typedef typename input_block_type::value_type input_value_type;
+                constexpr static const std::size_t input_value_bits = 8;
+
+                typedef private_key_type key_type;
+
+                // TODO: add default constructor
+
+                private_key(const private_key_type &privkey) :
+                    privkey(privkey), base_type(generate_public_key(privkey)) {
+                }
+
+                static inline public_key_type generate_public_key(const private_key_type &privkey) {
+                    return bls_scheme_type::generate_public_key(privkey);
+                }
+
+                template<typename MsgRange,
+                         typename std::enable_if<std::is_same<input_value_type, typename MsgRange::value_type>::value,
+                                                 bool>::type = true>
+                inline signature_type sign(const MsgRange &msg, const public_params_type &pp) const {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
+                    return bls_scheme_type::sign(privkey, msg, pp);
+                }
+
+            protected:
+                private_key_type privkey;
+            };
+
+            template<typename SignatureVariant, bls_scheme_enum bls_scheme>
+            struct no_key_ops<bls<SignatureVariant, bls_scheme>> {
+                typedef bls<SignatureVariant, bls_scheme> scheme_type;
+                typedef typename scheme_type::bls_scheme_type bls_scheme_type;
+
+                typedef typename bls_scheme_type::private_key_type private_key_type;
+                typedef typename bls_scheme_type::public_key_type public_key_type;
+                typedef typename bls_scheme_type::signature_type signature_type;
+
+                typedef std::vector<signature_type> input_block_type;
+                constexpr static const std::size_t input_block_bits = 0;    // non-restricted length
+
+                typedef typename input_block_type::value_type input_value_type;
+                constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
+
+                static inline signature_type aggregate(const signature_type &init_signature,
+                                                       const signature_type &signature) {
+                    return bls_scheme_type::aggregate(init_signature, signature);
+                }
+
+                template<
+                    typename SignatureRange,
+                    typename std::enable_if<std::is_same<signature_type, typename SignatureRange::value_type>::value,
+                                            bool>::type = true>
+                static inline signature_type aggregate(const SignatureRange &sigs) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
+                    return bls_scheme_type::aggregate(sigs);
+                }
+
+                template<
+                    typename SignatureRange,
+                    typename std::enable_if<std::is_same<signature_type, typename SignatureRange::value_type>::value,
+                                            bool>::type = true>
+                static inline signature_type aggregate(const signature_type &init_sig, SignatureRange &sigs) {
+                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
+                    return bls_scheme_type::aggregate(init_sig, sigs);
+                }
             };
         }    // namespace pubkey
     }        // namespace crypto3

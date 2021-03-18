@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -23,11 +23,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_HPP
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
@@ -42,15 +42,14 @@
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/public_params.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
+                // TODO: incremental computation
                 template<typename Mode>
-                struct verify_impl : boost::accumulators::accumulator_base {
+                struct aggregate_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
                     typedef typename mode_type::scheme_type scheme_type;
@@ -66,16 +65,12 @@ namespace nil {
                     typedef typename key_type::public_key_type public_key_type;
                     typedef typename key_type::private_key_type private_key_type;
                     typedef typename key_type::signature_type signature_type;
-                    typedef typename key_type::public_params_type public_params_type;
 
                 public:
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    verify_impl(const Args &args) :
-                        public_key(args[boost::accumulators::sample]),
-                        signature(args[::nil::crypto3::accumulators::signature]),
-                        pp(args[::nil::crypto3::accumulators::public_params]) {
+                    aggregate_impl(const Args &) {
                     }
 
                     template<typename Args>
@@ -86,18 +81,14 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(public_key, cache, signature, pp);
+                        return mode_type::process(cache);
                     }
 
                 protected:
-                    template<
-                        typename InputBlock,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, typename InputBlock::value_type>::value,
-                                                bool>::type = true>
+                    template<typename InputBlock, typename InputIterator>
                     inline void resolve_type(const InputBlock &block, InputIterator) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                        resolve_type(block.begin(), block.end());
+                        resolve_type(block.cbegin(), block.cend());
                     }
 
                     template<
@@ -117,44 +108,31 @@ namespace nil {
                         std::copy(first, last, std::back_inserter(cache));
                     }
 
-                    template<typename InputIterator>
-                    inline void resolve_type(const signature_type &sig, InputIterator) {
-                        signature = sig;
-                    }
-
-                    template<typename InputIterator>
-                    inline void resolve_type(const key_type &key, InputIterator) {
-                        public_key = key;
-                    }
-
                     input_block_type cache;
-                    signature_type signature;
-                    key_type public_key;
-                    public_params_type pp;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename Mode>
-                struct verify : boost::accumulators::depends_on<> {
+                struct aggregate : boost::accumulators::depends_on<> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::verify_impl<mode_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::aggregate_impl<mode_type>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::verify<Mode>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::aggregate<Mode>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::verify<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::aggregate<Mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_VERIFY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_AGGREGATE_HPP

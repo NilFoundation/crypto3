@@ -32,10 +32,10 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            struct private_key : public public_key<Scheme> {
+            struct _private_key : public _public_key<Scheme> {
                 typedef Scheme scheme_type;
 
-                typedef typename public_key<scheme_type>::public_key_policy_type public_key_policy_type;
+                typedef typename _public_key<scheme_type>::public_key_policy_type public_key_policy_type;
                 typedef typename scheme_type::private_key_policy_type private_key_policy_type;
 
                 typedef typename private_key_policy_type::public_key_type public_key_type;
@@ -51,8 +51,8 @@ namespace nil {
 
                 // typedef signature_type result_type;
 
-                private_key(const private_key_type &key, const public_params &pp) :
-                    privkey(key), public_key<scheme_type>(private_key_policy_type::key_gen(key), pp) {
+                _private_key(const private_key_type &key, const public_params &pp) :
+                    privkey(key), _public_key<scheme_type>(private_key_policy_type::key_gen(key), pp) {
                 }
 
                 template<typename MsgRange>

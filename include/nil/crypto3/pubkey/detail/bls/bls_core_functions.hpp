@@ -35,6 +35,8 @@
 #include <type_traits>
 #include <iterator>
 
+#include <nil/crypto3/detail/type_traits.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -148,6 +150,11 @@ namespace nil {
                         return C1 == C2;
                     }
 
+                    static inline signature_type core_aggregate(const signature_type &init_sig,
+                                                                const signature_type &sig) {
+                        return init_sig + sig;
+                    }
+
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
@@ -167,13 +174,13 @@ namespace nil {
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type core_aggregate(const signature_type &sig,
+                    static inline signature_type core_aggregate(const signature_type &init_sig,
                                                                 const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
                         assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
                         auto sig_n_iter = sig_n.begin();
-                        signature_type aggregate_p = sig;
+                        signature_type aggregate_p = init_sig;
                         while (sig_n_iter != sig_n.end()) {
                             signature_type next_p = *sig_n_iter++;
                             aggregate_p = aggregate_p + next_p;
@@ -288,7 +295,7 @@ namespace nil {
                         return result;
                     }
 
-                    static inline pubkey_id_type get_pubkey_id(const public_key_type &public_key) {
+                    static inline pubkey_id_type get_pubkey_bits(const public_key_type &public_key) {
                         return policy_type::point_to_pubkey(public_key);
                     }
 

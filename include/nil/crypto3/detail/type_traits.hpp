@@ -27,6 +27,7 @@
 #define CRYPTO3_TYPE_TRAITS_HPP
 
 #include <complex>
+#include <type_traits>
 
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
@@ -181,6 +182,14 @@
 namespace nil {
     namespace crypto3 {
         namespace detail {
+            //
+            // as C++20 is not used
+            //
+            template <class T>
+            struct unwrap_reference { using type = T; };
+            template <class U>
+            struct unwrap_reference<std::reference_wrapper<U>> { using type = U&; };
+
             GENERATE_HAS_MEMBER_TYPE(iterator)
             GENERATE_HAS_MEMBER_TYPE(const_iterator)
 
@@ -194,6 +203,12 @@ namespace nil {
             GENERATE_HAS_MEMBER_TYPE(key_type)
             GENERATE_HAS_MEMBER_TYPE(key_schedule_type)
             GENERATE_HAS_MEMBER_TYPE(word_type)
+
+            GENERATE_HAS_MEMBER_TYPE(scheme_type)
+            GENERATE_HAS_MEMBER_TYPE(public_key_type)
+            GENERATE_HAS_MEMBER_TYPE(private_key_type)
+            GENERATE_HAS_MEMBER_TYPE(signature_type)
+            GENERATE_HAS_MEMBER_TYPE(pubkey_id_type)
 
             GENERATE_HAS_MEMBER(encoded_value_bits)
             GENERATE_HAS_MEMBER(encoded_block_bits)
@@ -218,6 +233,10 @@ namespace nil {
 
             GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
             GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
+
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(sign, signature_type)
+            GENERATE_HAS_MEMBER_CONST_FUNCTION(verify)
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(aggregate, signature_type)
 
             GENERATE_HAS_MEMBER_FUNCTION(generate)
             GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
@@ -394,6 +413,17 @@ namespace nil {
             template<typename T>
             using remove_complex_t = typename remove_complex<T>::type;
 
+            template<typename T>
+            struct is_signing_key {
+                static const bool value = has_scheme_type<T>::value && has_sign<T>::value;
+                typedef T type;
+            };
+
+            template<typename T>
+            struct is_verification_key {
+                static const bool value = has_scheme_type<T>::value && has_verify<T>::value;
+                typedef T type;
+            };
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil

@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/pubkey/accumulators/sign.hpp>
 #include <nil/crypto3/pubkey/accumulators/verify.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate_verify.hpp>
 #include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
 
 namespace nil {
@@ -76,7 +78,20 @@ namespace nil {
             template<typename Mode>
             using aggregation_accumulator_set =
                 boost::accumulators::accumulator_set<typename Mode::result_type,
-                                                     boost::accumulators::features<accumulators::tag::sign<Mode>>>;
+                                                     boost::accumulators::features<accumulators::tag::aggregate<Mode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined aggregation accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_aggregation_policy<bls, nop_padding>)
+             */
+            template<typename Mode>
+            using aggregated_verification_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::result_type, boost::accumulators::features<accumulators::tag::aggregate_verify<Mode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
