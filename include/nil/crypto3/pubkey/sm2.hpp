@@ -132,27 +132,27 @@ namespace nil {
 
                     const size_t p_bytes = m_group.get_p_bytes();
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
                     const point_gfp C1 = m_group.blinded_base_point_multiply(k, rng, m_ws);
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> x1 = C1.get_affine_x();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> y1 = C1.get_affine_y();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x1 = C1.get_affine_x();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> y1 = C1.get_affine_y();
                     std::vector<uint8_t> x1_bytes(p_bytes);
                     std::vector<uint8_t> y1_bytes(p_bytes);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x1_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x1_bytes.data(),
                                                                                              x1_bytes.size(), x1);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y1_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y1_bytes.data(),
                                                                                              y1_bytes.size(), y1);
 
                     const point_gfp kPB = m_mul_public_point.mul(k, rng, m_group.get_order(), m_ws);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> x2 = kPB.get_affine_x();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> y2 = kPB.get_affine_y();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x2 = kPB.get_affine_x();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> y2 = kPB.get_affine_y();
                     std::vector<uint8_t> x2_bytes(p_bytes);
                     std::vector<uint8_t> y2_bytes(p_bytes);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(),
                                                                                              x2_bytes.size(), x2);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(),
                                                                                              y2_bytes.size(), y2);
 
                     secure_vector<uint8_t> kdf_input;
@@ -234,7 +234,7 @@ namespace nil {
                         //------------
 
                         const ec_group &group = m_key.domain();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> &cofactor = group.get_cofactor();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &cofactor = group.get_cofactor();
                     const size_t p_bytes = group.get_p_bytes();
 
                     valid_mask = 0x00;
@@ -247,7 +247,7 @@ namespace nil {
                         return secure_vector<uint8_t>();
                     }
 
-                    boost::multiprecision::number<Backend, ExpressionTemplates> x1, y1;
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x1, y1;
                     secure_vector<uint8_t> C3, masked_msg;
 
                     ber_decoder(ciphertext, ciphertext_len)
@@ -272,14 +272,14 @@ namespace nil {
 
                     const point_gfp dbC1 = group.blinded_var_point_multiply(C1, m_key.private_value(), m_rng, m_ws);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> x2 = dbC1.get_affine_x();
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> y2 = dbC1.get_affine_y();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x2 = dbC1.get_affine_x();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> y2 = dbC1.get_affine_y();
 
                     std::vector<uint8_t> x2_bytes(p_bytes);
                     std::vector<uint8_t> y2_bytes(p_bytes);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(),
                                                                                              x2_bytes.size(), x2);
-                    boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(),
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(),
                                                                                              y2_bytes.size(), y2);
 
                     secure_vector<uint8_t> kdf_input;

@@ -17,12 +17,12 @@ namespace {
         static const nil::crypto3::point_gfp base_point = group.get_base_point();
 
         // This is shared across runs to reduce overhead
-        static std::vector<boost::multiprecision::cpp_int> ws(nil::crypto3::point_gfp::WORKSPACE_SIZE);
+        static std::vector<nil::crypto3::multiprecision::cpp_int> ws(nil::crypto3::point_gfp::WORKSPACE_SIZE);
 
         const size_t hlen = len / 2;
-        const boost::multiprecision::cpp_int a = boost::multiprecision::cpp_int::decode(in, hlen);
-        const boost::multiprecision::cpp_int b = boost::multiprecision::cpp_int::decode(in + hlen, len - hlen);
-        const boost::multiprecision::cpp_int c = a + b;
+        const nil::crypto3::multiprecision::cpp_int a = nil::crypto3::multiprecision::cpp_int::decode(in, hlen);
+        const nil::crypto3::multiprecision::cpp_int b = nil::crypto3::multiprecision::cpp_int::decode(in + hlen, len - hlen);
+        const nil::crypto3::multiprecision::cpp_int c = a + b;
 
         const nil::crypto3::point_gfp P1 = base_point * a;
         const nil::crypto3::point_gfp Q1 = base_point * b;

@@ -144,8 +144,8 @@ namespace nil {
                         m_powermod_x_p(key.get_x(), m_p),
                         m_blinder(
                             m_p, rng,
-                            [](const boost::multiprecision::number<Backend, ExpressionTemplates> &k) { return k; },
-                            [this](const boost::multiprecision::number<Backend, ExpressionTemplates> &k) {
+                            [](const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &k) { return k; },
+                            [this](const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &k) {
                                 return m_powermod_x_p(inverse_mod(k, m_p));
                             }) {
                     }
@@ -153,15 +153,15 @@ namespace nil {
                     secure_vector<uint8_t> raw_agree(const uint8_t w[], size_t w_len) override;
 
                 private:
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_p;
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &m_p;
 
                     fixed_exponent_power_mod m_powermod_x_p;
                     blinder m_blinder;
                 };
 
                 secure_vector<uint8_t> dh_ka_operation::raw_agree(const uint8_t w[], size_t w_len) {
-                    boost::multiprecision::number<Backend, ExpressionTemplates> x =
-                        boost::multiprecision::number<Backend, ExpressionTemplates>::decode(w, w_len);
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x =
+                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::decode(w, w_len);
 
                     if (x <= 1 || x >= m_p - 1) {
                         throw std::invalid_argument("DH agreement - invalid key provided");
@@ -171,7 +171,7 @@ namespace nil {
                     x = m_powermod_x_p(x);
                     x = m_blinder.unblind(x);
 
-                    return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x, m_p.bytes());
+                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x, m_p.bytes());
                 }
 
             }    // namespace

@@ -65,22 +65,22 @@ namespace nil {
                         return false;
                     }
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> e(msg, msg_len,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> e(msg, msg_len,
                                                                                         m_group.get_order_bits());
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
 
                     if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order()) {
                         return false;
                     }
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> w =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> w =
                         inverse_mod(r, m_group.get_order());
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> u1 =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> u1 =
                         m_group.multiply_mod_order(e, w);
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> u2 =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> u2 =
                         m_group.multiply_mod_order(s, w);
                     const point_gfp R = m_group.point_multiply(u1, m_public_point, u2);
 
@@ -88,7 +88,7 @@ namespace nil {
                         return false;
                     }
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> v =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> v =
                         m_group.mod_order(R.get_affine_x());
                     return (v == r);
                 }
@@ -113,25 +113,25 @@ namespace nil {
                 template<typename Hash>
                 inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
                     const ec_group m_group;
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
-                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &m_x;
+                    std::vector<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
 
                     //-----------------------
                     pk_operations::signature_with_emsa(emsa), m_group(ecgdsa.domain()),
                         m_x(ecgdsa.private_value())
                         //------------------------
-                        const boost::multiprecision::number<Backend, ExpressionTemplates>
+                        const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
                             m(msg, msg_len, m_group.get_order_bits());
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> r =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r =
                         m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> kr =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> kr =
                         m_group.multiply_mod_order(k, r);
 
-                    const boost::multiprecision::number<Backend, ExpressionTemplates> s =
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s =
                         m_group.multiply_mod_order(m_x, kr - m);
 
                     // With overwhelming probability, a bug rather than actual zero r/s
@@ -139,7 +139,7 @@ namespace nil {
                         throw internal_error("During ECGDSA signature generated zero r/s");
                     }
 
-                    return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(
+                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(
                         r, s, m_group.get_order_bytes());
                 }
             };

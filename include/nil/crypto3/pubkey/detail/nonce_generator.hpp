@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_PUBKEY_NONCE_GENERATOR_HPP
 #define CRYPTO3_PUBKEY_NONCE_GENERATOR_HPP
 
-#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/crypto3/mac/hmac.hpp>
 
@@ -43,12 +43,12 @@ namespace nil {
                  */
                 template<typename Hash,
                          typename Backend,
-                         boost::multiprecision::expression_template_option ExpressionTemplates,
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
                          typename MessageAuthenticationCode = mac::hmac<Hash>>
-                boost::multiprecision::number<Backend, ExpressionTemplates>
-                    generate_rfc6979_nonce(const boost::multiprecision::number<Backend, ExpressionTemplates> &x,
-                                           const boost::multiprecision::number<Backend, ExpressionTemplates> &q,
-                                           const boost::multiprecision::number<Backend, ExpressionTemplates> &h) {
+                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                    generate_rfc6979_nonce(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &x,
+                                           const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &q,
+                                           const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &h) {
                     m_order(order), m_qlen(m_order.bits()), m_rlen(m_qlen / 8 + (m_qlen % 8 ? 1 : 0)),
                         m_rng_in(m_rlen * 2),
                         m_rng_out(m_rlen)
