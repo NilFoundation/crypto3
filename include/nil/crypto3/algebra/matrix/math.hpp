@@ -66,7 +66,7 @@ namespace nil {
              *  Computes the elementwise real of a matrix
              */
             template<typename T, std::size_t M, std::size_t N>
-            constexpr matrix<detail::remove_complex_t<T>, M, N> real(const matrix<T, M, N> &m) {
+            constexpr matrix<nil::crypto3::detail::remove_complex_t<T>, M, N> real(const matrix<T, M, N> &m) {
                 return elementwise([](auto i) { return std::real(i); }, m);
             }
 
@@ -78,7 +78,7 @@ namespace nil {
              *  Computes the elementwise imag of a matrix
              */
             template<typename T, std::size_t M, std::size_t N>
-            constexpr matrix<detail::remove_complex_t<T>, M, N> imag(const matrix<T, M, N> &m) {
+            constexpr matrix<nil::crypto3::detail::remove_complex_t<T>, M, N> imag(const matrix<T, M, N> &m) {
                 return elementwise([](auto i) { return std::imag(i); }, m);
             }
 
