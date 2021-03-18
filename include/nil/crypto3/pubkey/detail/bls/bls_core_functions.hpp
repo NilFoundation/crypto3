@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <boost/concept/assert.hpp>
 
@@ -39,7 +39,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                using namespace boost::multiprecision;
+                using namespace nil::crypto3::multiprecision;
                 using namespace nil::crypto3::algebra::curves::detail;
 
                 template<typename policy_type>

@@ -28,12 +28,13 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+
 #include <boost/concept/assert.hpp>
 
 #include <iterator>
 
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 using namespace nil::crypto3::algebra::curves;
 
 namespace nil {
@@ -191,7 +192,8 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                    static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets,
+                                                                       std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == sizeof_field_element);
 
                         if (m_byte & I_bit) {
@@ -220,7 +222,8 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                    static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets,
+                                                                         std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      2 * sizeof_field_element);
 
@@ -233,7 +236,8 @@ namespace nil {
                         modulus_type x, y;
                         import_bits(y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                         import_bits(x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
-                        g1_value_type result(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
+                        g1_value_type result(
+                            g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
                         BOOST_ASSERT(result.is_well_formed());
                         return result;
                     }
@@ -241,7 +245,8 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                    static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets,
+                                                                       std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      2 * sizeof_field_element);
 
@@ -272,7 +277,8 @@ namespace nil {
                     template<typename PointOctetsRange,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-                    static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                    static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets,
+                                                                         std::uint8_t m_byte) {
                         BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
                                      4 * sizeof_field_element);
 
@@ -297,8 +303,8 @@ namespace nil {
                         import_bits(
                             x_1, point_octets.rbegin() + 3 * sizeof_field_element, point_octets.rend(), 8, false);
                         g2_value_type result(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
-                                        g2_field_value_type(g1_field_value_type(y_0), g1_field_value_type(y_1)),
-                                        g2_field_value_type::one());
+                                             g2_field_value_type(g1_field_value_type(y_0), g1_field_value_type(y_1)),
+                                             g2_field_value_type::one());
                         BOOST_ASSERT(result.is_well_formed());
                         return result;
                     }

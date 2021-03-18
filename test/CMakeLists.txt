@@ -2,6 +2,7 @@ include(CMTest)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_multiprecision)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -11,8 +12,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::block
                        ${CMAKE_WORKSPACE_NAME}::hash
-
-                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+                       ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                        ${Boost_LIBRARIES})
 

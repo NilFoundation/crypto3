@@ -30,8 +30,6 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
@@ -49,7 +47,7 @@
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::pubkey;
 using namespace nil::crypto3::hashes;
-using namespace boost::multiprecision;
+using namespace nil::crypto3::multiprecision;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
