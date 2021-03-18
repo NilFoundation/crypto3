@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
 #define CRYPTO3_PUBKEY_PRIVATE_KEY_HPP
 
+#include <boost/range/concepts.hpp>
+
 #include <nil/crypto3/pubkey/public_key.hpp>
 
 namespace nil {

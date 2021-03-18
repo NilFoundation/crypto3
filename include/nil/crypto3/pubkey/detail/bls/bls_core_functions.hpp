@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 #define CRYPTO3_PUBKEY_BLS_CORE_FUNCTIONS_HPP
 
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <boost/concept/assert.hpp>
