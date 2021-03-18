@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -23,37 +23,33 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
-#define CRYPTO3_PUBKEY_NO_KEY_HPP
-
-#include <boost/range/concepts.hpp>
+#ifndef CRYPTO3_PUBKEY_PK_KEYS_HPP
+#define CRYPTO3_PUBKEY_PK_KEYS_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            struct _no_key {
-                typedef Scheme scheme_type;
-                typedef _no_key<scheme_type> self_type;
-                typedef typename scheme_type::no_key_policy_type no_key_policy_type;
+            struct public_key {
+                // static_assert(false, "Not implemented");
+            };
 
-                constexpr static const auto input_block_bits = no_key_policy_type::input_block_bits;
-                typedef typename no_key_policy_type::input_block_type input_block_type;
+            template<typename Scheme>
+            struct private_key {
+                // static_assert(false, "Not implemented");
+            };
 
-                constexpr static const auto input_value_bits = no_key_policy_type::input_value_bits;
-                typedef typename no_key_policy_type::input_value_type input_value_type;
+            template<typename Scheme>
+            struct agreement_key {
+                // static_assert(false, "Not implemented");
+            };
 
-                typedef typename no_key_policy_type::signature_type signature_type;
-
-                template<typename SignatureRange>
-                static inline signature_type aggregate(const SignatureRange &sigs) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
-
-                    return no_key_policy_type::aggregate(sigs);
-                }
+            template<typename Scheme>
+            struct no_key_ops {
+                // static_assert(false, "Not implemented");
             };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_NO_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_PK_KEYS_HPP

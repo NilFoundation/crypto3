@@ -29,8 +29,7 @@
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
-#include <nil/crypto3/pubkey/no_key.hpp>
+#include <nil/crypto3/pubkey/pk_keys.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -124,7 +123,7 @@ namespace nil {
                 struct isomorphic_aggregation_policy : public isomorphic_policy<Scheme, Padding> {
                     typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
 
-                    typedef no_key<Scheme> key_type;
+                    typedef no_key_ops<Scheme> key_type;
 
                     constexpr static const auto input_block_bits = key_type::input_block_bits;
                     typedef typename key_type::input_block_type input_block_type;
@@ -135,8 +134,28 @@ namespace nil {
                     typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
-                    inline static result_type process(const key_type &key, const Args &...args) {
-                        return key.aggregate(args...);
+                    inline static result_type process(const Args &...args) {
+                        return key_type::aggregate(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_aggregated_verification_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef public_key<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return key_type::aggregate_verify(args...);
                     }
                 };
 
@@ -190,6 +209,8 @@ namespace nil {
                     typedef detail::isomorphic_signing_policy<scheme_type, padding_type> signing_policy;
                     typedef detail::isomorphic_verification_policy<scheme_type, padding_type> verification_policy;
                     typedef detail::isomorphic_aggregation_policy<scheme_type, padding_type> aggregation_policy;
+                    typedef detail::isomorphic_aggregated_verification_policy<scheme_type, padding_type>
+                        aggregated_verification_policy;
 
                     template<typename Policy>
                     struct bind {

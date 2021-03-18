@@ -31,14 +31,14 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            struct agreement_key : public private_key<Scheme> {
-                typedef typename private_key<Scheme>::scheme_type scheme_type;
+            struct _agreement_key : public _private_key<Scheme> {
+                typedef typename _private_key<Scheme>::scheme_type scheme_type;
                 typedef typename Scheme::key_agreement_policy key_policy_type;
 
-                typedef typename private_key<Scheme>::key_type key_type;
-                typedef typename private_key<Scheme>::key_schedule_type key_schedule_type;
+                typedef typename _private_key<Scheme>::key_type key_type;
+                typedef typename _private_key<Scheme>::key_schedule_type key_schedule_type;
 
-                agreement_key(const key_type &key) : private_key<Scheme>(key), agrkey(key) {
+                agreement_key(const key_type &key) : _private_key<Scheme>(key), agrkey(key) {
                 }
 
                 key_schedule_type agrkey;

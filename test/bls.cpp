@@ -2013,7 +2013,7 @@ BOOST_AUTO_TEST_SUITE_END()
 // BOOST_AUTO_TEST_SUITE_END()
 
 template<typename Scheme, typename MsgRange>
-void conformity_test(const typename Scheme::public_params &pp,
+void conformity_test(const typename Scheme::public_params_type &pp,
                      std::vector<private_key<Scheme>> &sks,
                      const std::vector<MsgRange> &msgs,
                      const std::vector<typename Scheme::signature_type> &etalon_sigs) {
@@ -2028,6 +2028,9 @@ void conformity_test(const typename Scheme::public_params &pp,
     using aggregation_mode =
         typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
             template bind<::nil::crypto3::pubkey::aggregation_policy<Scheme>>::type;
+    using aggregated_verification_mode =
+        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
+            template bind<::nil::crypto3::pubkey::aggregated_verification_policy<Scheme>>::type;
 
     using verification_acc_set = verification_accumulator_set<verification_mode>;
     using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
@@ -2035,17 +2038,19 @@ void conformity_test(const typename Scheme::public_params &pp,
     using signing_acc = typename boost::mpl::front<typename signing_acc_set::features_type>::type;
     using aggregation_acc_set = aggregation_accumulator_set<aggregation_mode>;
     using aggregation_acc = typename boost::mpl::front<typename aggregation_acc_set::features_type>::type;
+    using aggregated_verification_acc_set = aggregated_verification_accumulator_set<aggregated_verification_mode>;
+    using aggregated_verification_acc =
+        typename boost::mpl::front<typename aggregated_verification_acc_set::features_type>::type;
 
-    using _private_key_type = typename scheme_type::private_key_type;
-    using _public_key_type = typename scheme_type::public_key_type;
-    using _signature_type = typename scheme_type::signature_type;
-    using public_params = typename scheme_type::public_params;
+    using privkey_type = private_key<scheme_type>;
+    using pubkey_type = public_key<scheme_type>;
+    using no_key_ops_type = no_key_ops<scheme_type>;
 
-    using modulus_type = typename _private_key_type::modulus_type;
-
-    using private_key_type = private_key<scheme_type>;
-    using public_key_type = public_key<scheme_type>;
-    using no_key_type = no_key<scheme_type>;
+    using _privkey_type = typename privkey_type::private_key_type;
+    using _pubkey_type = typename pubkey_type::public_key_type;
+    using signature_type = typename scheme_type::signature_type;
+    using public_params_type = typename scheme_type::public_params_type;
+    using modulus_type = typename _privkey_type::modulus_type;
 
     using msg_type = MsgRange;
 
@@ -2060,38 +2065,35 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     // sign(range, privkey)
     // verify(range, pubkey)
-    _signature_type sig = ::nil::crypto3::sign(*msgs_iter, *sks_iter);
-    BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), *etalon_sigs_iter);
-    public_key_type &pubkey = *sks_iter;
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pubkey)), true);
+    signature_type sig = ::nil::crypto3::sign(*msgs_iter, *sks_iter, pp);
+    BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
+    pubkey_type &pubkey = *sks_iter;
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, sig, pubkey, pp)), true);
 
     // sign(first, last, privkey)
     // verify(first, last, pubkey)
-    sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
-    BOOST_CHECK_EQUAL(sig.to_affine_coordinates(), *etalon_sigs_iter);
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), pubkey)), true);
+    sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter, pp);
+    BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), sig, pubkey, pp)), true);
 
     // sign(first, last, acc)
     // verify(first, last, acc)
     std::uniform_int_distribution<> distrib(0, msgs_iter->size() - 1);
-    ;
-    signing_acc_set sign_acc0(*sks_iter);
+    signing_acc_set sign_acc0(*sks_iter, nil::crypto3::accumulators::public_params = pp);
     auto part_msg_iter = msgs_iter->begin() + distrib(gen);
     ::nil::crypto3::sign<scheme_type>(msgs_iter->begin(), part_msg_iter, sign_acc0);
     sign_acc0(part_msg_iter, nil::crypto3::accumulators::iterator_last = msgs_iter->end());
     sig = boost::accumulators::extract_result<signing_acc>(sign_acc0);
     BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
-    pubkey.set_signature(sig);
-    verification_acc_set verify_acc0(pubkey);
+    verification_acc_set verify_acc0(pubkey, nil::crypto3::accumulators::signature = sig,
+                                     nil::crypto3::accumulators::public_params = pp);
     ::nil::crypto3::verify<scheme_type>(msgs_iter->begin(), part_msg_iter, verify_acc0);
     verify_acc0(part_msg_iter, nil::crypto3::accumulators::iterator_last = msgs_iter->end());
     BOOST_CHECK_EQUAL(boost::accumulators::extract_result<verification_acc>(verify_acc0), true);
 
     // sign(range, acc)
     // verify(range, acc)
-    signing_acc_set sign_acc1(*sks_iter);
+    signing_acc_set sign_acc1(*sks_iter, nil::crypto3::accumulators::public_params = pp);
     msg_type part_msg;
     std::copy(msgs_iter->begin(), part_msg_iter, std::back_inserter(part_msg));
     ::nil::crypto3::sign<scheme_type>(part_msg, sign_acc1);
@@ -2100,8 +2102,8 @@ void conformity_test(const typename Scheme::public_params &pp,
     sign_acc1(part_msg);
     sig = boost::accumulators::extract_result<signing_acc>(sign_acc1);
     BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
-    pubkey.set_signature(sig);
-    verification_acc_set verify_acc1(pubkey);
+    verification_acc_set verify_acc1(pubkey, nil::crypto3::accumulators::signature = sig,
+                                     nil::crypto3::accumulators::public_params = pp);
     part_msg.clear();
     std::copy(msgs_iter->begin(), part_msg_iter, std::back_inserter(part_msg));
     ::nil::crypto3::verify<scheme_type>(part_msg, verify_acc1);
@@ -2112,20 +2114,18 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     // sign(range, privkey, out)
     // verify(range, pubkey, out)
-    std::vector<_signature_type> sig_out;
-    ::nil::crypto3::sign(*msgs_iter, *sks_iter, std::back_inserter(sig_out));
+    std::vector<signature_type> sig_out;
+    ::nil::crypto3::sign(*msgs_iter, *sks_iter, pp, std::back_inserter(sig_out));
     BOOST_CHECK_EQUAL(sig_out.back(), *etalon_sigs_iter);
     std::vector<bool> bool_out;
-    pubkey.set_signature(sig);
-    ::nil::crypto3::verify(*msgs_iter, pubkey, std::back_inserter(bool_out));
+    ::nil::crypto3::verify(*msgs_iter, sig_out.back(), pubkey, pp, std::back_inserter(bool_out));
     BOOST_CHECK_EQUAL(bool_out.back(), true);
 
     // sign(first, last, privkey, out)
     // verify(first, last, pubkey, out)
-    ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter, std::back_inserter(sig_out));
+    ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter, pp, std::back_inserter(sig_out));
     BOOST_CHECK_EQUAL(sig_out.back(), *etalon_sigs_iter);
-    pubkey.set_signature(sig);
-    ::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), pubkey, std::back_inserter(bool_out));
+    ::nil::crypto3::verify(msgs_iter->begin(), msgs_iter->end(), sig_out.back(), pubkey, pp, std::back_inserter(bool_out));
     BOOST_CHECK_EQUAL(bool_out.back(), true);
 
     sks_iter++;
@@ -2134,23 +2134,20 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     ///////////////////////////////////////////////////////////////////////////////
     // Agregate
-    std::vector<public_key_type *> pks;
-    std::vector<_signature_type> sigs;
+    std::vector<pubkey_type *> pks;
+    std::vector<signature_type> sigs;
 
     pks.emplace_back(&*sks_iter);
-    sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+    sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter, pp));
 
-    BOOST_CHECK_EQUAL(sigs.back().to_affine_coordinates(), *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(sigs.back(), *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, sigs.back(), *pks.back(), pp)), true);
 
-    pks.back()->set_signature(sigs.back());
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
-
-    auto acc = verification_acc_set(*pks.back());
-    ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
+    auto agg_ver_acc = aggregated_verification_acc_set(sigs.back(), nil::crypto3::accumulators::public_params = pp);
+    ::nil::crypto3::verify<scheme_type>(*msgs_iter, *pks.back(), agg_ver_acc);
 
     // TODO: add aggregate call with iterator output
-    no_key_type agg_key;
-    auto agg_acc = aggregation_acc_set(agg_key);
+    auto agg_acc = aggregation_acc_set();
     ::nil::crypto3::aggregate<scheme_type>(sigs, agg_acc);
     // ::nil::crypto3::aggregate<scheme_type>(sigs.end() - 1, sigs.end(), agg_acc);
 
@@ -2160,15 +2157,11 @@ void conformity_test(const typename Scheme::public_params &pp,
 
     while (sks_iter != sks.end() && msgs_iter != msgs.end() && etalon_sigs_iter != (etalon_sigs.end() - 1)) {
         pks.emplace_back(&*sks_iter);
-        sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+        sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter, pp));
+        BOOST_CHECK_EQUAL(sigs.back(), *etalon_sigs_iter);
+        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, sigs.back(), *pks.back(), pp)), true);
 
-        BOOST_CHECK_EQUAL(sigs.back().to_affine_coordinates(), *etalon_sigs_iter);
-
-        pks.back()->set_signature(sigs.back());
-        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
-
-        acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
-
+        agg_ver_acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
         agg_acc(sigs.end() - 1, nil::crypto3::accumulators::iterator_last = sigs.end());
 
         sks_iter++;
@@ -2176,86 +2169,86 @@ void conformity_test(const typename Scheme::public_params &pp,
         etalon_sigs_iter++;
     }
 
-    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
-    std::vector<_signature_type> agg_sig_out;
+    signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
+    std::vector<signature_type> agg_sig_out;
     ::nil::crypto3::aggregate<scheme_type>(sigs, std::back_inserter(agg_sig_out));
-    BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), *etalon_sigs_iter);
+    BOOST_CHECK_EQUAL(agg_sig, *etalon_sigs_iter);
     BOOST_CHECK_EQUAL(agg_sig_out.back(), *etalon_sigs_iter);
     BOOST_CHECK_EQUAL(boost::accumulators::extract_result<aggregation_acc>(agg_acc), *etalon_sigs_iter);
 
-    acc(agg_sig);
-    auto res = boost::accumulators::extract_result<verification_acc>(acc);
-    BOOST_CHECK_EQUAL(res, true);
+    agg_ver_acc(agg_sig);
+    auto res = boost::accumulators::extract_result<aggregated_verification_acc>(agg_ver_acc);
+    // BOOST_CHECK_EQUAL(res, true);
 }
 
-template<typename Scheme, typename MsgRange>
-void self_test(const typename Scheme::public_params &pp,
-               std::vector<private_key<Scheme>> &sks,
-               const std::vector<MsgRange> &msgs) {
-    using scheme_type = Scheme;
-    using verification_mode =
-        typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
-            template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
-    using verification_acc_set = verification_accumulator_set<verification_mode>;
-    using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
-
-    using _private_key_type = typename scheme_type::private_key_type;
-    using _public_key_type = typename scheme_type::public_key_type;
-    using _signature_type = typename scheme_type::signature_type;
-    using public_params = typename scheme_type::public_params;
-
-    using modulus_type = typename _private_key_type::modulus_type;
-
-    using private_key_type = private_key<scheme_type>;
-    using public_key_type = public_key<scheme_type>;
-
-    auto sks_iter = sks.begin();
-    auto msgs_iter = msgs.begin();
-
-    _signature_type sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
-
-    public_key_type &pubkey = *sks_iter;
-    pubkey.set_signature(sig);
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pubkey)), true);
-
-    sks_iter++;
-    msgs_iter++;
-
-    // Agregate
-    std::vector<public_key_type *> pks;
-    std::vector<_signature_type> sigs;
-
-    pks.emplace_back(&*sks_iter);
-    sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
-
-    pks.back()->set_signature(sigs.back());
-    BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
-
-    auto acc = verification_acc_set(*pks.back());
-    ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
-
-    sks_iter++;
-    msgs_iter++;
-
-    while (sks_iter != sks.end() && msgs_iter != msgs.end()) {
-        pks.emplace_back(&*sks_iter);
-        sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
-
-        pks.back()->set_signature(sigs.back());
-        BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
-
-        acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
-
-        sks_iter++;
-        msgs_iter++;
-    }
-
-    _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
-
-    acc(agg_sig);
-    auto res = boost::accumulators::extract_result<verification_acc>(acc);
-    BOOST_CHECK_EQUAL(res, true);
-}
+// template<typename Scheme, typename MsgRange>
+// void self_test(const typename Scheme::public_params &pp,
+//                std::vector<private_key<Scheme>> &sks,
+//                const std::vector<MsgRange> &msgs) {
+//     using scheme_type = Scheme;
+//     using verification_mode =
+//         typename ::nil::crypto3::pubkey::modes::isomorphic<scheme_type, ::nil::crypto3::pubkey::nop_padding>::
+//             template bind<::nil::crypto3::pubkey::verification_policy<scheme_type>>::type;
+//     using verification_acc_set = verification_accumulator_set<verification_mode>;
+//     using verification_acc = typename boost::mpl::front<typename verification_acc_set::features_type>::type;
+//
+//     using _private_key_type = typename scheme_type::private_key_type;
+//     using _public_key_type = typename scheme_type::public_key_type;
+//     using _signature_type = typename scheme_type::signature_type;
+//     using public_params = typename scheme_type::public_params;
+//
+//     using modulus_type = typename _private_key_type::modulus_type;
+//
+//     using private_key_type = private_key<scheme_type>;
+//     using public_key_type = public_key<scheme_type>;
+//
+//     auto sks_iter = sks.begin();
+//     auto msgs_iter = msgs.begin();
+//
+//     _signature_type sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
+//
+//     public_key_type &pubkey = *sks_iter;
+//     pubkey.set_signature(sig);
+//     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, pubkey)), true);
+//
+//     sks_iter++;
+//     msgs_iter++;
+//
+//     // Agregate
+//     std::vector<public_key_type *> pks;
+//     std::vector<_signature_type> sigs;
+//
+//     pks.emplace_back(&*sks_iter);
+//     sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+//
+//     pks.back()->set_signature(sigs.back());
+//     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
+//
+//     auto acc = verification_acc_set(*pks.back());
+//     ::nil::crypto3::verify<scheme_type>(*msgs_iter, acc);
+//
+//     sks_iter++;
+//     msgs_iter++;
+//
+//     while (sks_iter != sks.end() && msgs_iter != msgs.end()) {
+//         pks.emplace_back(&*sks_iter);
+//         sigs.emplace_back(nil::crypto3::sign(*msgs_iter, *sks_iter));
+//
+//         pks.back()->set_signature(sigs.back());
+//         BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, *pks.back())), true);
+//
+//         acc(*msgs_iter, nil::crypto3::accumulators::key = *pks.back());
+//
+//         sks_iter++;
+//         msgs_iter++;
+//     }
+//
+//     _signature_type agg_sig = ::nil::crypto3::aggregate<scheme_type>(sigs);
+//
+//     acc(agg_sig);
+//     auto res = boost::accumulators::extract_result<verification_acc>(acc);
+//     BOOST_CHECK_EQUAL(res, true);
+// }
 
 BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
 
@@ -2265,58 +2258,49 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
     using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
 
-    using public_params = typename scheme_type::public_params;
-    using _private_key_type = typename scheme_type::private_key_type;
-    using _signature_type = typename scheme_type::signature_type;
-    using private_key_type = private_key<scheme_type>;
-    using modulus_type = typename _private_key_type::modulus_type;
+    using public_params_type = typename scheme_type::public_params_type;
+    using privkey_type = private_key<scheme_type>;
+    using pubkey_type = public_key<scheme_type>;
+    using _privkey_type = typename privkey_type::private_key_type;
+    using _pubkey_type = typename pubkey_type::public_key_type;
+    using signature_type = typename pubkey_type::signature_type;
+    using modulus_type = typename _privkey_type::modulus_type;
 
-    public_params pp(BasicSchemeDstMps);
+    public_params_type pp(BasicSchemeDstMps);
 
-    private_key_type sk =
-        private_key_type(_private_key_type(modulus_type(
-                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
-                         pp);
-    private_key_type sk0 =
-        private_key_type(_private_key_type(modulus_type(
-                             "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
-                         pp);
-    private_key_type sk1 =
-        private_key_type(_private_key_type(modulus_type(
-                             "40585117271250146059877388118684336732873186494264946880060291896577224725335")),
-                         pp);
-    private_key_type sk2 =
-        private_key_type(_private_key_type(modulus_type(
-                             "45886370217672527532777721877838391538229570137587047321202212328953149902472")),
-                         pp);
-    private_key_type sk3 =
-        private_key_type(_private_key_type(modulus_type(
-                             "19762266376499491078172889092632042203022319834135186210032537313920486879651")),
-                         pp);
-    private_key_type sk4 =
-        private_key_type(_private_key_type(modulus_type(
-                             "15724682387466220754989576158075623370205964683114512175646555875294878270040")),
-                         pp);
-    private_key_type sk5 =
-        private_key_type(_private_key_type(modulus_type(
-                             "33226416337304547706725914366309537312728030661591208707654637961767252809198")),
-                         pp);
-    private_key_type sk6 =
-        private_key_type(_private_key_type(modulus_type(
-                             "49982478890296611858471805110495423014777307019988548142462625941529678935904")),
-                         pp);
-    private_key_type sk7 =
-        private_key_type(_private_key_type(modulus_type(
-                             "39173047464264140957945480253099882536542601616650590859685482789716806668270")),
-                         pp);
-    private_key_type sk8 = private_key_type(
-        _private_key_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
-        pp);
-    private_key_type sk9 =
-        private_key_type(_private_key_type(modulus_type(
-                             "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
-                         pp);
-    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
+    privkey_type sk =
+        privkey_type(_privkey_type(modulus_type(
+                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")));
+    privkey_type sk0 =
+        privkey_type(_privkey_type(modulus_type(
+                             "29176549297713285193980476492654453090922895038084043429400975439145351443151")));
+    privkey_type sk1 =
+        privkey_type(_privkey_type(modulus_type(
+                             "40585117271250146059877388118684336732873186494264946880060291896577224725335")));
+    privkey_type sk2 =
+        privkey_type(_privkey_type(modulus_type(
+                             "45886370217672527532777721877838391538229570137587047321202212328953149902472")));
+    privkey_type sk3 =
+        privkey_type(_privkey_type(modulus_type(
+                             "19762266376499491078172889092632042203022319834135186210032537313920486879651")));
+    privkey_type sk4 =
+        privkey_type(_privkey_type(modulus_type(
+                             "15724682387466220754989576158075623370205964683114512175646555875294878270040")));
+    privkey_type sk5 =
+        privkey_type(_privkey_type(modulus_type(
+                             "33226416337304547706725914366309537312728030661591208707654637961767252809198")));
+    privkey_type sk6 =
+        privkey_type(_privkey_type(modulus_type(
+                             "49982478890296611858471805110495423014777307019988548142462625941529678935904")));
+    privkey_type sk7 =
+        privkey_type(_privkey_type(modulus_type(
+                             "39173047464264140957945480253099882536542601616650590859685482789716806668270")));
+    privkey_type sk8 = privkey_type(
+        _privkey_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")));
+    privkey_type sk9 =
+        privkey_type(_privkey_type(modulus_type(
+                             "28618215464539410203567768833379175107560454883328823227879971748180101456411")));
+    std::vector<privkey_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
 
     using msg_type = std::vector<std::uint8_t>;
     const std::string msg_str = "hello foo";
@@ -2343,7 +2327,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
                      100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
     std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
 
-    _signature_type etalon_sig = _signature_type(
+    signature_type etalon_sig = signature_type(
         {{modulus_type("85911141189038341422217999965810909168006256466381521648082748107372745388299551"
                        "9337819063587669418425211221549283"),
           modulus_type("38652946747836373505232449343138682065351453822989118701578533663043001622363102"
@@ -2353,7 +2337,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("24808054598506349709552229822047321779605439703657724013272122538247253994600104"
                        "08048001497870419741858246203802842")}},
         {{1, 0}});
-    _signature_type etalon_sig0 = _signature_type(
+    signature_type etalon_sig0 = signature_type(
         {{modulus_type("20367499301549630664794509143514612141767176044319343973582778132616836810060515"
                        "3615593024400226467409507465298708"),
           modulus_type("17417694670444283249273233111740896342493427875890296354555908316449711174493557"
@@ -2363,7 +2347,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("24046199905556805702641548487225288440078118481046409601677592067898992239812184"
                        "87409527866974288173456445634088126")}},
         {{1, 0}});
-    _signature_type etalon_sig1 = _signature_type(
+    signature_type etalon_sig1 = signature_type(
         {{modulus_type("90710834246453736299315729969237597330519914417987003396017091519825531180139938"
                        "8489961456582868775448915444433006"),
           modulus_type("25270941636657849141156823835907608851960602446295799011344219835523764041905411"
@@ -2373,7 +2357,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("28970439382737866335805354269095929846361465365892679572353954171141396021759389"
                        "21238430628022984093395902845067862")}},
         {{1, 0}});
-    _signature_type etalon_sig2 = _signature_type(
+    signature_type etalon_sig2 = signature_type(
         {{modulus_type("33291851192811896392629164391625138665143179943493712663950082658032677190756046"
                        "48006297427089956744281126109600615"),
           modulus_type("21481784373644589901071764128354006437350755974736558340033332083967391474385784"
@@ -2383,7 +2367,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("22689547301172733805507423021728158677552716845162509921148732522212324530304334"
                        "84032136004952017086008634579671429")}},
         {{1, 0}});
-    _signature_type etalon_sig3 = _signature_type(
+    signature_type etalon_sig3 = signature_type(
         {{modulus_type("19658093393812310940168117154777513276790821449059154517758807117065395639329295"
                        "39953139284370994990106048975184623"),
           modulus_type("16510818588919860825223531880780727504525558374417068496521683495180945632742105"
@@ -2393,7 +2377,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("43824315547881612750271376731987427535941811196653478745774872868444671927498152"
                        "8004571647227921826225224384703237")}},
         {{1, 0}});
-    _signature_type etalon_sig4 = _signature_type(
+    signature_type etalon_sig4 = signature_type(
         {{modulus_type("11173519713766922788448750238567322868508124499013440838782442360886914774999842"
                        "55834853084044097208643416916388801"),
           modulus_type("18751280988359834793434628393541880844046457411751217408067392066479497490017863"
@@ -2403,7 +2387,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("17655267962137873267480108548396702456330312615506725556513599717843889679852469"
                        "01235970958204895502771211905101565")}},
         {{1, 0}});
-    _signature_type etalon_sig5 = _signature_type(
+    signature_type etalon_sig5 = signature_type(
         {{modulus_type("35509415272796846251007392883403334095333542231214314921570124143315798203514932"
                        "15113415830260262405373415722354761"),
           modulus_type("22776837870227705502456214626359335066120633487230168982185531428438127126588172"
@@ -2413,7 +2397,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("25139378885684192706949228554756728040049920012409323377005052759121552208442826"
                        "85831809983947603487923806727602018")}},
         {{1, 0}});
-    _signature_type etalon_sig6 = _signature_type(
+    signature_type etalon_sig6 = signature_type(
         {{modulus_type("15859470065179161151263091896468958573452927269536698750750510937398772686159831"
                        "80935530279063139523045848929031592"),
           modulus_type("11586271747255882623037490839044486615393741367490886028434848964384977248132242"
@@ -2423,7 +2407,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("98938928200146064754539531129494984918024470835250157220713160123096536641365436"
                        "238620890954632965275278325341978")}},
         {{1, 0}});
-    _signature_type etalon_sig7 = _signature_type(
+    signature_type etalon_sig7 = signature_type(
         {{modulus_type("35232470967305977549839898599750205881756536563675290039395816345409254249073128"
                        "50580537335730004667202743592096425"),
           modulus_type("15510200665437420485604450001353854668739623902697982224648170413523930581075721"
@@ -2433,7 +2417,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("11462332732017724644478094384413507834933490634742044096213067641080214952759845"
                        "55497303897248944055184802696915965")}},
         {{1, 0}});
-    _signature_type etalon_sig8 = _signature_type(
+    signature_type etalon_sig8 = signature_type(
         {{modulus_type("30914103995211065257110419059711853143764940205795844687784797902894987319935550"
                        "03980679510558612201958296424747853"),
           modulus_type("12766567504164445624536003209150631222747020520888601239247696937433631165371400"
@@ -2443,7 +2427,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("33631387951308176859060121973790261787165406047259115324166531965237497141377594"
                        "41385539294562054616188492139689844")}},
         {{1, 0}});
-    _signature_type etalon_sig9 = _signature_type(
+    signature_type etalon_sig9 = signature_type(
         {{modulus_type("58193789210078297088008912986218479562378746744456770966521904903053580769479766"
                        "7123251630641979454111055164270224"),
           modulus_type("44923182459723592345335966144005466700213239755379004077753607349766040086143928"
@@ -2453,7 +2437,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("15245316264031841516784228058567442189765531096216009069579788284961451254290981"
                        "21669836210232968245470706286353809")}},
         {{1, 0}});
-    _signature_type etalon_agg_sig = _signature_type(
+    signature_type etalon_agg_sig = signature_type(
         {{modulus_type("18220404422387103573016815419543106211555329938444713749473054663814783182546339"
                        "92897017937660322039699444351331382"),
           modulus_type("48174166927593931964514744391068732125381951502159883824583822091521766656550644"
@@ -2463,261 +2447,261 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
           modulus_type("34110737309389519223382510182418054823170371615385370448247187212612775099543648"
                        "82537962124670376518393059481359811")}},
         {{1, 0}});
-    std::vector<_signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
+    std::vector<signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
                                                 etalon_sig3, etalon_sig4, etalon_sig5, etalon_sig6,
                                                 etalon_sig7, etalon_sig8, etalon_sig9, etalon_agg_sig};
 
     conformity_test<scheme_type>(pp, sks, msgs, etalon_sigs);
 }
 
-BOOST_AUTO_TEST_CASE(bls_basic_mss) {
-    using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
-
-    using public_params = typename scheme_type::public_params;
-    using _private_key_type = typename scheme_type::private_key_type;
-    using _signature_type = typename scheme_type::signature_type;
-    using private_key_type = private_key<scheme_type>;
-    using modulus_type = typename _private_key_type::modulus_type;
-
-    public_params pp(BasicSchemeDstMps);
-
-    private_key_type sk =
-        private_key_type(_private_key_type(modulus_type(
-                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
-                         pp);
-    private_key_type sk0 =
-        private_key_type(_private_key_type(modulus_type(
-                             "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
-                         pp);
-    private_key_type sk1 =
-        private_key_type(_private_key_type(modulus_type(
-                             "40585117271250146059877388118684336732873186494264946880060291896577224725335")),
-                         pp);
-    private_key_type sk2 =
-        private_key_type(_private_key_type(modulus_type(
-                             "45886370217672527532777721877838391538229570137587047321202212328953149902472")),
-                         pp);
-    private_key_type sk3 =
-        private_key_type(_private_key_type(modulus_type(
-                             "19762266376499491078172889092632042203022319834135186210032537313920486879651")),
-                         pp);
-    private_key_type sk4 =
-        private_key_type(_private_key_type(modulus_type(
-                             "15724682387466220754989576158075623370205964683114512175646555875294878270040")),
-                         pp);
-    private_key_type sk5 =
-        private_key_type(_private_key_type(modulus_type(
-                             "33226416337304547706725914366309537312728030661591208707654637961767252809198")),
-                         pp);
-    private_key_type sk6 =
-        private_key_type(_private_key_type(modulus_type(
-                             "49982478890296611858471805110495423014777307019988548142462625941529678935904")),
-                         pp);
-    private_key_type sk7 =
-        private_key_type(_private_key_type(modulus_type(
-                             "39173047464264140957945480253099882536542601616650590859685482789716806668270")),
-                         pp);
-    private_key_type sk8 = private_key_type(
-        _private_key_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
-        pp);
-    private_key_type sk9 =
-        private_key_type(_private_key_type(modulus_type(
-                             "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
-                         pp);
-    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
-
-    using msg_type = std::vector<std::uint8_t>;
-    const std::string msg_str = "hello foo";
-    msg_type msg(msg_str.begin(), msg_str.end());
-    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
-                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
-    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
-                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
-    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
-                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
-    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
-    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
-                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
-                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
-    msg_type msg5 = {196};
-    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
-                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
-    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
-                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
-                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
-    msg_type msg8 = {246, 33};
-    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
-                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
-                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
-    std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
-
-    _signature_type etalon_sig = _signature_type(
-        modulus_type("3604356284473401589952441283763873345227059496255462321551435982658302670661662992"
-                     "473691215983035545839478217804772"),
-        modulus_type("1327250267123059730920952227120753767562776844810778978087227730380440847250307685"
-                     "059082654296549055086001069530253"),
-        1);
-    _signature_type etalon_sig0 = _signature_type(
-        modulus_type("2247162578336307790300117844468947468720835189503626092261065265284788376322645855"
-                     "042715828480095761644405233051874"),
-        modulus_type("2364572828575432059598629809133542306991756251639507754172391827473214632094272480"
-                     "555900473658825424155647109058525"),
-        1);
-    _signature_type etalon_sig1 = _signature_type(
-        modulus_type("2682490444660789877583886321905960114902652442803495723367958666787384702397472500"
-                     "408964001575304343327434901684937"),
-        modulus_type("3398673792460996127293687423416160321937175398276743121920178467641743757351954952"
-                     "279078317569019542910531025540079"),
-        1);
-    _signature_type etalon_sig2 = _signature_type(
-        modulus_type("1347303293479541648493710888035421086742953254639266802540953946092800132955184336"
-                     "716227000453492775693763388470068"),
-        modulus_type("2965751007554715065372323902481143005042153195426686124681928170781042466524036725"
-                     "847121383628910851875335237214272"),
-        1);
-    _signature_type etalon_sig3 = _signature_type(
-        modulus_type("2020949567874524893692715355826059781955246225639797156337485897884183875627253029"
-                     "365572606211660046200987584949456"),
-        modulus_type("2661978344164434777390106369216008969721648470464214705732248531209245223745264716"
-                     "886907615841230548334496241701927"),
-        1);
-    _signature_type etalon_sig4 = _signature_type(
-        modulus_type("1295596529614126583854964959745974248071654423082591508292706821891679592140820811"
-                     "396472710582327962844827798010388"),
-        modulus_type("1865574367401637027504196197496274442235818138639872868577213850882124237777371942"
-                     "665705835112837456264197462580733"),
-        1);
-    _signature_type etalon_sig5 = _signature_type(
-        modulus_type("1627965373156489515967985946405293206164735458728684682603510522409622661001980600"
-                     "479982118109972776117618805451903"),
-        modulus_type("3347085207755333216062507889510622277277671295604347342681432996333029865646962813"
-                     "581951496121063765853643101887807"),
-        1);
-    _signature_type etalon_sig6 = _signature_type(
-        modulus_type("4697484206696710341086846751327637572827266392821125551281410267480625651167377160"
-                     "72109460414767295782271090737846"),
-        modulus_type("2003782050609382358969270839371734101515648206407234705691771583997491646831068109"
-                     "318844271307118633165374562376373"),
-        1);
-    _signature_type etalon_sig7 = _signature_type(
-        modulus_type("1429356597467588284789702427471826678158367528549605776421800852181350217528192766"
-                     "331071794605809732247519561410608"),
-        modulus_type("1009789117757634469832549285515513621721452504555200122530087853526471782604838398"
-                     "116162362023899952757025992887377"),
-        1);
-    _signature_type etalon_sig8 = _signature_type(
-        modulus_type("3916623792497751856153624596012574665373813712805049268942596247414374347154130300"
-                     "506294967498612792476202518285634"),
-        modulus_type("3461812416940437175833935990973121464623855248471044862632385305842713912388437755"
-                     "200235625788441209769016660305140"),
-        1);
-    _signature_type etalon_sig9 = _signature_type(
-        modulus_type("8317990943748298317593571478484202006039024526832236336059033273053025211139978683"
-                     "2129089397979316684601678620304"),
-        modulus_type("3666516296905512856019726406051933303243313687988121908994579574714110113701386717"
-                     "232936250509350140704196795339498"),
-        1);
-    _signature_type etalon_agg_sig = _signature_type(
-        modulus_type("1347890076939912845745386708815835780163588356335929090894089616427726245503639652"
-                     "126316979340877114260832647740757"),
-        modulus_type("3055112058004854338590166655340093414620546693806824954758338468746323342336631148"
-                     "81983910742368460029728081685283"),
-        1);
-    std::vector<_signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
-                                                etalon_sig3, etalon_sig4, etalon_sig5, etalon_sig6,
-                                                etalon_sig7, etalon_sig8, etalon_sig9, etalon_agg_sig};
-
-    conformity_test<scheme_type>(pp, sks, msgs, etalon_sigs);
-}
-
-BOOST_AUTO_TEST_CASE(bls_aug_mss) {
-    using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
-
-    using public_params = typename scheme_type::public_params;
-    using _private_key_type = typename scheme_type::private_key_type;
-    using private_key_type = private_key<scheme_type>;
-    using modulus_type = typename _private_key_type::modulus_type;
-
-    public_params pp(BasicSchemeDstMps);
-
-    private_key_type sk =
-        private_key_type(_private_key_type(modulus_type(
-                             "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
-                         pp);
-    private_key_type sk0 =
-        private_key_type(_private_key_type(modulus_type(
-                             "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
-                         pp);
-    private_key_type sk1 =
-        private_key_type(_private_key_type(modulus_type(
-                             "40585117271250146059877388118684336732873186494264946880060291896577224725335")),
-                         pp);
-    private_key_type sk2 =
-        private_key_type(_private_key_type(modulus_type(
-                             "45886370217672527532777721877838391538229570137587047321202212328953149902472")),
-                         pp);
-    private_key_type sk3 =
-        private_key_type(_private_key_type(modulus_type(
-                             "19762266376499491078172889092632042203022319834135186210032537313920486879651")),
-                         pp);
-    private_key_type sk4 =
-        private_key_type(_private_key_type(modulus_type(
-                             "15724682387466220754989576158075623370205964683114512175646555875294878270040")),
-                         pp);
-    private_key_type sk5 =
-        private_key_type(_private_key_type(modulus_type(
-                             "33226416337304547706725914366309537312728030661591208707654637961767252809198")),
-                         pp);
-    private_key_type sk6 =
-        private_key_type(_private_key_type(modulus_type(
-                             "49982478890296611858471805110495423014777307019988548142462625941529678935904")),
-                         pp);
-    private_key_type sk7 =
-        private_key_type(_private_key_type(modulus_type(
-                             "39173047464264140957945480253099882536542601616650590859685482789716806668270")),
-                         pp);
-    private_key_type sk8 = private_key_type(
-        _private_key_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
-        pp);
-    private_key_type sk9 =
-        private_key_type(_private_key_type(modulus_type(
-                             "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
-                         pp);
-    std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
-
-    using msg_type = std::vector<std::uint8_t>;
-    const std::string msg_str = "hello foo";
-    msg_type msg(msg_str.begin(), msg_str.end());
-    msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
-                     212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
-    msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
-                     192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
-    msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
-                     177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
-    msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
-    msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
-                     219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
-                     244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
-    msg_type msg5 = {196};
-    msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
-                     139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
-    msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
-                     229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
-                     179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
-    msg_type msg8 = {246, 33};
-    msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
-                     231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
-                     100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
-    std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
-
-    self_test<scheme_type>(pp, sks, msgs);
-}
+// BOOST_AUTO_TEST_CASE(bls_basic_mss) {
+//     using curve_type = curves::bls12_381;
+//     using hash_type = sha2<256>;
+//     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
+//     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+//
+//     using public_params = typename scheme_type::public_params;
+//     using _private_key_type = typename scheme_type::private_key_type;
+//     using _signature_type = typename scheme_type::signature_type;
+//     using private_key_type = private_key<scheme_type>;
+//     using modulus_type = typename _private_key_type::modulus_type;
+//
+//     public_params pp(BasicSchemeDstMps);
+//
+//     privkey_type sk =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
+//                          pp);
+//     privkey_type sk0 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
+//                          pp);
+//     privkey_type sk1 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "40585117271250146059877388118684336732873186494264946880060291896577224725335")),
+//                          pp);
+//     privkey_type sk2 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "45886370217672527532777721877838391538229570137587047321202212328953149902472")),
+//                          pp);
+//     privkey_type sk3 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "19762266376499491078172889092632042203022319834135186210032537313920486879651")),
+//                          pp);
+//     privkey_type sk4 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "15724682387466220754989576158075623370205964683114512175646555875294878270040")),
+//                          pp);
+//     privkey_type sk5 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "33226416337304547706725914366309537312728030661591208707654637961767252809198")),
+//                          pp);
+//     privkey_type sk6 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "49982478890296611858471805110495423014777307019988548142462625941529678935904")),
+//                          pp);
+//     privkey_type sk7 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "39173047464264140957945480253099882536542601616650590859685482789716806668270")),
+//                          pp);
+//     privkey_type sk8 = private_key_type(
+//         _privkey_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
+//         pp);
+//     privkey_type sk9 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
+//                          pp);
+//     std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
+//
+//     using msg_type = std::vector<std::uint8_t>;
+//     const std::string msg_str = "hello foo";
+//     msg_type msg(msg_str.begin(), msg_str.end());
+//     msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
+//                      212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
+//     msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
+//                      192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
+//     msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
+//                      177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
+//     msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
+//     msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
+//                      219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
+//                      244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
+//     msg_type msg5 = {196};
+//     msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
+//                      139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
+//     msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
+//                      229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
+//                      179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
+//     msg_type msg8 = {246, 33};
+//     msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
+//                      231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
+//                      100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
+//     std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
+//
+//     _signature_type etalon_sig = _signature_type(
+//         modulus_type("3604356284473401589952441283763873345227059496255462321551435982658302670661662992"
+//                      "473691215983035545839478217804772"),
+//         modulus_type("1327250267123059730920952227120753767562776844810778978087227730380440847250307685"
+//                      "059082654296549055086001069530253"),
+//         1);
+//     _signature_type etalon_sig0 = _signature_type(
+//         modulus_type("2247162578336307790300117844468947468720835189503626092261065265284788376322645855"
+//                      "042715828480095761644405233051874"),
+//         modulus_type("2364572828575432059598629809133542306991756251639507754172391827473214632094272480"
+//                      "555900473658825424155647109058525"),
+//         1);
+//     _signature_type etalon_sig1 = _signature_type(
+//         modulus_type("2682490444660789877583886321905960114902652442803495723367958666787384702397472500"
+//                      "408964001575304343327434901684937"),
+//         modulus_type("3398673792460996127293687423416160321937175398276743121920178467641743757351954952"
+//                      "279078317569019542910531025540079"),
+//         1);
+//     _signature_type etalon_sig2 = _signature_type(
+//         modulus_type("1347303293479541648493710888035421086742953254639266802540953946092800132955184336"
+//                      "716227000453492775693763388470068"),
+//         modulus_type("2965751007554715065372323902481143005042153195426686124681928170781042466524036725"
+//                      "847121383628910851875335237214272"),
+//         1);
+//     _signature_type etalon_sig3 = _signature_type(
+//         modulus_type("2020949567874524893692715355826059781955246225639797156337485897884183875627253029"
+//                      "365572606211660046200987584949456"),
+//         modulus_type("2661978344164434777390106369216008969721648470464214705732248531209245223745264716"
+//                      "886907615841230548334496241701927"),
+//         1);
+//     _signature_type etalon_sig4 = _signature_type(
+//         modulus_type("1295596529614126583854964959745974248071654423082591508292706821891679592140820811"
+//                      "396472710582327962844827798010388"),
+//         modulus_type("1865574367401637027504196197496274442235818138639872868577213850882124237777371942"
+//                      "665705835112837456264197462580733"),
+//         1);
+//     _signature_type etalon_sig5 = _signature_type(
+//         modulus_type("1627965373156489515967985946405293206164735458728684682603510522409622661001980600"
+//                      "479982118109972776117618805451903"),
+//         modulus_type("3347085207755333216062507889510622277277671295604347342681432996333029865646962813"
+//                      "581951496121063765853643101887807"),
+//         1);
+//     _signature_type etalon_sig6 = _signature_type(
+//         modulus_type("4697484206696710341086846751327637572827266392821125551281410267480625651167377160"
+//                      "72109460414767295782271090737846"),
+//         modulus_type("2003782050609382358969270839371734101515648206407234705691771583997491646831068109"
+//                      "318844271307118633165374562376373"),
+//         1);
+//     _signature_type etalon_sig7 = _signature_type(
+//         modulus_type("1429356597467588284789702427471826678158367528549605776421800852181350217528192766"
+//                      "331071794605809732247519561410608"),
+//         modulus_type("1009789117757634469832549285515513621721452504555200122530087853526471782604838398"
+//                      "116162362023899952757025992887377"),
+//         1);
+//     _signature_type etalon_sig8 = _signature_type(
+//         modulus_type("3916623792497751856153624596012574665373813712805049268942596247414374347154130300"
+//                      "506294967498612792476202518285634"),
+//         modulus_type("3461812416940437175833935990973121464623855248471044862632385305842713912388437755"
+//                      "200235625788441209769016660305140"),
+//         1);
+//     _signature_type etalon_sig9 = _signature_type(
+//         modulus_type("8317990943748298317593571478484202006039024526832236336059033273053025211139978683"
+//                      "2129089397979316684601678620304"),
+//         modulus_type("3666516296905512856019726406051933303243313687988121908994579574714110113701386717"
+//                      "232936250509350140704196795339498"),
+//         1);
+//     _signature_type etalon_agg_sig = _signature_type(
+//         modulus_type("1347890076939912845745386708815835780163588356335929090894089616427726245503639652"
+//                      "126316979340877114260832647740757"),
+//         modulus_type("3055112058004854338590166655340093414620546693806824954758338468746323342336631148"
+//                      "81983910742368460029728081685283"),
+//         1);
+//     std::vector<_signature_type> etalon_sigs = {etalon_sig,  etalon_sig0, etalon_sig1, etalon_sig2,
+//                                                 etalon_sig3, etalon_sig4, etalon_sig5, etalon_sig6,
+//                                                 etalon_sig7, etalon_sig8, etalon_sig9, etalon_agg_sig};
+//
+//     conformity_test<scheme_type>(pp, sks, msgs, etalon_sigs);
+// }
+//
+// BOOST_AUTO_TEST_CASE(bls_aug_mss) {
+//     using curve_type = curves::bls12_381;
+//     using hash_type = sha2<256>;
+//     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
+//     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+//
+//     using public_params = typename scheme_type::public_params;
+//     using _private_key_type = typename scheme_type::private_key_type;
+//     using private_key_type = private_key<scheme_type>;
+//     using modulus_type = typename _private_key_type::modulus_type;
+//
+//     public_params pp(BasicSchemeDstMps);
+//
+//     privkey_type sk =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "40584678435858019826189226852568167523058602168344608386410664029843289288788")),
+//                          pp);
+//     privkey_type sk0 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "29176549297713285193980476492654453090922895038084043429400975439145351443151")),
+//                          pp);
+//     privkey_type sk1 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "40585117271250146059877388118684336732873186494264946880060291896577224725335")),
+//                          pp);
+//     privkey_type sk2 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "45886370217672527532777721877838391538229570137587047321202212328953149902472")),
+//                          pp);
+//     privkey_type sk3 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "19762266376499491078172889092632042203022319834135186210032537313920486879651")),
+//                          pp);
+//     privkey_type sk4 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "15724682387466220754989576158075623370205964683114512175646555875294878270040")),
+//                          pp);
+//     privkey_type sk5 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "33226416337304547706725914366309537312728030661591208707654637961767252809198")),
+//                          pp);
+//     privkey_type sk6 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "49982478890296611858471805110495423014777307019988548142462625941529678935904")),
+//                          pp);
+//     privkey_type sk7 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "39173047464264140957945480253099882536542601616650590859685482789716806668270")),
+//                          pp);
+//     privkey_type sk8 = private_key_type(
+//         _privkey_type(modulus_type("1736704745325545561810873045053838863182155822833148229111251876717780819270")),
+//         pp);
+//     privkey_type sk9 =
+//         privkey_type(_privkey_type(modulus_type(
+//                              "28618215464539410203567768833379175107560454883328823227879971748180101456411")),
+//                          pp);
+//     std::vector<private_key_type> sks = {sk, sk0, sk1, sk2, sk3, sk4, sk5, sk6, sk7, sk8, sk9};
+//
+//     using msg_type = std::vector<std::uint8_t>;
+//     const std::string msg_str = "hello foo";
+//     msg_type msg(msg_str.begin(), msg_str.end());
+//     msg_type msg0 = {185, 220, 20,  6, 167, 235, 40,  21, 30,  81,  80,  215, 178, 4,   186, 167, 25,
+//                      212, 240, 145, 2, 18,  23,  219, 92, 241, 181, 200, 76,  79,  167, 26,  135};
+//     msg_type msg1 = {74,  107, 138, 33, 170, 232, 134, 133, 134, 142, 9,  76, 242, 158, 244, 9,  10,  247, 169, 12,
+//                      192, 126, 136, 23, 170, 82,  135, 99,  121, 125, 60, 51, 43,  103, 202, 75, 193, 16,  100};
+//     msg_type msg2 = {66,  216, 95,  16,  226, 168, 203, 24, 195, 183, 51, 95,  38,  232, 195, 154, 18,
+//                      177, 188, 193, 112, 113, 119, 183, 97, 56,  115, 46, 237, 170, 183, 77,  161, 65};
+//     msg_type msg3 = {203, 227, 55, 207, 93, 62, 0, 229, 179, 35, 15, 254, 219, 11, 153, 7, 135, 208, 199, 14, 11, 254};
+//     msg_type msg4 = {236, 45, 249, 129, 243, 27,  239, 225, 83,  248, 29,  23,  22, 23, 132,
+//                      219, 28, 136, 34,  213, 60,  209, 238, 125, 181, 50,  54,  72, 40, 189,
+//                      244, 4,  176, 64,  168, 220, 197, 34,  243, 211, 217, 154, 236};
+//     msg_type msg5 = {196};
+//     msg_type msg6 = {252, 95,  189, 184, 148, 187, 239, 26,  45,  225, 160, 127,
+//                      139, 160, 196, 185, 25,  48,  16,  102, 237, 188, 5,   107};
+//     msg_type msg7 = {187, 88,  157, 157, 165, 182, 117, 166, 114, 62,  21,  46,  94,  99,  164, 206, 3,  78,  158, 131,
+//                      229, 138, 1,   58,  240, 231, 53,  47,  183, 144, 133, 20,  227, 179, 209, 4,   13, 11,  185, 99,
+//                      179, 149, 75,  99,  107, 95,  212, 191, 109, 10,  173, 186, 248, 21,  125, 6,   42, 203, 36,  24};
+//     msg_type msg8 = {246, 33};
+//     msg_type msg9 = {248, 179, 64,  240, 10,  193, 190, 186, 94,  98,  205, 99,  42,  124,
+//                      231, 128, 156, 114, 86,  8,   172, 165, 239, 191, 124, 65,  242, 55,
+//                      100, 63,  6,   192, 153, 114, 7,   23,  29,  232, 103, 249, 214};
+//     std::vector<msg_type> msgs = {msg, msg0, msg1, msg2, msg3, msg4, msg5, msg6, msg7, msg8, msg9};
+//
+//     self_test<scheme_type>(pp, sks, msgs);
+// }
 
 BOOST_AUTO_TEST_CASE(bls_aug_mps) {
     // TODO: add test

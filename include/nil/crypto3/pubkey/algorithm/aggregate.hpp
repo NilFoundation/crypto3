@@ -286,6 +286,7 @@ namespace nil {
         //     return SignerImpl(r, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////////
         /*!
          * @brief
          *
@@ -314,7 +315,7 @@ namespace nil {
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return SignerImpl(first, last, std::move(out), SchemeAccumulator(pubkey::no_key<Scheme>()));
+            return SignerImpl(first, last, std::move(out), SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
         }
 
         /*!
@@ -344,7 +345,7 @@ namespace nil {
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return SignerImpl(rng, std::move(out), SchemeAccumulator(pubkey::no_key<Scheme>()));
+            return SignerImpl(rng, std::move(out), SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
         }
 
         /*!
@@ -431,7 +432,7 @@ namespace nil {
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(first, last, SchemeAccumulator(pubkey::no_key<Scheme>()));
+            return SignerImpl(first, last, SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
         }
 
         /*!
@@ -461,7 +462,7 @@ namespace nil {
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(r, SchemeAccumulator(pubkey::no_key<Scheme>()));
+            return SignerImpl(r, SchemeAccumulator(pubkey::no_key_ops<Scheme>()));
         }
     }    // namespace crypto3
 }    // namespace nil

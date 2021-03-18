@@ -23,37 +23,20 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
-#define CRYPTO3_PUBKEY_NO_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_SIGNATURE_HPP
+#define CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_SIGNATURE_HPP
 
-#include <boost/range/concepts.hpp>
+#include <boost/parameter/keyword.hpp>
+
+#include <boost/accumulators/accumulators_fwd.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace pubkey {
-            template<typename Scheme>
-            struct _no_key {
-                typedef Scheme scheme_type;
-                typedef _no_key<scheme_type> self_type;
-                typedef typename scheme_type::no_key_policy_type no_key_policy_type;
-
-                constexpr static const auto input_block_bits = no_key_policy_type::input_block_bits;
-                typedef typename no_key_policy_type::input_block_type input_block_type;
-
-                constexpr static const auto input_value_bits = no_key_policy_type::input_value_bits;
-                typedef typename no_key_policy_type::input_value_type input_value_type;
-
-                typedef typename no_key_policy_type::signature_type signature_type;
-
-                template<typename SignatureRange>
-                static inline signature_type aggregate(const SignatureRange &sigs) {
-                    BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SignatureRange>));
-
-                    return no_key_policy_type::aggregate(sigs);
-                }
-            };
-        }    // namespace pubkey
+        namespace accumulators {
+            BOOST_PARAMETER_KEYWORD(tag, signature)
+            BOOST_ACCUMULATORS_IGNORE_GLOBAL(signature)
+        }    // namespace accumulators
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_NO_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_SIGNATURE_HPP
