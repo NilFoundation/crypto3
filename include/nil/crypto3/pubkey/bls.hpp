@@ -474,6 +474,7 @@ namespace nil {
                     return bls_scheme_type::verify(pubkey, msg, sig, pp);
                 }
 
+                // TODO: fix me - std::reference_wrapper seems not to work
                 template<typename AggregateData, check_aggregate_type<AggregateData> = true>
                 static inline bool aggregate_verify(const AggregateData &agg_data, const signature_type &sig,
                                                     const public_params_type &pp) {
