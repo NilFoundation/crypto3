@@ -46,7 +46,7 @@ namespace nil {
                     public:
                         typedef typename policy_type::field_type field_type;
 
-                        /*constexpr static*/ typename policy_type::non_residue_type non_residue =
+                        constexpr static typename policy_type::non_residue_type non_residue =
                             typename policy_type::non_residue_type(policy_type::non_residue);
 
                         typedef typename policy_type::underlying_type underlying_type;

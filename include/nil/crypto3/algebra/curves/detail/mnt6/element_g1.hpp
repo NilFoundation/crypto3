@@ -78,11 +78,8 @@ namespace nil {
                          *
                          */
                         constexpr element_mnt6_g1() :
-                            element_mnt6_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                            underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_mnt6_g1() : element_mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        // when constexpr fields will be finished
+                            element_mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        
                         /** @brief
                          *    @return the selected affine point $(X:Y:1)$
                          *
@@ -104,15 +101,7 @@ namespace nil {
                          *
                          */
                         constexpr static element_mnt6_g1 one() {
-                            return element_mnt6_g1(
-                                underlying_field_value_type(
-                                    0x2A4FEEE24FD2C69D1D90471B2BA61ED56F9BAD79B57E0B4C671392584BDADEBC01ABBC0447D_cppui298),
-                                underlying_field_value_type(
-                                    0x32986C245F6DB2F82F4E037BF7AFD69CBFCBFF07FC25D71E9C75E1B97208A333D73D91D3028_cppui298),
-                                underlying_field_value_type::one());
-                            // must be
-                            // return element_mnt6_g1(one_fill[0], one_fill[1], one_fill[2]);
-                            // when constexpr fields will be finished
+                            return element_mnt6_g1(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -379,23 +368,21 @@ namespace nil {
                         static const g1_field_type_value twist_mul_by_q_Y(
                             0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);*/
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(
                                 0x2A4FEEE24FD2C69D1D90471B2BA61ED56F9BAD79B57E0B4C671392584BDADEBC01ABBC0447D_cppui298),
                             underlying_field_value_type(
                                 0x32986C245F6DB2F82F4E037BF7AFD69CBFCBFF07FC25D71E9C75E1B97208A333D73D91D3028_cppui298),
-                            underlying_field_value_type::one()};*/
+                            underlying_field_value_type::one()};
                     };
 
-                    template <>
-                    constexpr element_mnt6_g1<298>::g1_field_type_value const
+                    constexpr typename element_mnt6_g1<298>::g1_field_type_value const
                         element_mnt6_g1<298>::a;
-                    template <>
-                    constexpr element_mnt6_g1<298>::g1_field_type_value const
+                    constexpr typename element_mnt6_g1<298>::g1_field_type_value const
                         element_mnt6_g1<298>::b;
 
                 }    // namespace detail
