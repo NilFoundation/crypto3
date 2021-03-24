@@ -2013,10 +2013,10 @@ BOOST_AUTO_TEST_SUITE_END()
 // BOOST_AUTO_TEST_SUITE_END()
 
 template<typename Scheme, typename MsgRange>
-void conformity_test(const typename Scheme::public_params_type &pp,
+void conformity_test(const typename private_key<Scheme>::public_params_type &pp,
                      std::vector<private_key<Scheme>> &sks,
                      const std::vector<MsgRange> &msgs,
-                     const std::vector<typename Scheme::signature_type> &etalon_sigs) {
+                     const std::vector<typename private_key<Scheme>::signature_type> &etalon_sigs) {
     using scheme_type = Scheme;
 
     using signing_mode =
@@ -2048,8 +2048,8 @@ void conformity_test(const typename Scheme::public_params_type &pp,
 
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
-    using signature_type = typename scheme_type::signature_type;
-    using public_params_type = typename scheme_type::public_params_type;
+    using signature_type = typename privkey_type::signature_type;
+    using public_params_type = typename privkey_type::public_params_type;
     using modulus_type = typename _privkey_type::modulus_type;
 
     using msg_type = MsgRange;
@@ -2185,7 +2185,7 @@ void conformity_test(const typename Scheme::public_params_type &pp,
 }
 
 template<typename Scheme, typename MsgRange>
-void self_test(const typename Scheme::public_params_type &pp,
+void self_test(const typename private_key<Scheme>::public_params_type &pp,
                std::vector<private_key<Scheme>> &sks,
                const std::vector<MsgRange> &msgs) {
     using scheme_type = Scheme;
@@ -2219,8 +2219,8 @@ void self_test(const typename Scheme::public_params_type &pp,
 
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
-    using signature_type = typename scheme_type::signature_type;
-    using public_params_type = typename scheme_type::public_params_type;
+    using signature_type = typename pubkey_type::signature_type;
+    using public_params_type = typename pubkey_type::public_params_type;
     using modulus_type = typename _privkey_type::modulus_type;
 
     using msg_type = MsgRange;
@@ -2280,9 +2280,9 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
     using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
 
-    using public_params_type = typename scheme_type::public_params_type;
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
+    using public_params_type = typename pubkey_type::public_params_type;
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
     using signature_type = typename pubkey_type::signature_type;
@@ -2472,9 +2472,9 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
 
-    using public_params_type = typename scheme_type::public_params_type;
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
+    using public_params_type = typename pubkey_type::public_params_type;
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
     using signature_type = typename pubkey_type::signature_type;
@@ -2616,9 +2616,9 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
 
-    using public_params_type = typename scheme_type::public_params_type;
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
+    using public_params_type = typename pubkey_type::public_params_type;
     using _privkey_type = typename privkey_type::private_key_type;
     using _pubkey_type = typename pubkey_type::public_key_type;
     using signature_type = typename pubkey_type::signature_type;

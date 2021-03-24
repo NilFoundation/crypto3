@@ -303,7 +303,7 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
         OutputIterator sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key,
-                            const typename Scheme::public_params_type &pp, OutputIterator out) {
+                            const typename pubkey::private_key<Scheme>::public_params_type &pp, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type Mode;
@@ -333,8 +333,7 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
         OutputIterator sign(const SinglePassRange &rng, const pubkey::private_key<Scheme> &key,
-                            const typename Scheme::public_params_type &pp, OutputIterator out) {
-
+                            const typename pubkey::private_key<Scheme>::public_params_type &pp, OutputIterator out) {
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type Mode;
             typedef typename pubkey::signing_accumulator_set<Mode> SchemeAccumulator;
@@ -425,7 +424,7 @@ namespace nil {
                 Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key,
-                 const typename Scheme::public_params_type &pp) {
+                 const typename pubkey::private_key<Scheme>::public_params_type &pp) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type Mode;
@@ -456,7 +455,7 @@ namespace nil {
                 Scheme, pubkey::nop_padding>::template bind<pubkey::signing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             sign(const SinglePassRange &r, const pubkey::private_key<Scheme> &key,
-                 const typename Scheme::public_params_type &pp) {
+                 const typename pubkey::private_key<Scheme>::public_params_type &pp) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
                 pubkey::signing_policy<Scheme>>::type Mode;

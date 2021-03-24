@@ -412,8 +412,10 @@ namespace nil {
             struct bls {
                 typedef typename bls_scheme_trait<bls_scheme, SignatureVariant>::bls_scheme_type bls_scheme_type;
 
-                typedef typename bls_scheme_type::signature_type signature_type;
-                typedef typename bls_scheme_type::public_params_type public_params_type;
+                // typedef typename bls_scheme_type::private_key_type private_key_type;
+                // typedef typename bls_scheme_type::public_key_type public_key_type;
+                // typedef typename bls_scheme_type::signature_type::group_type signature_group_type;
+                // typedef typename bls_scheme_type::public_params_type public_params_type;
 
                 template<typename Mode, typename AccumulatorSet, std::size_t ValueBits = 0>
                 struct stream_processor {
