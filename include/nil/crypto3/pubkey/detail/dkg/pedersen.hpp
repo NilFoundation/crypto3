@@ -28,9 +28,6 @@
 
 #include <numeric>
 
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/sum.hpp>
-
 #include <nil/crypto3/pubkey/detail/secret_sharing/feldman.hpp>
 
 namespace nil {
@@ -47,79 +44,32 @@ namespace nil {
 
                     typedef typename base_type::private_element_type private_element_type;
                     typedef typename base_type::public_element_type public_element_type;
-                    typedef typename base_type::indexed_private_element_type indexed_private_element_type;
-                    typedef typename base_type::indexed_public_element_type indexed_public_element_type;
 
-                    typedef boost::accumulators::accumulator_set<
-                        private_element_type,
-                        boost::accumulators::features<boost::accumulators::tag::sum>>
-                        private_elements_sum_acc_type;
+                    typedef typename base_type::share_type share_type;
 
-                    typedef boost::accumulators::accumulator_set<
-                        public_element_type,
-                        boost::accumulators::features<boost::accumulators::tag::sum>>
-                        public_elements_sum_acc_type;
+                    // TODO: add accumulator for share dealing
+                    template<typename Shares,
+                             typename base_type::template check_indexed_private_elements_type<Shares> = true>
+                    static inline share_type deal_share(const Shares &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
+                        assert(base_type::check_minimal_size(std::distance(shares.begin(), shares.end())));
+                        auto index = shares.begin().first;
+                        assert(base_type::check_participant_index(index));
 
-                    template<typename PublicCoeffs,
-                             typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
-                                 true>
-                    static inline public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs) {
+                        private_element_type share = private_element_type::zero();
+                        for (auto &[i, s] : shares) {
+                            assert(index == i);
+                            share = share + s;
+                        }
+                        return share_type(index, share);
+                    }
+
+                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
+                                                        typename PublicCoeffs::value_type> = true>
+                    static inline public_element_type reconstruct_public_coeff(const PublicCoeffs &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
+                        assert(base_type::check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
                         return std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero());
-                    }
-
-                    // template<typename PublicCoeffs,
-                    //          typename std::enable_if<
-                    //              std::is_same<public_element_type, typename PublicCoeffs::value_type>::value,
-                    //              bool>::type = true>
-                    // static inline indexed_public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs,
-                    //                                                                std::size_t i) {
-                    //     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-                    //     assert(base_type::check_participant_index(i));
-                    //     return indexed_public_element_type(
-                    //         i, std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero()));
-                    // }
-
-                    static inline public_element_type reduce_public_coeffs(public_elements_sum_acc_type &&acc) {
-                        return boost::accumulators::sum(acc);
-                    }
-
-                    // static inline indexed_public_element_type reduce_public_coeffs(public_elements_sum_acc_type
-                    // &&acc,
-                    //                                                                std::size_t i) {
-                    //     assert(base_type::check_participant_index(i));
-                    //     return indexed_public_element_type(i, boost::accumulators::sum(acc));
-                    // }
-
-                    template<
-                        typename Shares,
-                        typename base_type::template check_private_element_type<typename Shares::value_type> = true>
-                    static inline private_element_type reduce_shares(const Shares &shares) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-                        return std::accumulate(shares.begin(), shares.end(), private_element_type::zero());
-                    }
-
-                    template<
-                        typename Shares,
-                        typename Number,
-                        typename base_type::template check_private_element_type<typename Shares::value_type> = true,
-                        typename base_type::template check_number_type<Number> = true>
-                    static inline indexed_private_element_type reduce_shares(const Shares &shares, Number i) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-                        assert(base_type::check_participant_index(i));
-                        return indexed_private_element_type(
-                            i, std::accumulate(shares.begin(), shares.end(), private_element_type::zero()));
-                    }
-
-                    static inline private_element_type reduce_shares(private_elements_sum_acc_type &&acc) {
-                        return boost::accumulators::sum(acc);
-                    }
-
-                    template<typename Number, typename base_type::template check_number_type<Number> = true>
-                    static inline indexed_private_element_type reduce_shares(private_elements_sum_acc_type &&acc,
-                                                                             Number i) {
-                        assert(base_type::check_participant_index(i));
-                        return indexed_private_element_type(i, boost::accumulators::sum(acc));
                     }
                 };
             }    // namespace detail

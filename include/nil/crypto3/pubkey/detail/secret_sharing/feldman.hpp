@@ -38,8 +38,10 @@ namespace nil {
 
                     typedef typename base_type::private_element_type private_element_type;
                     typedef typename base_type::public_element_type public_element_type;
-                    typedef typename base_type::indexed_private_element_type indexed_private_element_type;
-                    typedef typename base_type::indexed_public_element_type indexed_public_element_type;
+
+                    typedef typename base_type::share_type share_type;
+                    typedef typename base_type::public_share_type public_share_type;
+                    typedef typename base_type::public_coeff_type public_coeff_type;
 
                     //===========================================================================
                     // share verification functions
@@ -47,77 +49,48 @@ namespace nil {
                     //
                     //  verify public share
                     //
-                    template<typename PublicCoeffs, typename Number,
-                             typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
-                                 true,
-                             typename base_type::template check_number_type<Number> = true>
-                    static inline bool verify_share(const public_element_type &gs_i, Number i,
-                                                    const PublicCoeffs &public_coeffs) {
+                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
+                                                        typename PublicCoeffs::value_type> = true>
+                    static inline bool verify_share(const PublicCoeffs &public_coeffs,
+                                                    const public_share_type &public_share) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-                        assert(base_type::check_participant_index(i));
+                        assert(base_type::check_participant_index(public_share.first));
+                        assert(base_type::check_minimal_size(std::distance(public_coeffs.begin(), public_coeffs.end())));
 
-                        private_element_type e_i(i);
+                        private_element_type e_i(public_share.first);
                         private_element_type temp_mul = private_element_type::one();
-                        public_element_type temp_s_i = public_element_type::zero();
+                        public_element_type verification_val = public_element_type::zero();
 
                         for (const auto &c : public_coeffs) {
-                            temp_s_i = temp_s_i + c * temp_mul;
+                            verification_val = verification_val + c * temp_mul;
                             temp_mul = temp_mul * e_i;
                         }
-                        return gs_i == temp_s_i;
+                        return public_share.second == verification_val;
                     }
 
                     //
                     //  verify private share
                     //
-                    template<typename PublicCoeffs, typename Number,
-                             typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
-                                 true,
-                             typename base_type::template check_number_type<Number> = true>
-                    static inline bool verify_share(const private_element_type &s_i, Number i,
-                                                    const PublicCoeffs &public_coeffs) {
+                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
+                                                        typename PublicCoeffs::value_type> = true>
+                    static inline bool verify_share(const PublicCoeffs &public_coeffs, const share_type &share) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-
-                        return verify_share(base_type::get_public_element(s_i), i, public_coeffs);
-                    }
-
-                    //
-                    //  verify indexed public share
-                    //
-                    template<
-                        typename IndexedPublicElement, typename PublicCoeffs,
-                        typename base_type::template check_indexed_public_element_type<IndexedPublicElement> = true,
-                        typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
-                            true>
-                    static inline bool verify_share(const IndexedPublicElement &s_i,
-                                                    const PublicCoeffs &public_coeffs) {
-                        return verify_share(s_i.second, s_i.first, public_coeffs);
-                    }
-
-                    //
-                    //  verify indexed private share
-                    //
-                    template<
-                        typename IndexedPrivateElement, typename PublicCoeffs,
-                        typename base_type::template check_indexed_private_element_type<IndexedPrivateElement> = true,
-                        typename base_type::template check_public_element_type<typename PublicCoeffs::value_type> =
-                            true>
-                    static inline bool verify_share(const IndexedPrivateElement &s_i,
-                                                    const PublicCoeffs &public_coeffs) {
-                        return verify_share(s_i.second, s_i.first, public_coeffs);
+                        return verify_share(public_coeffs, base_type::get_public_share(share));
                     }
 
                     //
                     //  partial computing of verification value
                     //
-                    template<typename Number1, typename Number2,
-                             typename base_type::template check_number_type<Number1> = true,
-                             typename base_type::template check_number_type<Number2> = true>
-                    static inline public_element_type eval_partial_verification_value(
-                        const public_element_type &public_coeff, Number1 i, Number2 k,
-                        const public_element_type &init_value = public_element_type::zero()) {
-                        assert(base_type::check_participant_index(i));
-                        return init_value + public_coeff * private_element_type(i).pow(k);
+                    template<typename Number, typename base_type::template check_number_type<Number> = true>
+                    static inline public_share_type
+                        partial_eval_verification_value(const public_coeff_type &public_coeff, Number exp,
+                                                        const public_share_type &init_verification_value) {
+                        assert(base_type::check_participant_index(init_verification_value.first));
+                        assert(base_type::check_exp(exp));
+                        return public_share_type(init_verification_value.first,
+                                                 init_verification_value.second +
+                                                     private_element_type(init_verification_value.first).pow(exp) *
+                                                         public_coeff);
                     }
                 };
             }    // namespace detail

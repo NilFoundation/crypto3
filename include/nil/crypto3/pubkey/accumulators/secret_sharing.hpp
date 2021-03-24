@@ -38,86 +38,55 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/threshold_value.hpp>
 
+#include <nil/crypto3/pubkey/detail/secret_sharing/weighted_shamir.hpp>
+#include <nil/crypto3/pubkey/detail/secret_sharing/feldman.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
                 template<typename Scheme>
-                struct deal_shares_impl : boost::accumulators::accumulator_base {
-                protected:
-                    typedef Scheme scheme_type;
+                struct deal_shares_impl;
 
-                    typedef typename scheme_type::private_elements_type private_elements_type;
+                template<typename Group>
+                struct deal_shares_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> :
+                    boost::accumulators::accumulator_base {
+                protected:
+                    typedef nil::crypto3::pubkey::detail::shamir_sss<Group> scheme_type;
+
                     typedef typename scheme_type::private_element_type private_element_type;
 
-                public:
-                    typedef private_elements_type result_type;
+                    typedef typename scheme_type::coeff_type coeff_type;
+                    typedef typename scheme_type::share_type share_type;
+                    typedef typename scheme_type::shares_type shares_type;
 
+                public:
+                    typedef shares_type result_type;
+
+                    //
+                    // boost::accumulators::sample -- participants number
+                    //
+                    // nil::crypto3::accumulators::threshold_value -- threshold number of participants
+                    //
                     template<typename Args>
                     deal_shares_impl(const Args &args) : seen_coeffs(0) {
-                        assert(scheme_type::check_minimal_size(args[boost::accumulators::sample]));
+                        assert(scheme_type::check_t(args[nil::crypto3::accumulators::threshold_value],
+                                                    args[boost::accumulators::sample]));
                         n = args[boost::accumulators::sample];
-                        std::fill_n(std::back_inserter(shares), n, private_element_type::zero());
-                    }
-
-                    inline result_type result(boost::accumulators::dont_care) const {
-                        assert(scheme_type::check_t(seen_coeffs, n));
-                        return shares;
-                    }
-
-                    //
-                    // input coefficients should be supplied in increasing term degrees order
-                    //
-                    template<typename Args>
-                    inline void operator()(const Args &args) {
-                        resolve_type(args[boost::accumulators::sample]);
-                    }
-
-                protected:
-                    inline void resolve_type(const private_element_type &coeff) {
-                        auto shares_it = shares.begin();
+                        t = args[nil::crypto3::accumulators::threshold_value];
                         std::size_t i = 1;
-                        private_element_type e_i = private_element_type::one();
-                        while (shares_it != shares.end()) {
-                            *shares_it = scheme_type::eval_partial_private_element(coeff, i++, seen_coeffs, *shares_it);
-                            ++shares_it;
-                        }
-                        seen_coeffs++;
-                    }
-
-                    std::size_t n;
-                    std::size_t seen_coeffs;
-                    result_type shares;
-                };
-
-                template<typename Scheme>
-                struct deal_indexed_shares_impl : boost::accumulators::accumulator_base {
-                protected:
-                    typedef Scheme scheme_type;
-
-                    typedef typename scheme_type::private_element_type private_element_type;
-                    typedef typename scheme_type::indexed_private_element_type indexed_private_element_type;
-                    typedef typename scheme_type::indexed_private_elements_type indexed_private_elements_type;
-
-                public:
-                    typedef indexed_private_elements_type result_type;
-
-                    template<typename Args>
-                    deal_indexed_shares_impl(const Args &args) : seen_coeffs(0) {
-                        assert(scheme_type::check_minimal_size(args[boost::accumulators::sample]));
-                        n = args[boost::accumulators::sample];
-                        std::size_t i = 1;
-                        std::generate_n(std::inserter(indexed_shares, indexed_shares.end()), n, [&i]() {
-                            return indexed_private_element_type(i++, private_element_type::zero());
+                        std::generate_n(std::inserter(shares, shares.end()), n, [&i]() {
+                            return share_type(i++, private_element_type::zero());
                         });
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        assert(scheme_type::check_t(seen_coeffs, n));
-                        return indexed_shares;
+                        assert(t == seen_coeffs);
+                        return shares;
                     }
 
                     //
+                    // boost::accumulators::sample -- polynomial coefficients
                     // input coefficients should be supplied in increasing term degrees order
                     //
                     template<typename Args>
@@ -126,106 +95,133 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const private_element_type &coeff) {
-                        auto indexed_shares_it = indexed_shares.begin();
+                    inline void resolve_type(const coeff_type &coeff) {
+                        assert(t > seen_coeffs);
+                        auto shares_it = shares.begin();
                         private_element_type e_i = private_element_type::one();
-                        while (indexed_shares_it != indexed_shares.end()) {
-                            indexed_shares_it->second = scheme_type::eval_partial_private_element(
-                                coeff, indexed_shares_it->first, seen_coeffs, indexed_shares_it->second);
-                            indexed_shares_it++;
+                        while (shares_it != shares.end()) {
+                            shares_it->second = scheme_type::partial_eval_share(
+                                coeff, seen_coeffs, *shares_it).second;
+                            shares_it++;
                         }
                         seen_coeffs++;
                     }
 
+                    result_type shares;
                     std::size_t n;
+                    std::size_t t;
                     std::size_t seen_coeffs;
-                    result_type indexed_shares;
                 };
 
-                template<typename Scheme>
-                struct deal_indexed_weighted_shares_impl : boost::accumulators::accumulator_base {
+                template<typename Group>
+                struct deal_shares_impl<nil::crypto3::pubkey::detail::feldman_sss<Group>> : deal_shares_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> {
+                    typedef deal_shares_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> base_type;
+                    //
+                    // boost::accumulators::sample -- participants number
+                    //
+                    // nil::crypto3::accumulators::threshold_value -- threshold number of participants
+                    //
+                    template<typename Args>
+                    deal_shares_impl(const Args &args) : base_type(args) {}
+                };
+
+
+
+                template<typename Group>
+                struct deal_shares_impl<nil::crypto3::pubkey::detail::weighted_shamir_sss<Group>> :
+                    boost::accumulators::accumulator_base {
                 protected:
-                    typedef Scheme scheme_type;
+                    typedef nil::crypto3::pubkey::detail::weighted_shamir_sss<Group> scheme_type;
 
                     typedef typename scheme_type::private_element_type private_element_type;
-                    typedef typename scheme_type::private_elements_type private_elements_type;
+                    typedef typename scheme_type::coeff_type coeff_type;
+                    typedef typename scheme_type::coeffs_type coeffs_type;
+                    typedef typename scheme_type::weight_type weight_type;
                     typedef typename scheme_type::weights_type weights_type;
-                    typedef typename scheme_type::indexed_private_element_type indexed_private_element_type;
-                    typedef typename scheme_type::indexed_private_elements_type indexed_private_elements_type;
-                    typedef typename scheme_type::indexed_weighted_private_elements_type
-                        indexed_weighted_private_elements_type;
+                    typedef typename scheme_type::share_type share_type;
+                    typedef typename scheme_type::shares_type shares_type;
 
                 public:
-                    typedef std::pair<private_elements_type, indexed_weighted_private_elements_type> result_type;
+                    typedef shares_type result_type;
 
+                    //
+                    // boost::accumulators::sample -- participants number
+                    //
+                    // nil::crypto3::accumulators::threshold_value -- threshold number of participants
+                    //
                     template<typename Args>
-                    deal_indexed_weighted_shares_impl(const Args &args) {
+                    deal_shares_impl(const Args &args) : seen_coeffs(0) {
                         assert(scheme_type::check_t(args[nil::crypto3::accumulators::threshold_value],
                                                     args[boost::accumulators::sample]));
                         t = args[nil::crypto3::accumulators::threshold_value];
                         n = args[boost::accumulators::sample];
-                        //
-                        // default generation of polynomial coefficients
-                        //
-                        coeffs = scheme_type::get_poly(t, n);
                         std::size_t i = 1;
-                        std::fill_n(std::back_inserter(shares_weights), n, 1);
+                        std::generate_n(std::inserter(shares_weights, shares_weights.end()), n, [&i]() {
+                            return weight_type(i++, 1);
+                        });
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return std::make_pair(coeffs,
-                                              scheme_type::deal_indexed_weighted_shares(coeffs, shares_weights));
+                        assert(t == seen_coeffs);
+                        return scheme_type::deal_shares(coeffs, shares_weights);
                     }
 
+                    //
+                    // boost::accumulators::sample -- participant weight
+                    // or
+                    // boost::accumulators::sample -- polynomial coefficients
+                    // input coefficients should be supplied in increasing term degrees order
+                    //
                     template<typename Args>
                     inline void operator()(const Args &args) {
                         resolve_type(args[boost::accumulators::sample]);
                     }
 
                 protected:
-                    //
-                    // custom generated polynomial coefficients
-                    //
-                    template<typename IndexedCoeff,
-                             typename scheme_type::template check_indexed_private_element_type<IndexedCoeff> = true>
-                    inline void resolve_type(const IndexedCoeff &indexed_coeff) {
-                        assert(0 <= indexed_coeff.first && indexed_coeff.first < t);
-                        *(coeffs.begin() + indexed_coeff.first) = indexed_coeff.second;
+                    inline void resolve_type(const coeff_type &coeff) {
+                        assert(t > seen_coeffs);
+                        coeffs.emplace_back(coeff);
+                        seen_coeffs++;
                     }
 
-                    template<typename IndexedWeight,
-                             typename scheme_type::template check_indexed_weight_type<IndexedWeight> = true>
-                    inline void resolve_type(const IndexedWeight &w_i) {
+                    template<typename Weight,
+                             typename scheme_type::template check_indexed_weight_type<Weight> = true>
+                    inline void resolve_type(const Weight &w_i) {
                         assert(0 < w_i.first && w_i.first <= n);
-                        assert(0 < w_i.second);
-                        *(shares_weights.begin() + w_i.first - 1) = w_i.second;
+                        assert(scheme_type::check_weight(w_i.second));
+                        shares_weights.insert_or_assign(w_i.first, w_i.second);
                     }
 
                     std::size_t t;
                     std::size_t n;
-                    private_elements_type coeffs;
+                    std::size_t seen_coeffs;
+                    coeffs_type coeffs;
                     weights_type shares_weights;
                 };
 
                 template<typename Scheme>
-                struct recover_private_element_impl : boost::accumulators::accumulator_base {
+                struct reconstruct_secret_impl;
+
+                template<typename Group>
+                struct reconstruct_secret_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>>:
+                    boost::accumulators::accumulator_base {
                 protected:
-                    typedef Scheme scheme_type;
+                    typedef nil::crypto3::pubkey::detail::shamir_sss<Group> scheme_type;
 
                     typedef typename scheme_type::private_element_type private_element_type;
-                    typedef typename scheme_type::indexed_private_element_type indexed_private_element_type;
-                    typedef typename scheme_type::indexed_private_elements_type indexed_private_elements_type;
+                    typedef typename scheme_type::share_type share_type;
+                    typedef typename scheme_type::shares_type shares_type;
 
                 public:
                     typedef private_element_type result_type;
 
                     template<typename Args>
-                    recover_private_element_impl(const Args &args) : seen_shares(0) {
+                    reconstruct_secret_impl(const Args &args) : seen_shares(0) {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         assert(scheme_type::check_minimal_size(seen_shares));
-                        return scheme_type::recover_private_element(indexed_shares);
+                        return scheme_type::reconstruct_secret(shares);
                     }
 
                     template<typename Args>
@@ -234,33 +230,60 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const indexed_private_element_type &indexed_share) {
-                        assert(indexed_shares.emplace(indexed_share).second);
+                    inline void resolve_type(const share_type &share) {
+                        assert(shares.emplace(share).second);
                         seen_shares++;
                     }
 
                     std::size_t seen_shares;
-                    indexed_private_elements_type indexed_shares;
+                    shares_type shares;
+                };
+
+                template<typename Group>
+                struct reconstruct_secret_impl<nil::crypto3::pubkey::detail::weighted_shamir_sss<Group>> :
+                    reconstruct_secret_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> {
+                    typedef reconstruct_secret_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> base_type;
+
+                    template<typename Args>
+                    reconstruct_secret_impl(const Args &args) : base_type(args) {}
+                };
+
+                template<typename Group>
+                struct reconstruct_secret_impl<nil::crypto3::pubkey::detail::feldman_sss<Group>> :
+                    reconstruct_secret_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> {
+                    typedef reconstruct_secret_impl<nil::crypto3::pubkey::detail::shamir_sss<Group>> base_type;
+
+                    template<typename Args>
+                    reconstruct_secret_impl(const Args &args) : base_type(args) {}
                 };
 
                 template<typename Scheme>
-                struct verify_share_impl : boost::accumulators::accumulator_base {
+                struct verify_share_impl;
+
+                template<typename Group>
+                struct verify_share_impl<nil::crypto3::pubkey::detail::feldman_sss<Group>>:
+                    boost::accumulators::accumulator_base {
                 protected:
-                    typedef Scheme scheme_type;
+                    typedef nil::crypto3::pubkey::detail::feldman_sss<Group> scheme_type;
 
                     typedef typename scheme_type::public_element_type public_element_type;
-                    typedef typename scheme_type::indexed_public_element_type indexed_public_element_type;
+                    typedef typename scheme_type::public_coeff_type public_coeff_type;
+                    typedef typename scheme_type::public_share_type public_share_type;
 
                 public:
                     typedef bool result_type;
 
+                    //
+                    // boost::accumulators::sample -- verified public share
+                    //
                     template<typename Args>
                     verify_share_impl(const Args &args) :
-                        gs_i(args[boost::accumulators::sample]), seen_coeffs(0),
-                        share_verification_value(public_element_type::zero()) {
+                        public_share(args[boost::accumulators::sample]), seen_coeffs(0),
+                        verification_value(public_share.first, public_element_type::zero()) {
                     }
 
                     //
+                    // boost::accumulators::sample -- public polynomial coefficients
                     // input coefficients should be supplied in increasing term degrees order
                     //
                     template<typename Args>
@@ -269,19 +292,19 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return gs_i.second == share_verification_value;
+                        return public_share == verification_value;
                     }
 
                 protected:
-                    inline void resolve_type(const public_element_type &public_coeff) {
-                        share_verification_value = scheme_type::eval_partial_verification_value(
-                            public_coeff, gs_i.first, seen_coeffs, share_verification_value);
+                    inline void resolve_type(const public_coeff_type &public_coeff) {
+                        verification_value = scheme_type::partial_eval_verification_value(
+                            public_coeff, seen_coeffs, verification_value);
                         seen_coeffs++;
                     }
 
+                    public_share_type public_share;
+                    public_share_type verification_value;
                     std::size_t seen_coeffs;
-                    indexed_public_element_type gs_i;
-                    public_element_type share_verification_value;
                 };
             }    // namespace impl
 
@@ -297,26 +320,6 @@ namespace nil {
                 };
 
                 template<typename Scheme>
-                struct deal_indexed_shares : boost::accumulators::depends_on<> {
-                    typedef Scheme scheme_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::deal_indexed_shares_impl<scheme_type>> impl;
-                };
-
-                template<typename Scheme>
-                struct deal_indexed_weighted_shares : boost::accumulators::depends_on<> {
-                    typedef Scheme scheme_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::deal_indexed_weighted_shares_impl<scheme_type>> impl;
-                };
-
-                template<typename Scheme>
                 struct verify_share : boost::accumulators::depends_on<> {
                     typedef Scheme scheme_type;
 
@@ -327,13 +330,13 @@ namespace nil {
                 };
 
                 template<typename Scheme>
-                struct recover_private_element : boost::accumulators::depends_on<> {
+                struct reconstruct_secret : boost::accumulators::depends_on<> {
                     typedef Scheme scheme_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::recover_private_element_impl<scheme_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::reconstruct_secret_impl<scheme_type>> impl;
                 };
             }    // namespace tag
 
@@ -345,27 +348,15 @@ namespace nil {
                 }
 
                 template<typename Scheme, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::deal_indexed_shares<Scheme>>::type::result_type
-                    scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::deal_indexed_shares<Scheme>>(acc);
-                }
-
-                template<typename Scheme, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::deal_indexed_weighted_shares<Scheme>>::type::result_type
-                    scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::deal_indexed_weighted_shares<Scheme>>(acc);
-                }
-
-                template<typename Scheme, typename AccumulatorSet>
                 typename boost::mpl::apply<AccumulatorSet, tag::verify_share<Scheme>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::verify_share<Scheme>>(acc);
                 }
 
                 template<typename Scheme, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::recover_private_element<Scheme>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::reconstruct_secret<Scheme>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::recover_private_element<Scheme>>(acc);
+                    return boost::accumulators::extract_result<tag::reconstruct_secret<Scheme>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

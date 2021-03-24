@@ -30,24 +30,16 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            struct public_key {
-                // static_assert(false, "Not implemented");
-            };
+            struct public_key;
 
             template<typename Scheme>
-            struct private_key {
-                // static_assert(false, "Not implemented");
-            };
+            struct private_key;
 
             template<typename Scheme>
-            struct agreement_key {
-                // static_assert(false, "Not implemented");
-            };
+            struct agreement_key;
 
             template<typename Scheme>
-            struct no_key_ops {
-                // static_assert(false, "Not implemented");
-            };
+            struct no_key_ops;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

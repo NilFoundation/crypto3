@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_SHAMIR_SSS_HPP
-#define CRYPTO3_PUBKEY_SHAMIR_SSS_HPP
+#ifndef CRYPTO3_PUBKEY_DETAIL_SHAMIR_SSS_HPP
+#define CRYPTO3_PUBKEY_DETAIL_SHAMIR_SSS_HPP
 
 #include <vector>
 #include <type_traits>
@@ -42,24 +42,25 @@ namespace nil {
                 template<typename Group>
                 struct shamir_sss {
                     typedef Group group_type;
-                    typedef typename group_type::policy_type::base_field_type base_field_type;
                     typedef typename group_type::policy_type::scalar_field_type scalar_field_type;
 
                     typedef typename group_type::value_type group_value_type;
-                    typedef typename base_field_type::value_type base_field_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
+
+                    typedef scalar_field_value_type private_element_type;
+                    typedef group_value_type public_element_type;
 
                     //===========================================================================
                     // secret sharing scheme logical types
 
-                    typedef scalar_field_value_type private_element_type;
-                    typedef group_value_type public_element_type;
-                    typedef std::vector<private_element_type> private_elements_type;
-                    typedef std::vector<public_element_type> public_elements_type;
-                    typedef std::pair<std::size_t, private_element_type> indexed_private_element_type;
-                    typedef std::pair<std::size_t, public_element_type> indexed_public_element_type;
-                    typedef std::unordered_map<std::size_t, private_element_type> indexed_private_elements_type;
-                    typedef std::unordered_map<std::size_t, public_element_type> indexed_public_elements_type;
+                    typedef private_element_type coeff_type;
+                    typedef public_element_type public_coeff_type;
+                    typedef std::vector<coeff_type> coeffs_type;
+                    typedef std::vector<public_coeff_type> public_coeffs_type;
+                    typedef std::pair<std::size_t, private_element_type> share_type;
+                    typedef std::pair<std::size_t, public_element_type> public_share_type;
+                    typedef std::unordered_map<std::size_t, private_element_type> shares_type;
+                    typedef std::unordered_map<std::size_t, public_element_type> public_shares_type;
                     typedef std::set<std::size_t> indexes_type;
 
                     //===========================================================================
@@ -128,15 +129,15 @@ namespace nil {
                     template<typename Coeffs, typename Number,
                              check_private_element_type<typename Coeffs::value_type> = true,
                              check_number_type<Number> = true>
-                    static inline private_elements_type deal_shares(const Coeffs &coeffs, Number n) {
+                    static inline shares_type deal_shares(const Coeffs &coeffs, Number n) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
 
                         std::size_t t = std::distance(coeffs.begin(), coeffs.end());
                         assert(check_t(t, n));
 
-                        private_elements_type shares;
+                        shares_type shares;
                         for (std::size_t i = 1; i <= n; i++) {
-                            shares.emplace_back(deal_share(coeffs, i));
+                            assert(shares.emplace(deal_share(coeffs, i)).second);
                         }
                         return shares;
                     }
@@ -144,25 +145,10 @@ namespace nil {
                     template<typename Coeffs, typename Number,
                              check_private_element_type<typename Coeffs::value_type> = true,
                              check_number_type<Number> = true>
-                    static inline indexed_private_elements_type deal_indexed_shares(const Coeffs &coeffs, Number n) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-
-                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
-                        assert(check_t(t, n));
-
-                        indexed_private_elements_type shares;
-                        for (std::size_t i = 1; i <= n; i++) {
-                            assert(shares.emplace(i, deal_share(coeffs, i)).second);
-                        }
-                        return shares;
-                    }
-
-                    template<typename Coeffs, typename Number,
-                             check_private_element_type<typename Coeffs::value_type> = true,
-                             check_number_type<Number> = true>
-                    static inline private_element_type deal_share(const Coeffs &coeffs, Number i) {
+                    static inline share_type deal_share(const Coeffs &coeffs, Number i) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
                         assert(check_participant_index(i));
+                        assert(check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
 
                         private_element_type e_i(i);
                         private_element_type temp = private_element_type::one();
@@ -172,63 +158,47 @@ namespace nil {
                             share = share + c * temp;
                             temp = temp * e_i;
                         }
-                        return share;
+                        return share_type(i, share);
                     }
 
                     //
                     //  0 <= k < t
                     //
-                    template<typename Number1, typename Number2, check_number_type<Number1> = true,
-                             check_number_type<Number2> = true>
-                    static inline private_element_type eval_partial_private_element(
-                        const private_element_type &coeff, Number1 i, Number2 k,
-                        const private_element_type &init_share_value = private_element_type::zero()) {
-                        assert(check_participant_index(i));
-                        return init_share_value + coeff * private_element_type(i).pow(k);
+                    template<typename Number, check_number_type<Number> = true>
+                    static inline share_type partial_eval_share(const coeff_type &coeff, Number exp,
+                                                                const share_type &init_share_value) {
+                        assert(check_participant_index(init_share_value.first));
+                        assert(check_exp(exp));
+                        return share_type(init_share_value.first,
+                                          init_share_value.second +
+                                              coeff * private_element_type(init_share_value.first).pow(exp));
                     }
 
                     //===========================================================================
                     // secret recovering functions
 
-                    template<typename IndexedPrivateElements, typename Number,
-                             check_indexed_private_elements_type<IndexedPrivateElements> = true,
-                             check_number_type<Number> = true>
-                    static inline private_element_type
-                        recover_private_element(Number t, const IndexedPrivateElements &private_elements) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPrivateElements>));
+                    template<typename Shares, typename Number = std::size_t, check_indexed_private_elements_type<Shares> = true,
+                        check_number_type<Number> = true>
+                    static inline private_element_type reconstruct_secret(const Shares &shares, Number id_i = 0) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
 
-                        std::size_t len = std::distance(private_elements.begin(), private_elements.end());
-                        assert(check_minimal_size(t));
-                        assert(len >= t);
-
-                        return recover_private_element(private_elements);
-                    }
-
-                    template<typename IndexedPrivateElements,
-                             check_indexed_private_elements_type<IndexedPrivateElements> = true>
-                    static inline private_element_type
-                        recover_private_element(const IndexedPrivateElements &private_elements) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPrivateElements>));
-
-                        private_element_type result = private_element_type::zero();
-                        indexes_type indexes = get_indexes(private_elements);
-
-                        for (const auto &[i, s_i] : private_elements) {
-                            result = result + s_i * eval_basis_poly(indexes, i);
+                        private_element_type secret = private_element_type::zero();
+                        indexes_type indexes = get_shares_indexes(shares);
+                        for (const auto &[i, s_i] : shares) {
+                            secret = secret + s_i * eval_basis_poly(indexes, id_i ? id_i : i);
                         }
-                        return result;
+                        return secret;
                     }
 
-                    template<typename IndexedPublicElements,
-                             check_indexed_public_elements_type<IndexedPublicElements> = true>
-                    static inline public_element_type
-                        recover_public_element(const IndexedPublicElements &public_elements) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPublicElements>));
+                    template<typename PublicShares, check_indexed_public_elements_type<PublicShares> = true>
+                    static inline public_element_type reconstruct_public_element(const PublicShares &public_shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
+                        assert(check_minimal_size(std::distance(public_shares.begin(), public_shares.end())));
 
                         public_element_type result = public_element_type::zero();
-                        indexes_type indexes = get_indexes(public_elements);
+                        indexes_type indexes = get_shares_indexes(public_shares);
 
-                        for (const auto &[i, e_i] : public_elements) {
+                        for (const auto &[i, e_i] : public_shares) {
                             result = result + eval_basis_poly(indexes, i) * e_i;
                         }
                         return result;
@@ -237,7 +207,6 @@ namespace nil {
                     template<typename Number, check_number_type<Number> = true>
                     static inline private_element_type eval_basis_poly(const indexes_type &indexes, Number i) {
                         assert(check_participant_index(i));
-                        assert(indexes.count(i));
 
                         private_element_type e_i(i);
                         private_element_type result = private_element_type::one();
@@ -255,16 +224,16 @@ namespace nil {
 
                     template<typename Number1, typename Number2, check_number_type<Number1> = true,
                              check_number_type<Number2> = true>
-                    static inline private_elements_type get_poly(Number1 t, Number2 n) {
+                    static inline coeffs_type get_poly(Number1 t, Number2 n) {
                         assert(check_t(t, n));
                         return get_poly(t);
                     }
 
                     // TODO: add custom random generation
                     template<typename Number, check_number_type<Number> = true>
-                    static inline private_elements_type get_poly(Number t) {
+                    static inline coeffs_type get_poly(Number t) {
                         assert(check_minimal_size(t));
-                        private_elements_type coeffs;
+                        coeffs_type coeffs;
                         for (std::size_t i = 0; i < t; i++) {
                             coeffs.emplace_back(algebra::random_element<scalar_field_type>());
                         }
@@ -275,54 +244,43 @@ namespace nil {
                     // general purposes functions
 
                     template<typename IndexedElements, check_indexed_elements_type<IndexedElements> = true>
-                    static inline indexes_type get_indexes(const IndexedElements &elements) {
+                    static inline indexes_type get_shares_indexes(const IndexedElements &elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedElements>));
 
                         indexes_type indexes;
-                        for (const auto &s : elements) {
-                            assert(check_participant_index(s.first) && indexes.emplace(s.first).second);
+                        for (const auto &e : elements) {
+                            assert(check_participant_index(e.first) && indexes.emplace(e.first).second);
                         }
                         return indexes;
                     }
 
-                    template<typename PrivateElements,
-                             check_private_element_type<typename PrivateElements::value_type> = true>
-                    static inline public_elements_type get_public_elements(const PrivateElements &private_elements) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PrivateElements>));
+                    template<typename Coeffs, check_private_element_type<typename Coeffs::value_type> = true>
+                    static inline public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
+                        assert(check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
 
-                        public_elements_type public_elements;
-
-                        for (const auto &s : private_elements) {
-                            public_elements.emplace_back(get_public_element(s));
+                        public_coeffs_type public_coeffs;
+                        for (const auto &c : coeffs) {
+                            public_coeffs.emplace_back(get_public_element(c));
                         }
-                        return public_elements;
+                        return public_coeffs;
                     }
 
-                    template<typename IndexedPrivateElements,
-                             check_indexed_private_elements_type<IndexedPrivateElements> = true>
-                    static inline indexed_public_elements_type
-                        get_indexed_public_elements(const IndexedPrivateElements &indexed_private_elements) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPrivateElements>));
+                    template<typename Shares, check_indexed_private_elements_type<Shares> = true>
+                    static inline public_shares_type get_public_shares(const Shares &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
+                        assert(check_minimal_size(std::distance(shares.begin(), shares.end())));
 
-                        indexed_public_elements_type indexed_public_elements;
-
-                        for (const auto &s_i : indexed_private_elements) {
-                            indexed_public_elements.emplace(get_indexed_public_element(s_i));
+                        public_shares_type public_shares;
+                        for (const auto &s : shares) {
+                            assert(public_shares.emplace(get_public_share(s)).second);
                         }
-                        return indexed_public_elements;
+                        return public_shares;
                     }
 
-                    template<typename IndexedPrivateElement,
-                             check_indexed_private_element_type<IndexedPrivateElement> = true>
-                    static inline indexed_public_element_type
-                        get_indexed_public_element(const IndexedPrivateElement &s_i) {
-                        return get_indexed_public_element(s_i.first, s_i.second);
-                    }
-
-                    template<typename Number, check_number_type<Number> = true>
-                    static inline indexed_public_element_type
-                        get_indexed_public_element(Number i, const private_element_type &s_i) {
-                        return indexed_public_element_type(i, get_public_element(s_i));
+                    template<typename Share, check_indexed_private_element_type<Share> = true>
+                    static inline public_share_type get_public_share(const Share &s) {
+                        return public_share_type(s.first, get_public_element(s.second));
                     }
 
                     static inline public_element_type get_public_element(const private_element_type &s) {
@@ -332,18 +290,6 @@ namespace nil {
                     template<typename Number, check_number_type<Number> = true>
                     static inline bool check_minimal_size(Number size) {
                         return size >= 2;
-                    }
-
-                    template<typename Number1, typename Number2, check_number_type<Number1> = true,
-                             check_number_type<Number2> = true>
-                    static inline bool check_t(Number1 t, Number2 n) {
-                        return check_minimal_size(t) && t <= n;
-                    }
-
-                    template<typename Number1, typename Number2, check_number_type<Number1> = true,
-                             check_number_type<Number2> = true>
-                    static inline bool strong_check_t(Number1 t, Number2 n) {
-                        return check_t(t, n) && t >= get_minimal_t(n);
                     }
 
                     template<typename Number, check_number_type<Number> = true>
@@ -356,10 +302,21 @@ namespace nil {
                         assert(check_minimal_size(n));
                         return (n + 1) / 2;
                     }
+
+                    template<typename Number1, typename Number2, check_number_type<Number1> = true,
+                             check_number_type<Number2> = true>
+                    static inline bool check_t(Number1 t, Number2 n) {
+                        return check_minimal_size(t) && n >= t && t >= get_minimal_t(n);
+                    }
+
+                    template<typename Number, check_number_type<Number> = true>
+                    static inline bool check_exp(Number exp) {
+                        return exp >= 0;
+                    }
                 };
             }    // namespace detail
         }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_SHAMIR_SSS_HPP
+#endif    // CRYPTO3_PUBKEY_DETAIL_SHAMIR_SSS_HPP

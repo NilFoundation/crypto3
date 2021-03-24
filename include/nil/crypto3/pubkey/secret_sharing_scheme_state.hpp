@@ -36,27 +36,17 @@ namespace nil {
         namespace pubkey {
             template<typename Scheme>
             using shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::private_element_type,
+                typename Scheme::shares_type,
                 boost::accumulators::features<accumulators::tag::deal_shares<Scheme>>>;
 
             template<typename Scheme>
-            using indexed_shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
+            using secret_reconstructing_accumulator_set = boost::accumulators::accumulator_set<
                 typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::deal_indexed_shares<Scheme>>>;
-
-            template<typename Scheme>
-            using indexed_weighted_shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::deal_indexed_weighted_shares<Scheme>>>;
-
-            template<typename Scheme>
-            using secret_recovering_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::indexed_public_element_type,
-                boost::accumulators::features<accumulators::tag::recover_private_element<Scheme>>>;
+                boost::accumulators::features<accumulators::tag::reconstruct_secret<Scheme>>>;
 
             template<typename Scheme>
             using share_verification_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::indexed_public_element_type,
+                bool,
                 boost::accumulators::features<accumulators::tag::verify_share<Scheme>>>;
         }    // namespace pubkey
     }        // namespace crypto3
