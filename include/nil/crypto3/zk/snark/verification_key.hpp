@@ -22,20 +22,22 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PROOF_HPP
-#define CRYPTO3_ZK_PROOF_HPP
+#ifndef CRYPTO3_ZK_SNARK_VERIFICATION_KEY_HPP
+#define CRYPTO3_ZK_SNARK_VERIFICATION_KEY_HPP
 
 #include <numeric>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            template<typename ZkScheme>
-            struct proof {
-                typedef ZkScheme scheme_type;
-            };
-        }    // namespace zk
-    }        // namespace crypto3
+            namespace snark {
+                template<typename ZkScheme>
+                struct verification_key {
+                    typedef ZkScheme scheme_type;
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif

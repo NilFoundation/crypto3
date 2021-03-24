@@ -39,14 +39,7 @@
 #include <nil/crypto3/detail/digest.hpp>
 #include <nil/crypto3/detail/inject.hpp>
 
-#include <nil/crypto3/snark/accumulators/bits_count.hpp>
-
-#include <nil/crypto3/snark/accumulators/parameters/cipher.hpp>
-#include <nil/crypto3/snark/accumulators/parameters/bits.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
-#include <nil/crypto3/snark/detail/cipher_modes.hpp>
-
-#include <nil/crypto3/snark/cipher.hpp>
 
 namespace nil {
     namespace crypto3 {

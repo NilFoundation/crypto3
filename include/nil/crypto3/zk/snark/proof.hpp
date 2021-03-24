@@ -22,20 +22,35 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PROOF_HPP
-#define CRYPTO3_ZK_PROOF_HPP
+#ifndef CRYPTO3_ZK_SNARK_PROOF_HPP
+#define CRYPTO3_ZK_SNARK_PROOF_HPP
 
 #include <numeric>
+
+#include <nil/crypto3/zk/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            template<typename ZkScheme>
-            struct proof {
-                typedef ZkScheme scheme_type;
-            };
-        }    // namespace zk
-    }        // namespace crypto3
+            namespace snark {
+                template<typename ZkScheme>
+                class proof : public zk::proof<ZkScheme> {
+                    typedef zk::proof<ZkScheme> policy_type;
+
+                public:
+                    typedef typename policy_type::scheme_type scheme_type;
+
+                    typedef typename scheme_type::curve_type curve_type;
+
+                    constexpr static const std::size_t g1_bits = curve_type::g1_bits;
+                    typedef typename curve_type::g1_type g1_type;
+
+                    constexpr static const std::size_t g2_bits = curve_type::g2_bits;
+                    typedef typename curve_type::g2_type g2_type;
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif
