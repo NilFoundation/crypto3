@@ -31,7 +31,7 @@
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
-#include <nil/crypto3/pubkey/no_key.hpp>
+#include <nil/crypto3/pubkey/no_key_ops.hpp>
 
 namespace nil {
     namespace crypto3 {

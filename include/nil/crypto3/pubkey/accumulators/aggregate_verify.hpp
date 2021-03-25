@@ -43,7 +43,6 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/key.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/public_params.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
 
 namespace nil {
@@ -67,7 +66,6 @@ namespace nil {
                     typedef typename key_type::public_key_type public_key_type;
                     typedef typename key_type::private_key_type private_key_type;
                     typedef typename key_type::signature_type signature_type;
-                    typedef typename key_type::public_params_type public_params_type;
                     typedef typename key_type::aggregate_type cache_type;
 
                 public:
@@ -75,8 +73,7 @@ namespace nil {
 
                     template<typename Args>
                     aggregate_verify_impl(const Args &args) :
-                        signature(args[boost::accumulators::sample]),
-                        pp(args[::nil::crypto3::accumulators::public_params]), is_current_key_set(false) {
+                        signature(args[boost::accumulators::sample]), is_current_key_set(false) {
                     }
 
                     template<typename Args,
@@ -157,7 +154,7 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         assert(cache.size() > 0);
-                        return mode_type::process(cache, signature, pp);
+                        return mode_type::process(cache, signature);
                     }
 
                 protected:
@@ -190,7 +187,6 @@ namespace nil {
 
                     cache_type cache;
                     signature_type signature;
-                    public_params_type pp;
                     key_type current_key;
                     bool is_current_key_set;
                 };

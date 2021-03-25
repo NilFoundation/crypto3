@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -23,25 +23,16 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PK_KEYS_HPP
-#define CRYPTO3_PUBKEY_PK_KEYS_HPP
+#ifndef CRYPTO3_PUBKEY_NO_KEY_HPP
+#define CRYPTO3_PUBKEY_NO_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename Scheme>
-            struct public_key;
-
-            template<typename Scheme>
-            struct private_key;
-
-            template<typename Scheme>
-            struct agreement_key;
-
             template<typename Scheme>
             struct no_key_ops;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_PK_KEYS_HPP
+#endif    // CRYPTO3_PUBKEY_NO_KEY_HPP

@@ -29,7 +29,8 @@
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 
-#include <nil/crypto3/pubkey/pk_keys.hpp>
+#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/no_key_ops.hpp>
 
 namespace nil {
     namespace crypto3 {

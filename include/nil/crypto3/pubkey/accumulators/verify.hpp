@@ -42,7 +42,6 @@
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/public_params.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
 
 namespace nil {
@@ -66,7 +65,6 @@ namespace nil {
                     typedef typename key_type::public_key_type public_key_type;
                     typedef typename key_type::private_key_type private_key_type;
                     typedef typename key_type::signature_type signature_type;
-                    typedef typename key_type::public_params_type public_params_type;
 
                 public:
                     typedef typename mode_type::result_type result_type;
@@ -74,8 +72,7 @@ namespace nil {
                     template<typename Args>
                     verify_impl(const Args &args) :
                         public_key(args[boost::accumulators::sample]),
-                        signature(args[::nil::crypto3::accumulators::signature]),
-                        pp(args[::nil::crypto3::accumulators::public_params]) {
+                        signature(args[::nil::crypto3::accumulators::signature]) {
                     }
 
                     template<typename Args>
@@ -86,7 +83,7 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(public_key, cache, signature, pp);
+                        return mode_type::process(public_key, cache, signature);
                     }
 
                 protected:
@@ -130,7 +127,6 @@ namespace nil {
                     input_block_type cache;
                     signature_type signature;
                     key_type public_key;
-                    public_params_type pp;
                 };
             }    // namespace impl
 

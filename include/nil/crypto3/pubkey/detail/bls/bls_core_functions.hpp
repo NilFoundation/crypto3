@@ -106,7 +106,7 @@ namespace nil {
                         return !sk.is_zero();
                     }
 
-                    static inline public_key_type sk_to_pk(const private_key_type &sk) {
+                    static inline public_key_type privkey_to_pubkey(const private_key_type &sk) {
                         assert(private_key_validate(sk));
 
                         return sk * public_key_type::one();
@@ -249,7 +249,7 @@ namespace nil {
                     static inline signature_type pop_prove(const private_key_type &sk, const DstType &dst) {
                         assert(private_key_validate(sk));
 
-                        public_key_type pk = sk_to_pk(sk);
+                        public_key_type pk = privkey_to_pubkey(sk);
                         signature_type Q = hash_pubkey_to_point(pk, dst);
                         return sk * Q;
                     }
