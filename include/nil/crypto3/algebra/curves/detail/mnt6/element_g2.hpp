@@ -77,11 +77,8 @@ namespace nil {
                          *
                          */
                         constexpr element_mnt6_g2() :
-                            element_mnt6_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                            underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_mnt6_g2() : element_mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        // when constexpr fields will be finished
+                            element_mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
@@ -103,19 +100,7 @@ namespace nil {
                          *
                          */
                         constexpr static element_mnt6_g2 one() {
-                            return element_mnt6_g2(
-                                underlying_field_value_type(
-                                    0x34F7320A12B56CE532BCCB3B44902CBAA723CD60035ADA7404B743AD2E644AD76257E4C6813_cppui298,
-                                    0xCF41620BAA52EEC50E61A70AB5B45F681952E0109340FEC84F1B2890ABA9B15CAC5A0C80FA_cppui296,
-                                    0x11F99170E10E326433CCCB8032FB48007CA3C4E105CF31B056AC767E2CB01258391BD4917CE_cppui297),
-                                underlying_field_value_type(
-                                    0x3A65968F03CC64D62AD05C79C415E07EBD38B363EC48309487C0B83E1717A582C1B60FECC91_cppui298,
-                                    0xCA5E8427E5DB1506C1A24CEFC2451AB3ACCAEA5DB82DCB0C7117CC74402FAA5B2C37685C6E_cppui296,
-                                    0xF75D2DD88302C9A4EF941307629A1B3E197277D83ABB715F647C2E55A27BAF782F5C60E7F7_cppui296),
-                                underlying_field_value_type::one());
-                            // must be
-                            // return element_mnt6_g2(one_fill[0], one_fill[1], one_fill[2]);
-                            // when constexpr fields will be finished
+                            return element_mnt6_g2(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -389,33 +374,35 @@ namespace nil {
                                                         g2_field_type_value::underlying_type::zero(), g1_a);
 
                         constexpr static const underlying_field_value_type b = underlying_field_value_type(
-                            g1_b * twist.non_residue, g2_field_type_value::underlying_type::zero(),
+                            g1_b * underlying_field_value_type::non_residue, g2_field_type_value::underlying_type::zero(),
                             g2_field_type_value::underlying_type::zero());
-                        // must be
-                        // underlying_field_value_type(g1_b * twist.non_residue,
-                        // when constexpr fields will be finished
 
                         constexpr static const g2_field_type_value twist_coeff_a = a;
                         constexpr static const g2_field_type_value twist_coeff_b = b;
 
                     private:
-                        constexpr static const g1_field_type_value twist_mul_by_a_c0 = g1_a * twist.non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_a_c1 = g1_a * twist.non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c0 = g1_a * 
+                            underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c1 = g1_a * 
+                            underlying_field_value_type::non_residue;
                         constexpr static const g1_field_type_value twist_mul_by_a_c2 = g1_a;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = g1_b * twist.non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = g1_b * twist.non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c2 = g1_b * twist.non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = g1_b * 
+                            underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = g1_b * 
+                            underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c2 = g1_b * 
+                            underlying_field_value_type::non_residue;
 
                         constexpr static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                             0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
                         constexpr static const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
                             0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(
                                 0x34F7320A12B56CE532BCCB3B44902CBAA723CD60035ADA7404B743AD2E644AD76257E4C6813_cppui298,
                                 0xCF41620BAA52EEC50E61A70AB5B45F681952E0109340FEC84F1B2890ABA9B15CAC5A0C80FA_cppui296,
@@ -424,19 +411,16 @@ namespace nil {
                                 0x3A65968F03CC64D62AD05C79C415E07EBD38B363EC48309487C0B83E1717A582C1B60FECC91_cppui298,
                                 0xCA5E8427E5DB1506C1A24CEFC2451AB3ACCAEA5DB82DCB0C7117CC74402FAA5B2C37685C6E_cppui296,
                                 0xF75D2DD88302C9A4EF941307629A1B3E197277D83ABB715F647C2E55A27BAF782F5C60E7F7_cppui296),
-                            underlying_field_value_type::one()};*/
+                            underlying_field_value_type::one()};
                     };
 
-                    template <>
-                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
                         element_mnt6_g2<298>::twist;
 
-                    template <>
-                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
                         element_mnt6_g2<298>::twist_coeff_a;
 
-                    template <>
-                    constexpr element_mnt6_g2<298>::g2_field_type_value const
+                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
                         element_mnt6_g2<298>::twist_coeff_b;
 
                 }    // namespace detail

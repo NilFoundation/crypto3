@@ -85,11 +85,8 @@ namespace nil {
                          *
                          */
                         constexpr element_bls12_g1() :
-                            element_bls12_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                             underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_bls12_g1() : element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        // when constexpr fields will be finished
+                            element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
@@ -114,15 +111,7 @@ namespace nil {
                          *
                          */
                         constexpr static element_bls12_g1 one() {
-                            return element_bls12_g1(
-                                underlying_field_value_type(
-                                    0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB_cppui381),
-                                underlying_field_value_type(
-                                    0x8B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1_cppui380),
-                                underlying_field_value_type::one());
-                            // must be
-                            // element_bls12_g1() : element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                            // when constexpr fields will be finished
+                            return element_bls12_g1(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -417,14 +406,14 @@ namespace nil {
                     private:
                         constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB_cppui381),
                             underlying_field_value_type(0x8B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1_cppui380),
-                            underlying_field_value_type::one()};*/
+                            underlying_field_value_type::one()};
                     };
 
                     /** @brief A struct representing an element from the group G1 of BLS12-377 curve.
@@ -456,11 +445,7 @@ namespace nil {
                          *
                          */
                         element_bls12_g1() :
-                            element_bls12_g1(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                             underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_bls12_g1() : element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        // when constexpr fields will be finished
+                            element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
@@ -485,15 +470,7 @@ namespace nil {
                          *
                          */
                         static element_bls12_g1 one() {
-                            return element_bls12_g1(
-                                underlying_field_value_type(
-                                    0x8848DEFE740A67C8FC6225BF87FF5485951E2CAA9D41BB188282C8BD37CB5CD5481512FFCD394EEAB9B16EB21BE9EF_cppui376),
-                                underlying_field_value_type(
-                                    0x1914A69C5102EFF1F674F5D30AFEEC4BD7FB348CA3E52D96D182AD44FB82305C2FE3D3634A9591AFD82DE55559C8EA6_cppui377),
-                                underlying_field_value_type::one());
-                            // must be
-                            // element_bls12_g1() : element_bls12_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                            // when constexpr fields will be finished
+                            return element_bls12_g1(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -775,17 +752,16 @@ namespace nil {
                         }
 
                     private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(0x8848DEFE740A67C8FC6225BF87FF5485951E2CAA9D41BB188282C8BD37CB5CD5481512FFCD394EEAB9B16EB21BE9EF_cppui376),
                             underlying_field_value_type(0x1914A69C5102EFF1F674F5D30AFEEC4BD7FB348CA3E52D96D182AD44FB82305C2FE3D3634A9591AFD82DE55559C8EA6_cppui377),
-                            underlying_field_value_type::one()};*/
+                            underlying_field_value_type::one()};
                     };
 
                 }    // namespace detail
