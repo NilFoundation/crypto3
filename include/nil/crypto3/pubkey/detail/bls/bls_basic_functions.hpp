@@ -47,7 +47,7 @@ namespace nil {
                 using namespace nil::crypto3::algebra::curves::detail;
 
                 template<typename policy_type>
-                struct bls_core_functions {
+                struct bls_basic_functions {
                     typedef typename policy_type::curve_type curve_type;
                     typedef typename policy_type::hash_type hash_type;
                     typedef typename policy_type::modulus_type modulus_type;
