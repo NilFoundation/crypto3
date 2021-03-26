@@ -54,10 +54,9 @@ namespace nil {
                         opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
-                template<typename T1, typename T2, typename FieldType, typename MultiexpMethod>
+                template<typename MultiexpMethod, typename T1, typename T2, typename FieldType>
                 typename knowledge_commitment<T1, T2>::value_type kc_multiexp_with_mixed_addition(
-                    const knowledge_commitment_vector<T1, T2> &vec,
-                    const std::size_t min_idx,
+                    const knowledge_commitment_vector<T1, T2> &vec, const std::size_t min_idx,
                     const std::size_t max_idx,
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
@@ -105,8 +104,7 @@ namespace nil {
                         ++value_it;
                     }
 
-                    return acc + algebra::multiexp<knowledge_commitment<T1, T2>, FieldType, MultiexpMethod>(
-                                     g.begin(), g.end(), p.begin(), p.end(), chunks);
+                    return acc + algebra::multiexp<MultiexpMethod>(g.begin(), g.end(), p.begin(), p.end(), chunks);
                 }
 
                 template<typename T1, typename T2, typename FieldType>

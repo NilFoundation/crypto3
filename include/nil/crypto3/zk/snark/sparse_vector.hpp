@@ -213,9 +213,7 @@ namespace nil {
 
                                     accumulated_value =
                                         accumulated_value +
-                                        algebra::multiexp<
-                                            Type, BaseInputType,
-                                            algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
+                                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
                                             it_begin + (indices[first_pos] - offset),
                                             it_begin + (indices[last_pos] - offset) + 1, chunks);
@@ -240,14 +238,12 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value +
-                                algebra::multiexp<Type, BaseInputType,
-                                                  algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
-                                    values.begin() + first_pos,
-                                    values.begin() + last_pos + 1,
-                                    it_begin + (indices[first_pos] - offset),
-                                    it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks);
+                                accumulated_value + algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                                                        values.begin() + first_pos,
+                                                        values.begin() + last_pos + 1,
+                                                        it_begin + (indices[first_pos] - offset),
+                                                        it_begin + (indices[last_pos] - offset) + 1,
+                                                        chunks);
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);

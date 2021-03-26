@@ -30,11 +30,6 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
-// temporary includes begin
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-// temporary includes end
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -188,11 +183,7 @@ namespace nil {
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
-                        return non_fixed_precision_modulus_type(lhs.data) * rhs;
+                        return lhs.data * rhs;
                     }
 
                     template<
@@ -205,11 +196,7 @@ namespace nil {
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
-                        return lhs * non_fixed_precision_modulus_type(rhs.data);
+                        return lhs * rhs.data;
                     }
                 }    // namespace detail
             }        // namespace snark
