@@ -28,10 +28,12 @@
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
-#include <boost/core/ignore_unused.hpp>
 #include <nil/crypto3/multiprecision/debug_adaptor.hpp>
 #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+
+#include <boost/core/ignore_unused.hpp>
+
 #include <boost/random/independent_bits.hpp>
 #include <boost/random/discard_block.hpp>
 #include <boost/random/xor_combine.hpp>
