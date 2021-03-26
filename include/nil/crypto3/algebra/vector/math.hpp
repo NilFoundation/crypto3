@@ -70,7 +70,7 @@ namespace nil {
              * Computes the elementwise real of a vector.
              */
             template<typename T, std::size_t N>
-            constexpr vector<detail::remove_complex_t<T>, N> real(const vector<T, N> &v) {
+            constexpr vector<nil::crypto3::detail::remove_complex_t<T>, N> real(const vector<T, N> &v) {
                 return elementwise([](auto i) { return std::real(i); }, v);
             }
 
@@ -82,7 +82,7 @@ namespace nil {
              * Computes the elementwise imag of a vector.
              */
             template<typename T, std::size_t N>
-            constexpr vector<detail::remove_complex_t<T>, N> imag(const vector<T, N> &v) {
+            constexpr vector<nil::crypto3::detail::remove_complex_t<T>, N> imag(const vector<T, N> &v) {
                 return elementwise([](auto i) { return std::imag(i); }, v);
             }
 
@@ -94,7 +94,7 @@ namespace nil {
              *  Computes the elementwise absolute value of a vector.
              */
             template<typename T, std::size_t N>
-            constexpr vector<detail::remove_complex_t<T>, N> abs(const vector<T, N> &v) {
+            constexpr vector<nil::crypto3::detail::remove_complex_t<T>, N> abs(const vector<T, N> &v) {
                 return elementwise(abs<T>, v);
             }
 
