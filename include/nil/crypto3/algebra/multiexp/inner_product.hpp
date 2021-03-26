@@ -36,18 +36,12 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<
-                typename BaseType,
-                typename InputBaseIterator,
-                typename = typename std::enable_if<
-                    std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type, BaseType>::value>::type>
-            inline typename BaseType::value_type inner_product(InputBaseIterator a_begin,
-                                                               InputBaseIterator a_end,
-                                                               InputBaseIterator b_begin,
-                                                               InputBaseIterator b_end) {
-
-                return multiexp<BaseType, BaseType, policies::multiexp_method_naive_plain<BaseType, BaseType>>(
-                    a_begin, a_end, b_begin, b_end, 1);
+            template<typename InputBaseIterator>
+            inline typename std::iterator_traits<InputBaseIterator>::value_type inner_product(InputBaseIterator a_begin,
+                                                                                              InputBaseIterator a_end,
+                                                                                              InputBaseIterator b_begin,
+                                                                                              InputBaseIterator b_end) {
+                return multiexp<policies::multiexp_method_naive_plain>(a_begin, a_end, b_begin, b_end, 1);
             }
         }    // namespace algebra
     }        // namespace crypto3

@@ -91,16 +91,18 @@ namespace nil {
                          *    @return the selected affine point $(X:Y:1)$
                          *
                          */
-                        constexpr element_mnt4_g1(const underlying_field_value_type &X, const underlying_field_value_type &Y) :
-                            X(X), Y(Y), Z(underlying_field_value_type::one()) {};
+                        constexpr element_mnt4_g1(const underlying_field_value_type &X,
+                                                  const underlying_field_value_type &Y) :
+                            X(X),
+                            Y(Y), Z(underlying_field_value_type::one()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
                          *
                          */
                         constexpr element_mnt4_g1(underlying_field_value_type X,
-                                        underlying_field_value_type Y,
-                                        underlying_field_value_type Z) {
+                                                  underlying_field_value_type Y,
+                                                  underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -400,12 +402,8 @@ namespace nil {
                             underlying_field_value_type::one()};*/
                     };
 
-                    template <>
-                    constexpr element_mnt4_g1<298>::g1_field_type_value const
-                        element_mnt4_g1<298>::a;
-                    template <>
-                    constexpr element_mnt4_g1<298>::g1_field_type_value const
-                        element_mnt4_g1<298>::b;
+                    constexpr element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::a;
+                    constexpr element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::b;
 
                 }    // namespace detail
             }        // namespace curves

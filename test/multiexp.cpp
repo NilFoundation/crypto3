@@ -124,14 +124,14 @@ long long get_nsec_time() {
 }
 
 template<typename GroupType, typename FieldType, typename MultiexpMethod>
-run_result_t<GroupType>
-    profile_multiexp(test_instances_t<GroupType> group_elements, test_instances_t<FieldType> scalars) {
+run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
+                                         test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multiexp<GroupType, FieldType, MultiexpMethod>(
-            group_elements[i].cbegin(), group_elements[i].cend(), scalars[i].cbegin(), scalars[i].cend(), 1));
+        answers.push_back(multiexp<MultiexpMethod>(group_elements[i].cbegin(), group_elements[i].cend(),
+                                                   scalars[i].cbegin(), scalars[i].cend(), 1, MultiexpMethod()));
     }
 
     long long time_delta = get_nsec_time() - start_time;
@@ -178,13 +178,15 @@ void print_performance_csv(size_t expn_start, std::size_t expn_end_fast, std::si
     }
 }
 
-int main(void) {
+BOOST_AUTO_TEST_SUITE(multiexp_test_suite)
+
+BOOST_AUTO_TEST_CASE(multiexp_test_case) {
 
     std::cout << "Testing BLS12-381 G1" << std::endl;
     print_performance_csv<curves::bls12<381>::g1_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
 
     std::cout << "Testing BLS12-381 G2" << std::endl;
     print_performance_csv<curves::bls12<381>::g2_type, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
-
-    return 0;
 }
+
+BOOST_AUTO_TEST_SUITE_END()

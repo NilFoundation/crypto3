@@ -38,26 +38,19 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
+            template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
+            typename std::iterator_traits<InputBaseIterator>::value_type::value_type
+                multiexp(InputBaseIterator vec_start, InputBaseIterator vec_end, InputFieldIterator scalar_start,
+                         InputFieldIterator scalar_end, const std::size_t chunks_count) {
 
-            // TODO: Implement not only for vectors
-            template<typename BaseType,
-                     typename FieldType,
-                     typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
-            typename BaseType::value_type
-                multiexp(typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                         typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                         typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                         typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
-                         const std::size_t chunks_count) {
-                using base_value_type = typename BaseType::value_type;
-                using field_value_type = typename FieldType::value_type;
-                using multiexp_method = MultiexpMethod;
+                typedef typename std::iterator_traits<InputBaseIterator>::value_type::value_type base_value_type;
+                typedef typename std::iterator_traits<InputFieldIterator>::value_type::value_type field_value_type;
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
                 if ((total_size < chunks_count) || (chunks_count == 1)) {
                     // no need to split into "chunks_count", can call implementation directly
-                    return multiexp_method::process(vec_start, vec_end, scalar_start, scalar_end);
+                    return MultiexpMethod::process(vec_start, vec_end, scalar_start, scalar_end);
                 }
 
                 const std::size_t one_chunk_size = total_size / chunks_count;
@@ -66,7 +59,7 @@ namespace nil {
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
                     result =
-                        result + multiexp_method::process(
+                        result + MultiexpMethod::process(
                                      vec_start + i * one_chunk_size,
                                      (i == chunks_count - 1 ? vec_end : vec_start + (i + 1) * one_chunk_size),
                                      scalar_start + i * one_chunk_size,
@@ -76,26 +69,25 @@ namespace nil {
                 return result;
             }
 
-            template<typename BaseType,
-                     typename FieldType,
-                     typename MultiexpMethod = policies::multiexp_method_naive_plain<BaseType, FieldType>>
-            typename BaseType::value_type multiexp_with_mixed_addition(
-                typename std::vector<typename BaseType::value_type>::const_iterator vec_start,
-                typename std::vector<typename BaseType::value_type>::const_iterator vec_end,
-                typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
-                const std::size_t chunks_count) {
+            template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
+            typename std::iterator_traits<InputBaseIterator>::value_type::value_type
+                multiexp_with_mixed_addition(InputBaseIterator vec_start, InputBaseIterator vec_end,
+                                             InputFieldIterator scalar_start, InputFieldIterator scalar_end,
+                                             const std::size_t chunks_count,
+                                             const MultiexpMethod &mm = policies::multiexp_method_naive_plain()) {
 
-                using base_type = BaseType;
-                using field_type = FieldType;
-                using base_value_type = typename base_type::value_type;
-                using field_value_type = typename field_type::value_type;
-                using multiexp_method = MultiexpMethod;
+                typedef typename std::iterator_traits<InputBaseIterator>::value_type base_type;
+                typedef typename std::iterator_traits<InputFieldIterator>::value_type field_type;
+
+                typedef typename std::iterator_traits<InputBaseIterator>::value_type::value_type base_value_type;
+                typedef typename std::iterator_traits<InputFieldIterator>::value_type::value_type field_value_type;
+
+                typedef MultiexpMethod method_type;
 
                 assert(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
 
-                typename std::vector<base_value_type>::const_iterator vec_it = vec_start;
-                typename std::vector<field_value_type>::const_iterator scalar_it = scalar_start;
+                InputBaseIterator vec_it = vec_start;
+                InputFieldIterator scalar_it = scalar_start;
 
                 const field_value_type zero = field_value_type::zero();
                 const field_value_type one = field_value_type::one();
@@ -117,8 +109,7 @@ namespace nil {
                     }
                 }
 
-                return acc + multiexp<base_type, field_type, multiexp_method>(
-                                 g.begin(), g.end(), p.begin(), p.end(), chunks_count);
+                return acc + multiexp<method_type>(g.begin(), g.end(), p.begin(), p.end(), chunks_count);
             }
 
             /**
@@ -140,7 +131,8 @@ namespace nil {
 
                 std::size_t window = 1;
 
-                for (long i = curves::multiexp_params<GroupType>::fixed_base_exp_window_table.size() - 1; i >= 0; --i) {
+                for (std::size_t i = curves::multiexp_params<GroupType>::fixed_base_exp_window_table.size() - 1; i >= 0;
+                     --i) {
                     if (curves::multiexp_params<GroupType>::fixed_base_exp_window_table[i] != 0 &&
                         num_scalars >= curves::multiexp_params<GroupType>::fixed_base_exp_window_table[i]) {
                         window = i + 1;
@@ -191,9 +183,6 @@ namespace nil {
                                                         const typename FieldType::value_type &pow) {
 
                 typedef typename FieldType::number_type number_type;
-                // temporary added until fixed-precision modular adaptor is ready:
-                typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                    non_fixed_precision_number_type;
 
                 const std::size_t outerc = (scalar_size + window - 1) / window;
                 const number_type pow_val = pow.data;
@@ -203,8 +192,7 @@ namespace nil {
                 for (std::size_t outer = 0; outer < outerc; ++outer) {
                     std::size_t inner = 0;
                     for (std::size_t i = 0; i < window; ++i) {
-                        if (nil::crypto3::multiprecision::bit_test(non_fixed_precision_number_type(pow_val),
-                                                            outer * window + i)) {
+                        if (multiprecision::bit_test(pow_val, outer * window + i)) {
                             inner |= 1u << i;
                         }
                     }
@@ -215,9 +203,7 @@ namespace nil {
                 return res;
             }
 
-            template<typename GroupType,
-                     typename FieldType,
-                     typename InputRange,
+            template<typename GroupType, typename FieldType, typename InputRange,
                      typename = typename std::enable_if<
                          std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
             std::vector<typename GroupType::value_type> batch_exp(const std::size_t scalar_size,
@@ -233,9 +219,7 @@ namespace nil {
                 return res;
             }
 
-            template<typename GroupType,
-                     typename FieldType,
-                     typename InputRange,
+            template<typename GroupType, typename FieldType, typename InputRange,
                      typename = typename std::enable_if<
                          std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
             std::vector<typename GroupType::value_type>
@@ -255,8 +239,7 @@ namespace nil {
 
             template<typename GroupType, typename InputRange>
             typename std::enable_if<
-                std::is_same<typename InputRange::value_type, typename GroupType::value_type>::value,
-                void>::type
+                std::is_same<typename InputRange::value_type, typename GroupType::value_type>::value, void>::type
                 batch_to_special(InputRange &vec) {
 
                 std::vector<typename GroupType::value_type> non_zero_vec;

@@ -64,25 +64,18 @@ namespace nil {
                  * multiexp_method_naive uses opt_window_wnaf_exp for exponentiation,
                  * while multiexp_method_plain uses operator *.
                  */
-                template<typename BaseType, typename FieldType>
                 struct multiexp_method_naive_plain {
-                    using base_value_type = typename BaseType::value_type;
-                    using field_value_type = typename FieldType::value_type;
+                    template<typename InputBaseIterator, typename InputFieldIterator>
+                    inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        operator()(InputBaseIterator vec_start,
+                                   InputBaseIterator vec_end,
+                                   InputFieldIterator scalar_start,
+                                   InputFieldIterator scalar_end) {
 
-                public:
-                    template<typename InputBaseIterator, typename InputFieldIterator,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
-                                              base_value_type>::value>::type,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
-                                              field_value_type>::value>::type>
-                    static inline base_value_type process(InputBaseIterator vec_start,
-                                                          InputBaseIterator vec_end,
-                                                          InputFieldIterator scalar_start,
-                                                          InputFieldIterator scalar_end) {
+                        typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
+                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
-                        base_value_type result(base_value_type::zero());
+                        base_value_type result = base_value_type::zero();
 
                         InputBaseIterator vec_it;
                         InputFieldIterator scalar_it;
@@ -106,26 +99,19 @@ namespace nil {
                  * Requires that base_value_type implements .dbl() (and, if USE_MIXED_ADDITION is defined,
                  * .to_special(), .mixed_add(), and batch_to_special()).
                  */
-                template<typename BaseType, typename FieldType>
-                class multiexp_method_BDLO12 {
-                    using base_value_type = typename BaseType::value_type;
-                    using field_value_type = typename FieldType::value_type;
+                struct multiexp_method_BDLO12 {
+                    template<typename InputBaseIterator, typename InputFieldIterator>
+                    inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        operator()(InputBaseIterator bases,
+                                   InputBaseIterator bases_end,
+                                   InputFieldIterator exponents,
+                                   InputFieldIterator exponents_end) {
 
-                public:
-                    template<typename InputBaseIterator, typename InputFieldIterator,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
-                                              base_value_type>::value>::type,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
-                                              field_value_type>::value>::type>
-                    static inline base_value_type process(InputBaseIterator bases,
-                                                          InputBaseIterator bases_end,
-                                                          InputFieldIterator exponents,
-                                                          InputFieldIterator exponents_end) {
+                        typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
+                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                        typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_number_type;
 
                         std::size_t length = std::distance(bases, bases_end);
@@ -139,7 +125,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i < length; i++) {
                             bn_exponents[i] = non_fixed_precision_number_type(exponents[i].data);
-                            std::size_t bn_exponents_i_msb = nil::crypto3::multiprecision::msb(bn_exponents[i]) + 1;
+                            std::size_t bn_exponents_i_msb = multiprecision::msb(bn_exponents[i]) + 1;
                             num_bits = std::max(num_bits, bn_exponents_i_msb);
                         }
 
@@ -161,7 +147,7 @@ namespace nil {
                             for (std::size_t i = 0; i < length; i++) {
                                 std::size_t id = 0;
                                 for (std::size_t j = 0; j < c; j++) {
-                                    if (nil::crypto3::multiprecision::bit_test(bn_exponents[i], k * c + j)) {
+                                    if (multiprecision::bit_test(bn_exponents[i], k * c + j)) {
                                         id |= 1 << j;
                                     }
                                 }
@@ -225,26 +211,19 @@ namespace nil {
                  * [1] = Bos and Coster, "Addition chain heuristics", CRYPTO '89
                  * [2] = Bernstein, Duif, Lange, Schwabe, and Yang, "High-speed high-security signatures", CHES '11
                  */
-                template<typename BaseType, typename FieldType>
-                class multiexp_method_bos_coster {
-                    using base_value_type = typename BaseType::value_type;
-                    using field_value_type = typename FieldType::value_type;
+                struct multiexp_method_bos_coster {
+                    template<typename InputBaseIterator, typename InputFieldIterator>
+                    inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        operator()(InputBaseIterator vec_start,
+                                   InputBaseIterator vec_end,
+                                   InputFieldIterator scalar_start,
+                                   InputFieldIterator scalar_end) {
 
-                public:
-                    template<typename InputBaseIterator, typename InputFieldIterator,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputBaseIterator>::value_type,
-                                              base_value_type>::value>::type,
-                             typename = typename std::enable_if<
-                                 std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
-                                              field_value_type>::value>::type>
-                    static inline base_value_type process(InputBaseIterator vec_start,
-                                                          InputBaseIterator vec_end,
-                                                          InputFieldIterator scalar_start,
-                                                          InputFieldIterator scalar_end) {
+                        typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
+                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                        typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_number_type;
 
                         if (vec_start == vec_end) {
@@ -273,7 +252,9 @@ namespace nil {
                             opt_q.emplace_back(detail::ordered_exponent<non_fixed_precision_number_type>(
                                 i, non_fixed_precision_number_type(scalar_it->data)));
                         }
+
                         std::make_heap(opt_q.begin(), opt_q.end());
+
                         assert(scalar_it == scalar_end);
 
                         if (vec_len != odd_vec_len) {
@@ -291,7 +272,7 @@ namespace nil {
                             detail::ordered_exponent<non_fixed_precision_number_type> &b =
                                 (opt_q[1] < opt_q[2] ? opt_q[2] : opt_q[1]);
 
-                            const std::size_t abits = nil::crypto3::multiprecision::msb(a.r) + 1;
+                            const std::size_t abits = multiprecision::msb(a.r) + 1;
 
                             if (b.r.is_zero()) {
                                 // opt_result = opt_result + (a.r * g[a.idx]);
@@ -299,7 +280,7 @@ namespace nil {
                                 break;
                             }
 
-                            const std::size_t bbits = nil::crypto3::multiprecision::msb(b.r) + 1;
+                            const std::size_t bbits = multiprecision::msb(b.r) + 1;
                             const std::size_t limit = (abits - bbits >= 20 ? 20 : abits - bbits);
 
                             if (bbits < 1ul << limit) {
