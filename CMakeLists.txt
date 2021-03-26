@@ -169,9 +169,9 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::fft
                       ${CMAKE_WORKSPACE_NAME}::hash
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
 
-                      $<TARGET_NAME_IF_EXISTS:boost_math>
-                      $<TARGET_NAME_IF_EXISTS:boost_multiprecision>)
+                      $<TARGET_NAME_IF_EXISTS:boost_math>)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include

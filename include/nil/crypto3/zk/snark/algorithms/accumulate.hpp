@@ -30,27 +30,34 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename ProofSystemType, template<typename T> class ProofRange>
+                bool aggregate(const typename ProofSystemType::processed_verification_key_type &pvk,
+                               const typename ProofSystemType::primary_input_type &primary_input,
+                               const typename ProofSystemType::proof_type &proof) {
+
+                    return ProofSystemType::online_verifier(pvk, primary_input, proof);
+                }
 
                 template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type generator(
-                    const typename ProofSystemType::constraint_system_type &constraint_system) {
+                typename ProofSystemType::keypair_type
+                    generate_keys(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
                     return ProofSystemType::generator(constraint_system);
                 }
 
                 template<typename ProofSystemType>
-                typename ProofSystemType::proof_type prover(
-                    const typename ProofSystemType::proving_key_type &pk,
-                    const typename ProofSystemType::primary_input_type &primary_input,
-                    const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
+                typename ProofSystemType::proof_type
+                    prove(const typename ProofSystemType::proving_key_type &pk,
+                          const typename ProofSystemType::primary_input_type &primary_input,
+                          const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
                     return ProofSystemType::prover(pk, primary_input, auxiliary_input);
                 }
 
                 template<typename ProofSystemType>
-                bool verifier(const typename ProofSystemType::verification_key_type &vk,
-                              const typename ProofSystemType::primary_input_type &primary_input,
-                              const typename ProofSystemType::proof_type &proof) {
+                bool verity(const typename ProofSystemType::verification_key_type &vk,
+                            const typename ProofSystemType::primary_input_type &primary_input,
+                            const typename ProofSystemType::proof_type &proof) {
 
                     return ProofSystemType::verifier(vk, primary_input, proof);
                 }
@@ -62,10 +69,9 @@ namespace nil {
 
                     return ProofSystemType::online_verifier(pvk, primary_input, proof);
                 }
-
             }    // namespace snark
         }        // namespace zk
-    }        // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_HPP

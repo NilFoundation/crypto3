@@ -58,9 +58,9 @@
 
 #include <vector>
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
@@ -104,7 +104,7 @@ namespace nil {
 
                             modulus_type fp_out;
 
-                            boost::multiprecision::import_bits(fp_out, read_iter, read_iter + modulus_chunks,
+                            nil::crypto3::multiprecision::import_bits(fp_out, read_iter, read_iter + modulus_chunks,
                                                                chunk_size, false);
 
                             read_iter += modulus_chunks;
@@ -305,7 +305,7 @@ namespace nil {
 
                         constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
-                        typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
+                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                             modulus_type;
 
                         using chunk_type = std::uint8_t;
@@ -322,7 +322,7 @@ namespace nil {
                             field_type_process(typename FieldType::value_type input_fp,
                                                typename std::vector<chunk_type>::iterator &write_iter) {
 
-                            boost::multiprecision::export_bits(modulus_type(input_fp.data), write_iter, chunk_size,
+                            nil::crypto3::multiprecision::export_bits(modulus_type(input_fp.data), write_iter, chunk_size,
                                                                false);
                             write_iter += modulus_chunks;
                         }

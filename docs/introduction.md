@@ -3,6 +3,7 @@
 This module contains followings.
 
 Relations:
+
 * QAP - Quadratic Arithmetic Program
 * SAP - Square Arithmetic Program
 * SSP - Square Span Program
@@ -12,7 +13,8 @@ Relations:
 * USCS - Unitary-Square Constraint System
 
 zk-SNARKS (Zero-Knowledge Succinct Non-interactive ARgument of Knowledge):
-* bacs_ppzksnark-  - BACS PreProcessing zk-SNARK
+
+* bacs_ppzksnark- - BACS PreProcessing zk-SNARK
 * r1cs_gg_ppzksnark - R1CS Generic Group PreProcessing zk-SNARK (Groth16)
 * r1cs_ppzksnark - R1CS PreProcessing zk-SNARK
 * r1cs_se_ppzksnark - R1CS Simulation-Extractable PreProcessing zk-SNARK
