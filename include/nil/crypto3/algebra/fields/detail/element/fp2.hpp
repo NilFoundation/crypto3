@@ -46,8 +46,8 @@ namespace nil {
                     public:
                         typedef typename policy_type::field_type field_type;
 
-                        constexpr static const typename policy_type::non_residue_type non_residue =
-                            typename policy_type::non_residue_type(policy_type::non_residue);
+                        typedef typename policy_type::non_residue_type non_residue_type;
+                        constexpr static const non_residue_type non_residue = policy_type::non_residue;
 
                         typedef typename policy_type::underlying_type underlying_type;
 
@@ -75,7 +75,7 @@ namespace nil {
                             data = data_type({in_data0, in_data1});
                         }
 
-                        constexpr element_fp2(const element_fp2 &B) : data{B.data}{};
+                        constexpr element_fp2(const element_fp2 &B) : data {B.data} {};
 
                         constexpr inline static element_fp2 zero() {
                             return element_fp2(underlying_type::zero(), underlying_type::zero());
@@ -135,13 +135,12 @@ namespace nil {
                         }
 
                         constexpr element_fp2 operator*(const element_fp2 &B) const {
-                            // TODO: the use of data and B.data directly in return statement addition cause constexpr error for gcc
-                            const underlying_type A0 = data[0], A1 = data[1],
-                                                  B0 = B.data[0], B1 = B.data[1];
+                            // TODO: the use of data and B.data directly in return statement addition cause constexpr
+                            // error for gcc
+                            const underlying_type A0 = data[0], A1 = data[1], B0 = B.data[0], B1 = B.data[1];
                             const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                            return element_fp2(A0B0 + non_residue * A1B1,
-                                               (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
+                            return element_fp2(A0B0 + non_residue * A1B1, (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
                         }
 
                         constexpr element_fp2 &operator*=(const element_fp2 &B) {
@@ -316,6 +315,10 @@ namespace nil {
                     constexpr element_fp2<FieldParams> subNC(const element_fp2<FieldParams> &A,
                                                              const element_fp2<FieldParams> &B) {
                     }
+
+                    template<typename FieldParams>
+                    constexpr const typename element_fp2<FieldParams>::non_residue_type
+                        element_fp2<FieldParams>::non_residue;
 
                 }    // namespace detail
             }        // namespace fields

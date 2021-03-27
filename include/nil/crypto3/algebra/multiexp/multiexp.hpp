@@ -39,12 +39,12 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
-            typename std::iterator_traits<InputBaseIterator>::value_type::value_type
+            typename std::iterator_traits<InputBaseIterator>::value_type
                 multiexp(InputBaseIterator vec_start, InputBaseIterator vec_end, InputFieldIterator scalar_start,
                          InputFieldIterator scalar_end, const std::size_t chunks_count) {
 
-                typedef typename std::iterator_traits<InputBaseIterator>::value_type::value_type base_value_type;
-                typedef typename std::iterator_traits<InputFieldIterator>::value_type::value_type field_value_type;
+                typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
+                typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 
@@ -70,17 +70,13 @@ namespace nil {
             }
 
             template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
-            typename std::iterator_traits<InputBaseIterator>::value_type::value_type
+            typename std::iterator_traits<InputBaseIterator>::value_type
                 multiexp_with_mixed_addition(InputBaseIterator vec_start, InputBaseIterator vec_end,
                                              InputFieldIterator scalar_start, InputFieldIterator scalar_end,
-                                             const std::size_t chunks_count,
-                                             const MultiexpMethod &mm = policies::multiexp_method_naive_plain()) {
+                                             const std::size_t chunks_count) {
 
-                typedef typename std::iterator_traits<InputBaseIterator>::value_type base_type;
-                typedef typename std::iterator_traits<InputFieldIterator>::value_type field_type;
-
-                typedef typename std::iterator_traits<InputBaseIterator>::value_type::value_type base_value_type;
-                typedef typename std::iterator_traits<InputFieldIterator>::value_type::value_type field_value_type;
+                typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
+                typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                 typedef MultiexpMethod method_type;
 

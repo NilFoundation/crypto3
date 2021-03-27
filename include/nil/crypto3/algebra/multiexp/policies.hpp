@@ -66,11 +66,11 @@ namespace nil {
                  */
                 struct multiexp_method_naive_plain {
                     template<typename InputBaseIterator, typename InputFieldIterator>
-                    inline typename std::iterator_traits<InputBaseIterator>::value_type
-                        operator()(InputBaseIterator vec_start,
-                                   InputBaseIterator vec_end,
-                                   InputFieldIterator scalar_start,
-                                   InputFieldIterator scalar_end) {
+                    static inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        process(InputBaseIterator vec_start,
+                                InputBaseIterator vec_end,
+                                InputFieldIterator scalar_start,
+                                InputFieldIterator scalar_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
                         typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
@@ -101,11 +101,11 @@ namespace nil {
                  */
                 struct multiexp_method_BDLO12 {
                     template<typename InputBaseIterator, typename InputFieldIterator>
-                    inline typename std::iterator_traits<InputBaseIterator>::value_type
-                        operator()(InputBaseIterator bases,
-                                   InputBaseIterator bases_end,
-                                   InputFieldIterator exponents,
-                                   InputFieldIterator exponents_end) {
+                    static inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        process(InputBaseIterator bases,
+                                InputBaseIterator bases_end,
+                                InputFieldIterator exponents,
+                                InputFieldIterator exponents_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
                         typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
@@ -213,11 +213,11 @@ namespace nil {
                  */
                 struct multiexp_method_bos_coster {
                     template<typename InputBaseIterator, typename InputFieldIterator>
-                    inline typename std::iterator_traits<InputBaseIterator>::value_type
-                        operator()(InputBaseIterator vec_start,
-                                   InputBaseIterator vec_end,
-                                   InputFieldIterator scalar_start,
-                                   InputFieldIterator scalar_end) {
+                    static inline typename std::iterator_traits<InputBaseIterator>::value_type
+                        process(InputBaseIterator vec_start,
+                                InputBaseIterator vec_end,
+                                InputFieldIterator scalar_start,
+                                InputFieldIterator scalar_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
                         typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;

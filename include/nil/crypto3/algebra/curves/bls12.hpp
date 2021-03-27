@@ -45,10 +45,11 @@ namespace nil {
                  *  The basic equation of the curve is y^2 = x^3 + 4.
                  */
                 template<std::size_t ModulusBits>
-                struct bls12 {
+                class bls12 {
 
                     using policy_type = detail::bls12_basic_policy<ModulusBits>;
 
+                public:
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
                     typedef typename policy_type::number_type number_type;

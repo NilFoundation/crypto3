@@ -46,8 +46,8 @@ namespace nil {
                     public:
                         typedef typename policy_type::field_type field_type;
 
-                        constexpr static typename policy_type::non_residue_type non_residue =
-                            typename policy_type::non_residue_type(policy_type::non_residue);
+                        typedef typename policy_type::non_residue_type non_residue_type;
+                        constexpr static non_residue_type non_residue = policy_type::non_residue;
 
                         typedef typename policy_type::underlying_type underlying_type;
 
@@ -74,7 +74,9 @@ namespace nil {
                             data = data_type({in_data[0], in_data[1], in_data[2]});
                         };
 
-                        constexpr element_fp3(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
+                        constexpr element_fp3(underlying_type in_data0,
+                                              underlying_type in_data1,
+                                              underlying_type in_data2) {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 
@@ -249,15 +251,19 @@ namespace nil {
 
                     template<typename FieldParams>
                     constexpr element_fp3<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
-                                                       const element_fp3<FieldParams> &rhs) {
+                                                                 const element_fp3<FieldParams> &rhs) {
                         return element_fp3<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]);
                     }
 
                     template<typename FieldParams>
                     constexpr element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs,
-                                                       const typename FieldParams::underlying_type &rhs) {
+                                                                 const typename FieldParams::underlying_type &rhs) {
                         return rhs * lhs;
                     }
+
+                    template<typename FieldParams>
+                    constexpr const typename element_fp3<FieldParams>::non_residue_type
+                        element_fp3<FieldParams>::non_residue;
 
                 }    // namespace detail
             }        // namespace fields

@@ -41,8 +41,8 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
-                        constexpr static const typename policy_type::non_residue_type non_residue =
-                            typename policy_type::non_residue_type(policy_type::non_residue);
+                        typedef typename policy_type::non_residue_type non_residue_type;
+                        constexpr static const non_residue_type non_residue = policy_type::non_residue;
 
                         typedef typename policy_type::underlying_type underlying_type;
 
@@ -232,6 +232,10 @@ namespace nil {
                             return element_fp4(aA + beta_bB, (a + b) * (A + B) - aA - bB);
                         }
                     };
+
+                    template<typename FieldParams>
+                    constexpr const typename element_fp4<FieldParams>::non_residue_type
+                        element_fp4<FieldParams>::non_residue;
 
                 }    // namespace detail
             }        // namespace fields

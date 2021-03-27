@@ -43,10 +43,11 @@ namespace nil {
                  *
                  */
                 template<std::size_t ModulusBits>
-                struct mnt6 {
+                class mnt6 {
 
                     using policy_type = detail::mnt6_basic_policy<ModulusBits>;
 
+                public:
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
                     typedef typename policy_type::number_type number_type;

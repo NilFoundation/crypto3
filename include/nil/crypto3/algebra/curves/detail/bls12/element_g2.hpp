@@ -60,9 +60,9 @@ namespace nil {
                     template<>
                     struct element_bls12_g2<381> {
 
-                        using group_type = bls12_g1<381>;
+                        typedef bls12_g2<381> group_type;
 
-                        using policy_type = bls12_basic_policy<381>;
+                        typedef bls12_basic_policy<381> policy_type;
                         constexpr static const std::size_t g1_field_bits =
                             policy_type::base_field_bits;    ///< size of the group G1 in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
@@ -80,16 +80,15 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_bls12_g2() :
-                            element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
                         constexpr element_bls12_g2(underlying_field_value_type X,
-                                         underlying_field_value_type Y,
-                                         underlying_field_value_type Z) {
+                                                   underlying_field_value_type Y,
+                                                   underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -381,8 +380,9 @@ namespace nil {
 
                         constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                        constexpr static const g2_field_type_value twist = g2_field_type_value(
-                            g2_field_type_value::underlying_type::one(), g2_field_type_value::underlying_type::one());
+                        constexpr static const g2_field_type_value twist =
+                            g2_field_type_value(g2_field_type_value::underlying_type::one(),
+                                                g2_field_type_value::underlying_type::one());
 
                         constexpr static const g2_field_type_value twist_coeff_b = b * twist;
 
@@ -407,7 +407,7 @@ namespace nil {
                     template<>
                     struct element_bls12_g2<377> {
 
-                        using group_type = bls12_g1<377>;
+                        using group_type = bls12_g2<377>;
 
                         using policy_type = bls12_basic_policy<377>;
                         constexpr static const std::size_t g1_field_bits =
@@ -426,8 +426,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        element_bls12_g2() :
-                            element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
@@ -731,8 +730,9 @@ namespace nil {
 
                         constexpr static const g1_field_type_value b = policy_type::b;
 
-                        constexpr static const g2_field_type_value twist = g2_field_type_value(
-                            g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one());
+                        constexpr static const g2_field_type_value twist =
+                            g2_field_type_value(g2_field_type_value::underlying_type::zero(),
+                                                g2_field_type_value::underlying_type::one());
 
                         constexpr static const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
@@ -750,6 +750,18 @@ namespace nil {
                                 0x185067C6CA76D992F064A432BD9F9BE832B0CAC2D824D0518F77D39E76C3E146AFB825F2092218D038867D7F337A010_cppui377),
                             underlying_field_value_type::one()};
                     };
+
+                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
+                        element_bls12_g2<377>::zero_fill;
+
+                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
+                        element_bls12_g2<377>::one_fill;
+
+                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
+                        element_bls12_g2<377>::zero_fill;
+
+                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
+                        element_bls12_g2<377>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

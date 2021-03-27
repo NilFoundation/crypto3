@@ -76,16 +76,15 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_mnt6_g2() :
-                            element_mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        
+                        constexpr element_mnt6_g2() : element_mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
                         constexpr element_mnt6_g2(underlying_field_value_type X,
-                                        underlying_field_value_type Y,
-                                        underlying_field_value_type Z) {
+                                                  underlying_field_value_type Y,
+                                                  underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -374,24 +373,24 @@ namespace nil {
                                                         g2_field_type_value::underlying_type::zero(), g1_a);
 
                         constexpr static const underlying_field_value_type b = underlying_field_value_type(
-                            g1_b * underlying_field_value_type::non_residue, g2_field_type_value::underlying_type::zero(),
-                            g2_field_type_value::underlying_type::zero());
+                            g1_b * underlying_field_value_type::non_residue,
+                            g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::zero());
 
                         constexpr static const g2_field_type_value twist_coeff_a = a;
                         constexpr static const g2_field_type_value twist_coeff_b = b;
 
                     private:
-                        constexpr static const g1_field_type_value twist_mul_by_a_c0 = g1_a * 
-                            underlying_field_value_type::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_a_c1 = g1_a * 
-                            underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c0 =
+                            g1_a * underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c1 =
+                            g1_a * underlying_field_value_type::non_residue;
                         constexpr static const g1_field_type_value twist_mul_by_a_c2 = g1_a;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = g1_b * 
-                            underlying_field_value_type::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = g1_b * 
-                            underlying_field_value_type::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c2 = g1_b * 
-                            underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c0 =
+                            g1_b * underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c1 =
+                            g1_b * underlying_field_value_type::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c2 =
+                            g1_b * underlying_field_value_type::non_residue;
 
                         constexpr static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                             0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
@@ -414,14 +413,19 @@ namespace nil {
                             underlying_field_value_type::one()};
                     };
 
-                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
-                        element_mnt6_g2<298>::twist;
+                    constexpr std::array<typename element_mnt6_g2<298>::underlying_field_value_type, 3> const
+                        element_mnt6_g2<298>::zero_fill;
 
-                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
-                        element_mnt6_g2<298>::twist_coeff_a;
+                    constexpr std::array<typename element_mnt6_g2<298>::underlying_field_value_type, 3> const
+                        element_mnt6_g2<298>::one_fill;
 
-                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const
-                        element_mnt6_g2<298>::twist_coeff_b;
+                    constexpr typename element_mnt6_g2<298>::g2_field_type_value const element_mnt6_g2<298>::twist;
+
+                    constexpr
+                        typename element_mnt6_g2<298>::g2_field_type_value const element_mnt6_g2<298>::twist_coeff_a;
+
+                    constexpr
+                        typename element_mnt6_g2<298>::g2_field_type_value const element_mnt6_g2<298>::twist_coeff_b;
 
                 }    // namespace detail
             }        // namespace curves
