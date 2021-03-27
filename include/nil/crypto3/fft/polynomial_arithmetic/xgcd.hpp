@@ -83,10 +83,12 @@ namespace nil {
                 _polynomial_division<FieldType>(V1, R, V3, b);
 
                 value_type lead_coeff = G.back().inversed();
-                std::transform(G.begin(), G.end(), G.begin(), std::bind1st(std::multiplies<value_type>(), lead_coeff));
-                std::transform(U.begin(), U.end(), U.begin(), std::bind1st(std::multiplies<value_type>(), lead_coeff));
+                std::transform(G.begin(), G.end(), G.begin(),
+                               std::bind(std::multiplies<value_type>(), lead_coeff, std::placeholders::_1));
+                std::transform(U.begin(), U.end(), U.begin(),
+                               std::bind(std::multiplies<value_type>(), lead_coeff, std::placeholders::_1));
                 std::transform(V1.begin(), V1.end(), V1.begin(),
-                               std::bind1st(std::multiplies<value_type>(), lead_coeff));
+                               std::bind(std::multiplies<value_type>(), lead_coeff, std::placeholders::_1));
 
                 g = G;
                 u = U;

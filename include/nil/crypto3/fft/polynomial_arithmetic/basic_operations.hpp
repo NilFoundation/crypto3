@@ -175,7 +175,10 @@ namespace nil {
 #endif
 
                 const value_type sconst = value_type(n).inversed();
-                std::transform(c.begin(), c.end(), c.begin(), std::bind1st(std::multiplies<value_type>(), sconst));
+                std::transform(c.begin(),
+                               c.end(),
+                               c.begin(),
+                               std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                 _condense(c);
             }
 
