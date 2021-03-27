@@ -35,6 +35,8 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/zk/snark/accumulators/parameters/offset.hpp>
+
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 namespace nil {
@@ -49,35 +51,29 @@ namespace nil {
                     typedef std::pair<value_type, std::pair<indicies_type, std::vector<T>>> result_type;
 
                     template<typename Args>
-                    sparse_impl(const Args &args) : in_block(false) {
+                    sparse_impl(const Args &args) : in_block(false), accumulated_value(value_type::zero()) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        resolve_type(args[boost::accumulators::sample]);
+                        resolve_type(args[boost::accumulators::sample], args[::nil::crypto3::accumulators::offset]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                     }
 
                 protected:
-                    template<typename InputIterator>
-                    inline result_type resulve_type(InputIterator first, InputIterator last) {
+                    template<typename SinglePassRange>
+                    inline result_type resolve_type(const SinglePassRange r, std::size_t offset) {
                         const std::size_t chunks = 1;
 
-                        value_type accumulated_value = value_type::zero();
-                        sparse_vector<Type> resulting_vector;
+                        std::pair<indicies_type, std::vector<T>> resulting_vector;
                         resulting_vector.domain_size_ = domain_size_;
 
-                        const std::size_t range_len = last - first;
-                        std::size_t first_pos = -1,
-                                    last_pos = -1;    // g++ -flto emits unitialized warning, even though in_block
-                        // guards for such cases.
-
+                        const std::size_t range_len = r.size();
+                        std::size_t first_pos = -1, last_pos = -1;
                         for (std::size_t i = 0; i < indices.size(); ++i) {
                             const bool matching_pos = (offset <= indices[i] && indices[i] < offset + range_len);
-                            // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset,
-                            // w_size);
                             bool copy_over;
 
                             if (in_block) {
@@ -92,12 +88,10 @@ namespace nil {
 
                                     accumulated_value =
                                         accumulated_value +
-                                        algebra::multiexp<
-                                            T, BaseInputType,
-                                            algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
+                                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
-                                            first + (indices[first_pos] - offset),
-                                            first + (indices[last_pos] - offset) + 1, chunks);
+                                            std::begin(r) + (indices[first_pos] - offset),
+                                            std::begin(r) + (indices[last_pos] - offset) + 1, chunks);
                                 }
                             } else {
                                 if (matching_pos) {
@@ -112,8 +106,8 @@ namespace nil {
                             }
 
                             if (copy_over) {
-                                resulting_vector.indices.emplace_back(indices[i]);
-                                resulting_vector.values.emplace_back(values[i]);
+                                resulting_vector.first.emplace_back(indices[i]);
+                                resulting_vector.second.emplace_back(values[i]);
                             }
                         }
 
@@ -122,8 +116,8 @@ namespace nil {
                                 accumulated_value + algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                                         values.begin() + first_pos,
                                                         values.begin() + last_pos + 1,
-                                                        first + (indices[first_pos] - offset),
-                                                        first + (indices[last_pos] - offset) + 1,
+                                                        std::begin(r) + (indices[first_pos] - offset),
+                                                        std::begin(r) + (indices[last_pos] - offset) + 1,
                                                         chunks);
                         }
 
@@ -131,6 +125,8 @@ namespace nil {
                     }
 
                     bool in_block;
+
+                    value_type accumulated_value;
 
                     indicies_type indices;
                     std::vector<value_type> values;
