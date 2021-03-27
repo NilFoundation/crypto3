@@ -54,13 +54,14 @@ namespace nil {
                         opt_window_wnaf_exp(base.h, scalar, scalar_bits));
                 }
 
-                template<typename MultiexpMethod, typename T1, typename T2, typename FieldType>
-                typename knowledge_commitment<T1, T2>::value_type kc_multiexp_with_mixed_addition(
-                    const knowledge_commitment_vector<T1, T2> &vec, const std::size_t min_idx,
-                    const std::size_t max_idx,
-                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
-                    const std::size_t chunks) {
+                template<typename MultiexpMethod, typename T1, typename T2, typename InputFieldIterator>
+                typename knowledge_commitment<T1, T2>::value_type
+                    kc_multiexp_with_mixed_addition(const knowledge_commitment_vector<T1, T2> &vec,
+                                                    const std::size_t min_idx, const std::size_t max_idx,
+                                                    InputFieldIterator scalar_start, InputFieldIterator scalar_end,
+                                                    const std::size_t chunks) {
+                    typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
+                    typedef typename std::iterator_traits<InputFieldIterator>::value_type::field_type field_type;
 
                     const size_t scalar_length = std::distance(scalar_start, scalar_end);
                     assert((size_t)(scalar_length) <= vec.domain_size_);
@@ -70,10 +71,10 @@ namespace nil {
 
                     auto value_it = vec.values.begin() + offset;
 
-                    const typename FieldType::value_type zero = FieldType::value_type::zero();
-                    const typename FieldType::value_type one = FieldType::value_type::one();
+                    const field_value_type zero = field_value_type::zero();
+                    const field_value_type one = field_value_type::one();
 
-                    std::vector<typename FieldType::value_type> p;
+                    std::vector<field_value_type> p;
                     std::vector<typename knowledge_commitment<T1, T2>::value_type> g;
 
                     typename knowledge_commitment<T1, T2>::value_type acc =
@@ -83,7 +84,7 @@ namespace nil {
                         const std::size_t scalar_position = (*index_it) - min_idx;
                         assert(scalar_position < scalar_length);
 
-                        const typename FieldType::value_type scalar = *(scalar_start + scalar_position);
+                        const field_value_type scalar = *(scalar_start + scalar_position);
 
                         if (scalar == zero) {
                             // do nothing

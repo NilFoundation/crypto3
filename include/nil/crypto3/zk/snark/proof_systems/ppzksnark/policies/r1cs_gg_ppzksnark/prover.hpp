@@ -157,8 +157,7 @@ namespace nil {
                                     chunks);
 
                             typename g1_type::value_type evaluation_Ht =
-                                algebra::multiexp<g1_type, scalar_field_type,
-                                                  algebra::policies::multiexp_method_BDLO12>(
+                                algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
                                     proving_key.H_query.begin(),
                                     proving_key.H_query.begin() + (qap_wit.degree - 1),
                                     qap_wit.coefficients_for_H.begin(),
@@ -166,8 +165,7 @@ namespace nil {
                                     chunks);
 
                             typename g1_type::value_type evaluation_Lt =
-                                algebra::multiexp_with_mixed_addition<g1_type, scalar_field_type,
-                                                                      algebra::policies::multiexp_method_BDLO12>(
+                                algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                     proving_key.L_query.begin(),
                                     proving_key.L_query.end(),
                                     const_padded_assignment.begin() + qap_wit.num_inputs + 1,
