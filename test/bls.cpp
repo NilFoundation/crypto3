@@ -2270,7 +2270,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
     using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+    using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
@@ -2459,7 +2459,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+    using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
@@ -2600,7 +2600,7 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
     using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_scheme_enum::basic>;
+    using scheme_type = bls<bls_variant, bls_aug_scheme>;
 
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
