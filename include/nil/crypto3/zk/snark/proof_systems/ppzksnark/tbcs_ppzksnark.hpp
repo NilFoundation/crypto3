@@ -26,7 +26,8 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/tbcs_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/generator.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/prover.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/tbcs_ppzksnark/verifier.hpp>

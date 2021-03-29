@@ -97,7 +97,6 @@ namespace nil {
                         return result;
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

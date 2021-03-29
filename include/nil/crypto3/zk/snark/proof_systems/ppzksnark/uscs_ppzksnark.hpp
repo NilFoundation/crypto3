@@ -26,7 +26,8 @@
 #ifndef CRYPTO3_USCS_PPZKSNARK_HPP
 #define CRYPTO3_USCS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/uscs_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/uscs_ppzksnark/generator.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/uscs_ppzksnark/prover.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/uscs_ppzksnark/verifier.hpp>
@@ -35,7 +36,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 template<typename CurveType,
                          typename Generator = policies::uscs_ppzksnark_generator<CurveType>,
                          typename Prover = policies::uscs_ppzksnark_prover<CurveType>,
@@ -43,7 +43,7 @@ namespace nil {
                          typename OnlineVerifier =
                              policies::uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class uscs_ppzksnark {
-                    using types_policy = detail::uscs_ppzksnark_types_policy<CurveType>;
+                    using types_policy = detail::uscs_ppzksnark_basic_policy<CurveType>;
 
                 public:
                     typedef typename types_policy::constraint_system constraint_system_type;

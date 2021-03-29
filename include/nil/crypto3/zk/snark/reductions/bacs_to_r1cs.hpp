@@ -31,27 +31,60 @@
 // that the output is zero.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BACS_TO_R1CS_HPP
-#define CRYPTO3_ZK_BACS_TO_R1CS_HPP
+#ifndef CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP
+#define CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/reductions/detail/bacs_to_r1cs.hpp>
+#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
+#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace reductions {
 
-                template<typename FieldType>
-                class bacs_to_r1cs : private detail::bacs_to_r1cs_basic_policy<FieldType> {
-                    using policy_type = typename detail::bacs_to_r1cs_basic_policy<FieldType>;
+                    template<typename FieldType>
+                    struct bacs_to_r1cs {
 
-                public:
-                    using policy_type::instance_map;
-                    using policy_type::witness_map;
-                };
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                        /**
+                         * Instance map for the BACS-to-R1CS reduction.
+                         */
+                        static r1cs_constraint_system<FieldType> instance_map(const bacs_circuit<FieldType> &circuit) {
+                            assert(circuit.is_valid());
+                            r1cs_constraint_system<FieldType> result;
+
+                            result.primary_input_size = circuit.primary_input_size;
+                            result.auxiliary_input_size = circuit.auxiliary_input_size + circuit.gates.size();
+
+                            for (auto &g : circuit.gates) {
+                                result.constraints.emplace_back(r1cs_constraint<FieldType>(g.lhs, g.rhs, g.output));
+                            }
+
+                            for (auto &g : circuit.gates) {
+                                if (g.is_circuit_output) {
+                                    result.constraints.emplace_back(r1cs_constraint<FieldType>(1, g.output, 0));
+                                }
+                            }
+
+                            return result;
+                        }
+
+                        /**
+                         * Witness map for the BACS-to-R1CS reduction.
+                         */
+                        static r1cs_variable_assignment<FieldType>
+                            witness_map(const bacs_circuit<FieldType> &circuit,
+                                        const bacs_primary_input<FieldType> &primary_input,
+                                        const bacs_auxiliary_input<FieldType> &auxiliary_input) {
+                            const r1cs_variable_assignment<FieldType> result =
+                                circuit.get_all_wires(primary_input, auxiliary_input);
+                            return result;
+                        }
+                    };
+                }    // namespace reductions
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
-#endif    // BACS_TO_R1CS_HPP
+#endif    // CRYPTO3_ZK_BACS_TO_R1CS_BASIC_POLICY_HPP

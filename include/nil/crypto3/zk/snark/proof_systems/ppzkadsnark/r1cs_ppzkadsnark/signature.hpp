@@ -28,7 +28,7 @@
 #ifndef CRYPTO3_ZK_SIGNATURE_HPP
 #define CRYPTO3_ZK_SIGNATURE_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {

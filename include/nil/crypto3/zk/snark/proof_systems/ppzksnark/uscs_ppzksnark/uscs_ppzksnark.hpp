@@ -49,11 +49,12 @@
 #include <memory>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
+
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/detail/basic_policy.hpp>
 
-//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -84,7 +85,8 @@ namespace nil {
                     uscs_ppzksnark_constraint_system<CurveType> constraint_system;
 
                     uscs_ppzksnark_proving_key() {};
-                    uscs_ppzksnark_proving_key<CurveType> &operator=(const uscs_ppzksnark_proving_key<CurveType> &other) = default;
+                    uscs_ppzksnark_proving_key<CurveType> &
+                        operator=(const uscs_ppzksnark_proving_key<CurveType> &other) = default;
                     uscs_ppzksnark_proving_key(const uscs_ppzksnark_proving_key<CurveType> &other) = default;
                     uscs_ppzksnark_proving_key(uscs_ppzksnark_proving_key<CurveType> &&other) = default;
                     uscs_ppzksnark_proving_key(typename CurveType::g1_vector &&V_g1_query,
@@ -113,8 +115,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return CurveType::g1_type::value_bits * G1_size() +
-                               CurveType::g2_type::value_bits * G2_size();
+                        return CurveType::g1_type::value_bits * G1_size() + CurveType::g2_type::value_bits * G2_size();
                     }
 
                     bool operator==(const uscs_ppzksnark_proving_key<CurveType> &other) const;
@@ -156,7 +157,8 @@ namespace nil {
 
                     bool operator==(const uscs_ppzksnark_verification_key<CurveType> &other) const;
 
-                    static uscs_ppzksnark_verification_key<CurveType> dummy_verification_key(const std::size_t input_size);
+                    static uscs_ppzksnark_verification_key<CurveType>
+                        dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
@@ -244,8 +246,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * CurveType::g1_type::value_bits +
-                               G2_size() * CurveType::g2_type::value_bits;
+                        return G1_size() * CurveType::g1_type::value_bits + G2_size() * CurveType::g2_type::value_bits;
                     }
 
                     bool is_well_formed() const {
@@ -264,7 +265,8 @@ namespace nil {
                  * Given a USCS constraint system CS, this algorithm produces proving and verification keys for CS.
                  */
                 template<typename CurveType>
-                uscs_ppzksnark_keypair<CurveType> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs);
+                uscs_ppzksnark_keypair<CurveType>
+                    uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs);
 
                 /**
                  * A prover algorithm for the USCS ppzkSNARK.
@@ -327,9 +329,10 @@ namespace nil {
                  * (2) has weak input consistency.
                  */
                 template<typename CurveType>
-                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const uscs_ppzksnark_primary_input<CurveType> &primary_input,
-                                                            const uscs_ppzksnark_proof<CurveType> &proof);
+                bool uscs_ppzksnark_online_verifier_weak_IC(
+                    const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                    const uscs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the USCS ppzkSNARK that:
@@ -337,12 +340,14 @@ namespace nil {
                  * (2) has strong input consistency.
                  */
                 template<typename CurveType>
-                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const uscs_ppzksnark_primary_input<CurveType> &primary_input,
-                                                              const uscs_ppzksnark_proof<CurveType> &proof);
+                bool uscs_ppzksnark_online_verifier_strong_IC(
+                    const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                    const uscs_ppzksnark_proof<CurveType> &proof);
 
                 template<typename CurveType>
-                bool uscs_ppzksnark_proving_key<CurveType>::operator==(const uscs_ppzksnark_proving_key<CurveType> &other) const {
+                bool uscs_ppzksnark_proving_key<CurveType>::operator==(
+                    const uscs_ppzksnark_proving_key<CurveType> &other) const {
                     return (this->V_g1_query == other.V_g1_query && this->alpha_V_g1_query == other.alpha_V_g1_query &&
                             this->H_g1_query == other.H_g1_query && this->V_g2_query == other.V_g2_query &&
                             this->constraint_system == other.constraint_system);
@@ -377,14 +382,19 @@ namespace nil {
                 uscs_ppzksnark_verification_key<CurveType>
                     uscs_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     uscs_ppzksnark_verification_key<CurveType> result;
-                    result.tilde_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
-                    result.alpha_tilde_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
-                    result.Z_g2 = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                    result.tilde_g2 =
+                        random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                    result.alpha_tilde_g2 =
+                        random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
+                    result.Z_g2 =
+                        random_element<typename CurveType::scalar_field_type>() * typename CurveType::g2_type::one();
 
-                    typename CurveType::g1_type base = random_element<typename CurveType::scalar_field_type>() * typename CurveType::g1_type::one();
+                    typename CurveType::g1_type base =
+                        random_element<typename CurveType::scalar_field_type>() * typename CurveType::g1_type::one();
                     typename CurveType::g1_vector v;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        v.emplace_back(random_element<typename CurveType::scalar_field_type>() * typename CurveType::g1_type::one());
+                        v.emplace_back(random_element<typename CurveType::scalar_field_type>() *
+                                       typename CurveType::g1_type::one());
                     }
 
                     result.encoded_IC_query = accumulation_vector<typename CurveType::g1_type>(v);
@@ -393,11 +403,13 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                uscs_ppzksnark_keypair<CurveType> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs) {
+                uscs_ppzksnark_keypair<CurveType>
+                    uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs) {
 
                     /* draw random element at which the SSP is evaluated */
 
-                    const typename CurveType::scalar_field_type t = random_element<typename CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type t =
+                        random_element<typename CurveType::scalar_field_type>();
 
                     /* perform USCS-to-SSP reduction */
 
@@ -414,9 +426,11 @@ namespace nil {
                     Vt_table.emplace_back(ssp_inst.Zt);
 
                     std::vector<typename CurveType::scalar_field_type::value_type> Xt_table =
-                        std::vector<typename CurveType::scalar_field_type::value_type>(Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
+                        std::vector<typename CurveType::scalar_field_type::value_type>(
+                            Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
                     std::vector<typename CurveType::scalar_field_type::value_type> Vt_table_minus_Xt_table =
-                        std::vector<typename CurveType::scalar_field_type::value_type>(Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
+                        std::vector<typename CurveType::scalar_field_type::value_type>(
+                            Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
 
                     /* sanity checks */
 
@@ -428,7 +442,8 @@ namespace nil {
                         assert(!Xt_table[i].is_zero());
                     }
 
-                    const typename CurveType::scalar_field_type alpha = random_element<typename CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type alpha =
+                        random_element<typename CurveType::scalar_field_type>();
 
                     const std::size_t g1_exp_count = Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
                     const std::size_t g2_exp_count = Vt_table_minus_Xt_table.size();
@@ -437,19 +452,23 @@ namespace nil {
                     std::size_t g2_window = algebra::get_exp_window_size<typename CurveType::g2_type>(g2_exp_count);
 
                     algebra::window_table<typename CurveType::g1_type> g1_table =
-                        get_window_table(typename CurveType::scalar_field_type::value_bits, g1_window, typename CurveType::g1_type::one());
+                        get_window_table(typename CurveType::scalar_field_type::value_bits, g1_window,
+                                         typename CurveType::g1_type::one());
 
                     algebra::window_table<typename CurveType::g2_type> g2_table =
-                        get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window, typename CurveType::g2_type::one());
+                        get_window_table(typename CurveType::scalar_field_type::value_bits, g2_window,
+                                         typename CurveType::g2_type::one());
 
                     typename CurveType::g1_vector V_g1_query =
-                        batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, Vt_table_minus_Xt_table);
+                        batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
+                                  Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(V_g1_query);
 #endif
 
-                    typename CurveType::g1_vector alpha_V_g1_query = batch_exp_with_coeff(
-                        typename CurveType::scalar_field_type::value_bits, g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
+                    typename CurveType::g1_vector alpha_V_g1_query =
+                        batch_exp_with_coeff(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
+                                             alpha, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g1_type>(alpha_V_g1_query);
 #endif
@@ -465,7 +484,8 @@ namespace nil {
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<typename CurveType::g2_type>(V_g2_query);
 #endif
-                    const typename CurveType::scalar_field_type tilde = random_element<typename CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type tilde =
+                        random_element<typename CurveType::scalar_field_type>();
                     typename CurveType::g2_type tilde_g2 = tilde * typename CurveType::g2_type::one();
                     typename CurveType::g2_type alpha_tilde_g2 = (alpha * tilde) * typename CurveType::g2_type::one();
                     typename CurveType::g2_type Z_g2 = ssp_inst.Zt * typename CurveType::g2_type::one();
@@ -473,20 +493,22 @@ namespace nil {
                     typename CurveType::g1_type encoded_IC_base = Xt_table[0] * typename CurveType::g1_type::one();
                     typename CurveType::g1_vector encoded_IC_values =
                         batch_exp(typename CurveType::scalar_field_type::value_bits, g1_window, g1_table,
-                                  std::vector<typename CurveType::scalar_field_type::value_type>(Xt_table.begin() + 1, Xt_table.end()));
+                                  std::vector<typename CurveType::scalar_field_type::value_type>(Xt_table.begin() + 1,
+                                                                                                 Xt_table.end()));
 
                     accumulation_vector<typename CurveType::g1_type> encoded_IC_query(std::move(encoded_IC_base),
-                                                                           std::move(encoded_IC_values));
+                                                                                      std::move(encoded_IC_values));
 
                     uscs_ppzksnark_verification_key<CurveType> vk =
                         uscs_ppzksnark_verification_key<CurveType>(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
 
                     uscs_ppzksnark_constraint_system<CurveType> cs_copy = cs;
-                    uscs_ppzksnark_proving_key<CurveType> pk = uscs_ppzksnark_proving_key<CurveType>(std::move(V_g1_query),
-                                                                                         std::move(alpha_V_g1_query),
-                                                                                         std::move(H_g1_query),
-                                                                                         std::move(V_g2_query),
-                                                                                         std::move(cs_copy));
+                    uscs_ppzksnark_proving_key<CurveType> pk =
+                        uscs_ppzksnark_proving_key<CurveType>(std::move(V_g1_query),
+                                                              std::move(alpha_V_g1_query),
+                                                              std::move(H_g1_query),
+                                                              std::move(V_g2_query),
+                                                              std::move(cs_copy));
 
                     pk.print_size();
                     vk.print_size();
@@ -500,7 +522,8 @@ namespace nil {
                                           const uscs_ppzksnark_primary_input<CurveType> &primary_input,
                                           const uscs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
 
-                    const typename CurveType::scalar_field_type d = random_element<typename CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type d =
+                        random_element<typename CurveType::scalar_field_type>();
 
                     const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
                         uscs_to_ssp_witness_map(pk.constraint_system, primary_input, auxiliary_input, d);
@@ -513,20 +536,23 @@ namespace nil {
                     assert(pk.V_g2_query.size() == ssp_wit.num_variables() + 2);
 
                     typename CurveType::g1_type V_g1 = ssp_wit.d * pk.V_g1_query[pk.V_g1_query.size() - 1];
-                    typename CurveType::g1_type alpha_V_g1 = ssp_wit.d * pk.alpha_V_g1_query[pk.alpha_V_g1_query.size() - 1];
+                    typename CurveType::g1_type alpha_V_g1 =
+                        ssp_wit.d * pk.alpha_V_g1_query[pk.alpha_V_g1_query.size() - 1];
                     typename CurveType::g1_type H_g1 = typename CurveType::g1_type::zero();
-                    typename CurveType::g2_type V_g2 = pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
+                    typename CurveType::g2_type V_g2 =
+                        pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
 
 #ifdef MULTICORE
-                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
-                                                                    // omp_set_num_threads()
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or
+                                                                         // call omp_set_num_threads()
 #else
                     const std::size_t chunks = 1;
 #endif
 
                     // MAYBE LATER: do queries 1,2,4 at once for slightly better speed
 
-                    V_g1 = V_g1 + algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                    V_g1 = V_g1 + algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                                                                         typename CurveType::scalar_field_type,
                                                                          algebra::multi_exp_method_BDLO12>(
                                       pk.V_g1_query.begin(),
                                       pk.V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
@@ -534,27 +560,28 @@ namespace nil {
                                       ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
                     alpha_V_g1 =
-                        alpha_V_g1 + algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                        alpha_V_g1 + algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                                                                            typename CurveType::scalar_field_type,
                                                                             algebra::multi_exp_method_BDLO12>(
                                          pk.alpha_V_g1_query.begin(),
                                          pk.alpha_V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
                                          ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_inputs(),
                                          ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                    H_g1 =
-                        H_g1 + algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
-                                   pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
-                                   ssp_wit.coefficients_for_H.begin(),
-                                   ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
+                    H_g1 = H_g1 + algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                                                     algebra::multi_exp_method_BDLO12>(
+                                      pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
+                                      ssp_wit.coefficients_for_H.begin(),
+                                      ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
 
-                    V_g2 =
-                        V_g2 + algebra::multi_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
-                                   pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
-                                   ssp_wit.coefficients_for_Vs.begin(),
-                                   ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
+                    V_g2 = V_g2 + algebra::multi_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type,
+                                                     algebra::multi_exp_method_BDLO12>(
+                                      pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
+                                      ssp_wit.coefficients_for_Vs.begin(),
+                                      ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                    uscs_ppzksnark_proof<CurveType> proof = uscs_ppzksnark_proof<CurveType>(std::move(V_g1), std::move(alpha_V_g1),
-                                                                                std::move(H_g1), std::move(V_g2));
+                    uscs_ppzksnark_proof<CurveType> proof = uscs_ppzksnark_proof<CurveType>(
+                        std::move(V_g1), std::move(alpha_V_g1), std::move(H_g1), std::move(V_g2));
 
                     return proof;
                 }
@@ -579,14 +606,15 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const uscs_ppzksnark_primary_input<CurveType> &primary_input,
-                                                            const uscs_ppzksnark_proof<CurveType> &proof) {
+                bool uscs_ppzksnark_online_verifier_weak_IC(
+                    const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                    const uscs_ppzksnark_proof<CurveType> &proof) {
                     assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
                     const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                        pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(primary_input.begin(),
-                                                                                         primary_input.end(), 0);
+                        pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
+                            primary_input.begin(), primary_input.end(), 0);
                     assert(accumulated_IC.is_fully_accumulated());
                     const typename CurveType::g1_type &acc = accumulated_IC.first;
 
@@ -596,9 +624,11 @@ namespace nil {
                         result = false;
                     }
 
-                    algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp = CurveType::precompute_g1(proof.V_g1 + acc);
+                    algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp =
+                        CurveType::precompute_g1(proof.V_g1 + acc);
                     algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_g2(proof.V_g2);
-                    algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
+                    algebra::Fqk<CurveType> V_1 =
+                        miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                     algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
                     typename CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inversed());
                     if (V != typename CurveType::gt_type::one()) {
@@ -606,7 +636,8 @@ namespace nil {
                     }
 
                     algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_g1(proof.H_g1);
-                    algebra::Fqk<CurveType> SSP_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
+                    algebra::Fqk<CurveType> SSP_1 =
+                        miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
                     algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
                     typename CurveType::gt_type SSP =
                         final_exponentiation<CurveType>(SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
@@ -615,10 +646,14 @@ namespace nil {
                     }
 
                     algebra::G1_precomp<CurveType> proof_V_g1_precomp = CurveType::precompute_g1(proof.V_g1);
-                    algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_g1(proof.alpha_V_g1);
-                    algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
-                    algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                    typename CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inversed());
+                    algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp =
+                        CurveType::precompute_g1(proof.alpha_V_g1);
+                    algebra::Fqk<CurveType> alpha_V_1 =
+                        miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
+                    algebra::Fqk<CurveType> alpha_V_2 =
+                        miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
+                    typename CurveType::gt_type alpha_V =
+                        final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inversed());
                     if (alpha_V != typename CurveType::gt_type::one()) {
                         result = false;
                     }
@@ -630,15 +665,17 @@ namespace nil {
                 bool uscs_ppzksnark_verifier_weak_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
                                                      const uscs_ppzksnark_primary_input<CurveType> &primary_input,
                                                      const uscs_ppzksnark_proof<CurveType> &proof) {
-                    uscs_ppzksnark_processed_verification_key<CurveType> pvk = uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    uscs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
                     bool result = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, primary_input, proof);
                     return result;
                 }
 
                 template<typename CurveType>
-                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const uscs_ppzksnark_primary_input<CurveType> &primary_input,
-                                                              const uscs_ppzksnark_proof<CurveType> &proof) {
+                bool uscs_ppzksnark_online_verifier_strong_IC(
+                    const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                    const uscs_ppzksnark_proof<CurveType> &proof) {
                     bool result = true;
 
                     if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
@@ -654,7 +691,8 @@ namespace nil {
                 bool uscs_ppzksnark_verifier_strong_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
                                                        const uscs_ppzksnark_primary_input<CurveType> &primary_input,
                                                        const uscs_ppzksnark_proof<CurveType> &proof) {
-                    uscs_ppzksnark_processed_verification_key<CurveType> pvk = uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    uscs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
                     bool result = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, primary_input, proof);
                     return result;
                 }

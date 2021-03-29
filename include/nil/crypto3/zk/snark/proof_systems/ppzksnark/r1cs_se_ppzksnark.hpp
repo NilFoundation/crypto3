@@ -26,16 +26,16 @@
 #ifndef CRYPTO3_R1CS_SE_PPZKSNARK_HPP
 #define CRYPTO3_R1CS_SE_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_se_ppzksnark/types_policy.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_se_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_se_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_se_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/detail/basic_policy.hpp>
+
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 template<typename CurveType,
                          typename Generator = policies::r1cs_se_ppzksnark_generator<CurveType>,
                          typename Prover = policies::r1cs_se_ppzksnark_prover<CurveType>,

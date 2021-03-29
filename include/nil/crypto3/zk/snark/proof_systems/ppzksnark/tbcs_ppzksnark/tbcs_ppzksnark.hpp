@@ -35,7 +35,7 @@
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 
@@ -70,7 +70,8 @@ namespace nil {
                         uscs_pk(std::move(uscs_pk)) {
                     }
 
-                    tbcs_ppzksnark_proving_key<CurveType> &operator=(const tbcs_ppzksnark_proving_key<CurveType> &other) = default;
+                    tbcs_ppzksnark_proving_key<CurveType> &
+                        operator=(const tbcs_ppzksnark_proving_key<CurveType> &other) = default;
 
                     std::size_t G1_size() const {
                         return uscs_pk.G1_size();
@@ -168,9 +169,10 @@ namespace nil {
                  * Above, C is the TBCS circuit that was given as input to the generator algorithm.
                  */
                 template<typename CurveType>
-                tbcs_ppzksnark_proof<CurveType> tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
-                                                                const tbcs_ppzksnark_primary_input &primary_input,
-                                                                const tbcs_ppzksnark_auxiliary_input &auxiliary_input);
+                tbcs_ppzksnark_proof<CurveType>
+                    tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
+                                          const tbcs_ppzksnark_primary_input &primary_input,
+                                          const tbcs_ppzksnark_auxiliary_input &auxiliary_input);
 
                 /*
                  Below are four variants of verifier algorithm for the TBCS ppzkSNARK.
@@ -219,9 +221,10 @@ namespace nil {
                  * (2) has weak input consistency.
                  */
                 template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_weak_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const tbcs_ppzksnark_primary_input &primary_input,
-                                                            const tbcs_ppzksnark_proof<CurveType> &proof);
+                bool tbcs_ppzksnark_online_verifier_weak_IC(
+                    const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const tbcs_ppzksnark_primary_input &primary_input,
+                    const tbcs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the TBCS ppzkSNARK that:
@@ -229,12 +232,14 @@ namespace nil {
                  * (2) has strong input consistency.
                  */
                 template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_strong_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const tbcs_ppzksnark_primary_input &primary_input,
-                                                              const tbcs_ppzksnark_proof<CurveType> &proof);
+                bool tbcs_ppzksnark_online_verifier_strong_IC(
+                    const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const tbcs_ppzksnark_primary_input &primary_input,
+                    const tbcs_ppzksnark_proof<CurveType> &proof);
 
                 template<typename CurveType>
-                bool tbcs_ppzksnark_proving_key<CurveType>::operator==(const tbcs_ppzksnark_proving_key<CurveType> &other) const {
+                bool tbcs_ppzksnark_proving_key<CurveType>::operator==(
+                    const tbcs_ppzksnark_proving_key<CurveType> &other) const {
                     return (this->circuit == other.circuit && this->uscs_pk == other.uscs_pk);
                 }
 
@@ -245,14 +250,15 @@ namespace nil {
                     const uscs_constraint_system<FieldType> uscs_cs = tbcs_to_uscs_instance_map<FieldType>(circuit);
                     const uscs_ppzksnark_keypair<CurveType> uscs_keypair = uscs_ppzksnark_generator<CurveType>(uscs_cs);
 
-                    return tbcs_ppzksnark_keypair<CurveType>(tbcs_ppzksnark_proving_key<CurveType>(circuit, uscs_keypair.pk),
-                                                       uscs_keypair.vk);
+                    return tbcs_ppzksnark_keypair<CurveType>(
+                        tbcs_ppzksnark_proving_key<CurveType>(circuit, uscs_keypair.pk), uscs_keypair.vk);
                 }
 
                 template<typename CurveType>
-                tbcs_ppzksnark_proof<CurveType> tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
-                                                                const tbcs_ppzksnark_primary_input &primary_input,
-                                                                const tbcs_ppzksnark_auxiliary_input &auxiliary_input) {
+                tbcs_ppzksnark_proof<CurveType>
+                    tbcs_ppzksnark_prover(const tbcs_ppzksnark_proving_key<CurveType> &pk,
+                                          const tbcs_ppzksnark_primary_input &primary_input,
+                                          const tbcs_ppzksnark_auxiliary_input &auxiliary_input) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     const uscs_variable_assignment<FieldType> uscs_va =
@@ -306,9 +312,10 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_weak_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                            const tbcs_ppzksnark_primary_input &primary_input,
-                                                            const tbcs_ppzksnark_proof<CurveType> &proof) {
+                bool tbcs_ppzksnark_online_verifier_weak_IC(
+                    const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const tbcs_ppzksnark_primary_input &primary_input,
+                    const tbcs_ppzksnark_proof<CurveType> &proof) {
                     typedef typename CurveType::scalar_field_type FieldType;
                     const uscs_primary_input<FieldType> uscs_input =
                         algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
@@ -318,9 +325,10 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                bool tbcs_ppzksnark_online_verifier_strong_IC(const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
-                                                              const tbcs_ppzksnark_primary_input &primary_input,
-                                                              const tbcs_ppzksnark_proof<CurveType> &proof) {
+                bool tbcs_ppzksnark_online_verifier_strong_IC(
+                    const tbcs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const tbcs_ppzksnark_primary_input &primary_input,
+                    const tbcs_ppzksnark_proof<CurveType> &proof) {
                     typedef typename CurveType::scalar_field_type FieldType;
                     const uscs_primary_input<FieldType> uscs_input =
                         algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);

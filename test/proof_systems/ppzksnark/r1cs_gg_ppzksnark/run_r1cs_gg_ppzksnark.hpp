@@ -32,9 +32,6 @@
 #include <boost/config.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
 #include "../r1cs_examples.hpp"
 
