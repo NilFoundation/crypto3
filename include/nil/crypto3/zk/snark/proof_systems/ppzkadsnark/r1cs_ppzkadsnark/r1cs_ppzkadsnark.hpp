@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 #define CRYPTO3_R1CS_PPZKADSNARK_POLICY_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,7 +35,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_ppzkadsnark {
-                    using policy_type = detail::r1cs_ppzkadsnark_basic_policy<CurveType>;
+                    typedef detail::r1cs_ppzkadsnark_basic_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::snark_pp snark_pp;

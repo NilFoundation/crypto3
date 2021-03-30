@@ -46,6 +46,7 @@
 #include <nil/crypto3/zk/snark/components/hashes/crh_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
+
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 

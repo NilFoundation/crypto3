@@ -27,6 +27,7 @@
 #define CRYPTO3_ZK_SNARK_ACCUMULATION_VECTOR_HPP
 
 #include <iostream>
+#include <iterator>
 
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
@@ -84,19 +85,15 @@ namespace nil {
                         return first_size_in_bits + rest_size_in_bits;
                     }
 
-                    template<typename BaseInputType>
-                    accumulation_vector<Type> accumulate_chunk(
-                        const typename std::vector<typename BaseInputType::value_type>::const_iterator &it_begin,
-                        const typename std::vector<typename BaseInputType::value_type>::const_iterator &it_end,
-                        std::size_t offset) const {
-
+                    template<typename InputIterator>
+                    accumulation_vector<Type> accumulate_chunk(InputIterator begin, InputIterator end,
+                                                               std::size_t offset) const {
                         std::pair<underlying_value_type, sparse_vector<Type>> acc_result =
-                            rest.template accumulate<BaseInputType>(it_begin, it_end, offset);
+                            rest.accumulate(begin, end, offset);
                         underlying_value_type new_first = first + acc_result.first;
                         return accumulation_vector<Type>(std::move(new_first), std::move(acc_result.second));
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

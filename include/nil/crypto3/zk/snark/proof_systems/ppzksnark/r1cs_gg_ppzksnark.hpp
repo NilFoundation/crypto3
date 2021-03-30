@@ -26,10 +26,11 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_gg_ppzksnark/types_policy.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,25 +38,25 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType,
-                         typename Generator = policies::r1cs_gg_ppzksnark_generator<CurveType>,
-                         typename Prover = policies::r1cs_gg_ppzksnark_prover<CurveType>,
-                         typename Verifier = policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
+                         typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
+                         typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
+                         typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
                          typename OnlineVerifier =
-                             policies::r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
+                             r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_gg_ppzksnark {
-                    using types_policy = detail::r1cs_gg_ppzksnark_types_policy<CurveType>;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename types_policy::constraint_system constraint_system_type;
-                    typedef typename types_policy::primary_input primary_input_type;
-                    typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename types_policy::proving_key proving_key_type;
-                    typedef typename types_policy::verification_key verification_key_type;
-                    typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename types_policy::keypair keypair_type;
-                    typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
                     static inline keypair_type generator(const constraint_system_type &constraint_system) {
                         return Generator::process(constraint_system);
@@ -80,7 +81,6 @@ namespace nil {
                         return OnlineVerifier::process(pvk, primary_input, proof);
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

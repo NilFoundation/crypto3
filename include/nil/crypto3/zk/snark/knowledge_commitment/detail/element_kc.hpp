@@ -30,11 +30,6 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
-// temporary includes begin
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-// temporary includes end
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -162,20 +157,19 @@ namespace nil {
                     template<typename Type1,
                              typename Type2,
                              typename Backend,
-                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    element_kc<Type1, Type2>
-                        operator*(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &lhs,
-                                  const element_kc<Type1, Type2> &rhs) {
+                             multiprecision::expression_template_option ExpressionTemplates>
+                    element_kc<Type1, Type2> operator*(const multiprecision::number<Backend, ExpressionTemplates> &lhs,
+                                                       const element_kc<Type1, Type2> &rhs) {
                         return element_kc<Type1, Type2>(lhs * rhs.g, lhs * rhs.h);
                     }
 
                     template<typename Type1,
                              typename Type2,
                              typename Backend,
-                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                             multiprecision::expression_template_option ExpressionTemplates>
                     element_kc<Type1, Type2>
                         operator*(const element_kc<Type1, Type2> &lhs,
-                                  const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &rhs) {
+                                  const multiprecision::number<Backend, ExpressionTemplates> &rhs) {
                         return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
                     }
 
@@ -189,11 +183,7 @@ namespace nil {
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
-                        return non_fixed_precision_modulus_type(lhs.data) * rhs;
+                        return lhs.data * rhs;
                     }
 
                     template<
@@ -206,13 +196,8 @@ namespace nil {
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
-                        return lhs * non_fixed_precision_modulus_type(rhs.data);
+                        return lhs * rhs.data;
                     }
-
                 }    // namespace detail
             }        // namespace snark
         }            // namespace zk

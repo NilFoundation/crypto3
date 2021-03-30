@@ -28,7 +28,7 @@
 #ifndef CRYPTO3_ZK_R1CS_SP_PPZKPCD_PARAMS_HPP
 #define CRYPTO3_ZK_R1CS_SP_PPZKPCD_PARAMS_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_pcd_params.hpp>
 
 namespace nil {

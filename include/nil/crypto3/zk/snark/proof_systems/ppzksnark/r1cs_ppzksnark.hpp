@@ -26,17 +26,16 @@
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/detail/ppzksnark/r1cs_ppzksnark/types_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/prover.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/verifier.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 template<typename CurveType,
                          typename Generator = policies::r1cs_ppzksnark_generator<CurveType>,
                          typename Prover = policies::r1cs_ppzksnark_prover<CurveType>,
@@ -44,7 +43,7 @@ namespace nil {
                          typename OnlineVerifier =
                              policies::r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_ppzksnark {
-                    using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
+                    using types_policy = detail::r1cs_ppzksnark_policy<CurveType>;
 
                 public:
                     typedef Generator generator_type;

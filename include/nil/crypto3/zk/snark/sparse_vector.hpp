@@ -173,11 +173,9 @@ namespace nil {
 
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
-                    template<typename BaseInputType>
-                    std::pair<underlying_value_type, sparse_vector<Type>> accumulate(
-                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_begin,
-                        const typename std::vector<typename BaseInputType::value_type>::const_iterator it_end,
-                        std::size_t offset) const {
+                    template<typename InputBaseIterator>
+                    std::pair<underlying_value_type, sparse_vector<Type>>
+                        accumulate(InputBaseIterator it_begin, InputBaseIterator it_end, std::size_t offset) const {
 #ifdef MULTICORE
                         const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var
                                                                              // or call omp_set_num_threads()
@@ -189,7 +187,7 @@ namespace nil {
                         sparse_vector<Type> resulting_vector;
                         resulting_vector.domain_size_ = domain_size_;
 
-                        const std::size_t range_len = it_end - it_begin;
+                        const std::size_t range_len = std::distance(it_begin, it_end);
                         bool in_block = false;
                         std::size_t first_pos = -1,
                                     last_pos = -1;    // g++ -flto emits unitialized warning, even though in_block
@@ -213,9 +211,7 @@ namespace nil {
 
                                     accumulated_value =
                                         accumulated_value +
-                                        algebra::multiexp<
-                                            Type, BaseInputType,
-                                            algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
+                                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                             values.begin() + first_pos, values.begin() + last_pos + 1,
                                             it_begin + (indices[first_pos] - offset),
                                             it_begin + (indices[last_pos] - offset) + 1, chunks);
@@ -240,14 +236,12 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value +
-                                algebra::multiexp<Type, BaseInputType,
-                                                  algebra::policies::multiexp_method_bos_coster<Type, BaseInputType>>(
-                                    values.begin() + first_pos,
-                                    values.begin() + last_pos + 1,
-                                    it_begin + (indices[first_pos] - offset),
-                                    it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks);
+                                accumulated_value + algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                                                        values.begin() + first_pos,
+                                                        values.begin() + last_pos + 1,
+                                                        it_begin + (indices[first_pos] - offset),
+                                                        it_begin + (indices[last_pos] - offset) + 1,
+                                                        chunks);
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);
