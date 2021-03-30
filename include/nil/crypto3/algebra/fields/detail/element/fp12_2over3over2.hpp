@@ -42,9 +42,8 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
-                        constexpr static const typename policy_type::non_residue_type non_residue =
-                            typename policy_type::non_residue_type(policy_type::non_residue[0],
-                                                                   policy_type::non_residue[1]);
+                        typedef typename policy_type::non_residue_type non_residue_type;
+                        constexpr static const non_residue_type non_residue = policy_type::non_residue;
 
                         typedef typename policy_type::underlying_type underlying_type;
 
@@ -195,15 +194,18 @@ namespace nil {
                             // t0 + t1*y = (z0 + z1*y)^2 = a^2
                             tmp = z0 * z1;
                             t0 = (z0 + z1) * (z0 + underlying_type::non_residue * z1) - tmp -
-                            underlying_type::non_residue * tmp; t1 = tmp + tmp;
+                                 underlying_type::non_residue * tmp;
+                            t1 = tmp + tmp;
                             // t2 + t3*y = (z2 + z3*y)^2 = b^2
                             tmp = z2 * z3;
                             t2 = (z2 + z3) * (z2 + underlying_type::non_residue * z3) - tmp -
-                            underlying_type::non_residue * tmp; t3 = tmp + tmp;
+                                 underlying_type::non_residue * tmp;
+                            t3 = tmp + tmp;
                             // t4 + t5*y = (z4 + z5*y)^2 = c^2
                             tmp = z4 * z5;
                             t4 = (z4 + z5) * (z4 + underlying_type::non_residue * z5) - tmp -
-                            underlying_type::non_residue * tmp; t5 = tmp + tmp;
+                                 underlying_type::non_residue * tmp;
+                            t5 = tmp + tmp;
 
                             // for A
 
@@ -241,7 +243,7 @@ namespace nil {
                             z5 = z5 + z5;
                             z5 = z5 + t3;
 
-                            return element_fp12_2over3over2(underlying_type(z0,z4,z3),underlying_type(z2,z1,z5));
+                            return element_fp12_2over3over2(underlying_type(z0, z4, z3), underlying_type(z2, z1, z5));
                         }
 
                         template<typename PowerType>
@@ -477,6 +479,10 @@ namespace nil {
                         z.b_.b_ *= Param::gammar3[2];
                         z.b_.c_ *= Param::gammar3[4];
                     }*/
+
+                    template<typename FieldParams>
+                    constexpr const typename element_fp12_2over3over2<FieldParams>::non_residue_type
+                        element_fp12_2over3over2<FieldParams>::non_residue;
 
                 }    // namespace detail
             }        // namespace fields

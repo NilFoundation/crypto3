@@ -79,22 +79,23 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_mnt4_g2() :
-                            element_mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_mnt4_g2() : element_mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected affine point $(X:Y:1)$
                          *
                          */
-                        constexpr element_mnt4_g2(const underlying_field_value_type &X, const underlying_field_value_type &Y) :
-                            X(X), Y(Y), Z(underlying_field_value_type::one()) {};
+                        constexpr element_mnt4_g2(const underlying_field_value_type &X,
+                                                  const underlying_field_value_type &Y) :
+                            X(X),
+                            Y(Y), Z(underlying_field_value_type::one()) {};
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
                         constexpr element_mnt4_g2(underlying_field_value_type X,
-                                        underlying_field_value_type Y,
-                                        underlying_field_value_type Z) {
+                                                  underlying_field_value_type Y,
+                                                  underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -109,7 +110,7 @@ namespace nil {
                          *
                          */
                         constexpr static element_mnt4_g2 one() {
-                             return element_mnt4_g2(one_fill[0], one_fill[1], one_fill[2]);
+                            return element_mnt4_g2(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -357,10 +358,12 @@ namespace nil {
                                                 g2_field_type_value::underlying_type::one());
 
                         constexpr static const underlying_field_value_type a =
-                            underlying_field_value_type(g1_a * underlying_field_value_type::non_residue, g1_field_type_value::zero());
+                            underlying_field_value_type(g1_a * underlying_field_value_type::non_residue,
+                                                        g1_field_type_value::zero());
 
                         constexpr static const underlying_field_value_type b =
-                            underlying_field_value_type(g1_field_type_value::zero(), g1_b * underlying_field_value_type::non_residue);
+                            underlying_field_value_type(g1_field_type_value::zero(),
+                                                        g1_b *underlying_field_value_type::non_residue);
 
                         constexpr static const g2_field_type_value twist_coeff_a = a;
                         constexpr static const g2_field_type_value twist_coeff_b = b;
@@ -368,16 +371,16 @@ namespace nil {
                     private:
                         constexpr static const g1_field_type_value twist_mul_by_a_c0 =
                             g1_a * underlying_field_value_type::non_residue;
-                                                         
+
                         constexpr static const g1_field_type_value twist_mul_by_a_c1 =
                             g1_a * underlying_field_value_type::non_residue;
-                                                         
+
                         constexpr static const g1_field_type_value twist_mul_by_b_c0 =
                             g1_b * (underlying_field_value_type::non_residue).squared();
-                                                                   
+
                         constexpr static const g1_field_type_value twist_mul_by_b_c1 =
                             g1_b * underlying_field_value_type::non_residue;
-                                                         
+
                         constexpr static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                             0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
                         constexpr static const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
@@ -397,21 +400,23 @@ namespace nil {
                             underlying_field_value_type::one()};
                     };
 
-                    constexpr typename element_mnt4_g2<298>::underlying_field_value_type const
-                        element_mnt4_g2<298>::a;
+                    constexpr std::array<typename element_mnt4_g2<298>::underlying_field_value_type, 3> const
+                        element_mnt4_g2<298>::zero_fill;
 
-                    constexpr typename element_mnt4_g2<298>::underlying_field_value_type const
-                        element_mnt4_g2<298>::b;
+                    constexpr std::array<typename element_mnt4_g2<298>::underlying_field_value_type, 3> const
+                        element_mnt4_g2<298>::one_fill;
 
-                    constexpr typename element_mnt4_g2<298>::g2_field_type_value const
-                        element_mnt4_g2<298>::twist;
+                    constexpr typename element_mnt4_g2<298>::underlying_field_value_type const element_mnt4_g2<298>::a;
 
-                    constexpr typename element_mnt4_g2<298>::g2_field_type_value const
-                        element_mnt4_g2<298>::twist_coeff_a;
+                    constexpr typename element_mnt4_g2<298>::underlying_field_value_type const element_mnt4_g2<298>::b;
 
-                    constexpr typename element_mnt4_g2<298>::g2_field_type_value const
-                        element_mnt4_g2<298>::twist_coeff_b;
+                    constexpr typename element_mnt4_g2<298>::g2_field_type_value const element_mnt4_g2<298>::twist;
 
+                    constexpr
+                        typename element_mnt4_g2<298>::g2_field_type_value const element_mnt4_g2<298>::twist_coeff_a;
+
+                    constexpr
+                        typename element_mnt4_g2<298>::g2_field_type_value const element_mnt4_g2<298>::twist_coeff_b;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

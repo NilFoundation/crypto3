@@ -39,9 +39,8 @@ namespace nil {
                         typedef FieldParams policy_type;
 
                     public:
-                        constexpr static const typename policy_type::non_residue_type non_residue =
-                            typename policy_type::non_residue_type(policy_type::non_residue[0],
-                                                                   policy_type::non_residue[1]);
+                        typedef typename policy_type::non_residue_type non_residue_type;
+                        constexpr static const non_residue_type non_residue = policy_type::non_residue;
 
                         typedef typename policy_type::underlying_type underlying_type;
 
@@ -55,8 +54,8 @@ namespace nil {
                         }
 
                         constexpr element_fp6_3over2(underlying_type in_data0,
-                                           underlying_type in_data1,
-                                           underlying_type in_data2) {
+                                                     underlying_type in_data1,
+                                                     underlying_type in_data2) {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 
@@ -225,19 +224,20 @@ namespace nil {
                     }
 
                     template<typename FieldParams>
-                    constexpr element_fp6_3over2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
-                                                              const element_fp6_3over2<FieldParams> &rhs) {
+                    constexpr element_fp6_3over2<FieldParams>
+                        operator*(const typename FieldParams::underlying_type &lhs,
+                                  const element_fp6_3over2<FieldParams> &rhs) {
 
                         return element_fp6_3over2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]);
                     }
 
                     template<typename FieldParams>
-                    constexpr element_fp6_3over2<FieldParams> operator*(const element_fp6_3over2<FieldParams> &lhs,
-                                                              const typename FieldParams::underlying_type &rhs) {
+                    constexpr element_fp6_3over2<FieldParams>
+                        operator*(const element_fp6_3over2<FieldParams> &lhs,
+                                  const typename FieldParams::underlying_type &rhs) {
 
                         return rhs * lhs;
                     }
-
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

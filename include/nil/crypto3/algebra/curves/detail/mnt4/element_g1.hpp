@@ -80,23 +80,24 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_mnt4_g1() :
-                            element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_mnt4_g1() : element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected affine point $(X:Y:1)$
                          *
                          */
-                        constexpr element_mnt4_g1(const underlying_field_value_type &X, const underlying_field_value_type &Y) :
-                            X(X), Y(Y), Z(underlying_field_value_type::one()) {};
+                        constexpr element_mnt4_g1(const underlying_field_value_type &X,
+                                                  const underlying_field_value_type &Y) :
+                            X(X),
+                            Y(Y), Z(underlying_field_value_type::one()) {};
 
                         /** @brief
                          *    @return the selected point (X:Y:Z)
                          *
                          */
                         constexpr element_mnt4_g1(underlying_field_value_type X,
-                                        underlying_field_value_type Y,
-                                        underlying_field_value_type Z) {
+                                                  underlying_field_value_type Y,
+                                                  underlying_field_value_type Z) {
                             this->X = X;
                             this->Y = Y;
                             this->Z = Z;
@@ -388,10 +389,14 @@ namespace nil {
                             underlying_field_value_type::one()};
                     };
 
-                    constexpr typename element_mnt4_g1<298>::g1_field_type_value const
-                        element_mnt4_g1<298>::a;
-                    constexpr typename element_mnt4_g1<298>::g1_field_type_value const
-                        element_mnt4_g1<298>::b;
+                    constexpr std::array<typename element_mnt4_g1<298>::underlying_field_value_type, 3> const
+                        element_mnt4_g1<298>::zero_fill;
+
+                    constexpr std::array<typename element_mnt4_g1<298>::underlying_field_value_type, 3> const
+                        element_mnt4_g1<298>::one_fill;
+
+                    constexpr typename element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::a;
+                    constexpr typename element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::b;
 
                 }    // namespace detail
             }        // namespace curves
