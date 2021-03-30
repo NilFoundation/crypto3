@@ -35,7 +35,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_ppzkadsnark {
-                    using policy_type = detail::r1cs_ppzkadsnark_basic_policy<CurveType>;
+                    typedef detail::r1cs_ppzkadsnark_basic_policy<CurveType> policy_type;
 
                 public:
                     typedef typename policy_type::snark_pp snark_pp;
