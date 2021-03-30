@@ -80,7 +80,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_verifier_process_vk {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
 
                     public:
                         typedef typename types_policy::circuit circuit_type;
@@ -109,7 +109,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_verifier_weak_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
 
                     public:
                         typedef typename types_policy::circuit circuit_type;
@@ -145,7 +145,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_verifier_strong_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
 
                     public:
                         typedef typename types_policy::circuit circuit_type;
@@ -182,7 +182,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_online_verifier_weak_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
 
                     public:
                         typedef typename types_policy::circuit circuit_type;
@@ -217,7 +217,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_online_verifier_strong_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_types_policy<CurveType>;
+                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
 
                     public:
                         typedef typename types_policy::circuit circuit_type;

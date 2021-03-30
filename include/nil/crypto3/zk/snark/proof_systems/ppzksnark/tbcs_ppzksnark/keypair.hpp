@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
+#ifndef CRYPTO3_TBCS_PPZKSNARK_KEYPAIR_HPP
+#define CRYPTO3_TBCS_PPZKSNARK_KEYPAIR_HPP
 
 #include <tuple>
 
@@ -32,11 +32,13 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename ProvingKey, typename VerificationKey>
-                using r1cs_gg_ppzksnark_keypair = std::pair<ProvingKey, VerificationKey>;
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                namespace detail {
+                    template<typename ProvingKey, typename VerificationKey>
+                    using tbcs_ppzksnark_keypair = std::pair<ProvingKey, VerificationKey>;
+                }    // namespace detail
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP

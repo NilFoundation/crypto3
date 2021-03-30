@@ -68,7 +68,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class tbcs_ppzksnark_generator {
-                        typedef detail::tbcs_ppzksnark_types_policy<CurveType> policy_type;
+                        typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::circuit circuit_type;

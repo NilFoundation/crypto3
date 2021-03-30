@@ -22,33 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for BACS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation is a straightforward combination of:
-// (1) a BACS-to-R1CS reduction, and
-// (2) a ppzkSNARK for R1CS.
-//
-//
-// Acronyms:
-//
-// - BACS = "Bilinear Arithmetic Circuit Satisfiability"
-// - R1CS = "Rank-1 Constraint System"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BACS_PPZKSNARK_KEYPAIR_HPP
-#define CRYPTO3_ZK_BACS_PPZKSNARK_KEYPAIR_HPP
+#ifndef CRYPTO3_BACS_PPZKSNARK_KEYPAIR_HPP
+#define CRYPTO3_BACS_PPZKSNARK_KEYPAIR_HPP
 
 #include <tuple>
 
@@ -56,13 +32,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace detail {
-                    template<typename ProvingKey, typename VerificationKey>
-                    using bacs_ppzksnark_keypair = std::pair<ProvingKey, VerificationKey>;
-                }    // namespace detail
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                template<typename ProvingKey, typename VerificationKey>
+                using bacs_ppzksnark_keypair = std::pair<ProvingKey, VerificationKey>;
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
-#endif
+#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP

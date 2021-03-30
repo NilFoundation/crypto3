@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 //
 // MIT License
 //
@@ -23,20 +22,20 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_KEYPAIR_HPP
+#ifndef CRYPTO3_ZK_SNARK_KEYPAIR_HPP
+#define CRYPTO3_ZK_SNARK_KEYPAIR_HPP
 
-#include <tuple>
+#include <numeric>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename ProvingKey, typename VerificationKey>
-                using r1cs_gg_ppzksnark_keypair = std::pair<ProvingKey, VerificationKey>;
+                template<typename ZkScheme>
+                using keypair = std::pair<typename ZkScheme::proving_key, typename ZkScheme::verification_key>;
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
+#endif

@@ -80,14 +80,14 @@ namespace nil {
                         /**
                          * A proving key for the BACS ppzkSNARK.
                          */
-                        typedef bacs_ppzksnark_proving_key<curve_type, circuit_type> proving_key;
+                        typedef bacs_ppzksnark_proving_key<curve_type, circuit_type> proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the BACS ppzkSNARK.
                          */
-                        typedef typename r1cs_ppzksnark<curve_type>::verification_key_type verification_key;
+                        typedef typename r1cs_ppzksnark<curve_type>::verification_key_type verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -99,21 +99,21 @@ namespace nil {
                          * enables a faster verification time.
                          */
                         typedef typename r1cs_ppzksnark<CurveType>::processed_verification_key_type
-                            processed_verification_key;
+                            processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the BACS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        typedef bacs_ppzksnark_keypair<proving_key, verification_key> keypair;
+                        typedef bacs_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
 
                         /*********************************** Proof ***********************************/
 
                         /**
                          * A proof for the BACS ppzkSNARK.
                          */
-                        typedef typename r1cs_ppzksnark<CurveType>::proof_type proof;
+                        typedef typename r1cs_ppzksnark<CurveType>::proof_type proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark

@@ -43,19 +43,19 @@ namespace nil {
                          typename OnlineVerifier =
                              policies::r1cs_se_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_se_ppzksnark {
-                    using types_policy = detail::r1cs_se_ppzksnark_types_policy<CurveType>;
+                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename types_policy::constraint_system constraint_system_type;
-                    typedef typename types_policy::primary_input primary_input_type;
-                    typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::constraint_system constraint_system_type;
+                    typedef typename policy_type::primary_input primary_input_type;
+                    typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                    typedef typename types_policy::proving_key proving_key_type;
-                    typedef typename types_policy::verification_key verification_key_type;
-                    typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key proving_key_type;
+                    typedef typename policy_type::verification_key verification_key_type;
+                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                    typedef typename types_policy::keypair keypair_type;
-                    typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair keypair_type;
+                    typedef typename policy_type::proof proof_type;
 
                     static inline keypair_type generator(const constraint_system_type &constraint_system) {
                         return Generator::process(constraint_system);

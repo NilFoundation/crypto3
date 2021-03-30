@@ -66,6 +66,11 @@
 
 #include <memory>
 
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/keypair.hpp>
+
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap.hpp>
@@ -85,167 +90,25 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        using constraint_system = r1cs_constraint_system<typename CurveType::scalar_field_type>;
+                        typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system;
 
-                        using primary_input = r1cs_primary_input<typename CurveType::scalar_field_type>;
+                        typedef r1cs_primary_input<typename CurveType::scalar_field_type> primary_input;
 
-                        using auxiliary_input = r1cs_auxiliary_input<typename CurveType::scalar_field_type>;
+                        typedef r1cs_auxiliary_input<typename CurveType::scalar_field_type> auxiliary_input;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the R1CS SEppzkSNARK.
                          */
-                        struct proving_key {
-                            // G^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename std::vector<typename CurveType::g1_type::value_type> A_query;
-
-                            // H^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename std::vector<typename CurveType::g2_type::value_type> B_query;
-
-                            // G^{gamma^2 * C_i(t) + (alpha + beta) * gamma * A_i(t)}
-                            // for sap.num_inputs() + 1 < i <= sap.num_variables()
-                            typename std::vector<typename CurveType::g1_type::value_type> C_query_1;
-
-                            // G^{2 * gamma^2 * Z(t) * A_i(t)} for 0 <= i <= sap.num_variables()
-                            typename std::vector<typename CurveType::g1_type::value_type> C_query_2;
-
-                            // G^{gamma * Z(t)}
-                            typename CurveType::g1_type::value_type G_gamma_Z;
-
-                            // H^{gamma * Z(t)}
-                            typename CurveType::g2_type::value_type H_gamma_Z;
-
-                            // G^{(alpha + beta) * gamma * Z(t)}
-                            typename CurveType::g1_type::value_type G_ab_gamma_Z;
-
-                            // G^{gamma^2 * Z(t)^2}
-                            typename CurveType::g1_type::value_type G_gamma2_Z2;
-
-                            // G^{gamma^2 * Z(t) * t^i} for 0 <= i < sap.degree
-                            typename std::vector<typename CurveType::g1_type::value_type> G_gamma2_Z_t;
-
-                            constraint_system cs;
-
-                            proving_key() {};
-                            proving_key &operator=(const proving_key &other) = default;
-                            proving_key(const proving_key &other) = default;
-                            proving_key(proving_key &&other) = default;
-                            proving_key(typename std::vector<typename CurveType::g1_type::value_type> &&A_query,
-                                        typename std::vector<typename CurveType::g2_type::value_type> &&B_query,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&C_query_1,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&C_query_2,
-                                        typename CurveType::g1_type::value_type &G_gamma_Z,
-                                        typename CurveType::g2_type::value_type &H_gamma_Z,
-                                        typename CurveType::g1_type::value_type &G_ab_gamma_Z,
-                                        typename CurveType::g1_type::value_type &G_gamma2_Z2,
-                                        typename std::vector<typename CurveType::g1_type::value_type> &&G_gamma2_Z_t,
-                                        constraint_system &&cs) :
-                                A_query(std::move(A_query)),
-                                B_query(std::move(B_query)), C_query_1(std::move(C_query_1)),
-                                C_query_2(std::move(C_query_2)), G_gamma_Z(G_gamma_Z), H_gamma_Z(H_gamma_Z),
-                                G_ab_gamma_Z(G_ab_gamma_Z), G_gamma2_Z2(G_gamma2_Z2),
-                                G_gamma2_Z_t(std::move(G_gamma2_Z_t)), constraint_system(std::move(cs)) {};
-
-                            std::size_t G1_size() const {
-                                return A_query.size() + C_query_1.size() + C_query_2.size() + 3 + G_gamma2_Z_t.size();
-                            }
-
-                            std::size_t G2_size() const {
-                                return B_query.size() + 1;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return G1_size() * CurveType::g1_type::value_bits +
-                                       G2_size() * CurveType::g2_type::value_bits;
-                            }
-
-                            bool operator==(const proving_key &other) const {
-                                return (this->A_query == other.A_query && this->B_query == other.B_query &&
-                                        this->C_query_1 == other.C_query_1 && this->C_query_2 == other.C_query_2 &&
-                                        this->G_gamma_Z == other.G_gamma_Z && this->H_gamma_Z == other.H_gamma_Z &&
-                                        this->G_ab_gamma_Z == other.G_ab_gamma_Z &&
-                                        this->G_gamma2_Z2 == other.G_gamma2_Z2 &&
-                                        this->G_gamma2_Z_t == other.G_gamma2_Z_t && this->cs == other.cs);
-                            }
-                        };
+                        typedef r1cs_se_ppzksnark_proving_key<CurveType, constraint_system> proving_key;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the R1CS SEppzkSNARK.
                          */
-                        struct verification_key {
-                            // H
-                            typename CurveType::g2_type::value_type H;
-
-                            // G^{alpha}
-                            typename CurveType::g1_type::value_type G_alpha;
-
-                            // H^{beta}
-                            typename CurveType::g2_type::value_type H_beta;
-
-                            // G^{gamma}
-                            typename CurveType::g1_type::value_type G_gamma;
-
-                            // H^{gamma}
-                            typename CurveType::g2_type::value_type H_gamma;
-
-                            // G^{gamma * A_i(t) + (alpha + beta) * A_i(t)}
-                            // for 0 <= i <= sap.num_inputs()
-                            typename std::vector<typename CurveType::g1_type::value_type> query;
-
-                            verification_key() = default;
-                            verification_key(const typename CurveType::g2_type::value_type &H,
-                                             const typename CurveType::g1_type::value_type &G_alpha,
-                                             const typename CurveType::g2_type::value_type &H_beta,
-                                             const typename CurveType::g1_type::value_type &G_gamma,
-                                             const typename CurveType::g2_type::value_type &H_gamma,
-                                             typename std::vector<typename CurveType::g1_type::value_type> &&query) :
-                                H(H),
-                                G_alpha(G_alpha), H_beta(H_beta), G_gamma(G_gamma), H_gamma(H_gamma),
-                                query(std::move(query)) {};
-
-                            std::size_t G1_size() const {
-                                return 2 + query.size();
-                            }
-
-                            std::size_t G2_size() const {
-                                return 3;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return (G1_size() * CurveType::g1_type::value_bits +
-                                        G2_size() * CurveType::g2_type::value_bits);
-                            }
-
-                            bool operator==(const verification_key &other) const {
-                                return (this->H == other.H && this->G_alpha == other.G_alpha &&
-                                        this->H_beta == other.H_beta && this->G_gamma == other.G_gamma &&
-                                        this->H_gamma == other.H_gamma && this->query == other.query);
-                            }
-
-                            /*static verification_key dummy_verification_key(const std::size_t input_size) {
-                                verification_key result;
-                                result.H = algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.G_alpha = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
-                            result.H_beta = algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.G_gamma = algebra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
-                            result.H_gamma = algebra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one();
-
-                                typename std::vector<typename CurveType::g1_type::value_type> v;
-                                for (std::size_t i = 0; i < input_size + 1; ++i) {
-                                    v.emplace_back(algebra::random_element<typename CurveType::scalar_field_type>() *
-                            typename CurveType::g1_type::value_type::one());
-                                }
-                                result.query = std::move(v);
-
-                                return result;
-                            }*/
-                        };
+                        typedef r1cs_se_ppzksnark_verification_key<CurveType> verification_key;
 
                         /************************ Processed verification key *************************/
 
@@ -256,44 +119,14 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        class processed_verification_key {
-                            typedef typename CurveType::pairing_policy pairing_policy;
-
-                        public:
-                            typename CurveType::g1_type::value_type G_alpha;
-                            typename CurveType::g2_type::value_type H_beta;
-                            typename pairing_policy::Fqk_type G_alpha_H_beta_ml;
-                            typename pairing_policy::G1_precomp G_gamma_pc;
-                            typename pairing_policy::G2_precomp H_gamma_pc;
-                            typename pairing_policy::G2_precomp H_pc;
-
-                            typename std::vector<typename CurveType::g1_type::value_type> query;
-
-                            bool operator==(const processed_verification_key &other) const {
-                                return (this->G_alpha == other.G_alpha && this->H_beta == other.H_beta &&
-                                        this->G_alpha_H_beta_ml == other.G_alpha_H_beta_ml &&
-                                        this->G_gamma_pc == other.G_gamma_pc && this->H_gamma_pc == other.H_gamma_pc &&
-                                        this->H_pc == other.H_pc && this->query == other.query);
-                            }
-                        };
+                        typedef r1cs_se_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the R1CS SEppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        class keypair {
-                        public:
-                            proving_key pk;
-                            verification_key vk;
-
-                            keypair() = default;
-                            keypair(const keypair &other) = default;
-                            keypair(proving_key &&pk, verification_key &&vk) : pk(std::move(pk)), vk(std::move(vk)) {
-                            }
-
-                            keypair(keypair &&other) = default;
-                        };
+                        typedef r1cs_se_ppzksnark_keypair<proving_key, verification_key> keypair;
 
                         /*********************************** Proof ***********************************/
 
@@ -304,40 +137,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        struct proof {
-                            typename CurveType::g1_type::value_type A;
-                            typename CurveType::g2_type::value_type B;
-                            typename CurveType::g1_type::value_type C;
-
-                            proof() {
-                            }
-                            proof(typename CurveType::g1_type::value_type &&A,
-                                  typename CurveType::g2_type::value_type &&B,
-                                  typename CurveType::g1_type::value_type &&C) :
-                                A(std::move(A)),
-                                B(std::move(B)), C(std::move(C)) {};
-
-                            std::size_t G1_size() const {
-                                return 2;
-                            }
-
-                            std::size_t G2_size() const {
-                                return 1;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return G1_size() * CurveType::g1_type::value_bits +
-                                       G2_size() * CurveType::g2_type::value_bits;
-                            }
-
-                            bool is_well_formed() const {
-                                return (A.is_well_formed() && B.is_well_formed() && C.is_well_formed());
-                            }
-
-                            bool operator==(const proof &other) const {
-                                return (this->A == other.A && this->B == other.B && this->C == other.C);
-                            }
-                        };
+                        typedef r1cs_se_ppzksnark_proof<CurveType> proof;
                     };
                 }    // namespace detail
             }        // namespace snark

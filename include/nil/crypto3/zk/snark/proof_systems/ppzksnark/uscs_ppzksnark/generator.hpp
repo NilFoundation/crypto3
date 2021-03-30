@@ -76,7 +76,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_generator {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;

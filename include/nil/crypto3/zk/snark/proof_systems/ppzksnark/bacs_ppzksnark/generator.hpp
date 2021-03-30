@@ -59,45 +59,43 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace policies {
 
-                    /**
-                     * A generator algorithm for the BACS ppzkSNARK.
-                     *
-                     * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
-                     */
-                    template<typename CurveType>
-                    class bacs_ppzksnark_generator {
-                        using types_policy = detail::bacs_ppzksnark_types_policy<CurveType>;
+                /**
+                 * A generator algorithm for the BACS ppzkSNARK.
+                 *
+                 * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
+                 */
+                template<typename CurveType>
+                class bacs_ppzksnark_generator {
+                    typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline keypair_type process(const circuit_type &circuit) {
-                            typedef typename CurveType::scalar_field_type field_type;
+                    static inline keypair_type process(const circuit_type &circuit) {
+                        typedef typename CurveType::scalar_field_type field_type;
 
-                            const r1cs_constraint_system<field_type> r1cs_cs =
-                                bacs_to_r1cs_instance_map<field_type>(circuit);
-                            const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
-                                r1cs_ppzksnark<CurveType>::generator::template process<CurveType>(r1cs_cs);
+                        const r1cs_constraint_system<field_type> r1cs_cs =
+                            bacs_to_r1cs_instance_map<field_type>(circuit);
+                        const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
+                            r1cs_ppzksnark<CurveType>::generator::template process<CurveType>(r1cs_cs);
 
-                            return keypair_type(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
-                        }
-                    };
+                        return keypair_type(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
+                    }
+                };
 
-                }    // namespace policies
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_GENERATOR_HPP

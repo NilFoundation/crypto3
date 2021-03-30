@@ -50,8 +50,10 @@
 #ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_TYPES_POLICY_HPP
 #define CRYPTO3_ZK_TBCS_PPZKSNARK_TYPES_POLICY_HPP
 
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/keypair.hpp>
+
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 
 namespace nil {
@@ -61,7 +63,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
-                    struct tbcs_ppzksnark_types_policy {
+                    struct tbcs_ppzksnark_policy {
 
                         /******************************** Params ********************************/
 
@@ -69,70 +71,25 @@ namespace nil {
                          * Below are various typedefs aliases (used for uniformity with other proof systems).
                          */
 
-                        using circuit = tbcs_circuit;
+                        typedef tbcs_circuit circuit;
 
-                        using primary_input = tbcs_primary_input;
+                        typedef tbcs_primary_input primary_input;
 
-                        using auxiliary_input = tbcs_auxiliary_input;
+                        typedef tbcs_auxiliary_input auxiliary_input;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the TBCS ppzkSNARK.
                          */
-                        struct proving_key {
-                            typedef typename CurveType::scalar_field_type FieldType;
-
-                            circuit crct;
-                            typename uscs_ppzksnark<CurveType>::proving_key_type uscs_pk;
-
-                            proving_key() {};
-                            proving_key(const proving_key &other) = default;
-                            proving_key(proving_key &&other) = default;
-                            proving_key(const circuit &crct,
-                                        const typename uscs_ppzksnark<CurveType>::proving_key_type &uscs_pk) :
-                                circuit(crct),
-                                uscs_pk(uscs_pk) {
-                            }
-                            proving_key(circuit &&crct,
-                                        typename uscs_ppzksnark<CurveType>::proving_key_type &&uscs_pk) :
-                                crct(std::move(crct)),
-                                uscs_pk(std::move(uscs_pk)) {
-                            }
-
-                            proving_key &operator=(const proving_key &other) = default;
-
-                            std::size_t G1_size() const {
-                                return uscs_pk.G1_size();
-                            }
-
-                            std::size_t G2_size() const {
-                                return uscs_pk.G2_size();
-                            }
-
-                            std::size_t G1_sparse_size() const {
-                                return uscs_pk.G1_sparse_size();
-                            }
-
-                            std::size_t G2_sparse_size() const {
-                                return uscs_pk.G2_sparse_size();
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return uscs_pk.size_in_bits();
-                            }
-
-                            bool operator==(const proving_key &other) const {
-                                return (this->crct == other.crct && this->uscs_pk == other.uscs_pk);
-                            }
-                        };
+                        typedef tbcs_ppzksnark_proving_key<CurveType, circuit> proving_key;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the TBCS ppzkSNARK.
                          */
-                        using verification_key = typename uscs_ppzksnark<CurveType>::verification_key_type;
+                        typedef typename uscs_ppzksnark<CurveType>::verification_key_type verification_key;
 
                         /************************ Processed verification key *************************/
 
@@ -143,33 +100,22 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        using processed_verification_key =
-                            typename uscs_ppzksnark<CurveType>::processed_verification_key_type;
+                        typedef typename uscs_ppzksnark<CurveType>::processed_verification_key_type
+                            processed_verification_key;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the TBCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        struct keypair {
-                            proving_key pk;
-                            verification_key vk;
-
-                            keypair() {};
-                            keypair(keypair &&other) = default;
-                            keypair(const proving_key &pk, const verification_key &vk) : pk(pk), vk(vk) {
-                            }
-
-                            keypair(proving_key &&pk, verification_key &&vk) : pk(std::move(pk)), vk(std::move(vk)) {
-                            }
-                        };
+                        typedef tbcs_ppzksnark_keypair<proving_key, verification_key> keypair;
 
                         /*********************************** Proof ***********************************/
 
                         /**
                          * A proof for the TBCS ppzkSNARK.
                          */
-                        using proof = typename uscs_ppzksnark<CurveType>::proof_type;
+                        typedef typename uscs_ppzksnark<CurveType>::proof_type proof;
                     };
                 }    // namespace detail
             }        // namespace snark

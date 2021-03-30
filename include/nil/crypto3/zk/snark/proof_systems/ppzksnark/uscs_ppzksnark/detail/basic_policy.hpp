@@ -70,14 +70,17 @@
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/ssp.hpp>
 
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/proving_key.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/keypair.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 namespace detail {
-
                     template<typename CurveType>
-                    struct uscs_ppzksnark_basic_policy {
+                    struct uscs_ppzksnark_policy {
 
                         /******************************** Params ********************************/
 
@@ -96,115 +99,14 @@ namespace nil {
                         /**
                          * A proving key for the USCS ppzkSNARK.
                          */
-                        struct proving_key {
-                            typename std::vector<typename CurveType::g1_type::value_type> V_g1_query;
-                            typename std::vector<typename CurveType::g1_type::value_type> alpha_V_g1_query;
-                            typename std::vector<typename CurveType::g1_type::value_type> H_g1_query;
-                            typename std::vector<typename CurveType::g2_type::value_type> V_g2_query;
-
-                            constraint_system cs;
-
-                            proving_key() {};
-                            proving_key &operator=(const proving_key &other) = default;
-                            proving_key(const proving_key &other) = default;
-                            proving_key(proving_key &&other) = default;
-                            proving_key(
-                                typename std::vector<typename CurveType::g1_type::value_type> &&V_g1_query,
-                                typename std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
-                                typename std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
-                                typename std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
-                                constraint_system &&cs) :
-                                V_g1_query(std::move(V_g1_query)),
-                                alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
-                                V_g2_query(std::move(V_g2_query)), cs(std::move(cs)) {};
-
-                            std::size_t G1_size() const {
-                                return V_g1_query.size() + alpha_V_g1_query.size() + H_g1_query.size();
-                            }
-
-                            std::size_t G2_size() const {
-                                return V_g2_query.size();
-                            }
-
-                            std::size_t G1_sparse_size() const {
-                                return G1_size();
-                            }
-
-                            std::size_t G2_sparse_size() const {
-                                return G2_size();
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return CurveType::g1_type::value_bits * G1_size() +
-                                       CurveType::g2_type::value_bits * G2_size();
-                            }
-
-                            bool operator==(const proving_key &other) const {
-                                return (this->V_g1_query == other.V_g1_query &&
-                                        this->alpha_V_g1_query == other.alpha_V_g1_query &&
-                                        this->H_g1_query == other.H_g1_query && this->V_g2_query == other.V_g2_query &&
-                                        this->cs == other.cs);
-                            }
-                        };
+                        typedef uscs_ppzksnark_proving_key<CurveType, constraint_system> proving_key;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the USCS ppzkSNARK.
                          */
-                        struct verification_key {
-                            typename CurveType::g2_type::value_type tilde_g2;
-                            typename CurveType::g2_type::value_type alpha_tilde_g2;
-                            typename CurveType::g2_type::value_type Z_g2;
-
-                            accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
-
-                            verification_key() = default;
-                            verification_key(const typename CurveType::g2_type::value_type &tilde_g2,
-                                             const typename CurveType::g2_type::value_type &alpha_tilde_g2,
-                                             const typename CurveType::g2_type::value_type &Z_g2,
-                                             const accumulation_vector<typename CurveType::g1_type> &eIC) :
-                                tilde_g2(tilde_g2),
-                                alpha_tilde_g2(alpha_tilde_g2), Z_g2(Z_g2), encoded_IC_query(eIC) {};
-
-                            std::size_t G1_size() const {
-                                return encoded_IC_query.size();
-                            }
-
-                            std::size_t G2_size() const {
-                                return 3;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return encoded_IC_query.size_in_bits() + 3 * CurveType::g2_type::value_bits;
-                            }
-
-                            bool operator==(const verification_key &other) const {
-                                return (this->tilde_g2 == other.tilde_g2 &&
-                                        this->alpha_tilde_g2 == other.alpha_tilde_g2 && this->Z_g2 == other.Z_g2 &&
-                                        this->encoded_IC_query == other.encoded_IC_query);
-                            }
-
-                            /*static verification_key dummy_verification_key(const std::size_t input_size) {
-                                verification_key result;
-                                result.tilde_g2 = algenra::random_element<typename CurveType::scalar_field_type>() *
-                            typename CurveType::g2_type::value_type::one(); result.alpha_tilde_g2 =
-                            algenra::random_element<typename CurveType::scalar_field_type>() * typename
-                            CurveType::g2_type::value_type::one(); result.Z_g2 = algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g2_type::value_type::one();
-
-                                typename CurveType::g1_type::value_type base = algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one();
-                                typename std::vector<typename CurveType::g1_type::value_type> v; for (std::size_t i = 0;
-                            i < input_size; ++i) { v.emplace_back(algenra::random_element<typename
-                            CurveType::scalar_field_type>() * typename CurveType::g1_type::value_type::one());
-                                }
-
-                                result.encoded_IC_query = accumulation_vector<typename CurveType::g1_type>(v);
-
-                                return result;
-                            }*/
-                        };
+                        typedef uscs_ppzksnark_verification_key<CurveType> verification_key;
 
                         /************************ Processed verification key *************************/
 
@@ -215,45 +117,14 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        class processed_verification_key {
-                            typedef typename CurveType::pairing_policy pairing_policy;
-
-                        public:
-                            typename pairing_policy::G1_precomp pp_G1_one_precomp;
-                            typename pairing_policy::G2_precomp pp_G2_one_precomp;
-                            typename pairing_policy::G2_precomp vk_tilde_g2_precomp;
-                            typename pairing_policy::G2_precomp vk_alpha_tilde_g2_precomp;
-                            typename pairing_policy::G2_precomp vk_Z_g2_precomp;
-                            typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
-
-                            accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
-
-                            bool operator==(const processed_verification_key &other) const {
-                                return (this->pp_G1_one_precomp == other.pp_G1_one_precomp &&
-                                        this->pp_G2_one_precomp == other.pp_G2_one_precomp &&
-                                        this->vk_tilde_g2_precomp == other.vk_tilde_g2_precomp &&
-                                        this->vk_alpha_tilde_g2_precomp == other.vk_alpha_tilde_g2_precomp &&
-                                        this->vk_Z_g2_precomp == other.vk_Z_g2_precomp &&
-                                        this->pairing_of_g1_and_g2 == other.pairing_of_g1_and_g2 &&
-                                        this->encoded_IC_query == other.encoded_IC_query);
-                            }
-                        };
+                        typedef uscs_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the USCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        struct keypair {
-                            proving_key pk;
-                            verification_key vk;
-
-                            keypair() {};
-                            keypair(proving_key &&pk, verification_key &&vk) : pk(std::move(pk)), vk(std::move(vk)) {
-                            }
-
-                            keypair(keypair &&other) = default;
-                        };
+                        typedef uscs_ppzksnark_keypair<proving_key, verification_key> keypair;
 
                         /*********************************** Proof ***********************************/
 
@@ -264,49 +135,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        struct proof {
-                            typename CurveType::g1_type::value_type V_g1;
-                            typename CurveType::g1_type::value_type alpha_V_g1;
-                            typename CurveType::g1_type::value_type H_g1;
-                            typename CurveType::g2_type::value_type V_g2;
-
-                            proof() {
-                                // invalid proof with valid curve points
-                                this->V_g1 = typename CurveType::g1_type::value_type::one();
-                                this->alpha_V_g1 = typename CurveType::g1_type::value_type::one();
-                                this->H_g1 = typename CurveType::g1_type::value_type::one();
-                                this->V_g2 = typename CurveType::g2_type::value_type::one();
-                            }
-                            proof(typename CurveType::g1_type::value_type &&V_g1,
-                                  typename CurveType::g1_type::value_type &&alpha_V_g1,
-                                  typename CurveType::g1_type::value_type &&H_g1,
-                                  typename CurveType::g2_type::value_type &&V_g2) :
-                                V_g1(std::move(V_g1)),
-                                alpha_V_g1(std::move(alpha_V_g1)), H_g1(std::move(H_g1)), V_g2(std::move(V_g2)) {};
-
-                            std::size_t G1_size() const {
-                                return 3;
-                            }
-
-                            std::size_t G2_size() const {
-                                return 1;
-                            }
-
-                            std::size_t size_in_bits() const {
-                                return G1_size() * CurveType::g1_type::value_bits +
-                                       G2_size() * CurveType::g2_type::value_bits;
-                            }
-
-                            bool is_well_formed() const {
-                                return (V_g1.is_well_formed() && alpha_V_g1.is_well_formed() && H_g1.is_well_formed() &&
-                                        V_g2.is_well_formed());
-                            }
-
-                            bool operator==(const proof &other) const {
-                                return (this->V_g1 == other.V_g1 && this->alpha_V_g1 == other.alpha_V_g1 &&
-                                        this->H_g1 == other.H_g1 && this->V_g2 == other.V_g2);
-                            }
-                        };
+                        typedef uscs_ppzksnark_proof<CurveType> proof;
                     };
                 }    // namespace detail
             }        // namespace snark

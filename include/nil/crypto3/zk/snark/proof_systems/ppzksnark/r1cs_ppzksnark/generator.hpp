@@ -87,19 +87,19 @@ namespace nil {
 
                     template<typename CurveType>
                     class r1cs_ppzksnark_generator {
-                        using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
+                        typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
-                        typedef typename types_policy::constraint_system constraint_system_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                        typedef typename policy_type::constraint_system constraint_system_type;
+                        typedef typename policy_type::primary_input primary_input_type;
+                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                        typedef typename policy_type::proving_key proving_key_type;
+                        typedef typename policy_type::verification_key verification_key_type;
+                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                        typedef typename policy_type::keypair keypair_type;
+                        typedef typename policy_type::proof proof_type;
 
                         static inline keypair_type process(const constraint_system_type &constraint_system) {
 
@@ -116,7 +116,7 @@ namespace nil {
                                 algebra::random_element<scalar_field_type>();
 
                             qap_instance_evaluation<scalar_field_type> qap_inst =
-                                r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(cs_copy, t);
+                                reductions::r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(cs_copy, t);
 
                             std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
                             for (std::size_t i = 0; i < qap_inst.num_variables + 1; ++i) {

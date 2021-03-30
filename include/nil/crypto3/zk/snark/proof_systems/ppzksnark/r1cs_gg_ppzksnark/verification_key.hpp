@@ -38,93 +38,69 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace detail {
-                    template<typename CurveType>
-                    struct r1cs_gg_ppzksnark_verification_key {
-                        typedef CurveType curve_type;
+                template<typename CurveType>
+                struct r1cs_gg_ppzksnark_verification_key {
+                    typedef CurveType curve_type;
 
-                        typename CurveType::gt_type::value_type alpha_g1_beta_g2;
-                        typename CurveType::g2_type::value_type gamma_g2;
-                        typename CurveType::g2_type::value_type delta_g2;
+                    typename CurveType::gt_type::value_type alpha_g1_beta_g2;
+                    typename CurveType::g2_type::value_type gamma_g2;
+                    typename CurveType::g2_type::value_type delta_g2;
 
-                        accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
+                    accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
-                        r1cs_gg_ppzksnark_verification_key() = default;
-                        r1cs_gg_ppzksnark_verification_key(
-                            const typename CurveType::gt_type::value_type &alpha_g1_beta_g2,
-                            const typename CurveType::g2_type::value_type &gamma_g2,
-                            const typename CurveType::g2_type::value_type &delta_g2,
-                            const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
-                            alpha_g1_beta_g2(alpha_g1_beta_g2),
-                            gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
+                    r1cs_gg_ppzksnark_verification_key() = default;
+                    r1cs_gg_ppzksnark_verification_key(
+                        const typename CurveType::gt_type::value_type &alpha_g1_beta_g2,
+                        const typename CurveType::g2_type::value_type &gamma_g2,
+                        const typename CurveType::g2_type::value_type &delta_g2,
+                        const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
+                        alpha_g1_beta_g2(alpha_g1_beta_g2),
+                        gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
 
-                        std::size_t G1_size() const {
-                            return gamma_ABC_g1.size();
-                        }
+                    std::size_t G1_size() const {
+                        return gamma_ABC_g1.size();
+                    }
 
-                        std::size_t G2_size() const {
-                            return 2;
-                        }
+                    std::size_t G2_size() const {
+                        return 2;
+                    }
 
-                        std::size_t GT_size() const {
-                            return 1;
-                        }
+                    std::size_t GT_size() const {
+                        return 1;
+                    }
 
-                        std::size_t size_in_bits() const {
-                            // TODO: include GT size
-                            return (gamma_ABC_g1.size_in_bits() + 2 * CurveType::g2_type::value_bits);
-                        }
+                    std::size_t size_in_bits() const {
+                        // TODO: include GT size
+                        return (gamma_ABC_g1.size_in_bits() + 2 * CurveType::g2_type::value_bits);
+                    }
 
-                        bool operator==(const r1cs_gg_ppzksnark_verification_key &other) const {
-                            return (this->alpha_g1_beta_g2 == other.alpha_g1_beta_g2 &&
-                                    this->gamma_g2 == other.gamma_g2 && this->delta_g2 == other.delta_g2 &&
-                                    this->gamma_ABC_g1 == other.gamma_ABC_g1);
-                        }
+                    bool operator==(const r1cs_gg_ppzksnark_verification_key &other) const {
+                        return (this->alpha_g1_beta_g2 == other.alpha_g1_beta_g2 && this->gamma_g2 == other.gamma_g2 &&
+                                this->delta_g2 == other.delta_g2 && this->gamma_ABC_g1 == other.gamma_ABC_g1);
+                    }
+                };
 
-                        /*static verification_key dummy_verification_key(const std::size_t input_size) {
-                            verification_key result;
-                            result.alpha_g1_beta_g2 =
-                                algebra::random_element<typename CurveType::scalar_field_type>() *
-                                algebra::random_element<typename CurveType::gt_type>();
-                            result.gamma_g2 = algebra::random_element<typename CurveType::g2_type>();
-                            result.delta_g2 = algebra::random_element<typename CurveType::g2_type>();
+                template<typename CurveType>
+                struct r1cs_gg_ppzksnark_processed_verification_key {
+                    typedef CurveType curve_type;
+                    typedef typename CurveType::pairing_policy pairing_policy;
 
-                            typename CurveType::g1_type::value_type base =
-                                algebra::random_element<typename CurveType::g1_type>();
-                            typename std::vector<typename CurveType::g1_type::value_type> v;
-                            for (std::size_t i = 0; i < input_size; ++i) {
-                                v.emplace_back(algebra::random_element<typename CurveType::g1_type>());
-                            }
+                    typename CurveType::gt_type::value_type vk_alpha_g1_beta_g2;
+                    typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
+                    typename pairing_policy::G2_precomp vk_delta_g2_precomp;
 
-                            result.gamma_ABC_g1 =
-                                accumulation_vector<typename CurveType::g1_type>(std::move(base), std::move(v));
+                    accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 
-                            return result;
-                        }*/
-                    };
-
-                    template<typename CurveType>
-                    struct r1cs_gg_ppzksnark_processed_verification_key {
-                        typedef CurveType curve_type;
-                        typedef typename CurveType::pairing_policy pairing_policy;
-
-                        typename CurveType::gt_type::value_type vk_alpha_g1_beta_g2;
-                        typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
-                        typename pairing_policy::G2_precomp vk_delta_g2_precomp;
-
-                        accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
-
-                        bool operator==(const r1cs_gg_ppzksnark_processed_verification_key &other) const {
-                            return (this->vk_alpha_g1_beta_g2 == other.vk_alpha_g1_beta_g2 &&
-                                    this->vk_gamma_g2_precomp == other.vk_gamma_g2_precomp &&
-                                    this->vk_delta_g2_precomp == other.vk_delta_g2_precomp &&
-                                    this->gamma_ABC_g1 == other.gamma_ABC_g1);
-                        }
-                    };
-                }    // namespace detail
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                    bool operator==(const r1cs_gg_ppzksnark_processed_verification_key &other) const {
+                        return (this->vk_alpha_g1_beta_g2 == other.vk_alpha_g1_beta_g2 &&
+                                this->vk_gamma_g2_precomp == other.vk_gamma_g2_precomp &&
+                                this->vk_delta_g2_precomp == other.vk_delta_g2_precomp &&
+                                this->gamma_ABC_g1 == other.gamma_ABC_g1);
+                    }
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP

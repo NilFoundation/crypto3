@@ -23,40 +23,37 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_PROOF_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_PROOF_HPP
+#ifndef CRYPTO3_R1CS_SE_PPZKSNARK_PROOF_HPP
+#define CRYPTO3_R1CS_SE_PPZKSNARK_PROOF_HPP
 
-#include <memory>
-
-#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
-
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /**
+                 * A proof for the R1CS SEppzkSNARK.
+                 *
+                 * While the proof has a structure, externally one merely opaquely produces,
+                 * serializes/deserializes, and verifies proofs. We only expose some information
+                 * about the structure for statistics purposes.
+                 */
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_proof {
+                class r1cs_se_ppzksnark_proof {
                     typedef CurveType curve_type;
 
-                    typename CurveType::g1_type::value_type g_A;
-                    typename CurveType::g2_type::value_type g_B;
-                    typename CurveType::g1_type::value_type g_C;
+                    typename CurveType::g1_type::value_type A;
+                    typename CurveType::g2_type::value_type B;
+                    typename CurveType::g1_type::value_type C;
 
-                    r1cs_gg_ppzksnark_proof() {
-                        // invalid proof with valid curve points
-                        this->g_A = CurveType::g1_type::value_type::one();
-                        this->g_B = CurveType::g2_type::value_type::one();
-                        this->g_C = CurveType::g1_type::value_type::one();
+                    r1cs_se_ppzksnark_proof() {
                     }
-                    r1cs_gg_ppzksnark_proof(typename CurveType::g1_type::value_type &&g_A,
-                                            typename CurveType::g2_type::value_type &&g_B,
-                                            typename CurveType::g1_type::value_type &&g_C) :
-                        g_A(std::move(g_A)),
-                        g_B(std::move(g_B)), g_C(std::move(g_C)) {};
+                    r1cs_se_ppzksnark_proof(typename CurveType::g1_type::value_type &&A,
+                                            typename CurveType::g2_type::value_type &&B,
+                                            typename CurveType::g1_type::value_type &&C) :
+                        A(std::move(A)),
+                        B(std::move(B)), C(std::move(C)) {};
 
                     std::size_t G1_size() const {
                         return 2;
@@ -71,11 +68,11 @@ namespace nil {
                     }
 
                     bool is_well_formed() const {
-                        return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
+                        return (A.is_well_formed() && B.is_well_formed() && C.is_well_formed());
                     }
 
-                    bool operator==(const r1cs_gg_ppzksnark_proof &other) const {
-                        return (this->g_A == other.g_A && this->g_B == other.g_B && this->g_C == other.g_C);
+                    bool operator==(const r1cs_se_ppzksnark_proof &other) const {
+                        return (this->A == other.A && this->B == other.B && this->C == other.C);
                     }
                 };
             }    // namespace snark
@@ -83,4 +80,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
+#endif    // CRYPTO3_R1CS_PPZKSNARK_BASIC_PROVER_HPP

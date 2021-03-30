@@ -88,7 +88,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_process_vk {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;
@@ -131,7 +131,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_online_verifier_weak_input_consistency {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;
@@ -218,7 +218,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_weak_input_consistency {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;
@@ -251,7 +251,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_online_verifier_strong_input_consistency {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;
@@ -289,7 +289,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class uscs_ppzksnark_verifier_strong_input_consistency {
-                        typedef detail::uscs_ppzksnark_basic_policy<CurveType> policy_type;
+                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
                     public:
                         typedef typename policy_type::constraint_system constraint_system_type;

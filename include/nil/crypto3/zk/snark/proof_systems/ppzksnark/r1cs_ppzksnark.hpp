@@ -43,7 +43,7 @@ namespace nil {
                          typename OnlineVerifier =
                              policies::r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_ppzksnark {
-                    using types_policy = detail::r1cs_ppzksnark_types_policy<CurveType>;
+                    using types_policy = detail::r1cs_ppzksnark_policy<CurveType>;
 
                 public:
                     typedef Generator generator_type;
