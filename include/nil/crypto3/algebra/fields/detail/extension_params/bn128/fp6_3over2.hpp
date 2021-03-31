@@ -79,12 +79,11 @@ namespace nil {
                         constexpr static const std::array<modulus_type, 6 * 2> Frobenius_coeffs_c2 = {
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 2> const
+                    constexpr typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue_type const
                         fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>

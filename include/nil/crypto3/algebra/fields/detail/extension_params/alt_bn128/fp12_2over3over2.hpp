@@ -114,13 +114,12 @@ namespace nil {
                             0x290C83BF3D14634DB120850727BB392D6A86D50BD34B19B929BC44B896723B38_cppui254,
                             0x23BD9E3DA9136A739F668E1ADC9EF7F0F575EC93F71A8DF953C846338C32A1AB_cppui254};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr std::array<
-                        typename fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::modulus_type,
-                        2> const fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::non_residue;
+                    constexpr typename fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::non_residue_type
+                         const fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
                     constexpr std::array<

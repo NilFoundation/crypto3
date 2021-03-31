@@ -115,7 +115,7 @@ namespace nil {
                             0x5B2CFD9013A5FD8DF47FA6B48B1E045F39816240C0B8FEE8BEADF4D8E9C0566C63A3E6E257F87329B18FAE980078116_cppui379,
                             0x144E4211384586C16BD3AD4AFA99CC9170DF3560E77982D0DB45F3536814F0BD5871C1908BD478CD1EE605167FF82995_cppui381};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0x01, 0x01};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x01, 0x01);
                     };
 
                     /************************* BLS12-377 ***********************************/
@@ -190,14 +190,14 @@ namespace nil {
                             0xE0C97AD7FBDAB63937B3EBD47E0A1B36A986DEEF71F15C288ED7951A488E3B332941CFC8F883FAFFCA93E41F1603CF_cppui376,
                             0x00};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0x00, 0x01};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x00, 0x01);
                     };
 
-                    constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::modulus_type, 2> const
+                    constexpr 
+                        typename fp12_2over3over2_extension_params<bls12_base_field<381>>::non_residue_type const
                         fp12_2over3over2_extension_params<bls12_base_field<381>>::non_residue;
-                    constexpr std::array<
-                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::modulus_type, 2> const
+                    constexpr 
+                        typename fp12_2over3over2_extension_params<bls12_base_field<377>>::non_residue_type const
                         fp12_2over3over2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr std::array<

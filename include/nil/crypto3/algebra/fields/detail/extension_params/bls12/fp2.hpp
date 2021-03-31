@@ -87,7 +87,7 @@ namespace nil {
                             0x01,
                             0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381};
 
-                        constexpr static const modulus_type non_residue = modulus_type(
+                        constexpr static const non_residue_type non_residue = non_residue_type(
                             0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381);
                     };
 
@@ -134,13 +134,13 @@ namespace nil {
                             0x01,
                             0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000000_cppui377};
 
-                        constexpr static const modulus_type non_residue = modulus_type(
+                        constexpr static const non_residue_type non_residue = non_residue_type(
                             0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
                     };
 
-                    constexpr typename fp2_extension_params<bls12_base_field<381>>::modulus_type const
+                    constexpr typename fp2_extension_params<bls12_base_field<381>>::non_residue_type const
                         fp2_extension_params<bls12_base_field<381>>::non_residue;
-                    constexpr typename fp2_extension_params<bls12_base_field<377>>::modulus_type const
+                    constexpr typename fp2_extension_params<bls12_base_field<377>>::non_residue_type const
                         fp2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr typename std::size_t const fp2_extension_params<bls12_base_field<381>>::s;

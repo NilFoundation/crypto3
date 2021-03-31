@@ -78,11 +78,11 @@ namespace nil {
                             0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182,
                             0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182};
 
-                        constexpr static const modulus_type non_residue = modulus_type(0x3D);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x3D);
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type const
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::non_residue_type const
                         fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>
