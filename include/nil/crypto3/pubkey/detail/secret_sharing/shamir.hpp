@@ -184,8 +184,8 @@ namespace nil {
 
                         private_element_type secret = private_element_type::zero();
                         indexes_type indexes = get_shares_indexes(shares);
-                        for (const auto &[i, s_i] : shares) {
-                            secret = secret + s_i * eval_basis_poly(indexes, id_i ? id_i : i);
+                        for (const auto &[i, s] : shares) {
+                            secret = secret + s * eval_basis_poly(indexes, id_i ? id_i : i);
                         }
                         return secret;
                     }

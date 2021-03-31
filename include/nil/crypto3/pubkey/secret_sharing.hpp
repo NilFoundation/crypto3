@@ -91,6 +91,14 @@ namespace nil {
 
                 template<typename Weight>
                 using check_weight_type = typename base_type::ops_type::template check_indexed_weight_type<Weight>;
+
+                template<typename Share>
+                using check_share_type =
+                    typename base_type::ops_type::template check_indexed_weighted_share_type<Share>;
+
+                template<typename Shares>
+                using check_shares_type =
+                    typename base_type::ops_type::template check_indexed_weighted_shares_type<Shares>;
             };
 
             template<typename Group>

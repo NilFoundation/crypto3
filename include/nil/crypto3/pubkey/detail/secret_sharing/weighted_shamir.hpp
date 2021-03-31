@@ -65,6 +65,26 @@ namespace nil {
                         std::is_same<get_indexed_weight_type<IndexedWeight>, IndexedWeight>::value,
                         bool>::type;
 
+                    template<typename IndexedWeightedShare,
+                             typename Index = typename IndexedWeightedShare::first_type,
+                             typename WeightedShare = typename IndexedWeightedShare::second_type,
+                             typename Share = typename WeightedShare::first_type,
+                             typename Shares = typename WeightedShare::second_type,
+                             typename base_type::template check_index_type<Index> = true,
+                             typename base_type::template check_private_element_type<Share> = true,
+                             typename base_type::template check_indexed_private_elements_type<Shares> = true>
+                    using get_indexed_weighted_share_type = std::pair<Index, WeightedShare>;
+
+                    template<typename IndexedWeightedShare>
+                    using check_indexed_weighted_share_type =
+                        typename std::enable_if<std::is_same<get_indexed_weighted_share_type<IndexedWeightedShare>,
+                                                             IndexedWeightedShare>::value,
+                                                bool>::type;
+
+                    template<typename IndexedWeightedShares>
+                    using check_indexed_weighted_shares_type =
+                        check_indexed_weighted_share_type<typename IndexedWeightedShares::value_type>;
+
                     //===========================================================================
                     // shares dealing functions
 
@@ -101,14 +121,14 @@ namespace nil {
                         assert(base_type::check_t(t, n));
 
                         separated_shares_type separated_shares;
-                        for (auto [i, w_i] : weights) {
-                            assert(check_weight(w_i));
+                        for (auto w_i : weights) {
+                            assert(check_weight(w_i, n));
                             typename separated_share_type::second_type i_shares;
-                            for (std::size_t j = 1; j <= w_i; j++) {
-                                std::size_t id_ij = i * t + j;
+                            for (std::size_t j = 1; j <= w_i.second; j++) {
+                                std::size_t id_ij = w_i.first * t + j;
                                 assert(i_shares.emplace(base_type::deal_share(coeffs, id_ij)).second);
                             }
-                            assert(separated_shares.emplace(i, i_shares).second);
+                            assert(separated_shares.emplace(w_i.first, i_shares).second);
                         }
                         return separated_shares;
                     }
@@ -122,6 +142,17 @@ namespace nil {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SeparatedShare>));
                         assert(base_type::check_participant_index(i));
                         return base_type::reconstruct_secret(separated_share, i);
+                    }
+
+                    template<typename Shares, check_indexed_weighted_shares_type<Shares> = true>
+                    static inline private_element_type reconstruct_secret(const Shares &shares) {
+                        typename base_type::shares_type _shares;
+                        for (const auto &[i, s] : shares) {
+                            for (const auto &_s : s.second) {
+                                _shares.emplace(_s);
+                            }
+                        }
+                        return base_type::reconstruct_secret(_shares);
                     }
 
                     template<typename Weight,

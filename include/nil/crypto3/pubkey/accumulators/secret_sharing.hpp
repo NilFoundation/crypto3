@@ -251,9 +251,8 @@ namespace nil {
                                      pubkey::shamir_sss<typename Mode::scheme_type::group_type>>::value ||
                         std::is_same<typename Mode::scheme_type,
                                      pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value ||
-                        std::is_same<
-                            typename Mode::scheme_type,
-                            pubkey::detail::weighted_shamir_sss<typename Mode::scheme_type::group_type>>::value>::type>
+                        std::is_same<typename Mode::scheme_type,
+                                     pubkey::weighted_shamir_sss<typename Mode::scheme_type::group_type>>::value>::type>
                     : boost::accumulators::accumulator_base {
                 protected:
                     typedef typename Mode::scheme_type scheme_type;
@@ -358,7 +357,8 @@ namespace nil {
                     }
 
                 protected:
-                    template<typename PublicCoeff, typename InputIterator,
+                    template<typename PublicCoeff,
+                             typename InputIterator,
                              typename key_type::template check_public_coeff_type<PublicCoeff> = true>
                     inline void resolve_type(const PublicCoeff &public_coeff, InputIterator) {
                         verification_value =
@@ -366,7 +366,8 @@ namespace nil {
                         seen_coeffs++;
                     }
 
-                    template<typename PublicCoeffs,
+                    template<
+                        typename PublicCoeffs,
                         typename InputIterator,
                         typename key_type::template check_public_coeff_type<typename PublicCoeffs::value_type> = true>
                     inline void resolve_type(const PublicCoeffs &public_coeffs, InputIterator dont_care) {
@@ -376,8 +377,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator,
-                        typename key_type::template check_public_coeff_type<
-                            typename std::iterator_traits<InputIterator>::value_type> = true>
+                             typename key_type::template check_public_coeff_type<
+                                 typename std::iterator_traits<InputIterator>::value_type> = true>
                     inline void resolve_type(InputIterator first, InputIterator last) {
                         for (auto it = first; it != last; it++) {
                             resolve_type(*it, last);
