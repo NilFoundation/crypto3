@@ -87,11 +87,11 @@ namespace nil {
                             0x01,
                             0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298};
 
-                        constexpr static const modulus_type non_residue = modulus_type(0x11);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x11);
                     };
 
                     template<std::size_t ModulusBits>
-                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
+                    constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits>>::non_residue_type const
                         fp2_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
 
                     template<std::size_t ModulusBits>

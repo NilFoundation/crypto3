@@ -111,7 +111,7 @@ namespace nil {
                             0x5F19672FDF76CE51BA69C6076A0F77EADDB3A93BE6F89688DE17D813620A00022E01FFFFFFFEFFFF_cppui319,
                             0x00};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0x01, 0x01};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x01, 0x01);
                     };
 
                     /************************* BLS12-377 ***********************************/
@@ -186,13 +186,13 @@ namespace nil {
                             0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377,
                             0x00};
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0x00, 0x01};
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x00, 0x01);
                     };
 
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381>>::modulus_type,
-                                         2> const fp6_3over2_extension_params<bls12_base_field<381>>::non_residue;
-                    constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<377>>::modulus_type,
-                                         2> const fp6_3over2_extension_params<bls12_base_field<377>>::non_residue;
+                    constexpr typename fp6_3over2_extension_params<bls12_base_field<381>>::non_residue_type
+                                         const fp6_3over2_extension_params<bls12_base_field<381>>::non_residue;
+                    constexpr typename fp6_3over2_extension_params<bls12_base_field<377>>::non_residue_type
+                                         const fp6_3over2_extension_params<bls12_base_field<377>>::non_residue;
 
                     constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381>>::modulus_type,
                                          6 * 2> const
