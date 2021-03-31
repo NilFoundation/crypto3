@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_PUBKEY_SECRET_SHARING_SCHEME_STATE_HPP
 #define CRYPTO3_PUBKEY_SECRET_SHARING_SCHEME_STATE_HPP
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/sum.hpp>
+
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
@@ -34,20 +37,29 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename Scheme>
+            template<typename Mode>
+            using share_dealing_accumulator_set =
+                boost::accumulators::accumulator_set<typename Mode::scheme_type::private_element_type,
+                                                     boost::accumulators::features<boost::accumulators::tag::sum>>;
+
+            template<typename Mode>
+            using public_coeffs_reducing_accumulator_set =
+                boost::accumulators::accumulator_set<typename Mode::scheme_type::public_element_type,
+                                                     boost::accumulators::features<boost::accumulators::tag::sum>>;
+
+            template<typename Mode>
             using shares_dealing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::shares_type,
-                boost::accumulators::features<accumulators::tag::deal_shares<Scheme>>>;
+                typename Mode::scheme_type::shares_type,
+                boost::accumulators::features<accumulators::tag::deal_shares<Mode>>>;
 
-            template<typename Scheme>
+            template<typename Mode>
             using secret_reconstructing_accumulator_set = boost::accumulators::accumulator_set<
-                typename Scheme::private_element_type,
-                boost::accumulators::features<accumulators::tag::reconstruct_secret<Scheme>>>;
+                typename Mode::scheme_type::private_element_type,
+                boost::accumulators::features<accumulators::tag::reconstruct_secret<Mode>>>;
 
-            template<typename Scheme>
+            template<typename Mode>
             using share_verification_accumulator_set = boost::accumulators::accumulator_set<
-                bool,
-                boost::accumulators::features<accumulators::tag::verify_share<Scheme>>>;
+                bool, boost::accumulators::features<accumulators::tag::verify_share<Mode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

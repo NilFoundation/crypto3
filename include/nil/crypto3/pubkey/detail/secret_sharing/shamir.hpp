@@ -283,6 +283,11 @@ namespace nil {
                         return public_share_type(s.first, get_public_element(s.second));
                     }
 
+                    template<typename PublicShare, check_indexed_public_element_type<PublicShare> = true>
+                    static inline public_share_type get_public_share(const PublicShare &ps) {
+                        return ps;
+                    }
+
                     static inline public_element_type get_public_element(const private_element_type &s) {
                         return s * public_element_type::one();
                     }
@@ -295,6 +300,11 @@ namespace nil {
                     template<typename Number, check_number_type<Number> = true>
                     static inline bool check_participant_index(Number i) {
                         return i > 0;
+                    }
+
+                    template<typename Number1, typename Number2, check_number_type<Number1> = true, check_number_type<Number2> = true>
+                    static inline bool check_participant_index(Number1 i, Number2 n) {
+                        return i > 0 && i <= n;
                     }
 
                     template<typename Number, check_number_type<Number> = true>

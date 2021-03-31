@@ -26,76 +26,230 @@
 #ifndef CRYPTO3_PUBKEY_SECRET_SHARING_HPP
 #define CRYPTO3_PUBKEY_SECRET_SHARING_HPP
 
-#include <nil/crypto3/pubkey/pk_keys.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/pubkey/detail/stream_processor.hpp>
+
+#include <nil/crypto3/pubkey/detail/secret_sharing/shamir.hpp>
+#include <nil/crypto3/pubkey/detail/secret_sharing/weighted_shamir.hpp>
+#include <nil/crypto3/pubkey/detail/secret_sharing/feldman.hpp>
+
+#include <nil/crypto3/pubkey/no_key_ops.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            namespace detail {
-                template<typename PubkeyScheme, template<typename Group> SecretSharingScheme>
-                struct secret_sharing_scheme_policy {
-                    typedef PubkeyScheme pubkey_scheme_type;
-                    typedef typename pubkey_scheme_type::signature_type signature_type;
-                    typedef typename signature_type::group_type group_type;
-                    typedef SecretSharingScheme<group_type> scheme_type;
+            template<typename Ops>
+            struct secret_sharing_policy {
+                typedef Ops ops_type;
+
+                typedef typename ops_type::group_type group_type;
+                typedef typename ops_type::private_element_type private_element_type;
+                typedef typename ops_type::public_element_type public_element_type;
+                typedef typename ops_type::share_type share_type;
+                typedef typename ops_type::shares_type shares_type;
+                typedef typename ops_type::public_share_type public_share_type;
+                typedef typename ops_type::public_shares_type public_shares_type;
+                typedef typename ops_type::coeff_type coeff_type;
+                typedef typename ops_type::coeffs_type coeffs_type;
+                typedef typename ops_type::public_coeff_type public_coeff_type;
+                typedef typename ops_type::public_coeffs_type public_coeffs_type;
+
+                template<typename Share>
+                using check_share_type = typename ops_type::template check_indexed_private_element_type<Share>;
+
+                template<typename Shares>
+                using check_shares_type = typename ops_type::template check_indexed_private_elements_type<Shares>;
+
+                template<typename Coeff>
+                using check_coeff_type = typename ops_type::template check_private_element_type<Coeff>;
+
+                template<typename PublicCoeff>
+                using check_public_coeff_type = typename ops_type::template check_public_element_type<PublicCoeff>;
+
+                template<typename Mode, typename AccumulatorSet, std::size_t ValueBits = 0>
+                struct stream_processor {
+                    struct params_type {
+                        typedef stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                    };
+                    typedef ::nil::crypto3::pubkey::stream_processor<Mode, AccumulatorSet, params_type> type;
                 };
-
-                template<typename PubkeyScheme, template<typename Group> SecretSharingScheme>
-                struct secret_sharing_policy : secret_sharing_scheme_policy<PubkeyScheme, SecretSharingScheme> {
-                    typedef secret_sharing_policy<PubkeyScheme, SecretSharingScheme> policy_type;
-                    typedef policy_type::pubkey_scheme_type pubkey_scheme_type;
-                    typedef policy_type::scheme_type scheme_type;
-
-                    typedef std::vector<private_key<pubkey_scheme_type>> result_type;
-
-                    template<typename... Args>
-                    static inline result_type process(const Args &...args) {
-                        auto secrets = scheme_type::deal_shares(args...);
-                        result_type result;
-                        for (const auto &s : secrets) {
-                            result.emplace_back(s);
-                        }
-                        return result;
-                    }
-                };
-
-                template<typename PubkeyScheme, template<typename Group> SecretSharingScheme>
-                struct secret_reconstructing_policy : secret_sharing_scheme_policy<PubkeyScheme, SecretSharingScheme> {
-                    typedef secret_sharing_policy<PubkeyScheme, SecretSharingScheme> policy_type;
-                    typedef policy_type::pubkey_scheme_type pubkey_scheme_type;
-                    typedef policy_type::scheme_type scheme_type;
-
-                    typedef private_key<pubkey_scheme_type> result_type;
-                };
-
-                template<typename PubkeyScheme, template<typename Group> SecretSharingScheme>
-                struct secret_verification_policy : secret_sharing_scheme_policy<PubkeyScheme, SecretSharingScheme> {
-                    typedef secret_sharing_policy<PubkeyScheme, SecretSharingScheme> policy_type;
-                    typedef policy_type::pubkey_scheme_type pubkey_scheme_type;
-                    typedef policy_type::scheme_type scheme_type;
-
-                    typedef public_key<pubkey_scheme_type> pubkey_type;
-
-                    typedef bool result_type;
-
-                    template<typename... Args>
-                    static inline result_type process(const pubkey_type &pubkey, const Args &...args) {
-                        return pubkey.verify_share(args...);
-                    }
-                };
-            }    // namespace detail
-
-            template<typename PubkeyScheme, template<typename Group> SecretSharingScheme>
-            struct secret_sharing_scheme : detail::secret_sharing_scheme_policy<PubkeyScheme, SecretSharingScheme> {
-                typedef secret_sharing_policy<PubkeyScheme, SecretSharingScheme> policy_type;
-                typedef policy_type::scheme_type scheme_type;
-
-                typedef detail::secret_sharing_policy<PubkeyScheme, SecretSharingScheme> sharing_policy;
-                typedef detail::secret_reconstructing_policy<PubkeyScheme, SecretSharingScheme> reconstructing_policy;
-                typedef typename detail::secret_verification_policy<PubkeyScheme, SecretSharingScheme> verification_policy;
             };
 
+            template<typename Group>
+            struct shamir_sss : secret_sharing_policy<detail::shamir_sss<Group>> { };
 
+            template<typename Group>
+            struct weighted_shamir_sss : secret_sharing_policy<detail::weighted_shamir_sss<Group>> {
+            private:
+                typedef secret_sharing_policy<detail::weighted_shamir_sss<Group>> base_type;
+
+            public:
+                typedef typename base_type::ops_type::weight_type weight_type;
+                typedef typename base_type::ops_type::weights_type weights_type;
+
+                template<typename Weight>
+                using check_weight_type = typename base_type::ops_type::template check_indexed_weight_type<Weight>;
+            };
+
+            template<typename Group>
+            struct feldman_sss : secret_sharing_policy<detail::feldman_sss<Group>> { };
+
+            template<typename Group>
+            struct no_key_ops<shamir_sss<Group>> : shamir_sss<Group> {
+                typedef shamir_sss<Group> scheme_type;
+
+                template<typename Number1, typename Number2>
+                static inline typename scheme_type::coeffs_type get_poly(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::get_poly(t, n);
+                }
+
+                template<typename Coeffs>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
+                    return scheme_type::ops_type::get_public_coeffs(coeffs);
+                }
+
+                template<typename Coeffs, typename Number>
+                static inline typename scheme_type::shares_type deal_shares(const Coeffs &coeffs, Number n) {
+                    return scheme_type::ops_type::deal_shares(coeffs, n);
+                }
+
+                template<typename Shares>
+                static inline typename scheme_type::private_element_type reconstruct_secret(const Shares &shares) {
+                    return scheme_type::ops_type::reconstruct_secret(shares);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_t(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::check_t(t, n);
+                }
+
+                template<typename Number>
+                static inline bool check_minimal_size(Number n) {
+                    return scheme_type::ops_type::check_minimal_size(n);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_participant_index(Number1 i, Number2 n) {
+                    return scheme_type::ops_type::check_participant_index(i, n);
+                }
+
+                template<typename Coeff, typename Number, typename Share>
+                static inline typename scheme_type::share_type partial_eval_share(const Coeff &coeff, Number exp,
+                                                                                  const Share &init_share_value) {
+                    return scheme_type::ops_type::partial_eval_share(coeff, exp, init_share_value);
+                }
+            };
+
+            template<typename Group>
+            struct no_key_ops<weighted_shamir_sss<Group>> : weighted_shamir_sss<Group> {
+                typedef weighted_shamir_sss<Group> scheme_type;
+
+                template<typename Number1, typename Number2>
+                static inline typename scheme_type::coeffs_type get_poly(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::get_poly(t, n);
+                }
+
+                template<typename Coeffs>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
+                    return scheme_type::ops_type::get_public_coeffs(coeffs);
+                }
+
+                template<typename Coeffs, typename Number>
+                static inline typename scheme_type::shares_type deal_shares(const Coeffs &coeffs, Number n) {
+                    return scheme_type::ops_type::deal_shares(coeffs, n);
+                }
+
+                template<typename Shares>
+                static inline typename scheme_type::private_element_type reconstruct_secret(const Shares &shares) {
+                    return scheme_type::ops_type::reconstruct_secret(shares);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_t(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::check_t(t, n);
+                }
+
+                template<typename Number>
+                static inline bool check_minimal_size(Number n) {
+                    return scheme_type::ops_type::check_minimal_size(n);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_participant_index(Number1 i, Number2 n) {
+                    return scheme_type::ops_type::check_participant_index(i, n);
+                }
+
+                template<typename Weight, typename Number>
+                static inline bool check_weight(const Weight &w, Number n) {
+                    return scheme_type::ops_type::check_weight(w, n);
+                }
+            };
+
+            template<typename Group>
+            struct no_key_ops<feldman_sss<Group>> : feldman_sss<Group> {
+                typedef feldman_sss<Group> scheme_type;
+
+                template<typename Number1, typename Number2>
+                static inline typename scheme_type::coeffs_type get_poly(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::get_poly(t, n);
+                }
+
+                template<typename Coeffs>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
+                    return scheme_type::ops_type::get_public_coeffs(coeffs);
+                }
+
+                template<typename Coeffs, typename Number>
+                static inline typename scheme_type::shares_type deal_shares(const Coeffs &coeffs, Number n) {
+                    return scheme_type::ops_type::deal_shares(coeffs, n);
+                }
+
+                template<typename Shares>
+                static inline typename scheme_type::private_element_type reconstruct_secret(const Shares &shares) {
+                    return scheme_type::ops_type::reconstruct_secret(shares);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_t(Number1 t, Number2 n) {
+                    return scheme_type::ops_type::check_t(t, n);
+                }
+
+                template<typename Number>
+                static inline bool check_minimal_size(Number n) {
+                    return scheme_type::ops_type::check_minimal_size(n);
+                }
+
+                template<typename Number1, typename Number2>
+                static inline bool check_participant_index(Number1 i, Number2 n) {
+                    return scheme_type::ops_type::check_participant_index(i, n);
+                }
+
+                template<typename Share>
+                static inline typename scheme_type::public_share_type get_public_share(const Share &share) {
+                    return scheme_type::ops_type::get_public_share(share);
+                }
+
+                template<typename PublicCoeffs, typename Share>
+                static inline bool verify_share(const PublicCoeffs &public_coeffs, const Share &share) {
+                    return scheme_type::ops_type::verify_share(public_coeffs, share);
+                }
+
+                template<typename Coeff, typename Number, typename Share>
+                static inline typename scheme_type::share_type partial_eval_share(const Coeff &coeff, Number exp,
+                                                                                  const Share &init_share_value) {
+                    return scheme_type::ops_type::partial_eval_share(coeff, exp, init_share_value);
+                }
+
+                template<typename PublicCoeff, typename Number, typename PublicShare>
+                static inline typename scheme_type::public_share_type
+                    partial_eval_verification_value(const PublicCoeff &public_coeff, Number exp,
+                                                    const PublicShare &init_verification_value) {
+                    return scheme_type::ops_type::partial_eval_verification_value(public_coeff, exp,
+                                                                                  init_verification_value);
+                }
+            };
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

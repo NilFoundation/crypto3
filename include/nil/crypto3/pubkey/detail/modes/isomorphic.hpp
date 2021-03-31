@@ -92,6 +92,9 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
                     typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
@@ -111,6 +114,9 @@ namespace nil {
 
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
 
                     typedef bool result_type;
 
@@ -132,6 +138,9 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
                     typedef typename key_type::signature_type result_type;
 
                     template<typename... Args>
@@ -152,11 +161,106 @@ namespace nil {
                     constexpr static const auto input_value_bits = key_type::input_value_bits;
                     typedef typename key_type::input_value_type input_value_type;
 
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
                     typedef bool result_type;
 
                     template<typename... Args>
                     inline static result_type process(const Args &...args) {
                         return key_type::aggregate_verify(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_shares_dealing_sss_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef no_key_ops<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = 0;
+                    typedef typename key_type::coeffs_type input_block_type;
+
+                    constexpr static const auto input_value_bits = 0;
+                    typedef typename key_type::coeff_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef typename scheme_type::shares_type result_type;
+
+                    template<typename... Args>
+                    static inline result_type process(const Args &...args) {
+                        return key_type::deal_shares(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_share_dealing_dkg_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef no_key_ops<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = 0;
+                    typedef typename key_type::shares_type input_block_type;
+
+                    constexpr static const auto input_value_bits = 0;
+                    typedef typename key_type::share_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef typename scheme_type::shares_type result_type;
+
+                    template<typename... Args>
+                    static inline result_type process(const Args &...args) {
+                        return key_type::deal_share(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_secret_reconstructing_sss_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef no_key_ops<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = 0;
+                    typedef typename key_type::shares_type input_block_type;
+
+                    constexpr static const auto input_value_bits = 0;
+                    typedef typename key_type::share_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename key_type::template check_share_type<ValueType>;
+
+                    typedef typename scheme_type::private_element_type result_type;
+
+                    template<typename... Args>
+                    static inline result_type process(const Args &...args) {
+                        return key_type::reconstruct_secret(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_share_verification_sss_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef no_key_ops<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = 0;
+                    typedef typename key_type::public_coeffs_type input_block_type;
+
+                    constexpr static const auto input_value_bits = 0;
+                    typedef typename key_type::public_coeff_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef typename scheme_type::shares_type result_type;
+
+                    template<typename... Args>
+                    static inline result_type process(const Args &...args) {
+                        return key_type::verify_share(args...);
                     }
                 };
 
@@ -174,6 +278,9 @@ namespace nil {
 
                     constexpr static const auto input_value_bits = policy_type::input_value_bits;
                     typedef typename policy_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename policy_type::template check_input_value_type<ValueType>;
 
                     typedef typename policy_type::result_type result_type;
 
@@ -212,6 +319,10 @@ namespace nil {
                     typedef detail::isomorphic_aggregation_policy<scheme_type, padding_type> aggregation_policy;
                     typedef detail::isomorphic_aggregated_verification_policy<scheme_type, padding_type>
                         aggregated_verification_policy;
+                    typedef detail::isomorphic_shares_dealing_sss_policy<scheme_type, padding_type> shares_dealing_sss_policy;
+                    typedef detail::isomorphic_secret_reconstructing_sss_policy<scheme_type, padding_type> secret_reconstructing_sss_policy;
+                    typedef detail::isomorphic_share_verification_sss_policy<scheme_type, padding_type> share_verification_sss_policy;
+                    typedef detail::isomorphic_share_dealing_dkg_policy<scheme_type, padding_type> share_dealing_dkg_policy;
 
                     template<typename Policy>
                     struct bind {

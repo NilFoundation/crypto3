@@ -52,9 +52,10 @@ namespace nil {
                              typename base_type::template check_indexed_private_elements_type<Shares> = true>
                     static inline share_type deal_share(const Shares &shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-                        assert(base_type::check_minimal_size(std::distance(shares.begin(), shares.end())));
-                        auto index = shares.begin().first;
-                        assert(base_type::check_participant_index(index));
+                        auto n = std::distance(shares.begin(), shares.end());
+                        assert(base_type::check_minimal_size(n));
+                        auto index = shares.begin()->first;
+                        assert(base_type::check_participant_index(index, n));
 
                         private_element_type share = private_element_type::zero();
                         for (auto &[i, s] : shares) {
@@ -66,7 +67,7 @@ namespace nil {
 
                     template<typename PublicCoeffs, typename base_type::template check_public_element_type<
                                                         typename PublicCoeffs::value_type> = true>
-                    static inline public_element_type reconstruct_public_coeff(const PublicCoeffs &coeffs) {
+                    static inline public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
                         assert(base_type::check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
                         return std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero());

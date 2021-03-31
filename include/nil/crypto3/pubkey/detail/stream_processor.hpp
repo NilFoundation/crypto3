@@ -85,7 +85,8 @@ namespace nil {
                 template<
                     typename InputIterator, bool ep = enable_packer,
                     typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                    typename std::enable_if<!ep && std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    typename std::enable_if<!ep, bool>::type = true,
+                    typename mode_type::template check_input_value_type<ValueType> = true>
                 inline void operator()(InputIterator first, InputIterator last) {
                     acc(first, nil::crypto3::accumulators::iterator_last = last);
                 }
@@ -93,7 +94,8 @@ namespace nil {
                 template<
                     typename SinglePassRange, bool ep = enable_packer,
                     typename ValueType = typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
-                    typename std::enable_if<!ep && std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    typename std::enable_if<!ep, bool>::type = true,
+                    typename mode_type::template check_input_value_type<ValueType> = true>
                 inline void operator()(const SinglePassRange &block) {
                     acc(block);
                 }

@@ -44,8 +44,11 @@ namespace nil {
                     typedef std::unordered_map<std::size_t, std::size_t> weights_type;
                     typedef std::pair<std::size_t, typename base_type::shares_type> separated_share_type;
                     typedef std::unordered_map<std::size_t, typename base_type::shares_type> separated_shares_type;
-                    typedef std::pair<std::size_t, std::pair<private_element_type, typename base_type::shares_type>> share_type;
-                    typedef std::unordered_map<std::size_t, std::pair<private_element_type, typename base_type::shares_type>> shares_type;
+                    typedef std::pair<std::size_t, std::pair<private_element_type, typename base_type::shares_type>>
+                        share_type;
+                    typedef std::unordered_map<std::size_t,
+                                               std::pair<private_element_type, typename base_type::shares_type>>
+                        shares_type;
 
                     //===========================================================================
                     // constraints checking meta-functions
@@ -77,7 +80,8 @@ namespace nil {
                         separated_shares_type separated_shares = deal_separated_shares(coeffs, weights);
                         shares_type shares;
                         for (const auto &[i, i_shares] : separated_shares) {
-                            assert(shares.emplace(i, std::make_pair(join_separated_share(i, i_shares), i_shares)).second);
+                            assert(
+                                shares.emplace(i, std::make_pair(join_separated_share(i, i_shares), i_shares)).second);
                         }
                         return shares;
                     }
@@ -113,15 +117,19 @@ namespace nil {
                              typename SeparatedShare,
                              typename base_type::template check_number_type<Number> = true,
                              typename base_type::template check_indexed_private_elements_type<SeparatedShare> = true>
-                    static inline private_element_type join_separated_share(Number i, const SeparatedShare &separated_share) {
+                    static inline private_element_type join_separated_share(Number i,
+                                                                            const SeparatedShare &separated_share) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SeparatedShare>));
                         assert(base_type::check_participant_index(i));
                         return base_type::reconstruct_secret(separated_share, i);
                     }
 
-                    template<typename Number, typename base_type::template check_number_type<Number> = true>
-                    static inline bool check_weight(Number w) {
-                        return w > 0;
+                    template<typename Weight,
+                             typename Number,
+                             check_indexed_weight_type<Weight> = true,
+                             typename base_type::template check_number_type<Number> = true>
+                    static inline bool check_weight(const Weight &w, Number n) {
+                        return base_type::check_participant_index(w.first, n) && w.second > 0;
                     }
                 };
             }    // namespace detail
