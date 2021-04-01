@@ -38,13 +38,13 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Mode>
-            using share_dealing_accumulator_set =
-                boost::accumulators::accumulator_set<typename Mode::scheme_type::private_element_type,
-                                                     boost::accumulators::features<boost::accumulators::tag::sum>>;
+            using share_dealing_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::scheme_type::share_type,
+                boost::accumulators::features<accumulators::tag::deal_share<Mode>>>;
 
-            template<typename Mode>
-            using public_coeffs_reducing_accumulator_set =
-                boost::accumulators::accumulator_set<typename Mode::scheme_type::public_element_type,
+            template<typename Scheme>
+            using polynomial_recovering_accumulator_set =
+                boost::accumulators::accumulator_set<typename Scheme::public_element_type,
                                                      boost::accumulators::features<boost::accumulators::tag::sum>>;
 
             template<typename Mode>

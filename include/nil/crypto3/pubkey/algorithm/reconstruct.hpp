@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -36,8 +37,8 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            using secret_reconstructing_sss_policy =
-                typename pubkey::modes::isomorphic<Scheme, nop_padding>::secret_reconstructing_sss_policy;
+            using secret_reconstructing_policy =
+                typename pubkey::modes::isomorphic<Scheme, nop_padding>::secret_reconstructing_policy;
         }
 
         /*!
@@ -313,7 +314,7 @@ namespace nil {
             reconstruct(InputIterator first, InputIterator last, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
             typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
@@ -343,7 +344,7 @@ namespace nil {
             reconstruct(const SinglePassRange &rng, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
             typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
@@ -370,7 +371,7 @@ namespace nil {
         template<typename Scheme, typename InputIterator,
                  typename OutputAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
                      typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                         pubkey::secret_reconstructing_sss_policy<Scheme>>::type>>
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             reconstruct(InputIterator first, InputIterator last, OutputAccumulator &acc) {
@@ -398,7 +399,7 @@ namespace nil {
         template<typename Scheme, typename SinglePassRange,
                  typename OutputAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
                      typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                         pubkey::secret_reconstructing_sss_policy<Scheme>>::type>>
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
             reconstruct(const SinglePassRange &r, OutputAccumulator &acc) {
@@ -428,12 +429,12 @@ namespace nil {
         template<typename Scheme, typename InputIterator,
                  typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
                      typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                         pubkey::secret_reconstructing_sss_policy<Scheme>>::type>>
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             reconstruct(InputIterator first, InputIterator last) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -458,12 +459,12 @@ namespace nil {
         template<typename Scheme, typename SinglePassRange,
                  typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
                      typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                         pubkey::secret_reconstructing_sss_policy<Scheme>>::type>>
+                         pubkey::secret_reconstructing_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             reconstruct(const SinglePassRange &r) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;

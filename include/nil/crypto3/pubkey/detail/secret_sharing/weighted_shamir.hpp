@@ -144,6 +144,7 @@ namespace nil {
                         return base_type::reconstruct_secret(separated_share, i);
                     }
 
+                    // TODO: implement without temporary variable _shares
                     template<typename Shares, check_indexed_weighted_shares_type<Shares> = true>
                     static inline private_element_type reconstruct_secret(const Shares &shares) {
                         typename base_type::shares_type _shares;

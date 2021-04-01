@@ -40,6 +40,7 @@
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
 #include <nil/crypto3/pubkey/secret_sharing.hpp>
+#include <nil/crypto3/pubkey/dkg.hpp>
 
 #include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
 
@@ -57,7 +58,9 @@ namespace nil {
                         std::is_same<typename Mode::scheme_type,
                                      pubkey::shamir_sss<typename Mode::scheme_type::group_type>>::value ||
                         std::is_same<typename Mode::scheme_type,
-                                     pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value>::type>
+                                     pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value ||
+                        std::is_same<typename Mode::scheme_type,
+                                     pubkey::pedersen_dkg<typename Mode::scheme_type::group_type>>::value>::type>
                     : boost::accumulators::accumulator_base {
                 protected:
                     typedef typename Mode::scheme_type scheme_type;
@@ -241,6 +244,81 @@ namespace nil {
                 };
 
                 template<typename Mode, typename = void>
+                struct deal_share_impl;
+
+                template<typename Mode>
+                struct deal_share_impl<Mode,
+                                       typename std::enable_if<std::is_same<
+                                           typename Mode::scheme_type,
+                                           pubkey::pedersen_dkg<typename Mode::scheme_type::group_type>>::value>::type>
+                    : boost::accumulators::accumulator_base {
+                    typedef typename Mode::scheme_type scheme_type;
+                    typedef typename Mode::key_type key_type;
+
+                    typedef typename key_type::private_element_type private_element_type;
+                    typedef typename key_type::share_type share_type;
+                    typedef typename key_type::shares_type shares_type;
+
+                public:
+                    typedef share_type result_type;
+
+                    //
+                    // boost::accumulators::sample -- participant index
+                    //
+                    template<typename Args>
+                    deal_share_impl(const Args &args) {
+                        assert(key_type::check_participant_index(args[boost::accumulators::sample]));
+                        i = args[boost::accumulators::sample];
+                        share = share_type(i, private_element_type::zero());
+                    }
+
+                    inline result_type result(boost::accumulators::dont_care) const {
+                        return share;
+                    }
+
+                    //
+                    // boost::accumulators::sample -- polynomial coefficients
+                    // input coefficients should be supplied in increasing term degrees order
+                    //
+                    template<typename Args>
+                    inline void operator()(const Args &args) {
+                        resolve_type(
+                            args[boost::accumulators::sample],
+                            args[::nil::crypto3::accumulators::iterator_last | typename shares_type::iterator()]);
+                    }
+
+                protected:
+                    template<typename Share,
+                             typename InputIterator,
+                             typename key_type::template check_share_type<Share> = true>
+                    inline void resolve_type(const Share &share_update, InputIterator) {
+                        assert(share_update.first == share.first);
+                        share.second = share.second + share_update.second;
+                    }
+
+                    template<typename Shares,
+                             typename InputIterator,
+                             typename key_type::template check_shares_type<Shares> = true>
+                    inline void resolve_type(const Shares &shares_update, InputIterator dont_care) {
+                        for (const auto &s : shares_update) {
+                            resolve_type(s, dont_care);
+                        }
+                    }
+
+                    template<typename InputIterator,
+                             typename key_type::template check_share_type<
+                                 typename std::iterator_traits<InputIterator>::value_type> = true>
+                    inline void resolve_type(InputIterator first, InputIterator last) {
+                        for (auto it = first; it != last; it++) {
+                            resolve_type(*it, last);
+                        }
+                    }
+
+                    result_type share;
+                    std::size_t i;
+                };
+
+                template<typename Mode, typename = void>
                 struct reconstruct_secret_impl;
 
                 template<typename Mode>
@@ -252,7 +330,9 @@ namespace nil {
                         std::is_same<typename Mode::scheme_type,
                                      pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value ||
                         std::is_same<typename Mode::scheme_type,
-                                     pubkey::weighted_shamir_sss<typename Mode::scheme_type::group_type>>::value>::type>
+                                     pubkey::weighted_shamir_sss<typename Mode::scheme_type::group_type>>::value ||
+                        std::is_same<typename Mode::scheme_type,
+                                     pubkey::pedersen_dkg<typename Mode::scheme_type::group_type>>::value>::type>
                     : boost::accumulators::accumulator_base {
                 protected:
                     typedef typename Mode::scheme_type scheme_type;
@@ -315,10 +395,13 @@ namespace nil {
                 struct verify_share_impl;
 
                 template<typename Mode>
-                struct verify_share_impl<Mode,
-                                         typename std::enable_if<std::is_same<
-                                             typename Mode::scheme_type,
-                                             pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value>::type>
+                struct verify_share_impl<
+                    Mode,
+                    typename std::enable_if<
+                        std::is_same<typename Mode::scheme_type,
+                                     pubkey::feldman_sss<typename Mode::scheme_type::group_type>>::value ||
+                        std::is_same<typename Mode::scheme_type,
+                                     pubkey::pedersen_dkg<typename Mode::scheme_type::group_type>>::value>::type>
                     : boost::accumulators::accumulator_base {
                 protected:
                     typedef typename Mode::scheme_type scheme_type;
@@ -421,6 +504,16 @@ namespace nil {
 
                     typedef boost::mpl::always<accumulators::impl::reconstruct_secret_impl<mode_type>> impl;
                 };
+
+                template<typename Mode>
+                struct deal_share : boost::accumulators::depends_on<> {
+                    typedef Mode mode_type;
+
+                    /// INTERNAL ONLY
+                    ///
+
+                    typedef boost::mpl::always<accumulators::impl::deal_share_impl<mode_type>> impl;
+                };
             }    // namespace tag
 
             namespace extract {
@@ -428,6 +521,12 @@ namespace nil {
                 typename boost::mpl::apply<AccumulatorSet, tag::deal_shares<Mode>>::type::result_type
                     scheme(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::deal_shares<Mode>>(acc);
+                }
+
+                template<typename Mode, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet, tag::deal_share<Mode>>::type::result_type
+                    scheme(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::deal_share<Mode>>(acc);
                 }
 
                 template<typename Mode, typename AccumulatorSet>
