@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2019-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_THRESHOLD_SCHEME_MODE_HPP
-#define CRYPTO3_PUBKEY_THRESHOLD_SCHEME_MODE_HPP
+#ifndef CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP
+#define CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/modes/detail/threshold_scheme.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -77,25 +78,47 @@ namespace nil {
 
                 template<typename Scheme, typename Padding>
                 struct threshold_signing_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::threshold_scheme_type
+                        threshold_scheme_type;
                     typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename threshold_policy<Scheme, Padding>::number_type number_type;
 
                     typedef private_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::sign(key, plaintext);
+                    typedef typename key_type::signature_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return threshold_scheme_type::part_sign(key, args...);
                     }
                 };
 
                 template<typename Scheme, typename Padding>
                 struct threshold_verification_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::threshold_scheme_type
+                        threshold_scheme_type;
                     typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename threshold_policy<Scheme, Padding>::number_type number_type;
 
                     typedef public_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::verify(key, plaintext);
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return threshold_scheme_type::part_verify(key, args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct threshold_aggregation_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::threshold_scheme_type
+                        threshold_scheme_type;
+                    typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef typename scheme_type::signature_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return threshold_scheme_type::aggregate(args...);
                     }
                 };
 
@@ -124,16 +147,21 @@ namespace nil {
             }    // namespace detail
 
             namespace modes {
-                template<typename Scheme, template<typename> class Padding>
+                template<typename Scheme, template<typename> class SecretSharingScheme, template<typename> class Padding>
                 struct threshold {
-                    typedef Scheme scheme_type;
+                    typedef Scheme base_scheme_type;
+                    typedef typename detail::threshold_scheme<base_scheme_type, SecretSharingScheme>::type scheme_type;
                     typedef Padding<Scheme> padding_type;
 
                     typedef detail::threshold_agreement_policy<scheme_type, padding_type> agreement_policy;
                     typedef detail::threshold_encryption_policy<scheme_type, padding_type> encryption_policy;
                     typedef detail::threshold_decryption_policy<scheme_type, padding_type> decryption_policy;
-                    typedef detail::threshold_signing_policy<scheme_type, padding_type> signing_policy;
-                    typedef detail::threshold_verification_policy<scheme_type, padding_type> verification_policy;
+                    typedef detail::threshold_signing_policy<scheme_type, padding_type>
+                        signing_policy;
+                    typedef detail::threshold_verification_policy<scheme_type, padding_type>
+                        verification_policy;
+                    typedef detail::threshold_aggregation_policy<scheme_type, padding_type>
+                        aggregation_policy;
 
                     template<typename Policy>
                     struct bind {
@@ -145,4 +173,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MODE_HPP
+#endif    // CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP
