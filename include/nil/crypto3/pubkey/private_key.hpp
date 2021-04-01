@@ -31,7 +31,7 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename Scheme>
+            template<typename Scheme, typename = void>
             struct private_key;
         }    // namespace pubkey
     }        // namespace crypto3
