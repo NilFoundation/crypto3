@@ -60,6 +60,14 @@ namespace nil {
                 template<typename Shares>
                 using check_shares_type = typename ops_type::template check_indexed_private_elements_type<Shares>;
 
+                template<typename PublicShare>
+                using check_public_share_type =
+                    typename ops_type::template check_indexed_public_element_type<PublicShare>;
+
+                template<typename PublicShares>
+                using check_public_shares_type =
+                    typename ops_type::template check_indexed_public_elements_type<PublicShares>;
+
                 template<typename Coeff>
                 using check_coeff_type = typename ops_type::template check_private_element_type<Coeff>;
 
@@ -99,6 +107,14 @@ namespace nil {
                 template<typename Shares>
                 using check_shares_type =
                     typename base_type::ops_type::template check_indexed_weighted_shares_type<Shares>;
+
+                template<typename PublicShare>
+                using check_public_share_type =
+                    typename base_type::ops_type::template check_indexed_weighted_public_share_type<PublicShare>;
+
+                template<typename PublicShares>
+                using check_public_shares_type =
+                    typename base_type::ops_type::template check_indexed_weighted_public_shares_type<PublicShares>;
             };
 
             template<typename Group>
@@ -111,6 +127,16 @@ namespace nil {
                 template<typename Number1, typename Number2>
                 static inline typename scheme_type::coeffs_type get_poly(Number1 t, Number2 n) {
                     return scheme_type::ops_type::get_poly(t, n);
+                }
+
+                template<typename Shares>
+                static inline typename scheme_type::public_shares_type get_public_shares(const Shares &shares) {
+                    return scheme_type::ops_type::get_public_shares(shares);
+                }
+
+                template<typename Share>
+                static inline typename scheme_type::public_share_type get_public_share(const Share &share) {
+                    return scheme_type::ops_type::get_public_share(share);
                 }
 
                 template<typename Coeffs>
@@ -128,6 +154,12 @@ namespace nil {
                     return scheme_type::ops_type::reconstruct_secret(shares);
                 }
 
+                template<typename PublicShares>
+                static inline typename scheme_type::public_element_type
+                    reconstruct_public_element(const PublicShares &public_shares) {
+                    return scheme_type::ops_type::reconstruct_public_element(public_shares);
+                }
+
                 template<typename Number1, typename Number2>
                 static inline bool check_t(Number1 t, Number2 n) {
                     return scheme_type::ops_type::check_t(t, n);
@@ -136,6 +168,11 @@ namespace nil {
                 template<typename Number>
                 static inline bool check_minimal_size(Number n) {
                     return scheme_type::ops_type::check_minimal_size(n);
+                }
+
+                template<typename Number>
+                static inline bool check_participant_index(Number i) {
+                    return scheme_type::ops_type::check_participant_index(i);
                 }
 
                 template<typename Number1, typename Number2>
@@ -159,6 +196,16 @@ namespace nil {
                     return scheme_type::ops_type::get_poly(t, n);
                 }
 
+                template<typename Shares>
+                static inline typename scheme_type::public_shares_type get_public_shares(const Shares &shares) {
+                    return scheme_type::ops_type::get_public_shares(shares);
+                }
+
+                template<typename Share>
+                static inline typename scheme_type::public_share_type get_public_share(const Share &share) {
+                    return scheme_type::ops_type::get_public_share(share);
+                }
+
                 template<typename Coeffs>
                 static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
                     return scheme_type::ops_type::get_public_coeffs(coeffs);
@@ -174,6 +221,12 @@ namespace nil {
                     return scheme_type::ops_type::reconstruct_secret(shares);
                 }
 
+                template<typename PublicShares>
+                static inline typename scheme_type::public_element_type
+                    reconstruct_public_element(const PublicShares &public_shares) {
+                    return scheme_type::ops_type::reconstruct_public_element(public_shares);
+                }
+
                 template<typename Number1, typename Number2>
                 static inline bool check_t(Number1 t, Number2 n) {
                     return scheme_type::ops_type::check_t(t, n);
@@ -182,6 +235,11 @@ namespace nil {
                 template<typename Number>
                 static inline bool check_minimal_size(Number n) {
                     return scheme_type::ops_type::check_minimal_size(n);
+                }
+
+                template<typename Number>
+                static inline bool check_participant_index(Number i) {
+                    return scheme_type::ops_type::check_participant_index(i);
                 }
 
                 template<typename Number1, typename Number2>
@@ -204,6 +262,16 @@ namespace nil {
                     return scheme_type::ops_type::get_poly(t, n);
                 }
 
+                template<typename Shares>
+                static inline typename scheme_type::public_shares_type get_public_shares(const Shares &shares) {
+                    return scheme_type::ops_type::get_public_shares(shares);
+                }
+
+                template<typename Share>
+                static inline typename scheme_type::public_share_type get_public_share(const Share &share) {
+                    return scheme_type::ops_type::get_public_share(share);
+                }
+
                 template<typename Coeffs>
                 static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
                     return scheme_type::ops_type::get_public_coeffs(coeffs);
@@ -219,6 +287,12 @@ namespace nil {
                     return scheme_type::ops_type::reconstruct_secret(shares);
                 }
 
+                template<typename PublicShares>
+                static inline typename scheme_type::public_element_type
+                    reconstruct_public_element(const PublicShares &public_shares) {
+                    return scheme_type::ops_type::reconstruct_public_element(public_shares);
+                }
+
                 template<typename Number1, typename Number2>
                 static inline bool check_t(Number1 t, Number2 n) {
                     return scheme_type::ops_type::check_t(t, n);
@@ -229,14 +303,14 @@ namespace nil {
                     return scheme_type::ops_type::check_minimal_size(n);
                 }
 
+                template<typename Number>
+                static inline bool check_participant_index(Number i) {
+                    return scheme_type::ops_type::check_participant_index(i);
+                }
+
                 template<typename Number1, typename Number2>
                 static inline bool check_participant_index(Number1 i, Number2 n) {
                     return scheme_type::ops_type::check_participant_index(i, n);
-                }
-
-                template<typename Share>
-                static inline typename scheme_type::public_share_type get_public_share(const Share &share) {
-                    return scheme_type::ops_type::get_public_share(share);
                 }
 
                 template<typename PublicCoeffs, typename Share>

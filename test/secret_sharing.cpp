@@ -102,7 +102,7 @@ template<typename T>
 class TD;
 
 // TODO: add verification of wrong values
-BOOST_AUTO_TEST_SUITE(base_functional_self_tests)
+BOOST_AUTO_TEST_SUITE(secret_sharing_base_functional_self_tests)
 
 BOOST_AUTO_TEST_CASE(feldman_sss) {
     using curve_type = curves::bls12_381;
@@ -383,8 +383,8 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
             auto it = shares.begin();
             auto weight = 0;
             while (true) {
-                weight += it->second.second.size();
-                if (weight > t) {
+                weight += it->second.size();
+                if (weight >= t) {
                     break;
                 }
                 it++;

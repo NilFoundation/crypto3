@@ -29,6 +29,7 @@
 #include <vector>
 #include <type_traits>
 #include <unordered_map>
+#include <iterator>
 
 #include <boost/concept_check.hpp>
 #include <boost/range/concepts.hpp>
@@ -112,16 +113,16 @@ namespace nil {
                         std::is_same<get_indexed_element_type<IndexedElement>, IndexedElement>::value, bool>::type;
 
                     template<typename IndexedPrivateElements>
-                    using check_indexed_private_elements_type =
-                        check_indexed_private_element_type<typename IndexedPrivateElements::value_type>;
+                    using check_indexed_private_elements_type = check_indexed_private_element_type<
+                        typename std::iterator_traits<typename IndexedPrivateElements::iterator>::value_type>;
 
                     template<typename IndexedPublicElements>
-                    using check_indexed_public_elements_type =
-                        check_indexed_public_element_type<typename IndexedPublicElements::value_type>;
+                    using check_indexed_public_elements_type = check_indexed_public_element_type<
+                        typename std::iterator_traits<typename IndexedPublicElements::iterator>::value_type>;
 
                     template<typename IndexedElements>
-                    using check_indexed_elements_type =
-                        check_indexed_element_type<typename IndexedElements::value_type>;
+                    using check_indexed_elements_type = check_indexed_element_type<
+                        typename std::iterator_traits<typename IndexedElements::iterator>::value_type>;
 
                     //===========================================================================
                     // shares dealing functions
@@ -177,8 +178,8 @@ namespace nil {
                     //===========================================================================
                     // secret recovering functions
 
-                    template<typename Shares, typename Number = std::size_t, check_indexed_private_elements_type<Shares> = true,
-                        check_number_type<Number> = true>
+                    template<typename Shares, typename Number = std::size_t,
+                             check_indexed_private_elements_type<Shares> = true, check_number_type<Number> = true>
                     static inline private_element_type reconstruct_secret(const Shares &shares, Number id_i = 0) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
 
@@ -280,12 +281,8 @@ namespace nil {
 
                     template<typename Share, check_indexed_private_element_type<Share> = true>
                     static inline public_share_type get_public_share(const Share &s) {
+                        assert(check_participant_index(s.first));
                         return public_share_type(s.first, get_public_element(s.second));
-                    }
-
-                    template<typename PublicShare, check_indexed_public_element_type<PublicShare> = true>
-                    static inline public_share_type get_public_share(const PublicShare &ps) {
-                        return ps;
                     }
 
                     static inline public_element_type get_public_element(const private_element_type &s) {
@@ -302,7 +299,8 @@ namespace nil {
                         return i > 0;
                     }
 
-                    template<typename Number1, typename Number2, check_number_type<Number1> = true, check_number_type<Number2> = true>
+                    template<typename Number1, typename Number2, check_number_type<Number1> = true,
+                             check_number_type<Number2> = true>
                     static inline bool check_participant_index(Number1 i, Number2 n) {
                         return i > 0 && i <= n;
                     }

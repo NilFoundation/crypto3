@@ -39,16 +39,14 @@ namespace nil {
                     //===========================================================================
                     // secret sharing scheme logical types
                     typedef typename base_type::private_element_type private_element_type;
+                    typedef typename base_type::public_element_type public_element_type;
 
                     typedef std::pair<std::size_t, std::size_t> weight_type;
                     typedef std::unordered_map<std::size_t, std::size_t> weights_type;
-                    typedef std::pair<std::size_t, typename base_type::shares_type> separated_share_type;
-                    typedef std::unordered_map<std::size_t, typename base_type::shares_type> separated_shares_type;
-                    typedef std::pair<std::size_t, std::pair<private_element_type, typename base_type::shares_type>>
-                        share_type;
-                    typedef std::unordered_map<std::size_t,
-                                               std::pair<private_element_type, typename base_type::shares_type>>
-                        shares_type;
+                    typedef std::pair<std::size_t, typename base_type::shares_type> share_type;
+                    typedef std::unordered_map<std::size_t, typename base_type::shares_type> shares_type;
+                    typedef std::pair<std::size_t, typename base_type::public_shares_type> public_share_type;
+                    typedef std::unordered_map<std::size_t, typename base_type::public_shares_type> public_shares_type;
 
                     //===========================================================================
                     // constraints checking meta-functions
@@ -68,12 +66,17 @@ namespace nil {
                     template<typename IndexedWeightedShare,
                              typename Index = typename IndexedWeightedShare::first_type,
                              typename WeightedShare = typename IndexedWeightedShare::second_type,
-                             typename Share = typename WeightedShare::first_type,
-                             typename Shares = typename WeightedShare::second_type,
                              typename base_type::template check_index_type<Index> = true,
-                             typename base_type::template check_private_element_type<Share> = true,
-                             typename base_type::template check_indexed_private_elements_type<Shares> = true>
+                             typename base_type::template check_indexed_private_elements_type<WeightedShare> = true>
                     using get_indexed_weighted_share_type = std::pair<Index, WeightedShare>;
+
+                    template<typename IndexedPublicWeightedShare,
+                             typename Index = typename IndexedPublicWeightedShare::first_type,
+                             typename WeightedPublicShare = typename IndexedPublicWeightedShare::second_type,
+                             typename base_type::template check_index_type<Index> = true,
+                             typename base_type::template check_indexed_public_elements_type<WeightedPublicShare> =
+                                 true>
+                    using get_indexed_weighted_public_share_type = std::pair<Index, WeightedPublicShare>;
 
                     template<typename IndexedWeightedShare>
                     using check_indexed_weighted_share_type =
@@ -81,9 +84,19 @@ namespace nil {
                                                              IndexedWeightedShare>::value,
                                                 bool>::type;
 
+                    template<typename IndexedWeightedPublicShare>
+                    using check_indexed_weighted_public_share_type = typename std::enable_if<
+                        std::is_same<get_indexed_weighted_public_share_type<IndexedWeightedPublicShare>,
+                                     IndexedWeightedPublicShare>::value,
+                        bool>::type;
+
                     template<typename IndexedWeightedShares>
-                    using check_indexed_weighted_shares_type =
-                        check_indexed_weighted_share_type<typename IndexedWeightedShares::value_type>;
+                    using check_indexed_weighted_shares_type = check_indexed_weighted_share_type<
+                        typename std::iterator_traits<typename IndexedWeightedShares::iterator>::value_type>;
+
+                    template<typename IndexedWeightedPublicShares>
+                    using check_indexed_weighted_public_shares_type = check_indexed_weighted_public_share_type<
+                        typename std::iterator_traits<typename IndexedWeightedPublicShares::iterator>::value_type>;
 
                     //===========================================================================
                     // shares dealing functions
@@ -97,51 +110,21 @@ namespace nil {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
 
-                        separated_shares_type separated_shares = deal_separated_shares(coeffs, weights);
-                        shares_type shares;
-                        for (const auto &[i, i_shares] : separated_shares) {
-                            assert(
-                                shares.emplace(i, std::make_pair(join_separated_share(i, i_shares), i_shares)).second);
-                        }
-                        return shares;
-                    }
-
-                    template<
-                        typename Coeffs,
-                        typename Weights,
-                        typename base_type::template check_private_element_type<typename Coeffs::value_type> = true,
-                        check_indexed_weight_type<typename Weights::value_type> = true>
-                    static inline separated_shares_type deal_separated_shares(const Coeffs &coeffs,
-                                                                              const Weights &weights) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
-
                         std::size_t t = std::distance(coeffs.begin(), coeffs.end());
                         std::size_t n = std::distance(weights.begin(), weights.end());
                         assert(base_type::check_t(t, n));
 
-                        separated_shares_type separated_shares;
+                        shares_type shares;
                         for (auto w_i : weights) {
                             assert(check_weight(w_i, n));
-                            typename separated_share_type::second_type i_shares;
+                            typename share_type::second_type i_shares;
                             for (std::size_t j = 1; j <= w_i.second; j++) {
                                 std::size_t id_ij = w_i.first * t + j;
                                 assert(i_shares.emplace(base_type::deal_share(coeffs, id_ij)).second);
                             }
-                            assert(separated_shares.emplace(w_i.first, i_shares).second);
+                            assert(shares.emplace(w_i.first, i_shares).second);
                         }
-                        return separated_shares;
-                    }
-
-                    template<typename Number,
-                             typename SeparatedShare,
-                             typename base_type::template check_number_type<Number> = true,
-                             typename base_type::template check_indexed_private_elements_type<SeparatedShare> = true>
-                    static inline private_element_type join_separated_share(Number i,
-                                                                            const SeparatedShare &separated_share) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SeparatedShare>));
-                        assert(base_type::check_participant_index(i));
-                        return base_type::reconstruct_secret(separated_share, i);
+                        return shares;
                     }
 
                     // TODO: implement without temporary variable _shares
@@ -149,11 +132,34 @@ namespace nil {
                     static inline private_element_type reconstruct_secret(const Shares &shares) {
                         typename base_type::shares_type _shares;
                         for (const auto &[i, s] : shares) {
-                            for (const auto &_s : s.second) {
-                                _shares.emplace(_s);
+                            for (const auto &part_s : s) {
+                                assert(_shares.emplace(part_s).second);
                             }
                         }
                         return base_type::reconstruct_secret(_shares);
+                    }
+
+                    template<typename Shares, check_indexed_weighted_shares_type<Shares> = true>
+                    static inline public_shares_type get_public_shares(const Shares &shares) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
+                        assert(check_minimal_size(std::distance(shares.begin(), shares.end())));
+
+                        public_shares_type public_shares;
+                        for (const auto &s : shares) {
+                            assert(public_shares.emplace(get_public_share(s)).second);
+                        }
+                        return public_shares;
+                    }
+
+                    template<typename Share, check_indexed_weighted_share_type<Share> = true>
+                    static inline public_share_type get_public_share(const Share &s) {
+                        assert(base_type::check_participant_index(s.first));
+                        public_share_type public_share;
+                        public_share.first = s.first;
+                        for (const auto &part_s : s.second) {
+                            assert(public_share.second.emplace(base_type::get_public_elemnt(part_s)).second);
+                        }
+                        return public_share;
                     }
 
                     template<typename Weight,
