@@ -88,7 +88,7 @@ namespace nil {
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {
-                        return threshold_scheme_type::part_sign(key, args...);
+                        return key_type::sign(key, args...);
                     }
                 };
 
@@ -104,7 +104,23 @@ namespace nil {
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {
-                        return threshold_scheme_type::part_verify(key, args...);
+                        return key_type::verify(key, args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct threshold_part_verification_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::threshold_scheme_type
+                        threshold_scheme_type;
+                    typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
+
+                    typedef public_key<scheme_type> key_type;
+
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key_type::part_verify(key, args...);
                     }
                 };
 
@@ -158,6 +174,8 @@ namespace nil {
                     typedef detail::threshold_decryption_policy<scheme_type, padding_type> decryption_policy;
                     typedef detail::threshold_signing_policy<scheme_type, padding_type>
                         signing_policy;
+                    typedef detail::threshold_part_verification_policy<scheme_type, padding_type>
+                        part_verification_policy;
                     typedef detail::threshold_verification_policy<scheme_type, padding_type>
                         verification_policy;
                     typedef detail::threshold_aggregation_policy<scheme_type, padding_type>
