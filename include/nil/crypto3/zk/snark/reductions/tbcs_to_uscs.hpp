@@ -55,6 +55,7 @@ namespace nil {
                 namespace reductions {
                     template<typename FieldType>
                     struct tbcs_to_uscs {
+                        typedef FieldType field_type;
 
                         /**
                          * Instance map for the TBCS-to-USCS reduction.

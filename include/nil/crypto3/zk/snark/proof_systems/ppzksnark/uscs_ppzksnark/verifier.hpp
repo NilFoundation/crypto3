@@ -67,253 +67,250 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace policies {
 
-                    /*
-                     Below are four variants of verifier algorithm for the USCS ppzkSNARK.
+                /*
+                 Below are four variants of verifier algorithm for the USCS ppzkSNARK.
 
-                     These are the four cases that arise from the following two choices:
+                 These are the four cases that arise from the following two choices:
 
-                     (1) The verifier accepts a (non-processed) verification key or, instead, a processed
-                     verification key. In the latter case, we call the algorithm an "online verifier".
+                 (1) The verifier accepts a (non-processed) verification key or, instead, a processed
+                 verification key. In the latter case, we call the algorithm an "online verifier".
 
-                     (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
-                         Strong input consistency requires that |primary_input| = CS.num_inputs, whereas
-                         weak input consistency requires that |primary_input| <= CS.num_inputs (and
-                         the primary input is implicitly padded with zeros up to length CS.num_inputs).
-                     */
+                 (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
+                     Strong input consistency requires that |primary_input| = CS.num_inputs, whereas
+                     weak input consistency requires that |primary_input| <= CS.num_inputs (and
+                     the primary input is implicitly padded with zeros up to length CS.num_inputs).
+                 */
 
-                    /**
-                     * Convert a (non-processed) verification key into a processed verification key.
-                     */
-                    template<typename CurveType>
-                    class uscs_ppzksnark_verifier_process_vk {
-                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+                /**
+                 * Convert a (non-processed) verification key into a processed verification key.
+                 */
+                template<typename CurveType>
+                class uscs_ppzksnark_verifier_process_vk {
+                    typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
-                    public:
-                        typedef typename policy_type::constraint_system constraint_system_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline processed_verification_key_type process(const verification_key_type &vk) {
+                    static inline processed_verification_key_type process(const verification_key_type &vk) {
 
-                            processed_verification_key_type pvk;
+                        processed_verification_key_type pvk;
 
-                            pvk.pp_G1_one_precomp =
-                                CurveType::precompute_g1(typename CurveType::g1_type::value_type::one());
-                            pvk.pp_G2_one_precomp =
-                                CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
+                        pvk.pp_G1_one_precomp =
+                            CurveType::precompute_g1(typename CurveType::g1_type::value_type::one());
+                        pvk.pp_G2_one_precomp =
+                            CurveType::precompute_g2(typename CurveType::g2_type::value_type::one());
 
-                            pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
-                            pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);
-                            pvk.vk_Z_g2_precomp = CurveType::precompute_g2(vk.Z_g2);
+                        pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
+                        pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);
+                        pvk.vk_Z_g2_precomp = CurveType::precompute_g2(vk.Z_g2);
 
-                            pvk.pairing_of_g1_and_g2 =
-                                miller_loop<CurveType>(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
+                        pvk.pairing_of_g1_and_g2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
 
-                            pvk.encoded_IC_query = vk.encoded_IC_query;
+                        pvk.encoded_IC_query = vk.encoded_IC_query;
 
-                            return pvk;
+                        return pvk;
+                    }
+                };
+
+                /**
+                 * A verifier algorithm for the USCS ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                class uscs_ppzksnark_online_verifier_weak_input_consistency {
+                    typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
+
+                    static inline bool process(const processed_verification_key_type &pvk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        typedef typename CurveType::pairing_policy pairing_policy;
+
+                        assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
+
+                        const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
+                            pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
+                                primary_input.begin(), primary_input.end(), 0);
+                        assert(accumulated_IC.is_fully_accumulated());
+                        const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
+
+                        bool result = true;
+
+                        if (!proof.is_well_formed()) {
+                            result = false;
                         }
-                    };
 
-                    /**
-                     * A verifier algorithm for the USCS ppzkSNARK that:
-                     * (1) accepts a processed verification key, and
-                     * (2) has weak input consistency.
-                     */
-                    template<typename CurveType>
-                    class uscs_ppzksnark_online_verifier_weak_input_consistency {
-                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+                        typename pairing_policy::G1_precomp proof_V_g1_with_acc_precomp =
+                            pairing_policy::precompute_g1(proof.V_g1 + acc);
+                        typename pairing_policy::G2_precomp proof_V_g2_precomp =
+                            pairing_policy::precompute_g2(proof.V_g2);
+                        typename pairing_policy::Fqk_type V_1 =
+                            pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
+                        typename pairing_policy::Fqk_type V_2 =
+                            pairing_policy::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
+                        typename CurveType::gt_type::value_type V =
+                            pairing_policy::final_exponentiation(V_1 * V_2.unitary_inversed());
 
-                    public:
-                        typedef typename policy_type::constraint_system constraint_system_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
-
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
-
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
-
-                        static inline bool process(const processed_verification_key_type &pvk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
-                            typedef typename CurveType::pairing_policy pairing_policy;
-
-                            assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
-
-                            const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                                pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(
-                                    primary_input.begin(), primary_input.end(), 0);
-                            assert(accumulated_IC.is_fully_accumulated());
-                            const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
-
-                            bool result = true;
-
-                            if (!proof.is_well_formed()) {
-                                result = false;
-                            }
-
-                            typename pairing_policy::G1_precomp proof_V_g1_with_acc_precomp =
-                                pairing_policy::precompute_g1(proof.V_g1 + acc);
-                            typename pairing_policy::G2_precomp proof_V_g2_precomp =
-                                pairing_policy::precompute_g2(proof.V_g2);
-                            typename pairing_policy::Fqk_type V_1 =
-                                pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
-                            typename pairing_policy::Fqk_type V_2 =
-                                pairing_policy::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                            typename CurveType::gt_type::value_type V =
-                                pairing_policy::final_exponentiation(V_1 * V_2.unitary_inversed());
-
-                            if (V != typename CurveType::gt_type::one()) {
-                                result = false;
-                            }
-
-                            typename pairing_policy::G1_precomp proof_H_g1_precomp =
-                                pairing_policy::precompute_g1(proof.H_g1);
-                            typename pairing_policy::Fqk_type SSP_1 =
-                                pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
-                            typename pairing_policy::Fqk_type SSP_2 =
-                                pairing_policy::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
-                            typename CurveType::gt_type::value_type SSP = pairing_policy::final_exponentiation(
-                                SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
-
-                            if (SSP != typename CurveType::gt_type::one()) {
-                                result = false;
-                            }
-
-                            typename pairing_policy::G1_precomp proof_V_g1_precomp =
-                                pairing_policy::precompute_g1(proof.V_g1);
-                            typename pairing_policy::G1_precomp proof_alpha_V_g1_precomp =
-                                pairing_policy::precompute_g1(proof.alpha_V_g1);
-                            typename pairing_policy::Fqk_type alpha_V_1 =
-                                pairing_policy::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
-                            typename pairing_policy::Fqk_type alpha_V_2 =
-                                pairing_policy::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                            typename CurveType::gt_type::value_type alpha_V =
-                                pairing_policy::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inversed());
-
-                            if (alpha_V != typename CurveType::gt_type::one()) {
-                                result = false;
-                            }
-
-                            return result;
+                        if (V != typename CurveType::gt_type::one()) {
+                            result = false;
                         }
-                    };
 
-                    /**
-                     * A verifier algorithm for the USCS ppzkSNARK that:
-                     * (1) accepts a non-processed verification key, and
-                     * (2) has weak input consistency.
-                     */
-                    template<typename CurveType>
-                    class uscs_ppzksnark_verifier_weak_input_consistency {
-                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+                        typename pairing_policy::G1_precomp proof_H_g1_precomp =
+                            pairing_policy::precompute_g1(proof.H_g1);
+                        typename pairing_policy::Fqk_type SSP_1 =
+                            pairing_policy::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
+                        typename pairing_policy::Fqk_type SSP_2 =
+                            pairing_policy::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
+                        typename CurveType::gt_type::value_type SSP = pairing_policy::final_exponentiation(
+                            SSP_1.unitary_inversed() * SSP_2 * pvk.pairing_of_g1_and_g2);
 
-                    public:
-                        typedef typename policy_type::constraint_system constraint_system_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                        if (SSP != typename CurveType::gt_type::one()) {
+                            result = false;
+                        }
 
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                        typename pairing_policy::G1_precomp proof_V_g1_precomp =
+                            pairing_policy::precompute_g1(proof.V_g1);
+                        typename pairing_policy::G1_precomp proof_alpha_V_g1_precomp =
+                            pairing_policy::precompute_g1(proof.alpha_V_g1);
+                        typename pairing_policy::Fqk_type alpha_V_1 =
+                            pairing_policy::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
+                        typename pairing_policy::Fqk_type alpha_V_2 =
+                            pairing_policy::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
+                        typename CurveType::gt_type::value_type alpha_V =
+                            pairing_policy::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inversed());
 
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
+                        if (alpha_V != typename CurveType::gt_type::one()) {
+                            result = false;
+                        }
 
-                        static inline bool process(const verification_key_type &vk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
+                        return result;
+                    }
+                };
 
-                            processed_verification_key_type pvk =
-                                uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
-                            bool result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                /**
+                 * A verifier algorithm for the USCS ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                class uscs_ppzksnark_verifier_weak_input_consistency {
+                    typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
+
+                    static inline bool process(const verification_key_type &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+
+                        processed_verification_key_type pvk =
+                            uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                        bool result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                            pvk, primary_input, proof);
+                        return result;
+                    }
+                };
+
+                /**
+                 * A verifier algorithm for the USCS ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                class uscs_ppzksnark_online_verifier_strong_input_consistency {
+                    typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
+
+                    static inline bool process(const processed_verification_key_type &pvk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+
+                        bool result = true;
+
+                        if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
+                            result = false;
+                        } else {
+                            result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
                                 pvk, primary_input, proof);
-                            return result;
                         }
-                    };
 
-                    /**
-                     * A verifier algorithm for the USCS ppzkSNARK that:
-                     * (1) accepts a processed verification key, and
-                     * (2) has strong input consistency.
-                     */
-                    template<typename CurveType>
-                    class uscs_ppzksnark_online_verifier_strong_input_consistency {
-                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
+                        return result;
+                    }
+                };
 
-                    public:
-                        typedef typename policy_type::constraint_system constraint_system_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                /**
+                 * A verifier algorithm for the USCS ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                class uscs_ppzksnark_verifier_strong_input_consistency {
+                    typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                public:
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        static inline bool process(const processed_verification_key_type &pvk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                            bool result = true;
-
-                            if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
-                                result = false;
-                            } else {
-                                result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                                    pvk, primary_input, proof);
-                            }
-
-                            return result;
-                        }
-                    };
-
-                    /**
-                     * A verifier algorithm for the USCS ppzkSNARK that:
-                     * (1) accepts a non-processed verification key, and
-                     * (2) has strong input consistency.
-                     */
-                    template<typename CurveType>
-                    class uscs_ppzksnark_verifier_strong_input_consistency {
-                        typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
-
-                    public:
-                        typedef typename policy_type::constraint_system constraint_system_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
-
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
-
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
-
-                        static inline bool process(const verification_key_type &vk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
-                            return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
-                                uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk), primary_input, proof);
-                        }
-                    };
-                }    // namespace policies
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                    static inline bool process(const verification_key_type &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                            uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk), primary_input, proof);
+                    }
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_USCS_PPZKSNARK_BASIC_VERIFIER_HPP

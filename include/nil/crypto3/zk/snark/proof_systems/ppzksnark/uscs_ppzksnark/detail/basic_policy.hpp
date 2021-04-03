@@ -73,6 +73,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/proving_key.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/keypair.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -88,25 +89,25 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        using constraint_system = uscs_constraint_system<typename CurveType::scalar_field_type>;
+                        typedef uscs_constraint_system<typename CurveType::scalar_field_type> constraint_system_type;
 
-                        using primary_input = uscs_primary_input<typename CurveType::scalar_field_type>;
+                        typedef uscs_primary_input<typename CurveType::scalar_field_type> primary_input_type;
 
-                        using auxiliary_input = uscs_auxiliary_input<typename CurveType::scalar_field_type>;
+                        typedef uscs_auxiliary_input<typename CurveType::scalar_field_type> auxiliary_input_type;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the USCS ppzkSNARK.
                          */
-                        typedef uscs_ppzksnark_proving_key<CurveType, constraint_system> proving_key;
+                        typedef uscs_ppzksnark_proving_key<CurveType, constraint_system_type> proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the USCS ppzkSNARK.
                          */
-                        typedef uscs_ppzksnark_verification_key<CurveType> verification_key;
+                        typedef uscs_ppzksnark_verification_key<CurveType> verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -117,14 +118,14 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        typedef uscs_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
+                        typedef uscs_ppzksnark_processed_verification_key<CurveType> processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the USCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        typedef uscs_ppzksnark_keypair<proving_key, verification_key> keypair;
+                        typedef uscs_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -135,7 +136,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef uscs_ppzksnark_proof<CurveType> proof;
+                        typedef uscs_ppzksnark_proof<CurveType> proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark

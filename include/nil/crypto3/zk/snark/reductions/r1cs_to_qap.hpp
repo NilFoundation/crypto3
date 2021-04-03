@@ -62,9 +62,10 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace reductions {
-
                     template<typename FieldType>
                     struct r1cs_to_qap {
+                        typedef FieldType field_type;
+
                         /**
                          * Instance map for the R1CS-to-QAP reduction.
                          *

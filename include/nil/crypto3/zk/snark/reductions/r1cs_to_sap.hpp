@@ -59,9 +59,9 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace reductions {
-
                     template<typename FieldType>
                     class r1cs_to_sap {
+                        typedef FieldType field_type;
 
                         /**
                          * Helper function to multiply a field element by 4 efficiently

@@ -59,54 +59,50 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace policies {
 
-                    /**
-                     * A prover algorithm for the TBCS ppzkSNARK.
-                     *
-                     * Given a TBCS primary input X and a TBCS auxiliary input Y, this algorithm
-                     * produces a proof (of knowledge) that attests to the following statement:
-                     *               ``there exists Y such that C(X,Y)=0''.
-                     * Above, C is the TBCS circuit that was given as input to the generator algorithm.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_prover {
-                        typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
+                /**
+                 * A prover algorithm for the TBCS ppzkSNARK.
+                 *
+                 * Given a TBCS primary input X and a TBCS auxiliary input Y, this algorithm
+                 * produces a proof (of knowledge) that attests to the following statement:
+                 *               ``there exists Y such that C(X,Y)=0''.
+                 * Above, C is the TBCS circuit that was given as input to the generator algorithm.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_prover {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    public:
-                        typedef typename policy_type::circuit circuit_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline proof_type process(const proving_key_type &pk,
-                                                         const primary_input_type &primary_input,
-                                                         const auxiliary_input_type &auxiliary_input) {
-                            typedef typename CurveType::scalar_field_type FieldType;
+                    static inline proof_type process(const proving_key_type &pk,
+                                                     const primary_input_type &primary_input,
+                                                     const auxiliary_input_type &auxiliary_input) {
+                        typedef typename CurveType::scalar_field_type FieldType;
 
-                            const uscs_variable_assignment<FieldType> uscs_va =
-                                tbcs_to_uscs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
-                            const uscs_primary_input<FieldType> uscs_pi =
-                                algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
-                            const uscs_auxiliary_input<FieldType> uscs_ai(
-                                uscs_va.begin() + primary_input.size(),
-                                uscs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                            const typename uscs_ppzksnark<CurveType>::proof_type uscs_proof =
-                                uscs_ppzksnark<CurveType>::prover(pk.uscs_pk, uscs_pi, uscs_ai);
+                        const uscs_variable_assignment<FieldType> uscs_va =
+                            tbcs_to_uscs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
+                        const uscs_primary_input<FieldType> uscs_pi =
+                            algebra::convert_bit_vector_to_field_element_vector<FieldType>(primary_input);
+                        const uscs_auxiliary_input<FieldType> uscs_ai(
+                            uscs_va.begin() + primary_input.size(),
+                            uscs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
 
-                            return uscs_proof;
-                        }
-                    };
-                }    // namespace policies
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                        return uscs_ppzksnark<CurveType>::prover(pk.uscs_pk, uscs_pi, uscs_ai);
+                    }
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_PROVER_HPP
