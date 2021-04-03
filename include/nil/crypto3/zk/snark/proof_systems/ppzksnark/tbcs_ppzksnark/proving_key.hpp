@@ -46,18 +46,20 @@ namespace nil {
                     typedef typename curve_type::scalar_field_type field_type;
 
                     circuit_type crct;
-                    uscs_ppzksnark_proving_key<CurveType> uscs_pk;
+                    uscs_ppzksnark_proving_key<CurveType, circuit_type> uscs_pk;
 
                     tbcs_ppzksnark_proving_key() {};
                     tbcs_ppzksnark_proving_key(const tbcs_ppzksnark_proving_key &other) = default;
                     tbcs_ppzksnark_proving_key(tbcs_ppzksnark_proving_key &&other) = default;
                     tbcs_ppzksnark_proving_key(const circuit_type &crct,
-                                               const uscs_ppzksnark_proving_key<CurveType> &uscs_pk) :
+                                               const uscs_ppzksnark_proving_key<CurveType, circuit_type> &uscs_pk) :
                         crct(crct),
                         uscs_pk(uscs_pk) {
                     }
-                    tbcs_ppzksnark_proving_key(circuit_type &&crct, uscs_ppzksnark_proving_key<CurveType> &&uscs_pk) :
-                        crct(std::move(crct)), uscs_pk(std::move(uscs_pk)) {
+                    tbcs_ppzksnark_proving_key(circuit_type &&crct,
+                                               uscs_ppzksnark_proving_key<CurveType, circuit_type> &&uscs_pk) :
+                        crct(std::move(crct)),
+                        uscs_pk(std::move(uscs_pk)) {
                     }
 
                     tbcs_ppzksnark_proving_key &operator=(const tbcs_ppzksnark_proving_key &other) = default;

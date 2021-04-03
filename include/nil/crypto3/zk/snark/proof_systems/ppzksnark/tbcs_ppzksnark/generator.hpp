@@ -59,44 +59,41 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace policies {
+                /**
+                 * A generator algorithm for the TBCS ppzkSNARK.
+                 *
+                 * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_generator {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    /**
-                     * A generator algorithm for the TBCS ppzkSNARK.
-                     *
-                     * Given a TBCS circuit C, this algorithm produces proving and verification keys for C.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_generator {
-                        typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    public:
-                        typedef typename policy_type::circuit circuit_type;
-                        typedef typename policy_type::primary_input primary_input_type;
-                        typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename policy_type::proving_key proving_key_type;
-                        typedef typename policy_type::verification_key verification_key_type;
-                        typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        typedef typename policy_type::keypair keypair_type;
-                        typedef typename policy_type::proof proof_type;
+                    static inline keypair_type process(const circuit_type &circuit) {
+                        typedef typename CurveType::scalar_field_type field_type;
 
-                        static inline keypair_type process(const circuit_type &circuit) {
-                            typedef typename CurveType::scalar_field_type field_type;
+                        const uscs_constraint_system<field_type> uscs_cs =
+                            tbcs_to_uscs_instance_map<field_type>(circuit);
+                        const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair =
+                            uscs_ppzksnark<CurveType>::generator(uscs_cs);
 
-                            const uscs_constraint_system<field_type> uscs_cs =
-                                tbcs_to_uscs_instance_map<field_type>(circuit);
-                            const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair =
-                                uscs_ppzksnark<CurveType>::generator(uscs_cs);
-
-                            return keypair_type(proving_key_type(circuit, uscs_keypair.pk), uscs_keypair.vk);
-                        }
-                    };
-                }    // namespace policies
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                        return {{circuit, uscs_keypair.first}, uscs_keypair.second};
+                    }
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_GENERATOR_HPP

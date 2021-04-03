@@ -40,6 +40,8 @@ namespace nil {
                  */
                 template<typename CurveType>
                 struct uscs_ppzksnark_verification_key {
+                    typedef CurveType curve_type;
+
                     typename CurveType::g2_type::value_type tilde_g2;
                     typename CurveType::g2_type::value_type alpha_tilde_g2;
                     typename CurveType::g2_type::value_type Z_g2;

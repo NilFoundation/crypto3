@@ -45,6 +45,7 @@ namespace nil {
 
                     template<typename FieldType>
                     struct bacs_to_r1cs {
+                        typedef FieldType field_type;
 
                         /**
                          * Instance map for the BACS-to-R1CS reduction.

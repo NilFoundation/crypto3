@@ -58,26 +58,26 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    static inline keypair_type generator(const constraint_system_type &constraint_system) {
+                    static inline keypair_type generate(const constraint_system_type &constraint_system) {
                         return Generator::process(constraint_system);
                     }
 
-                    static inline proof_type prover(const proving_key_type &pk,
-                                                    const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input) {
+                    static inline proof_type prove(const proving_key_type &pk,
+                                                   const primary_input_type &primary_input,
+                                                   const auxiliary_input_type &auxiliary_input) {
 
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verifier(const verification_key_type &vk,
-                                                const primary_input_type &primary_input,
-                                                const proof_type &proof) {
+                    static inline bool verify(const verification_key_type &vk,
+                                              const primary_input_type &primary_input,
+                                              const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 
-                    static inline bool online_verifier(const processed_verification_key_type &pvk,
-                                                       const primary_input_type &primary_input,
-                                                       const proof_type &proof) {
+                    static inline bool online_verify(const processed_verification_key_type &pvk,
+                                                     const primary_input_type &primary_input,
+                                                     const proof_type &proof) {
                         return OnlineVerifier::process(pvk, primary_input, proof);
                     }
                 };

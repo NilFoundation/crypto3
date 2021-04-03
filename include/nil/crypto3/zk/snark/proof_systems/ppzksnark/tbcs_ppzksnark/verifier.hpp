@@ -53,201 +53,190 @@
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace policies {
 
-                    /*
-                     Below are four variants of verifier algorithm for the TBCS ppzkSNARK.
+                /*
+                 Below are four variants of verifier algorithm for the TBCS ppzkSNARK.
 
-                     These are the four cases that arise from the following two choices:
+                 These are the four cases that arise from the following two choices:
 
-                     (1) The verifier accepts a (non-processed) verification key or, instead, a processed
-                     verification key. In the latter case, we call the algorithm an "online verifier".
+                 (1) The verifier accepts a (non-processed) verification key or, instead, a processed
+                 verification key. In the latter case, we call the algorithm an "online verifier".
 
-                     (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
-                         Strong input consistency requires that |primary_input| = C.num_inputs, whereas
-                         weak input consistency requires that |primary_input| <= C.num_inputs (and
-                         the primary input is implicitly padded with zeros up to length C.num_inputs).
-                     */
+                 (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
+                     Strong input consistency requires that |primary_input| = C.num_inputs, whereas
+                     weak input consistency requires that |primary_input| <= C.num_inputs (and
+                     the primary input is implicitly padded with zeros up to length C.num_inputs).
+                 */
 
-                    /**
-                     * Convert a (non-processed) verification key into a processed verification key.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_verifier_process_vk {
-                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
+                /**
+                 * Convert a (non-processed) verification key into a processed verification key.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_verifier_process_vk {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline processed_verification_key_type process(const verification_key_type &vk) {
-                            const processed_verification_key_type pvk =
-                                uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                    static inline processed_verification_key_type process(const verification_key_type &vk) {
+                        return uscs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
+                    }
+                };
 
-                            return pvk;
-                        }
-                    };
+                /**
+                 * A verifier algorithm for the TBCS ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_verifier_weak_input_consistency {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    /**
-                     * A verifier algorithm for the TBCS ppzkSNARK that:
-                     * (1) accepts a non-processed verification key, and
-                     * (2) has weak input consistency.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_verifier_weak_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
+                public:
+                    typedef CurveType curve_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline bool process(const verification_key_type &vk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
-                            typedef typename CurveType::scalar_field_type field_type;
-                            const uscs_primary_input<field_type> uscs_input =
-                                algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
-                            const processed_verification_key_type pvk =
-                                tbcs_ppzksnark_verifier_process_vk(vk)<CurveType>::process;
-                            const bool bit = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                                pvk, uscs_input, proof);
+                    static inline bool process(const verification_key_type &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        typedef typename CurveType::scalar_field_type field_type;
+                        const uscs_primary_input<field_type> uscs_input =
+                            algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
+                        return uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                            tbcs_ppzksnark_verifier_process_vk<CurveType>::process(vk), uscs_input, proof);
+                    }
+                };
 
-                            return bit;
-                        }
-                    };
+                /**
+                 * A verifier algorithm for the TBCS ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_verifier_strong_input_consistency {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    /**
-                     * A verifier algorithm for the TBCS ppzkSNARK that:
-                     * (1) accepts a non-processed verification key, and
-                     * (2) has strong input consistency.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_verifier_strong_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    static inline bool process(const verification_key_type &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        typedef typename CurveType::scalar_field_type field_type;
+                        const uscs_primary_input<field_type> uscs_input =
+                            algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                        static inline bool process(const verification_key_type &vk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
-                            typedef typename CurveType::scalar_field_type field_type;
-                            const processed_verification_key pvk =
-                                tbcs_ppzksnark_verifier_process_vk<CurveType>::process(vk);
-                            const uscs_primary_input<field_type> uscs_input =
-                                algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
-                            const bool bit =
-                                uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
-                                    pvk, uscs_input, proof);
+                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                            tbcs_ppzksnark_verifier_process_vk<CurveType>::process(vk), uscs_input, proof);
+                    }
+                };
 
-                            return bit;
-                        }
-                    };
+                /**
+                 * A verifier algorithm for the TBCS ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_online_verifier_weak_input_consistency {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    /**
-                     * A verifier algorithm for the TBCS ppzkSNARK that:
-                     * (1) accepts a processed verification key, and
-                     * (2) has weak input consistency.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_online_verifier_weak_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
+                public:
+                    typedef CurveType curve_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline bool process(const processed_verification_key_type &pvk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
+                    static inline bool process(const processed_verification_key_type &pvk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
 
-                            typedef typename CurveType::scalar_field_type field_type;
-                            const uscs_primary_input<field_type> uscs_input =
-                                algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
-                            const bool bit = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                                pvk, uscs_input, proof);
+                        typedef typename CurveType::scalar_field_type field_type;
+                        const uscs_primary_input<field_type> uscs_input =
+                            algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                            return bit;
-                        }
-                    };
+                        return uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                            pvk, uscs_input, proof);
+                    }
+                };
 
-                    /**
-                     * A verifier algorithm for the TBCS ppzkSNARK that:
-                     * (1) accepts a processed verification key, and
-                     * (2) has strong input consistency.
-                     */
-                    template<typename CurveType>
-                    class tbcs_ppzksnark_online_verifier_strong_input_consistency {
-                        using types_policy = detail::tbcs_ppzksnark_policy<CurveType>;
+                /**
+                 * A verifier algorithm for the TBCS ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                class tbcs_ppzksnark_online_verifier_strong_input_consistency {
+                    typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
-                    public:
-                        typedef typename types_policy::circuit circuit_type;
-                        typedef typename types_policy::primary_input primary_input_type;
-                        typedef typename types_policy::auxiliary_input auxiliary_input_type;
+                public:
+                    typedef typename policy_type::circuit_type circuit_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                        typedef typename types_policy::proving_key proving_key_type;
-                        typedef typename types_policy::verification_key verification_key_type;
-                        typedef typename types_policy::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                        typedef typename types_policy::keypair keypair_type;
-                        typedef typename types_policy::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                        static inline bool process(const processed_verification_key_type &pvk,
-                                                   const primary_input_type &primary_input,
-                                                   const proof_type &proof) {
-                            typedef typename CurveType::scalar_field_type field_type;
-                            const uscs_primary_input<field_type> uscs_input =
-                                algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
-                            const bool bit =
-                                uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
-                                    pvk, uscs_input, proof);
+                    static inline bool process(const processed_verification_key_type &pvk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        typedef typename CurveType::scalar_field_type field_type;
+                        const uscs_primary_input<field_type> uscs_input =
+                            algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                            return bit;
-                        }
-                    };
-                }    // namespace policies
-            }        // namespace snark
-        }            // namespace zk
-    }                // namespace crypto3
+                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                            pvk, uscs_input, proof);
+                    }
+                };
+            }    // namespace snark
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_BASIC_VERIFIER_HPP

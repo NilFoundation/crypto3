@@ -37,46 +37,46 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType,
-                         typename Generator = policies::r1cs_se_ppzksnark_generator<CurveType>,
-                         typename Prover = policies::r1cs_se_ppzksnark_prover<CurveType>,
-                         typename Verifier = policies::r1cs_se_ppzksnark_verifier_strong_input_consistency<CurveType>,
+                         typename Generator = r1cs_se_ppzksnark_generator<CurveType>,
+                         typename Prover = r1cs_se_ppzksnark_prover<CurveType>,
+                         typename Verifier = r1cs_se_ppzksnark_verifier_strong_input_consistency<CurveType>,
                          typename OnlineVerifier =
-                             policies::r1cs_se_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
+                             r1cs_se_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
                 class r1cs_se_ppzksnark {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 
                 public:
-                    typedef typename policy_type::constraint_system constraint_system_type;
-                    typedef typename policy_type::primary_input primary_input_type;
-                    typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename policy_type::proving_key proving_key_type;
-                    typedef typename policy_type::verification_key verification_key_type;
-                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair keypair_type;
-                    typedef typename policy_type::proof proof_type;
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::proof_type proof_type;
 
-                    static inline keypair_type generator(const constraint_system_type &constraint_system) {
+                    static inline keypair_type generate(const constraint_system_type &constraint_system) {
                         return Generator::process(constraint_system);
                     }
 
-                    static inline proof_type prover(const proving_key_type &pk,
-                                                    const primary_input_type &primary_input,
-                                                    const auxiliary_input_type &auxiliary_input) {
+                    static inline proof_type prove(const proving_key_type &pk,
+                                                   const primary_input_type &primary_input,
+                                                   const auxiliary_input_type &auxiliary_input) {
 
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verifier(const verification_key_type &vk,
-                                                const primary_input_type &primary_input,
-                                                const proof_type &proof) {
+                    static inline bool verifiy(const verification_key_type &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
 
-                    static inline bool online_verifier(const processed_verification_key_type &pvk,
-                                                       const primary_input_type &primary_input,
-                                                       const proof_type &proof) {
+                    static inline bool online_verifiy(const processed_verification_key_type &pvk,
+                                                      const primary_input_type &primary_input,
+                                                      const proof_type &proof) {
                         return OnlineVerifier::process(pvk, primary_input, proof);
                     }
                 };

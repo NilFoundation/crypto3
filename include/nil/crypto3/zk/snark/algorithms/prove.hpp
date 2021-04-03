@@ -36,7 +36,7 @@ namespace nil {
                           const typename ProofSystemType::primary_input_type &primary_input,
                           const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
-                    return ProofSystemType::prover(pk, primary_input, auxiliary_input);
+                    return ProofSystemType::prove(pk, primary_input, auxiliary_input);
                 }
             }    // namespace snark
         }        // namespace zk

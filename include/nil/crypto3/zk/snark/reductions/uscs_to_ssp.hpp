@@ -58,10 +58,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                namespace reductons {
-
+                namespace reductions {
                     template<typename FieldType>
                     struct uscs_to_ssp {
+                        typedef FieldType field_type;
+
                         /**
                          * Instance map for the USCS-to-SSP reduction.
                          *
@@ -237,7 +238,7 @@ namespace nil {
                                                           std::move(coefficients_for_H));
                         }
                     };
-                }    // namespace reductons
+                }    // namespace reductions
             }        // namespace snark
         }            // namespace zk
     }                // namespace crypto3

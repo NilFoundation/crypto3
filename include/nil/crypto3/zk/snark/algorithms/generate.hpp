@@ -34,7 +34,7 @@ namespace nil {
                 typename ProofSystemType::keypair_type
                     generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
-                    return ProofSystemType::generator(constraint_system);
+                    return ProofSystemType::generate(constraint_system);
                 }
             }    // namespace snark
         }        // namespace zk

@@ -71,25 +71,25 @@ namespace nil {
                          * Below are various typedefs aliases (used for uniformity with other proof systems).
                          */
 
-                        typedef tbcs_circuit circuit;
+                        typedef tbcs_circuit circuit_type;
 
-                        typedef tbcs_primary_input primary_input;
+                        typedef tbcs_primary_input primary_input_type;
 
-                        typedef tbcs_auxiliary_input auxiliary_input;
+                        typedef tbcs_auxiliary_input auxiliary_input_type;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the TBCS ppzkSNARK.
                          */
-                        typedef tbcs_ppzksnark_proving_key<CurveType, circuit> proving_key;
+                        typedef tbcs_ppzksnark_proving_key<CurveType, circuit_type> proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the TBCS ppzkSNARK.
                          */
-                        typedef typename uscs_ppzksnark<CurveType>::verification_key_type verification_key;
+                        typedef typename uscs_ppzksnark<CurveType>::verification_key_type verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -101,21 +101,21 @@ namespace nil {
                          * enables a faster verification time.
                          */
                         typedef typename uscs_ppzksnark<CurveType>::processed_verification_key_type
-                            processed_verification_key;
+                            processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the TBCS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        typedef tbcs_ppzksnark_keypair<proving_key, verification_key> keypair;
+                        typedef tbcs_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
 
                         /*********************************** Proof ***********************************/
 
                         /**
                          * A proof for the TBCS ppzkSNARK.
                          */
-                        typedef typename uscs_ppzksnark<CurveType>::proof_type proof;
+                        typedef typename uscs_ppzksnark<CurveType>::proof_type proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark

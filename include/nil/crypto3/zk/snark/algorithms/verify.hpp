@@ -35,7 +35,7 @@ namespace nil {
                             const typename ProofSystemType::primary_input_type &primary_input,
                             const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::verifier(vk, primary_input, proof);
+                    return ProofSystemType::verify(vk, primary_input, proof);
                 }
 
                 template<typename ProofSystemType>
@@ -43,7 +43,7 @@ namespace nil {
                                      const typename ProofSystemType::primary_input_type &primary_input,
                                      const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::online_verifier(pvk, primary_input, proof);
+                    return ProofSystemType::online_verify(pvk, primary_input, proof);
                 }
             }    // namespace snark
         }        // namespace zk

@@ -35,14 +35,14 @@ namespace nil {
                                const typename ProofSystemType::primary_input_type &primary_input,
                                const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::online_verifier(pvk, primary_input, proof);
+                    return ProofSystemType::online_verify(pvk, primary_input, proof);
                 }
 
                 template<typename ProofSystemType>
                 typename ProofSystemType::keypair_type
                     generate_keys(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
-                    return ProofSystemType::generator(constraint_system);
+                    return ProofSystemType::generate(constraint_system);
                 }
 
                 template<typename ProofSystemType>
@@ -51,7 +51,7 @@ namespace nil {
                           const typename ProofSystemType::primary_input_type &primary_input,
                           const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
-                    return ProofSystemType::prover(pk, primary_input, auxiliary_input);
+                    return ProofSystemType::prove(pk, primary_input, auxiliary_input);
                 }
 
                 template<typename ProofSystemType>
@@ -59,7 +59,7 @@ namespace nil {
                             const typename ProofSystemType::primary_input_type &primary_input,
                             const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::verifier(vk, primary_input, proof);
+                    return ProofSystemType::verify(vk, primary_input, proof);
                 }
 
                 template<typename ProofSystemType>
@@ -67,7 +67,7 @@ namespace nil {
                                      const typename ProofSystemType::primary_input_type &primary_input,
                                      const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::online_verifier(pvk, primary_input, proof);
+                    return ProofSystemType::online_verify(pvk, primary_input, proof);
                 }
             }    // namespace snark
         }        // namespace zk

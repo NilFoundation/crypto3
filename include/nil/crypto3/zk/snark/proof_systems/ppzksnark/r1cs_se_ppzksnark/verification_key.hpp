@@ -43,19 +43,19 @@ namespace nil {
                     typedef CurveType curve_type;
 
                     // H
-                    typename CurveType::g2_type::value_type H;
+                    typename curve_type::g2_type::value_type H;
 
                     // G^{alpha}
-                    typename CurveType::g1_type::value_type G_alpha;
+                    typename curve_type::g1_type::value_type G_alpha;
 
                     // H^{beta}
-                    typename CurveType::g2_type::value_type H_beta;
+                    typename curve_type::g2_type::value_type H_beta;
 
                     // G^{gamma}
-                    typename CurveType::g1_type::value_type G_gamma;
+                    typename curve_type::g1_type::value_type G_gamma;
 
                     // H^{gamma}
-                    typename CurveType::g2_type::value_type H_gamma;
+                    typename curve_type::g2_type::value_type H_gamma;
 
                     // G^{gamma * A_i(t) + (alpha + beta) * A_i(t)}
                     // for 0 <= i <= sap.num_inputs()
