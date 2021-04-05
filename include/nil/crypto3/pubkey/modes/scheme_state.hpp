@@ -28,9 +28,10 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
-#include <nil/crypto3/pubkey/modes/accumulators/keys.hpp>
-#include <nil/crypto3/pubkey/modes/accumulators/signatures.hpp>
+// #include <nil/crypto3/pubkey/accumulators/scheme.hpp>
+// #include <nil/crypto3/pubkey/modes/accumulators/keys.hpp>
+// #include <nil/crypto3/pubkey/modes/accumulators/signatures.hpp>
+#include <nil/crypto3/pubkey/modes/accumulators/part_verify.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,10 +48,14 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename ProcessingMode>
-            using keys_accumulator_set = boost::accumulators::accumulator_set<
-                digest<ProcessingMode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::scheme_keys<ProcessingMode>>>;
+            // template<typename ProcessingMode>
+            // using keys_accumulator_set = boost::accumulators::accumulator_set<
+            //     digest<ProcessingMode::input_block_bits>,
+            //     boost::accumulators::features<accumulators::tag::scheme_keys<ProcessingMode>>>;
+
+            template<typename Mode>
+            using part_verification_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::result_type, boost::accumulators::features<accumulators::tag::part_verify<Mode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

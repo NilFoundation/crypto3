@@ -93,7 +93,7 @@ namespace nil {
                     sss_signature_group_type;
 
                 typedef no_key_ops<sss_public_key_group_type> sss_public_key_no_key_ops_type;
-                typedef no_key_ops<sss_signature_group_type> sss_signature_no_key_ops_ops;
+                typedef no_key_ops<sss_signature_group_type> sss_signature_no_key_ops_type;
 
                 typedef std::pair<typename sss_public_key_no_key_ops_type::share_type::first_type,
                                   base_scheme_private_key_type>
@@ -101,7 +101,7 @@ namespace nil {
                 typedef std::pair<typename sss_public_key_no_key_ops_type::public_share_type::first_type,
                                   base_scheme_public_key_type>
                     public_key_type;
-                typedef typename sss_signature_no_key_ops_ops::public_share_type part_signature_type;
+                typedef typename sss_signature_no_key_ops_type::indexed_public_element_type part_signature_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
                 typedef typename base_scheme_public_key_type::public_params_type public_params_type;
@@ -116,6 +116,15 @@ namespace nil {
                 public_key() {
                 }
 
+                //
+                // PK
+                //
+                public_key(const typename sss_public_key_no_key_ops_type::public_element_type &key) : pubkey(0, key) {
+                }
+
+                //
+                // VK_i
+                //
                 public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key) :
                     pubkey(key.first, base_scheme_public_key_type(key.second)) {
                     assert(sss_public_key_no_key_ops_type::check_participant_index(key.first));
@@ -127,6 +136,7 @@ namespace nil {
                                                                 typename MsgRange::iterator>::value_type>::value,
                              bool>::type = true>
                 inline bool verify(const MsgRange &msg, const signature_type &sig) const {
+                    assert(check_PK());
                     return pubkey.second.verify(msg, sig);
                 }
 
@@ -141,6 +151,10 @@ namespace nil {
                 }
 
             protected:
+                inline bool check_PK() const {
+                    return 0 == pubkey.first;
+                }
+
                 public_key_type pubkey;
             };
 
@@ -167,7 +181,7 @@ namespace nil {
                 typedef typename base_type::sss_signature_group_type sss_signature_group_type;
 
                 typedef typename base_type::sss_public_key_no_key_ops_type sss_public_key_no_key_ops_type;
-                typedef typename base_type::sss_signature_no_key_ops_ops sss_signature_no_key_ops_ops;
+                typedef typename base_type::sss_signature_no_key_ops_type sss_signature_no_key_ops_type;
 
                 typedef typename base_type::private_key_type private_key_type;
                 typedef typename base_type::public_key_type public_key_type;
@@ -229,8 +243,8 @@ namespace nil {
                 typedef typename scheme_public_key_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename scheme_public_key_type::sss_signature_group_type sss_signature_group_type;
 
-                typedef typename scheme_public_key_type::sss_public_key_ops sss_public_key_no_key_ops_type;
-                typedef typename scheme_public_key_type::sss_signature_ops sss_signature_no_key_ops_ops;
+                typedef typename scheme_public_key_type::sss_public_key_no_key_ops_type sss_public_key_no_key_ops_type;
+                typedef typename scheme_public_key_type::sss_signature_no_key_ops_type sss_signature_no_key_ops_type;
 
                 typedef typename scheme_public_key_type::private_key_type private_key_type;
                 typedef typename scheme_public_key_type::public_key_type public_key_type;
@@ -247,9 +261,9 @@ namespace nil {
                 constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
 
                 template<typename Signatures,
-                         typename sss_signature_no_key_ops_ops::template check_public_shares_type<Signatures> = true>
+                         typename sss_signature_no_key_ops_type::template check_public_shares_type<Signatures> = true>
                 static inline signature_type aggregate(const Signatures &signatures) {
-                    return sss_signature_no_key_ops_ops::reconstruct_public_element(signatures);
+                    return sss_signature_no_key_ops_type::reconstruct_public_element(signatures);
                 }
             };
 
@@ -273,7 +287,7 @@ namespace nil {
                     sss_signature_group_type;
 
                 typedef no_key_ops<sss_public_key_group_type> sss_public_key_no_key_ops_type;
-                typedef no_key_ops<sss_signature_group_type> sss_signature_no_key_ops_ops;
+                typedef no_key_ops<sss_signature_group_type> sss_signature_no_key_ops_type;
 
                 typedef std::pair<typename sss_public_key_no_key_ops_type::share_type::first_type,
                                   std::unordered_map<typename sss_public_key_no_key_ops_type::share_type::first_type,
@@ -281,9 +295,9 @@ namespace nil {
                     private_key_type;
                 typedef std::pair<typename sss_public_key_no_key_ops_type::share_type::first_type,
                                   std::unordered_map<typename sss_public_key_no_key_ops_type::share_type::first_type,
-                                                     base_scheme_private_key_type>>
+                                                     base_scheme_public_key_type>>
                     public_key_type;
-                typedef typename sss_signature_no_key_ops_ops::public_share_type part_signature_type;
+                typedef typename sss_signature_no_key_ops_type::indexed_public_element_type part_signature_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
                 typedef typename base_scheme_public_key_type::public_params_type public_params_type;
@@ -298,11 +312,57 @@ namespace nil {
                 public_key() {
                 }
 
-                public_key(const public_key_type &pubkey) {
+                //
+                // PK
+                //
+                public_key(const typename sss_public_key_no_key_ops_type::public_element_type &key) :
+                    pubkey(0, typename public_key_type::second_type::value_type(0, key)) {
+                }
+
+                // TODO: is it possible to add caching of computed VK_i
+                //
+                // VK_i
+                //
+                public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key) :
+                    VK_i(sss_public_key_no_key_ops_type::reconstruct_public_element(key)) {
+                    key_init(key);
+                }
+
+                template<typename MsgRange,
+                         typename std::enable_if<
+                             std::is_same<input_value_type, typename std::iterator_traits<
+                                                                typename MsgRange::iterator>::value_type>::value,
+                             bool>::type = true>
+                inline bool verify(const MsgRange &msg, const signature_type &sig) const {
+                    assert(check_PK());
+                    return pubkey.second.verify(msg, sig);
+                }
+
+                template<typename MsgRange,
+                         typename std::enable_if<
+                             std::is_same<input_value_type, typename std::iterator_traits<
+                                                                typename MsgRange::iterator>::value_type>::value,
+                             bool>::type = true>
+                inline bool part_verify(const MsgRange &msg, const part_signature_type &part_sig) const {
+                    assert(pubkey.first == part_sig.first);
+                    return VK_i.verify(msg, part_sig.second);
                 }
 
             protected:
+                inline void key_init(const typename sss_public_key_no_key_ops_type::public_share_type &key) {
+                    assert(sss_public_key_no_key_ops_type::check_participant_index(key.first));
+                    pubkey.first = key.first;
+                    for (const auto &part_s : key.second) {
+                        assert(pubkey.second.emplace(part_s).second);
+                    }
+                }
+
+                inline void check_PK() const {
+                    return 0 == pubkey.first && 1 == pubkey.second.size() && 0 == pubkey.second.begin()->first;
+                }
+
                 public_key_type pubkey;
+                base_scheme_public_key_type VK_i;
             };
 
             template<typename Scheme, template<typename> class SecretSharingScheme>
@@ -321,7 +381,7 @@ namespace nil {
                 typedef typename base_type::sss_signature_group_type sss_signature_group_type;
 
                 typedef typename base_type::sss_public_key_no_key_ops_type sss_public_key_no_key_ops_type;
-                typedef typename base_type::sss_signature_no_key_ops_ops sss_signature_no_key_ops_ops;
+                typedef typename base_type::sss_signature_no_key_ops_type sss_signature_no_key_ops_type;
 
                 typedef typename base_type::private_key_type private_key_type;
                 typedef typename base_type::public_key_type public_key_type;
@@ -336,6 +396,36 @@ namespace nil {
 
                 typedef typename input_block_type::value_type input_value_type;
                 constexpr static const std::size_t input_value_bits = 8;
+
+                private_key() {
+                }
+
+                private_key(const typename sss_public_key_no_key_ops_type::share_type &key) :
+                    s_i(sss_public_key_no_key_ops_type::reconstruct_secret(key)),
+                    base_type(sss_public_key_no_key_ops_type::get_public_share(key)) {
+                    key_init(key);
+                }
+
+                template<typename MsgRange,
+                         typename std::enable_if<
+                             std::is_same<input_value_type, typename std::iterator_traits<
+                                                                typename MsgRange::iterator>::value_type>::value,
+                             bool>::type = true>
+                inline part_signature_type sign(const MsgRange &msg) const {
+                    return part_signature_type(privkey.first, s_i.sign(msg));
+                }
+
+            protected:
+                inline void key_init(const typename sss_public_key_no_key_ops_type::share_type &key) {
+                    assert(sss_public_key_no_key_ops_type::check_participant_index(key.first));
+                    privkey.first = key.first;
+                    for (const auto &part_s : key.second) {
+                        assert(privkey.second.emplace(part_s).second);
+                    }
+                }
+
+                private_key_type privkey;
+                base_scheme_private_key_type s_i;
             };
 
             template<typename Scheme, template<typename> class SecretSharingScheme>
@@ -355,8 +445,8 @@ namespace nil {
                 typedef typename scheme_public_key_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename scheme_public_key_type::sss_signature_group_type sss_signature_group_type;
 
-                typedef typename scheme_public_key_type::sss_public_key_ops sss_public_key_no_key_ops_type;
-                typedef typename scheme_public_key_type::sss_signature_ops sss_signature_no_key_ops_ops;
+                typedef typename scheme_public_key_type::sss_public_key_no_key_ops_type sss_public_key_no_key_ops_type;
+                typedef typename scheme_public_key_type::sss_signature_no_key_ops_type sss_signature_no_key_ops_type;
 
                 typedef typename scheme_public_key_type::private_key_type private_key_type;
                 typedef typename scheme_public_key_type::public_key_type public_key_type;
@@ -371,6 +461,12 @@ namespace nil {
 
                 typedef typename input_block_type::value_type input_value_type;
                 constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
+
+                template<typename Signatures,
+                         typename sss_signature_no_key_ops_type::template check_public_shares_type<Signatures> = true>
+                static inline signature_type aggregate(const Signatures &signatures) {
+                    return sss_signature_no_key_ops_type::reduce_public_elements(signatures);
+                }
             };
         }    // namespace pubkey
     }        // namespace crypto3
