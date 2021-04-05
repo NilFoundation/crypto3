@@ -50,6 +50,8 @@ namespace nil {
 
                     typedef scalar_field_value_type private_element_type;
                     typedef group_value_type public_element_type;
+                    typedef std::pair<std::size_t, private_element_type> indexed_private_element_type;
+                    typedef std::pair<std::size_t, public_element_type> indexed_public_element_type;
 
                     //===========================================================================
                     // secret sharing scheme logical types
@@ -58,8 +60,8 @@ namespace nil {
                     typedef public_element_type public_coeff_type;
                     typedef std::vector<coeff_type> coeffs_type;
                     typedef std::vector<public_coeff_type> public_coeffs_type;
-                    typedef std::pair<std::size_t, private_element_type> share_type;
-                    typedef std::pair<std::size_t, public_element_type> public_share_type;
+                    typedef indexed_private_element_type share_type;
+                    typedef indexed_public_element_type public_share_type;
                     typedef std::unordered_map<std::size_t, private_element_type> shares_type;
                     typedef std::unordered_map<std::size_t, public_element_type> public_shares_type;
                     typedef std::set<std::size_t> indexes_type;
@@ -111,6 +113,14 @@ namespace nil {
                     template<typename IndexedElement>
                     using check_indexed_element_type = typename std::enable_if<
                         std::is_same<get_indexed_element_type<IndexedElement>, IndexedElement>::value, bool>::type;
+
+                    template<typename PublicElements>
+                    using check_public_elements_type = check_public_element_type<
+                        typename std::iterator_traits<typename PublicElements::iterator>::value_type>;
+
+                    template<typename PrivateElements>
+                    using check_private_elements_type = check_private_element_type<
+                        typename std::iterator_traits<typename PrivateElements::iterator>::value_type>;
 
                     template<typename IndexedPrivateElements>
                     using check_indexed_private_elements_type = check_indexed_private_element_type<
@@ -216,6 +226,28 @@ namespace nil {
                             if (j != i) {
                                 result = result * (private_element_type(j) / (private_element_type(j) - e_i));
                             }
+                        }
+                        return result;
+                    }
+
+                    template<typename PublicElements, check_public_elements_type<PublicElements> = true>
+                    static inline public_element_type reduce_public_element(const PublicElements &public_elements) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicElements>));
+                        assert(check_minimal_size(std::distance(public_elements.begin(), public_elements.end())));
+                        return std::accumulate(public_elements.begin(), public_elements.end(),
+                                               public_element_type::zero());
+                    }
+
+                    template<typename IndexedPublicElements,
+                             check_indexed_public_elements_type<IndexedPublicElements> = true>
+                    static inline public_element_type
+                        reduce_public_element(const IndexedPublicElements &indexed_public_elements) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPublicElements>));
+                        assert(check_minimal_size(
+                            std::distance(indexed_public_elements.begin(), indexed_public_elements.end())));
+                        public_element_type result = public_element_type::zero();
+                        for (const auto &[i, e] : indexed_public_elements) {
+                            result = result + e;
                         }
                         return result;
                     }

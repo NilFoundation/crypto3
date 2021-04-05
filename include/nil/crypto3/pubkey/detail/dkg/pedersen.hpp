@@ -64,14 +64,6 @@ namespace nil {
                         }
                         return share_type(index, share);
                     }
-
-                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
-                                                        typename PublicCoeffs::value_type> = true>
-                    static inline public_element_type reduce_public_coeffs(const PublicCoeffs &coeffs) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
-                        assert(base_type::check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
-                        return std::accumulate(coeffs.begin(), coeffs.end(), public_element_type::zero());
-                    }
                 };
             }    // namespace detail
         }        // namespace pubkey

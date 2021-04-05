@@ -45,6 +45,8 @@ namespace nil {
                 typedef typename ops_type::group_type group_type;
                 typedef typename ops_type::private_element_type private_element_type;
                 typedef typename ops_type::public_element_type public_element_type;
+                typedef typename ops_type::indexed_private_element_type indexed_private_element_type;
+                typedef typename ops_type::indexed_public_element_type indexed_public_element_type;
                 typedef typename ops_type::share_type share_type;
                 typedef typename ops_type::shares_type shares_type;
                 typedef typename ops_type::public_share_type public_share_type;
@@ -225,6 +227,11 @@ namespace nil {
                 static inline typename scheme_type::public_element_type
                     reconstruct_public_element(const PublicShares &public_shares) {
                     return scheme_type::ops_type::reconstruct_public_element(public_shares);
+                }
+
+                template<typename PublicElements>
+                static inline typename scheme_type::public_element_type reduce_public_elements(const PublicElements &public_elements) {
+                    return scheme_type::ops_type::reduce_public_elements(public_elements);
                 }
 
                 template<typename Number1, typename Number2>

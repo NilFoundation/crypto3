@@ -40,6 +40,8 @@ namespace nil {
                 typedef typename ops_type::group_type group_type;
                 typedef typename ops_type::private_element_type private_element_type;
                 typedef typename ops_type::public_element_type public_element_type;
+                typedef typename ops_type::indexed_private_element_type indexed_private_element_type;
+                typedef typename ops_type::indexed_public_element_type indexed_public_element_type;
                 typedef typename ops_type::share_type share_type;
                 typedef typename ops_type::shares_type shares_type;
                 typedef typename ops_type::public_share_type public_share_type;
