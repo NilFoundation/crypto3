@@ -32,6 +32,7 @@
 #define CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
@@ -47,7 +48,7 @@ namespace nil {
 
                     template<typename CurveType>
                     class basic_curve_component_policy;
-                    
+
                     /**
                      * Specialization for MNT6.
                      */
@@ -55,14 +56,14 @@ namespace nil {
                     class basic_curve_component_policy<curves::mnt6<Version>> {
                         using curve_type = typename curves::mnt6<Version>;
 
-                        typedef typename curve_type::pairing_policy::other_curve_type other_curve_type;    // mnt4
+                        typedef typename curve_type::pairing::pair_curve_type pair_curve_type;    // mnt4
 
-                        typedef typename other_curve_type::pairing_policy::Fqe_type fqe_type;
-                        typedef typename other_curve_type::pairing_policy::Fqk_type fqk_type;
+                        typedef typename pair_curve_type::pairing::Fqe_type fqe_type;
+                        typedef typename pair_curve_type::pairing::Fqk_type fqk_type;
 
-                        typedef typename curve_type::pairing_policy::Fp_type field_type;
+                        typedef typename curve_type::pairing::Fp_type field_type;
+
                     public:
-
                         typedef Fp2_variable<fqe_type> Fqe_variable_type;
                         typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;
                         typedef Fp2_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
@@ -73,11 +74,10 @@ namespace nil {
                         typedef Fp4_mul_component<fqk_type> Fqk_special_mul_component_type;
                         typedef Fp4_sqr_component<fqk_type> Fqk_sqr_component_type;
                     };
-
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP

@@ -44,7 +44,7 @@ namespace nil {
 
                     template<typename FieldType>
                     struct as_waksman_routing_component : public component<FieldType> {
-                    
+
                         /*
                           Indexing conventions:
 
@@ -94,7 +94,8 @@ namespace nil {
                     };
 
                     template<typename FieldType>
-                    void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size);
+                    void test_as_waksman_routing_component(const std::size_t num_packets,
+                                                           const std::size_t packet_size);
 
                     template<typename FieldType>
                     as_waksman_routing_component<FieldType>::as_waksman_routing_component(
@@ -193,12 +194,12 @@ namespace nil {
                                         const std::size_t straight_edge = neighbors[column_idx][switch_input].first;
                                         const std::size_t cross_edge = neighbors[column_idx][switch_input].second;
 
-                                        this->bp.add_r1cs_constraint(
-                                            r1cs_constraint<FieldType>(routed_packets[column_idx][switch_input][0] -
-                                                                           routed_packets[column_idx + 1][straight_edge][0],
-                                                                       routed_packets[column_idx][switch_input][0] -
-                                                                           routed_packets[column_idx + 1][cross_edge][0],
-                                                                       0));
+                                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                                            routed_packets[column_idx][switch_input][0] -
+                                                routed_packets[column_idx + 1][straight_edge][0],
+                                            routed_packets[column_idx][switch_input][0] -
+                                                routed_packets[column_idx + 1][cross_edge][0],
+                                            0));
                                     }
                                 } else {
                                     /* require switching bit to be boolean */
@@ -206,7 +207,8 @@ namespace nil {
                                                                                 asw_switch_bits[column_idx][row_idx]);
 
                                     /* route forward according to the switch bit */
-                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
+                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
+                                         ++subpacket_idx) {
                                         /*
                                           (1-switch_bit) * (cur-straight_edge) + switch_bit * (cur-cross_edge) = 0
                                           switch_bit * (cross_edge-straight_edge) = cur-straight_edge
@@ -248,7 +250,8 @@ namespace nil {
                                     /* this is a straight edge, so just pass the values forward */
                                     const std::size_t next = neighbors[column_idx][row_idx].first;
 
-                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
+                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
+                                         ++subpacket_idx) {
                                         this->bp.val(routed_packets[column_idx + 1][next][subpacket_idx]) =
                                             this->bp.val(routed_packets[column_idx][row_idx][subpacket_idx]);
                                     }
@@ -288,7 +291,8 @@ namespace nil {
                     }
 
                     template<typename FieldType>
-                    void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
+                    void test_as_waksman_routing_component(const std::size_t num_packets,
+                                                           const std::size_t packet_size) {
                         blueprint<FieldType> bp;
                         integer_permutation permutation(num_packets);
                         permutation.random_shuffle();
@@ -320,10 +324,10 @@ namespace nil {
                         assert(!bp.is_satisfied());
                     }
 
-                }    // namespace components        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // AS_WAKSMAN_ROUTING_COMPONENT_HPP

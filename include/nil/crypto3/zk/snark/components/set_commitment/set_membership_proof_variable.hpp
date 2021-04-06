@@ -54,7 +54,8 @@ namespace nil {
                             tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) {
                             if (tree_depth > 0) {
                                 address_bits.allocate(bp, tree_depth);
-                                merkle_path.reset(new merkle_authentication_path_variable<FieldType, Hash>(bp, tree_depth));
+                                merkle_path.reset(
+                                    new merkle_authentication_path_variable<FieldType, Hash>(bp, tree_depth));
                             }
                         }
 
@@ -68,8 +69,8 @@ namespace nil {
                         }
                         void generate_r1cs_witness(const set_membership_proof &proof) {
                             if (tree_depth > 0) {
-                                address_bits.fill_with_bits_of_field_element(this->bp,
-                                                                             typename FieldType::value_type(proof.address));
+                                address_bits.fill_with_bits_of_field_element(
+                                    this->bp, typename FieldType::value_type(proof.address));
                                 merkle_path->generate_r1cs_witness(proof.address, proof.merkle_path);
                             }
                         }
@@ -99,11 +100,10 @@ namespace nil {
                             return bp.full_variable_assignment();
                         }
                     };
-
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SET_MEMBERSHIP_PROOF_VARIABLE_HPP

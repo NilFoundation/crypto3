@@ -104,11 +104,10 @@ namespace nil {
                             return merkle_tree_check_read_component<FieldType, Hash>::root_size_in_bits();
                         }
                     };
-
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SET_COMMITMENT_COMPONENT_HPP

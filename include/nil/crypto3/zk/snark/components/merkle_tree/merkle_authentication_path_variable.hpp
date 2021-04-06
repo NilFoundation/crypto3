@@ -88,9 +88,9 @@ namespace nil {
                     };
 
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP

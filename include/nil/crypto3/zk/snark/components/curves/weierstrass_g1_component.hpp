@@ -44,22 +44,22 @@ namespace nil {
             namespace snark {
                 namespace components {
 
-                    using namespace nil::crypto3::algebra::pairings;
+                    using namespace nil::crypto3::algebra::pairing;
 
                     /**
                      * Gadget that represents a G1 variable.
                      */
                     template<typename CurveType>
-                    class G1_variable : public component<typename CurveType::scalar_field_type> {
+                    class g1_variable : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
-                    public:
 
+                    public:
                         blueprint_linear_combination<FieldType> X;
                         blueprint_linear_combination<FieldType> Y;
 
                         blueprint_linear_combination_vector<FieldType> all_vars;
 
-                        G1_variable(blueprint<FieldType> &bp) : component<FieldType>(bp) {
+                        g1_variable(blueprint<FieldType> &bp) : component<FieldType>(bp) {
                             blueprint_variable<FieldType> X_var, Y_var;
 
                             X_var.allocate(bp);
@@ -72,10 +72,11 @@ namespace nil {
                             all_vars.emplace_back(Y);
                         }
 
-                        G1_variable(blueprint<FieldType> &bp,
-                                    const typename other_curve_type<CurveType>::g1_type::value_type &P) :
+                        g1_variable(blueprint<FieldType> &bp,
+                                    const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P) :
                             component<FieldType>(bp) {
-                            typename other_curve_type<CurveType>::g1_type::value_type Pcopy = P.to_affine_coordinates();
+                            typename CurveType::pairing::pair_curve_type::g1_type::value_type Pcopy =
+                                P.to_affine_coordinates();
 
                             X.assign(bp, Pcopy.X);
                             Y.assign(bp, Pcopy.Y);
@@ -85,8 +86,10 @@ namespace nil {
                             all_vars.emplace_back(Y);
                         }
 
-                        void generate_r1cs_witness(const typename other_curve_type<CurveType>::g1_type::value_type &el) {
-                            typename other_curve_type<CurveType>::g1_type::value_type el_normalized = el.to_affine_coordinates();
+                        void generate_r1cs_witness(
+                            const typename CurveType::pairing::pair_curve_type::g1_type::value_type &el) {
+                            typename CurveType::pairing::pair_curve_type::g1_type::value_type el_normalized =
+                                el.to_affine_coordinates();
 
                             this->bp.lc_val(X) = el_normalized.X;
                             this->bp.lc_val(Y) = el_normalized.Y;
@@ -108,13 +111,13 @@ namespace nil {
                     template<typename CurveType>
                     class G1_checker_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
-                    public:
 
-                        G1_variable<CurveType> P;
+                    public:
+                        g1_variable<CurveType> P;
                         blueprint_variable<FieldType> P_X_squared;
                         blueprint_variable<FieldType> P_Y_squared;
 
-                        G1_checker_component(blueprint<FieldType> &bp, const G1_variable<CurveType> &P) :
+                        G1_checker_component(blueprint<FieldType> &bp, const g1_variable<CurveType> &P) :
                             component<FieldType>(bp), P(P) {
                             P_X_squared.allocate(bp);
                             P_Y_squared.allocate(bp);
@@ -124,8 +127,10 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 {P.X},
-                                {P_X_squared, blueprint_variable<FieldType>(0) * other_curve_type<CurveType>::a},
-                                {P_Y_squared, blueprint_variable<FieldType>(0) * (-other_curve_type<CurveType>::b)}));
+                                {P_X_squared,
+                                 blueprint_variable<FieldType>(0) * CurveType::pairing::pair_curve_type::a},
+                                {P_Y_squared,
+                                 blueprint_variable<FieldType>(0) * (-CurveType::pairing::pair_curve_type::b)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(P_X_squared) = this->bp.lc_val(P.X).squared();
@@ -139,19 +144,19 @@ namespace nil {
                     template<typename CurveType>
                     class G1_add_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
-                    public:
 
+                    public:
                         blueprint_variable<FieldType> lambda;
                         blueprint_variable<FieldType> inv;
 
-                        G1_variable<CurveType> A;
-                        G1_variable<CurveType> B;
-                        G1_variable<CurveType> C;
+                        g1_variable<CurveType> A;
+                        g1_variable<CurveType> B;
+                        g1_variable<CurveType> C;
 
                         G1_add_component(blueprint<FieldType> &bp,
-                                         const G1_variable<CurveType> &A,
-                                         const G1_variable<CurveType> &B,
-                                         const G1_variable<CurveType> &C) :
+                                         const g1_variable<CurveType> &A,
+                                         const g1_variable<CurveType> &B,
+                                         const g1_variable<CurveType> &C) :
                             component<FieldType>(bp),
                             A(A), B(B), C(C) {
                             /*
@@ -178,13 +183,14 @@ namespace nil {
                             this->bp.add_r1cs_constraint(
                                 r1cs_constraint<FieldType>({lambda}, {B.X, A.X * (-1)}, {B.Y, A.Y * (-1)}));
 
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {C.X, A.X, B.X}));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>({lambda}, {lambda}, {C.X, A.X, B.X}));
 
                             this->bp.add_r1cs_constraint(
                                 r1cs_constraint<FieldType>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
 
-                            this->bp.add_r1cs_constraint(
-                                r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {blueprint_variable<FieldType>(0)}));
+                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                                {inv}, {B.X, A.X * (-1)}, {blueprint_variable<FieldType>(0)}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(inv) = (this->bp.lc_val(B.X) - this->bp.lc_val(A.X)).inversed();
@@ -192,7 +198,8 @@ namespace nil {
                             this->bp.lc_val(C.X) =
                                 this->bp.val(lambda).squared() - this->bp.lc_val(A.X) - this->bp.lc_val(B.X);
                             this->bp.lc_val(C.Y) =
-                                this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(C.X)) - this->bp.lc_val(A.Y);
+                                this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(C.X)) -
+                                this->bp.lc_val(A.Y);
                         }
                     };
 
@@ -202,17 +209,17 @@ namespace nil {
                     template<typename CurveType>
                     class G1_dbl_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
-                    public:
 
+                    public:
                         blueprint_variable<FieldType> Xsquared;
                         blueprint_variable<FieldType> lambda;
 
-                        G1_variable<CurveType> A;
-                        G1_variable<CurveType> B;
+                        g1_variable<CurveType> A;
+                        g1_variable<CurveType> B;
 
                         G1_dbl_component(blueprint<FieldType> &bp,
-                                         const G1_variable<CurveType> &A,
-                                         const G1_variable<CurveType> &B) :
+                                         const g1_variable<CurveType> &A,
+                                         const g1_variable<CurveType> &B) :
                             component<FieldType>(bp),
                             A(A), B(B) {
                             Xsquared.allocate(bp);
@@ -221,25 +228,29 @@ namespace nil {
                         void generate_r1cs_constraints() {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({A.X}, {A.X}, {Xsquared}));
 
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                {lambda * 2},
-                                {A.Y},
-                                {Xsquared * 3, blueprint_variable<FieldType>(0x00) * other_curve_type<CurveType>::a}));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>({lambda * 2},
+                                                           {A.Y},
+                                                           {Xsquared * 3, blueprint_variable<FieldType>(0x00) *
+                                                                              CurveType::pairing::pair_curve_type::a}));
 
-                            this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
                             this->bp.add_r1cs_constraint(
                                 r1cs_constraint<FieldType>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
                         }
                         void generate_r1cs_witness() {
                             this->bp.val(Xsquared) = this->bp.lc_val(A.X).squared();
-                            this->bp.val(lambda) = (typename FieldType::value_type(0x03) * this->bp.val(Xsquared) +
-                                                    other_curve_type<CurveType>::a) *
-                                                   (typename FieldType::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
+                            this->bp.val(lambda) =
+                                (typename FieldType::value_type(0x03) * this->bp.val(Xsquared) +
+                                 CurveType::pairing::pair_curve_type::a) *
+                                (typename FieldType::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
                             this->bp.lc_val(B.X) = this->bp.val(lambda).squared() -
                                                    typename FieldType::value_type(0x02) * this->bp.lc_val(A.X);
                             this->bp.lc_val(B.Y) =
-                                this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(B.X)) - this->bp.lc_val(A.Y);
+                                this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(B.X)) -
+                                this->bp.lc_val(A.Y);
                         }
                     };
 
@@ -249,29 +260,29 @@ namespace nil {
                     template<typename CurveType>
                     class G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
-                    public:
 
-                        std::vector<G1_variable<CurveType>> computed_results;
-                        std::vector<G1_variable<CurveType>> chosen_results;
+                    public:
+                        std::vector<g1_variable<CurveType>> computed_results;
+                        std::vector<g1_variable<CurveType>> chosen_results;
                         std::vector<G1_add_component<CurveType>> adders;
                         std::vector<G1_dbl_component<CurveType>> doublers;
 
-                        G1_variable<CurveType> base;
+                        g1_variable<CurveType> base;
                         blueprint_variable_vector<FieldType> scalars;
-                        std::vector<G1_variable<CurveType>> points;
-                        std::vector<G1_variable<CurveType>> points_and_powers;
-                        G1_variable<CurveType> result;
+                        std::vector<g1_variable<CurveType>> points;
+                        std::vector<g1_variable<CurveType>> points_and_powers;
+                        g1_variable<CurveType> result;
 
                         const std::size_t elt_size;
                         const std::size_t num_points;
                         const std::size_t scalar_size;
 
                         G1_multiscalar_mul_component(blueprint<FieldType> &bp,
-                                                     const G1_variable<CurveType> &base,
+                                                     const g1_variable<CurveType> &base,
                                                      const blueprint_variable_vector<FieldType> &scalars,
                                                      const std::size_t elt_size,
-                                                     const std::vector<G1_variable<CurveType>> &points,
-                                                     const G1_variable<CurveType> &result) :
+                                                     const std::vector<g1_variable<CurveType>> &points,
+                                                     const g1_variable<CurveType> &result) :
                             component<FieldType>(bp),
                             base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
                             num_points(points.size()), scalar_size(scalars.size()) {
@@ -281,17 +292,19 @@ namespace nil {
                             for (std::size_t i = 0; i < num_points; ++i) {
                                 points_and_powers.emplace_back(points[i]);
                                 for (std::size_t j = 0; j < elt_size - 1; ++j) {
-                                    points_and_powers.emplace_back(G1_variable<CurveType>(bp));
-                                    doublers.emplace_back(G1_dbl_component<CurveType>(
-                                        bp, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
+                                    points_and_powers.emplace_back(g1_variable<CurveType>(bp));
+                                    doublers.emplace_back(
+                                        G1_dbl_component<CurveType>(bp,
+                                                                    points_and_powers[i * elt_size + j],
+                                                                    points_and_powers[i * elt_size + j + 1]));
                                 }
                             }
 
                             chosen_results.emplace_back(base);
                             for (std::size_t i = 0; i < scalar_size; ++i) {
-                                computed_results.emplace_back(G1_variable<CurveType>(bp));
+                                computed_results.emplace_back(g1_variable<CurveType>(bp));
                                 if (i < scalar_size - 1) {
-                                    chosen_results.emplace_back(G1_variable<CurveType>(bp));
+                                    chosen_results.emplace_back(g1_variable<CurveType>(bp));
                                 } else {
                                     chosen_results.emplace_back(result);
                                 }
@@ -339,20 +352,22 @@ namespace nil {
                             for (std::size_t i = 0; i < scalar_size; ++i) {
                                 adders[i].generate_r1cs_witness();
                                 this->bp.lc_val(chosen_results[i + 1].X) =
-                                    (this->bp.val(scalars[i]) == typename CurveType::scalar_field_type::value_type::zero() ?
+                                    (this->bp.val(scalars[i]) ==
+                                             typename CurveType::scalar_field_type::value_type::zero() ?
                                          this->bp.lc_val(chosen_results[i].X) :
                                          this->bp.lc_val(computed_results[i].X));
                                 this->bp.lc_val(chosen_results[i + 1].Y) =
-                                    (this->bp.val(scalars[i]) == typename CurveType::scalar_field_type::value_type::zero() ?
+                                    (this->bp.val(scalars[i]) ==
+                                             typename CurveType::scalar_field_type::value_type::zero() ?
                                          this->bp.lc_val(chosen_results[i].Y) :
                                          this->bp.lc_val(computed_results[i].Y));
                             }
                         }
                     };
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP

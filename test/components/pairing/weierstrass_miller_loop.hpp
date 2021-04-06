@@ -35,25 +35,25 @@ template<typename CurveType>
 void test_mnt_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = pairings::other_curve_type<curve_type>;
-    using curve_pairing_policy = typename curve_type::pairing_policy;
-    using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
+    using pair_curve_type = pairing::pair_curve_type<curve_type>;
+    using curve_pairing_policy = typename curve_type::pairing;
+    using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
     using component_policy = components::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
-    typename other_curve_type::g1_type::value_type P_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    components::G1_variable<curve_type> P(bp);
-    components::G2_variable<curve_type> Q(bp);
+    components::g1_variable<curve_type> P(bp);
+    components::g2_variable<curve_type> Q(bp);
 
-    components::G1_precomputation<curve_type> prec_P;
-    components::G2_precomputation<curve_type> prec_Q;
+    components::g1_precomputation<curve_type> prec_P;
+    components::g2_precomputation<curve_type> prec_Q;
 
     components::precompute_G1_component<curve_type> compute_prec_P(bp, P, prec_P);
     components::precompute_G2_component<curve_type> compute_prec_Q(bp, Q, prec_Q);
@@ -75,12 +75,12 @@ void test_mnt_miller_loop(){
     miller.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P = 
-        affine_ate_precompute_G1<other_curve_type>(P_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q = 
-        affine_ate_precompute_G2<other_curve_type>(Q_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P = 
+        affine_ate_precompute_G1<pair_curve_type>(P_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q = 
+        affine_ate_precompute_G2<pair_curve_type>(Q_val);
     typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
-        affine_ate_miller_loop<other_curve_type>(native_prec_P, native_prec_Q);
+        affine_ate_miller_loop<pair_curve_type>(native_prec_P, native_prec_Q);
 
     BOOST_CHECK(result.get_element() == native_result);
     std::cout << "number of constraints for Miller loop" << bp.num_constraints() << std::endl;
@@ -90,39 +90,39 @@ template<typename CurveType>
 void test_mnt_e_over_e_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = pairings::other_curve_type<curve_type>;
-    using curve_pairing_policy = typename curve_type::pairing_policy;
-    using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
+    using pair_curve_type = pairing::pair_curve_type<curve_type>;
+    using curve_pairing_policy = typename curve_type::pairing;
+    using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
     using component_policy = components::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
-    typename other_curve_type::g1_type::value_type P1_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q1_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P1_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q1_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    typename other_curve_type::g1_type::value_type P2_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q2_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P2_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q2_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    components::G1_variable<curve_type> P1(bp);
-    components::G2_variable<curve_type> Q1(bp);
-    components::G1_variable<curve_type> P2(bp);
-    components::G2_variable<curve_type> Q2(bp);
+    components::g1_variable<curve_type> P1(bp);
+    components::g2_variable<curve_type> Q1(bp);
+    components::g1_variable<curve_type> P2(bp);
+    components::g2_variable<curve_type> Q2(bp);
 
-    components::G1_precomputation<curve_type> prec_P1;
+    components::g1_precomputation<curve_type> prec_P1;
     components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);
-    components::G1_precomputation<curve_type> prec_P2;
+    components::g1_precomputation<curve_type> prec_P2;
     components::precompute_G1_component<curve_type> compute_prec_P2(bp, P2, prec_P2);
-    components::G2_precomputation<curve_type> prec_Q1;
+    components::g2_precomputation<curve_type> prec_Q1;
     components::precompute_G2_component<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
-    components::G2_precomputation<curve_type> prec_Q2;
+    components::g2_precomputation<curve_type> prec_Q2;
     components::precompute_G2_component<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
 
     typename component_policy::Fqk_variable_type result(bp);
@@ -147,17 +147,17 @@ void test_mnt_e_over_e_miller_loop(){
     miller.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P1 = 
-        affine_ate_precompute_G1<other_curve_type>(P1_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q1 = 
-        affine_ate_precompute_G2<other_curve_type>(Q1_val);
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P2 = 
-        affine_ate_precompute_G1<other_curve_type>(P2_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q2 = 
-        affine_ate_precompute_G2<other_curve_type>(Q2_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P1 = 
+        affine_ate_precompute_G1<pair_curve_type>(P1_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q1 = 
+        affine_ate_precompute_G2<pair_curve_type>(Q1_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P2 = 
+        affine_ate_precompute_G1<pair_curve_type>(P2_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q2 = 
+        affine_ate_precompute_G2<pair_curve_type>(Q2_val);
     typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
-        (affine_ate_miller_loop<other_curve_type>(native_prec_P1, native_prec_Q1) *
-            affine_ate_miller_loop<other_curve_type>(native_prec_P2, native_prec_Q2).inversed());
+        (affine_ate_miller_loop<pair_curve_type>(native_prec_P1, native_prec_Q1) *
+            affine_ate_miller_loop<pair_curve_type>(native_prec_P2, native_prec_Q2).inversed());
 
     BOOST_CHECK(result.get_element() == native_result);
     std::cout << "number of constraints for e over e Miller loop " << bp.num_constraints() << std::endl;
@@ -167,52 +167,52 @@ template<typename CurveType>
 void test_mnt_e_times_e_over_e_miller_loop(){
 
     using curve_type = CurveType;
-    using other_curve_type = pairings::other_curve_type<curve_type>;
-    using curve_pairing_policy = typename curve_type::pairing_policy;
-    using other_curve_pairing_policy = typename other_curve_type::pairing_policy;
+    using pair_curve_type = pairing::pair_curve_type<curve_type>;
+    using curve_pairing_policy = typename curve_type::pairing;
+    using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
     using component_policy = components::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
-    typename other_curve_type::g1_type::value_type P1_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q1_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P1_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q1_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    typename other_curve_type::g1_type::value_type P2_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q2_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P2_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q2_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    typename other_curve_type::g1_type::value_type P3_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g1_type::value_type::one();
-    typename other_curve_type::g2_type::value_type Q3_val = 
-        random_element<typename other_curve_type::scalar_field_type>() * 
-        other_curve_type::g2_type::value_type::one();
+    typename pair_curve_type::g1_type::value_type P3_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g1_type::value_type::one();
+    typename pair_curve_type::g2_type::value_type Q3_val = 
+        random_element<typename pair_curve_type::scalar_field_type>() * 
+        pair_curve_type::g2_type::value_type::one();
 
-    components::G1_variable<curve_type> P1(bp);
-    components::G2_variable<curve_type> Q1(bp);
-    components::G1_variable<curve_type> P2(bp);
-    components::G2_variable<curve_type> Q2(bp);
-    components::G1_variable<curve_type> P3(bp);
-    components::G2_variable<curve_type> Q3(bp);
+    components::g1_variable<curve_type> P1(bp);
+    components::g2_variable<curve_type> Q1(bp);
+    components::g1_variable<curve_type> P2(bp);
+    components::g2_variable<curve_type> Q2(bp);
+    components::g1_variable<curve_type> P3(bp);
+    components::g2_variable<curve_type> Q3(bp);
 
-    components::G1_precomputation<curve_type> prec_P1;
+    components::g1_precomputation<curve_type> prec_P1;
     components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);
-    components::G1_precomputation<curve_type> prec_P2;
+    components::g1_precomputation<curve_type> prec_P2;
     components::precompute_G1_component<curve_type> compute_prec_P2(bp, P2, prec_P2);
-    components::G1_precomputation<curve_type> prec_P3;
+    components::g1_precomputation<curve_type> prec_P3;
     components::precompute_G1_component<curve_type> compute_prec_P3(bp, P3, prec_P3);
-    components::G2_precomputation<curve_type> prec_Q1;
+    components::g2_precomputation<curve_type> prec_Q1;
     components::precompute_G2_component<curve_type> compute_prec_Q1(bp, Q1, prec_Q1);
-    components::G2_precomputation<curve_type> prec_Q2;
+    components::g2_precomputation<curve_type> prec_Q2;
     components::precompute_G2_component<curve_type> compute_prec_Q2(bp, Q2, prec_Q2);
-    components::G2_precomputation<curve_type> prec_Q3;
+    components::g2_precomputation<curve_type> prec_Q3;
     components::precompute_G2_component<curve_type> compute_prec_Q3(bp, Q3, prec_Q3);
 
     typename component_policy::Fqk_variable_type result(bp);
@@ -245,22 +245,22 @@ void test_mnt_e_times_e_over_e_miller_loop(){
     miller.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P1 = 
-        affine_ate_precompute_G1<other_curve_type>(P1_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q1 = 
-        affine_ate_precompute_G2<other_curve_type>(Q1_val);
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P2 = 
-        affine_ate_precompute_G1<other_curve_type>(P2_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q2 = 
-        affine_ate_precompute_G2<other_curve_type>(Q2_val);
-    typename other_curve_pairing_policy::affine_ate_G1_precomp native_prec_P3 = 
-        affine_ate_precompute_G1<other_curve_type>(P3_val);
-    typename other_curve_pairing_policy::affine_ate_G2_precomp native_prec_Q3 = 
-        affine_ate_precompute_G2<other_curve_type>(Q3_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P1 = 
+        affine_ate_precompute_G1<pair_curve_type>(P1_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q1 = 
+        affine_ate_precompute_G2<pair_curve_type>(Q1_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P2 = 
+        affine_ate_precompute_G1<pair_curve_type>(P2_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q2 = 
+        affine_ate_precompute_G2<pair_curve_type>(Q2_val);
+    typename other_curve_pairing_policy::affine_ate_g1_precomp native_prec_P3 = 
+        affine_ate_precompute_G1<pair_curve_type>(P3_val);
+    typename other_curve_pairing_policy::affine_ate_g2_precomp native_prec_Q3 = 
+        affine_ate_precompute_G2<pair_curve_type>(Q3_val);
     typename other_curve_pairing_policy::Fqk_type::value_type native_result = 
-        (affine_ate_miller_loop<other_curve_type>(native_prec_P1, native_prec_Q1) *
-        affine_ate_miller_loop<other_curve_type>(native_prec_P2, native_prec_Q2) *
-        affine_ate_miller_loop<other_curve_type>(native_prec_P3, native_prec_Q3).inversed());
+        (affine_ate_miller_loop<pair_curve_type>(native_prec_P1, native_prec_Q1) *
+        affine_ate_miller_loop<pair_curve_type>(native_prec_P2, native_prec_Q2) *
+        affine_ate_miller_loop<pair_curve_type>(native_prec_P3, native_prec_Q3).inversed());
 
     BOOST_CHECK(result.get_element() == native_result);
     std::cout << "number of constraints for e times e over e Miller loop " << bp.num_constraints() << std::endl;

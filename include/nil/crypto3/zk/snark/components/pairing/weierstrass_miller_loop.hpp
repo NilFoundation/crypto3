@@ -46,7 +46,7 @@ namespace nil {
             namespace snark {
                 namespace components {
 
-                    using namespace nil::crypto3::algebra::pairings;
+                    using namespace nil::crypto3::algebra::pairing;
 
                     /**
                      * Gadget for doubling step in the Miller loop.
@@ -62,25 +62,27 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
-                    
-                        typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+
+                        typedef typename CurveType::pairing::Fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
-                    public:
 
-                        G1_precomputation<CurveType> prec_P;
+                    public:
+                        g1_precomputation<CurveType> prec_P;
                         precompute_G2_component_coeffs<CurveType> c;
-                        std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RR_at_P;    // reference from outside
+                        std::shared_ptr<typename component_policy::Fqk_variable_type>
+                            &g_RR_at_P;    // reference from outside
 
                         std::shared_ptr<typename component_policy::Fqe_variable_type> gamma_twist;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> g_RR_at_P_c1;
                         std::shared_ptr<typename component_policy::Fqe_mul_by_lc_component_type> compute_g_RR_at_P_c1;
 
-                        mnt_miller_loop_dbl_line_eval(blueprint<field_type> &bp,
-                                                      const G1_precomputation<CurveType> &prec_P,
-                                                      const precompute_G2_component_coeffs<CurveType> &c,
-                                                      std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RR_at_P) :
+                        mnt_miller_loop_dbl_line_eval(
+                            blueprint<field_type> &bp,
+                            const g1_precomputation<CurveType> &prec_P,
+                            const precompute_G2_component_coeffs<CurveType> &c,
+                            std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RR_at_P) :
                             component<field_type>(bp),
                             prec_P(prec_P), c(c), g_RR_at_P(g_RR_at_P) {
 
@@ -90,13 +92,15 @@ namespace nil {
                                 gamma_twist->evaluate();
                                 const typename fqe_type::value_type gamma_twist_const = gamma_twist->get_element();
                                 g_RR_at_P_c1.reset(new typename component_policy::Fqe_variable_type(
-                                    typename component_policy::Fqe_variable_type(this->bp, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
-                                    *(c.RY) * (-field_type::value_type::one())));
+                                    typename component_policy::Fqe_variable_type(this->bp, -gamma_twist_const,
+                                                                                 prec_P.P->X) +
+                                    *(c.gamma_X) + *(c.RY) * (-field_type::value_type::one())));
                             } else if (prec_P.P->X.is_constant()) {
                                 prec_P.P->X.evaluate(bp);
                                 const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
-                                g_RR_at_P_c1.reset(new typename component_policy::Fqe_variable_type(*gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                                                               *(c.RY) * (-field_type::value_type::one())));
+                                g_RR_at_P_c1.reset(new typename component_policy::Fqe_variable_type(
+                                    *gamma_twist * (-P_X_const) + *(c.gamma_X) +
+                                    *(c.RY) * (-field_type::value_type::one())));
                             } else {
                                 g_RR_at_P_c1.reset(new typename component_policy::Fqe_variable_type(bp));
                                 compute_g_RR_at_P_c1.reset(new typename component_policy::Fqe_mul_by_lc_component_type(
@@ -104,7 +108,8 @@ namespace nil {
                                     *(c.gamma_X) + *(c.RY) * (-field_type::value_type::one()) +
                                         (*g_RR_at_P_c1) * (-field_type::value_type::one())));
                             }
-                            g_RR_at_P.reset(new typename component_policy::Fqk_variable_type(bp, *(prec_P.PY_twist_squared), *g_RR_at_P_c1));
+                            g_RR_at_P.reset(new typename component_policy::Fqk_variable_type(
+                                bp, *(prec_P.PY_twist_squared), *g_RR_at_P_c1));
                         }
 
                         void generate_r1cs_constraints() {
@@ -119,7 +124,8 @@ namespace nil {
                             const typename field_type::value_type PX_val = this->bp.lc_val(prec_P.P->X);
                             const typename fqe_type::value_type gamma_X_val = c.gamma_X->get_element();
                             const typename fqe_type::value_type RY_val = c.RY->get_element();
-                            const typename fqe_type::value_type g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
+                            const typename fqe_type::value_type g_RR_at_P_c1_val =
+                                -PX_val * gamma_twist_val + gamma_X_val - RY_val;
                             g_RR_at_P_c1->generate_r1cs_witness(g_RR_at_P_c1_val);
 
                             if (!gamma_twist->is_constant() && !prec_P.P->X.is_constant()) {
@@ -143,29 +149,31 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
-                    
-                        typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
+
+                        typedef typename CurveType::pairing::Fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
-                    public:
 
+                    public:
                         bool invert_Q;
-                        G1_precomputation<CurveType> prec_P;
+                        g1_precomputation<CurveType> prec_P;
                         precompute_G2_component_coeffs<CurveType> c;
-                        G2_variable<CurveType> Q;
-                        std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RQ_at_P;    // reference from outside
+                        g2_variable<CurveType> Q;
+                        std::shared_ptr<typename component_policy::Fqk_variable_type>
+                            &g_RQ_at_P;    // reference from outside
 
                         std::shared_ptr<typename component_policy::Fqe_variable_type> gamma_twist;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> g_RQ_at_P_c1;
                         std::shared_ptr<typename component_policy::Fqe_mul_by_lc_component_type> compute_g_RQ_at_P_c1;
 
-                        mnt_miller_loop_add_line_eval(blueprint<field_type> &bp,
-                                                      const bool invert_Q,
-                                                      const G1_precomputation<CurveType> &prec_P,
-                                                      const precompute_G2_component_coeffs<CurveType> &c,
-                                                      const G2_variable<CurveType> &Q,
-                                                      std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RQ_at_P) :
+                        mnt_miller_loop_add_line_eval(
+                            blueprint<field_type> &bp,
+                            const bool invert_Q,
+                            const g1_precomputation<CurveType> &prec_P,
+                            const precompute_G2_component_coeffs<CurveType> &c,
+                            const g2_variable<CurveType> &Q,
+                            std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RQ_at_P) :
                             component<field_type>(bp),
                             invert_Q(invert_Q), prec_P(prec_P), c(c), Q(Q), g_RQ_at_P(g_RQ_at_P) {
                             gamma_twist.reset(new typename component_policy::Fqe_variable_type(c.gamma->mul_by_X()));
@@ -174,24 +182,29 @@ namespace nil {
                                 gamma_twist->evaluate();
                                 const typename fqe_type::value_type gamma_twist_const = gamma_twist->get_element();
                                 g_RQ_at_P_c1.reset(new typename component_policy::Fqe_variable_type(
-                                    typename component_policy::Fqe_variable_type(this->bp, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
-                                    *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
+                                    typename component_policy::Fqe_variable_type(this->bp, -gamma_twist_const,
+                                                                                 prec_P.P->X) +
+                                    *(c.gamma_X) +
+                                    *(Q.Y) *
+                                        (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                             } else if (prec_P.P->X.is_constant()) {
                                 prec_P.P->X.evaluate(bp);
                                 const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
                                 g_RQ_at_P_c1.reset(new typename component_policy::Fqe_variable_type(
                                     *gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                    *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
+                                    *(Q.Y) *
+                                        (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                             } else {
                                 g_RQ_at_P_c1.reset(new typename component_policy::Fqe_variable_type(bp));
                                 compute_g_RQ_at_P_c1.reset(new typename component_policy::Fqe_mul_by_lc_component_type(
                                     bp, *gamma_twist, prec_P.P->X,
                                     *(c.gamma_X) +
-                                        *(Q.Y) *
-                                            (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one()) +
+                                        *(Q.Y) * (!invert_Q ? -field_type::value_type::one() :
+                                                              field_type::value_type::one()) +
                                         (*g_RQ_at_P_c1) * (-field_type::value_type::one())));
                             }
-                            g_RQ_at_P.reset(new typename component_policy::Fqk_variable_type(bp, *(prec_P.PY_twist_squared), *g_RQ_at_P_c1));
+                            g_RQ_at_P.reset(new typename component_policy::Fqk_variable_type(
+                                bp, *(prec_P.PY_twist_squared), *g_RQ_at_P_c1));
                         }
                         void generate_r1cs_constraints() {
                             if (!gamma_twist->is_constant() && !prec_P.P->X.is_constant()) {
@@ -220,13 +233,13 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
-                    
-                        typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
+
+                        typedef typename CurveType::pairing::Fp_type field_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
-                    public:
 
+                    public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_Ps;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RQ_at_Ps;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> fs;
@@ -234,21 +247,23 @@ namespace nil {
                         std::vector<std::shared_ptr<mnt_miller_loop_add_line_eval<CurveType>>> addition_steps;
                         std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps;
 
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls;
 
                         std::size_t f_count;
                         std::size_t add_count;
                         std::size_t dbl_count;
 
-                        G1_precomputation<CurveType> prec_P;
-                        G2_precomputation<CurveType> prec_Q;
+                        g1_precomputation<CurveType> prec_P;
+                        g2_precomputation<CurveType> prec_Q;
                         typename component_policy::Fqk_variable_type result;
 
                         mnt_miller_loop_component(blueprint<field_type> &bp,
-                                                  const G1_precomputation<CurveType> &prec_P,
-                                                  const G2_precomputation<CurveType> &prec_Q,
+                                                  const g1_precomputation<CurveType> &prec_P,
+                                                  const g2_precomputation<CurveType> &prec_Q,
                                                   const typename component_policy::Fqk_variable_type &result) :
                             component<field_type>(bp),
                             prec_P(prec_P), prec_Q(prec_Q), result(result) {
@@ -304,20 +319,24 @@ namespace nil {
                                 doubling_steps[dbl_id].reset(new mnt_miller_loop_dbl_line_eval<CurveType>(
                                     bp, prec_P, *prec_Q.coeffs[prec_id], g_RR_at_Ps[dbl_id]));
                                 ++prec_id;
-                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
+                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
+                                    bp, *fs[f_id], *fs[f_id + 1]));
                                 ++f_id;
                                 dbl_muls[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                    bp, *fs[f_id], *g_RR_at_Ps[dbl_id], (f_id + 1 == f_count ? result : *fs[f_id + 1])));
+                                    bp, *fs[f_id], *g_RR_at_Ps[dbl_id],
+                                    (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                                 ++f_id;
                                 ++dbl_id;
 
                                 if (NAF[i] != 0) {
                                     addition_steps[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                        bp, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q, g_RQ_at_Ps[add_id]));
+                                        bp, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q,
+                                        g_RQ_at_Ps[add_id]));
                                     ++prec_id;
-                                    add_muls[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, *fs[f_id], *g_RQ_at_Ps[add_id],
-                                        (f_id + 1 == f_count ? result : *fs[f_id + 1])));
+                                    add_muls[add_id].reset(new
+                                                           typename component_policy::Fqk_special_mul_component_type(
+                                                               bp, *fs[f_id], *g_RQ_at_Ps[add_id],
+                                                               (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                                     ++f_id;
                                     ++add_id;
                                 }
@@ -373,14 +392,14 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
-                    
-                        typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
+
+                        typedef typename CurveType::pairing::Fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
-                    public:
 
+                    public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P1s;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RQ_at_P1s;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P2s;
@@ -393,26 +412,30 @@ namespace nil {
                         std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps2;
 
                         std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls1;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls1;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls2;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls2;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls1;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls1;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls2;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls2;
 
                         std::size_t f_count;
                         std::size_t add_count;
                         std::size_t dbl_count;
 
-                        G1_precomputation<CurveType> prec_P1;
-                        G2_precomputation<CurveType> prec_Q1;
-                        G1_precomputation<CurveType> prec_P2;
-                        G2_precomputation<CurveType> prec_Q2;
+                        g1_precomputation<CurveType> prec_P1;
+                        g2_precomputation<CurveType> prec_Q1;
+                        g1_precomputation<CurveType> prec_P2;
+                        g2_precomputation<CurveType> prec_Q2;
                         typename component_policy::Fqk_variable_type result;
 
                         mnt_e_over_e_miller_loop_component(blueprint<field_type> &bp,
-                                                           const G1_precomputation<CurveType> &prec_P1,
-                                                           const G2_precomputation<CurveType> &prec_Q1,
-                                                           const G1_precomputation<CurveType> &prec_P2,
-                                                           const G2_precomputation<CurveType> &prec_Q2,
+                                                           const g1_precomputation<CurveType> &prec_P1,
+                                                           const g2_precomputation<CurveType> &prec_Q1,
+                                                           const g1_precomputation<CurveType> &prec_P2,
+                                                           const g2_precomputation<CurveType> &prec_Q2,
                                                            const typename component_policy::Fqk_variable_type &result) :
                             component<field_type>(bp),
                             prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), result(result) {
@@ -477,13 +500,15 @@ namespace nil {
                                     bp, prec_P2, *prec_Q2.coeffs[prec_id], g_RR_at_P2s[dbl_id]));
                                 ++prec_id;
 
-                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
+                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
+                                    bp, *fs[f_id], *fs[f_id + 1]));
                                 ++f_id;
                                 dbl_muls1[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
                                     bp, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                                 ++f_id;
                                 dbl_muls2[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id], *fs[f_id]));
+                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++dbl_id;
 
@@ -495,12 +520,14 @@ namespace nil {
                                         bp, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q,
                                         g_RQ_at_P2s[add_id]));
                                     ++prec_id;
-                                    add_muls1[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                    add_muls1[add_id].reset(new
+                                                            typename component_policy::Fqk_special_mul_component_type(
+                                                                bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                     ++f_id;
-                                    add_muls2[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P2s[add_id],
-                                        *fs[f_id]));
+                                    add_muls2[add_id].reset(new
+                                                            typename component_policy::Fqk_special_mul_component_type(
+                                                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]),
+                                                                *g_RQ_at_P2s[add_id], *fs[f_id]));
                                     ++f_id;
                                     ++add_id;
                                 }
@@ -577,14 +604,14 @@ namespace nil {
                     template<typename CurveType>
                     class mnt_e_times_e_over_e_miller_loop_component
                         : public component<typename CurveType::scalar_field_type> {
-                    
-                        typedef typename CurveType::pairing_policy::Fp_type field_type;
-                        using fqe_type = typename other_curve_type<CurveType>::pairing_policy::Fqe_type;
-                        using fqk_type = typename other_curve_type<CurveType>::pairing_policy::Fqk_type;
+
+                        typedef typename CurveType::pairing::Fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
-                    public:
 
+                    public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P1s;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RQ_at_P1s;
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P2s;
@@ -601,33 +628,40 @@ namespace nil {
                         std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps3;
 
                         std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls1;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls1;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls2;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls2;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls3;
-                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls3;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls1;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls1;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls2;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls2;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            dbl_muls3;
+                        std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
+                            add_muls3;
 
                         std::size_t f_count;
                         std::size_t add_count;
                         std::size_t dbl_count;
 
-                        G1_precomputation<CurveType> prec_P1;
-                        G2_precomputation<CurveType> prec_Q1;
-                        G1_precomputation<CurveType> prec_P2;
-                        G2_precomputation<CurveType> prec_Q2;
-                        G1_precomputation<CurveType> prec_P3;
-                        G2_precomputation<CurveType> prec_Q3;
+                        g1_precomputation<CurveType> prec_P1;
+                        g2_precomputation<CurveType> prec_Q1;
+                        g1_precomputation<CurveType> prec_P2;
+                        g2_precomputation<CurveType> prec_Q2;
+                        g1_precomputation<CurveType> prec_P3;
+                        g2_precomputation<CurveType> prec_Q3;
                         typename component_policy::Fqk_variable_type result;
 
-                        mnt_e_times_e_over_e_miller_loop_component(blueprint<field_type> &bp,
-                                                                   const G1_precomputation<CurveType> &prec_P1,
-                                                                   const G2_precomputation<CurveType> &prec_Q1,
-                                                                   const G1_precomputation<CurveType> &prec_P2,
-                                                                   const G2_precomputation<CurveType> &prec_Q2,
-                                                                   const G1_precomputation<CurveType> &prec_P3,
-                                                                   const G2_precomputation<CurveType> &prec_Q3,
-                                                                   const typename component_policy::Fqk_variable_type &result) :
+                        mnt_e_times_e_over_e_miller_loop_component(
+                            blueprint<field_type> &bp,
+                            const g1_precomputation<CurveType> &prec_P1,
+                            const g2_precomputation<CurveType> &prec_Q1,
+                            const g1_precomputation<CurveType> &prec_P2,
+                            const g2_precomputation<CurveType> &prec_Q2,
+                            const g1_precomputation<CurveType> &prec_P3,
+                            const g2_precomputation<CurveType> &prec_Q3,
+                            const typename component_policy::Fqk_variable_type &result) :
                             component<field_type>(bp),
                             prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), prec_P3(prec_P3),
                             prec_Q3(prec_Q3), result(result) {
@@ -700,7 +734,8 @@ namespace nil {
                                     bp, prec_P3, *prec_Q3.coeffs[prec_id], g_RR_at_P3s[dbl_id]));
                                 ++prec_id;
 
-                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
+                                dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
+                                    bp, *fs[f_id], *fs[f_id + 1]));
                                 ++f_id;
                                 dbl_muls1[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
                                     bp, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
@@ -709,7 +744,8 @@ namespace nil {
                                     bp, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
                                 ++f_id;
                                 dbl_muls3[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id], *fs[f_id]));
+                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++dbl_id;
 
@@ -724,15 +760,18 @@ namespace nil {
                                         bp, NAF[i] < 0, prec_P3, *prec_Q3.coeffs[prec_id], *prec_Q3.Q,
                                         g_RQ_at_P3s[add_id]));
                                     ++prec_id;
-                                    add_muls1[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                    add_muls1[add_id].reset(new
+                                                            typename component_policy::Fqk_special_mul_component_type(
+                                                                bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                     ++f_id;
-                                    add_muls2[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
+                                    add_muls2[add_id].reset(new
+                                                            typename component_policy::Fqk_special_mul_component_type(
+                                                                bp, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
                                     ++f_id;
-                                    add_muls3[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                        bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P3s[add_id],
-                                        *fs[f_id]));
+                                    add_muls3[add_id].reset(new
+                                                            typename component_policy::Fqk_special_mul_component_type(
+                                                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]),
+                                                                *g_RQ_at_P3s[add_id], *fs[f_id]));
                                     ++f_id;
                                     ++add_id;
                                 }
@@ -814,9 +853,9 @@ namespace nil {
                     };
 
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP

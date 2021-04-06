@@ -33,11 +33,6 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
-// temporary includes begin
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-// temporary includes end
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -88,14 +83,8 @@ namespace nil {
                         void generate_r1cs_witness_from_packed() {
                             packed.evaluate(this->bp);
 
-                            // temporary added until fixed-precision modular adaptor is ready:
-                            typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                                non_fixed_precision_modulus_type;
-
-                            assert(
-                                nil::crypto3::multiprecision::msb(non_fixed_precision_modulus_type(this->bp.lc_val(packed).data)) +
-                                    1 <=
-                                bits.size());    // `bits` is large enough to represent this packed value
+                            assert(multiprecision::msb(this->bp.lc_val(packed).data) + 1 <=
+                                   bits.size());    // `bits` is large enough to represent this packed value
                             bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                         }
 
@@ -175,7 +164,8 @@ namespace nil {
                         }
                         void generate_r1cs_constraints() {
                             for (std::size_t i = 0; i < source.size(); ++i) {
-                                this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(do_copy, source[i] - target[i], 0));
+                                this->bp.add_r1cs_constraint(
+                                    r1cs_constraint<FieldType>(do_copy, source[i] - target[i], 0));
                             }
                         }
 
@@ -214,8 +204,8 @@ namespace nil {
                                                   const blueprint_linear_combination<FieldType> &do_copy,
                                                   std::size_t chunk_size) :
                             component<FieldType>(bp),
-                            source_bits(source_bits), target_bits(target_bits), do_copy(do_copy), chunk_size(chunk_size),
-                            num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
+                            source_bits(source_bits), target_bits(target_bits), do_copy(do_copy),
+                            chunk_size(chunk_size), num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
 
                             assert(source_bits.size() == target_bits.size());
 
@@ -262,7 +252,8 @@ namespace nil {
                         blueprint_variable<FieldType> packed;
                         blueprint_variable_vector<FieldType> bits;
 
-                        dual_variable_component(blueprint<FieldType> &bp, std::size_t width) : component<FieldType>(bp) {
+                        dual_variable_component(blueprint<FieldType> &bp, std::size_t width) :
+                            component<FieldType>(bp) {
                             packed.allocate(bp);
                             bits.allocate(bp, width);
                             consistency_check.reset(new packing_component<FieldType>(bp, bits, packed));
@@ -456,7 +447,8 @@ namespace nil {
                             pack_alpha.reset(new packing_component<FieldType>(bp, alpha, alpha_packed));
 
                             all_zeros_test.reset(new disjunction_component<FieldType>(
-                                bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
+                                bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n),
+                                not_all_zeros));
                         };
 
                         void generate_r1cs_constraints() {
@@ -611,19 +603,20 @@ namespace nil {
 
                             // temporary added until fixed-precision modular adaptor is ready:
                             typedef nil::crypto3::multiprecision::number<
-                                nil::crypto3::multiprecision::backends::cpp_int_backend<>> 
+                                nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                                 non_fixed_precision_modulus_type;
 
                             /* assumes that idx can be fit in ulong; true for our purposes for now */
                             const typename FieldType::value_type valint = this->bp.val(index);
-                            
-                            unsigned long idx = static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
+
+                            unsigned long idx =
+                                static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
 
                             if (idx >= arr.size() || non_fixed_precision_modulus_type(valint.data) >= arr.size()) {
                                 for (std::size_t i = 0; i < arr.size(); ++i) {
                                     this->bp.val(alpha[i]) = FieldType::value_type::zero();
                                 }
-                                
+
                                 this->bp.val(success_flag) = FieldType::value_type::zero();
                             } else {
                                 for (std::size_t i = 0; i < arr.size(); ++i) {
@@ -681,9 +674,9 @@ namespace nil {
                         return (num_bits + (FieldType::capacity()) - 1) / FieldType::capacity();
                     }
 
-                }    // namespace components        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BASIC_COMPONENTS_HPP

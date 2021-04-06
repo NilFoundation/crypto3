@@ -55,18 +55,18 @@ namespace nil {
                         std::shared_ptr<e_over_e_miller_loop_component<CurveType>> compute_ratio;
                         std::shared_ptr<final_exp_component<CurveType>> check_finexp;
 
-                        G1_precomputation<CurveType> lhs_G1;
-                        G2_precomputation<CurveType> lhs_G2;
-                        G1_precomputation<CurveType> rhs_G1;
-                        G2_precomputation<CurveType> rhs_G2;
+                        g1_precomputation<CurveType> lhs_G1;
+                        g2_precomputation<CurveType> lhs_G2;
+                        g1_precomputation<CurveType> rhs_G1;
+                        g2_precomputation<CurveType> rhs_G2;
 
                         variable<field_type> result;
 
                         check_e_equals_e_component(blueprint<field_type> &bp,
-                                                   const G1_precomputation<CurveType> &lhs_G1,
-                                                   const G2_precomputation<CurveType> &lhs_G2,
-                                                   const G1_precomputation<CurveType> &rhs_G1,
-                                                   const G2_precomputation<CurveType> &rhs_G2,
+                                                   const g1_precomputation<CurveType> &lhs_G1,
+                                                   const g2_precomputation<CurveType> &lhs_G2,
+                                                   const g1_precomputation<CurveType> &rhs_G1,
+                                                   const g2_precomputation<CurveType> &rhs_G2,
                                                    const variable<field_type> &result) :
                             component<field_type>(bp),
                             lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
@@ -96,22 +96,22 @@ namespace nil {
                         std::shared_ptr<e_times_e_over_e_miller_loop_component<CurveType>> compute_ratio;
                         std::shared_ptr<final_exp_component<CurveType>> check_finexp;
 
-                        G1_precomputation<CurveType> lhs_G1;
-                        G2_precomputation<CurveType> lhs_G2;
-                        G1_precomputation<CurveType> rhs1_G1;
-                        G2_precomputation<CurveType> rhs1_G2;
-                        G1_precomputation<CurveType> rhs2_G1;
-                        G2_precomputation<CurveType> rhs2_G2;
+                        g1_precomputation<CurveType> lhs_G1;
+                        g2_precomputation<CurveType> lhs_G2;
+                        g1_precomputation<CurveType> rhs1_G1;
+                        g2_precomputation<CurveType> rhs1_G2;
+                        g1_precomputation<CurveType> rhs2_G1;
+                        g2_precomputation<CurveType> rhs2_G2;
 
                         variable<field_type> result;
 
                         check_e_equals_ee_component(blueprint<field_type> &bp,
-                                                    const G1_precomputation<CurveType> &lhs_G1,
-                                                    const G2_precomputation<CurveType> &lhs_G2,
-                                                    const G1_precomputation<CurveType> &rhs1_G1,
-                                                    const G2_precomputation<CurveType> &rhs1_G2,
-                                                    const G1_precomputation<CurveType> &rhs2_G1,
-                                                    const G2_precomputation<CurveType> &rhs2_G2,
+                                                    const g1_precomputation<CurveType> &lhs_G1,
+                                                    const g2_precomputation<CurveType> &lhs_G2,
+                                                    const g1_precomputation<CurveType> &rhs1_G1,
+                                                    const g2_precomputation<CurveType> &rhs1_G2,
+                                                    const g1_precomputation<CurveType> &rhs2_G1,
+                                                    const g2_precomputation<CurveType> &rhs2_G2,
                                                     const variable<field_type> &result) :
                             component<field_type>(bp),
                             lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),

@@ -55,13 +55,13 @@ namespace nil {
 
                         using underlying_type = blueprint_linear_combination<base_field_type>;
 
-                        using data_type = std::array<underlying_type, Fp3T::arity/Fp3T::underlying_field_type::arity>;
+                        using data_type = std::array<underlying_type, Fp3T::arity / Fp3T::underlying_field_type::arity>;
 
                         data_type data;
 
-                        //blueprint_linear_combination<base_field_type> c0;
-                        //blueprint_linear_combination<base_field_type> c1;
-                        //blueprint_linear_combination<base_field_type> c2;
+                        // blueprint_linear_combination<base_field_type> c0;
+                        // blueprint_linear_combination<base_field_type> c1;
+                        // blueprint_linear_combination<base_field_type> c2;
 
                         blueprint_linear_combination_vector<base_field_type> all_vars;
 
@@ -72,14 +72,16 @@ namespace nil {
                             c1_var.allocate(bp);
                             c2_var.allocate(bp);
 
-                            data = data_type({underlying_type(c0_var), underlying_type(c1_var), underlying_type(c2_var)});
+                            data =
+                                data_type({underlying_type(c0_var), underlying_type(c1_var), underlying_type(c2_var)});
 
                             all_vars.emplace_back(data[0]);
                             all_vars.emplace_back(data[1]);
                             all_vars.emplace_back(data[2]);
                         }
 
-                        Fp3_variable(blueprint<base_field_type> &bp, const typename Fp3T::value_type &el) : component<base_field_type>(bp) {
+                        Fp3_variable(blueprint<base_field_type> &bp, const typename Fp3T::value_type &el) :
+                            component<base_field_type>(bp) {
                             blueprint_linear_combination<base_field_type> c0_lc;
                             blueprint_linear_combination<base_field_type> c1_lc;
                             blueprint_linear_combination<base_field_type> c2_lc;
@@ -123,7 +125,7 @@ namespace nil {
                                      const blueprint_linear_combination<base_field_type> &c0_lc,
                                      const blueprint_linear_combination<base_field_type> &c1_lc,
                                      const blueprint_linear_combination<base_field_type> &c2_lc) :
-                            component<base_field_type>(bp){
+                            component<base_field_type>(bp) {
 
                             data = data_type({underlying_type(c0_lc), underlying_type(c1_lc), underlying_type(c2_lc)});
 
@@ -178,10 +180,7 @@ namespace nil {
 
                         Fp3_variable<Fp3T> mul_by_X() const {
                             blueprint_linear_combination<base_field_type> new_c0, new_c1, new_c2;
-                            new_c0.assign(this->bp, this->data[2] * Fp3T::value_type::one().non_residue);
-                            // while constepr is not ready
-                            // must be:
-                            //new_c0.assign(this->bp, this->data[2] * Fp3T::value_type::non_residue);
+                            new_c0.assign(this->bp, this->data[2] * Fp3T::value_type::non_residue);
 
                             new_c1.assign(this->bp, this->data[0]);
                             new_c2.assign(this->bp, this->data[1]);
@@ -239,11 +238,10 @@ namespace nil {
                                     v0 = A.data[0] * B.data[0]
                                     v1 = (A.data[0] + A.data[1] + A.data[2]) * (B.data[0] + B.data[1] + B.data[2])
                                     v2 = (A.data[0] - A.data[1] + A.data[2]) * (B.data[0] - B.data[1] + B.data[2])
-                                    v3 = (A.data[0] + 2*A.data[1] + 4*A.data[2]) * (B.data[0] + 2*B.data[1] + 4*B.data[2])
-                                    v4 = A.data[2] * B.data[2]
-                                    result.data[0] = v0 + non_residue * (v0/2 - v1/2 - v2/6 + v3/6 - 2*v4)
-                                    result.data[1] = -(1/2) v0 +  v1 - (1/3) v2 - (1/6) v3 + 2 v4 + non_residue*v4
-                                    result.data[2] = -v0 + (1/2) v1 + (1/2) v2 - v4
+                                    v3 = (A.data[0] + 2*A.data[1] + 4*A.data[2]) * (B.data[0] + 2*B.data[1] +
+                               4*B.data[2]) v4 = A.data[2] * B.data[2] result.data[0] = v0 + non_residue * (v0/2 - v1/2
+                               - v2/6 + v3/6 - 2*v4) result.data[1] = -(1/2) v0 +  v1 - (1/3) v2 - (1/6) v3 + 2 v4 +
+                               non_residue*v4 result.data[2] = -v0 + (1/2) v1 + (1/2) v2 - v4
 
                                 Enforced with 5 constraints. Doing so requires some care, as we first
                                 compute two of the v_i explicitly, and then "inline" result.data[1]/data[2]/c3
@@ -253,10 +251,10 @@ namespace nil {
                                     A.data[0] * B.data[0] = v0
                                     A.data[2] * B.data[2] = v4
                                 Then we use the following 3 additional constraints:
-                                    v1 = result.data[1] + result.data[2] + (result.data[0] - v0)/non_residue + v0 + v4 - non_residue v4
-                                    v2 = -result.data[1] + result.data[2] + v0 + (-result.data[0] + v0)/non_residue + v4 + non_residue v4
-                                    v3 = 2 * result.data[1] + 4 result.data[2] + (8*(result.data[0] - v0))/non_residue + v0 + 16 * v4 - 2 *
-                               non_residue * v4
+                                    v1 = result.data[1] + result.data[2] + (result.data[0] - v0)/non_residue + v0 + v4 -
+                               non_residue v4 v2 = -result.data[1] + result.data[2] + v0 + (-result.data[0] +
+                               v0)/non_residue + v4 + non_residue v4 v3 = 2 * result.data[1] + 4 result.data[2] +
+                               (8*(result.data[0] - v0))/non_residue + v0 + 16 * v4 - 2 * non_residue * v4
 
                                 Reference:
                                     "Multiplication and Squaring on Pairing-Friendly Fields"
@@ -273,10 +271,7 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[0], B.data[0], v0));
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[2], B.data[2], v4));
 
-                            const typename base_field_type::value_type beta = Fp3T::value_type::one().non_residue;
-                            // while constepr is not ready
-                            // must be:
-                            //const typename base_field_type::value_type beta = Fp3T::value_type::non_residue;
+                            const typename base_field_type::value_type beta = Fp3T::value_type::non_residue;
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
                                 A.data[0] + A.data[1] + A.data[2],
@@ -287,8 +282,10 @@ namespace nil {
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
                                 A.data[0] - A.data[1] + A.data[2],
                                 B.data[0] - B.data[1] + B.data[2],
-                                -result.data[1] + result.data[2] + v0 * (typename base_field_type::value_type(1) + beta.inversed()) -
-                                    result.data[0] * beta.inversed() + v4 * (typename base_field_type::value_type(1) + beta)));
+                                -result.data[1] + result.data[2] +
+                                    v0 * (typename base_field_type::value_type(1) + beta.inversed()) -
+                                    result.data[0] * beta.inversed() +
+                                    v4 * (typename base_field_type::value_type(1) + beta)));
                             this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(
                                 A.data[0] + 2 * A.data[1] + 4 * A.data[2],
                                 B.data[0] + 2 * B.data[1] + 4 * B.data[2],
@@ -296,8 +293,8 @@ namespace nil {
                                     result.data[0] * (typename base_field_type::value_type(8) * beta.inversed()) +
                                     v0 * (typename base_field_type::value_type(1) -
                                           typename base_field_type::value_type(8) * beta.inversed()) +
-                                    v4 *
-                                        (typename base_field_type::value_type(16) - typename base_field_type::value_type(2) * beta)));
+                                    v4 * (typename base_field_type::value_type(16) -
+                                          typename base_field_type::value_type(2) * beta)));
                         }
 
                         void generate_r1cs_witness() {
@@ -333,9 +330,12 @@ namespace nil {
                         }
 
                         void generate_r1cs_constraints() {
-                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[0], lc, result.data[0]));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[1], lc, result.data[1]));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<base_field_type>(A.data[2], lc, result.data[2]));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<base_field_type>(A.data[0], lc, result.data[0]));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<base_field_type>(A.data[1], lc, result.data[1]));
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<base_field_type>(A.data[2], lc, result.data[2]));
                         }
 
                         void generate_r1cs_witness() {
@@ -375,11 +375,10 @@ namespace nil {
                             mul->generate_r1cs_witness();
                         }
                     };
-
-                }    // namespace components        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_FP3_COMPONENTS_HPP

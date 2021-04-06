@@ -102,11 +102,10 @@ namespace nil {
                             }
                         }
                     };
-
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_COMPONENT_FROM_R1CS_HPP

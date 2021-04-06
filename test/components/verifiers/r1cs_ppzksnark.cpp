@@ -280,20 +280,20 @@ void test_Frobenius() {
 template<typename CurveType>
 void test_full_pairing() {
     typedef typename CurveType::scalar_field_type FieldType;
-    typedef typename pairings::other_curve_type<CurveType>::pairing_policy pairing_policy;
+    typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
     blueprint<FieldType> bp;
-    pairings::other_curve_type<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
-        pairings::other_curve_type<CurveType>::g1_type::value_type::one();
-    pairings::other_curve_type<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
-        pairings::other_curve_type<CurveType>::g2_type::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
+        algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::g2_type::value_type Q_val =
+        algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
 
-    G1_variable<CurveType> P(bp);
-    G2_variable<CurveType> Q(bp);
-    G1_precomputation<CurveType> prec_P;
-    G2_precomputation<CurveType> prec_Q;
+    g1_variable<CurveType> P(bp);
+    g2_variable<CurveType> Q(bp);
+    g1_precomputation<CurveType> prec_P;
+    g2_precomputation<CurveType> prec_Q;
 
     precompute_G1_component<CurveType> compute_prec_P(bp, P, prec_P);
     precompute_G2_component<CurveType> compute_prec_Q(bp, Q, prec_Q);
@@ -317,8 +317,8 @@ void test_full_pairing() {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_G1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_G2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
+    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
@@ -335,18 +335,18 @@ void test_full_pairing() {
 template<typename CurveType>
 void test_full_precomputed_pairing() {
     typedef typename CurveType::scalar_field_type FieldType;
-    typedef typename pairings::other_curve_type<CurveType>::pairing_policy pairing_policy;
+    typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
     blueprint<FieldType> bp;
-    pairings::other_curve_type<CurveType>::g1_type::value_type P_val =
-        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
-        pairings::other_curve_type<CurveType>::g1_type::value_type::one();
-    pairings::other_curve_type<CurveType>::g2_type::value_type Q_val =
-        algebra::random_element<pairings::other_curve_type<CurveType>::scalar_field_type>() *
-        pairings::other_curve_type<CurveType>::g2_type::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
+        algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
+    pairing::CurveType::pairing::pair_curve_type::g2_type::value_type Q_val =
+        algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
 
-    G1_precomputation<CurveType> prec_P(bp, P_val);
-    G2_precomputation<CurveType> prec_Q(bp, Q_val);
+    g1_precomputation<CurveType> prec_P(bp, P_val);
+    g2_precomputation<CurveType> prec_Q(bp, Q_val);
 
     Fqk_variable<CurveType> miller_result(bp);
     mnt_miller_loop_component<CurveType> miller(bp, prec_P, prec_Q, miller_result);
@@ -361,8 +361,8 @@ void test_full_precomputed_pairing() {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_G1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_G2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
+    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
@@ -403,11 +403,11 @@ BOOST_AUTO_TEST_CASE(benes_components_test) {
     test_G2_checker_component<curves::mnt4>();
     test_G2_checker_component<curves::mnt6>();
 
-    test_G1_variable_precomp<curves::mnt4>();
-    test_G1_variable_precomp<curves::mnt6>();
+    test_g1_variable_precomp<curves::mnt4>();
+    test_g1_variable_precomp<curves::mnt6>();
 
-    test_G2_variable_precomp<curves::mnt4>();
-    test_G2_variable_precomp<curves::mnt6>();
+    test_g2_variable_precomp<curves::mnt4>();
+    test_g2_variable_precomp<curves::mnt6>();
 
     test_mnt_miller_loop<curves::mnt4>();
     test_mnt_miller_loop<curves::mnt6>();

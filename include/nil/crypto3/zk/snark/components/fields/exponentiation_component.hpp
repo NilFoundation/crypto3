@@ -75,14 +75,14 @@ namespace nil {
                         std::size_t dbl_count;
 
                         template<typename Backend,
-                                 typename nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                                 typename multiprecision::expression_template_option ExpressionTemplates>
                         exponentiation_component(blueprint<FieldType> &bp,
                                                  const Fpk_variableT<FpkT> &elt,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &power,
+                                                 const multiprecision::number<Backend, ExpressionTemplates> &power,
                                                  const Fpk_variableT<FpkT> &result) :
                             component<FieldType>(bp),
                             elt(elt), power(power), result(result) {
-                            NAF = nil::crypto3::multiprecision::find_wnaf(1, power);
+                            NAF = multiprecision::find_wnaf(1, power);
 
                             intermed_count = 0;
                             add_count = 0;
@@ -141,14 +141,16 @@ namespace nil {
                                             bp,
                                             *intermediate[intermed_id],
                                             elt,
-                                            (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])));
+                                            (intermed_id + 1 == intermed_count ? result :
+                                                                                 *intermediate[intermed_id + 1])));
                                         ++add_id;
                                         ++intermed_id;
                                     } else {
                                         /* next = cur / elt, i.e. next * elt = cur */
                                         subtraction_steps[sub_id].reset(new Fpk_mul_componentT<FpkT>(
                                             bp,
-                                            (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1]),
+                                            (intermed_id + 1 == intermed_count ? result :
+                                                                                 *intermediate[intermed_id + 1]),
                                             elt,
                                             *intermediate[intermed_id]));
                                         ++sub_id;
@@ -191,7 +193,8 @@ namespace nil {
                                         ++intermed_id;
                                         ++add_id;
                                     } else {
-                                        const typename FpkT::value_type cur_val = intermediate[intermed_id]->get_element();
+                                        const typename FpkT::value_type cur_val =
+                                            intermediate[intermed_id]->get_element();
                                         const typename FpkT::value_type elt_val = elt.get_element();
                                         const typename FpkT::value_type next_val = cur_val * elt_val.inversed();
 
@@ -207,11 +210,10 @@ namespace nil {
                             }
                         }
                     };
-                    
-                }    // namespace components    
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_EXPONENTIATION_COMPONENT_HPP

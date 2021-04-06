@@ -94,7 +94,8 @@ namespace nil {
                                 compute_sigma1[i].reset(
                                     new small_sigma_component<FieldType>(bp, W_bits[i - 2], sigma1[i], 17, 19, 10));
 
-                                /* unreduced_W = sigma0(W_{i-15}) + sigma1(W_{i-2}) + W_{i-7} + W_{i-16} before modulo 2^32
+                                /* unreduced_W = sigma0(W_{i-15}) + sigma1(W_{i-2}) + W_{i-7} + W_{i-16} before modulo
+                                 * 2^32
                                  */
                                 unreduced_W[i].allocate(bp);
 
@@ -260,7 +261,8 @@ namespace nil {
 
                             this->bp.val(unreduced_new_a) = this->bp.val(packed_h) + this->bp.val(sigma1) +
                                                             this->bp.val(choice) + typename FieldType::value_type(K) +
-                                                            this->bp.val(W) + this->bp.val(sigma0) + this->bp.val(majority);
+                                                            this->bp.val(W) + this->bp.val(sigma0) +
+                                                            this->bp.val(majority);
                             this->bp.val(unreduced_new_e) = this->bp.val(packed_d) + this->bp.val(packed_h) +
                                                             this->bp.val(sigma1) + this->bp.val(choice) +
                                                             typename FieldType::value_type(K) + this->bp.val(W);
@@ -293,10 +295,10 @@ namespace nil {
                         return result;
                     }
 
-                }    // namespace components        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SHA256_COMPONENTS_HPP

@@ -32,7 +32,6 @@
 #define CRYPTO3_ZK_BENES_ROUTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
-#include <nil/crypto3/zk/snark/routing/benes_routing_algorithm.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 
@@ -85,7 +84,7 @@ namespace nil {
                             const std::size_t num_packets,
                             const std::vector<blueprint_variable_vector<FieldType>> &routing_input_bits,
                             const std::vector<blueprint_variable_vector<FieldType>> &routing_output_bits,
-                            const std::size_t lines_to_unpack):
+                            const std::size_t lines_to_unpack) :
                             component<FieldType>(bp),
                             num_packets(num_packets), num_columns(benes_num_columns(num_packets)),
                             routing_input_bits(routing_input_bits), routing_output_bits(routing_output_bits),
@@ -133,17 +132,18 @@ namespace nil {
                             }
                         }
 
-                        void generate_r1cs_constraints(){
+                        void generate_r1cs_constraints() {
                             /* packing/unpacking */
                             for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                                 pack_inputs[packet_idx].generate_r1cs_constraints(false);
                                 if (packet_idx < lines_to_unpack) {
                                     unpack_outputs[packet_idx].generate_r1cs_constraints(true);
                                 } else {
-                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
-                                        this->bp.add_r1cs_constraint(
-                                            r1cs_constraint<FieldType>(1, routed_packets[0][packet_idx][subpacket_idx],
-                                                                       routed_packets[num_columns][packet_idx][subpacket_idx]));
+                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
+                                         ++subpacket_idx) {
+                                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                                            1, routed_packets[0][packet_idx][subpacket_idx],
+                                            routed_packets[num_columns][packet_idx][subpacket_idx]));
                                     }
                                 }
                             }
@@ -156,19 +156,20 @@ namespace nil {
 
                                     if (num_subpackets == 1) {
                                         /* easy case: (cur-next)*(cur-cross) = 0 */
-                                        this->bp.add_r1cs_constraint(
-                                            r1cs_constraint<FieldType>(routed_packets[column_idx][packet_idx][0] -
-                                                                           routed_packets[column_idx + 1][straight_edge][0],
-                                                                       routed_packets[column_idx][packet_idx][0] -
-                                                                           routed_packets[column_idx + 1][cross_edge][0],
-                                                                       0));
+                                        this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                                            routed_packets[column_idx][packet_idx][0] -
+                                                routed_packets[column_idx + 1][straight_edge][0],
+                                            routed_packets[column_idx][packet_idx][0] -
+                                                routed_packets[column_idx + 1][cross_edge][0],
+                                            0));
                                     } else {
                                         /* routing bit must be boolean */
-                                        generate_boolean_r1cs_constraint<FieldType>(this->bp,
-                                                                                    benes_switch_bits[column_idx][packet_idx]);
+                                        generate_boolean_r1cs_constraint<FieldType>(
+                                            this->bp, benes_switch_bits[column_idx][packet_idx]);
 
                                         /* route forward according to routing bits */
-                                        for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
+                                        for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
+                                             ++subpacket_idx) {
                                             /*
                                               (1-switch_bit) * (cur-straight_edge) + switch_bit * (cur-cross_edge) = 0
                                               switch_bit * (cross_edge-straight_edge) = cur-straight_edge
@@ -185,7 +186,7 @@ namespace nil {
                             }
                         }
 
-                        void generate_r1cs_witness(const integer_permutation &permutation){
+                        void generate_r1cs_witness(const integer_permutation &permutation) {
                             /* pack inputs */
                             for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                                 pack_inputs[packet_idx].generate_r1cs_witness_from_bits();
@@ -204,7 +205,8 @@ namespace nil {
                                             typename FieldType::value_type(routing[column_idx][packet_idx] ? 1 : 0);
                                     }
 
-                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
+                                    for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
+                                         ++subpacket_idx) {
                                         this->bp.val(routing[column_idx][packet_idx] ?
                                                          routed_packets[column_idx + 1][cross_edge][subpacket_idx] :
                                                          routed_packets[column_idx + 1][straight_edge][subpacket_idx]) =
@@ -220,10 +222,10 @@ namespace nil {
                         }
                     };
 
-                }    // namespace components    
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // BENES_ROUTING_COMPONENT_HPP
