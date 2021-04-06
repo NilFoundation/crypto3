@@ -9,7 +9,7 @@
 #ifndef BOOST_MULTIPRECISION_WNAF_HPP
 #define BOOST_MULTIPRECISION_WNAF_HPP
 
-#include <nil/crypto3/multiprecision/detail/default_ops.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
 
 namespace nil {
     namespace crypto3 {
