@@ -89,9 +89,9 @@ namespace nil {
                          */
                         element_edwards_g2(underlying_field_value_type in_X, underlying_field_value_type in_Y,
                                            underlying_field_value_type in_Z) {
-                            this->X = X;
-                            this->Y = Y;
-                            this->Z = Z;
+                            this->X = in_X;
+                            this->Y = in_Y;
+                            this->Z = in_Z;
 
                             // temporary, until fp3 will be literall
                             twist_mul_by_a_c0 = a * X.non_residue;
@@ -356,9 +356,9 @@ namespace nil {
 
                         /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
                             g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one(),
-                             g2_field_type_value::underlying_type::zero());
+                            g2_field_type_value::underlying_type::zero());
                         ;
-                        
+
                     private:
                         /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                         /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);

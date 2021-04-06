@@ -84,7 +84,7 @@ template<typename T>
 using test_instances_t = std::vector<std::vector<T>>;
 
 template<typename GroupType>
-test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t size) {
+test_instances_t<GroupType> generate_group_elements(std::size_t count, std::size_t size) {
     // generating a random group element is expensive,
     // so for now we only generate a single one and repeat it
     test_instances_t<GroupType> result(count);
@@ -92,7 +92,7 @@ test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t si
     for (size_t i = 0; i < count; i++) {
 
         typename GroupType::value_type x =
-            curve_random_element<GroupType>().to_special();    // djb requires input to be in special form
+            random_element<GroupType>().to_special();    // djb requires input to be in special form
 
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
@@ -104,14 +104,14 @@ test_instances_t<GroupType> generate_group_elements(size_t count, std::size_t si
 }
 
 template<typename FieldType>
-test_instances_t<FieldType> generate_scalars(size_t count, std::size_t size) {
+test_instances_t<FieldType> generate_scalars(std::size_t count, std::size_t size) {
     // we use SHA512_rng because it is much faster than
     // FieldType::random_element()
     test_instances_t<FieldType> result(count);
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(field_random_element<FieldType>(i * size + j));
+            result[i].push_back(random_element<FieldType>(i * size + j));
         }
     }
 
@@ -124,14 +124,14 @@ long long get_nsec_time() {
 }
 
 template<typename GroupType, typename FieldType, typename MultiexpMethod>
-run_result_t<GroupType> profile_multiexp(test_instances_t<GroupType> group_elements,
-                                         test_instances_t<FieldType> scalars) {
+run_result_t<GroupType>
+    profile_multiexp(test_instances_t<GroupType> group_elements, test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<typename GroupType::value_type> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
         answers.push_back(multiexp<MultiexpMethod>(group_elements[i].cbegin(), group_elements[i].cend(),
-                                                   scalars[i].cbegin(), scalars[i].cend(), 1, MultiexpMethod()));
+                                                   scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
     long long time_delta = get_nsec_time() - start_time;

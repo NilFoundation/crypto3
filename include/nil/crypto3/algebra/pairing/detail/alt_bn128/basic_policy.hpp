@@ -31,7 +31,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 254>
@@ -50,8 +50,8 @@ namespace nil {
                         using Fqe_type = typename policy_type::g2_field_type;
                         using Fqk_type = typename policy_type::gt_field_type;
 
-                        using g1_type = curves::detail::alt_bn128_g1<254>;
-                        using g2_type = curves::detail::alt_bn128_g2<254>;
+                        using g1_type = policy_type::g1_field_type;
+                        using g2_type = policy_type::g2_field_type;
                         using gt_type = typename policy_type::gt_field_type;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
@@ -73,7 +73,7 @@ namespace nil {
                     constexpr typename alt_bn128_basic_policy<254>::number_type const
                         alt_bn128_basic_policy<254>::ate_loop_count;
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

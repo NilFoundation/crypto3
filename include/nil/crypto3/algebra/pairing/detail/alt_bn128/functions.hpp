@@ -33,7 +33,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 254>
@@ -49,8 +49,8 @@ namespace nil {
                         using Fqe_type = typename policy_type::Fqe_type;
                         using Fqk_type = typename policy_type::Fqk_type;
 
-                        using g1_type = typename policy_type::g1_type;
-                        using g2_type = typename policy_type::g2_type;
+                        using g1_type = curves::detail::alt_bn128_g1<254>;
+                        using g2_type = curves::detail::alt_bn128_g2<254>;
                         using gt_type = typename policy_type::gt_type;
 
                         constexpr static const typename policy_type::number_type ate_loop_count =
@@ -70,8 +70,8 @@ namespace nil {
                         using Fq = typename Fq_type::value_type;
                         using Fq2 = typename Fqe_type::value_type;
                         using gt = typename Fqk_type::value_type;
+
                     public:
-                        
                         struct ate_g1_precomp {
                             Fq PX;
                             Fq PY;
@@ -486,7 +486,7 @@ namespace nil {
                         }
                     };
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

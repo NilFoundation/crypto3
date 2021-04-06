@@ -35,7 +35,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 298>
@@ -642,7 +642,7 @@ namespace nil {
                     };
 
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

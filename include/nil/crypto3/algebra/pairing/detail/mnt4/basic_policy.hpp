@@ -33,7 +33,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 298>
@@ -86,7 +86,7 @@ namespace nil {
                     constexpr bool const mnt4_basic_policy<298>::ate_is_loop_count_neg;
                     constexpr bool const mnt4_basic_policy<298>::final_exponent_last_chunk_is_w0_neg;
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

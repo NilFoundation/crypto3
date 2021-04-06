@@ -33,7 +33,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 183>
@@ -80,7 +80,7 @@ namespace nil {
                         typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::ate_loop_count;
 
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

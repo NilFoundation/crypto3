@@ -29,47 +29,46 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
 
                 template<typename CurveType>
-                using other_curve_type = typename CurveType::pairing_policy::other_curve_type;
+                using pair_curve_type = typename CurveType::pairing::pair_curve_type;
 
                 template<typename CurveType>
-                using Fp_type = typename CurveType::pairing_policy::Fp_type;
+                using Fp_type = typename CurveType::pairing::Fp_type;
 
                 template<typename CurveType>
-                using Fq_type = typename CurveType::pairing_policy::Fq_type;
+                using Fq_type = typename CurveType::pairing::Fq_type;
 
                 template<typename CurveType>
-                using Fqe_type = typename CurveType::pairing_policy::Fqe_type;
+                using Fqe_type = typename CurveType::pairing::Fqe_type;
 
                 template<typename CurveType>
-                using Fqk_type = typename CurveType::pairing_policy::Fqk_type;
+                using Fqk_type = typename CurveType::pairing::Fqk_type;
 
                 template<typename CurveType>
-                using g1_type = typename CurveType::pairing_policy::g1_type;
+                using g1_type = typename CurveType::pairing::g1_type;
 
                 template<typename CurveType>
-                using g2_type = typename CurveType::pairing_policy::g2_type;
+                using g2_type = typename CurveType::pairing::g2_type;
 
                 template<typename CurveType>
-                using gt_type = typename CurveType::pairing_policy::gt_type;
+                using gt_type = typename CurveType::pairing::gt_type;
 
                 template<typename CurveType>
-                using G1_precomp = typename CurveType::pairing_policy::G1_precomp;
+                using g1_precomp = typename CurveType::pairing::g1_precomp;
 
                 template<typename CurveType>
-                using G2_precomp = typename CurveType::pairing_policy::G2_precomp;
+                using g2_precomp = typename CurveType::pairing::g2_precomp;
 
                 template<typename CurveType>
-                using affine_ate_G1_precomp = typename CurveType::pairing_policy::affine_ate_G1_precomp;
+                using affine_ate_g1_precomp = typename CurveType::pairing::affine_ate_g1_precomp;
 
                 template<typename CurveType>
-                using affine_ate_G2_precomp = typename CurveType::pairing_policy::affine_ate_G2_precomp;
+                using affine_ate_g2_precomp = typename CurveType::pairing::affine_ate_g2_precomp;
 
-
-            }    // namespace pairings    
-        }    // namespace algebra
-    }        // namespace crypto3
+            }    // namespace pairing
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ALGEBRA_PAIRINGS_TYPES_HPP

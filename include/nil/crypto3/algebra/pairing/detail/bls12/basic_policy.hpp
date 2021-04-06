@@ -32,7 +32,7 @@
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 381>
@@ -124,7 +124,7 @@ namespace nil {
                     constexpr bool const bls12_basic_policy<377>::final_exponent_is_z_neg;
 
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

@@ -91,9 +91,9 @@ namespace nil {
                          */
                         element_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
                                            underlying_field_value_type in_Z) {
-                            this->X = X;
-                            this->Y = Y;
-                            this->Z = Z;
+                            this->X = in_X;
+                            this->Y = in_Y;
+                            this->Z = in_Z;
                         };
                         /** @brief
                          *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
