@@ -127,6 +127,8 @@ namespace nil {
                         return shares;
                     }
 
+                    using base_type::reconstruct_secret;
+
                     // TODO: implement without temporary variable _shares
                     template<typename Shares, check_indexed_weighted_shares_type<Shares> = true>
                     static inline private_element_type reconstruct_secret(const Shares &shares) {
@@ -157,7 +159,7 @@ namespace nil {
                         public_share_type public_share;
                         public_share.first = s.first;
                         for (const auto &part_s : s.second) {
-                            assert(public_share.second.emplace(base_type::get_public_elemnt(part_s)).second);
+                            assert(public_share.second.emplace(base_type::get_public_share(part_s)).second);
                         }
                         return public_share;
                     }

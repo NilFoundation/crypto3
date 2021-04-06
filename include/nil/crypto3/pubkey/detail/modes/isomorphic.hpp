@@ -27,6 +27,8 @@
 #ifndef CRYPTO3_SCHEME_MODES_HPP
 #define CRYPTO3_SCHEME_MODES_HPP
 
+#include <type_traits>
+
 #include <nil/crypto3/detail/stream_endian.hpp>
 
 #include <nil/crypto3/pubkey/agreement_key.hpp>

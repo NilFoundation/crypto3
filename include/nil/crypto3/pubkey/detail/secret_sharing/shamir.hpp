@@ -204,7 +204,7 @@ namespace nil {
                     template<typename PublicShares, check_indexed_public_elements_type<PublicShares> = true>
                     static inline public_element_type reconstruct_public_element(const PublicShares &public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
-                        assert(check_minimal_size(std::distance(public_shares.begin(), public_shares.end())));
+                        // assert(check_minimal_size(std::distance(public_shares.begin(), public_shares.end())));
 
                         public_element_type result = public_element_type::zero();
                         indexes_type indexes = get_shares_indexes(public_shares);
