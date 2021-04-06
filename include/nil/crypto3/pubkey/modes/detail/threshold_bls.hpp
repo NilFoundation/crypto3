@@ -104,7 +104,6 @@ namespace nil {
                 typedef typename sss_signature_no_key_ops_type::indexed_public_element_type part_signature_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
-                typedef typename base_scheme_public_key_type::public_params_type public_params_type;
                 typedef typename base_scheme_public_key_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<std::uint8_t> input_block_type;
@@ -145,7 +144,7 @@ namespace nil {
                              std::is_same<input_value_type, typename std::iterator_traits<
                                                                 typename MsgRange::iterator>::value_type>::value,
                              bool>::type = true>
-                inline bool verify(const MsgRange &msg, const part_signature_type &part_sig) const {
+                inline bool part_verify(const MsgRange &msg, const part_signature_type &part_sig) const {
                     assert(pubkey.first == part_sig.first);
                     return pubkey.second.verify(msg, part_sig.second);
                 }
@@ -175,7 +174,7 @@ namespace nil {
                 typedef public_key<detail::threshold_bls<Scheme, SecretSharingScheme>> base_type;
                 typedef typename base_type::scheme_type scheme_type;
                 typedef typename base_type::base_scheme_type base_scheme_type;
-                typedef private_key<base_scheme_type> base_scheme_private_key_type;
+                typedef typename base_type::base_scheme_private_key_type base_scheme_private_key_type;
 
                 typedef typename base_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename base_type::sss_signature_group_type sss_signature_group_type;
@@ -188,7 +187,6 @@ namespace nil {
                 typedef typename base_type::part_signature_type part_signature_type;
                 typedef typename base_type::signature_type signature_type;
 
-                typedef typename base_type::public_params_type public_params_type;
                 typedef typename base_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<std::uint8_t> input_block_type;
@@ -233,12 +231,11 @@ namespace nil {
                         pedersen_dkg<typename public_key<Scheme>::public_key_type::group_type>,
                         SecretSharingScheme<typename public_key<Scheme>::public_key_type::group_type>>::value>::type> {
                 typedef detail::threshold_bls<Scheme, SecretSharingScheme> scheme_type;
-                typedef typename scheme_type::base_scheme_type base_scheme_type;
-                typedef private_key<base_scheme_type> base_scheme_private_key_type;
-                typedef public_key<base_scheme_type> base_scheme_public_key_type;
-                typedef no_key_ops<base_scheme_type> base_scheme_no_key_ops_type;
-
                 typedef public_key<scheme_type> scheme_public_key_type;
+                typedef typename scheme_type::base_scheme_type base_scheme_type;
+                typedef typename scheme_public_key_type::base_scheme_private_key_type base_scheme_private_key_type;
+                typedef typename scheme_public_key_type::base_scheme_public_key_type base_scheme_public_key_type;
+                typedef no_key_ops<base_scheme_type> base_scheme_no_key_ops_type;
 
                 typedef typename scheme_public_key_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename scheme_public_key_type::sss_signature_group_type sss_signature_group_type;
@@ -251,7 +248,6 @@ namespace nil {
                 typedef typename scheme_public_key_type::part_signature_type part_signature_type;
                 typedef typename scheme_public_key_type::signature_type signature_type;
 
-                typedef typename scheme_public_key_type::public_params_type public_params_type;
                 typedef typename scheme_public_key_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<part_signature_type> input_block_type;
@@ -300,7 +296,6 @@ namespace nil {
                 typedef typename sss_signature_no_key_ops_type::indexed_public_element_type part_signature_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
-                typedef typename base_scheme_public_key_type::public_params_type public_params_type;
                 typedef typename base_scheme_public_key_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<std::uint8_t> input_block_type;
@@ -324,7 +319,7 @@ namespace nil {
                 // VK_i
                 //
                 public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key) :
-                    VK_i(sss_public_key_no_key_ops_type::reconstruct_public_element(key)) {
+                    VK_i(sss_public_key_no_key_ops_type::reconstruct_public_element(key.second)) {
                     key_init(key);
                 }
 
@@ -375,7 +370,7 @@ namespace nil {
                 typedef public_key<detail::threshold_bls<Scheme, SecretSharingScheme>> base_type;
                 typedef typename base_type::scheme_type scheme_type;
                 typedef typename base_type::base_scheme_type base_scheme_type;
-                typedef private_key<base_scheme_type> base_scheme_private_key_type;
+                typedef typename base_type::base_scheme_private_key_type base_scheme_private_key_type;
 
                 typedef typename base_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename base_type::sss_signature_group_type sss_signature_group_type;
@@ -388,7 +383,6 @@ namespace nil {
                 typedef typename base_type::part_signature_type part_signature_type;
                 typedef typename base_type::signature_type signature_type;
 
-                typedef typename base_type::public_params_type public_params_type;
                 typedef typename base_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<std::uint8_t> input_block_type;
@@ -401,7 +395,7 @@ namespace nil {
                 }
 
                 private_key(const typename sss_public_key_no_key_ops_type::share_type &key) :
-                    s_i(sss_public_key_no_key_ops_type::reconstruct_secret(key)),
+                    s_i(sss_public_key_no_key_ops_type::reconstruct_secret(key.second)),
                     base_type(sss_public_key_no_key_ops_type::get_public_share(key)) {
                     key_init(key);
                 }
@@ -435,12 +429,11 @@ namespace nil {
                     weighted_shamir_sss<typename public_key<Scheme>::public_key_type::group_type>,
                     SecretSharingScheme<typename public_key<Scheme>::public_key_type::group_type>>::value>::type> {
                 typedef detail::threshold_bls<Scheme, SecretSharingScheme> scheme_type;
-                typedef typename scheme_type::base_scheme_type base_scheme_type;
-                typedef private_key<base_scheme_type> base_scheme_private_key_type;
-                typedef public_key<base_scheme_type> base_scheme_public_key_type;
-                typedef no_key_ops<base_scheme_type> base_scheme_no_key_ops_type;
-
                 typedef public_key<scheme_type> scheme_public_key_type;
+                typedef typename scheme_type::base_scheme_type base_scheme_type;
+                typedef typename scheme_public_key_type::base_scheme_private_key_type base_scheme_private_key_type;
+                typedef typename scheme_public_key_type::base_scheme_public_key_type base_scheme_public_key_type;
+                typedef no_key_ops<base_scheme_type> base_scheme_no_key_ops_type;
 
                 typedef typename scheme_public_key_type::sss_public_key_group_type sss_public_key_group_type;
                 typedef typename scheme_public_key_type::sss_signature_group_type sss_signature_group_type;
@@ -453,7 +446,6 @@ namespace nil {
                 typedef typename scheme_public_key_type::part_signature_type part_signature_type;
                 typedef typename scheme_public_key_type::signature_type signature_type;
 
-                typedef typename scheme_public_key_type::public_params_type public_params_type;
                 typedef typename scheme_public_key_type::pubkey_id_type pubkey_id_type;
 
                 typedef std::vector<part_signature_type> input_block_type;
@@ -468,6 +460,66 @@ namespace nil {
                     return sss_signature_no_key_ops_type::reduce_public_elements(signatures);
                 }
             };
+
+            template<typename Scheme, typename Number1, typename Number2>
+            inline typename std::enable_if<
+                std::is_same<shamir_sss<typename private_key<Scheme>::base_scheme_public_key_type::public_key_type::group_type>,
+                             typename private_key<Scheme>::sss_public_key_group_type>::value,
+                std::pair<public_key<Scheme>, std::vector<private_key<Scheme>>>>::type
+                key_gen(Number1 t, Number2 n) {
+                using result_type = std::vector<private_key<Scheme>>;
+                using sss_no_key_ops_type = typename private_key<Scheme>::sss_public_key_no_key_ops_type;
+                using sss_scheme_type = typename sss_no_key_ops_type::scheme_type;
+                auto coeffs = sss_no_key_ops_type::get_poly(t, n);
+                typename sss_no_key_ops_type::shares_type shares = nil::crypto3::deal_shares<sss_scheme_type>(coeffs, n, t);
+                result_type result;
+                for (const auto &s : shares) {
+                    result.emplace_back(s);
+                }
+                auto PK = public_key<Scheme>(sss_no_key_ops_type::get_public_coeffs(coeffs).front());
+                return std::make_pair(PK, result);
+            }
+
+            template<typename Key, typename Number1, typename Number2, typename Weights>
+            inline typename std::enable_if<
+                std::is_same<
+                    weighted_shamir_sss<typename Key::base_scheme_public_key_type::public_key_type::group_type>,
+                    typename Key::sss_public_key_group_type>::value,
+                std::vector<Key>>::type
+                key_gen(Number1 t, Number2 n, const Weights &weights) {
+                using result_type = std::vector<Key>;
+                using sss_no_key_ops_type = typename Key::sss_public_key_no_key_ops_type;
+                using scheme_type = typename sss_no_key_ops_type::scheme_type;
+                using shares_dealing_acc_set_type = shares_dealing_accumulator_set<typename modes::isomorphic<
+                    scheme_type, nop_padding>::template bind<shares_dealing_policy<scheme_type>>::type>;
+                using shares_dealing_acc =
+                    typename boost::mpl::front<typename shares_dealing_acc_set_type::features_type>::type;
+
+                auto coeffs = sss_no_key_ops_type::get_poly(t, n);
+
+                shares_dealing_acc_set_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
+                nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
+                for (const auto &w : weights) {
+                    deal_shares_acc(w);
+                }
+                typename sss_no_key_ops_type::shares_type shares =
+                    boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
+
+                result_type result;
+                for (const auto &s : shares) {
+                    result.emplace_back(s);
+                }
+                return result;
+            }
+
+            template<typename Key, typename Shares>
+            inline typename std::enable_if<
+                std::is_same<pedersen_dkg<typename Key::base_scheme_public_key_type::public_key_type::group_type>,
+                             typename Key::sss_public_key_group_type>::type,
+                Key>
+                key_gen() {
+                using result_type = Key;
+            }
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

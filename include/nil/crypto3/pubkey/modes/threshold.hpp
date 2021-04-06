@@ -95,7 +95,7 @@ namespace nil {
 
                     template<typename... Args>
                     inline static result_type process(const key_type &key, const Args &...args) {
-                        return key.sign(key, args...);
+                        return key.sign(args...);
                     }
                 };
 
@@ -164,7 +164,7 @@ namespace nil {
 
                     template<typename... Args>
                     inline static result_type process(const Args &...args) {
-                        return scheme_type::aggregate(args...);
+                        return key_type::aggregate(args...);
                     }
                 };
 

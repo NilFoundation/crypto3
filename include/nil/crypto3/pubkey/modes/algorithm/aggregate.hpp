@@ -37,7 +37,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Mode>
-            using aggregation_mode_policy = Mode::aggregation_policy;
+            using aggregation_mode_policy = typename Mode::aggregation_policy;
         }
         /*!
          * @brief
@@ -62,7 +62,7 @@ namespace nil {
         //                     KeyInputIterator key_last, OutputIterator out) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //     typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
@@ -94,7 +94,7 @@ namespace nil {
         //                     OutputIterator out) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //     typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
@@ -129,7 +129,7 @@ namespace nil {
         //     sign(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -160,7 +160,7 @@ namespace nil {
         //     sign(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -188,7 +188,7 @@ namespace nil {
         // OutputIterator sign(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //     typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
@@ -216,7 +216,7 @@ namespace nil {
         // OutputRange &sign(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //     typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
@@ -245,7 +245,7 @@ namespace nil {
         // OutputRange &sign(const SinglePassRange &rng, const pubkey::private_key<Mode> &key, OutputRange &out) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //     typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
@@ -277,7 +277,7 @@ namespace nil {
         //     sign(const SinglePassRange &r, const KeySinglePassRange &key) {
         //
         //     typedef typename Mode::template bind<
-        //         pubkey::aggregation_mode_policy<Mode>>::type Mode;
+        //         pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -307,14 +307,14 @@ namespace nil {
                                 OutputIterator>::type
             aggregate(InputIterator first, InputIterator last, OutputIterator out) {
 
-            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type Mode;
+            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
             typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
             return SignerImpl(first, last, std::move(out),
-                              ModeAccumulator(pubkey::no_key_ops<typename Mode::scheme_type>()));
+                              ModeAccumulator(pubkey::no_key_ops<typename AggregationMode::scheme_type>()));
         }
 
         /*!
@@ -337,13 +337,13 @@ namespace nil {
                                 OutputIterator>::type
             aggregate(const SinglePassRange &rng, OutputIterator out) {
 
-            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type Mode;
+            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
             typedef typename pubkey::aggregation_accumulator_set<Mode> ModeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return SignerImpl(rng, std::move(out), ModeAccumulator(pubkey::no_key_ops<typename Mode::scheme_type>()));
+            return SignerImpl(rng, std::move(out), ModeAccumulator(pubkey::no_key_ops<typename AggregationMode::scheme_type>()));
         }
 
         /*!
@@ -421,12 +421,12 @@ namespace nil {
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
             aggregate(InputIterator first, InputIterator last) {
 
-            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type Mode;
+            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(first, last, ModeAccumulator(pubkey::no_key_ops<typename Mode::scheme_type>()));
+            return SignerImpl(first, last, ModeAccumulator(pubkey::no_key_ops<typename AggregationMode::scheme_type>()));
         }
 
         /*!
@@ -449,12 +449,12 @@ namespace nil {
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
             aggregate(const SinglePassRange &r) {
 
-            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type Mode;
+            typedef typename Mode::template bind<pubkey::aggregation_mode_policy<Mode>>::type AggregationMode;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(r, ModeAccumulator(pubkey::no_key_ops<typename Mode::scheme_type>()));
+            return SignerImpl(r, ModeAccumulator(pubkey::no_key_ops<typename AggregationMode::scheme_type>()));
         }
     }    // namespace crypto3
 }    // namespace nil

@@ -72,7 +72,7 @@ namespace nil {
                     template<typename Args>
                     part_verify_impl(const Args &args) :
                         public_key(args[boost::accumulators::sample]),
-                        signature(args[::nil::crypto3::accumulators::signature]) {
+                        part_signature(args[::nil::crypto3::accumulators::signature]) {
                     }
 
                     template<typename Args>
@@ -115,8 +115,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    inline void resolve_type(const signature_type &part_sig, InputIterator) {
-                        part_signature = sig;
+                    inline void resolve_type(const part_signature_type &part_sig, InputIterator) {
+                        part_signature = part_sig;
                     }
 
                     template<typename InputIterator>
