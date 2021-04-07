@@ -28,9 +28,12 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
+#include <nil/crypto3/pubkey/scheme_state.hpp>
+
 // #include <nil/crypto3/pubkey/accumulators/scheme.hpp>
 // #include <nil/crypto3/pubkey/modes/accumulators/keys.hpp>
 // #include <nil/crypto3/pubkey/modes/accumulators/signatures.hpp>
+#include <nil/crypto3/pubkey/modes/accumulators/sign.hpp>
 #include <nil/crypto3/pubkey/modes/accumulators/part_verify.hpp>
 
 namespace nil {

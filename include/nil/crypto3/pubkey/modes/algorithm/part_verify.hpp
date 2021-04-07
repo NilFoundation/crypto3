@@ -423,7 +423,7 @@ namespace nil {
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
 
-            return VerifyerImpl(r, acc);
+            return VerifyerImpl(r, std::forward<OutputAccumulator>(acc));
         }
 
         /*!

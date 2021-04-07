@@ -23,26 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PART_VERIFY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PART_VERIFY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_MODES_SIGN_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_MODES_SIGN_HPP
 
-#include <type_traits>
-#include <iterator>
-
-#include <boost/assert.hpp>
-#include <boost/concept_check.hpp>
-
-#include <boost/range/concepts.hpp>
-
-#include <boost/parameter/value_type.hpp>
-
-#include <boost/accumulators/framework/accumulator_base.hpp>
-#include <boost/accumulators/framework/extractor.hpp>
-#include <boost/accumulators/framework/depends_on.hpp>
-#include <boost/accumulators/framework/parameters/sample.hpp>
-
-#include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/signature.hpp>
+#include <nil/crypto3/pubkey/accumulators/sign.hpp>
 
 #include <nil/crypto3/pubkey/secret_sharing.hpp>
 
@@ -52,101 +36,10 @@ namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
-                template<typename ProcessingMode, typename = void>
-                struct part_verify_impl;
-
                 template<typename ProcessingMode>
-                struct part_verify_impl<
-                    ProcessingMode,
-                    typename std::enable_if<
-                        !std::is_same<pubkey::weighted_shamir_sss<
-                                          typename ProcessingMode::key_type::sss_public_key_group_type::group_type>,
-                                      typename ProcessingMode::key_type::sss_public_key_group_type>::value>::type>
-                    : boost::accumulators::accumulator_base {
-                protected:
-                    typedef ProcessingMode mode_type;
-                    typedef typename mode_type::scheme_type scheme_type;
-                    typedef typename mode_type::padding_type padding_type;
-                    typedef typename mode_type::key_type key_type;
-
-                    constexpr static const auto block_bits = mode_type::input_block_bits;
-                    typedef typename mode_type::input_block_type input_block_type;
-
-                    constexpr static const auto value_bits = mode_type::input_value_bits;
-                    typedef typename mode_type::input_value_type input_value_type;
-
-                    typedef typename key_type::public_key_type public_key_type;
-                    typedef typename key_type::private_key_type private_key_type;
-                    typedef typename key_type::part_signature_type part_signature_type;
-
-                public:
-                    typedef typename mode_type::result_type result_type;
-
-                    template<typename Args>
-                    part_verify_impl(const Args &args) :
-                        public_key(args[boost::accumulators::sample]),
-                        part_signature(args[::nil::crypto3::accumulators::signature]) {
-                    }
-
-                    template<typename Args>
-                    inline void operator()(const Args &args) {
-                        resolve_type(
-                            args[boost::accumulators::sample],
-                            args[::nil::crypto3::accumulators::iterator_last | typename input_block_type::iterator()]);
-                    }
-
-                    inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(public_key, cache, part_signature);
-                    }
-
-                protected:
-                    template<
-                        typename InputBlock,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, typename InputBlock::value_type>::value,
-                                                bool>::type = true>
-                    inline void resolve_type(const InputBlock &block, InputIterator) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                        resolve_type(block.begin(), block.end());
-                    }
-
-                    template<
-                        typename ValueType,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(const ValueType &value, InputIterator) {
-                        cache.emplace_back(value);
-                    }
-
-                    template<
-                        typename InputIterator,
-                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
-                    inline void resolve_type(InputIterator first, InputIterator last) {
-                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
-                        std::copy(first, last, std::back_inserter(cache));
-                    }
-
-                    template<typename InputIterator>
-                    inline void resolve_type(const part_signature_type &part_sig, InputIterator) {
-                        part_signature = part_sig;
-                    }
-
-                    template<typename InputIterator>
-                    inline void resolve_type(const key_type &key, InputIterator) {
-                        public_key = key;
-                    }
-
-                    input_block_type cache;
-                    part_signature_type part_signature;
-                    key_type public_key;
-                };
-
-                template<typename ProcessingMode>
-                struct part_verify_impl<
-                    ProcessingMode,
-                    typename std::enable_if<
-                        std::is_same<pubkey::weighted_shamir_sss<
+                struct sign_impl<ProcessingMode,
+                                 typename std::enable_if<!std::is_same<
+                                     pubkey::weighted_shamir_sss<
                                          typename ProcessingMode::key_type::sss_public_key_group_type::group_type>,
                                      typename ProcessingMode::key_type::sss_public_key_group_type>::value>::type>
                     : boost::accumulators::accumulator_base {
@@ -162,19 +55,11 @@ namespace nil {
                     constexpr static const auto value_bits = mode_type::input_value_bits;
                     typedef typename mode_type::input_value_type input_value_type;
 
-                    typedef typename key_type::public_key_type public_key_type;
-                    typedef typename key_type::private_key_type private_key_type;
-                    typedef typename key_type::part_signature_type part_signature_type;
-
-                    typedef typename key_type::sss_public_key_no_key_ops_type::weights_type weights_type;
-
                 public:
                     typedef typename mode_type::result_type result_type;
 
                     template<typename Args>
-                    part_verify_impl(const Args &args) :
-                        public_key(args[boost::accumulators::sample]),
-                        part_signature(args[::nil::crypto3::accumulators::signature]) {
+                    sign_impl(const Args &args) : private_key(args[boost::accumulators::sample]) {
                     }
 
                     template<typename Args>
@@ -185,18 +70,14 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return mode_type::process(public_key, cache, part_signature, confirmed_weights);
+                        return mode_type::process(private_key, cache);
                     }
 
                 protected:
-                    template<
-                        typename InputBlock,
-                        typename InputIterator,
-                        typename std::enable_if<std::is_same<input_value_type, typename InputBlock::value_type>::value,
-                                                bool>::type = true>
+                    template<typename InputBlock, typename InputIterator>
                     inline void resolve_type(const InputBlock &block, InputIterator) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
-                        resolve_type(block.begin(), block.end());
+                        resolve_type(block.cbegin(), block.cend());
                     }
 
                     template<
@@ -216,14 +97,75 @@ namespace nil {
                         std::copy(first, last, std::back_inserter(cache));
                     }
 
-                    template<typename InputIterator>
-                    inline void resolve_type(const part_signature_type &part_sig, InputIterator) {
-                        part_signature = part_sig;
+                    key_type private_key;
+                    input_block_type cache;
+                };
+
+                template<typename ProcessingMode>
+                struct sign_impl<ProcessingMode,
+                                 typename std::enable_if<std::is_same<
+                                     pubkey::weighted_shamir_sss<
+                                         typename ProcessingMode::key_type::sss_public_key_group_type::group_type>,
+                                     typename ProcessingMode::key_type::sss_public_key_group_type>::value>::type>
+                    : boost::accumulators::accumulator_base {
+                protected:
+                    typedef ProcessingMode mode_type;
+                    typedef typename mode_type::scheme_type scheme_type;
+                    typedef typename mode_type::padding_type padding_type;
+                    typedef typename mode_type::key_type key_type;
+
+                    constexpr static const auto block_bits = mode_type::input_block_bits;
+                    typedef typename mode_type::input_block_type input_block_type;
+
+                    constexpr static const auto value_bits = mode_type::input_value_bits;
+                    typedef typename mode_type::input_value_type input_value_type;
+
+                    typedef typename key_type::sss_public_key_no_key_ops_type::weights_type weights_type;
+
+                public:
+                    typedef typename mode_type::result_type result_type;
+
+                    template<typename Args>
+                    sign_impl(const Args &args) : private_key(args[boost::accumulators::sample]) {
                     }
 
-                    template<typename InputIterator>
-                    inline void resolve_type(const key_type &key, InputIterator) {
-                        public_key = key;
+                    template<typename Args>
+                    inline void operator()(const Args &args) {
+                        resolve_type(
+                            args[boost::accumulators::sample],
+                            args[::nil::crypto3::accumulators::iterator_last | typename input_block_type::iterator()]);
+                    }
+
+                    inline result_type result(boost::accumulators::dont_care) const {
+                        return mode_type::process(private_key, cache, confirmed_weights);
+                    }
+
+                protected:
+                    template<
+                        typename InputBlock,
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<typename InputBlock::iterator>::value_type,
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    inline void resolve_type(const InputBlock &block, InputIterator) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const InputBlock>));
+                        resolve_type(block.cbegin(), block.cend());
+                    }
+
+                    template<
+                        typename ValueType,
+                        typename InputIterator,
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    inline void resolve_type(const ValueType &value, InputIterator) {
+                        cache.emplace_back(value);
+                    }
+
+                    template<
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
+                    inline void resolve_type(InputIterator first, InputIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                        std::copy(first, last, std::back_inserter(cache));
                     }
 
                     template<
@@ -239,8 +181,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator,
-                        typename key_type::sss_public_key_no_key_ops_type::template check_weight_type<
-                            typename std::iterator_traits<InputIterator>::value_type> = true>
+                             typename key_type::sss_public_key_no_key_ops_type::template check_weight_type<
+                                 typename std::iterator_traits<InputIterator>::value_type> = true>
                     inline void resolve_type(InputIterator first, InputIterator last) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
                         for (auto it = first; it != last; it++) {
@@ -257,34 +199,13 @@ namespace nil {
                         resolve_type(weights.begin(), weights.end());
                     }
 
+                    key_type private_key;
                     input_block_type cache;
-                    part_signature_type part_signature;
-                    key_type public_key;
                     weights_type confirmed_weights;
                 };
             }    // namespace impl
-
-            namespace tag {
-                template<typename ProcessingMode>
-                struct part_verify : boost::accumulators::depends_on<> {
-                    typedef ProcessingMode mode_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::part_verify_impl<mode_type>> impl;
-                };
-            }    // namespace tag
-
-            namespace extract {
-                template<typename ProcessingMode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::part_verify<ProcessingMode>>::type::result_type
-                    scheme(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::part_verify<ProcessingMode>>(acc);
-                }
-            }    // namespace extract
         }        // namespace accumulators
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PART_VERIFY_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_SIGN_HPP

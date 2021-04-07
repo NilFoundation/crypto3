@@ -144,6 +144,12 @@ BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {
     using pubkey_type = public_key<scheme_type>;
     using no_key_type = no_key_ops<scheme_type>;
 
+    using signing_acc_set_type = signing_accumulator_set<typename mode_type::template bind<signing_mode_policy<mode_type>>::type>;
+    using signing_acc_type = typename boost::mpl::front<typename signing_acc_set_type::features_type>::type;
+
+    using part_verification_acc_set_type = part_verification_accumulator_set<typename mode_type::template bind<part_verification_mode_policy<mode_type>>::type>;
+    using part_verification_acc_type = typename boost::mpl::front<typename part_verification_acc_set_type::features_type>::type;
+
     std::size_t n = 20;
     std::size_t t = 10;
 
@@ -155,9 +161,37 @@ BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {
         return typename privkey_type::sss_public_key_no_key_ops_type::weight_type(i++, j++);
     });
 
-    auto privkeys = key_gen<privkey_type>(t, n, weights);
+    //===========================================================================
+    // dealer creates participants keys and its public key
+    auto [PK, privkeys] = key_gen<scheme_type>(t, n, weights);
 
+    //===========================================================================
+    // participants sign messages and verify its signatures
 
+    std::vector<typename privkey_type::part_signature_type> part_signatures;
+    std::vector<signing_acc_set_type> signing_accs;
+    std::vector<part_verification_acc_set_type> part_verification_accs;
+    for (auto &sk : privkeys) {
+        signing_accs.emplace_back(signing_acc_set_type(sk));
+        nil::crypto3::sign<mode_type>(msg, signing_accs.back());
+        signing_accs.back()(weights);
+        part_signatures.emplace_back(boost::accumulators::extract_result<signing_acc_type>(signing_accs.back()));
+
+        part_verification_accs.emplace_back(part_verification_acc_set_type(sk, nil::crypto3::accumulators::signature = part_signatures.back()));
+        nil::crypto3::part_verify<mode_type>(msg, part_verification_accs.back());
+        part_verification_accs.back()(weights);
+        // BOOST_CHECK(static_cast<bool>(boost::accumulators::extract_result<part_verification_acc_type>(part_verification_accs.back())));
+    }
+
+    //===========================================================================
+    // threshold number of participants aggregate partial signatures
+    typename no_key_type::signature_type sig = nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.end());
+    BOOST_CHECK(static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig, PK)));
+
+    //===========================================================================
+    // less than threshold number of participants cannot aggregate partial signatures
+    typename no_key_type::signature_type wrong_sig = nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.end() - 1);
+    BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, wrong_sig, PK)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

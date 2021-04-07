@@ -39,6 +39,8 @@
 
 #include <nil/crypto3/pubkey/detail/stream_processor.hpp>
 
+#include <nil/crypto3/pubkey/algorithm/deal_shares.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -285,14 +287,8 @@ namespace nil {
                 typedef no_key_ops<sss_public_key_group_type> sss_public_key_no_key_ops_type;
                 typedef no_key_ops<sss_signature_group_type> sss_signature_no_key_ops_type;
 
-                typedef std::pair<typename sss_public_key_no_key_ops_type::share_type::first_type,
-                                  std::unordered_map<typename sss_public_key_no_key_ops_type::share_type::first_type,
-                                                     base_scheme_private_key_type>>
-                    private_key_type;
-                typedef std::pair<typename sss_public_key_no_key_ops_type::share_type::first_type,
-                                  std::unordered_map<typename sss_public_key_no_key_ops_type::share_type::first_type,
-                                                     base_scheme_public_key_type>>
-                    public_key_type;
+                typedef typename sss_public_key_no_key_ops_type::share_type private_key_type;
+                typedef typename sss_public_key_no_key_ops_type::public_share_type public_key_type;
                 typedef typename sss_signature_no_key_ops_type::indexed_public_element_type part_signature_type;
                 typedef typename base_scheme_public_key_type::signature_type signature_type;
 
@@ -311,53 +307,41 @@ namespace nil {
                 // PK
                 //
                 public_key(const typename sss_public_key_no_key_ops_type::public_element_type &key) :
-                    pubkey(0, typename public_key_type::second_type::value_type(0, key)) {
+                    pubkey(0, typename public_key_type::second_type(
+                                  {typename public_key_type::second_type::value_type(0, key)})) {
                 }
 
-                // TODO: is it possible to add caching of computed VK_i
                 //
                 // VK_i
                 //
-                public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key) :
-                    VK_i(sss_public_key_no_key_ops_type::reconstruct_public_element(key.second)) {
-                    key_init(key);
+                template<typename Number>
+                public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key, Number t) :
+                    t(t), pubkey(key) {
                 }
 
-                template<typename MsgRange,
-                         typename std::enable_if<
-                             std::is_same<input_value_type, typename std::iterator_traits<
-                                                                typename MsgRange::iterator>::value_type>::value,
-                             bool>::type = true>
+                template<typename MsgRange>
                 inline bool verify(const MsgRange &msg, const signature_type &sig) const {
                     assert(check_PK());
-                    return pubkey.second.verify(msg, sig);
+                    return base_scheme_public_key_type(pubkey.second.begin()->second).verify(msg, sig);
                 }
 
-                template<typename MsgRange,
-                         typename std::enable_if<
-                             std::is_same<input_value_type, typename std::iterator_traits<
-                                                                typename MsgRange::iterator>::value_type>::value,
-                             bool>::type = true>
-                inline bool part_verify(const MsgRange &msg, const part_signature_type &part_sig) const {
+                template<typename MsgRange, typename ConfirmedWeights>
+                inline bool part_verify(const MsgRange &msg, const part_signature_type &part_sig,
+                                        const ConfirmedWeights &confirmed_weights) const {
                     assert(pubkey.first == part_sig.first);
+                    base_scheme_public_key_type VK_i(
+                        sss_public_key_no_key_ops_type::reconstruct_weighted_public_element(pubkey.second,
+                                                                                            confirmed_weights, t));
                     return VK_i.verify(msg, part_sig.second);
                 }
 
             protected:
-                inline void key_init(const typename sss_public_key_no_key_ops_type::public_share_type &key) {
-                    assert(sss_public_key_no_key_ops_type::check_participant_index(key.first));
-                    pubkey.first = key.first;
-                    for (const auto &part_s : key.second) {
-                        assert(pubkey.second.emplace(part_s).second);
-                    }
-                }
-
-                inline void check_PK() const {
+                inline bool check_PK() const {
                     return 0 == pubkey.first && 1 == pubkey.second.size() && 0 == pubkey.second.begin()->first;
                 }
 
+                std::size_t t;
                 public_key_type pubkey;
-                base_scheme_public_key_type VK_i;
             };
 
             template<typename Scheme, template<typename> class SecretSharingScheme>
@@ -394,32 +378,21 @@ namespace nil {
                 private_key() {
                 }
 
-                private_key(const typename sss_public_key_no_key_ops_type::share_type &key) :
-                    s_i(sss_public_key_no_key_ops_type::reconstruct_secret(key.second)),
-                    base_type(sss_public_key_no_key_ops_type::get_public_share(key)) {
-                    key_init(key);
+                template<typename Number>
+                private_key(const typename sss_public_key_no_key_ops_type::share_type &key, Number t) :
+                    t(t), privkey(key), base_type(sss_public_key_no_key_ops_type::get_public_share(key), t) {
                 }
 
-                template<typename MsgRange,
-                         typename std::enable_if<
-                             std::is_same<input_value_type, typename std::iterator_traits<
-                                                                typename MsgRange::iterator>::value_type>::value,
-                             bool>::type = true>
-                inline part_signature_type sign(const MsgRange &msg) const {
+                template<typename MsgRange, typename ConfirmedWeights>
+                inline part_signature_type sign(const MsgRange &msg, const ConfirmedWeights &confirmed_weights) const {
+                    base_scheme_private_key_type s_i(sss_public_key_no_key_ops_type::reconstruct_weighted_secret(
+                        privkey.second, confirmed_weights, t));
                     return part_signature_type(privkey.first, s_i.sign(msg));
                 }
 
             protected:
-                inline void key_init(const typename sss_public_key_no_key_ops_type::share_type &key) {
-                    assert(sss_public_key_no_key_ops_type::check_participant_index(key.first));
-                    privkey.first = key.first;
-                    for (const auto &part_s : key.second) {
-                        assert(privkey.second.emplace(part_s).second);
-                    }
-                }
-
+                std::size_t t;
                 private_key_type privkey;
-                base_scheme_private_key_type s_i;
             };
 
             template<typename Scheme, template<typename> class SecretSharingScheme>
@@ -454,8 +427,7 @@ namespace nil {
                 typedef typename input_block_type::value_type input_value_type;
                 constexpr static const std::size_t input_value_bits = 0;    // non-integral objects
 
-                template<typename Signatures,
-                         typename sss_signature_no_key_ops_type::template check_public_shares_type<Signatures> = true>
+                template<typename Signatures>
                 static inline signature_type aggregate(const Signatures &signatures) {
                     return sss_signature_no_key_ops_type::reduce_public_elements(signatures);
                 }
@@ -463,53 +435,55 @@ namespace nil {
 
             template<typename Scheme, typename Number1, typename Number2>
             inline typename std::enable_if<
-                std::is_same<shamir_sss<typename private_key<Scheme>::base_scheme_public_key_type::public_key_type::group_type>,
-                             typename private_key<Scheme>::sss_public_key_group_type>::value,
+                std::is_same<
+                    shamir_sss<typename private_key<Scheme>::base_scheme_public_key_type::public_key_type::group_type>,
+                    typename private_key<Scheme>::sss_public_key_group_type>::value,
                 std::pair<public_key<Scheme>, std::vector<private_key<Scheme>>>>::type
                 key_gen(Number1 t, Number2 n) {
-                using result_type = std::vector<private_key<Scheme>>;
+                using privkeys_type = std::vector<private_key<Scheme>>;
                 using sss_no_key_ops_type = typename private_key<Scheme>::sss_public_key_no_key_ops_type;
                 using sss_scheme_type = typename sss_no_key_ops_type::scheme_type;
+
                 auto coeffs = sss_no_key_ops_type::get_poly(t, n);
-                typename sss_no_key_ops_type::shares_type shares = nil::crypto3::deal_shares<sss_scheme_type>(coeffs, n, t);
-                result_type result;
+                typename sss_no_key_ops_type::shares_type shares =
+                    nil::crypto3::deal_shares<sss_scheme_type>(coeffs, n, t);
+                privkeys_type privkeys;
                 for (const auto &s : shares) {
-                    result.emplace_back(s);
+                    privkeys.emplace_back(s);
                 }
                 auto PK = public_key<Scheme>(sss_no_key_ops_type::get_public_coeffs(coeffs).front());
-                return std::make_pair(PK, result);
+                return std::make_pair(PK, privkeys);
             }
 
-            template<typename Key, typename Number1, typename Number2, typename Weights>
+            template<typename Scheme, typename Number1, typename Number2, typename Weights>
             inline typename std::enable_if<
-                std::is_same<
-                    weighted_shamir_sss<typename Key::base_scheme_public_key_type::public_key_type::group_type>,
-                    typename Key::sss_public_key_group_type>::value,
-                std::vector<Key>>::type
+                std::is_same<weighted_shamir_sss<typename private_key<
+                                 Scheme>::base_scheme_public_key_type::public_key_type::group_type>,
+                             typename private_key<Scheme>::sss_public_key_group_type>::value,
+                std::pair<public_key<Scheme>, std::vector<private_key<Scheme>>>>::type
                 key_gen(Number1 t, Number2 n, const Weights &weights) {
-                using result_type = std::vector<Key>;
-                using sss_no_key_ops_type = typename Key::sss_public_key_no_key_ops_type;
-                using scheme_type = typename sss_no_key_ops_type::scheme_type;
+                using privkeys_type = std::vector<private_key<Scheme>>;
+                using sss_no_key_ops_type = typename private_key<Scheme>::sss_public_key_no_key_ops_type;
+                using sss_scheme_type = typename sss_no_key_ops_type::scheme_type;
                 using shares_dealing_acc_set_type = shares_dealing_accumulator_set<typename modes::isomorphic<
-                    scheme_type, nop_padding>::template bind<shares_dealing_policy<scheme_type>>::type>;
+                    sss_scheme_type, nop_padding>::template bind<shares_dealing_policy<sss_scheme_type>>::type>;
                 using shares_dealing_acc =
                     typename boost::mpl::front<typename shares_dealing_acc_set_type::features_type>::type;
 
                 auto coeffs = sss_no_key_ops_type::get_poly(t, n);
-
                 shares_dealing_acc_set_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
-                nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
+                nil::crypto3::deal_shares<sss_scheme_type>(coeffs, deal_shares_acc);
                 for (const auto &w : weights) {
                     deal_shares_acc(w);
                 }
                 typename sss_no_key_ops_type::shares_type shares =
                     boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc);
-
-                result_type result;
+                privkeys_type privkeys;
                 for (const auto &s : shares) {
-                    result.emplace_back(s);
+                    privkeys.emplace_back(s, t);
                 }
-                return result;
+                auto PK = public_key<Scheme>(sss_no_key_ops_type::get_public_coeffs(coeffs).front());
+                return std::make_pair(PK, privkeys);
             }
 
             template<typename Key, typename Shares>

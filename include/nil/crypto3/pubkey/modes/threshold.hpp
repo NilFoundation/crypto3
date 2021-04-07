@@ -158,7 +158,8 @@ namespace nil {
 
                     template<typename ValueType>
                     using check_input_value_type =
-                        typename key_type::sss_signature_no_key_ops_type::template check_public_share_type<ValueType>;
+                        typename key_type::sss_signature_no_key_ops_type::template check_indexed_public_element<
+                            ValueType>;
 
                     typedef typename key_type::signature_type result_type;
 

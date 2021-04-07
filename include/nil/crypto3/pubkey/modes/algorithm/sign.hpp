@@ -29,7 +29,7 @@
 #include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
 
 #include <nil/crypto3/pubkey/scheme_value.hpp>
-#include <nil/crypto3/pubkey/scheme_state.hpp>
+#include <nil/crypto3/pubkey/modes/scheme_state.hpp>
 
 #include <nil/crypto3/pubkey/private_key.hpp>
 
@@ -405,7 +405,7 @@ namespace nil {
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(r, acc);
+            return SignerImpl(r, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
