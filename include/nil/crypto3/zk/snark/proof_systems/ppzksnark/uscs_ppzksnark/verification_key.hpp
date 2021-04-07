@@ -83,16 +83,16 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class uscs_ppzksnark_processed_verification_key {
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
 
-                    typename pairing_policy::G1_precomp pp_G1_one_precomp;
-                    typename pairing_policy::G2_precomp pp_G2_one_precomp;
-                    typename pairing_policy::G2_precomp vk_tilde_g2_precomp;
-                    typename pairing_policy::G2_precomp vk_alpha_tilde_g2_precomp;
-                    typename pairing_policy::G2_precomp vk_Z_g2_precomp;
+                    typename pairing_policy::g1_precomp pp_G1_one_precomp;
+                    typename pairing_policy::g2_precomp pp_G2_one_precomp;
+                    typename pairing_policy::g2_precomp vk_tilde_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_alpha_tilde_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_Z_g2_precomp;
                     typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
 
                     accumulation_vector<typename CurveType::g1_type> encoded_IC_query;

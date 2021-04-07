@@ -96,19 +96,19 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_ppzksnark_processed_verification_key {
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
 
-                    typename pairing_policy::G2_precomp pp_G2_one_precomp;
-                    typename pairing_policy::G2_precomp vk_alphaA_g2_precomp;
-                    typename pairing_policy::G1_precomp vk_alphaB_g1_precomp;
-                    typename pairing_policy::G2_precomp vk_alphaC_g2_precomp;
-                    typename pairing_policy::G2_precomp vk_rC_Z_g2_precomp;
-                    typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
-                    typename pairing_policy::G1_precomp vk_gamma_beta_g1_precomp;
-                    typename pairing_policy::G2_precomp vk_gamma_beta_g2_precomp;
+                    typename pairing_policy::g2_precomp pp_G2_one_precomp;
+                    typename pairing_policy::g2_precomp vk_alphaA_g2_precomp;
+                    typename pairing_policy::g1_precomp vk_alphaB_g1_precomp;
+                    typename pairing_policy::g2_precomp vk_alphaC_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_rC_Z_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_gamma_g2_precomp;
+                    typename pairing_policy::g1_precomp vk_gamma_beta_g1_precomp;
+                    typename pairing_policy::g2_precomp vk_gamma_beta_g2_precomp;
 
                     accumulation_vector<typename CurveType::g1_type> encoded_IC_query;
 

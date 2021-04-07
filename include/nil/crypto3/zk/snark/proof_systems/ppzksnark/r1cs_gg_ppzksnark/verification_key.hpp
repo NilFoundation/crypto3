@@ -83,11 +83,11 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_processed_verification_key {
                     typedef CurveType curve_type;
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                     typename CurveType::gt_type::value_type vk_alpha_g1_beta_g2;
-                    typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
-                    typename pairing_policy::G2_precomp vk_delta_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_gamma_g2_precomp;
+                    typename pairing_policy::g2_precomp vk_delta_g2_precomp;
 
                     accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1;
 

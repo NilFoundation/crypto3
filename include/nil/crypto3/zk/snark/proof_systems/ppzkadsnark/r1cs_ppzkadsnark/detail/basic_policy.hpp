@@ -404,23 +404,23 @@ namespace nil {
                          * enables a faster verification time.
                          */
                         class processed_verification_key {
-                            using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
+                            using pairing_policy = typename snark_pp<CurveType>::pairing;
 
                         public:
-                            typename pairing_policy::G2_precomp::value_type pp_G2_one_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_alphaA_g2_precomp;
-                            typename pairing_policy::G1_precomp::value_type vk_alphaB_g1_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_alphaC_g2_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_rC_Z_g2_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_gamma_g2_precomp;
-                            typename pairing_policy::G1_precomp::value_type vk_gamma_beta_g1_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_gamma_beta_g2_precomp;
-                            typename pairing_policy::G2_precomp::value_type vk_rC_i_g2_precomp;
+                            typename pairing_policy::g2_precomp::value_type pp_G2_one_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_alphaA_g2_precomp;
+                            typename pairing_policy::g1_precomp::value_type vk_alphaB_g1_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_alphaC_g2_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_rC_Z_g2_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_gamma_g2_precomp;
+                            typename pairing_policy::g1_precomp::value_type vk_gamma_beta_g1_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_gamma_beta_g2_precomp;
+                            typename pairing_policy::g2_precomp::value_type vk_rC_i_g2_precomp;
 
                             typename CurveType::g1_type::value_type A0;
                             typename std::vector<typename CurveType::g1_type::value_type> Ain;
 
-                            std::vector<pairing_policy::G1_precomp::value_type> proof_g_vki_precomp;
+                            std::vector<pairing_policy::g1_precomp::value_type> proof_g_vki_precomp;
 
                             bool operator==(const processed_verification_key &other) const {
                                 bool result = (this->pp_G2_one_precomp == other.pp_G2_one_precomp &&
@@ -953,7 +953,7 @@ namespace nil {
                         static processed_verification_key<CurveType>
                             verifier_process_vk(const verification_key<CurveType> &vk) {
 
-                            using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
+                            using pairing_policy = typename snark_pp<CurveType>::pairing;
 
                             processed_verification_key<CurveType> pvk;
                             pvk.pp_G2_one_precomp =
@@ -966,7 +966,7 @@ namespace nil {
                             pvk.vk_gamma_beta_g1_precomp = pairing_policy::precompute_g1(vk.gamma_beta_g1);
                             pvk.vk_gamma_beta_g2_precomp = pairing_policy::precompute_g2(vk.gamma_beta_g2);
 
-                            typename pairing_policy::G2_precomp::value_type vk_rC_z_g2_precomp =
+                            typename pairing_policy::g2_precomp::value_type vk_rC_z_g2_precomp =
                                 pairing_policy::precompute_g2(vk.rC_Z_g2);
 
                             pvk.A0 = typename CurveType::g1_type::value_type(vk.A0);
@@ -990,7 +990,7 @@ namespace nil {
                                                     const sec_auth_key<CurveType> &sak,
                                                     const std::vector<label_type> &labels) {
 
-                            using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
+                            using pairing_policy = typename snark_pp<CurveType>::pairing;
 
                             bool result = true;
 
@@ -1018,9 +1018,9 @@ namespace nil {
                                 result_auth = false;
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aau_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aau_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aau_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aau_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.h);
 
                             typename pairing_policy::Fqk_type::value_type kc_Aau_1 =
@@ -1035,9 +1035,9 @@ namespace nil {
 
                             result &= result_auth;
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_A_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_A_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_A_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_A_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.h);
                             typename pairing_policy::Fqk_type::value_type kc_A_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_precomp, pvk.vk_alphaA_g2_precomp);
@@ -1049,9 +1049,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G2_precomp::value_type proof_g_B_g_precomp =
+                            typename pairing_policy::g2_precomp::value_type proof_g_B_g_precomp =
                                 pairing_policy::precompute_g2(proof.g_B.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_B_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_B_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_B.h);
                             typename pairing_policy::Fqk_type::value_type kc_B_1 =
                                 pairing_policy::miller_loop(pvk.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
@@ -1063,9 +1063,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_C_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_C_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_C_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_C_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.h);
                             typename pairing_policy::Fqk_type::value_type kc_C_1 =
                                 pairing_policy::miller_loop(proof_g_C_g_precomp, pvk.vk_alphaC_g2_precomp);
@@ -1079,9 +1079,9 @@ namespace nil {
 
                             typename CurveType::g1_type::value_type Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aacc_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aacc_precomp =
                                 pairing_policy::precompute_g1(Aacc);
-                            typename pairing_policy::G1_precomp::value_type proof_g_H_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_H_precomp =
                                 pairing_policy::precompute_g1(proof.g_H);
                             typename pairing_policy::Fqk_type::value_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
@@ -1093,9 +1093,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_K_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_K_precomp =
                                 pairing_policy::precompute_g1(proof.g_K);
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aacc_C_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aacc_C_precomp =
                                 pairing_policy::precompute_g1(Aacc + proof.g_C.g);
                             typename pairing_policy::Fqk_type::value_type K_1 =
                                 pairing_policy::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);
@@ -1135,7 +1135,7 @@ namespace nil {
                                                     const pub_auth_key<CurveType> &pak,
                                                     const std::vector<label_type> &labels) {
 
-                            using pairing_policy = typename snark_pp<CurveType>::pairing_policy;
+                            using pairing_policy = typename snark_pp<CurveType>::pairing;
 
                             bool result = true;
 
@@ -1158,11 +1158,11 @@ namespace nil {
                             }
 
                             // To Do: Decide whether to move pak and lambda preprocessing to offline
-                            std::vector<pairing_policy::G2_precomp> g_Lambdas_precomp;
+                            std::vector<pairing_policy::g2_precomp> g_Lambdas_precomp;
                             g_Lambdas_precomp.reserve(auth_data.size());
                             for (std::size_t i = 0; i < auth_data.size(); i++)
                                 g_Lambdas_precomp.emplace_back(pairing_policy::precompute_g2(auth_data[i].Lambda));
-                            typename pairing_policy::G2_precomp::value_type g_minusi_precomp =
+                            typename pairing_policy::g2_precomp::value_type g_minusi_precomp =
                                 pairing_policy::precompute_g2(pak.minusI2);
 
                             typename pairing_policy::Fqk_type::value_type accum;
@@ -1177,9 +1177,9 @@ namespace nil {
                                                     pvk.proof_g_vki_precomp[i + 1], g_Lambdas_precomp[i + 1]);
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_muA_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_muA_precomp =
                                 pairing_policy::precompute_g1(proof.muA);
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aau_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aau_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.g);
                             typename pairing_policy::Fqk_type::value_type accum2 = pairing_policy::double_miller_loop(
                                 proof_g_muA_precomp, pvk.pp_G2_one_precomp, proof_g_Aau_precomp, g_minusi_precomp);
@@ -1192,9 +1192,9 @@ namespace nil {
                             if (!(result_auth)) {
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aau_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aau_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aau_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aau_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.h);
                             typename pairing_policy::Fqk_type::value_type kc_Aau_1 =
                                 pairing_policy::miller_loop(proof_g_Aau_g_precomp, pvk.vk_alphaA_g2_precomp);
@@ -1208,9 +1208,9 @@ namespace nil {
 
                             result &= result_auth;
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_A_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_A_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_A_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_A_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.h);
                             typename pairing_policy::Fqk_type::value_type kc_A_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_precomp, pvk.vk_alphaA_g2_precomp);
@@ -1222,9 +1222,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G2_precomp::value_type proof_g_B_g_precomp =
+                            typename pairing_policy::g2_precomp::value_type proof_g_B_g_precomp =
                                 pairing_policy::precompute_g2(proof.g_B.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_B_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_B_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_B.h);
                             typename pairing_policy::Fqk_type::value_type kc_B_1 =
                                 pairing_policy::miller_loop(pvk.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
@@ -1236,9 +1236,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_C_g_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_C_g_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.g);
-                            typename pairing_policy::G1_precomp::value_type proof_g_C_h_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_C_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.h);
                             typename pairing_policy::Fqk_type::value_type kc_C_1 =
                                 pairing_policy::miller_loop(proof_g_C_g_precomp, pvk.vk_alphaC_g2_precomp);
@@ -1252,9 +1252,9 @@ namespace nil {
 
                             typename CurveType::g1_type::value_type Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aacc_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aacc_precomp =
                                 pairing_policy::precompute_g1(Aacc);
-                            typename pairing_policy::G1_precomp::value_type proof_g_H_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_H_precomp =
                                 pairing_policy::precompute_g1(proof.g_H);
                             typename pairing_policy::Fqk_type::value_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
@@ -1266,9 +1266,9 @@ namespace nil {
                                 result = false;
                             }
 
-                            typename pairing_policy::G1_precomp::value_type proof_g_K_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_K_precomp =
                                 pairing_policy::precompute_g1(proof.g_K);
-                            typename pairing_policy::G1_precomp::value_type proof_g_Aacc_C_precomp =
+                            typename pairing_policy::g1_precomp::value_type proof_g_Aacc_C_precomp =
                                 pairing_policy::precompute_g1(Aacc + proof.g_C.g);
                             typename pairing_policy::Fqk_type::value_type K_1 =
                                 pairing_policy::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);

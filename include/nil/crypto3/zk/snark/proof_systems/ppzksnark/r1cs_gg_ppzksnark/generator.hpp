@@ -84,7 +84,7 @@ namespace nil {
                 class r1cs_gg_ppzksnark_generator {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type g1_type;
                     typedef typename CurveType::g2_type g2_type;
