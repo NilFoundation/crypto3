@@ -62,8 +62,6 @@ namespace nil {
                     constexpr static const auto value_bits = mode_type::input_value_bits;
                     typedef typename mode_type::input_value_type input_value_type;
 
-                    typedef typename key_type::public_key_type public_key_type;
-                    typedef typename key_type::private_key_type private_key_type;
                     typedef typename key_type::signature_type signature_type;
 
                 public:

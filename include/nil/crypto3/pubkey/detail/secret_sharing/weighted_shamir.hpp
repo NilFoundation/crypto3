@@ -51,8 +51,7 @@ namespace nil {
                     //===========================================================================
                     // constraints checking meta-functions
 
-                    template<typename IndexedWeight,
-                             typename Index = typename IndexedWeight::first_type,
+                    template<typename IndexedWeight, typename Index = typename IndexedWeight::first_type,
                              typename Weight = typename IndexedWeight::second_type,
                              typename base_type::template check_index_type<Index> = true,
                              typename base_type::template check_number_type<Weight> = true>
@@ -60,11 +59,9 @@ namespace nil {
 
                     template<typename IndexedWeight>
                     using check_indexed_weight_type = typename std::enable_if<
-                        std::is_same<get_indexed_weight_type<IndexedWeight>, IndexedWeight>::value,
-                        bool>::type;
+                        std::is_same<get_indexed_weight_type<IndexedWeight>, IndexedWeight>::value, bool>::type;
 
-                    template<typename IndexedWeightedShare,
-                             typename Index = typename IndexedWeightedShare::first_type,
+                    template<typename IndexedWeightedShare, typename Index = typename IndexedWeightedShare::first_type,
                              typename WeightedShare = typename IndexedWeightedShare::second_type,
                              typename base_type::template check_index_type<Index> = true,
                              typename base_type::template check_indexed_private_elements_type<WeightedShare> = true>
@@ -77,6 +74,10 @@ namespace nil {
                              typename base_type::template check_indexed_public_elements_type<WeightedPublicShare> =
                                  true>
                     using get_indexed_weighted_public_share_type = std::pair<Index, WeightedPublicShare>;
+
+                    template<typename IndexesWeights>
+                    using check_indexed_weights_type = check_indexed_weight_type<
+                        typename std::iterator_traits<typename IndexesWeights::iterator>::value_type>;
 
                     template<typename IndexedWeightedShare>
                     using check_indexed_weighted_share_type =
@@ -102,10 +103,9 @@ namespace nil {
                     // shares dealing functions
 
                     template<
-                        typename Coeffs,
-                        typename Weights,
+                        typename Coeffs, typename Weights,
                         typename base_type::template check_private_element_type<typename Coeffs::value_type> = true,
-                        check_indexed_weight_type<typename Weights::value_type> = true>
+                        check_indexed_weights_type<Weights> = true>
                     static inline shares_type deal_shares(const Coeffs &coeffs, const Weights &weights) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
@@ -118,7 +118,7 @@ namespace nil {
                         for (auto w_i : weights) {
                             assert(check_weight(w_i, n));
                             typename share_type::second_type i_shares;
-                            for (std::size_t j = 1; j <= w_i.second; j++) {
+                            for (typename Weights::value_type::second_type j = 1; j <= w_i.second; j++) {
                                 std::size_t id_ij = w_i.first * t + j;
                                 assert(i_shares.emplace(base_type::deal_share(coeffs, id_ij)).second);
                             }
@@ -127,6 +127,7 @@ namespace nil {
                         return shares;
                     }
 
+                    // TODO: REFACTOR RECONSTRUCTION FUNCTIONAL
                     using base_type::reconstruct_secret;
 
                     // TODO: implement without temporary variable _shares
@@ -139,6 +140,54 @@ namespace nil {
                             }
                         }
                         return base_type::reconstruct_secret(_shares);
+                    }
+
+                    template<typename Shares, typename Weights, typename Number,
+                             typename base_type::template check_indexed_private_elements_type<Shares> = true,
+                             check_indexed_weights_type<Weights> = true,
+                             typename base_type::template check_number_type<Number> = true>
+                    static inline private_element_type reconstruct_weighted_secret(const Shares &shares,
+                                                                                   const Weights &weights, Number t) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
+
+                        private_element_type secret = private_element_type::zero();
+                        typename base_type::indexes_type indexes = get_weighted_indexes(weights, t);
+                        for (const auto &[i, s] : shares) {
+                            assert(indexes.count(i));
+                            secret = secret + s * base_type::eval_basis_poly(indexes, i);
+                        }
+                        return secret;
+                    }
+
+                    template<typename PublicShares, typename Weights, typename Number,
+                        typename base_type::template check_indexed_public_elements_type<PublicShares> = true,
+                             check_indexed_weights_type<Weights> = true,
+                             typename base_type::template check_number_type<Number> = true>
+                    static inline public_element_type reconstruct_weighted_public_element(const PublicShares &public_shares,
+                                                                                 const Weights &weights, Number t) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
+
+                        public_element_type result = public_element_type::zero();
+                        typename base_type::indexes_type indexes = get_weighted_indexes(weights, t);
+                        for (const auto &[i, e_i] : public_shares) {
+                            result = result + base_type::eval_basis_poly(indexes, i) * e_i;
+                        }
+                        return result;
+                    }
+
+                    template<typename Weights, typename Number, check_indexed_weights_type<Weights> = true,
+                             typename base_type::template check_number_type<Number> = true>
+                    static inline typename base_type::indexes_type get_weighted_indexes(const Weights &weights,
+                                                                                        Number t) {
+                        typename base_type::indexes_type indexes;
+                        for (auto [i, w] : weights) {
+                            for (typename Weights::value_type::second_type j = 1; j <= w; j++) {
+                                assert(indexes.emplace(i * t + j).second);
+                            }
+                        }
+                        return indexes;
                     }
 
                     template<typename Shares, check_indexed_weighted_shares_type<Shares> = true>
@@ -164,9 +213,7 @@ namespace nil {
                         return public_share;
                     }
 
-                    template<typename Weight,
-                             typename Number,
-                             check_indexed_weight_type<Weight> = true,
+                    template<typename Weight, typename Number, check_indexed_weight_type<Weight> = true,
                              typename base_type::template check_number_type<Number> = true>
                     static inline bool check_weight(const Weight &w, Number n) {
                         return base_type::check_participant_index(w.first, n) && w.second > 0;

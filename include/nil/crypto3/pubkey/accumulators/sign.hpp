@@ -43,12 +43,29 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/iterator_last.hpp>
 
+#include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
+                template<typename T>
+                struct is_isomorphic_signing {
+                    constexpr static bool value = std::is_same<
+                        typename pubkey::modes::isomorphic<typename T::scheme_type, pubkey::nop_padding>::template bind<
+                            typename pubkey::modes::isomorphic<typename T::scheme_type,
+                                                               pubkey::nop_padding>::signing_policy>::type,
+                        T>::value;
+
+                    typedef T type;
+                };
+
+                template<typename ProcessingMode, typename = void>
+                struct sign_impl;
+
                 template<typename Mode>
-                struct sign_impl : boost::accumulators::accumulator_base {
+                struct sign_impl<Mode, typename std::enable_if<is_isomorphic_signing<Mode>::value>::type>
+                    : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
                     typedef typename mode_type::scheme_type scheme_type;
@@ -60,10 +77,6 @@ namespace nil {
 
                     constexpr static const auto value_bits = mode_type::input_value_bits;
                     typedef typename mode_type::input_value_type input_value_type;
-
-                    typedef typename key_type::public_key_type public_key_type;
-                    typedef typename key_type::private_key_type private_key_type;
-                    typedef typename key_type::signature_type signature_type;
 
                 public:
                     typedef typename mode_type::result_type result_type;

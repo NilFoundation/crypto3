@@ -194,7 +194,7 @@ namespace nil {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
 
                         private_element_type secret = private_element_type::zero();
-                        indexes_type indexes = get_shares_indexes(shares);
+                        indexes_type indexes = get_indexes(shares);
                         for (const auto &[i, s] : shares) {
                             secret = secret + s * eval_basis_poly(indexes, id_i ? id_i : i);
                         }
@@ -207,7 +207,7 @@ namespace nil {
                         // assert(check_minimal_size(std::distance(public_shares.begin(), public_shares.end())));
 
                         public_element_type result = public_element_type::zero();
-                        indexes_type indexes = get_shares_indexes(public_shares);
+                        indexes_type indexes = get_indexes(public_shares);
 
                         for (const auto &[i, e_i] : public_shares) {
                             result = result + eval_basis_poly(indexes, i) * e_i;
@@ -231,7 +231,7 @@ namespace nil {
                     }
 
                     template<typename PublicElements, check_public_elements_type<PublicElements> = true>
-                    static inline public_element_type reduce_public_element(const PublicElements &public_elements) {
+                    static inline public_element_type reduce_public_elements(const PublicElements &public_elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicElements>));
                         assert(check_minimal_size(std::distance(public_elements.begin(), public_elements.end())));
                         return std::accumulate(public_elements.begin(), public_elements.end(),
@@ -241,7 +241,7 @@ namespace nil {
                     template<typename IndexedPublicElements,
                              check_indexed_public_elements_type<IndexedPublicElements> = true>
                     static inline public_element_type
-                        reduce_public_element(const IndexedPublicElements &indexed_public_elements) {
+                        reduce_public_elements(const IndexedPublicElements &indexed_public_elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPublicElements>));
                         assert(check_minimal_size(
                             std::distance(indexed_public_elements.begin(), indexed_public_elements.end())));
@@ -277,7 +277,7 @@ namespace nil {
                     // general purposes functions
 
                     template<typename IndexedElements, check_indexed_elements_type<IndexedElements> = true>
-                    static inline indexes_type get_shares_indexes(const IndexedElements &elements) {
+                    static inline indexes_type get_indexes(const IndexedElements &elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedElements>));
 
                         indexes_type indexes;

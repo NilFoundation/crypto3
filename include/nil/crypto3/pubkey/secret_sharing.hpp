@@ -57,6 +57,10 @@ namespace nil {
                 typedef typename ops_type::public_coeffs_type public_coeffs_type;
 
                 template<typename Share>
+                using check_indexed_public_element =
+                    typename ops_type::template check_indexed_public_element_type<Share>;
+
+                template<typename Share>
                 using check_share_type = typename ops_type::template check_indexed_private_element_type<Share>;
 
                 template<typename Shares>
@@ -101,6 +105,9 @@ namespace nil {
 
                 template<typename Weight>
                 using check_weight_type = typename base_type::ops_type::template check_indexed_weight_type<Weight>;
+
+                template<typename Weights>
+                using check_weights_type = typename base_type::ops_type::template check_indexed_weights_type<Weights>;
 
                 template<typename Share>
                 using check_share_type =
@@ -223,6 +230,19 @@ namespace nil {
                     return scheme_type::ops_type::reconstruct_secret(shares);
                 }
 
+                template<typename Shares, typename Weights, typename Number>
+                static inline typename scheme_type::private_element_type
+                    reconstruct_weighted_secret(const Shares &shares, const Weights &weights, Number t) {
+                    return scheme_type::ops_type::reconstruct_weighted_secret(shares, weights, t);
+                }
+
+                template<typename PublicShares, typename Weights, typename Number>
+                static inline typename scheme_type::public_element_type
+                    reconstruct_weighted_public_element(const PublicShares &public_shares, const Weights &weights,
+                                                        Number t) {
+                    return scheme_type::ops_type::reconstruct_weighted_public_element(public_shares, weights, t);
+                }
+
                 template<typename PublicShares>
                 static inline typename scheme_type::public_element_type
                     reconstruct_public_element(const PublicShares &public_shares) {
@@ -230,7 +250,8 @@ namespace nil {
                 }
 
                 template<typename PublicElements>
-                static inline typename scheme_type::public_element_type reduce_public_elements(const PublicElements &public_elements) {
+                static inline typename scheme_type::public_element_type
+                    reduce_public_elements(const PublicElements &public_elements) {
                     return scheme_type::ops_type::reduce_public_elements(public_elements);
                 }
 

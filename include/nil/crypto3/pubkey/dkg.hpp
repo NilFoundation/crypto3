@@ -52,6 +52,10 @@ namespace nil {
                 typedef typename ops_type::public_coeffs_type public_coeffs_type;
 
                 template<typename Share>
+                using check_indexed_public_element =
+                    typename ops_type::template check_indexed_public_element_type<Share>;
+
+                template<typename Share>
                 using check_share_type = typename ops_type::template check_indexed_private_element_type<Share>;
 
                 template<typename Shares>

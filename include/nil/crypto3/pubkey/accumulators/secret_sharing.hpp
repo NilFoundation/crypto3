@@ -349,7 +349,7 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        assert(key_type::check_minimal_size(seen_shares));
+                        // assert(key_type::check_minimal_size(seen_shares));
                         return key_type::reconstruct_secret(shares);
                     }
 
