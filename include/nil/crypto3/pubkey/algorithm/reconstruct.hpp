@@ -26,6 +26,11 @@
 #ifndef CRYPTO3_PUBKEY_RECONSTRUCT_HPP
 #define CRYPTO3_PUBKEY_RECONSTRUCT_HPP
 
+#include <boost/assert.hpp>
+#include <boost/concept_check.hpp>
+
+#include <boost/range/concepts.hpp>
+
 #include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
 
 #include <nil/crypto3/pubkey/scheme_value.hpp>
@@ -64,14 +69,14 @@ namespace nil {
         //                     KeyInputIterator key_last, OutputIterator out) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
+        //     typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
         //
         //     return SignerImpl(first, last, std::move(out),
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
+        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
         // }
 
         /*!
@@ -96,14 +101,14 @@ namespace nil {
         //                     OutputIterator out) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
+        //     typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
         //
         //     return SignerImpl(first, last, std::move(out),
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -133,13 +138,13 @@ namespace nil {
         //     key_last) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
         //     return SignerImpl(first, last,
-        //                       SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
+        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
         // }
 
         /*!
@@ -165,12 +170,12 @@ namespace nil {
         //     reconstruct(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
-        //     return SignerImpl(first, last, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //     return SignerImpl(first, last, SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -193,14 +198,14 @@ namespace nil {
         // OutputIterator reconstruct(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
+        //     typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
         //
         //     return SignerImpl(rng, std::move(out),
-        //     SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //     SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -221,14 +226,14 @@ namespace nil {
         // OutputRange &reconstruct(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
+        //     typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
         //     return SignerImpl(rng, std::move(out),
-        //     SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //     SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -255,12 +260,12 @@ namespace nil {
         //     reconstruct(const SinglePassRange &r, const KeySinglePassRange &key) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
-        //     return SignerImpl(r, SchemeAccumulator(Mode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //     return SignerImpl(r, SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -283,8 +288,8 @@ namespace nil {
         // &out) {
         //
         //     typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type Mode;
-        //     typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+        //         pubkey::secret_reconstructing_sss_policy<Scheme>>::type ProcessingMode;
+        //     typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -314,8 +319,8 @@ namespace nil {
             reconstruct(InputIterator first, InputIterator last, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
-            typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
+            typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
@@ -344,8 +349,8 @@ namespace nil {
             reconstruct(const SinglePassRange &rng, OutputIterator out) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
-            typedef typename pubkey::secret_reconstructing_accumulator_set<Mode> SchemeAccumulator;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
+            typedef typename pubkey::secret_reconstructing_accumulator_set<ProcessingMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
@@ -434,7 +439,7 @@ namespace nil {
             reconstruct(InputIterator first, InputIterator last) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
@@ -464,12 +469,44 @@ namespace nil {
             reconstruct(const SinglePassRange &r) {
 
             typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_policy<Scheme>>::type Mode;
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(r, SchemeAccumulator());
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator1, typename InputIterator2,
+            typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
+                typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                    pubkey::secret_reconstructing_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        reconstruct(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(first1, last1, first2, last2, SchemeAccumulator());
         }
     }    // namespace crypto3
 }    // namespace nil

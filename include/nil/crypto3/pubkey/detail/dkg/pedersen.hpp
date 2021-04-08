@@ -47,20 +47,28 @@ namespace nil {
 
                     typedef typename base_type::share_type share_type;
 
-                    // TODO: add accumulator for share dealing
                     template<typename Shares,
-                             typename base_type::template check_indexed_private_elements_type<Shares> = true>
+                             typename base_type::template check_indexed_private_element_type<
+                                 typename std::iterator_traits<typename Shares::iterator>::value_type> = true>
                     static inline share_type deal_share(const Shares &shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
-                        auto n = std::distance(shares.begin(), shares.end());
+                        return deal_share(shares.begin(), shares.end());
+                    }
+
+                    template<typename SharesIterator,
+                             typename base_type::template check_indexed_private_element_type<
+                                 typename std::iterator_traits<SharesIterator>::value_type> = true>
+                    static inline share_type deal_share(SharesIterator first, SharesIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIterator>));
+                        auto n = std::distance(first, last);
                         assert(base_type::check_minimal_size(n));
-                        auto index = shares.begin()->first;
+                        auto index = first->first;
                         assert(base_type::check_participant_index(index, n));
 
                         private_element_type share = private_element_type::zero();
-                        for (auto &[i, s] : shares) {
-                            assert(index == i);
-                            share = share + s;
+                        for (auto it = first; it != last; it++) {
+                            assert(index == it->first);
+                            share = share + it->second;
                         }
                         return share_type(index, share);
                     }

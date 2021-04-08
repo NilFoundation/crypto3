@@ -31,7 +31,9 @@
 #include <unordered_map>
 #include <iterator>
 
+#include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
+
 #include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -138,35 +140,55 @@ namespace nil {
                     // shares dealing functions
 
                     template<typename Coeffs, typename Number,
-                             check_private_element_type<typename Coeffs::value_type> = true,
+                             check_private_element_type<
+                                 typename std::iterator_traits<typename Coeffs::iterator>::value_type> = true,
                              check_number_type<Number> = true>
                     static inline shares_type deal_shares(const Coeffs &coeffs, Number n) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
+                        return deal_shares(coeffs.begin(), coeffs.end(), n);
+                    }
 
-                        std::size_t t = std::distance(coeffs.begin(), coeffs.end());
+                    template<
+                        typename CoeffsIterator, typename Number,
+                        check_private_element_type<typename std::iterator_traits<CoeffsIterator>::value_type> = true,
+                        check_number_type<Number> = true>
+                    static inline shares_type deal_shares(CoeffsIterator first, CoeffsIterator last, Number n) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<CoeffsIterator>));
+
+                        std::size_t t = std::distance(first, last);
                         assert(check_t(t, n));
 
                         shares_type shares;
                         for (std::size_t i = 1; i <= n; i++) {
-                            assert(shares.emplace(deal_share(coeffs, i)).second);
+                            assert(shares.emplace(deal_share(first, last, i)).second);
                         }
                         return shares;
                     }
 
                     template<typename Coeffs, typename Number,
-                             check_private_element_type<typename Coeffs::value_type> = true,
+                             check_private_element_type<
+                                 typename std::iterator_traits<typename Coeffs::iterator>::value_type> = true,
                              check_number_type<Number> = true>
                     static inline share_type deal_share(const Coeffs &coeffs, Number i) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
+                        return deal_share(coeffs.begin(), coeffs.end(), i);
+                    }
+
+                    template<
+                        typename CoeffsIterator, typename Number,
+                        check_private_element_type<typename std::iterator_traits<CoeffsIterator>::value_type> = true,
+                        check_number_type<Number> = true>
+                    static inline share_type deal_share(CoeffsIterator first, CoeffsIterator last, Number i) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<CoeffsIterator>));
                         assert(check_participant_index(i));
-                        assert(check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
+                        assert(check_minimal_size(std::distance(first, last)));
 
                         private_element_type e_i(i);
                         private_element_type temp = private_element_type::one();
                         private_element_type share = private_element_type::zero();
 
-                        for (const auto &c : coeffs) {
-                            share = share + c * temp;
+                        for (auto it = first; it != last; it++) {
+                            share = share + *it * temp;
                             temp = temp * e_i;
                         }
                         return share_type(i, share);
@@ -189,28 +211,49 @@ namespace nil {
                     // secret recovering functions
 
                     template<typename Shares, typename Number = std::size_t,
-                             check_indexed_private_elements_type<Shares> = true, check_number_type<Number> = true>
+                             check_indexed_private_element_type<
+                                 typename std::iterator_traits<typename Shares::iterator>::value_type> = true,
+                             check_number_type<Number> = true>
                     static inline private_element_type reconstruct_secret(const Shares &shares, Number id_i = 0) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
+                        return reconstruct_secret(shares.begin(), shares.end(), id_i);
+                    }
+
+                    template<typename SharesIterator, typename Number = std::size_t,
+                             check_indexed_private_element_type<
+                                 typename std::iterator_traits<SharesIterator>::value_type> = true,
+                             check_number_type<Number> = true>
+                    static inline private_element_type reconstruct_secret(SharesIterator first, SharesIterator last,
+                                                                          Number id_i = 0) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIterator>));
 
                         private_element_type secret = private_element_type::zero();
-                        indexes_type indexes = get_indexes(shares);
-                        for (const auto &[i, s] : shares) {
-                            secret = secret + s * eval_basis_poly(indexes, id_i ? id_i : i);
+                        indexes_type indexes = get_indexes(first, last);
+                        for (auto it = first; it != last; it++) {
+                            secret = secret + it->second * eval_basis_poly(indexes, id_i ? id_i : it->first);
                         }
                         return secret;
                     }
 
-                    template<typename PublicShares, check_indexed_public_elements_type<PublicShares> = true>
+                    template<typename PublicShares, check_indexed_public_element_type<typename std::iterator_traits<
+                                                        typename PublicShares::iterator>::value_type> = true>
                     static inline public_element_type reconstruct_public_element(const PublicShares &public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
-                        // assert(check_minimal_size(std::distance(public_shares.begin(), public_shares.end())));
+                        return reconstruct_public_element(public_shares.begin(), public_shares.end());
+                    }
+
+                    template<typename PublicSharesIterator,
+                             check_indexed_public_element_type<
+                                 typename std::iterator_traits<PublicSharesIterator>::value_type> = true>
+                    static inline public_element_type reconstruct_public_element(PublicSharesIterator first,
+                                                                                 PublicSharesIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicSharesIterator>));
 
                         public_element_type result = public_element_type::zero();
-                        indexes_type indexes = get_indexes(public_shares);
+                        indexes_type indexes = get_indexes(first, last);
 
-                        for (const auto &[i, e_i] : public_shares) {
-                            result = result + eval_basis_poly(indexes, i) * e_i;
+                        for (auto it = first; it != last; it++) {
+                            result = result + eval_basis_poly(indexes, it->first) * it->second;
                         }
                         return result;
                     }
@@ -230,24 +273,42 @@ namespace nil {
                         return result;
                     }
 
-                    template<typename PublicElements, check_public_elements_type<PublicElements> = true>
+                    template<typename PublicElements, check_public_element_type<typename std::iterator_traits<
+                                                          typename PublicElements::iterator>::value_type> = true>
                     static inline public_element_type reduce_public_elements(const PublicElements &public_elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicElements>));
-                        assert(check_minimal_size(std::distance(public_elements.begin(), public_elements.end())));
-                        return std::accumulate(public_elements.begin(), public_elements.end(),
-                                               public_element_type::zero());
+                        return reduce_public_elements(public_elements.begin(), public_elements.end());
+                    }
+
+                    template<typename PublicElementsIterator, check_public_element_type<typename std::iterator_traits<
+                                                                  PublicElementsIterator>::value_type> = true>
+                    static inline public_element_type reduce_public_elements(PublicElementsIterator first,
+                                                                             PublicElementsIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicElementsIterator>));
+                        assert(check_minimal_size(std::distance(first, last)));
+                        return std::accumulate(first, last, public_element_type::zero());
                     }
 
                     template<typename IndexedPublicElements,
-                             check_indexed_public_elements_type<IndexedPublicElements> = true>
+                             check_indexed_public_element_type<typename std::iterator_traits<
+                                 typename IndexedPublicElements::iterator>::value_type> = true>
                     static inline public_element_type
                         reduce_public_elements(const IndexedPublicElements &indexed_public_elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedPublicElements>));
-                        assert(check_minimal_size(
-                            std::distance(indexed_public_elements.begin(), indexed_public_elements.end())));
+                        return reduce_public_elements(indexed_public_elements.begin(), indexed_public_elements.end());
+                    }
+
+                    template<typename IndexedPublicElementsIterator,
+                             check_indexed_public_element_type<
+                                 typename std::iterator_traits<IndexedPublicElementsIterator>::value_type> = true>
+                    static inline public_element_type reduce_public_elements(IndexedPublicElementsIterator first,
+                                                                             IndexedPublicElementsIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<IndexedPublicElementsIterator>));
+                        assert(check_minimal_size(std::distance(first, last)));
+
                         public_element_type result = public_element_type::zero();
-                        for (const auto &[i, e] : indexed_public_elements) {
-                            result = result + e;
+                        for (auto it = first; it != last; it++) {
+                            result = result + it->second;
                         }
                         return result;
                     }
@@ -276,30 +337,49 @@ namespace nil {
                     //===========================================================================
                     // general purposes functions
 
-                    template<typename IndexedElements, check_indexed_elements_type<IndexedElements> = true>
+                    template<typename IndexedElements, check_indexed_element_type<typename std::iterator_traits<
+                                                           typename IndexedElements::iterator>::value_type> = true>
                     static inline indexes_type get_indexes(const IndexedElements &elements) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const IndexedElements>));
+                        return get_indexes(elements.begin(), elements.end());
+                    }
+
+                    template<typename IndexedElementsIterator, check_indexed_element_type<typename std::iterator_traits<
+                                                                   IndexedElementsIterator>::value_type> = true>
+                    static inline indexes_type get_indexes(IndexedElementsIterator first,
+                                                           IndexedElementsIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<IndexedElementsIterator>));
 
                         indexes_type indexes;
-                        for (const auto &e : elements) {
-                            assert(check_participant_index(e.first) && indexes.emplace(e.first).second);
+                        for (auto it = first; it != last; it++) {
+                            assert(check_participant_index(it->first) && indexes.emplace(it->first).second);
                         }
                         return indexes;
                     }
 
-                    template<typename Coeffs, check_private_element_type<typename Coeffs::value_type> = true>
+                    template<typename Coeffs, check_private_element_type<typename std::iterator_traits<
+                                                  typename Coeffs::iterator>::value_type> = true>
                     static inline public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Coeffs>));
-                        assert(check_minimal_size(std::distance(coeffs.begin(), coeffs.end())));
+                        return get_public_coeffs(coeffs.begin(), coeffs.end());
+                    }
+
+                    template<
+                        typename CoeffsIterator,
+                        check_private_element_type<typename std::iterator_traits<CoeffsIterator>::value_type> = true>
+                    static inline public_coeffs_type get_public_coeffs(CoeffsIterator first, CoeffsIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<CoeffsIterator>));
+                        assert(check_minimal_size(std::distance(first, last)));
 
                         public_coeffs_type public_coeffs;
-                        for (const auto &c : coeffs) {
-                            public_coeffs.emplace_back(get_public_element(c));
+                        for (auto it = first; it != last; it++) {
+                            public_coeffs.emplace_back(get_public_element(*it));
                         }
                         return public_coeffs;
                     }
 
-                    template<typename Shares, check_indexed_private_elements_type<Shares> = true>
+                    template<typename Shares, check_indexed_private_element_type<typename std::iterator_traits<
+                                                  typename Shares::iterator>::value_type> = true>
                     static inline public_shares_type get_public_shares(const Shares &shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                         assert(check_minimal_size(std::distance(shares.begin(), shares.end())));
@@ -307,6 +387,19 @@ namespace nil {
                         public_shares_type public_shares;
                         for (const auto &s : shares) {
                             assert(public_shares.emplace(get_public_share(s)).second);
+                        }
+                        return public_shares;
+                    }
+
+                    template<typename SharesIterator, check_indexed_private_element_type<typename std::iterator_traits<
+                                                          SharesIterator>::value_type> = true>
+                    static inline public_shares_type get_public_shares(SharesIterator first, SharesIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIterator>));
+                        assert(check_minimal_size(std::distance(first, last)));
+
+                        public_shares_type public_shares;
+                        for (auto it = first; it != last; it++) {
+                            assert(public_shares.emplace(get_public_share(*it)).second);
                         }
                         return public_shares;
                     }

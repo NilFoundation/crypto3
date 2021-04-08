@@ -49,20 +49,31 @@ namespace nil {
                     //
                     //  verify public share
                     //
-                    template<typename PublicCoeffs, typename base_type::template check_public_element_type<
-                                                        typename PublicCoeffs::value_type> = true>
+                    template<typename PublicCoeffs,
+                             typename base_type::template check_public_element_type<
+                                 typename std::iterator_traits<typename PublicCoeffs::iterator>::value_type> = true>
                     static inline bool verify_share(const PublicCoeffs &public_coeffs,
                                                     const public_share_type &public_share) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicCoeffs>));
+                        return verify_share(public_coeffs.begin(), public_coeffs.end(), public_share);
+                    }
+
+                    template<typename PublicCoeffsIterator,
+                             typename base_type::template check_public_element_type<
+                                 typename std::iterator_traits<PublicCoeffsIterator>::value_type> = true>
+                    static inline bool verify_share(PublicCoeffsIterator first, PublicCoeffsIterator last,
+                                                    const public_share_type &public_share) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicCoeffsIterator>));
+
                         assert(base_type::check_participant_index(public_share.first));
-                        assert(base_type::check_minimal_size(std::distance(public_coeffs.begin(), public_coeffs.end())));
+                        assert(base_type::check_minimal_size(std::distance(first, last)));
 
                         private_element_type e_i(public_share.first);
                         private_element_type temp_mul = private_element_type::one();
                         public_element_type verification_val = public_element_type::zero();
 
-                        for (const auto &c : public_coeffs) {
-                            verification_val = verification_val + c * temp_mul;
+                        for (auto it = first; it != last; it++) {
+                            verification_val = verification_val + *it * temp_mul;
                             temp_mul = temp_mul * e_i;
                         }
                         return public_share.second == verification_val;

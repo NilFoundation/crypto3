@@ -232,15 +232,15 @@ namespace nil {
 
                 template<typename Shares, typename Weights, typename Number>
                 static inline typename scheme_type::private_element_type
-                    reconstruct_weighted_secret(const Shares &shares, const Weights &weights, Number t) {
-                    return scheme_type::ops_type::reconstruct_weighted_secret(shares, weights, t);
+                    reconstruct_part_secret(const Shares &shares, const Weights &weights, Number t) {
+                    return scheme_type::ops_type::reconstruct_part_secret(shares, weights, t);
                 }
 
                 template<typename PublicShares, typename Weights, typename Number>
                 static inline typename scheme_type::public_element_type
-                    reconstruct_weighted_public_element(const PublicShares &public_shares, const Weights &weights,
+                    reconstruct_part_public_element(const PublicShares &public_shares, const Weights &weights,
                                                         Number t) {
-                    return scheme_type::ops_type::reconstruct_weighted_public_element(public_shares, weights, t);
+                    return scheme_type::ops_type::reconstruct_part_public_element(public_shares, weights, t);
                 }
 
                 template<typename PublicShares>

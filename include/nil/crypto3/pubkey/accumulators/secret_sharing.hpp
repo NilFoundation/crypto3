@@ -267,9 +267,7 @@ namespace nil {
                     //
                     template<typename Args>
                     deal_share_impl(const Args &args) {
-                        assert(key_type::check_participant_index(args[boost::accumulators::sample]));
-                        i = args[boost::accumulators::sample];
-                        share = share_type(i, private_element_type::zero());
+                        share = share_type(0, private_element_type::zero());
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
@@ -292,6 +290,11 @@ namespace nil {
                              typename InputIterator,
                              typename key_type::template check_share_type<Share> = true>
                     inline void resolve_type(const Share &share_update, InputIterator) {
+                        if (!share.first) {
+                            assert(key_type::check_participant_index(share_update.first));
+                            share.first = share_update.first;
+                        }
+
                         assert(share_update.first == share.first);
                         share.second = share.second + share_update.second;
                     }
@@ -315,7 +318,6 @@ namespace nil {
                     }
 
                     result_type share;
-                    std::size_t i;
                 };
 
                 template<typename Mode, typename = void>

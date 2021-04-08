@@ -131,9 +131,9 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     auto pub_coeffs = key_type::get_public_coeffs(coeffs);
 
     // deal_shares(rng)
-    typename key_type::shares_type shares = nil::crypto3::deal_shares<scheme_type>(coeffs, n, t);
+    typename key_type::shares_type shares = nil::crypto3::deal_shares<scheme_type>(coeffs, n);
     // deal_shares(first, last)
-    typename key_type::shares_type shares1 = nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, t);
+    typename key_type::shares_type shares1 = nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
     // deal_shares(rng, acc)
     shares_dealing_acc_type deal_shares_acc(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_acc);
@@ -144,10 +144,10 @@ BOOST_AUTO_TEST_CASE(feldman_sss) {
     typename key_type::shares_type shares3 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
     // deal_shares(rng, out)
     std::vector<typename key_type::shares_type> shares_out;
-    nil::crypto3::deal_shares<scheme_type>(coeffs, n, t, std::back_inserter(shares_out));
+    nil::crypto3::deal_shares<scheme_type>(coeffs, n, std::back_inserter(shares_out));
     // deal_shares(first, last, out)
     std::vector<typename key_type::shares_type> shares_out1;
-    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, t, std::back_inserter(shares_out1));
+    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, std::back_inserter(shares_out1));
 
     BOOST_CHECK(shares == shares1);
     BOOST_CHECK(shares == shares2);
@@ -270,10 +270,10 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
     // default shares dealing
 
     // deal_shares(rng)
-    typename key_type::shares_type shares_one = nil::crypto3::deal_shares<scheme_type>(coeffs, n, t);
+    typename key_type::shares_type shares_one = nil::crypto3::deal_shares<scheme_type>(coeffs, n);
     // deal_shares(first, last)
     typename key_type::shares_type shares_one1 =
-        nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, t);
+        nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n);
     // deal_shares(rng, acc)
     shares_dealing_acc_type deal_shares_one_acc(n, nil::crypto3::accumulators::threshold_value = t);
     nil::crypto3::deal_shares<scheme_type>(coeffs, deal_shares_one_acc);
@@ -286,10 +286,10 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
         boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_one_acc1);
     // deal_shares(rng, out)
     std::vector<typename key_type::shares_type> shares_one_out;
-    nil::crypto3::deal_shares<scheme_type>(coeffs, n, t, std::back_inserter(shares_one_out));
+    nil::crypto3::deal_shares<scheme_type>(coeffs, n, std::back_inserter(shares_one_out));
     // deal_shares(first, last, out)
     std::vector<typename key_type::shares_type> shares_one_out1;
-    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, t, std::back_inserter(shares_one_out1));
+    nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), n, std::back_inserter(shares_one_out1));
 
     BOOST_CHECK(shares_one == shares_one1);
     BOOST_CHECK(shares_one == shares_one2);
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg) {
 
     std::vector<typename scheme_type::shares_type> P_generated_shares;
     std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_generated_shares), [n, t](const auto &poly_i) {
-        return static_cast<typename key_type::shares_type>(nil::crypto3::deal_shares<scheme_type>(poly_i, n, t));
+        return static_cast<typename key_type::shares_type>(nil::crypto3::deal_shares<scheme_type>(poly_i, n));
     });
 
     //===========================================================================
@@ -459,7 +459,7 @@ BOOST_AUTO_TEST_CASE(pedersen_dkg) {
     for (const auto &i_generated_shares : P_generated_shares) {
         for (const auto &j_share : i_generated_shares) {
             if (!P_shares_acc.count(j_share.first)) {
-                assert(P_shares_acc.emplace(j_share.first, share_dealing_acc_type(j_share.first)).second);
+                assert(P_shares_acc.emplace(j_share.first, share_dealing_acc_type()).second);
             }
             P_shares_acc.at(j_share.first)(j_share);
         }
