@@ -46,9 +46,5 @@ You can either run all the tests listed in `Jamfile.v2` or run a single test:
 
 ## Dependencies
 
-### Internal
-
-* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git) (branch `33-extended-inverse`).
-
 ### External
 * [Boost](https://boost.org) (>= 1.73). Because boost::config doesn't have BOOST_IF_CONSTEXPR definition before 1.73 version.
