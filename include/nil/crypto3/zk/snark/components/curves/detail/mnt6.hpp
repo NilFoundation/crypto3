@@ -58,10 +58,10 @@ namespace nil {
 
                         typedef typename curve_type::pairing::pair_curve_type pair_curve_type;    // mnt4
 
-                        typedef typename pair_curve_type::pairing::Fqe_type fqe_type;
-                        typedef typename pair_curve_type::pairing::Fqk_type fqk_type;
+                        typedef typename pair_curve_type::pairing::fqe_type fqe_type;
+                        typedef typename pair_curve_type::pairing::fqk_type fqk_type;
 
-                        typedef typename curve_type::pairing::Fp_type field_type;
+                        typedef typename curve_type::pairing::fp_type field_type;
 
                     public:
                         typedef Fp2_variable<fqe_type> Fqe_variable_type;

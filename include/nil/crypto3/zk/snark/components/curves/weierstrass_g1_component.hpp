@@ -76,7 +76,7 @@ namespace nil {
                                     const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P) :
                             component<FieldType>(bp) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type Pcopy =
-                                P.to_affine_coordinates();
+                                P.to_affine();
 
                             X.assign(bp, Pcopy.X);
                             Y.assign(bp, Pcopy.Y);
@@ -89,7 +89,7 @@ namespace nil {
                         void generate_r1cs_witness(
                             const typename CurveType::pairing::pair_curve_type::g1_type::value_type &el) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type el_normalized =
-                                el.to_affine_coordinates();
+                                el.to_affine();
 
                             this->bp.lc_val(X) = el_normalized.X;
                             this->bp.lc_val(Y) = el_normalized.Y;

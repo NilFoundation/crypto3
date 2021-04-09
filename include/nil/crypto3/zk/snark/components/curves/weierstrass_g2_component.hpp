@@ -55,10 +55,10 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class g2_variable : public component<typename CurveType::scalar_field_type> {
-                        using field_type = typename CurveType::pairing::Fp_type;
+                        using field_type = typename CurveType::pairing::fp_type;
 
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         using component_policy = basic_curve_component_policy<CurveType>;
 
@@ -79,7 +79,7 @@ namespace nil {
                                     const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
                             component<field_type>(bp) {
                             typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy =
-                                Q.to_affine_coordinates();
+                                Q.to_affine();
 
                             X.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.X));
                             Y.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.Y));
@@ -91,7 +91,7 @@ namespace nil {
                         void generate_r1cs_witness(
                             const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) {
                             typename CurveType::pairing::pair_curve_type::g2_type::value_type Qcopy =
-                                Q.to_affine_coordinates();
+                                Q.to_affine();
 
                             X->generate_r1cs_witness(Qcopy.X);
                             Y->generate_r1cs_witness(Qcopy.Y);
@@ -112,9 +112,9 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class G2_checker_component : public component<typename CurveType::scalar_field_type> {
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         using component_policy = basic_curve_component_policy<CurveType>;
 

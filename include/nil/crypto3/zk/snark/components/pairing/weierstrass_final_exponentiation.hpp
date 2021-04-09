@@ -84,12 +84,12 @@ namespace nil {
                         std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv_q_3_minus_1;
                         std::shared_ptr<Fqk_mul_component<curve_type>> compute_inv_beta;
 
-                        std::shared_ptr<exponentiation_component<curve_type>::pairing::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing::fqk_type,
                                         Fp6_2over3_variable,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component,
                                         algebra::mnt6_q_limbs> > compute_w1;
-                        std::shared_ptr<exponentiation_component<curve_type>::pairing::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing::fqk_type,
                                         Fp6_2over3_variable,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component,
@@ -129,7 +129,7 @@ namespace nil {
                             compute_inv_beta.reset(
                                 new Fqk_mul_component<curve_type>(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
-                            compute_w1.reset(new exponentiation_component<curve_type>::pairing::Fqk_type,
+                            compute_w1.reset(new exponentiation_component<curve_type>::pairing::fqk_type,
                                              Fp6_2over3_variable,
                                              Fp6_2over3_mul_component,
                                              Fp6_2over3_cyclotomic_sqr_component,
@@ -137,7 +137,7 @@ namespace nil {
                                                  (bp, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
                             compute_w0.reset(
-                                new exponentiation_component<curve_type>::pairing::Fqk_type,
+                                new exponentiation_component<curve_type>::pairing::fqk_type,
                                 Fp6_2over3_variable,
                                 Fp6_2over3_mul_component,
                                 Fp6_2over3_cyclotomic_sqr_component,
@@ -152,7 +152,7 @@ namespace nil {
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                pairing::pair_curve_type<curve_type>::pairing::Fqk_type::value_type::one());
+                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_3_minus_1->generate_r1cs_constraints();
@@ -177,7 +177,7 @@ namespace nil {
 
                         void generate_r1cs_witness() {
                             one->generate_r1cs_witness(
-                                pairing::pair_curve_type<curve_type>::pairing::Fqk_type::value_type::one());
+                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();
@@ -230,12 +230,12 @@ namespace nil {
                         std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_q_2_minus_1;
                         std::shared_ptr<Fqk_mul_component<curve_type>> compute_el_inv_q_2_minus_1;
 
-                        std::shared_ptr<exponentiation_component<curve_type>::pairing::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing::fqk_type,
                                         Fp4_variable,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component,
                                         algebra::mnt4_q_limbs> > compute_w1;
-                        std::shared_ptr<exponentiation_component<curve_type>::pairing::Fqk_type,
+                        std::shared_ptr<exponentiation_component<curve_type>::pairing::fqk_type,
                                         Fp4_variable,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component,
@@ -267,14 +267,14 @@ namespace nil {
                                 new Fqk_mul_component<curve_type>(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
                             compute_w1.reset(
-                                new exponentiation_component<curve_type>::pairing::Fqk_type,
+                                new exponentiation_component<curve_type>::pairing::fqk_type,
                                 Fp4_variable,
                                 Fp4_mul_component,
                                 Fp4_cyclotomic_sqr_component,
                                 algebra::mnt4_q_limbs >
                                     (bp, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
                             compute_w0.reset(
-                                new exponentiation_component<curve_type>::pairing::Fqk_type,
+                                new exponentiation_component<curve_type>::pairing::fqk_type,
                                 Fp4_variable,
                                 Fp4_mul_component,
                                 Fp4_cyclotomic_sqr_component,
@@ -289,7 +289,7 @@ namespace nil {
 
                         void generate_r1cs_constraints() {
                             one->generate_r1cs_equals_const_constraints(
-                                pairing::pair_curve_type<curve_type>::pairing::Fqk_type::value_type::one());
+                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
 
                             compute_el_inv->generate_r1cs_constraints();
                             compute_el_q_2_minus_1->generate_r1cs_constraints();
@@ -308,7 +308,7 @@ namespace nil {
 
                         void generate_r1cs_witness() {
                             one->generate_r1cs_witness(
-                                pairing::pair_curve_type<curve_type>::pairing::Fqk_type::value_type::one());
+                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
                             el_inv->generate_r1cs_witness(el.get_element().inversed());
 
                             compute_el_inv->generate_r1cs_witness();
@@ -326,7 +326,6 @@ namespace nil {
                                                                                field_type::value_type::zero());
                         }
                     };
-
                 }    // namespace components
             }        // namespace snark
         }            // namespace zk

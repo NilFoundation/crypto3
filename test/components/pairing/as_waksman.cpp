@@ -30,9 +30,8 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation_components.hpp>
 
@@ -45,9 +44,9 @@ using namespace nil::crypto3::algebra;
 template<typename CurveType>
 void test_g1_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
-    typename pairing::CurveType::pairing::pair_curve_type::g1_type::value_type g_val =
-        algebra::random_element<typename pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
+    typename CurveType::pairing::pair_curve_type::g1_type::value_type g_val =
+        algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        CurveType::pairing::pair_curve_type::g1_type::value_type::one();
 
     g1_variable<CurveType> g(bp);
     g1_precomputation<CurveType> precomp;
@@ -58,10 +57,10 @@ void test_g1_variable_precomp() {
     do_precomp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    g1_precomputation<CurveType> const_precomp(bp, g_val);
+    typename CurveType::pairing::g1_precomp const_precomp(bp, g_val);
 
-    algebra::affine_ate_g1_precomp<pairing::CurveType::pairing::pair_curve_type> native_precomp =
-        pairing::CurveType::pairing::pair_curve_type::affine_ate_precompute_G1(g_val);
+    typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g1_precomp native_precomp =
+        CurveType::pairing::pair_curve_type::affine_ate_precompute_g1(g_val);
     BOOST_CHECK(precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
     BOOST_CHECK(const_precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
 }
@@ -69,9 +68,9 @@ void test_g1_variable_precomp() {
 template<typename CurveType>
 void test_g2_variable_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
-    typename pairing::CurveType::pairing::pair_curve_type::g2_type::value_type g_val =
-        algebra::random_element<typename pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
-        pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
+    typename CurveType::pairing::pair_curve_type::g2_type::value_type g_val =
+        algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
+        CurveType::pairing::pair_curve_type::g2_type::value_type::one();
 
     g2_variable<CurveType> g(bp);
     g2_precomputation<CurveType> precomp;
@@ -82,11 +81,11 @@ void test_g2_variable_precomp() {
     do_precomp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    algebra::affine_ate_g2_precomp<pairing::CurveType::pairing::pair_curve_type> native_precomp =
-        pairing::CurveType::pairing::pair_curve_type::affine_ate_precompute_G2(g_val);
+    typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp native_precomp =
+        CurveType::pairing::pair_curve_type::affine_ate_precompute_g2(g_val);
 
     BOOST_CHECK(precomp.coeffs.size() - 1 ==
-           native_precomp.coeffs.size());    // the last precomp is unused, but remains for convenient programming
+                native_precomp.coeffs.size());    // the last precomp is unused, but remains for convenient programming
     for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
         BOOST_CHECK(precomp.coeffs[i]->RX->get_element() == native_precomp.coeffs[i].old_RX);
         BOOST_CHECK(precomp.coeffs[i]->RY->get_element() == native_precomp.coeffs[i].old_RY);
@@ -100,10 +99,9 @@ void test_g2_variable_precomp() {
 BOOST_AUTO_TEST_SUITE(weierstrass_precomputation_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(weierstrass_precomputation_components_test) {
-    
+
     test_all_set_commitment_components<curves::mnt4<298>>();
     test_all_set_commitment_components<curves::mnt6<298>>();
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

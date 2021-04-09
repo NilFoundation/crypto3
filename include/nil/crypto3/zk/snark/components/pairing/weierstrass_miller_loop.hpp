@@ -63,8 +63,8 @@ namespace nil {
                     template<typename CurveType>
                     class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
 
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
@@ -150,8 +150,8 @@ namespace nil {
                     template<typename CurveType>
                     class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
 
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
@@ -234,8 +234,8 @@ namespace nil {
                     template<typename CurveType>
                     class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
 
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
@@ -393,9 +393,9 @@ namespace nil {
                     template<typename CurveType>
                     class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
 
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
@@ -605,9 +605,9 @@ namespace nil {
                     class mnt_e_times_e_over_e_miller_loop_component
                         : public component<typename CurveType::scalar_field_type> {
 
-                        typedef typename CurveType::pairing::Fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        typedef typename CurveType::pairing::fp_type field_type;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         using component_policy = basic_pairing_component_policy<CurveType>;
 

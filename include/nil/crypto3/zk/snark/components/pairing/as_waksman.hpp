@@ -59,7 +59,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class g1_precomputation {
-                        typedef typename CurveType::pairing::Fp_type FieldType;
+                        typedef typename CurveType::pairing::fp_type FieldType;
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
@@ -74,7 +74,7 @@ namespace nil {
                             blueprint<FieldType> &bp,
                             const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P_val) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type P_val_copy =
-                                P_val.to_affine_coordinates();
+                                P_val.to_affine();
                             P.reset(new g1_variable<CurveType>(bp, P_val_copy));
                             PY_twist_squared.reset(new typename component_policy::Fqe_variable_type(
                                 bp,
@@ -92,7 +92,7 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::Fqk_type;
+                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
                         g1_precomputation<CurveType> &precomp;    // must be a reference.
 
@@ -160,7 +160,7 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        typedef typename CurveType::pairing::Fp_type FieldType;
+                        typedef typename CurveType::pairing::fp_type FieldType;
 
                         std::shared_ptr<typename component_policy::Fqe_variable_type> RX;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> RY;
@@ -194,7 +194,7 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        typedef typename CurveType::pairing::Fp_type FieldType;
+                        typedef typename CurveType::pairing::fp_type FieldType;
 
                         std::shared_ptr<g2_variable<CurveType>> Q;
 
@@ -208,7 +208,7 @@ namespace nil {
                             Q.reset(new g2_variable<CurveType>(bp, Q_val));
                             const typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp
                                 native_precomp =
-                                    affine_ate_precompute_G2<typename CurveType::pairing::pair_curve_type>(Q_val);
+                                    affine_ate_precompute_g2<typename CurveType::pairing::pair_curve_type>(Q_val);
 
                             coeffs.resize(native_precomp.coeffs.size() +
                                           1);    // the last precomp remains for convenient programming
@@ -251,8 +251,8 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        typedef typename CurveType::pairing::Fp_type FieldType;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::Fqe_type;
+                        typedef typename CurveType::pairing::fp_type FieldType;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::fqe_type;
 
                         precompute_G2_component_coeffs<CurveType> cur;
                         precompute_G2_component_coeffs<CurveType> next;
@@ -368,8 +368,8 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        typedef typename CurveType::pairing::Fp_type FieldType;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::Fqe_type;
+                        typedef typename CurveType::pairing::fp_type FieldType;
+                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
                         bool invert_Q;
                         precompute_G2_component_coeffs<CurveType> cur;
@@ -466,7 +466,7 @@ namespace nil {
                         using component_policy = basic_pairing_component_policy<CurveType>;
 
                     public:
-                        typedef typename CurveType::pairing::Fp_type FieldType;
+                        typedef typename CurveType::pairing::fp_type FieldType;
 
                         std::vector<std::shared_ptr<precompute_G2_component_addition_step<CurveType>>> addition_steps;
                         std::vector<std::shared_ptr<precompute_G2_component_doubling_step<CurveType>>> doubling_steps;

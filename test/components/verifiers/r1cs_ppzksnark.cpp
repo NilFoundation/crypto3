@@ -278,7 +278,7 @@ void test_Frobenius() {
 }
 
 template<typename CurveType>
-void test_full_pairing() {
+void test_full_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
@@ -317,8 +317,8 @@ void test_full_pairing() {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_g1(P_val);
+    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_g2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
@@ -333,7 +333,7 @@ void test_full_pairing() {
 }
 
 template<typename CurveType>
-void test_full_precomputed_pairing() {
+void test_full_precomputed_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
@@ -361,8 +361,8 @@ void test_full_precomputed_pairing() {
     finexp.generate_r1cs_witness();
     BOOST_CHECK(bp.is_satisfied());
 
-    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_G1(P_val);
-    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_G2(Q_val);
+    typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_g1(P_val);
+    typename pairing_policy::affine_ate_g2_precomp native_prec_Q = pairing_policy::affine_ate_precompute_g2(Q_val);
     typename pairing_policy::Fqk native_miller_result =
         pairing_policy::affine_ate_miller_loop(native_prec_P, native_prec_Q);
 
