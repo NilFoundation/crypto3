@@ -1023,9 +1023,9 @@ namespace nil {
                             typename pairing_policy::g1_precomp::value_type proof_g_Aau_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.h);
 
-                            typename pairing_policy::Fqk_type::value_type kc_Aau_1 =
+                            typename pairing_policy::fqk_type::value_type kc_Aau_1 =
                                 pairing_policy:: ::miller_loop(proof_g_Aau_g_precomp, pvk.vk_alphaA_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_Aau_2 =
+                            typename pairing_policy::fqk_type::value_type kc_Aau_2 =
                                 pairing_policy::miller_loop(proof_g_Aau_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_Aau =
                                 pairing_policy::final_exponentiation(kc_Aau_1 * kc_Aau_2.unitary_inversed());
@@ -1039,9 +1039,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_A.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_A_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.h);
-                            typename pairing_policy::Fqk_type::value_type kc_A_1 =
+                            typename pairing_policy::fqk_type::value_type kc_A_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_precomp, pvk.vk_alphaA_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_A_2 =
+                            typename pairing_policy::fqk_type::value_type kc_A_2 =
                                 pairing_policy::miller_loop(proof_g_A_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_A =
                                 pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
@@ -1053,9 +1053,9 @@ namespace nil {
                                 pairing_policy::precompute_g2(proof.g_B.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_B_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_B.h);
-                            typename pairing_policy::Fqk_type::value_type kc_B_1 =
+                            typename pairing_policy::fqk_type::value_type kc_B_1 =
                                 pairing_policy::miller_loop(pvk.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_B_2 =
+                            typename pairing_policy::fqk_type::value_type kc_B_2 =
                                 pairing_policy::miller_loop(proof_g_B_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_B =
                                 pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
@@ -1067,9 +1067,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_C.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_C_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.h);
-                            typename pairing_policy::Fqk_type::value_type kc_C_1 =
+                            typename pairing_policy::fqk_type::value_type kc_C_1 =
                                 pairing_policy::miller_loop(proof_g_C_g_precomp, pvk.vk_alphaC_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_C_2 =
+                            typename pairing_policy::fqk_type::value_type kc_C_2 =
                                 pairing_policy::miller_loop(proof_g_C_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_C =
                                 pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
@@ -1083,9 +1083,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(Aacc);
                             typename pairing_policy::g1_precomp::value_type proof_g_H_precomp =
                                 pairing_policy::precompute_g1(proof.g_H);
-                            typename pairing_policy::Fqk_type::value_type QAP_1 =
+                            typename pairing_policy::fqk_type::value_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
-                            typename pairing_policy::Fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
+                            typename pairing_policy::fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
                                 proof_g_H_precomp, pvk.vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type QAP =
                                 pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
@@ -1097,9 +1097,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_K);
                             typename pairing_policy::g1_precomp::value_type proof_g_Aacc_C_precomp =
                                 pairing_policy::precompute_g1(Aacc + proof.g_C.g);
-                            typename pairing_policy::Fqk_type::value_type K_1 =
+                            typename pairing_policy::fqk_type::value_type K_1 =
                                 pairing_policy::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type K_23 =
+                            typename pairing_policy::fqk_type::value_type K_23 =
                                 pairing_policy::double_miller_loop(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
                                                                    pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::gt_type K =
@@ -1165,11 +1165,11 @@ namespace nil {
                             typename pairing_policy::g2_precomp::value_type g_minusi_precomp =
                                 pairing_policy::precompute_g2(pak.minusI2);
 
-                            typename pairing_policy::Fqk_type::value_type accum;
+                            typename pairing_policy::fqk_type::value_type accum;
                             if (auth_data.size() % 2 == 1) {
                                 pairing_policy::miller_loop(pvk.proof_g_vki_precomp[0], g_Lambdas_precomp[0]);
                             } else {
-                                accum = pairing_policy::Fqk_type::value_type::one();
+                                accum = pairing_policy::fqk_type::value_type::one();
                             }
                             for (std::size_t i = auth_data.size() % 2; i < labels.size(); i = i + 2) {
                                 accum = accum * pairing_policy::double_miller_loop(
@@ -1181,7 +1181,7 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.muA);
                             typename pairing_policy::g1_precomp::value_type proof_g_Aau_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.g);
-                            typename pairing_policy::Fqk_type::value_type accum2 = pairing_policy::double_miller_loop(
+                            typename pairing_policy::fqk_type::value_type accum2 = pairing_policy::double_miller_loop(
                                 proof_g_muA_precomp, pvk.pp_G2_one_precomp, proof_g_Aau_precomp, g_minusi_precomp);
                             typename pairing_policy::gt_type authPair =
                                 pairing_policy::final_exponentiation(accum * accum2.unitary_inversed());
@@ -1196,9 +1196,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_Aau.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_Aau_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_Aau.h);
-                            typename pairing_policy::Fqk_type::value_type kc_Aau_1 =
+                            typename pairing_policy::fqk_type::value_type kc_Aau_1 =
                                 pairing_policy::miller_loop(proof_g_Aau_g_precomp, pvk.vk_alphaA_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_Aau_2 =
+                            typename pairing_policy::fqk_type::value_type kc_Aau_2 =
                                 pairing_policy::miller_loop(proof_g_Aau_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_Aau =
                                 typename ::final_exponentiation(kc_Aau_1 * kc_Aau_2.unitary_inversed());
@@ -1212,9 +1212,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_A.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_A_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_A.h);
-                            typename pairing_policy::Fqk_type::value_type kc_A_1 =
+                            typename pairing_policy::fqk_type::value_type kc_A_1 =
                                 pairing_policy::miller_loop(proof_g_A_g_precomp, pvk.vk_alphaA_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_A_2 =
+                            typename pairing_policy::fqk_type::value_type kc_A_2 =
                                 pairing_policy::miller_loop(proof_g_A_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_A =
                                 pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
@@ -1226,9 +1226,9 @@ namespace nil {
                                 pairing_policy::precompute_g2(proof.g_B.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_B_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_B.h);
-                            typename pairing_policy::Fqk_type::value_type kc_B_1 =
+                            typename pairing_policy::fqk_type::value_type kc_B_1 =
                                 pairing_policy::miller_loop(pvk.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_B_2 =
+                            typename pairing_policy::fqk_type::value_type kc_B_2 =
                                 pairing_policy::miller_loop(proof_g_B_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_B =
                                 pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
@@ -1240,9 +1240,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_C.g);
                             typename pairing_policy::g1_precomp::value_type proof_g_C_h_precomp =
                                 pairing_policy::precompute_g1(proof.g_C.h);
-                            typename pairing_policy::Fqk_type::value_type kc_C_1 =
+                            typename pairing_policy::fqk_type::value_type kc_C_1 =
                                 pairing_policy::miller_loop(proof_g_C_g_precomp, pvk.vk_alphaC_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type kc_C_2 =
+                            typename pairing_policy::fqk_type::value_type kc_C_2 =
                                 pairing_policy::miller_loop(proof_g_C_h_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type kc_C =
                                 pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
@@ -1256,9 +1256,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(Aacc);
                             typename pairing_policy::g1_precomp::value_type proof_g_H_precomp =
                                 pairing_policy::precompute_g1(proof.g_H);
-                            typename pairing_policy::Fqk_type::value_type QAP_1 =
+                            typename pairing_policy::fqk_type::value_type QAP_1 =
                                 pairing_policy::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
-                            typename pairing_policy::Fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
+                            typename pairing_policy::fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
                                 proof_g_H_precomp, pvk.vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk.pp_G2_one_precomp);
                             typename pairing_policy::gt_type QAP =
                                 pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
@@ -1270,9 +1270,9 @@ namespace nil {
                                 pairing_policy::precompute_g1(proof.g_K);
                             typename pairing_policy::g1_precomp::value_type proof_g_Aacc_C_precomp =
                                 pairing_policy::precompute_g1(Aacc + proof.g_C.g);
-                            typename pairing_policy::Fqk_type::value_type K_1 =
+                            typename pairing_policy::fqk_type::value_type K_1 =
                                 pairing_policy::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);
-                            typename pairing_policy::Fqk_type::value_type K_23 =
+                            typename pairing_policy::fqk_type::value_type K_23 =
                                 pairing_policy::double_miller_loop(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
                                                                    pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                             typename pairing_policy::gt_type K =

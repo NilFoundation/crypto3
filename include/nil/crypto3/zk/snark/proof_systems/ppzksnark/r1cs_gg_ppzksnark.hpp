@@ -36,7 +36,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
                 template<typename CurveType,
                          typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,

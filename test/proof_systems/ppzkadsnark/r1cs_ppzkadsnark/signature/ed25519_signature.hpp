@@ -64,7 +64,7 @@ namespace nil {
                     unsigned char signature[64 + 16 + 320];
                     unsigned char message[16 + 320];
 
-                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambda.to_affine_coordinates();
+                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambda.to_affine();
 
                     for (std::size_t i = 0; i < 16; i++)
                         message[i] = label.label_bytes[i];
@@ -95,7 +95,7 @@ namespace nil {
                     unsigned char message[64 + 16 + 320];
                     unsigned char signature[64 + 16 + 320];
 
-                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambda.to_affine_coordinates();
+                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambda.to_affine();
 
                     for (std::size_t i = 0; i < 64; i++)
                         signature[i] = sig.sig_bytes[i];
@@ -155,7 +155,7 @@ namespace nil {
                             signaturemem[i * (64 + 16 + 320) + 64 + j] = labels[i].label_bytes[j];
 
                         // More efficient way to get canonical point rep?
-                        snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambdas[i].to_affine_coordinates();
+                        snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy = Lambdas[i].to_affine();
                         stream.clear();
                         stream.rdbuf()->pubsetbuf((char *)(signaturemem + i * (64 + 16 + 320) + 64 + 16), 320);
                         stream << Lambda_copy;

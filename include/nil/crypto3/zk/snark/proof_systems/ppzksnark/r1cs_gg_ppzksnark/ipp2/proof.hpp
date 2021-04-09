@@ -27,6 +27,8 @@
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_AGGREGATE_PROOF_HPP
 
 #include <memory>
+#include <vector>
+#include <tuple>
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commit.hpp>
 
@@ -34,6 +36,46 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /// KZGOpening represents the KZG opening of a commitment key (which is a tuple
+                /// given commitment keys are a tuple).
+                template<typename GroupType>
+                using kzg_opening = std::pair<typename GroupType::value_type, typename GroupType::value_type>;
+
+                /// It contains all elements derived in the GIPA loop for both TIPP and MIPP at
+                /// the same time.
+                template<typename CurveType>
+                struct gipa_proof {
+                    std::uint32_t nproofs;
+                    std::vector<std::pair<r1cs_gg_ppzksnark_commitment_output<CurveType>,
+                                          r1cs_gg_ppzksnark_commitment_output<CurveType>>>
+                        comms_ab;
+                    std::vector<std::pair<r1cs_gg_ppzksnark_commitment_output<CurveType>,
+                                          r1cs_gg_ppzksnark_commitment_output<CurveType>>>
+                        comms_c;
+                    std::vector<std::pair<typename CurveType::pairing::fqk_type, typename CurveType::pairing::fqk_type>>
+                        z_ab;
+                    std::vector<
+                        std::pair<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>>
+                        z_c;
+                    typename CurveType::g1_type::value_type final_a;
+                    typename CurveType::g2_type::value_type final_b;
+                    typename CurveType::g1_type::value_type final_c;
+                    typename CurveType::scalar_field_type::value_type final_r;
+
+                    /// final commitment keys $v$ and $w$ - there is only one element at the
+                    /// end for v1 and v2 hence it's a tuple.
+                    r1cs_gg_ppzksnark_vkey<CurveType> final_vkey;
+                    r1cs_gg_ppzksnark_wkey<CurveType> final_2key;
+                };
+
+                template<typename CurveType>
+                struct tipp_mipp_proof {
+                    typedef CurveType curve_type;
+
+                    gipa_proof<CurveType> gipa;
+                    kzg_opening<typename CurveType::g2_type> vkey_opening;
+                    kzg_opening<typename CurveType::g1_type> wkey_opening;
+                };
                 /// AggregateProof contains all elements to verify n aggregated Groth16 proofs
                 /// using inner pairing product arguments. This proof can be created by any
                 /// party in possession of valid Groth16 proofs.
@@ -45,9 +87,10 @@ namespace nil {
                     /// commit to C separate since we use it only in MIPP
                     r1cs_gg_ppzksnark_commitment_output<CurveType> com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
-                    algebra::Fqk<CurveType> ip_ab;
+                    typename CurveType::pairing::fqk_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
-                    pub agg_c : E::G1, pub tmipp : TippMippProof<E>,
+                    typename CurveType::g1_type::value_type agg_c;
+                    tipp_mipp_proof<CurveType> tmipp;
                 };
             }    // namespace snark
         }        // namespace zk

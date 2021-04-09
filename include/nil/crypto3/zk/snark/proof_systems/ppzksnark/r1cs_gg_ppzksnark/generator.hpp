@@ -233,7 +233,7 @@ namespace nil {
 #endif
 
                         typename gt_type::value_type alpha_g1_beta_g2 =
-                            pairing_policy::reduced_pairing(alpha_g1, beta_g2);
+                            pairing_policy::pair_reduced(alpha_g1, beta_g2);
                         typename g2_type::value_type gamma_g2 = gamma * G2_gen;
 
                         typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;

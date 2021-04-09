@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_GENERATE_HPP
-#define CRYPTO3_ZK_SNARK_GENERATE_HPP
+#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
+#define CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
 
 namespace nil {
     namespace crypto3 {

@@ -179,7 +179,7 @@ namespace nil {
                                 processed_verification_key.query.begin() + 1, processed_verification_key.query.end(),
                                 primary_input.begin(), primary_input.end(), chunks);
 
-                        typename pairing_policy::Fqk_type
+                        typename pairing_policy::fqk_type
                             test1_l = pairing_policy::miller_loop(
                                 pairing_policy::precompute_g1(proof.A + processed_verification_key.G_alpha),
                                 pairing_policy::precompute_g2(proof.B + processed_verification_key.H_beta)),
@@ -198,7 +198,7 @@ namespace nil {
                         /**
                          * e(A, H^{gamma}) = e(G^{gamma}, B)
                          */
-                        typename pairing_policy::Fqk_type test2_l = pairing_policy::miller_loop(
+                        typename pairing_policy::fqk_type test2_l = pairing_policy::miller_loop(
                                                               pairing_policy::precompute_g1(proof.A),
                                                               processed_verification_key.H_gamma_pc),
                                                           test2_r = pairing_policy::miller_loop(

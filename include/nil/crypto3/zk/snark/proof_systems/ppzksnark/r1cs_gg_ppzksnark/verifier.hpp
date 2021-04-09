@@ -130,7 +130,7 @@ namespace nil {
                     typedef typename CurveType::gt_type gt_type;
                     typedef typename pairing_policy::g1_precomp g1_precomp;
                     typedef typename pairing_policy::g2_precomp g2_precomp;
-                    typedef typename pairing_policy::Fqk_type Fqk_type;
+                    typedef typename pairing_policy::fqk_type fqk_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -167,9 +167,9 @@ namespace nil {
                         const g1_precomp proof_g_C_precomp = pairing_policy::precompute_g1(proof.g_C);
                         const g1_precomp acc_precomp = pairing_policy::precompute_g1(acc);
 
-                        const typename Fqk_type::value_type QAP1 =
+                        const typename fqk_type::value_type QAP1 =
                             pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                        const typename Fqk_type::value_type QAP2 = pairing_policy::double_miller_loop(
+                        const typename fqk_type::value_type QAP2 = pairing_policy::double_miller_loop(
                             acc_precomp, processed_verification_key.vk_gamma_g2_precomp, proof_g_C_precomp,
                             processed_verification_key.vk_delta_g2_precomp);
                         const typename gt_type::value_type QAP =
@@ -298,7 +298,7 @@ namespace nil {
                     typedef typename CurveType::gt_type gt_type;
                     typedef typename pairing_policy::affine_ate_g1_precomp affine_ate_g1_precomp;
                     typedef typename pairing_policy::affine_ate_g2_precomp affine_ate_g2_precomp;
-                    typedef typename pairing_policy::Fqk_type Fqk_type;
+                    typedef typename pairing_policy::fqk_type fqk_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -319,9 +319,9 @@ namespace nil {
                         assert(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
                         affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(verification_key.gamma_g2);
+                            pairing_policy::affine_ate_precompute_g2(verification_key.gamma_g2);
                         affine_ate_g2_precomp pvk_vk_delta_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(verification_key.delta_g2);
+                            pairing_policy::affine_ate_precompute_g2(verification_key.delta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
                             verification_key.gamma_ABC_g1.template accumulate_chunk<scalar_field_type>(
@@ -335,14 +335,14 @@ namespace nil {
                         }
 
                         const affine_ate_g1_precomp proof_g_A_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_A);
+                            pairing_policy::affine_ate_precompute_g1(proof.g_A);
                         const affine_ate_g2_precomp proof_g_B_precomp =
-                            pairing_policy::affine_ate_precompute_G2(proof.g_B);
+                            pairing_policy::affine_ate_precompute_g2(proof.g_B);
                         const affine_ate_g1_precomp proof_g_C_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_C);
-                        const affine_ate_g1_precomp acc_precomp = pairing_policy::affine_ate_precompute_G1(acc);
+                            pairing_policy::affine_ate_precompute_g1(proof.g_C);
+                        const affine_ate_g1_precomp acc_precomp = pairing_policy::affine_ate_precompute_g1(acc);
 
-                        const typename Fqk_type::value_type QAP_miller =
+                        const typename fqk_type::value_type QAP_miller =
                             CurveType::affine_ate_e_times_e_over_e_miller_loop(
                                 acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                                 proof_g_A_precomp, proof_g_B_precomp);
