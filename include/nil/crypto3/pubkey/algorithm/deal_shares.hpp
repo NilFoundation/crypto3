@@ -70,7 +70,8 @@ namespace nil {
         //     typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
         //
         //     return SignerImpl(first, last, std::move(out),
-        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
+        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first,
+        //                       key_last)))));
         // }
 
         /*!
@@ -137,7 +138,8 @@ namespace nil {
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
         //     return SignerImpl(first, last,
-        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first, key_last)))));
+        //                       SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key_first,
+        //                       key_last)))));
         // }
 
         /*!
@@ -167,7 +169,8 @@ namespace nil {
         //     typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
         //
-        //     return SignerImpl(first, last, SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
+        //     return SignerImpl(first, last,
+        //     SchemeAccumulator(ProcessingMode(Scheme(pubkey::private_key<Scheme>(key)))));
         // }
 
         /*!
@@ -477,6 +480,43 @@ namespace nil {
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(r, SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = r.size()));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator1, typename InputIterator2, typename Number,
+                 typename SchemeAccumulator =
+                     typename pubkey::shares_dealing_accumulator_set<typename pubkey::modes::isomorphic<
+                         Scheme, pubkey::nop_padding>::template bind<pubkey::shares_dealing_policy<Scheme>>::type>>
+        typename std::enable_if<
+            !boost::accumulators::detail::is_accumulator_set<Number>::value,
+            pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>>::type
+            deal_shares(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                        Number n) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::shares_dealing_policy<Scheme>>::type ProcessingMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                first1, last1, first2, last2,
+                SchemeAccumulator(n, nil::crypto3::accumulators::threshold_value = std::distance(first1, last1)));
         }
     }    // namespace crypto3
 }    // namespace nil

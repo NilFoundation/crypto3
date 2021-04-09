@@ -153,6 +153,11 @@ namespace nil {
                     return scheme_type::ops_type::get_public_coeffs(coeffs);
                 }
 
+                template<typename CoeffsIterator>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(CoeffsIterator first, CoeffsIterator last) {
+                    return scheme_type::ops_type::get_public_coeffs(first, last);
+                }
+
                 template<typename Coeffs, typename Number>
                 static inline typename scheme_type::shares_type deal_shares(const Coeffs &coeffs, Number n) {
                     return scheme_type::ops_type::deal_shares(coeffs, n);
@@ -220,6 +225,11 @@ namespace nil {
                     return scheme_type::ops_type::get_public_coeffs(coeffs);
                 }
 
+                template<typename CoeffsIterator>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(CoeffsIterator first, CoeffsIterator last) {
+                    return scheme_type::ops_type::get_public_coeffs(first, last);
+                }
+
                 template<typename Coeffs, typename Number>
                 static inline typename scheme_type::shares_type deal_shares(const Coeffs &coeffs, Number n) {
                     return scheme_type::ops_type::deal_shares(coeffs, n);
@@ -239,7 +249,7 @@ namespace nil {
                 template<typename PublicShares, typename Weights, typename Number>
                 static inline typename scheme_type::public_element_type
                     reconstruct_part_public_element(const PublicShares &public_shares, const Weights &weights,
-                                                        Number t) {
+                                                    Number t) {
                     return scheme_type::ops_type::reconstruct_part_public_element(public_shares, weights, t);
                 }
 
@@ -303,6 +313,11 @@ namespace nil {
                 template<typename Coeffs>
                 static inline typename scheme_type::public_coeffs_type get_public_coeffs(const Coeffs &coeffs) {
                     return scheme_type::ops_type::get_public_coeffs(coeffs);
+                }
+
+                template<typename CoeffsIterator>
+                static inline typename scheme_type::public_coeffs_type get_public_coeffs(CoeffsIterator first, CoeffsIterator last) {
+                    return scheme_type::ops_type::get_public_coeffs(first, last);
                 }
 
                 template<typename Coeffs, typename Number>

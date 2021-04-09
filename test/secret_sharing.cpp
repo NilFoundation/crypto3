@@ -314,7 +314,10 @@ BOOST_AUTO_TEST_CASE(shamir_weighted_sss) {
         deal_shares_acc1(w);
     }
     typename key_type::shares_type shares1 = boost::accumulators::extract_result<shares_dealing_acc>(deal_shares_acc1);
+    typename key_type::shares_type shares2 =
+        nil::crypto3::deal_shares<scheme_type>(coeffs.begin(), coeffs.end(), weights.begin(), weights.end(), n);
     BOOST_CHECK(shares == shares1);
+    BOOST_CHECK(shares == shares2);
 
     //===========================================================================
     // reconstructing secret

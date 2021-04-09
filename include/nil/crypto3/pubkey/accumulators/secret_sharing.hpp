@@ -236,6 +236,15 @@ namespace nil {
                         shares_weights.insert_or_assign(w.first, w.second);
                     }
 
+                    template<typename InputIterator,
+                             typename key_type::template check_weight_type<
+                                 typename std::iterator_traits<InputIterator>::value_type> = true>
+                    inline void resolve_type(InputIterator first, InputIterator last) {
+                        for (auto it = first; it != last; it++) {
+                            resolve_type(*it, last);
+                        }
+                    }
+
                     std::size_t t;
                     std::size_t n;
                     std::size_t seen_coeffs;

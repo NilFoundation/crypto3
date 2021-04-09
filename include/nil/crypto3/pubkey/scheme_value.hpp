@@ -152,6 +152,26 @@ namespace nil {
                         typename InputIterator1, typename InputIterator2,
                         typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
                         typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
+                        typename std::enable_if<std::numeric_limits<ValueType1>::is_specialized, bool>::type = true,
+                        typename std::enable_if<!std::numeric_limits<ValueType2>::is_specialized, bool>::type = true>
+                    range_scheme_impl(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
+                                      InputIterator2 last2, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator1>));
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator2>));
+
+                        typedef typename scheme_type::template stream_processor<
+                            mode_type, accumulator_set_type,
+                            std::numeric_limits<ValueType1>::digits + std::numeric_limits<ValueType1>::is_signed>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(first1, last1, first2, last2);
+                    }
+
+                    template<
+                        typename InputIterator1, typename InputIterator2,
+                        typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
+                        typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
                         typename std::enable_if<!std::numeric_limits<ValueType1>::is_specialized, bool>::type = true,
                         typename std::enable_if<!std::numeric_limits<ValueType2>::is_specialized, bool>::type = true>
                     range_scheme_impl(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,

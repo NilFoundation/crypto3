@@ -82,6 +82,17 @@ namespace nil {
                     acc(block);
                 }
 
+                template<typename InputIterator1, typename InputIterator2, bool ep = enable_packer,
+                         typename std::enable_if<ep, bool>::type = true>
+                inline void operator()(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
+                                       InputIterator2 last2) {
+                    input_block_type block {};
+                    ::nil::crypto3::detail::pack_to<endian_type, value_bits, input_value_bits>(
+                        first1, last1, std::back_inserter(block));
+                    acc(block);
+                    acc(first2, nil::crypto3::accumulators::iterator_last = last2);
+                }
+
                 template<typename InputIterator, bool ep = enable_packer,
                          typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
                          typename std::enable_if<!ep, bool>::type = true,
@@ -90,12 +101,12 @@ namespace nil {
                     acc(first, nil::crypto3::accumulators::iterator_last = last);
                 }
 
+                // TODO: implement second input value check
                 template<typename InputIterator1, typename InputIterator2, bool ep = enable_packer,
                          typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
                          typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
                          typename std::enable_if<!ep, bool>::type = true,
-                         typename mode_type::template check_input_value_type<ValueType1> = true,
-                         typename mode_type::template check_input_value_type<ValueType2> = true>
+                         typename mode_type::template check_input_value_type<ValueType1> = true>
                 inline void operator()(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
                                        InputIterator2 last2) {
                     acc(first1, nil::crypto3::accumulators::iterator_last = last1);

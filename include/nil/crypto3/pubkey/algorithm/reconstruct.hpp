@@ -476,38 +476,6 @@ namespace nil {
 
             return SignerImpl(r, SchemeAccumulator());
         }
-
-        /*!
-         * @brief
-         *
-         * @ingroup pubkey_algorithms
-         *
-         * @tparam Scheme
-         * @tparam InputIterator
-         * @tparam KeySinglePassRange
-         * @tparam SchemeAccumulator
-         *
-         * @param first
-         * @param last
-         * @param key
-         *
-         * @return
-         */
-        template<typename Scheme, typename InputIterator1, typename InputIterator2,
-            typename SchemeAccumulator = typename pubkey::secret_reconstructing_accumulator_set<
-                typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                    pubkey::secret_reconstructing_policy<Scheme>>::type>>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        reconstruct(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2) {
-
-            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
-                pubkey::secret_reconstructing_policy<Scheme>>::type ProcessingMode;
-
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
-
-            return SignerImpl(first1, last1, first2, last2, SchemeAccumulator());
-        }
     }    // namespace crypto3
 }    // namespace nil
 
