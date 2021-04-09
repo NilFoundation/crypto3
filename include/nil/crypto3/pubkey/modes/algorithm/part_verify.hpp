@@ -487,6 +487,39 @@ namespace nil {
 
             return VerifyerImpl(r, ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
         }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam ModeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Mode, typename InputIterator1, typename InputIterator2,
+                 typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
+            part_verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key) {
+
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
+
+            typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
+
+            return VerifyerImpl(first1, last1, first2, last2,
+                                ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
+        }
     }    // namespace crypto3
 }    // namespace nil
 

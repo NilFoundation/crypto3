@@ -465,6 +465,37 @@ namespace nil {
 
             return SignerImpl(first, last, ModeAccumulator(key));
         }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam ModeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Mode, typename InputIterator1, typename InputIterator2,
+                 typename ModeAccumulator = typename pubkey::signing_accumulator_set<
+                     typename Mode::template bind<pubkey::signing_mode_policy<Mode>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
+            sign(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                 const pubkey::private_key<typename Mode::scheme_type> &key) {
+
+            typedef typename Mode::template bind<pubkey::signing_mode_policy<Mode>>::type SigningMode;
+
+            typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(first1, last1, first2, last2, ModeAccumulator(key));
+        }
     }    // namespace crypto3
 }    // namespace nil
 
