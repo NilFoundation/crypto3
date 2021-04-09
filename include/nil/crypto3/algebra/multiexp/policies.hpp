@@ -97,7 +97,7 @@ namespace nil {
                  * (https://eprint.iacr.org/2012/549.pdf)
                  * When compiled with USE_MIXED_ADDITION, assumes input is in special form.
                  * Requires that base_value_type implements .dbl() (and, if USE_MIXED_ADDITION is defined,
-                 * .to_special(), .mixed_add(), and batch_to_special()).
+                 * .to_projective(), .mixed_add(), and batch_to_projective()).
                  */
                 struct multiexp_method_BDLO12 {
                     template<typename InputBaseIterator, typename InputFieldIterator>

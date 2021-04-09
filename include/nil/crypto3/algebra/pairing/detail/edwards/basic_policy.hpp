@@ -47,10 +47,10 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using Fp_type = typename policy_type::scalar_field_type;
-                        using Fq_type = typename policy_type::g1_field_type;
-                        using Fqe_type = typename policy_type::g2_field_type;
-                        using Fqk_type = typename policy_type::gt_field_type;
+                        using fp_type = typename policy_type::scalar_field_type;
+                        using fq_type = typename policy_type::g1_field_type;
+                        using fqe_type = typename policy_type::g2_field_type;
+                        using fqk_type = typename policy_type::gt_field_type;
 
                         using g1_type = curves::detail::edwards_g1<183>;
                         using g2_type = curves::detail::edwards_g2<183>;

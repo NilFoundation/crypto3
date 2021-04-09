@@ -28,7 +28,8 @@ macro(define_runtime_algebra_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 17)
+    set_target_properties(algebra_${name}_test PROPERTIES CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED TRUE)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")

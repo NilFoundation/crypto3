@@ -194,7 +194,7 @@ enum curve_operation_test_points : std::size_t {
     p2_mul_C1_plus_p2_mul_C2,
     p1_dbl,
     p1_mixed_add_p2,
-    p1_to_affine_coordinates,
+    p1_to_affine,
     p2_to_special
 };
 
@@ -207,9 +207,9 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
     BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
-    typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine_coordinates();
-    BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
-    typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_special();
+    typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
+    BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
+    typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
     BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
     BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +

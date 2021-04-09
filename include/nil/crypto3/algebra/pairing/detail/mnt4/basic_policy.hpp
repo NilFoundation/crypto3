@@ -47,10 +47,10 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using Fp_type = typename policy_type::scalar_field_type;
-                        using Fq_type = typename policy_type::g1_field_type;
-                        using Fqe_type = typename policy_type::g2_field_type;
-                        using Fqk_type = typename policy_type::gt_field_type;
+                        using fp_type = typename policy_type::scalar_field_type;
+                        using fq_type = typename policy_type::g1_field_type;
+                        using fqe_type = typename policy_type::g2_field_type;
+                        using fqk_type = typename policy_type::gt_field_type;
 
                         using g1_type = curves::detail::mnt4_g1<298>;
                         using g2_type = curves::detail::mnt4_g2<298>;
@@ -64,13 +64,13 @@ namespace nil {
                         constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
 
                         constexpr static const number_type ate_loop_count =
-                            number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);
+                            0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149;
                         constexpr static const bool ate_is_loop_count_neg = false;
                         constexpr static const extended_number_type final_exponent = extended_number_type(
                             0x343C7AC3174C87A1EFE216B37AFB6D3035ACCA5A07B2394F42E0029264C0324A95E87DCB6C97234CBA7385B8D20FEA4E85074066818687634E61F58B68EA590B11CEE431BE8348DEB351384D8485E987A57004BB9A1E7A6036C7A5801F55AC8E065E41B012422619E7E69541C5980000_cppui894);
 
                         constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
-                            number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660001_cppui149);
+                            0x1EEF5546609756BEC2A33F0DC9A1B671660001_cppui149;
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = false;
                         constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                     };

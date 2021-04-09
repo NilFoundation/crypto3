@@ -65,10 +65,10 @@ namespace nil {
                     constexpr static const number_type final_exponent_last_chunk_w1 =
                         policy_type::final_exponent_last_chunk_w1;
 
-                    using Fp_type = typename policy_type::Fp_type;
-                    using Fq_type = typename policy_type::Fq_type;
-                    using Fqe_type = typename policy_type::Fqe_type;
-                    using Fqk_type = typename policy_type::Fqk_type;
+                    using fp_type = typename policy_type::fp_type;
+                    using fq_type = typename policy_type::fq_type;
+                    using fqe_type = typename policy_type::fqe_type;
+                    using fqk_type = typename policy_type::fqk_type;
 
                     using g1_type = typename policy_type::g1_type;
                     using g2_type = typename policy_type::g2_type;
@@ -109,14 +109,14 @@ namespace nil {
                         return policy_type::precompute_g2(Q);
                     }
 
-                    static inline typename gt_type::value_type pairing(const typename g1_type::value_type &P,
+                    static inline typename gt_type::value_type pair(const typename g1_type::value_type &P,
                                                                        const typename g2_type::value_type &Q) {
-                        return policy_type::pairing(P, Q);
+                        return policy_type::pair(P, Q);
                     }
 
-                    static inline typename gt_type::value_type reduced_pairing(const typename g1_type::value_type &P,
+                    static inline typename gt_type::value_type pair_reduced(const typename g1_type::value_type &P,
                                                                                const typename g2_type::value_type &Q) {
-                        return policy_type::reduced_pairing(P, Q);
+                        return policy_type::pair_reduced(P, Q);
                     }
 
                     static inline typename gt_type::value_type double_miller_loop(const g1_precomp &prec_P1,

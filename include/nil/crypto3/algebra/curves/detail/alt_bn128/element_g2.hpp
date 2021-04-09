@@ -355,7 +355,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_alt_bn128_g2 to_affine_coordinates() {
+                        element_alt_bn128_g2 to_affine() {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -378,8 +378,8 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_alt_bn128_g2 to_special() {
-                            return this->to_affine_coordinates();
+                        element_alt_bn128_g2 to_projective() {
+                            return this->to_affine();
                         }
 
                     private:

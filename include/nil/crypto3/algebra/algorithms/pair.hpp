@@ -32,14 +32,14 @@ namespace nil {
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing::affine_ate_g1_precomp
-                affine_ate_precompute_G1(const typename PairingCurveType::pairing::g1_type::value_type &P) {
+                affine_ate_precompute_g1(const typename PairingCurveType::pairing::g1_type::value_type &P) {
 
                 return PairingCurveType::pairing::affine_ate_precompute_g1(P);
             }
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing::affine_ate_g2_precomp
-                affine_ate_precompute_G2(const typename PairingCurveType::pairing::g2_type::value_type &P) {
+                affine_ate_precompute_g2(const typename PairingCurveType::pairing::g2_type::value_type &P) {
 
                 return PairingCurveType::pairing::affine_ate_precompute_g2(P);
             }
@@ -68,17 +68,17 @@ namespace nil {
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing::gt_type::value_type
-                pairing(const typename PairingCurveType::pairing::g1_type::value_type &v1,
-                        const typename PairingCurveType::pairing::g2_type::value_type &v2) {
-                return PairingCurveType::pairing::pairing(v1, v2);
+                pair(const typename PairingCurveType::pairing::g1_type::value_type &v1,
+                     const typename PairingCurveType::pairing::g2_type::value_type &v2) {
+                return PairingCurveType::pairing::pair(v1, v2);
             }
 
             template<typename PairingCurveType>
             typename PairingCurveType::pairing::gt_type::value_type
-                reduced_pairing(const typename PairingCurveType::pairing::g1_type::value_type &v1,
-                                const typename PairingCurveType::pairing::g2_type::value_type &v2) {
+                pair_reduced(const typename PairingCurveType::pairing::g1_type::value_type &v1,
+                             const typename PairingCurveType::pairing::g2_type::value_type &v2) {
 
-                return PairingCurveType::pairing::reduced_pairing(v1, v2);
+                return PairingCurveType::pairing::pair_reduced(v1, v2);
             }
 
             template<typename PairingCurveType>

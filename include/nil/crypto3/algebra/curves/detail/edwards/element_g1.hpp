@@ -287,7 +287,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from inverted coordinates to affine coordinates
                          */
-                        element_edwards_g1 to_affine_coordinates() const {
+                        element_edwards_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -312,7 +312,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from projective coordinates to affine coordinates
                          */
-                        element_edwards_g1 to_special() const {
+                        element_edwards_g1 to_projective() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->Z.is_zero()) {

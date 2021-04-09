@@ -214,11 +214,11 @@ void pairing_example() {
     std::cout << "g2_precomp_el2: ";
     print_ate_g2_precomp_element(g2_precomp_el2);
 
-    typename PairingT::GT_type gt_el1 = PairingT::reduced_pairing(g1_el1, g2_el1);
+    typename PairingT::GT_type gt_el1 = PairingT::pair_reduced(g1_el1, g2_el1);
     std::cout << "gt_el1: ";
     print_field_element(gt_el1);
 
-    typename PairingT::GT_type gt_el2 = PairingT::pairing(g1_el1, g2_el1);
+    typename PairingT::GT_type gt_el2 = PairingT::pair(g1_el1, g2_el1);
     std::cout << "gt_el2: ";
     print_field_element(gt_el2);
 

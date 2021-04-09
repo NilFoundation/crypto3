@@ -162,7 +162,7 @@ template<typename H2CType,
 void check_hash_to_curve(const std::string &msg_str, const GroupValueType &expected, const DstType &dst) {
     std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
     GroupValueType result = H2CType::hash_to_curve(msg, dst);
-    BOOST_CHECK_EQUAL(result.to_affine_coordinates(), expected);
+    BOOST_CHECK_EQUAL(result.to_affine(), expected);
 }
 
 BOOST_AUTO_TEST_SUITE(h2c_manual_tests)

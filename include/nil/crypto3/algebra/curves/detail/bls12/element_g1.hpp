@@ -374,7 +374,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_bls12_g1 to_affine_coordinates() const {
+                        constexpr element_bls12_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -397,12 +397,12 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_bls12_g1 to_special() const {
-                            return this->to_affine_coordinates();
+                        constexpr element_bls12_g1 to_projective() const {
+                            return this->to_affine();
                         }
 
                     private:
-                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value b = policy_type::b;
 
                         constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
@@ -724,7 +724,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_bls12_g1 to_affine_coordinates() const {
+                        element_bls12_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -746,12 +746,12 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_bls12_g1 to_special() const {
-                            return this->to_affine_coordinates();
+                        element_bls12_g1 to_projective() const {
+                            return this->to_affine();
                         }
 
                     private:
-                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value b = policy_type::b;
 
                         constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),

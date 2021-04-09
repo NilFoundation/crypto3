@@ -415,10 +415,10 @@ enum G2_enum : std::size_t { B1, B2, VKy, VKz };
 enum GT_enum : std::size_t {
     pairing_A1_B1,
     pairing_A2_B2,
-    reduced_pairing_A1_B1,
-    reduced_pairing_A2_B2,
-    reduced_pairing_A1_B1_mul_reduced_pairing_A2_B2,
-    reduced_pairing_VKx_poly_A1_B1,
+    pair_reduceding_A1_B1,
+    pair_reduceding_A2_B2,
+    pair_reduceding_A1_B1_mul_pair_reduceding_A2_B2,
+    pair_reduceding_VKx_poly_A1_B1,
     miller_loop_prec_A1_prec_B1,
     miller_loop_prec_A2_prec_B2,
     double_miller_loop_prec_A1_prec_B1_prec_A2_prec_B2
@@ -426,7 +426,7 @@ enum GT_enum : std::size_t {
 enum g1_precomp_enum : std::size_t { prec_A1, prec_A2 };
 enum g2_precomp_enum : std::size_t { prec_B1, prec_B2 };
 
-// TODO: add affine_reduced_pairing test
+// TODO: add affine_pair_reduceding test
 template<typename PairingT, typename Fr_value_type, typename G1_value_type, typename G2_value_type,
          typename GT_value_type, typename g1_precomp_value_type, typename g2_precomp_value_type>
 void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
@@ -458,43 +458,43 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     BOOST_CHECK_EQUAL(PairingT::precompute_g1(G1_elements[A2]), G1_prec_elements[prec_A2]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B1]), G2_prec_elements[prec_B1]);
     BOOST_CHECK_EQUAL(PairingT::precompute_g2(G2_elements[B2]), G2_prec_elements[prec_B2]);
-    BOOST_CHECK_EQUAL(PairingT::pairing(G1_elements[A1], G2_elements[B1]), GT_elements[pairing_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::pairing(G1_elements[A2], G2_elements[B2]), GT_elements[pairing_A2_B2]);
+    BOOST_CHECK_EQUAL(PairingT::pair(G1_elements[A1], G2_elements[B1]), GT_elements[pairing_A1_B1]);
+    BOOST_CHECK_EQUAL(PairingT::pair(G1_elements[A2], G2_elements[B2]), GT_elements[pairing_A2_B2]);
     std::cout << " * Precomputing and pairing tests finished." << std::endl << std::endl;
 
-    // TODO: activate after reduced_pairing->cyclotomic_exp fixed. Bugs in final_exponentiation_last_chunk
+    // TODO: activate after pair_reduceding->cyclotomic_exp fixed. Bugs in final_exponentiation_last_chunk
     std::cout << " * Reduced pairing tests started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]), GT_elements[reduced_pairing_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]),
-                      PairingT::reduced_pairing(G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::reduced_pairing(G1_elements[C1], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A2], G2_elements[B2]), GT_elements[reduced_pairing_A2_B2]);
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A2], G2_elements[B2]),
-                      PairingT::reduced_pairing(G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::reduced_pairing(G1_elements[C2], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]) *
-                          PairingT::reduced_pairing(G1_elements[A2], G2_elements[B2]),
-                      GT_elements[reduced_pairing_A1_B1_mul_reduced_pairing_A2_B2]);
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]), GT_elements[pair_reduceding_A1_B1]);
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]),
+                      PairingT::pair_reduced(G1_elements[VKx], G2_elements[VKy]) *
+                          PairingT::pair_reduced(G1_elements[C1], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]), GT_elements[pair_reduceding_A2_B2]);
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
+                      PairingT::pair_reduced(G1_elements[VKx], G2_elements[VKy]) *
+                          PairingT::pair_reduced(G1_elements[C2], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]) *
+                          PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
+                      GT_elements[pair_reduceding_A1_B1_mul_pair_reduceding_A2_B2]);
     std::cout << " * Reduced pairing tests finished." << std::endl << std::endl;
 
     // TODO: activate when scalar multiplication done
     std::cout << " * Reduced pairing tests with scalar multiplication started..." << std::endl;
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]) *
-                          PairingT::reduced_pairing(G1_elements[A2], G2_elements[B2]),
-                      PairingT::reduced_pairing(Fr_value_type(2) * G1_elements[VKx], G2_elements[VKy]) *
-                          PairingT::reduced_pairing(G1_elements[C1] + G1_elements[C2], G2_elements[VKz]));
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
-                      GT_elements[reduced_pairing_VKx_poly_A1_B1]);
-    BOOST_CHECK_EQUAL(PairingT::reduced_pairing(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
-                      PairingT::reduced_pairing(G1_elements[A1], Fr_elements[VKx_poly] * G2_elements[B1]));
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]) *
+                          PairingT::pair_reduced(G1_elements[A2], G2_elements[B2]),
+                      PairingT::pair_reduced(Fr_value_type(2) * G1_elements[VKx], G2_elements[VKy]) *
+                          PairingT::pair_reduced(G1_elements[C1] + G1_elements[C2], G2_elements[VKz]));
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+                      GT_elements[pair_reduceding_VKx_poly_A1_B1]);
+    BOOST_CHECK_EQUAL(PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+                      PairingT::pair_reduced(G1_elements[A1], Fr_elements[VKx_poly] * G2_elements[B1]));
     std::cout << " * Reduced pairing tests with scalar multiplication finished." << std::endl << std::endl;
 
     // TODO: activate when pow will be override with field element
     std::cout << " * Reduced pairing tests with pow started..." << std::endl;
     BOOST_CHECK_EQUAL(
-        PairingT::reduced_pairing(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
+        PairingT::pair_reduced(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
         // TODO: fix pow to accept field element as exponent
-        PairingT::reduced_pairing(G1_elements[A1], G2_elements[B1]).pow(cpp_int(Fr_elements[VKx_poly].data)));
+        PairingT::pair_reduced(G1_elements[A1], G2_elements[B1]).pow(cpp_int(Fr_elements[VKx_poly].data)));
     std::cout << " * Reduced pairing tests with pow finished." << std::endl << std::endl;
 
     std::cout << " * Miller loop tests started..." << std::endl;
@@ -863,7 +863,7 @@ void pairing_test_init(std::vector<Fr_value_type> &Fr_elements,
 
 template<typename PairingT, typename TestSet>
 void pairing_operation_test(const TestSet &test_set) {
-    std::vector<typename PairingT::Fp_type::value_type> Fr_elements;
+    std::vector<typename PairingT::fp_type::value_type> Fr_elements;
     std::vector<typename PairingT::g1_type::value_type> G1_elements;
     std::vector<typename PairingT::g2_type::value_type> G2_elements;
     std::vector<typename PairingT::gt_type::value_type> GT_elements;
@@ -878,7 +878,7 @@ void pairing_operation_test(const TestSet &test_set) {
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-// TODO: fix reduced_pairing
+// TODO: fix pair_reduceding
 BOOST_DATA_TEST_CASE(pairing_operation_test_bls12_381, string_data("pairing_operation_test_bls12_381"), data_set) {
     using pairing_policy = typename curves::bls12<381>::pairing;
 
