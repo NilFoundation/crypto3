@@ -39,9 +39,7 @@ namespace nil {
                 template<typename CurveType,
                          typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
-                         typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                         typename OnlineVerifier =
-                             r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>>
+                         typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>>
                 class r1cs_gg_ppzksnark {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
@@ -68,16 +66,10 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verify(const verification_key_type &vk,
+                    static inline bool verify(const typename Verifier::verification_key_type &vk,
                                               const primary_input_type &primary_input,
                                               const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
-                    }
-
-                    static inline bool online_verify(const processed_verification_key_type &pvk,
-                                                     const primary_input_type &primary_input,
-                                                     const proof_type &proof) {
-                        return OnlineVerifier::process(pvk, primary_input, proof);
                     }
                 };
             }    // namespace snark

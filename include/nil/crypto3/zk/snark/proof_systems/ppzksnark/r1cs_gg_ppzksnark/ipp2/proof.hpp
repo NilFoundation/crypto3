@@ -30,7 +30,7 @@
 #include <vector>
 #include <tuple>
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commit.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,11 +46,11 @@ namespace nil {
                 template<typename CurveType>
                 struct gipa_proof {
                     std::uint32_t nproofs;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_commitment_output<CurveType>,
-                                          r1cs_gg_ppzksnark_commitment_output<CurveType>>>
+                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
+                                          r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
                         comms_ab;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_commitment_output<CurveType>,
-                                          r1cs_gg_ppzksnark_commitment_output<CurveType>>>
+                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
+                                          r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
                         comms_c;
                     std::vector<std::pair<typename CurveType::pairing::fqk_type, typename CurveType::pairing::fqk_type>>
                         z_ab;
@@ -64,8 +64,8 @@ namespace nil {
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    r1cs_gg_ppzksnark_vkey<CurveType> final_vkey;
-                    r1cs_gg_ppzksnark_wkey<CurveType> final_2key;
+                    r1cs_gg_ppzksnark_ipp2_vkey<CurveType> final_vkey;
+                    r1cs_gg_ppzksnark_ipp2_wkey<CurveType> final_wkey;
                 };
 
                 template<typename CurveType>

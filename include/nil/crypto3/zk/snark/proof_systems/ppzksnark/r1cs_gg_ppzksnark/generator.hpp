@@ -51,6 +51,7 @@
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 
 #include <memory>
+#include <random>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
@@ -102,6 +103,9 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
+                    template<typename DistributionType =
+                                 boost::random::uniform_int_distribution<typename CurveType::value_type::modulus_type>,
+                             typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type process(const constraint_system_type &cs) {
 
                         /* Make the B_query "lighter" if possible */
@@ -109,15 +113,16 @@ namespace nil {
                         r1cs_copy.swap_AB_if_beneficial();
 
                         /* Generate secret randomness */
-                        const typename scalar_field_type::value_type t = algebra::random_element<scalar_field_type>();
+                        const typename scalar_field_type::value_type t =
+                            algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         const typename scalar_field_type::value_type alpha =
-                            algebra::random_element<scalar_field_type>();
+                            algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         const typename scalar_field_type::value_type beta =
-                            algebra::random_element<scalar_field_type>();
+                            algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         const typename scalar_field_type::value_type gamma =
-                            algebra::random_element<scalar_field_type>();
+                            algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         const typename scalar_field_type::value_type delta =
-                            algebra::random_element<scalar_field_type>();
+                            algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         const typename scalar_field_type::value_type gamma_inverse = gamma.inversed();
                         const typename scalar_field_type::value_type delta_inverse = delta.inversed();
 
@@ -232,8 +237,7 @@ namespace nil {
                         algebra::batch_to_special<g1_type>(L_query);
 #endif
 
-                        typename gt_type::value_type alpha_g1_beta_g2 =
-                            pairing_policy::pair_reduced(alpha_g1, beta_g2);
+                        typename gt_type::value_type alpha_g1_beta_g2 = pairing_policy::pair_reduced(alpha_g1, beta_g2);
                         typename g2_type::value_type gamma_g2 = gamma * G2_gen;
 
                         typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
@@ -259,7 +263,7 @@ namespace nil {
                                                                std::move(L_query),
                                                                std::move(r1cs_copy));
 
-                        return keypair_type(std::move(pk), std::move(vk));
+                        return {std::move(pk), std::move(vk)};
                     }
                 };
             }    // namespace snark
