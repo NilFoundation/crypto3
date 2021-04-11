@@ -84,7 +84,7 @@ namespace nil {
                             result = result + (*scalar_it) * (*vec_it);
                         }
 
-                        assert(scalar_it == scalar_end);
+                        BOOST_ASSERT(scalar_it == scalar_end);
 
                         return result;
                     }
@@ -110,22 +110,16 @@ namespace nil {
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
                         typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_number_type;
-
                         std::size_t length = std::distance(bases, bases_end);
 
                         // empirically, this seems to be a decent estimate of the optimal value of c
                         std::size_t log2_length = std::log2(length);
                         std::size_t c = log2_length - (log2_length / 3 - 2);
 
-                        std::vector<non_fixed_precision_number_type> bn_exponents(length);
                         std::size_t num_bits = 0;
 
                         for (std::size_t i = 0; i < length; i++) {
-                            bn_exponents[i] = non_fixed_precision_number_type(exponents[i].data);
-                            std::size_t bn_exponents_i_msb = multiprecision::msb(bn_exponents[i]) + 1;
+                            std::size_t bn_exponents_i_msb = multiprecision::msb(exponents[i].data) + 1;
                             num_bits = std::max(num_bits, bn_exponents_i_msb);
                         }
 
@@ -147,7 +141,7 @@ namespace nil {
                             for (std::size_t i = 0; i < length; i++) {
                                 std::size_t id = 0;
                                 for (std::size_t j = 0; j < c; j++) {
-                                    if (multiprecision::bit_test(bn_exponents[i], k * c + j)) {
+                                    if (multiprecision::bit_test(exponents[i].data, k * c + j)) {
                                         id |= 1 << j;
                                     }
                                 }
