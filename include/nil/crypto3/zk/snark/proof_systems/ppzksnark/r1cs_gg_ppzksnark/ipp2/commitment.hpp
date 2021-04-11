@@ -250,8 +250,21 @@ namespace nil {
                         u1.mul_assign(&u2);
                         return {t1.mul_assign(t2), u1.mul_assign(u2)};
                     }
+
+                    /// Commits to a single vector of G1 elements in the following way:
+                    /// $T = \prod_{i=0}^n e(A_i, v_{1,i})$
+                    /// $U = \prod_{i=0}^n e(A_i, v_{2,i})$
+                    /// Output is $(T,U)$
+                    template<typename InputG1Iterator>
+                    output_type pair(const vkey_type &vkey, InputG1Iterator afirst, InputG1Iterator alast) {
+                        return {algebra::pair(afirst, alast, vkey.a), algebra::pair(afirst, alast, vkey.b)};
+                    }
                 };
 
+                /// Commits to a tuple of G1 vector and G2 vector in the following way:
+                /// $T = \prod_{i=0}^n e(A_i, v_{1,i})e(B_i,w_{1,i})$
+                /// $U = \prod_{i=0}^n e(A_i, v_{2,i})e(B_i,w_{2,i})$
+                /// Output is $(T,U)$
                 template<typename ProofSchemeCommitmentType, typename InputG1Iterator, typename InputG2Iterator>
                 typename ProofSchemeCommitmentType::output_type
                     pair(const typename ProofSchemeCommitmentType::vkey_type &vkey,
@@ -269,6 +282,17 @@ namespace nil {
                     t1.mul_assign(&t2);
                     u1.mul_assign(&u2);
                     return {t1.mul_assign(t2), u1.mul_assign(u2)};
+                }
+
+                /// Commits to a single vector of G1 elements in the following way:
+                /// $T = \prod_{i=0}^n e(A_i, v_{1,i})$
+                /// $U = \prod_{i=0}^n e(A_i, v_{2,i})$
+                /// Output is $(T,U)$
+                template<typename ProofSchemeCommitmentType, typename InputG1Iterator>
+                typename ProofSchemeCommitmentType::output_type
+                    pair(const typename ProofSchemeCommitmentType::vkey_type &vkey, InputG1Iterator afirst,
+                         InputG1Iterator alast) {
+                    return {algebra::pair(afirst, alast, vkey.a), algebra::pair(afirst, alast, vkey.b)};
                 }
             }    // namespace snark
         }        // namespace zk

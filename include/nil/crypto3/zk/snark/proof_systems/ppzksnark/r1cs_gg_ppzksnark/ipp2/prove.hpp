@@ -26,9 +26,19 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_PROVE_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_PROVE_HPP
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include <tuple>
+
+#include <boost/iterator/zip_iterator.hpp>
+
+#include <nil/crypto3/detail/pack_numeric.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
@@ -37,8 +47,42 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /// Returns the vector used for the linear combination fo the inner pairing product
+                /// between A and B for the Groth16 aggregation: A^r * B. It is required as it
+                /// is not enough to simply prove the ipp of A*B, we need a random linear
+                /// combination of those.
+                template<typename FieldType>
+                std::vector<typename FieldType::value_type>
+                    structured_scalar_power(std::size_t num, const typename FieldType::value_type &s) {
+                    std::vector<typename FieldType::value_type> powers = {FieldType::value_type::one()};
+                    for (int i = 1; i < num; i++) {
+                        powers.emplace_back(powers[i - 1] * s);
+                    }
+                    return powers;
+                }
+
+                /// compress is similar to commit::{V,W}KEY::compress: it modifies the `vec`
+                /// vector by setting the value at index $i:0 -> split$  $vec[i] = vec[i] +
+                /// vec[i+split]^scaler$. The `vec` vector is half of its size after this call.
+                template<typename CurveType>
+                void compress(std::vector<typename CurveType::value_type> &vec, std::size_t split,
+                              const typename CurveType::scalar &scaler) {
+                    std::vector<typename CurveType::value_type> left = {vec.begin(), vec.begin() + split},
+                                                                right = {vec.begin() + split, vec.end()};
+                    std::for_each(boost::make_zip_iterator(std::make_tuple(left.begin(), right.begin())),
+                                  boost::make_zip_iterator(std::make_tuple(left.end(), right.end())),
+                                  [&](const std::tuple<const typename CurveType::value_type &,
+                                                       const typename CurveType::value_type &> &t) {
+                                      auto x = std::get<1>(t).to_projective() * scaler;
+                                      x += std::get<0>(t);
+                                      std::get<0>(t) = x.to_affine();
+                                  });
+
+                    vec.resize(left.size());
+                }
+
                 /// Aggregate `n` zkSnark proofs, where `n` must be a power of two.
-                template<typename CurveType, typename InputProofIterator>
+                template<typename CurveType, typename InputProofIterator, typename Hash = hashes::sha2<256>>
                 typename std::enable_if<std::is_same<typename std::iterator_traits<InputProofIterator>::value_type,
                                                      r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::value,
                                         r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::type
@@ -48,43 +92,73 @@ namespace nil {
                     BOOST_ASSERT((size & (size - 1)) == 0);
                     BOOST_ASSERT(srs.valid(size));
 
+                    std::vector<typename CurveType::g1_type::value_type> a, c;
+                    std::vector<typename CurveType::g2_type::value_type> b;
+
                     // We first commit to A B and C - these commitments are what the verifier
                     // will use later to verify the TIPP and MIPP proofs
-                    par ! {let a = proofs.iter().map(| proof | proof.a).collect::<Vec<_>>(),
-                           let b = proofs.iter().map(| proof | proof.b).collect::<Vec<_>>(),
-                           let c = proofs.iter().map(| proof | proof.c).collect::<Vec<_>>()};
+                    while (first != last) {
+                        a.emplace_back(*first.g_A);
+                        b.emplace_back(*first.g_B);
+                        c.emplace_back(*first.g_C);
+                        ++first;
+                    }
 
                     // A and B are committed together in this scheme
                     // we need to take the reference so the macro doesn't consume the value
                     // first
-                    let refa = &a;
-                    let refb = &b;
-                    let refc = &c;
-                    par ! {let com_ab = commit::pair::<E>(&srs.vkey, &srs.wkey, refa, refb),
-                           let com_c = commit::single_g1::<E>(&srs.vkey, refc)};
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_ab =
+                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(srs.vkey, srs.wkey, a.begin(), a.end(),
+                                                                           b.begin(), b.end());
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_c =
+                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(srs.vkey, c.begin(), c.end());
 
                     // Random linear combination of proofs
-                    let r = oracle !(&com_ab .0, &com_ab .1, &com_c .0, &com_c .1);
+                    std::size_t counter_nonce = 1;
+                    std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
+                    detail::pack<stream_endian::big_byte_big_bit>({counter_nonce}, counter_nonce_bytes);
+                    accumulator_set<Hash> acc;
+
+                    hash<Hash>(counter_nonce_bytes, acc);
+                    hash<Hash>(std::get<0>(com_ab), acc);
+                    hash<Hash>(std::get<1>(com_ab), acc);
+                    hash<Hash>(std::get<0>(com_c), acc);
+                    hash<Hash>(std::get<1>(com_c), acc);
+
+                    typename Hash::digest_type d = accumulators::extract::hash<Hash>(acc);
+                    typename CurveType::scalar_field_type::value_type r;
+                    detail::pack(d, r.data);
+                    r = r.inversed();
+
                     // r, r^2, r^3, r^4 ...
-                    let r_vec = structured_scalar_power(proofs.len(), &r);
+                    std::vector<typename CurveType::scalar_field_type::value_type> r_vec =
+                        structured_scalar_power<typename CurveType::scalar_field_type>(std::distance(first, last), r);
                     // r^-1, r^-2, r^-3
-                    let r_inv = r_vec.par_iter().map(| ri | ri.inverse().unwrap()).collect::<Vec<_>>();
+                    std::vector<typename CurveType::scalar_field_type::value_type> r_inv;
+                    for (const typename CurveType::scalar_field_type::value_type &ri : r_vec) {
+                        r_inv.emplace_back(ri.inversed());
+                    }
 
                     // B^{r}
-                    let b_r = b.par_iter()
-                                  .zip(r_vec.par_iter())
-                                  .map(| (bi, ri) | mul !(bi.into_projective(), ri.into_repr()).into_affine())
-                                  .collect::<Vec<_>>();
-                    let refb_r = &b_r;
+                    std::vector<typename CurveType::scalar_field_type::value_type> b_r;
+                    std::for_each(boost::make_zip_iterator(std::make_tuple(b.begin(), r_vec.begin())),
+                                  boost::make_zip_iterator(std::make_tuple(b.end(), r_vec.end())),
+                                  [&](const std::tuple<const typename CurveType::g2_type::value_type &,
+                                                       const typename CurveType::scalar_field_type::value_type &> &t) {
+                                      b_r.emplace_back((std::get<0>(t).to_projective() * std::get<1>(t)).to_affine());
+                                  });
+
                     // w^{r^{-1}}
-                    let wkey_r_inv = srs.wkey.scale(&r_inv);
+                    auto wkey_r_inv = srs.wkey.scale(r_inv);
 
                     // we prove tipp and mipp using the same recursive loop
-                    let proof = prove_tipp_mipp::<E>(&srs, &a, &b_r, &c, &wkey_r_inv, &r_vec) ? ;
-                    par ! {// compute A * B^r for the verifier
-                           let ip_ab = inner_product::pairing::<E>(&refa, &refb_r),
-                           // compute C^r for the verifier
-                           let agg_c = inner_product::multiexponentiation::<E::G1Affine>(&refc, &r_vec)};
+                    tipp_mipp_proof<CurveType> proof =
+                        prove_tipp_mipp(srs, wkey_r_inv, a.begin(), a.end(), b_r.begin(), b_r.end(), c.begin(), c.end(),
+                                        r_vec.begin(), r_vec.end());
+                    // compute A * B^r for the verifier
+                    auto ip_ab = algebra::pair<CurveType>(a, b_r);
+                    // compute C^r for the verifier
+                    auto agg_c = algebra::multiexp<algebra::multiexp_method_bos_coster>(c, r_vec);
 
                     debug_assert !({
                         let computed_com_ab = commit::pair::<E>(&srs.vkey, &wkey_r_inv, &a, &b_r);
@@ -107,7 +181,7 @@ namespace nil {
                 /// only one KZG proof is needed for v. In the original paper version, since the
                 /// challenges of GIPA would be different, two KZG proofs would be needed.
                 template<typename CurveType, typename InputG1Iterator, typename InputG2Iterator,
-                         typename InputScalarIterator>
+                         typename InputScalarIterator, typename Hash = hashes::sha2<256>>
                 tipp_mipp_proof<CurveType> prove_tipp_mipp(const r1cs_gg_ppzksnark_srs_proving_key<CurveType> &srs,
                                                            const r1cs_gg_ppzksnark_ipp2_wkey<CurveType> &wkey,
                                                            InputG1Iterator afirst, InputG1Iterator alast,
@@ -122,37 +196,44 @@ namespace nil {
 
                     // Run GIPA
                     std::tuple<gipa_proof<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
-                               std::vector<typename CurveType::scalar_field_type::value_type>> =
-                        gipa_tipp_mipp(afirst, alast, bfirst, blast, cfirst, clast, rfirst, rlast, srs.vkey, wkey);
+                               std::vector<typename CurveType::scalar_field_type::value_type>>
+                        gtm =
+                            gipa_tipp_mipp(afirst, alast, bfirst, blast, cfirst, clast, rfirst, rlast, srs.vkey, wkey);
 
                     // Prove final commitment keys are wellformed
                     // we reverse the transcript so the polynomial in kzg opening is constructed
                     // correctly - the formula indicates x_{l-j}. Also for deriving KZG
                     // challenge point, input must be the last challenge.
-                    challenges.reverse();
-                    challenges_inv.reverse();
+                    std::reverse(std::get<1>(gtm).begin(), std::get<1>(gtm).end());
+                    std::reverse(std::get<2>(gtm).begin(), std::get<2>(gtm).end());
                     typename std::iterator_traits<InputScalarIterator>::value_type r_inverse = r_shift.inverse();
 
                     // KZG challenge point
-                    let z = oracle !(&challenges[0],
-                                     &proof.final_vkey .0,
-                                     &proof.final_vkey .1,
-                                     &proof.final_wkey .0,
-                                     &proof.final_wkey .1);
+                    std::size_t counter_nonce = 1;
+                    std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
+                    detail::pack<stream_endian::big_byte_big_bit>({counter_nonce}, counter_nonce_bytes);
+                    accumulator_set<Hash> acc;
+
+                    hash<Hash>(counter_nonce_bytes, acc);
+                    hash<Hash>(*std::get<1>(gtm).begin(), acc);
+                    hash<Hash>(std::get<0>(std::get<0>(gtm).final_vkey), acc);
+                    hash<Hash>(std::get<1>(std::get<0>(gtm).final_vkey), acc);
+                    hash<Hash>(std::get<0>(std::get<0>(gtm).final_wkey), acc);
+                    hash<Hash>(std::get<1>(std::get<0>(gtm).final_wkey), acc);
+
+                    typename Hash::digest_type d = accumulators::extract::hash<Hash>(acc);
+                    typename CurveType::scalar_field_type::value_type z;
+                    multiprecision::import_bits(z.data, d);
+                    z = z.inversed();
 
                     // Complete KZG proofs
-                    par ! {let vkey_opening =
-                               prove_commitment_key_kzg_opening(&srs.h_alpha_powers_table, &srs.h_beta_powers_table,
-                                                                srs.n, &challenges_inv, &<E::Fr>::one(), &z, ),
-                           let wkey_opening =
-                               prove_commitment_key_kzg_opening(&srs.g_alpha_powers_table, &srs.g_beta_powers_table,
-                                                                srs.n, &challenges, &r_inverse, &z, )};
+                    kzg_opening<typename CurveType::g2_type> vkey_opening = prove_commitment_key_kzg_opening(
+                        srs.h_alpha_powers_table, srs.h_beta_powers_table, srs.n, std::get<2>(gtm),
+                        CurveType::scalar_field_type::value_type::one(), z);
+                    kzg_opening<typename CurveType::g1_type> wkey_opening = prove_commitment_key_kzg_opening(
+                        srs.g_alpha_powers_table, srs.g_beta_powers_table, srs.n, std::get<1>(gtm), r_inverse, z);
 
-    Ok(TippMippProof {
-        gipa: proof,
-        vkey_opening: vkey_opening?,
-        wkey_opening: wkey_opening?,
-    })
+                    return {std::get<0>(gtm), vkey_opening, wkey_opening};
                 }
 
                 /*
@@ -163,7 +244,7 @@ namespace nil {
                  * @param wkey scaled key w^r^-1
                  */
                 template<typename CurveType, typename InputG1Iterator, typename InputG2Iterator,
-                         typename InputScalarIterator>
+                         typename InputScalarIterator, typename Hash = hashes::sha2<256>>
                 std::tuple<gipa_proof<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
                            std::vector<typename CurveType::scalar_field_type::value_type>>
                     gipa_tipp_mipp(InputG1Iterator afirst, InputG1Iterator alast, InputG2Iterator bfirst,
@@ -185,8 +266,7 @@ namespace nil {
                     let mut comms_c = Vec::new ();
                     let mut z_ab = Vec::new ();
                     let mut z_c = Vec::new ();
-                    let mut challenges : Vec<E::Fr> = Vec::new ();
-                    let mut challenges_inv : Vec<E::Fr> = Vec::new ();
+                    std::vector<typename CurveType::scalar_field_type::value_type> challenges, challenges_inv;
 
                     while (m_a.size() > 1) {
                         // recursive step
@@ -194,64 +274,87 @@ namespace nil {
                         std::size_t split = m_a.size() / 2;
 
                         // TIPP ///
-                        let(a_left, a_right) = m_a.split_at_mut(split);
-                        let(b_left, b_right) = m_b.split_at_mut(split);
+                        std::vector<typename std::iterator_traits<InputG1Iterator>::value_type>
+                            a_left = {m_a.begin(), m_a.begin() + split},
+                            a_right = {m_a.begin() + split, m_a.end()};
+                        std::vector<typename std::iterator_traits<InputG2Iterator>::value_type>
+                            b_left = {m_b.begin(), m_b.begin() + split},
+                            b_right = {m_b.begin() + split, m_b.end()};
                         // MIPP ///
                         // c[:n']   c[n':]
-                        let(c_left, c_right) = m_c.split_at_mut(split);
+                        std::vector<typename std::iterator_traits<InputG1Iterator>::value_type>
+                            c_left = {m_c.begin() + m_c.begin() + split},
+                            c_right = {m_c.begin() + split, m_c.end()};
                         // r[:n']   r[:n']
-                        let(r_left, r_right) = m_r.split_at_mut(split);
+                        std::vector<typename std::iterator_traits<InputScalarIterator>::value_type>
+                            r_left = {m_r.begin(), m_r.begin() + split},
+                            r_right = {m_r.begin() + split, m_r.end()};
 
-                        let(vk_left, vk_right) = vkey.split(split);
-                        let(wk_left, wk_right) = wkey.split(split);
+                        r1cs_gg_ppzksnark_ipp2_vkey<CurveType> vk_left = {{vkey.a.begin(), vkey.a.begin() + split},
+                                                                          {vkey.b.begin(), vkey.b.begin() + split}},
+                                                               vk_right = {{vkey.a.begin() + split, vkey.a.end()},
+                                                                           {vkey.b.begin() + split, vkey.b.end()}};
 
-                        // since we do this in parallel we take reference first so it can be
-                        // moved within the macro's rayon scope.
-                        let(rvk_left, rvk_right) = (&vk_left, &vk_right);
-                        let(rwk_left, rwk_right) = (&wk_left, &wk_right);
-                        let(ra_left, ra_right) = (&a_left, &a_right);
-                        let(rb_left, rb_right) = (&b_left, &b_right);
-                        let(rc_left, rc_right) = (&c_left, &c_right);
-                        let(rr_left, rr_right) = (&r_left, &r_right);
+                        r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wk_left = {{wkey.a.begin(), wkey.a.begin() + split},
+                                                                          {wkey.b.begin(), wkey.b.begin() + split}},
+                                                               wk_right = {{wkey.a.begin() + split, wkey.a.end()},
+                                                                           {wkey.b.begin() + split, wkey.b.end()}};
+
                         // See section 3.3 for paper version with equivalent names
-                        par ! {// TIPP part
-                               let tab_l = commit::pair::<E>(&rvk_left, &rwk_right, &ra_right, &rb_left),
-                               let tab_r = commit::pair::<E>(&rvk_right, &rwk_left, &ra_left, &rb_right),
-                               let zab_l = inner_product::pairing::<E>(&ra_right, &rb_left),
-                               let zab_r = inner_product::pairing::<E>(&ra_left, &rb_right),
+                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_l =
+                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_left, wk_right, a_right, b_left);
+                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_r =
+                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_right, wk_left, a_left, b_right);
 
-                               // MIPP part
-                               // z_l = c[n':] ^ r[:n']
-                               let zc_l = inner_product::multiexponentiation::<E::G1Affine>(rc_right, rr_left),
-                               // Z_r = c[:n'] ^ r[n':]
-                               let zc_r = inner_product::multiexponentiation::<E::G1Affine>(rc_left, rr_right),
-                               // u_l = c[n':] * v[:n']
-                               let tuc_l = commit::single_g1::<E>(&rvk_left, rc_right),
-                               // u_r = c[:n'] * v[n':]
-                               let tuc_r = commit::single_g1::<E>(&rvk_right, rc_left)};
+                        // TIPP part
+                        auto zab_l = algebra::pair<CurveType>(a_right, b_left);
+                        auto zab_r = algebra::pair<CurveType>(a_left, b_right);
+
+                        // MIPP part
+                        // z_l = c[n':] ^ r[:n']
+                        auto zc_l = algebra::multiexp<multiexp_method_bos_coster>(c_right, r_left);
+                        // Z_r = c[:n'] ^ r[n':]
+                        auto zc_r = algebra::multiexp<multiexp_method_bos_coster>(c_left, r_right);
+                        // u_l = c[n':] * v[:n']
+                        auto tuc_l = r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_left, c_right);
+                        // u_r = c[:n'] * v[n':]
+                        auto tuc_r = r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_right, c_left);
 
                         // Fiat-Shamir challenge
-                        let default_transcript = E::Fr::zero();
-                        let transcript = challenges.last().unwrap_or(&default_transcript);
+                        typename CurveType::scalar_field_type::value_type default_transcript =
+                            typename CurveType::scalar_field_type::value_type::zero();
+                        auto transcript = challenges.empty() ? default_transcript : *(challenges.end() - 1);
 
                         // combine both TIPP and MIPP transcript
-                        let c_inv = oracle !(&transcript,
-                                             &tab_l .0,
-                                             &tab_l .1,
-                                             &tab_r .0,
-                                             &tab_r .1,
-                                             &zab_l,
-                                             &zab_r,
-                                             &zc_l,
-                                             &zc_r,
-                                             &tuc_l .0,
-                                             &tuc_l .1,
-                                             &tuc_r .0,
-                                             &tuc_r .1);
+                        std::size_t counter_nonce = 1;
+                        std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
+                        detail::pack<stream_endian::big_byte_big_bit>({counter_nonce}, counter_nonce_bytes);
+                        accumulator_set<Hash> acc;
+
+                        hash<Hash>(counter_nonce_bytes, acc);
+                        hash<Hash>(transcript, acc);
+                        hash<Hash>(std::get<0>(tab_l), acc);
+                        hash<Hash>(std::get<1>(tab_l), acc);
+                        hash<Hash>(std::get<0>(tab_r), acc);
+                        hash<Hash>(std::get<1>(tab_r), acc);
+                        hash<Hash>(zab_l, acc);
+                        hash<Hash>(zab_r, acc);
+                        hash<Hash>(zc_l, acc);
+                        hash<Hash>(zc_r, acc);
+                        hash<Hash>(std::get<0>(tuc_l), acc);
+                        hash<Hash>(std::get<1>(tuc_l), acc);
+                        hash<Hash>(std::get<0>(tuc_r), acc);
+                        hash<Hash>(std::get<1>(tuc_r), acc);
+
+                        typename hashes::sha2<256>::digest_type d = accumulators::extract::hash<hashes::sha2<256>>(acc);
+                        typename CurveType::scalar_field_type::value_type c_inv;
+                        detail::pack(d, c_inv.data);
+                        c_inv = c_inv.inversed();
+
                         // Optimization for multiexponentiation to rescale G2 elements with
                         // 128-bit challenge Swap 'c' and 'c_inv' since can't control bit size
                         // of c_inv
-                        let c = c_inv.inverse().unwrap();
+                        typename CurveType::scalar_field_type::value_type c = c_inv.inversed();
 
                         // Set up values for next step of recursion
                         // A[:n'] + A[n':] ^ x
@@ -308,14 +411,13 @@ namespace nil {
                 /// Returns the KZG opening proof for the given commitment key. Specifically, it
                 /// returns $g^{f(alpha) - f(z) / (alpha - z)}$ for $a$ and $b$.
                 template<typename CurveType>
-                kzg_opening<CurveType> prove_commitment_key_kzg_opening(srs_powers_alpha_table
-                                                                        : &dyn MultiscalarPrecomp<G>,
-                                                                          srs_powers_beta_table
-                                                                        : &dyn MultiscalarPrecomp<G>, srs_powers_len
-                                                                        : usize, transcript
-                                                                        : &[G::Scalar], r_shift
-                                                                        : &G::Scalar, kzg_challenge
-                                                                        : &G::Scalar) {
+                kzg_opening<CurveType>
+                    prove_commitment_key_kzg_opening(MultiscalarPrecomp<CurveType> &srs_powers_alpha_table,
+                                                     MultiscalarPrecomp<CurveType> &srs_powers_beta_table,
+                                                     std::size_t srs_powers_len, transcript
+                                                     : &[G::Scalar], r_shift
+                                                     : &G::Scalar, kzg_challenge
+                                                     : &G::Scalar) {
                     // f_v
                     let vkey_poly =
                         DensePolynomial::from_coeffs(polynomial_coefficients_from_transcript(transcript, r_shift));
@@ -420,7 +522,7 @@ namespace nil {
                     while (transcript_first != transcript_last) {
                         std::size_t n = coefficients.size();
                         for (int j = 0; j < n; j++) {
-                            corfficients.emplace_back(coefficients[j] * (*transcript_first * power_2_r));
+                            coefficients.emplace_back(coefficients[j] * (*transcript_first * power_2_r));
                         }
                         power_2_r *= power_2_r;
 

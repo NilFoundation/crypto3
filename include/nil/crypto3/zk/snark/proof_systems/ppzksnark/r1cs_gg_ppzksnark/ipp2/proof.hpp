@@ -83,9 +83,9 @@ namespace nil {
                 struct r1cs_gg_ppzksnark_aggregate_proof {
                     /// commitment to A and B using the pair commitment scheme needed to verify
                     /// TIPP relation.
-                    r1cs_gg_ppzksnark_commitment_output<CurveType> com_ab;
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_ab;
                     /// commit to C separate since we use it only in MIPP
-                    r1cs_gg_ppzksnark_commitment_output<CurveType> com_c;
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
                     typename CurveType::pairing::fqk_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
