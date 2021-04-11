@@ -17,4 +17,4 @@ To actually include this library in a project it is required to:
 * [Public Key Cryptography](https://github.com/nilfoundation/pubkey.git)
 
 ### External
-* [Boost](https://boost.org) (>= 1.58)
+* [Boost](https://boost.org) (>= 1.73)
