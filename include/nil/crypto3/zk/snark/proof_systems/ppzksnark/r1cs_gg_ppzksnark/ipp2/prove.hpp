@@ -39,6 +39,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
@@ -64,15 +65,15 @@ namespace nil {
                 /// compress is similar to commit::{V,W}KEY::compress: it modifies the `vec`
                 /// vector by setting the value at index $i:0 -> split$  $vec[i] = vec[i] +
                 /// vec[i+split]^scaler$. The `vec` vector is half of its size after this call.
-                template<typename CurveType>
-                void compress(std::vector<typename CurveType::value_type> &vec, std::size_t split,
-                              const typename CurveType::scalar &scaler) {
-                    std::vector<typename CurveType::value_type> left = {vec.begin(), vec.begin() + split},
-                                                                right = {vec.begin() + split, vec.end()};
+                template<typename CurveAffine>
+                void compress(std::vector<typename CurveAffine::value_type> &vec, std::size_t split,
+                              const typename CurveAffine::scalar &scaler) {
+                    std::vector<typename CurveAffine::value_type> left = {vec.begin(), vec.begin() + split},
+                                                                  right = {vec.begin() + split, vec.end()};
                     std::for_each(boost::make_zip_iterator(std::make_tuple(left.begin(), right.begin())),
                                   boost::make_zip_iterator(std::make_tuple(left.end(), right.end())),
-                                  [&](const std::tuple<const typename CurveType::value_type &,
-                                                       const typename CurveType::value_type &> &t) {
+                                  [&](const std::tuple<const typename CurveAffine::value_type &,
+                                                       const typename CurveAffine::value_type &> &t) {
                                       auto x = std::get<1>(t).to_projective() * scaler;
                                       x += std::get<0>(t);
                                       std::get<0>(t) = x.to_affine();
@@ -158,20 +159,14 @@ namespace nil {
                     // compute A * B^r for the verifier
                     auto ip_ab = algebra::pair<CurveType>(a, b_r);
                     // compute C^r for the verifier
-                    auto agg_c = algebra::multiexp<algebra::multiexp_method_bos_coster>(c, r_vec);
+                    auto agg_c = algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c, r_vec);
 
-                    debug_assert !({
-                        let computed_com_ab = commit::pair::<E>(&srs.vkey, &wkey_r_inv, &a, &b_r);
-                        com_ab == computed_com_ab
-                    });
+                    // debug assert
+                    auto computed_com_ab = r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(
+                        srs.vkey, wkey_r_inv, a.begin(), a.end(), b_r.begin(), b_r.end());
+                    BOOST_ASSERT(com_ab == computed_com_ab);
 
-                    Ok(AggregateProof {
-                        com_ab,
-                        com_c,
-                        ip_ab,
-                        agg_c,
-                        tmipp : proof,
-                    })
+                    return {com_ab, com_c, ip_ab, agg_c, proof};
                 }
 
                 /// Proves a TIPP relation between A and B as well as a MIPP relation with C and
@@ -262,10 +257,14 @@ namespace nil {
                     r1cs_gg_ppzksnark_ipp2_wkey<CurveType> wkey = wkey;
 
                     // storing the values for including in the proof
-                    let mut comms_ab = Vec::new ();
-                    let mut comms_c = Vec::new ();
-                    let mut z_ab = Vec::new ();
-                    let mut z_c = Vec::new ();
+                    std::vector<std::tuple<typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type,
+                                           typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type>>
+                        comms_ab;
+                    std::vector<std::tuple<typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type,
+                                           typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type>>
+                        comms_c;
+                    std::vector<typename CurveType::pairing::gt_type::value_type> z_ab;
+                    std::vector<typename std::iterator_traits<InputG1Iterator>::value_type> z_c;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges, challenges_inv;
 
                     while (m_a.size() > 1) {
@@ -301,24 +300,30 @@ namespace nil {
                                                                            {wkey.b.begin() + split, wkey.b.end()}};
 
                         // See section 3.3 for paper version with equivalent names
-                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_l =
+                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_l =
                             r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_left, wk_right, a_right, b_left);
-                        r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_r =
+                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tab_r =
                             r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_right, wk_left, a_left, b_right);
 
                         // TIPP part
-                        auto zab_l = algebra::pair<CurveType>(a_right, b_left);
-                        auto zab_r = algebra::pair<CurveType>(a_left, b_right);
+                        typename CurveType::pairing::gt_type::value_type zab_l =
+                            algebra::pair<CurveType>(a_right, b_left);
+                        typename CurveType::pairing::gt_type::value_type zab_r =
+                            algebra::pair<CurveType>(a_left, b_right);
 
                         // MIPP part
                         // z_l = c[n':] ^ r[:n']
-                        auto zc_l = algebra::multiexp<multiexp_method_bos_coster>(c_right, r_left);
+                        typename std::iterator_traits<InputG1Iterator>::value_type zc_l =
+                            algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c_right, r_left);
                         // Z_r = c[:n'] ^ r[n':]
-                        auto zc_r = algebra::multiexp<multiexp_method_bos_coster>(c_left, r_right);
+                        typename std::iterator_traits<InputG1Iterator>::value_type zc_r =
+                            algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c_left, r_right);
                         // u_l = c[n':] * v[:n']
-                        auto tuc_l = r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_left, c_right);
+                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tuc_l =
+                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_left, c_right);
                         // u_r = c[:n'] * v[n':]
-                        auto tuc_r = r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_right, c_left);
+                        typename r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::output_type tuc_r =
+                            r1cs_gg_ppzksnark_ipp2_commitment<CurveType>::pair(vk_right, c_left);
 
                         // Fiat-Shamir challenge
                         typename CurveType::scalar_field_type::value_type default_transcript =
@@ -358,31 +363,35 @@ namespace nil {
 
                         // Set up values for next step of recursion
                         // A[:n'] + A[n':] ^ x
-                        compress(&mut m_a, split, &c);
+                        compress(m_a, split, c);
                         // B[:n'] + B[n':] ^ x^-1
-                        compress(&mut m_b, split, &c_inv);
+                        compress(m_b, split, c_inv);
 
                         // c[:n'] + c[n':]^x
-                        compress(&mut m_c, split, &c);
-                        r_left.par_iter_mut().zip(r_right.par_iter_mut()).for_each(| (r_l, r_r) | {
-                            // r[:n'] + r[n':]^x^-1
-                            r_r.mul_assign(&c_inv);
-                            r_l.add_assign(r_r);
-                        });
-                        let len = r_left.len();
-                        m_r.resize(len, E::Fr::zero());    // shrink to new size
+                        compress(m_c, split, c);
+                        std::for_each(
+                            boost::make_zip_iterator(std::make_tuple(r_left.begin(), r_right.begin())),
+                            boost::make_zip_iterator(std::make_tuple(r_left.end(), r_right.end())),
+                            [&](const std::tuple<typename std::iterator_traits<InputScalarIterator>::value_type &,
+                                                 typename std::iterator_traits<InputScalarIterator>::value_type &> &t) {
+                                // r[:n'] + r[n':]^x^-1
+                                std::get<1>(t) *= c_inv;
+                                std::get<0>(t) += std::get<1>(t);
+                            });
+                        std::size_t len = r_left.size();
+                        m_r.resize(len);    // shrink to new size
 
                         // v_left + v_right^x^-1
-                        vkey = vk_left.compress(&vk_right, &c_inv);
+                        vkey = vk_left.compress(vk_right, c_inv);
                         // w_left + w_right^x
-                        wkey = wk_left.compress(&wk_right, &c);
+                        wkey = wk_left.compress(wk_right, c);
 
-                        comms_ab.push((tab_l, tab_r));
-                        comms_c.push((tuc_l, tuc_r));
-                        z_ab.push((zab_l, zab_r));
-                        z_c.push((zc_l, zc_r));
-                        challenges.push(c);
-                        challenges_inv.push(c_inv);
+                        comms_ab.emplace_back({tab_l, tab_r});
+                        comms_c.emplace_back({tuc_l, tuc_r});
+                        z_ab.emplace_back({zab_l, zab_r});
+                        z_c.emplace_back({zc_l, zc_r});
+                        challenges.emplace_back(c);
+                        challenges_inv.emplace_back(c_inv);
                     }
 
                     BOOST_ASSERT(m_a.size() == 1 && m_b.size() == 1);
@@ -390,78 +399,9 @@ namespace nil {
                     BOOST_ASSERT(vkey.a.size() == 1 && vkey.b.size() == 1);
                     BOOST_ASSERT(wkey.a.size() == 1 && wkey.b.size() == 1);
 
-                    let(final_a, final_b, final_c, final_r) = (m_a[0], m_b[0], m_c[0], m_r[0]);
-                    let(final_vkey, final_wkey) = (vkey.first(), wkey.first());
-                    (GipaProof {
-                        nproofs : a.len() as u32,    // TODO: ensure u32
-                        comms_ab,
-                        comms_c,
-                        z_ab,
-                        z_c,
-                        final_a,
-                        final_b,
-                        final_c,
-                        final_r,
-                        final_vkey,
-                        final_wkey,
-                    },
-                     challenges, challenges_inv)
-                }
-
-                /// Returns the KZG opening proof for the given commitment key. Specifically, it
-                /// returns $g^{f(alpha) - f(z) / (alpha - z)}$ for $a$ and $b$.
-                template<typename CurveType>
-                kzg_opening<CurveType>
-                    prove_commitment_key_kzg_opening(MultiscalarPrecomp<CurveType> &srs_powers_alpha_table,
-                                                     MultiscalarPrecomp<CurveType> &srs_powers_beta_table,
-                                                     std::size_t srs_powers_len, transcript
-                                                     : &[G::Scalar], r_shift
-                                                     : &G::Scalar, kzg_challenge
-                                                     : &G::Scalar) {
-                    // f_v
-                    let vkey_poly =
-                        DensePolynomial::from_coeffs(polynomial_coefficients_from_transcript(transcript, r_shift));
-
-                    if (srs_powers_len != vkey_poly.coeffs().size()) {
-                        return Err(SynthesisError::MalformedSrs);
-                    }
-
-                    // f_v(z)
-                    let vkey_poly_z =
-                        polynomial_evaluation_product_form_from_transcript(&transcript, kzg_challenge, &r_shift);
-
-                    let mut neg_kzg_challenge = *kzg_challenge;
-                    neg_kzg_challenge.negate();
-
-                    // f_v(X) - f_v(z) / (X - z)
-                    let quotient_polynomial =
-                        &(&vkey_poly - &DensePolynomial::from_coeffs(vec ![vkey_poly_z])) /
-                        &(DensePolynomial::from_coeffs(vec ![ neg_kzg_challenge, G::Scalar::one() ]));
-
-                    let quotient_polynomial_coeffs = quotient_polynomial.into_coeffs();
-
-                    // multiexponentiation inner_product, inlined to optimize
-                    let zero = G::Scalar::zero().into_repr();
-                    let quotient_polynomial_coeffs_len = quotient_polynomial_coeffs.len();
-                    let getter = | i : usize |-><G::Scalar as PrimeField>::Repr {
-                        if i
-                            >= quotient_polynomial_coeffs_len {
-                                return zero;
-                            }
-                        quotient_polynomial_coeffs[i].into_repr()
-                    };
-
-                    // we do one proof over h^a and one proof over h^b (or g^a and g^b depending
-                    // on the curve we are on). that's the extra cost of the commitment scheme
-                    // used which is compatible with Groth16 CRS insteaf of the original paper
-                    // of Bunz'19
-                    Ok(rayon::join(
-                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_alpha_table,
-                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
-                                .into_affine()},
-                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_beta_table,
-                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
-                                .into_affine()}, ))
+                    return std::make_tuple({a.size(), comms_ab, comms_c, z_ab, z_c, m_a[0], m_b[0], m_c[0], m_r[0],
+                                            *vkey.begin(), *wkey.begin()},
+                                           challenges, challenges_inv);
                 }
 
                 /// It returns the evaluation of the polynomial $\prod (1 + x_{l-j}(rX)^{2j}$ at
@@ -510,7 +450,7 @@ namespace nil {
                 // This method expects the coefficients in reverse order so transcript[i] =
                 // x_{l-j}.
                 template<typename FieldType, typename InputFieldValueIterator>
-                typename std::enable_if<std::is_same<typename std::iterator_traits<InputFieldIterator>::value_type,
+                typename std::enable_if<std::is_same<typename std::iterator_traits<InputFieldValueIterator>::value_type,
                                                      typename FieldType::value_type>::value,
                                         std::vector<typename FieldType::value_type>>::type
                     polynomial_coefficients_from_transcript(InputFieldValueIterator transcript_first,
@@ -530,6 +470,58 @@ namespace nil {
                     }
 
                     return coefficients;
+                }
+
+                /// Returns the KZG opening proof for the given commitment key. Specifically, it
+                /// returns $g^{f(alpha) - f(z) / (alpha - z)}$ for $a$ and $b$.
+                template<typename CurveAffine, typename InputScalarIterator>
+                kzg_opening<CurveAffine> prove_commitment_key_kzg_opening(
+                    MultiscalarPrecomp<CurveAffine> &srs_powers_alpha_table,
+                    MultiscalarPrecomp<CurveAffine> &srs_powers_beta_table, std::size_t srs_powers_len,
+                    InputScalarIterator transcript_first, InputScalarIterator transcript_last,
+                    const typename std::iterator_traits<InputScalarIterator>::value_type &r_shift,
+                    const typename std::iterator_traits<InputScalarIterator>::value_type &kzg_challenge) {
+                    // f_v
+                    DensePolynomial vkey_poly(
+                        polynomial_coefficients_from_transcript(transcript_first, transcript_last, r_shift));
+
+                    BOOST_ASSERT_MSG(srs_powers_len != vkey_poly.coeffs().size(), "Malformed SRS");
+                    // f_v(z)
+                    std::vector<typename std::iterator_traits<InputScalarIterator>::value_type> vkey_poly_z =
+                        polynomial_evaluation_product_form_from_transcript(transcript_first, transcript_last,
+                                                                           kzg_challenge, r_shift);
+
+                    typename std::iterator_traits<InputScalarIterator>::value_type neg_kzg_challenge =
+                        kzg_challenge.negate();
+
+                    // f_v(X) - f_v(z) / (X - z)
+                    DensePolynomial quotient_polynomial =
+                        (vkey_poly - DensePolynomial(vkey_poly_z)) /
+                        (DensePolynomial({neg_kzg_challenge,
+                                          typename std::iterator_traits<InputScalarIterator>::value_type::one()}));
+
+                    std::vector<typename std::iterator_traits<InputScalarIterator>::value_type>
+                        quotient_polynomial_coeffs = quotient_polynomial.into_coeffs();
+
+                    // multiexponentiation inner_product, inlined to optimize
+                    std::size_t quotient_polynomial_coeffs_len = quotient_polynomial_coeffs.size();
+                    auto getter = [&](std::size_t i) -> typename CurveAffine::scalar_field_type::value_type {
+                        return i >= quotient_polynomial_coeffs_len ?
+                                   typename std::iterator_traits<InputScalarIterator>::value_type::zero() :
+                                   quotient_polynomial_coeffs[i];
+                    };
+
+                    // we do one proof over h^a and one proof over h^b (or g^a and g^b depending
+                    // on the curve we are on). that's the extra cost of the commitment scheme
+                    // used which is compatible with Groth16 CRS insteaf of the original paper
+                    // of Bunz'19
+                    Ok(rayon::join(
+                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_alpha_table,
+                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
+                                .into_affine()},
+                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_beta_table,
+                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
+                                .into_affine()}, ))
                 }
             }    // namespace snark
         }        // namespace zk

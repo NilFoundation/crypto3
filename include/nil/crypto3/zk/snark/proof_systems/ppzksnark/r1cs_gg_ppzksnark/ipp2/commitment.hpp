@@ -57,6 +57,7 @@
 #include <vector>
 
 #include <boost/assert.hpp>
+#include <boost/iterator/zip_iterator.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
@@ -158,17 +159,15 @@ namespace nil {
                                  std::distance(first, last) == key.b.size());
                     r1cs_gg_ppzksnark_ipp2_commitment_key<FieldType> result;
 
-                    typename r1cs_gg_ppzksnark_ipp2_commitment_key<FieldType>::const_iterator afirst = key.a.begin(),
-                                                                                              bfirst = key.b.begin();
-
-                    while (first != last && afirst != key.a.end() && bfirst != key.b.end()) {
-                        result.a.emplace_back(afirst->to_projective() * first->to_affine());
-                        result.b.emplace_back(bfirst->to_projective() * first->to_affine());
-
-                        ++first;
-                        ++afirst;
-                        ++bfirst;
-                    }
+                    std::for_each(
+                        boost::make_zip_iterator(std::make_tuple(first, key.a.begin(), key.b.begin())),
+                        boost::make_zip_iterator(std::make_tuple(last, key.a.end(), key.b.end())),
+                        [&](const std::tuple<const typename FieldType::value_type &,
+                                             const typename FieldType::value_type &,
+                                             const typename FieldType::value_type &> &t) {
+                            result.a.emplace_back(std::get<1>(t).to_projective() * std::get<0>(t).to_affine());
+                            result.b.emplace_back(std::get<2>(t).to_projective() * std::get<0>(t).to_affine());
+                        });
 
                     return result;
                 }
@@ -189,22 +188,23 @@ namespace nil {
                     typename r1cs_gg_ppzksnark_ipp2_commitment_key<FieldType>::const_iterator rafirst = right.a.begin(),
                                                                                               rbfirst = right.b.begin();
 
-                    while (lafirst != left.a.end() && lbfirst != left.b.end() && rafirst != right.a.begin() &&
-                           rbfirst != right.b.begin()) {
-                        auto ra = rafirst->to_projective() * scale;
-                        auto rb = rbfirst->to_projective() * scale;
+                    std::for_each(
+                        boost::make_zip_iterator(
+                            std::make_tuple(left.a.begin(), left.b.begin(), right.a.begin(), right.b.begin())),
+                        boost::make_zip_iterator(
+                            std::make_tuple(left.a.end(), left.b.end(), right.a.end(), right.b.end())),
+                        [&](const std::tuple<
+                            const typename FieldType::value_type &, const typename FieldType::value_type &,
+                            const typename FieldType::value_type &, const typename FieldType::value_type &> &t) {
+                            auto ra = std::get<2>(t).to_projective() * scale;
+                            auto rb = std::get<3>(t).to_projective() * scale;
 
-                        ra.add_assign_mixed(*lafirst);
-                        rb.add_assign_mixed(*lbfirst);
+                            ra += std::get<0>(t);
+                            rb += std::get<1>(t);
 
-                        result.a.emplace_back(ra.to_affine());
-                        result.b.emplace_back(rb.to_affine());
-
-                        ++lafirst;
-                        ++lbfirst;
-                        ++rafirst;
-                        ++rbfirst;
-                    }
+                            result.a.emplace_back(ra.to_affine());
+                            result.b.emplace_back(rb.to_affine());
+                        });
 
                     return result;
                 }
@@ -246,9 +246,7 @@ namespace nil {
                         auto u2 = algebra::pair(wkey.b, bfirst, blast);
 
                         // (A * v)(w * B)
-                        t1.mul_assign(&t2);
-                        u1.mul_assign(&u2);
-                        return {t1.mul_assign(t2), u1.mul_assign(u2)};
+                        return {t1 *= t2, u1 *= u2};
                     }
 
                     /// Commits to a single vector of G1 elements in the following way:
@@ -279,9 +277,7 @@ namespace nil {
                     auto u2 = algebra::pair(wkey.b, bfirst, blast);
 
                     // (A * v)(w * B)
-                    t1.mul_assign(&t2);
-                    u1.mul_assign(&u2);
-                    return {t1.mul_assign(t2), u1.mul_assign(u2)};
+                    return {t1 *= t2, u1 *= u2};
                 }
 
                 /// Commits to a single vector of G1 elements in the following way:

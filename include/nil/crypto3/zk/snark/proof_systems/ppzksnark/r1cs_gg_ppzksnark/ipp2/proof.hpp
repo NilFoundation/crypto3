@@ -45,6 +45,8 @@ namespace nil {
                 /// the same time.
                 template<typename CurveType>
                 struct gipa_proof {
+                    typedef CurveType curve_type;
+
                     std::uint32_t nproofs;
                     std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                           r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
@@ -81,16 +83,17 @@ namespace nil {
                 /// party in possession of valid Groth16 proofs.
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_aggregate_proof {
+                    typedef CurveType curve_type;
                     /// commitment to A and B using the pair commitment scheme needed to verify
                     /// TIPP relation.
-                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_ab;
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_ab;
                     /// commit to C separate since we use it only in MIPP
-                    r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType> com_c;
+                    r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
-                    typename CurveType::pairing::fqk_type ip_ab;
+                    typename curve_type::pairing::fqk_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
-                    typename CurveType::g1_type::value_type agg_c;
-                    tipp_mipp_proof<CurveType> tmipp;
+                    typename curve_type::g1_type::value_type agg_c;
+                    tipp_mipp_proof<curve_type> tmipp;
                 };
             }    // namespace snark
         }        // namespace zk
