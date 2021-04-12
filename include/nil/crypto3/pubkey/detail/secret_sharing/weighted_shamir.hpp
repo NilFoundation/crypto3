@@ -172,11 +172,10 @@ namespace nil {
                                  typename std::iterator_traits<typename Weights::iterator>::value_type> = true,
                              typename base_type::template check_number_type<Number> = true>
                     static inline private_element_type reconstruct_part_secret(const Shares &shares,
-                                                                                   const Weights &weights, Number t) {
+                                                                               const Weights &weights, Number t) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Shares>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
-                        return reconstruct_part_secret(shares.begin(), shares.end(), weights.begin(), weights.end(),
-                                                           t);
+                        return reconstruct_part_secret(shares.begin(), shares.end(), weights.begin(), weights.end(), t);
                     }
 
                     template<
@@ -187,7 +186,7 @@ namespace nil {
                         typename base_type::template check_number_type<Number> = true>
                     static inline private_element_type
                         reconstruct_part_secret(SharesIterator first1, SharesIterator last1, WeightsIterator first2,
-                                                    WeightsIterator last2, Number t) {
+                                                WeightsIterator last2, Number t) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<SharesIterator>));
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightsIterator>));
 
@@ -206,13 +205,13 @@ namespace nil {
                              check_indexed_weight_type<
                                  typename std::iterator_traits<typename Weights::iterator>::value_type> = true,
                              typename base_type::template check_number_type<Number> = true>
-                    static inline public_element_type
-                        reconstruct_part_public_element(const PublicShares &public_shares, const Weights &weights,
-                                                            Number t) {
+                    static inline public_element_type reconstruct_part_public_element(const PublicShares &public_shares,
+                                                                                      const Weights &weights,
+                                                                                      Number t) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const PublicShares>));
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const Weights>));
                         return reconstruct_part_public_element(public_shares.begin(), public_shares.end(),
-                                                                   weights.begin(), weights.end(), t);
+                                                               weights.begin(), weights.end(), t);
                     }
 
                     template<
@@ -223,13 +222,14 @@ namespace nil {
                         typename base_type::template check_number_type<Number> = true>
                     static inline public_element_type
                         reconstruct_part_public_element(PublicSharesIterator first1, PublicSharesIterator last1,
-                                                            WeightsIterator first2, WeightsIterator last2, Number t) {
+                                                        WeightsIterator first2, WeightsIterator last2, Number t) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<PublicSharesIterator>));
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<WeightsIterator>));
 
                         public_element_type result = public_element_type::zero();
                         typename base_type::indexes_type indexes = get_weighted_indexes(first2, last2, t);
                         for (auto it1 = first1; it1 != last1; it1++) {
+                            assert(indexes.count(it1->first));
                             result = result + it1->second * base_type::eval_basis_poly(indexes, it1->first);
                         }
                         return result;
