@@ -168,7 +168,6 @@ BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {
 
     //===========================================================================
     // participants sign messages and verify its signatures
-
     std::vector<typename privkey_type::part_signature_type> part_signatures;
     for (auto &sk : privkeys) {
         part_signatures.emplace_back(
@@ -178,16 +177,84 @@ BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {
     }
 
     //===========================================================================
-    // threshold number of participants aggregate partial signatures
+    // confirmed group of participants aggregate partial signatures
     typename no_key_type::signature_type sig =
         nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.end());
     BOOST_CHECK(static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig, PK)));
 
     //===========================================================================
-    // less than threshold number of participants cannot aggregate partial signatures
+    // not confirmed group of participants cannot aggregate partial signatures
     typename no_key_type::signature_type wrong_sig =
         nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.end() - 1);
     BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, wrong_sig, PK)));
+
+    //===========================================================================
+    // threshold number of participants sign messages and verify its signatures
+
+    std::vector<typename privkey_type::part_signature_type> part_signatures_t;
+    typename privkey_type::sss_public_key_no_key_ops_type::weights_type confirmed_weights;
+    std::vector<privkey_type> confirmed_keys;
+    auto it_weight_t = privkeys.begin();
+    auto weight = 0;
+    while (true) {
+        weight += it_weight_t->get_weight();
+        if (weight >= t) {
+            confirmed_keys.emplace_back(*it_weight_t);
+            confirmed_weights.emplace(it_weight_t->get_index(), weights.at(it_weight_t->get_index()));
+            it_weight_t++;
+            break;
+        }
+        confirmed_keys.emplace_back(*it_weight_t);
+        confirmed_weights.emplace(it_weight_t->get_index(), weights.at(it_weight_t->get_index()));
+        it_weight_t++;
+    }
+
+    for (auto &sk : confirmed_keys) {
+        part_signatures_t.emplace_back(nil::crypto3::sign<mode_type>(msg.begin(), msg.end(), confirmed_weights.begin(),
+                                                                     confirmed_weights.end(), sk));
+        BOOST_CHECK(static_cast<bool>(nil::crypto3::part_verify<mode_type>(
+            msg.begin(), msg.end(), confirmed_weights.begin(), confirmed_weights.end(), part_signatures_t.back(), sk)));
+    }
+
+    //===========================================================================
+    // threshold number of participants aggregate partial signatures
+
+    typename no_key_type::signature_type sig_t =
+        nil::crypto3::aggregate<mode_type>(part_signatures_t.begin(), part_signatures_t.end());
+    BOOST_CHECK(static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig_t, PK)));
+
+    //===========================================================================
+    // less than threshold number of participants sign messages and verify its signatures
+
+    std::vector<typename privkey_type::part_signature_type> part_signatures_less_t;
+    typename privkey_type::sss_public_key_no_key_ops_type::weights_type confirmed_weights_less_t;
+    std::vector<privkey_type> confirmed_keys_less_t;
+    auto it_weight_less_t = privkeys.begin();
+    auto weight_less_t = 0;
+    while (true) {
+        weight_less_t += it_weight_less_t->get_weight();
+        if (weight_less_t >= t) {
+            break;
+        }
+        confirmed_keys_less_t.emplace_back(*it_weight_less_t);
+        confirmed_weights_less_t.emplace(it_weight_less_t->get_index(), weights.at(it_weight_less_t->get_index()));
+        it_weight_t++;
+    }
+
+    for (auto &sk : confirmed_keys_less_t) {
+        part_signatures_less_t.emplace_back(nil::crypto3::sign<mode_type>(
+            msg.begin(), msg.end(), confirmed_weights_less_t.begin(), confirmed_weights_less_t.end(), sk));
+        BOOST_CHECK(static_cast<bool>(
+            nil::crypto3::part_verify<mode_type>(msg.begin(), msg.end(), confirmed_weights_less_t.begin(),
+                                                 confirmed_weights_less_t.end(), part_signatures_less_t.back(), sk)));
+    }
+
+    //===========================================================================
+    // less than threshold number of participants cannot aggregate partial signatures
+
+    typename no_key_type::signature_type sig_less_t =
+        nil::crypto3::aggregate<mode_type>(part_signatures_less_t.begin(), part_signatures_less_t.end());
+    BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig_less_t, PK)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

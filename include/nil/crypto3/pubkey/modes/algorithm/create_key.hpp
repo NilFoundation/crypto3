@@ -41,7 +41,9 @@
 
 namespace nil {
     namespace crypto3 {
-        template<typename Scheme, typename InputIterator, typename Number,
+        template<typename Scheme,
+                 typename InputIterator,
+                 typename Number,
                  typename SecretSharingScheme = typename pubkey::private_key<Scheme>::sss_public_key_group_type,
                  typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
                  typename SecretSharingScheme::template check_coeff_type<ValueType> = true>
@@ -64,7 +66,9 @@ namespace nil {
             return std::make_pair(PK, privkeys);
         }
 
-        template<typename Scheme, typename SinglePassRange, typename Number,
+        template<typename Scheme,
+                 typename SinglePassRange,
+                 typename Number,
                  typename SecretSharingScheme = typename pubkey::private_key<Scheme>::sss_public_key_group_type,
                  typename ValueType = typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
                  typename SecretSharingScheme::template check_coeff_type<ValueType> = true>
@@ -76,7 +80,9 @@ namespace nil {
             return create_key<Scheme>(r.begin(), r.end(), n);
         }
 
-        template<typename Scheme, typename InputIterator1, typename InputIterator2,
+        template<typename Scheme,
+                 typename InputIterator1,
+                 typename InputIterator2,
                  typename SecretSharingScheme = typename pubkey::private_key<Scheme>::sss_public_key_group_type,
                  typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
                  typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
@@ -99,11 +105,14 @@ namespace nil {
             for (const auto &s : shares) {
                 privkeys.emplace_back(s, std::distance(first1, last1));
             }
-            auto PK = pubkey::public_key<Scheme>(sss_no_key_ops_type::get_public_coeffs(first1, last1).front());
+            auto PK = pubkey::public_key<Scheme>(sss_no_key_ops_type::get_public_coeffs(first1, last1).front(),
+                                                 std::distance(first2, last2));
             return std::make_pair(PK, privkeys);
         }
 
-        template<typename Scheme, typename SinglePassRange, typename Weights,
+        template<typename Scheme,
+                 typename SinglePassRange,
+                 typename Weights,
                  typename SecretSharingScheme = typename pubkey::private_key<Scheme>::sss_public_key_group_type,
                  typename ValueType1 = typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
                  typename ValueType2 = typename std::iterator_traits<typename Weights::iterator>::value_type,

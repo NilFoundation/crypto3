@@ -306,9 +306,10 @@ namespace nil {
                 //
                 // PK
                 //
-                public_key(const typename sss_public_key_no_key_ops_type::public_element_type &key) :
-                    pubkey(0, typename public_key_type::second_type(
-                                  {typename public_key_type::second_type::value_type(0, key)})) {
+                template<typename Number>
+                public_key(const typename sss_public_key_no_key_ops_type::public_element_type &key, Number t) :
+                    t(t), weight(0), pubkey(0, typename public_key_type::second_type(
+                                                   {typename public_key_type::second_type::value_type(0, key)})) {
                 }
 
                 //
@@ -316,7 +317,7 @@ namespace nil {
                 //
                 template<typename Number>
                 public_key(const typename sss_public_key_no_key_ops_type::public_share_type &key, Number t) :
-                    t(t), pubkey(key) {
+                    t(t), weight(key.second.size()), pubkey(key) {
                 }
 
                 template<typename MsgRange>
@@ -334,12 +335,26 @@ namespace nil {
                     return VK_i.verify(msg, part_sig.second);
                 }
 
+                inline std::size_t get_weight() {
+                    return weight;
+                }
+
+                inline std::size_t get_t() {
+                    return t;
+                }
+
+                inline std::size_t get_index() {
+                    return pubkey.first;
+                }
+
             protected:
                 inline bool check_PK() const {
-                    return 0 == pubkey.first && 1 == pubkey.second.size() && 0 == pubkey.second.begin()->first;
+                    return 0 == pubkey.first && 1 == pubkey.second.size() && 0 == pubkey.second.begin()->first &&
+                           0 == weight;
                 }
 
                 std::size_t t;
+                std::size_t weight;
                 public_key_type pubkey;
             };
 
@@ -379,18 +394,17 @@ namespace nil {
 
                 template<typename Number>
                 private_key(const typename sss_public_key_no_key_ops_type::share_type &key, Number t) :
-                    t(t), privkey(key), base_type(sss_public_key_no_key_ops_type::get_public_share(key), t) {
+                    privkey(key), base_type(sss_public_key_no_key_ops_type::get_public_share(key), t) {
                 }
 
                 template<typename MsgRange, typename ConfirmedWeights>
                 inline part_signature_type sign(const MsgRange &msg, const ConfirmedWeights &confirmed_weights) const {
-                    base_scheme_private_key_type s_i(
-                        sss_public_key_no_key_ops_type::reconstruct_part_secret(privkey.second, confirmed_weights, t));
+                    base_scheme_private_key_type s_i(sss_public_key_no_key_ops_type::reconstruct_part_secret(
+                        privkey.second, confirmed_weights, this->t));
                     return part_signature_type(privkey.first, s_i.sign(msg));
                 }
 
             protected:
-                std::size_t t;
                 private_key_type privkey;
             };
 
