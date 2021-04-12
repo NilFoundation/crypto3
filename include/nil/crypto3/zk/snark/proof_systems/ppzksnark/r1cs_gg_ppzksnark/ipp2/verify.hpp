@@ -200,7 +200,7 @@ namespace nil {
 
                             // we multiple left side by x and right side by x^-1
                             vec ![
-                                Op<CurveType>::tab(tab_l, std::get<4>(t)),
+                                Op<CurveType>::TAB(tab_l, std::get<4>(t)),
                                 Op<CurveType>::tab(tab_r, c_inv_repr),
                                 Op::UAB(uab_l, c_repr),
                                 Op::UAB(uab_r, c_inv_repr),
@@ -296,16 +296,20 @@ debug !("TIPP verify: gipa prep and accumulate took {}ms", now.elapsed().as_mill
                                              const typename CurveType::scalar_field_type &r_shift) {
         // (T,U), Z for TIPP and MIPP  and all challenges
         std::tuple<gipa_tuz<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
-                   std::vector<typename CurveType::scalar_field_type::value_type>> = gipa_verify_tipp_mipp(proof);
-        let(final_res, mut challenges, mut challenges_inv) = gipa_verify_tipp_mipp(&proof);
+                   std::vector<typename CurveType::scalar_field_type::value_type>>
+            gtmp = gipa_verify_tipp_mipp(proof);
+        auto &final_res = std::get<0>(gtmp);
+        auto &challenges = std::get<1>(gtmp);
+        auto &challenges_inv = std::get<2>(gtmp);
 
         // we reverse the order so the KZG polynomial have them in the expected
         // order to construct them in logn time.
-        challenges.reverse();
-        challenges_inv.reverse();
+        std::reverse(challenges.begin(), challenges.end());
+        std::reverse(challenges_inv.begin(), challenges_inv.end());
+
         // Verify commitment keys wellformed
-        let fvkey = proof.tmipp.gipa.final_vkey;
-        let fwkey = proof.tmipp.gipa.final_wkey;
+        auto fvkey = proof.tmipp.gipa.final_vkey;
+        auto fwkey = proof.tmipp.gipa.final_wkey;
         // KZG challenge point
         let c = oracle !(&challenges.first().unwrap(), &fvkey .0, &fvkey .1, &fwkey .0, &fwkey .1);
 
