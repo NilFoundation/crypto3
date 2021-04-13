@@ -141,14 +141,14 @@ namespace nil {
                 static inline signature_type sign(const private_key_type &privkey, const MsgRange &message) {
                     public_key_type pubkey = generate_public_key(privkey);
                     return basic_functions::core_sign(privkey, basic_functions::pk_conc_msg(pubkey, message),
-                                                     public_params::dst);
+                                                      public_params::dst);
                 }
 
                 template<typename MsgRange>
                 static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
                                           const signature_type &signature) {
                     return basic_functions::core_verify(pubkey, basic_functions::pk_conc_msg(pubkey, message),
-                                                       public_params::dst, signature);
+                                                        public_params::dst, signature);
                 }
 
                 template<typename SignatureRange>
@@ -434,6 +434,10 @@ namespace nil {
                 inline signature_type sign(const MsgRange &msg) const {
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const MsgRange>));
                     return bls_scheme_type::sign(privkey, msg);
+                }
+
+                inline const private_key_type &get_privkey() const {
+                    return privkey;
                 }
 
             protected:

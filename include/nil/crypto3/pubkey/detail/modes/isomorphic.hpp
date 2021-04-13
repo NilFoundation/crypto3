@@ -215,8 +215,7 @@ namespace nil {
                     typedef typename key_type::share_type input_value_type;
 
                     template<typename ValueType>
-                    using check_input_value_type =
-                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+                    using check_input_value_type = typename key_type::template check_share_type<ValueType>;
 
                     typedef typename scheme_type::share_type result_type;
 
