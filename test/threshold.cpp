@@ -97,12 +97,12 @@ const std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
 
 BOOST_AUTO_TEST_SUITE(threshold_self_test_suite)
 
-BOOST_AUTO_TEST_CASE(threshold_bls_shamir_self_test) {
+BOOST_AUTO_TEST_CASE(threshold_bls_feldman_self_test) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
     using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
     using base_scheme_type = bls<bls_variant, bls_basic_scheme>;
-    using mode_type = modes::threshold<base_scheme_type, shamir_sss, nop_padding>;
+    using mode_type = modes::threshold<base_scheme_type, feldman_sss, nop_padding>;
     using scheme_type = typename mode_type::scheme_type;
     using privkey_type = private_key<scheme_type>;
     using pubkey_type = public_key<scheme_type>;
@@ -115,7 +115,22 @@ BOOST_AUTO_TEST_CASE(threshold_bls_shamir_self_test) {
     //===========================================================================
     // dealer creates participants keys and its public key
     typename sss_pubkey_no_key_type::coeffs_type coeffs = sss_pubkey_no_key_type::get_poly(t, n);
+    typename sss_pubkey_no_key_type::public_coeffs_type public_coeffs =
+        sss_pubkey_no_key_type::get_public_coeffs(coeffs);
+    typename sss_pubkey_no_key_type::public_coeffs_type public_coeffs_wrong(public_coeffs.begin(),
+                                                                            public_coeffs.end() - 1);
     auto [PK, privkeys] = nil::crypto3::create_key<scheme_type>(coeffs, n);
+
+    //===========================================================================
+    // participants should check received shares before key creating
+    std::vector<privkey_type> verified_privkeys;
+    typename sss_pubkey_no_key_type::shares_type verified_shares =
+        nil::crypto3::deal_shares<typename privkey_type::sss_public_key_group_type>(coeffs, n);
+    for (auto &s : verified_shares) {
+        verified_privkeys.emplace_back(nil::crypto3::create_key<scheme_type>(public_coeffs, s, n));
+        BOOST_CHECK(verified_privkeys.back().verify_key(public_coeffs));
+        BOOST_CHECK(!verified_privkeys.back().verify_key(public_coeffs_wrong));
+    }
 
     //===========================================================================
     // participants sign messages and verify its signatures
@@ -136,6 +151,85 @@ BOOST_AUTO_TEST_CASE(threshold_bls_shamir_self_test) {
     typename no_key_type::signature_type wrong_sig =
         nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.begin() + t - 1);
     BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, wrong_sig, PK)));
+}
+
+BOOST_AUTO_TEST_CASE(threshold_bls_pedersen_self_test) {
+    using curve_type = curves::bls12_381;
+    using hash_type = sha2<256>;
+    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
+    using base_scheme_type = bls<bls_variant, bls_basic_scheme>;
+    using mode_type = modes::threshold<base_scheme_type, pedersen_dkg, nop_padding>;
+    using scheme_type = typename mode_type::scheme_type;
+    using privkey_type = private_key<scheme_type>;
+    using pubkey_type = public_key<scheme_type>;
+    using no_key_type = no_key_ops<scheme_type>;
+    using sss_pubkey_group_type = typename privkey_type::sss_public_key_group_type;
+    using sss_pubkey_no_key_type = typename privkey_type::sss_public_key_no_key_ops_type;
+
+    std::size_t n = 20;
+    std::size_t t = 10;
+
+    //===========================================================================
+    // every participant generates polynomial
+
+    std::vector<typename sss_pubkey_no_key_type::coeffs_type> P_polys;
+    std::generate_n(std::back_inserter(P_polys), n, [t, n]() { return sss_pubkey_no_key_type::get_poly(t, n); });
+
+    //===========================================================================
+    // each participant calculates public values representing coefficients of its polynomial,
+    // then he broadcasts these values
+
+    std::vector<typename sss_pubkey_no_key_type::public_coeffs_type> P_public_polys;
+    std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_public_polys),
+                   [](const auto &poly_i) { return sss_pubkey_no_key_type::get_public_coeffs(poly_i); });
+
+    //===========================================================================
+    // every participant generates shares for each participant in group,
+    // which he then transmits to the intended parties
+
+    std::vector<typename sss_pubkey_no_key_type::shares_type> P_generated_shares;
+    std::transform(P_polys.begin(), P_polys.end(), std::back_inserter(P_generated_shares), [n, t](const auto &poly_i) {
+        return static_cast<typename sss_pubkey_no_key_type::shares_type>(
+            nil::crypto3::deal_shares<sss_pubkey_group_type>(poly_i, n));
+    });
+
+    std::vector<std::vector<typename sss_pubkey_no_key_type::share_type>> P_received_shares(n);
+    for (auto &i_generated_shares : P_generated_shares) {
+        for (auto it = i_generated_shares.begin(); it != i_generated_shares.end(); it++) {
+            P_received_shares.at(it->first - 1).emplace_back(*it);
+        }
+    }
+
+    //===========================================================================
+    // each participant check received share and create key
+
+    std::vector<pubkey_type> PKs;
+    std::vector<privkey_type> privkeys;
+    for (auto &shares : P_received_shares) {
+        auto [PK_temp, privkey] = nil::crypto3::create_key<scheme_type>(P_public_polys, shares, n);
+        PKs.emplace_back(PK_temp);
+        privkeys.emplace_back(privkey);
+    }
+
+    //===========================================================================
+    // participants sign messages and verify its signatures
+    std::vector<typename privkey_type::part_signature_type> part_signatures;
+    for (auto &sk : privkeys) {
+        part_signatures.emplace_back(nil::crypto3::sign<mode_type>(msg, sk));
+        BOOST_CHECK(static_cast<bool>(nil::crypto3::part_verify<mode_type>(msg, part_signatures.back(), sk)));
+    }
+
+    //===========================================================================
+    // threshold number of participants aggregate partial signatures
+    typename no_key_type::signature_type sig =
+        nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.begin() + t);
+    BOOST_CHECK(static_cast<bool>(nil::crypto3::verify<mode_type>(msg, sig, PKs.back())));
+
+    //===========================================================================
+    // less than threshold number of participants cannot aggregate partial signatures
+    typename no_key_type::signature_type wrong_sig =
+        nil::crypto3::aggregate<mode_type>(part_signatures.begin(), part_signatures.begin() + t - 1);
+    BOOST_CHECK(!static_cast<bool>(nil::crypto3::verify<mode_type>(msg, wrong_sig, PKs.back())));
 }
 
 BOOST_AUTO_TEST_CASE(threshold_bls_weighted_shamir_test) {

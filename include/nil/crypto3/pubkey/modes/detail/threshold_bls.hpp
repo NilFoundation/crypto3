@@ -40,6 +40,7 @@
 #include <nil/crypto3/pubkey/detail/stream_processor.hpp>
 
 #include <nil/crypto3/pubkey/algorithm/deal_shares.hpp>
+#include <nil/crypto3/pubkey/algorithm/verify_share.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -215,6 +216,23 @@ namespace nil {
                     return part_signature_type(privkey.first, privkey.second.sign(msg));
                 }
 
+                template<
+                    typename PublicCoeffs,
+                    typename ValueType = typename std::iterator_traits<typename PublicCoeffs::iterator>::value_type,
+                    typename sss_public_key_no_key_ops_type::template check_public_coeff_type<ValueType> = true>
+                inline typename std::enable_if<
+                    std::is_same<feldman_sss<typename public_key<Scheme>::public_key_type::group_type>,
+                                 sss_public_key_group_type>::value ||
+                        std::is_same<pedersen_dkg<typename public_key<Scheme>::public_key_type::group_type>,
+                                     sss_public_key_group_type>::value,
+                    bool>::type
+                    verify_key(const PublicCoeffs &public_coeffs) {
+                    return static_cast<bool>(nil::crypto3::verify_share<sss_public_key_group_type>(
+                        public_coeffs,
+                        typename sss_public_key_no_key_ops_type::share_type(privkey.first,
+                                                                            privkey.second.get_privkey())));
+                }
+
             protected:
                 private_key_type privkey;
             };
@@ -335,15 +353,15 @@ namespace nil {
                     return VK_i.verify(msg, part_sig.second);
                 }
 
-                inline std::size_t get_weight() {
+                inline std::size_t get_weight() const {
                     return weight;
                 }
 
-                inline std::size_t get_t() {
+                inline std::size_t get_t() const {
                     return t;
                 }
 
-                inline std::size_t get_index() {
+                inline std::size_t get_index() const {
                     return pubkey.first;
                 }
 
