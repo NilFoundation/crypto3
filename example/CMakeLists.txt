@@ -15,7 +15,7 @@ macro(define_pubkey_example name)
                           ${CMAKE_WORKSPACE_NAME}::block
                           ${CMAKE_WORKSPACE_NAME}::hash
                           ${CMAKE_WORKSPACE_NAME}::algebra
-                          $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+                          ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                           ${Boost_LIBRARIES})
     set_target_properties(pubkey_${name}_example PROPERTIES CXX_STANDARD 17)
