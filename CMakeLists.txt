@@ -27,6 +27,7 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
 
 option(BUILD_TESTS "Build unit tests" FALSE)
+option(BUILD_EXAMPLES "Build examples" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pubkey/algorithm/sign.hpp
@@ -400,4 +401,8 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
 if(BUILD_TESTS)
     add_subdirectory(test)
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(example)
 endif()
