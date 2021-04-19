@@ -77,19 +77,19 @@ namespace nil {
                     }
 
                     static inline typename gt_type::value_type pair(const typename g1_type::value_type &P,
-                                                                       const typename g2_type::value_type &Q) {
+                                                                    const typename g2_type::value_type &Q) {
                         return policy_type::pair(P, Q);
                     }
 
                     static inline typename gt_type::value_type pair_reduced(const typename g1_type::value_type &P,
-                                                                               const typename g2_type::value_type &Q) {
+                                                                            const typename g2_type::value_type &Q) {
                         return policy_type::pair_reduced(P, Q);
                     }
 
-                    static inline typename policy_type::gt double_miller_loop(const g1_precomp &prec_P1,
-                                                                              const g2_precomp &prec_Q1,
-                                                                              const g1_precomp &prec_P2,
-                                                                              const g2_precomp &prec_Q2) {
+                    static inline typename gt_type::value_type double_miller_loop(const g1_precomp &prec_P1,
+                                                                                  const g2_precomp &prec_Q1,
+                                                                                  const g1_precomp &prec_P2,
+                                                                                  const g2_precomp &prec_Q2) {
                         return policy_type::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 

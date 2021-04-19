@@ -623,7 +623,7 @@ namespace nil {
                             underlying_field_value_type Y1Z1 = (this->Y) * (this->Z);
                             underlying_field_value_type Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
 
-                            return element_bls12_g1(X3, Y3, Z3);
+                            return {X3, Y3, Z3};
                         }
 
                         /** @brief
@@ -687,7 +687,7 @@ namespace nil {
                             underlying_field_value_type Z3 =
                                 ((this->Z) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
-                            return element_bls12_g1(X3, Y3, Z3);
+                            return {X3, Y3, Z3};
                         }
 
                     private:
@@ -714,7 +714,7 @@ namespace nil {
                             underlying_field_value_type Z3 =
                                 ((this->Z + other.Z).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
-                            return element_bls12_g1(X3, Y3, Z3);
+                            return {X3, Y3, Z3};
                         }
 
                     public:

@@ -45,7 +45,6 @@ namespace nil {
                         using policy_type = edwards_basic_policy<183>;
 
                     public:
-
                         using fp_type = typename policy_type::fp_type;
                         using fq_type = typename policy_type::fq_type;
                         using fqe_type = typename policy_type::fqe_type;
@@ -58,8 +57,8 @@ namespace nil {
                         constexpr static const typename policy_type::number_type ate_loop_count =
                             policy_type::ate_loop_count;
 
-                        /*constexpr static*/ const typename g2_type::underlying_field_type::value_type twist =
-                            g2::one().twist;
+                        constexpr static const typename g2_type::underlying_field_type::value_type twist =
+                            g2_type::value_type::twist;
                         // must be
                         // constexpr static const typename g2_type::underlying_field_type::value_type
                         //    twist = g2::one()::twist;
@@ -72,8 +71,8 @@ namespace nil {
                         using Fq = typename fq_type::value_type;
                         using Fq3 = typename fqe_type::value_type;
                         using gt = typename fqk_type::value_type;
+
                     public:
-                        
                         struct Fq_conic_coefficients {
 
                             Fq c_ZZ;
@@ -280,7 +279,8 @@ namespace nil {
 
                             bool found_one = false;
                             for (long i = policy_type::scalar_field_bits; i >= 0; --i) {
-                                const bool bit = nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
+                                const bool bit =
+                                    nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;
@@ -311,7 +311,8 @@ namespace nil {
                             bool found_one = false;
                             std::size_t idx = 0;
                             for (long i = policy_type::scalar_field_bits - 1; i >= 0; --i) {
-                                const bool bit = nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
+                                const bool bit =
+                                    nil::crypto3::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                                 if (!found_one) {
                                     /* this skips the MSB itself */
                                     found_one |= bit;

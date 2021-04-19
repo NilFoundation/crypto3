@@ -57,7 +57,7 @@ namespace nil {
                         constexpr static const std::size_t base_field_bits = 254;    ///< size of the base field in bits
 
                         typedef fields::alt_bn128_fq<base_field_bits> g1_field_type;
-                        using base_field_type = g1_field_type;
+                        typedef g1_field_type base_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
 
