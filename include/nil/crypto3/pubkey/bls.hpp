@@ -55,9 +55,24 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            //
-            // Basic scheme
-            // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+        //
+        // Basic scheme
+        // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+        /*!
+         * @brief 
+         * 
+         * @ingroup pubkey_algorithms
+         * 
+         * BLS is a digital signature scheme with aggregation properties.  Given set of signatures 
+         * (signature_1, ..., signature_n) anyone can produce an aggregated signature.  Aggregation 
+         * can also be done on secret keys and public keys.  Furthermore, the BLS signature scheme 
+         * is deterministic, non-malleable, and efficient.  Its simplicity and cryptographic properties 
+         * allows it to be useful in a variety of use- cases, specifically when minimal storage space or 
+         * bandwidth are required.
+         *
+         *
+         *
+         */
             //
             template<typename SignatureVariant, typename public_params>
             struct bls_basic_scheme {

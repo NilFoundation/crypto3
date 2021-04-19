@@ -36,6 +36,25 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+
+ /*!
+         * @brief 
+         * 
+         * @ingroup pubkey_algorithms
+         * 
+         * Signature verification. For document and signature data, the validity of the signature 
+         * is determined using the public key. Verification of the signature is performed with a 
+         * public key corresponding to the same private key that was used when signing.
+         *
+         * Funcion verify is a validation algorithm that outputs VALID if the signature is a 
+         * valid public key message signature, and INVALID otherwise.
+         *
+         */
+
+
+
+
+
             template<typename Scheme>
             using verification_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::verification_policy;
 
@@ -303,6 +322,7 @@ namespace nil {
          *
          * @param first
          * @param last
+         * @param sig
          * @param key
          * @param out
          *
@@ -334,6 +354,7 @@ namespace nil {
          * @tparam OutputIterator
          *
          * @param rng
+         * @param sig
          * @param key
          * @param out
          *
@@ -418,11 +439,11 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam KeySinglePassRange
          * @tparam SchemeAccumulator
          *
          * @param first
          * @param last
+         * @param sig
          * @param key
          *
          * @return
@@ -455,6 +476,7 @@ namespace nil {
          * @tparam SchemeAccumulator
          *
          * @param r
+         * @param sig
          * @param key
          *
          * @return
@@ -487,6 +509,7 @@ namespace nil {
          *
          * @param first
          * @param last
+         * @param key
          * @param acc
          *
          * @return
@@ -517,6 +540,7 @@ namespace nil {
          * @tparam OutputAccumulator
          *
          * @param r
+         * @param key
          * @param acc
          *
          * @return

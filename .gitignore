@@ -440,4 +440,4 @@ TSWLatexianTemp*
 
 ### TeX Patch ###
 # glossaries
-*.glstex
+*.glstex.DS_Store

@@ -36,6 +36,27 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+
+
+
+        /*!
+         * @brief 
+         * 
+         * @ingroup pubkey_algorithms
+         * 
+         * A digital signature is a mathematical scheme for verifying the authenticity of 
+         * digital messages or documents. A valid digital signature, where the prerequisites 
+         * are satisfied, gives a recipient very strong reason to believe that the message 
+         * was created by a known sender (authentication), and that the message was not altered 
+         * in transit (integrity).
+         *
+         * The function sign takes as input parameters - a message to be signed, a private key for 
+         * signing and an iterator for output the message. Once executed, the function returns a 
+         * signed message.
+         *
+         *
+         * @brief Algorithms are meant to provide hashing interface similar to STL algorithms' one.
+         */
             template<typename Scheme>
             using signing_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::signing_policy;
         }
@@ -296,7 +317,7 @@ namespace nil {
          *
          * @param first
          * @param last
-         * @param key
+         *  
          * @param out
          *
          * @return

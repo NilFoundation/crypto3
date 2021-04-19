@@ -36,6 +36,22 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+
+
+        /*!
+         * @brief 
+         * 
+         * @ingroup pubkey_algorithms
+         * 
+         * Given a list of signatures for a list of messages and public keys, an aggregation algorithm 
+         * generates one signature that authenticates the same list of messages and public keys.
+         *
+         *
+         *
+         */
+
+
+
             template<typename Scheme>
             using aggregation_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::aggregation_policy;
         }
@@ -298,7 +314,6 @@ namespace nil {
          *
          * @param first
          * @param last
-         * @param key
          * @param out
          *
          * @return
@@ -328,7 +343,6 @@ namespace nil {
          * @tparam OutputIterator
          *
          * @param rng
-         * @param key
          * @param out
          *
          * @return
@@ -445,7 +459,6 @@ namespace nil {
          * @tparam SchemeAccumulator
          *
          * @param r
-         * @param key
          *
          * @return
          */
