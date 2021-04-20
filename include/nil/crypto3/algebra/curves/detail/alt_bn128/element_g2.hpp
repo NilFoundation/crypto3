@@ -115,17 +115,7 @@ namespace nil {
                          *
                          */
                         static element_alt_bn128_g2 one() {
-                            return element_alt_bn128_g2(
-                                underlying_field_value_type(
-                                    0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
-                                    0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
-                                underlying_field_value_type(
-                                    0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
-                                    0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
-                                underlying_field_value_type::one());
-                            // must be
-                            // return element_alt_bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
-                            // when constexpr fields will be finished
+                            return element_alt_bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         bool operator==(const element_alt_bn128_g2 &other) const {
@@ -383,36 +373,35 @@ namespace nil {
                         }
 
                     private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                        /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(0x09, 0x01);
+                        constexpr static const g2_field_type_value twist = g2_field_type_value(0x09, 0x01);
 
-                        /*constexpr static */ const g2_field_type_value twist_coeff_b = b * twist.inversed();
+                        constexpr static const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_b_c0 = b * twist.non_residue;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_b_c1 = b * twist.non_residue;
-                        /*constexpr static */ const g2_field_type_value twist_mul_by_q_X = g2_field_type_value(
+                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = b * twist.non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = b * twist.non_residue;
+                        constexpr static const g2_field_type_value twist_mul_by_q_X = g2_field_type_value(
                             0x2FB347984F7911F74C0BEC3CF559B143B78CC310C2C3330C99E39557176F553D_cppui254,
-                             0x16C9E55061EBAE204BA4CC8BD75A079432AE2A1D0B7C9DCE1665D51C640FCBA2_cppui253);
-                        /*constexpr static */ const g2_field_type_value twist_mul_by_q_Y = g2_field_type_value(
+                            0x16C9E55061EBAE204BA4CC8BD75A079432AE2A1D0B7C9DCE1665D51C640FCBA2_cppui253);
+                        constexpr static const g2_field_type_value twist_mul_by_q_Y = g2_field_type_value(
                             0x63CF305489AF5DCDC5EC698B6E2F9B9DBAAE0EDA9C95998DC54014671A0135A_cppui251,
-                             0x7C03CBCAC41049A0704B5A7EC796F2B21807DC98FA25BD282D37F632623B0E3_cppui251);
+                            0x7C03CBCAC41049A0704B5A7EC796F2B21807DC98FA25BD282D37F632623B0E3_cppui251);
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(
                                 0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
                                 0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
                             underlying_field_value_type(
                                 0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
                                 0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
-                            underlying_field_value_type::one()};*/
+                            underlying_field_value_type::one()};
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

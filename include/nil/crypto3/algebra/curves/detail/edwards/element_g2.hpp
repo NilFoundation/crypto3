@@ -76,12 +76,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        element_edwards_g2() :
-                            element_edwards_g2(underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                                               underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_edwards_g2() : element_edwards_g2(one_fill[0], one_fill[1]) {};
-                        // when constexpr fields will be finished
+                        element_edwards_g2() : element_edwards_g2(one_fill[0], one_fill[1], one_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
@@ -107,12 +102,7 @@ namespace nil {
                          *
                          */
                         static element_edwards_g2 zero() {
-                            return element_edwards_g2(underlying_field_value_type::zero(),
-                                                      underlying_field_value_type::one(),
-                                                      underlying_field_value_type::zero());
-                            // must be
-                            // return element_edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
-                            // when constexpr fields will be finished
+                            return element_edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
                         }
                         /** @brief Get the generator of group G2
                          *
@@ -354,43 +344,72 @@ namespace nil {
                             return element_edwards_g2(p_out[0], p_out[1], p_out[2]);
                         }
 
-                        /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
+                        constexpr static const g2_field_type_value twist = g2_field_type_value(
                             g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one(),
                             g2_field_type_value::underlying_type::zero());
-                        ;
 
                     private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
+                        constexpr static const g1_field_type_value a = policy_type::a;
+                        constexpr static const g1_field_type_value d = policy_type::d;
 
-                        /*constexpr static */ const g2_field_type_value twist_coeff_a = a * twist;
-                        /*constexpr static */ const g2_field_type_value twist_coeff_d = d * twist;
+                        constexpr static const g2_field_type_value twist_coeff_a = a * twist;
+                        constexpr static const g2_field_type_value twist_coeff_d = d * twist;
 
-                        /*constexpr static const*/ g1_field_type_value twist_mul_by_a_c0;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_a_c1 = a;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_a_c2 = a;
-                        /*constexpr static const*/ g1_field_type_value twist_mul_by_d_c0;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_d_c1 = d;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_d_c2 = d;
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_q_Y =
+                        static g1_field_type_value twist_mul_by_a_c0;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c1 = a;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c2 = a;
+                        static g1_field_type_value twist_mul_by_d_c0;
+                        constexpr static const g1_field_type_value twist_mul_by_d_c1 = d;
+                        constexpr static const g1_field_type_value twist_mul_by_d_c2 = d;
+                        constexpr static const g1_field_type_value twist_mul_by_q_Y =
                             g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-                        /*constexpr static */ const g1_field_type_value twist_mul_by_q_Z =
+                        constexpr static const g1_field_type_value twist_mul_by_q_Z =
                             g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
-                            underlying_field_value_type::zero(),
-                            underlying_field_value_type::one(),
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
+                            underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
                                                         0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
                                                         0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
                             underlying_field_value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
                                                         0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
-                                                        0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)};*/
+                                                        0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),
+                            underlying_field_value_type::zero()};    //< Third value is not correct!
                     };
 
+                    constexpr std::array<typename element_edwards_g2<183>::underlying_field_value_type, 3> const
+                        element_edwards_g2<183>::zero_fill;
+                    constexpr std::array<typename element_edwards_g2<183>::underlying_field_value_type, 3> const
+                        element_edwards_g2<183>::one_fill;
+
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const element_edwards_g2<183>::a;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const element_edwards_g2<183>::d;
+
+                    constexpr typename element_edwards_g2<183>::g2_field_type_value const
+                        element_edwards_g2<183>::twist_coeff_a;
+                    constexpr typename element_edwards_g2<183>::g2_field_type_value const
+                        element_edwards_g2<183>::twist_coeff_d;
+
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_a_c1;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_a_c2;
+
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_d_c1;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_d_c2;
+
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_q_Y;
+                    constexpr typename element_edwards_g2<183>::g1_field_type_value const
+                        element_edwards_g2<183>::twist_mul_by_q_Z;
+
+                    typename element_edwards_g2<183>::g1_field_type_value element_edwards_g2<183>::twist_mul_by_a_c0;
+                    typename element_edwards_g2<183>::g1_field_type_value element_edwards_g2<183>::twist_mul_by_d_c0;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

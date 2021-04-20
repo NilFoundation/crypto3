@@ -57,10 +57,6 @@ namespace nil {
                         constexpr static const typename policy_type::number_type ate_loop_count =
                             policy_type::ate_loop_count;
 
-                        constexpr static const typename g2_type::underlying_field_type::value_type twist =
-                            g2_type::twist;
-                        // but it's better to implement a structure pairing_params with such values
-
                     private:
                         using g1 = typename g1_type::value_type;
                         using g2 = typename g2_type::value_type;
@@ -69,6 +65,10 @@ namespace nil {
                         using gt = typename fqk_type::value_type;
 
                     public:
+                        constexpr static const typename g2_type::underlying_field_type::value_type twist =
+                            g2_type::value_type::twist;
+                        // but it's better to implement a structure pairing_params with such values
+
                         struct ate_g1_precomp {
                             using value_type = Fq;
 

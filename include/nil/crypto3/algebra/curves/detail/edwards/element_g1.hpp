@@ -28,7 +28,6 @@
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
@@ -111,15 +110,7 @@ namespace nil {
                          *
                          */
                         static element_edwards_g1 one() {
-                            return element_edwards_g1(
-                                underlying_field_value_type(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
-                                underlying_field_value_type(
-                                    0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182));    // it's better to
-                                                                                                    // precompute also
-                                                                                                    // one_fill[2]
-                            // must be
-                            // return element_edwards_g1(one_fill[0], one_fill[1]);    // it's better to precompute also
-                            // one_fill[2] when constexpr fields will be finished
+                            return element_edwards_g1(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -328,18 +319,26 @@ namespace nil {
                         }
 
                     private:
-                        /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
+                        constexpr static const g1_field_type_value a = policy_type::a;
+                        constexpr static const g1_field_type_value d = policy_type::d;
 
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
-                            underlying_field_value_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182)};*/
+                            underlying_field_value_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182),
+                            underlying_field_value_type::zero()};    //< Third value is not correct!
                     };
 
+                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
+                        element_edwards_g1<183>::zero_fill;
+                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
+                        element_edwards_g1<183>::one_fill;
+
+                    constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::a;
+                    constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::d;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -26,7 +26,6 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_BASIC_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 

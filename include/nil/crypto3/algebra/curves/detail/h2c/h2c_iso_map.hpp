@@ -241,7 +241,6 @@ namespace nil {
                             return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -28,7 +28,6 @@
 #define CRYPTO3_ALGEBRA_CURVES_MNT4_G2_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
@@ -350,8 +349,8 @@ namespace nil {
                             return this->to_affine();
                         }
 
-                        constexpr static const g1_field_type_value g1_a = g1_field_type_value(policy_type::a);
-                        constexpr static const g1_field_type_value g1_b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value g1_a = policy_type::a;
+                        constexpr static const g1_field_type_value g1_b = policy_type::b;
 
                         constexpr static const g2_field_type_value twist =
                             g2_field_type_value(g2_field_type_value::underlying_type::zero(),
@@ -417,6 +416,21 @@ namespace nil {
 
                     constexpr
                         typename element_mnt4_g2<298>::g2_field_type_value const element_mnt4_g2<298>::twist_coeff_b;
+
+                    constexpr typename element_mnt4_g2<298>::g1_field_type_value const
+                        element_mnt4_g2<298>::twist_mul_by_a_c0;
+                    constexpr typename element_mnt4_g2<298>::g1_field_type_value const
+                        element_mnt4_g2<298>::twist_mul_by_a_c1;
+
+                    constexpr typename element_mnt4_g2<298>::g1_field_type_value const
+                        element_mnt4_g2<298>::twist_mul_by_b_c0;
+                    constexpr typename element_mnt4_g2<298>::g1_field_type_value const
+                        element_mnt4_g2<298>::twist_mul_by_b_c1;
+
+                    constexpr
+                        typename element_mnt4_g2<298>::g1_field_type_value const element_mnt4_g2<298>::twist_mul_by_q_X;
+                    constexpr
+                        typename element_mnt4_g2<298>::g1_field_type_value const element_mnt4_g2<298>::twist_mul_by_q_Y;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -26,7 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS128_BASIC_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS128_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/g2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -50,8 +51,8 @@ namespace nil {
                         using fqe_type = typename policy_type::g2_field_type;
                         using fqk_type = typename policy_type::gt_field_type;
 
-                        using g1_type = typename policy_type::g1_field_type;
-                        using g2_type = typename policy_type::g2_field_type;
+                        using g1_type = curves::detail::bls12_g1<381>;
+                        using g2_type = curves::detail::bls12_g2<381>;
                         using gt_type = typename policy_type::gt_field_type;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
@@ -80,17 +81,17 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using g1_type = typename policy_type::g1_field_type;
-                        using g2_type = typename policy_type::g2_field_type;
+                        using g1_type = curves::detail::bls12_g1<377>;
+                        using g2_type = curves::detail::bls12_g2<377>;
                         using gt_type = typename policy_type::gt_field_type;
 
                         typedef typename policy_type::scalar_field_type Fp_field;
-                        using Fq_field = typename policy_type::g1_field_type;
-                        using Fqe_field = typename policy_type::g2_field_type;
+                        typedef typename policy_type::g1_field_type Fq_field;
+                        typedef typename policy_type::g2_field_type Fqe_field;
                         typedef typename policy_type::gt_field_type Fqk_field;
 
                         typedef typename Fq_field::value_type Fq;
-                        using Fq2 = typename Fqe_field::value_type;
+                        typedef typename Fqe_field::value_type Fq2;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                         constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
