@@ -30,11 +30,6 @@
 #include <cstdint>
 #include <string>
 
-// #include <nil/crypto3/multiprecision/cpp_modular.hpp>
-// #include <nil/crypto3/multiprecision/number.hpp>
-// #include <nil/crypto3/multiprecision/cpp_int.hpp>
-// #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>

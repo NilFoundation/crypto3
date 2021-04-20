@@ -57,7 +57,6 @@ namespace nil {
 
                         using value_type = element_edwards_g1<ModulusBits>;
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

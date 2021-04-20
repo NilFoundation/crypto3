@@ -26,14 +26,13 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_BASIC_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 183>
@@ -47,10 +46,10 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using Fp_type = typename policy_type::scalar_field_type;
-                        using Fq_type = typename policy_type::g1_field_type;
-                        using Fqe_type = typename policy_type::g2_field_type;
-                        using Fqk_type = typename policy_type::gt_field_type;
+                        using fp_type = typename policy_type::scalar_field_type;
+                        using fq_type = typename policy_type::g1_field_type;
+                        using fqe_type = typename policy_type::g2_field_type;
+                        using fqk_type = typename policy_type::gt_field_type;
 
                         using g1_type = curves::detail::edwards_g1<183>;
                         using g2_type = curves::detail::edwards_g2<183>;
@@ -80,7 +79,7 @@ namespace nil {
                         typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::ate_loop_count;
 
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

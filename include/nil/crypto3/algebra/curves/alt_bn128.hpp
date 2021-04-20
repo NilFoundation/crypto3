@@ -67,8 +67,8 @@ namespace nil {
                     typedef typename detail::alt_bn128_g1<ModulusBits> g1_type;
                     typedef typename detail::alt_bn128_g2<ModulusBits> g2_type;
 
-                    // typedef typename pairings::pairing_policy<alt_bn128<ModulusBits>,
-                    //    pairings::detail::alt_bn128_pairing_functions<ModulusBits>> pairing_policy;
+                    // typedef typename pairing::pairing_policy<alt_bn128<ModulusBits>,
+                    //    pairing::detail::alt_bn128_pairing_functions<ModulusBits>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
                 };

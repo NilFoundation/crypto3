@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
+
 #include <nil/crypto3/multiprecision/ressol.hpp>
 #include <nil/crypto3/multiprecision/inverse.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
@@ -161,7 +162,7 @@ namespace nil {
                             return data >= B.data;
                         }
 
-                        constexpr element_fp & operator++() {
+                        constexpr element_fp &operator++() {
                             data = data + data_type(1, modulus);
                             return *this;
                         }
@@ -172,7 +173,7 @@ namespace nil {
                             return temp;
                         }
 
-                        constexpr element_fp & operator--() {
+                        constexpr element_fp &operator--() {
                             data = data - data_type(1, modulus);
                             return *this;
                         }
@@ -210,17 +211,15 @@ namespace nil {
                         }
 
                         template<typename PowerType,
-                            typename = typename std::enable_if<boost::is_integral<PowerType>::value>::type>
+                                 typename = typename std::enable_if<boost::is_integral<PowerType>::value>::type>
                         constexpr element_fp pow(const PowerType pwr) const {
-                            using nil::crypto3::multiprecision::powm;
-                            using nil::crypto3::multiprecision::uint128_t;
-                            return element_fp(powm(data, uint128_t(pwr)));
+                            return element_fp(multiprecision::powm(data, multiprecision::uint128_t(pwr)));
                         }
 
-                        template <typename Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr element_fp pow(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
-                            using nil::crypto3::multiprecision::powm;
-                            return element_fp(powm(data, pwr));
+                        template<typename Backend, multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr element_fp
+                            pow(const multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
+                            return element_fp(multiprecision::powm(data, pwr));
                         }
                     };
 

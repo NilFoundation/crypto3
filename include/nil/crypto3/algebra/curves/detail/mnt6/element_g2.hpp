@@ -331,7 +331,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        constexpr element_mnt6_g2 to_affine_coordinates() const {
+                        constexpr element_mnt6_g2 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -351,8 +351,8 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        constexpr element_mnt6_g2 to_special() const {
-                            return this->to_affine_coordinates();
+                        constexpr element_mnt6_g2 to_projective() const {
+                            return this->to_affine();
                         }
 
                         /*element_mnt6_g2 mul_by_q() const {

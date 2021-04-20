@@ -314,7 +314,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_mnt6_g1 to_affine_coordinates() const {
+                        constexpr element_mnt6_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -334,38 +334,35 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        constexpr element_mnt6_g1 to_special() const {
-                            return this->to_affine_coordinates();
+                        constexpr element_mnt6_g1 to_projective() const {
+                            return this->to_affine();
                         }
 
                     private:
-                        constexpr static const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value a = policy_type::a;
+                        constexpr static const g1_field_type_value b = policy_type::b;
 
-                        /*constexpr static const g2_field_type_value twist =
-                            g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
-                                                typename g2_field_type_value::underlying_type::one(),
-                                                typename g2_field_type_value::underlying_type::zero());
+                        constexpr static const g2_field_type_value twist =
+                            g2_field_type_value(g2_field_type_value::underlying_type::zero(),
+                                                g2_field_type_value::underlying_type::one(),
+                                                g2_field_type_value::underlying_type::zero());
 
-                        static const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits>::a;
-                        static const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits>::b;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c0 =
+                            element_mnt6_g1<298>::a * g2_field_type_value::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c1 =
+                            element_mnt6_g1<298>::a * g2_field_type_value::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_a_c2 = element_mnt6_g1<298>::a;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c0 =
+                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c1 =
+                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c2 =
+                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
 
-                        static const g1_field_type_value twist_mul_by_a_c0 =
-                            element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_a_c1 =
-                            element_mnt6_g1<ModulusBits>::a * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_a_c2 =
-                            element_mnt6_g1<ModulusBits>::a; static const g1_field_type_value twist_mul_by_b_c0 =
-                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_b_c1 =
-                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
-                        static const g1_field_type_value twist_mul_by_b_c2 =
-                            element_mnt6_g1<ModulusBits>::b * g2_field_type_value::non_residue;
-
-                        static const g1_field_type_value twist_mul_by_q_X(
-                            0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
-                        static const g1_field_type_value twist_mul_by_q_Y(
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);*/
+                        constexpr static const g1_field_type_value twist_mul_by_q_X =
+                            0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298;
+                        constexpr static const g1_field_type_value twist_mul_by_q_Y =
+                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298;
 
                         constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),

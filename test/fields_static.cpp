@@ -30,11 +30,6 @@
 #include <cstdint>
 #include <string>
 
-// #include <boost/multiprecision/cpp_modular.hpp>
-// #include <boost/multiprecision/number.hpp>
-// #include <boost/multiprecision/cpp_int.hpp>
-// #include <boost/multiprecision/modular/modular_adaptor.hpp>
-
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -193,10 +188,27 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-template<typename element_type>
-constexpr bool check_field_operations_static(const std::array<element_type, elements_set_size> elements,
-                                             const std::array<constant_type, constants_set_size>
-                                                 constants) {
+typedef std::size_t constant_type;
+enum field_operation_test_constants : std::size_t { C1, constants_set_size };
+
+enum field_operation_test_elements : std::size_t {
+    e1,
+    e2,
+    e1_plus_e2,
+    e1_minus_e2,
+    e1_mul_e2,
+    e1_dbl,
+    e2_inv,
+    e1_pow_C1,
+    e2_pow_2,
+    e2_pow_2_sqrt,
+    minus_e1,
+
+    elements_set_size
+};
+
+template<typename ElementsRange, typename ConstantsRange>
+constexpr bool check_field_operations_static(const ElementsRange &elements, const ConstantsRange &constants) {
     static_assert(elements[e1] + elements[e2] == elements[e1_plus_e2], "add error");
     static_assert(elements[e1] - elements[e2] == elements[e1_minus_e2], "sub error");
     static_assert(elements[e1] * elements[e2] == elements[e1_mul_e2], "mul error");

@@ -114,11 +114,7 @@ namespace nil {
                          *
                          */
                         static element_alt_bn128_g1 one() {
-                            return element_alt_bn128_g1(underlying_field_value_type(1), underlying_field_value_type(2),
-                                                        underlying_field_value_type(1));
-                            // must be
-                            // return element_alt_bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
-                            // when constexpr fields will be finished
+                            return element_alt_bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         bool operator==(const element_alt_bn128_g1 &other) const {
@@ -340,7 +336,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_alt_bn128_g1 to_affine_coordinates() {
+                        element_alt_bn128_g1 to_affine() {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -363,20 +359,19 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G1 in affine coordinates
                          */
-                        element_alt_bn128_g1 to_special() {
-                            return this->to_affine_coordinates();
+                        element_alt_bn128_g1 to_projective() {
+                            return this->to_affine();
                         }
 
                     private:
-                        /*constexpr static const underlying_field_value_type zero_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};
 
-                        constexpr static const underlying_field_value_type one_fill = {
+                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
                             underlying_field_value_type(1), underlying_field_value_type(2),
-                        underlying_field_value_type(1)};*/
+                            underlying_field_value_type(1)};
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -105,7 +105,7 @@ test_instances_t<GroupType> generate_group_elements(std::size_t count, std::size
 
     for (size_t i = 0; i < count; i++) {
 
-        typename GroupType::value_type x = random_element<GroupType>().to_special();    // djb requires input to be in special form
+        typename GroupType::value_type x = random_element<GroupType>().to_projective();    // djb requires input to be in special form
 
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);

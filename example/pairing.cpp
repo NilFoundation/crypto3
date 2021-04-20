@@ -92,11 +92,11 @@ void print_curve_group_element(CurveGroupValueType e) {
     print_field_element(e.Z);
 }
 
-void print_ate_g1_precomp_element(const typename curves::bls12<381>::pairing_policy::G1_precomp &e) {
+void print_ate_g1_precomp_element(const typename curves::bls12<381>::pairing::g1_precomp &e) {
     std::cout << e.PX.data << " " << e.PY.data << std::endl;
 }
 
-void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing_policy::G2_precomp &e) {
+void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing::g2_precomp &e) {
     std::cout << "\"coordinates\": [[" << e.QX.data[0].data << " , " << e.QX.data[1].data << "] , ["
               << e.QY.data[0].data << " , " << e.QY.data[1].data << "]]" << std::endl;
     auto print_coeff = [](const auto &c) {
@@ -113,7 +113,7 @@ void print_ate_g2_precomp_element(const typename curves::bls12<381>::pairing_pol
     std::cout << "]" << std::endl;
 }
 
-void print_ate_g1_precomp_element(const typename curves::mnt4<298>::pairing_policy::G1_precomp &e) {
+void print_ate_g1_precomp_element(const typename curves::mnt4<298>::pairing::g1_precomp &e) {
     std::cout << "Ate g1 precomp element:" << std::endl;
     print_field_element(e.PX);
     print_field_element(e.PY);
@@ -121,7 +121,7 @@ void print_ate_g1_precomp_element(const typename curves::mnt4<298>::pairing_poli
     print_field_element(e.PY_twist);
 }
 
-void print_ate_g2_precomp_element(const typename curves::mnt4<298>::pairing_policy::G2_precomp &e) {
+void print_ate_g2_precomp_element(const typename curves::mnt4<298>::pairing::g2_precomp &e) {
     std::cout << "Ate g2 precomp element:" << std::endl;
 
     print_field_element(e.QX);
@@ -147,7 +147,7 @@ void print_ate_g2_precomp_element(const typename curves::mnt4<298>::pairing_poli
     }
 }
 
-void print_ate_g1_precomp_element(const typename curves::mnt6<298>::pairing_policy::G1_precomp &e) {
+void print_ate_g1_precomp_element(const typename curves::mnt6<298>::pairing::g1_precomp &e) {
     std::cout << "Ate g1 precomp element:" << std::endl;
     print_field_element(e.PX);
     print_field_element(e.PY);
@@ -155,7 +155,7 @@ void print_ate_g1_precomp_element(const typename curves::mnt6<298>::pairing_poli
     print_field_element(e.PY_twist);
 }
 
-void print_ate_g2_precomp_element(const typename curves::mnt6<298>::pairing_policy::G2_precomp &e) {
+void print_ate_g2_precomp_element(const typename curves::mnt6<298>::pairing::g2_precomp &e) {
     std::cout << "Ate g2 precomp element:" << std::endl;
 
     print_field_element(e.QX);
@@ -191,34 +191,34 @@ void pairing_example() {
     typename PairingT::G1_type g1_el1(g1_X1, g1_Y1, g1_Z1);
     std::cout << "g1_el1: ";
     print_curve_group_element(g1_el1);
-    typename PairingT::G1_precomp g1_precomp_el1 = PairingT::precompute_g1(g1_el1);
+    typename PairingT::g1_precomp g1_precomp_el1 = PairingT::precompute_g1(g1_el1);
     std::cout << "g1_precomp_el1: ";
     print_ate_g1_precomp_element(g1_precomp_el1);
     typename PairingT::G1_type g1_el2 = PairingT::G1_type::one();
     std::cout << "g1_el2: ";
     print_curve_group_element(g1_el2);
-    typename PairingT::G1_precomp g1_precomp_el2 = PairingT::precompute_g1(g1_el2);
+    typename PairingT::g1_precomp g1_precomp_el2 = PairingT::precompute_g1(g1_el2);
     std::cout << "g1_precomp_el2: ";
     print_ate_g1_precomp_element(g1_precomp_el2);
 
     typename PairingT::G2_type g2_el1 = PairingT::G2_type::one();
     std::cout << "g2_el1: ";
     print_curve_group_element(g2_el1);
-    typename PairingT::G2_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
+    typename PairingT::g2_precomp g2_precomp_el1 = PairingT::precompute_g2(g2_el1);
     std::cout << "g2_precomp_el1: ";
     print_ate_g2_precomp_element(g2_precomp_el1);
     typename PairingT::G2_type g2_el2 = PairingT::G2_type::one();
     std::cout << "g2_el2: ";
     print_curve_group_element(g2_el2);
-    typename PairingT::G2_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
+    typename PairingT::g2_precomp g2_precomp_el2 = PairingT::precompute_g2(g2_el2);
     std::cout << "g2_precomp_el2: ";
     print_ate_g2_precomp_element(g2_precomp_el2);
 
-    typename PairingT::GT_type gt_el1 = PairingT::reduced_pairing(g1_el1, g2_el1);
+    typename PairingT::GT_type gt_el1 = PairingT::pair_reduced(g1_el1, g2_el1);
     std::cout << "gt_el1: ";
     print_field_element(gt_el1);
 
-    typename PairingT::GT_type gt_el2 = PairingT::pairing(g1_el1, g2_el1);
+    typename PairingT::GT_type gt_el2 = PairingT::pair(g1_el1, g2_el1);
     std::cout << "gt_el2: ";
     print_field_element(gt_el2);
 
@@ -237,9 +237,9 @@ void pairing_example() {
 }
 
 int main() {
-    //pairing_example<curves::bls12<381>::pairing_policy>();
+    //pairing_example<curves::bls12<381>::pairing>();
 
-    //pairing_example<curves::mnt4<298>::pairing_policy>();
+    //pairing_example<curves::mnt4<298>::pairing>();
 
-    pairing_example<curves::mnt6<298>::pairing_policy>();
+    pairing_example<curves::mnt6<298>::pairing>();
 }

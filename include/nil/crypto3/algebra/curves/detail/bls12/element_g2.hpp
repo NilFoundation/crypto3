@@ -352,7 +352,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        constexpr element_bls12_g2 to_affine_coordinates() const {
+                        constexpr element_bls12_g2 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -374,11 +374,11 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        constexpr element_bls12_g2 to_special() const {
-                            return this->to_affine_coordinates();
+                        constexpr element_bls12_g2 to_projective() const {
+                            return this->to_affine();
                         }
 
-                        constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                        constexpr static const g1_field_type_value b = policy_type::b;
 
                         constexpr static const g2_field_type_value twist =
                             g2_field_type_value(g2_field_type_value::underlying_type::one(),
@@ -702,7 +702,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_bls12_g2 to_affine_coordinates() const {
+                        element_bls12_g2 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -724,8 +724,8 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_bls12_g2 to_special() const {
-                            return this->to_affine_coordinates();
+                        element_bls12_g2 to_projective() const {
+                            return this->to_affine();
                         }
 
                         constexpr static const g1_field_type_value b = policy_type::b;

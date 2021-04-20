@@ -26,13 +26,13 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS128_BASIC_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS128_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/g2.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
-            namespace pairings {
+            namespace pairing {
                 namespace detail {
 
                     template<std::size_t ModulusBits = 381>
@@ -46,10 +46,10 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using Fp_type = typename policy_type::scalar_field_type;
-                        using Fq_type = typename policy_type::g1_field_type;
-                        using Fqe_type = typename policy_type::g2_field_type;
-                        using Fqk_type = typename policy_type::gt_field_type;
+                        using fp_type = typename policy_type::scalar_field_type;
+                        using fq_type = typename policy_type::g1_field_type;
+                        using fqe_type = typename policy_type::g2_field_type;
+                        using fqk_type = typename policy_type::gt_field_type;
 
                         using g1_type = curves::detail::bls12_g1<381>;
                         using g2_type = curves::detail::bls12_g2<381>;
@@ -64,12 +64,12 @@ namespace nil {
 
                         constexpr static const number_type coef_b = policy_type::b;
 
-                        constexpr static const number_type ate_loop_count = number_type(0xD201000000010000_cppui64);
+                        constexpr static const number_type ate_loop_count = 0xD201000000010000_cppui64;
                         constexpr static const bool ate_is_loop_count_neg = true;
                         // constexpr static const extended_number_type final_exponent = extended_number_type(
                         //    0x2EE1DB5DCC825B7E1BDA9C0496A1C0A89EE0193D4977B3F7D4507D07363BAA13F8D14A917848517BADC3A43D1073776AB353F2C30698E8CC7DEADA9C0AADFF5E9CFEE9A074E43B9A660835CC872EE83FF3A0F0F1C0AD0D6106FEAF4E347AA68AD49466FA927E7BB9375331807A0DCE2630D9AA4B113F414386B0E8819328148978E2B0DD39099B86E1AB656D2670D93E4D7ACDD350DA5359BC73AB61A0C5BF24C374693C49F570BCD2B01F3077FFB10BF24DDE41064837F27611212596BC293C8D4C01F25118790F4684D0B9C40A68EB74BB22A40EE7169CDC1041296532FEF459F12438DFC8E2886EF965E61A474C5C85B0129127A1B5AD0463434724538411D1676A53B5A62EB34C05739334F46C02C3F0BD0C55D3109CD15948D0A1FAD20044CE6AD4C6BEC3EC03EF19592004CEDD556952C6D8823B19DADD7C2498345C6E5308F1C511291097DB60B1749BF9B71A9F9E0100418A3EF0BC627751BBD81367066BCA6A4C1B6DCFC5CCEB73FC56947A403577DFA9E13C24EA820B09C1D9F7C31759C3635DE3F7A3639991708E88ADCE88177456C49637FD7961BE1A4C7E79FB02FAA732E2F3EC2BEA83D196283313492CAA9D4AFF1C910E9622D2A73F62537F2701AAEF6539314043F7BBCE5B78C7869AEB2181A67E49EEED2161DAF3F881BD88592D767F67C4717489119226C2F011D4CAB803E9D71650A6F80698E2F8491D12191A04406FBC8FBD5F48925F98630E68BFB24C0BCB9B55DF57510_cppui4314);
 
-                        constexpr static const number_type final_exponent_z = number_type(0xD201000000010000_cppui64);
+                        constexpr static const number_type final_exponent_z = 0xD201000000010000_cppui64;
                         constexpr static const bool final_exponent_is_z_neg = true;
                     };
 
@@ -81,18 +81,17 @@ namespace nil {
                         typedef typename policy_type::number_type number_type;
                         typedef typename policy_type::extended_number_type extended_number_type;
 
-                        using g1_group = curves::detail::bls12_g1<381>;
-                        using g2_group = curves::detail::bls12_g2<381>;
+                        using g1_type = curves::detail::bls12_g1<377>;
+                        using g2_type = curves::detail::bls12_g2<377>;
+                        using gt_type = typename policy_type::gt_field_type;
+
                         typedef typename policy_type::scalar_field_type Fp_field;
-                        using Fq_field = typename policy_type::g1_field_type;
-                        using Fqe_field = typename policy_type::g2_field_type;
+                        typedef typename policy_type::g1_field_type Fq_field;
+                        typedef typename policy_type::g2_field_type Fqe_field;
                         typedef typename policy_type::gt_field_type Fqk_field;
 
-                        using g1 = typename g1_group::value_type;
-                        using g2 = typename g2_group::value_type;
                         typedef typename Fq_field::value_type Fq;
-                        using Fq2 = typename Fqe_field::value_type;
-                        typedef typename Fqk_field::value_type gt;
+                        typedef typename Fqe_field::value_type Fq2;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                         constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
@@ -124,7 +123,7 @@ namespace nil {
                     constexpr bool const bls12_basic_policy<377>::final_exponent_is_z_neg;
 
                 }    // namespace detail
-            }        // namespace pairings
+            }        // namespace pairing
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil

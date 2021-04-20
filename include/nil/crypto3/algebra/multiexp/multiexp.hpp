@@ -80,7 +80,7 @@ namespace nil {
 
                 typedef MultiexpMethod method_type;
 
-                assert(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
+                BOOST_ASSERT(std::distance(vec_start, vec_end) == std::distance(scalar_start, scalar_end));
 
                 InputBaseIterator vec_it = vec_start;
                 InputFieldIterator scalar_it = scalar_start;
@@ -247,7 +247,7 @@ namespace nil {
 
                 GroupType::batch_to_special_all_non_zeros(non_zero_vec);
                 typename std::vector<typename GroupType::value_type>::const_iterator it = non_zero_vec.begin();
-                typename GroupType::value_type zero_special = GroupType::value_type::zero().to_special();
+                typename GroupType::value_type zero_special = GroupType::value_type::zero().to_projective();
 
                 for (std::size_t i = 0; i < vec.size(); ++i) {
                     if (!vec[i].is_zero()) {

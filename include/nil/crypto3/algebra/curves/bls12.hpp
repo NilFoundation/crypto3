@@ -70,9 +70,9 @@ namespace nil {
 
                     constexpr static const bool has_affine_pairing = false;
 
-                    typedef typename pairings::pairing_policy<bls12<ModulusBits>,
-                                                              pairings::detail::bls12_pairing_functions<ModulusBits>>
-                        pairing_policy;
+                    typedef typename pairing::pairing_policy<bls12<ModulusBits>,
+                                                             pairing::detail::bls12_pairing_functions<ModulusBits>>
+                        pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;
                 };

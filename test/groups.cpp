@@ -48,31 +48,31 @@ void test_mixed_add() {
 
     base = GroupType::value_type::zero();
     el = GroupType::value_type::zero();
-    el.to_special();
+    el.to_projective();
     result = base.mixed_add(el);
     assert(result == base + el);
 
     base = GroupType::value_type::zero();
     el = random_element<GroupType>();
-    el.to_special();
+    el.to_projective();
     result = base.mixed_add(el);
     assert(result == base + el);
 
     base = random_element<GroupType>();
     el = GroupType::value_type::zero();
-    el.to_special();
+    el.to_projective();
     result = base.mixed_add(el);
     assert(result == base + el);
 
     base = random_element<GroupType>();
     el = random_element<GroupType>();
-    el.to_special();
+    el.to_projective();
     result = base.mixed_add(el);
     assert(result == base + el);
 
     base = random_element<GroupType>();
     el = base;
-    el.to_special();
+    el.to_projective();
     result = base.mixed_add(el);
     assert(result == base.dbl());
 }
