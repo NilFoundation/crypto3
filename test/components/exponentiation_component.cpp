@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(exponentiation_component_mnt4_298_test_case) {
 
     std::cout << "Testing mnt4<298>: " << std::endl;
 
-    test_exponentiation_component<curves::mnt4<298>::pairing_policy::Fqk_type, components::Fp4_variable, 
+    test_exponentiation_component<curves::mnt4<298>::pairing::fqk_type, components::Fp4_variable, 
         components::Fp4_mul_component, components::Fp4_sqr_component>(
-            curves::mnt4<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
+            curves::mnt4<298>::pairing::final_exponent_last_chunk_abs_of_w0);
 
 }
 
@@ -90,9 +90,9 @@ BOOST_AUTO_TEST_CASE(exponentiation_component_mnt6_298_test_case) {
 
     std::cout << "Testing mnt6<298>: " << std::endl;
 
-    test_exponentiation_component<curves::mnt6<298>::pairing_policy::Fqk_type, components::Fp6_2over3_variable, 
+    test_exponentiation_component<curves::mnt6<298>::pairing::fqk_type, components::Fp6_2over3_variable, 
         components::Fp6_2over3_mul_component, components::Fp6_2over3_sqr_component>(
-            curves::mnt6<298>::pairing_policy::final_exponent_last_chunk_abs_of_w0);
+            curves::mnt6<298>::pairing::final_exponent_last_chunk_abs_of_w0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

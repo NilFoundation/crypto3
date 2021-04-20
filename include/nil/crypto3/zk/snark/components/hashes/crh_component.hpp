@@ -43,9 +43,9 @@ namespace nil {
                     using crh_with_bit_out_component = knapsack_crh_with_bit_out_component<FieldType>;
 
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_CRH_COMPONENT_HPP

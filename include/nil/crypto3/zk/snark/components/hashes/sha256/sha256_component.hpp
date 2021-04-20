@@ -124,9 +124,9 @@ namespace nil {
                                 round_e.emplace_back(new_round_e_variables);
 
                                 round_functions.push_back(sha256_round_function_component<FieldType>(
-                                    bp, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i], round_g[i],
-                                    round_h[i], packed_W[i], block::detail::shacal2_policy<256>::constants[i],
-                                    round_a[i + 1], round_e[i + 1]));
+                                    bp, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i],
+                                    round_g[i], round_h[i], packed_W[i],
+                                    block::detail::shacal2_policy<256>::constants[i], round_a[i + 1], round_e[i + 1]));
                             }
 
                             /* finalize */
@@ -175,8 +175,9 @@ namespace nil {
                             for (std::size_t i = 0; i < 4; ++i) {
                                 this->bp.val(unreduced_output[i]) = this->bp.val(round_functions[3 - i].packed_d) +
                                                                     this->bp.val(round_functions[63 - i].packed_new_a);
-                                this->bp.val(unreduced_output[4 + i]) = this->bp.val(round_functions[3 - i].packed_h) +
-                                                                        this->bp.val(round_functions[63 - i].packed_new_e);
+                                this->bp.val(unreduced_output[4 + i]) =
+                                    this->bp.val(round_functions[3 - i].packed_h) +
+                                    this->bp.val(round_functions[63 - i].packed_new_e);
                             }
 
                             for (std::size_t i = 0; i < 8; ++i) {
@@ -248,8 +249,8 @@ namespace nil {
 
                             block_variable<FieldType> input_variable(bp, hashes::sha2<256>::block_bits);
                             digest_variable<FieldType> output_variable(bp, hashes::sha2<256>::digest_bits);
-                            sha256_two_to_one_hash_component<FieldType> f(bp, hashes::sha2<256>::block_bits, input_variable,
-                                                                          output_variable);
+                            sha256_two_to_one_hash_component<FieldType> f(bp, hashes::sha2<256>::block_bits,
+                                                                          input_variable, output_variable);
 
                             input_variable.generate_r1cs_witness(input);
                             f.generate_r1cs_witness();
@@ -262,11 +263,10 @@ namespace nil {
                             return 27280;                                                /* hardcoded for now */
                         }
                     };
-
                 }    // namespace components
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SHA256_COMPONENT_HPP

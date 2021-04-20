@@ -125,8 +125,9 @@ namespace nil {
 
                     void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r, i) ? field_value_type::one() :
-                                                                                         field_value_type::zero();
+                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r, i) ?
+                                                     field_value_type::one() :
+                                                     field_value_type::zero();
                         }
                     }
 
@@ -297,16 +298,9 @@ namespace nil {
                     }
 
                     void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
-
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.lc_val((*this)[i]) =
-                                nil::crypto3::multiprecision::bit_test(non_fixed_precision_modulus_type(r.data), i) ?
-                                    field_value_type::one() :
-                                    field_value_type::zero();
+                            bp.lc_val((*this)[i]) = multiprecision::bit_test(r.data, i) ? field_value_type::one() :
+                                                                                          field_value_type::zero();
                         }
                     }
 

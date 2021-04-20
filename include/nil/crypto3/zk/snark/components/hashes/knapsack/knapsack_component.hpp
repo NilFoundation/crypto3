@@ -34,7 +34,7 @@
 // d*log(|F|).
 //
 // Below, we give two different components:
-// - knapsack_CRH_with_field_out_component, which verifies H_M
+// - knapsack_crh_with_field_out_component, which verifies H_M
 // - knapsack_crh_with_bit_out_component, which verifies H_M when its output is "expanded" to bits.
 // In both cases, a method ("sample_randomness") allows to sample M.
 //
@@ -80,7 +80,7 @@ namespace nil {
                     /*********************** Knapsack with field output **************************/
 
                     template<typename FieldType>
-                    class knapsack_CRH_with_field_out_component : public component<FieldType> {
+                    class knapsack_crh_with_field_out_component : public component<FieldType> {
                     private:
                         static std::vector<typename FieldType::value_type> knapsack_coefficients;
                         static std::size_t num_cached_coefficients;
@@ -92,10 +92,11 @@ namespace nil {
                         block_variable<FieldType> input_block;
                         blueprint_linear_combination_vector<FieldType> output;
 
-                        knapsack_CRH_with_field_out_component(blueprint<FieldType> &bp,
-                                                              std::size_t input_len,
-                                                              const block_variable<FieldType> &input_block,
-                                                              const blueprint_linear_combination_vector<FieldType> &output);
+                        knapsack_crh_with_field_out_component(
+                            blueprint<FieldType> &bp,
+                            std::size_t input_len,
+                            const block_variable<FieldType> &input_block,
+                            const blueprint_linear_combination_vector<FieldType> &output);
                         void generate_r1cs_constraints();
                         void generate_r1cs_witness();
 
@@ -122,7 +123,7 @@ namespace nil {
 
                         blueprint_linear_combination_vector<FieldType> output;
 
-                        std::shared_ptr<knapsack_CRH_with_field_out_component<FieldType>> hasher;
+                        std::shared_ptr<knapsack_crh_with_field_out_component<FieldType>> hasher;
 
                         block_variable<FieldType> input_block;
                         digest_variable<FieldType> output_digest;
@@ -146,19 +147,19 @@ namespace nil {
 
                     template<typename FieldType>
                     std::vector<typename FieldType::value_type>
-                        knapsack_CRH_with_field_out_component<FieldType>::knapsack_coefficients;
+                        knapsack_crh_with_field_out_component<FieldType>::knapsack_coefficients;
                     template<typename FieldType>
-                    std::size_t knapsack_CRH_with_field_out_component<FieldType>::num_cached_coefficients;
+                    std::size_t knapsack_crh_with_field_out_component<FieldType>::num_cached_coefficients;
 
                     template<typename FieldType>
-                    knapsack_CRH_with_field_out_component<FieldType>::knapsack_CRH_with_field_out_component(
+                    knapsack_crh_with_field_out_component<FieldType>::knapsack_crh_with_field_out_component(
                         blueprint<FieldType> &bp,
                         std::size_t input_len,
                         const block_variable<FieldType> &input_block,
                         const blueprint_linear_combination_vector<FieldType> &output) :
                         component<FieldType>(bp),
-                        input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension), input_block(input_block),
-                        output(output) {
+                        input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension),
+                        input_block(input_block), output(output) {
                         assert(input_block.bits.size() == input_len);
                         if (num_cached_coefficients < dimension * input_len) {
                             sample_randomness(input_len);
@@ -167,20 +168,21 @@ namespace nil {
                     }
 
                     template<typename FieldType>
-                    void knapsack_CRH_with_field_out_component<FieldType>::generate_r1cs_constraints() {
+                    void knapsack_crh_with_field_out_component<FieldType>::generate_r1cs_constraints() {
                         for (std::size_t i = 0; i < dimension; ++i) {
                             this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 1,
-                                blueprint_coeff_sum<FieldType>(input_block.bits,
-                                                               std::vector<typename FieldType::value_type>(
-                                                                   knapsack_coefficients.begin() + input_len * i,
-                                                                   knapsack_coefficients.begin() + input_len * (i + 1))),
+                                blueprint_coeff_sum<FieldType>(
+                                    input_block.bits,
+                                    std::vector<typename FieldType::value_type>(
+                                        knapsack_coefficients.begin() + input_len * i,
+                                        knapsack_coefficients.begin() + input_len * (i + 1))),
                                 output[i]));
                         }
                     }
 
                     template<typename FieldType>
-                    void knapsack_CRH_with_field_out_component<FieldType>::generate_r1cs_witness() {
+                    void knapsack_crh_with_field_out_component<FieldType>::generate_r1cs_witness() {
                         const std::vector<bool> input = input_block.get_block();
 
                         for (std::size_t i = 0; i < dimension; ++i) {
@@ -196,18 +198,18 @@ namespace nil {
                     }
 
                     template<typename FieldType>
-                    std::size_t knapsack_CRH_with_field_out_component<FieldType>::get_digest_len() {
+                    std::size_t knapsack_crh_with_field_out_component<FieldType>::get_digest_len() {
                         return knapsack_dimension<FieldType>::dimension;
                     }
 
                     template<typename FieldType>
-                    std::size_t knapsack_CRH_with_field_out_component<FieldType>::get_block_len() {
+                    std::size_t knapsack_crh_with_field_out_component<FieldType>::get_block_len() {
                         return 0;
                     }
 
                     template<typename FieldType>
                     std::vector<typename FieldType::value_type>
-                        knapsack_CRH_with_field_out_component<FieldType>::get_hash(const std::vector<bool> &input) {
+                        knapsack_crh_with_field_out_component<FieldType>::get_hash(const std::vector<bool> &input) {
                         const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                         if (num_cached_coefficients < dimension * input.size()) {
                             sample_randomness(input.size());
@@ -227,12 +229,12 @@ namespace nil {
                     }
 
                     template<typename FieldType>
-                    std::size_t knapsack_CRH_with_field_out_component<FieldType>::expected_constraints() {
+                    std::size_t knapsack_crh_with_field_out_component<FieldType>::expected_constraints() {
                         return knapsack_dimension<FieldType>::dimension;
                     }
 
                     template<typename FieldType>
-                    void knapsack_CRH_with_field_out_component<FieldType>::sample_randomness(std::size_t input_len) {
+                    void knapsack_crh_with_field_out_component<FieldType>::sample_randomness(std::size_t input_len) {
                         const std::size_t num_coefficients = knapsack_dimension<FieldType>::dimension * input_len;
                         if (num_coefficients > num_cached_coefficients) {
                             knapsack_coefficients.resize(num_coefficients);
@@ -250,8 +252,8 @@ namespace nil {
                         const block_variable<FieldType> &input_block,
                         const digest_variable<FieldType> &output_digest) :
                         component<FieldType>(bp),
-                        input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension), input_block(input_block),
-                        output_digest(output_digest) {
+                        input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension),
+                        input_block(input_block), output_digest(output_digest) {
                         assert(output_digest.bits.size() == this->get_digest_len());
 
                         output.resize(dimension);
@@ -264,11 +266,12 @@ namespace nil {
                         }
 
                         hasher.reset(
-                            new knapsack_CRH_with_field_out_component<FieldType>(bp, input_len, input_block, output));
+                            new knapsack_crh_with_field_out_component<FieldType>(bp, input_len, input_block, output));
                     }
 
                     template<typename FieldType>
-                    void knapsack_crh_with_bit_out_component<FieldType>::generate_r1cs_constraints(bool enforce_bitness) {
+                    void knapsack_crh_with_bit_out_component<FieldType>::generate_r1cs_constraints(
+                        bool enforce_bitness) {
                         hasher->generate_r1cs_constraints();
 
                         if (enforce_bitness) {
@@ -306,7 +309,7 @@ namespace nil {
                     std::vector<bool>
                         knapsack_crh_with_bit_out_component<FieldType>::get_hash(const std::vector<bool> &input) {
                         const std::vector<typename FieldType::value_type> hash_elems =
-                            knapsack_CRH_with_field_out_component<FieldType>::get_hash(input);
+                            knapsack_crh_with_field_out_component<FieldType>::get_hash(input);
                         hash_value_type result;
 
                         for (const typename FieldType::value_type &elt : hash_elems) {
@@ -318,22 +321,22 @@ namespace nil {
                     }
 
                     template<typename FieldType>
-                    std::size_t knapsack_crh_with_bit_out_component<FieldType>::expected_constraints(bool enforce_bitness) {
+                    std::size_t
+                        knapsack_crh_with_bit_out_component<FieldType>::expected_constraints(bool enforce_bitness) {
                         const std::size_t hasher_constraints =
-                            knapsack_CRH_with_field_out_component<FieldType>::expected_constraints();
+                            knapsack_crh_with_field_out_component<FieldType>::expected_constraints();
                         const std::size_t bitness_constraints = (enforce_bitness ? get_digest_len() : 0);
                         return hasher_constraints + bitness_constraints;
                     }
 
                     template<typename FieldType>
                     void knapsack_crh_with_bit_out_component<FieldType>::sample_randomness(std::size_t input_len) {
-                        knapsack_CRH_with_field_out_component<FieldType>::sample_randomness(input_len);
+                        knapsack_crh_with_field_out_component<FieldType>::sample_randomness(input_len);
                     }
-
-                }    // namespace components        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP

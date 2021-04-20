@@ -134,7 +134,7 @@ namespace nil {
                         }
                     };
 
-    #define SHA256_COMPONENT_ROTR(A, i, k) A[((i) + (k)) % 32]
+#define SHA256_COMPONENT_ROTR(A, i, k) A[((i) + (k)) % 32]
 
                     /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                     template<typename FieldType>
@@ -162,8 +162,8 @@ namespace nil {
                             for (std::size_t i = 0; i < 32; ++i) {
                                 compute_bits[i].reset(new XOR3_component<FieldType>(
                                     bp, SHA256_COMPONENT_ROTR(W, i, rot1), SHA256_COMPONENT_ROTR(W, i, rot2),
-                                    (i + shift < 32 ? W[i + shift] : blueprint_variable<FieldType>(0)), (i + shift >= 32),
-                                    result_bits[i]));
+                                    (i + shift < 32 ? W[i + shift] : blueprint_variable<FieldType>(0)),
+                                    (i + shift >= 32), result_bits[i]));
                             }
                             pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                         }
@@ -247,7 +247,8 @@ namespace nil {
                         blueprint_variable<FieldType> result;
                         std::shared_ptr<packing_component<FieldType>> pack_result;
 
-                        choice_component(blueprint<FieldType> &bp, const blueprint_linear_combination_vector<FieldType> &X,
+                        choice_component(blueprint<FieldType> &bp,
+                                         const blueprint_linear_combination_vector<FieldType> &X,
                                          const blueprint_linear_combination_vector<FieldType> &Y,
                                          const blueprint_linear_combination_vector<FieldType> &Z,
                                          const blueprint_variable<FieldType> &result) :
@@ -322,7 +323,8 @@ namespace nil {
                         void generate_r1cs_witness() {
 
                             // temporary added until fixed-precision modular adaptor is ready:
-                            typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                            typedef nil::crypto3::multiprecision::number<
+                                nil::crypto3::multiprecision::backends::cpp_int_backend<>>
                                 non_fixed_precision_modulus_type;
 
                             using modulus_type = typename FieldType::modulus_type;
@@ -337,10 +339,10 @@ namespace nil {
                         }
                     };
 
-                }    // namespace copmonents        
-            }    // namespace snark
-        }        // namespace zk
-    }            // namespace crypto3
+                }    // namespace components
+            }        // namespace snark
+        }            // namespace zk
+    }                // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_SHA256_AUX_HPP
