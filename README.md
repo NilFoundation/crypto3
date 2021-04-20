@@ -21,7 +21,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git) (branch `33-extended-inverse`).
+* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git).
 
 ### External
-* [Boost](https://boost.org) (>= 1.58)
+* [Boost](https://boost.org) (>= 1.73)
