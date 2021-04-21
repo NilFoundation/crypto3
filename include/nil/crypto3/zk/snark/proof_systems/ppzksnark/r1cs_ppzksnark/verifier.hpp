@@ -97,7 +97,7 @@ namespace nil {
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
 
-                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::pairing pairing_policy;
 
                         processed_verification_key_type processed_verification_key;
                         processed_verification_key.pp_G2_one_precomp =
@@ -132,7 +132,7 @@ namespace nil {
                 class r1cs_ppzksnark_online_verifier_weak_input_consistency {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
-                    using pairing_policy = typename CurveType::pairing_policy;
+                    using pairing_policy = typename CurveType::pairing;
                     using g1_type = typename CurveType::g1_type;
                     using g2_type = typename CurveType::g2_type;
                     using gt_type = typename CurveType::gt_type;
@@ -140,9 +140,9 @@ namespace nil {
                     using g2_value_type = typename g2_type::value_type;
                     using gt_value_type = typename gt_type::value_type;
                     using scalar_field_type = typename CurveType::scalar_field_type;
-                    using G1_precomp = typename pairing_policy::G1_precomp;
-                    using G2_precomp = typename pairing_policy::G2_precomp;
-                    using Fqk_type = typename pairing_policy::Fqk_type;
+                    using g1_precomp = typename pairing_policy::g1_precomp;
+                    using g2_precomp = typename pairing_policy::g2_precomp;
+                    using fqk_type = typename pairing_policy::fqk_type;
 
                 public:
                     typedef typename policy_type::constraint_system constraint_system_type;
@@ -172,33 +172,33 @@ namespace nil {
                         if (!proof.is_well_formed()) {
                             result = false;
                         }
-                        G1_precomp proof_g_A_g_precomp = pairing_policy::precompute_g1(proof.g_A.g);
-                        G1_precomp proof_g_A_h_precomp = pairing_policy::precompute_g1(proof.g_A.h);
-                        typename Fqk_type::value_type kc_A_1 = pairing_policy::miller_loop(
+                        g1_precomp proof_g_A_g_precomp = pairing_policy::precompute_g1(proof.g_A.g);
+                        g1_precomp proof_g_A_h_precomp = pairing_policy::precompute_g1(proof.g_A.h);
+                        typename fqk_type::value_type kc_A_1 = pairing_policy::miller_loop(
                             proof_g_A_g_precomp, processed_verification_key.vk_alphaA_g2_precomp);
-                        typename Fqk_type::value_type kc_A_2 = pairing_policy::miller_loop(
+                        typename fqk_type::value_type kc_A_2 = pairing_policy::miller_loop(
                             proof_g_A_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_A = pairing_policy::final_exponentiation(kc_A_1 * kc_A_2.unitary_inversed());
                         if (kc_A != gt_value_type::one()) {
                             result = false;
                         }
 
-                        G2_precomp proof_g_B_g_precomp = pairing_policy::precompute_g2(proof.g_B.g);
-                        G1_precomp proof_g_B_h_precomp = pairing_policy::precompute_g1(proof.g_B.h);
-                        typename Fqk_type::value_type kc_B_1 = pairing_policy::miller_loop(
+                        g2_precomp proof_g_B_g_precomp = pairing_policy::precompute_g2(proof.g_B.g);
+                        g1_precomp proof_g_B_h_precomp = pairing_policy::precompute_g1(proof.g_B.h);
+                        typename fqk_type::value_type kc_B_1 = pairing_policy::miller_loop(
                             processed_verification_key.vk_alphaB_g1_precomp, proof_g_B_g_precomp);
-                        typename Fqk_type::value_type kc_B_2 = pairing_policy::miller_loop(
+                        typename fqk_type::value_type kc_B_2 = pairing_policy::miller_loop(
                             proof_g_B_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_B = pairing_policy::final_exponentiation(kc_B_1 * kc_B_2.unitary_inversed());
                         if (kc_B != gt_value_type::one()) {
                             result = false;
                         }
 
-                        G1_precomp proof_g_C_g_precomp = pairing_policy::precompute_g1(proof.g_C.g);
-                        G1_precomp proof_g_C_h_precomp = pairing_policy::precompute_g1(proof.g_C.h);
-                        typename Fqk_type::value_type kc_C_1 = pairing_policy::miller_loop(
+                        g1_precomp proof_g_C_g_precomp = pairing_policy::precompute_g1(proof.g_C.g);
+                        g1_precomp proof_g_C_h_precomp = pairing_policy::precompute_g1(proof.g_C.h);
+                        typename fqk_type::value_type kc_C_1 = pairing_policy::miller_loop(
                             proof_g_C_g_precomp, processed_verification_key.vk_alphaC_g2_precomp);
-                        typename Fqk_type::value_type kc_C_2 = pairing_policy::miller_loop(
+                        typename fqk_type::value_type kc_C_2 = pairing_policy::miller_loop(
                             proof_g_C_h_precomp, processed_verification_key.pp_G2_one_precomp);
                         gt_value_type kc_C = pairing_policy::final_exponentiation(kc_C_1 * kc_C_2.unitary_inversed());
                         if (kc_C != gt_value_type::one()) {
@@ -207,11 +207,11 @@ namespace nil {
 
                         // check that g^((A+acc)*B)=g^(H*\Prod(t-\sigma)+C)
                         // equivalently, via pairings, that e(g^(A+acc), g^B) = e(g^H, g^Z) + e(g^C, g^1)
-                        G1_precomp proof_g_A_g_acc_precomp = pairing_policy::precompute_g1(proof.g_A.g + acc);
-                        G1_precomp proof_g_H_precomp = pairing_policy::precompute_g1(proof.g_H);
-                        typename Fqk_type::value_type QAP_1 =
+                        g1_precomp proof_g_A_g_acc_precomp = pairing_policy::precompute_g1(proof.g_A.g + acc);
+                        g1_precomp proof_g_H_precomp = pairing_policy::precompute_g1(proof.g_H);
+                        typename fqk_type::value_type QAP_1 =
                             pairing_policy::miller_loop(proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
-                        typename Fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
+                        typename fqk_type::value_type QAP_23 = pairing_policy::double_miller_loop(
                             proof_g_H_precomp, processed_verification_key.vk_rC_Z_g2_precomp, proof_g_C_g_precomp,
                             processed_verification_key.pp_G2_one_precomp);
                         gt_value_type QAP = pairing_policy::final_exponentiation(QAP_1 * QAP_23.unitary_inversed());
@@ -219,12 +219,12 @@ namespace nil {
                             result = false;
                         }
 
-                        G1_precomp proof_g_K_precomp = pairing_policy::precompute_g1(proof.g_K);
-                        G1_precomp proof_g_A_g_acc_C_precomp =
+                        g1_precomp proof_g_K_precomp = pairing_policy::precompute_g1(proof.g_K);
+                        g1_precomp proof_g_A_g_acc_C_precomp =
                             pairing_policy::precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
-                        typename Fqk_type::value_type K_1 = pairing_policy::miller_loop(
+                        typename fqk_type::value_type K_1 = pairing_policy::miller_loop(
                             proof_g_K_precomp, processed_verification_key.vk_gamma_g2_precomp);
-                        typename Fqk_type::value_type K_23 = pairing_policy::double_miller_loop(
+                        typename fqk_type::value_type K_23 = pairing_policy::double_miller_loop(
                             proof_g_A_g_acc_C_precomp, processed_verification_key.vk_gamma_beta_g2_precomp,
                             processed_verification_key.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                         gt_value_type K = pairing_policy::final_exponentiation(K_1 * K_23.unitary_inversed());
@@ -345,7 +345,7 @@ namespace nil {
                 class r1cs_ppzksnark_affine_verifier_weak_input_consistency {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
-                    using pairing_policy = typename CurveType::pairing_policy;
+                    using pairing_policy = typename CurveType::pairing;
                     using g1_type = typename CurveType::g1_type;
                     using g2_type = typename CurveType::g2_type;
                     using gt_type = typename CurveType::gt_type;
@@ -353,11 +353,11 @@ namespace nil {
                     using g2_value_type = typename g2_type::value_type;
                     using gt_value_type = typename gt_type::value_type;
                     using scalar_field_type = typename CurveType::scalar_field_type;
-                    using G1_precomp = typename pairing_policy::G1_precomp;
-                    using G2_precomp = typename pairing_policy::G2_precomp;
-                    using affine_ate_G1_precomp = typename pairing_policy::affine_ate_G1_precomp;
-                    using affine_ate_G2_precomp = typename pairing_policy::affine_ate_G2_precomp;
-                    using Fqk_type = typename pairing_policy::Fqk_type;
+                    using g1_precomp = typename pairing_policy::g1_precomp;
+                    using g2_precomp = typename pairing_policy::g2_precomp;
+                    using affine_ate_g1_precomp = typename pairing_policy::affine_ate_g1_precomp;
+                    using affine_ate_g2_precomp = typename pairing_policy::affine_ate_g2_precomp;
+                    using fqk_type = typename pairing_policy::fqk_type;
 
                 public:
                     typedef typename policy_type::constraint_system constraint_system_type;
@@ -374,26 +374,26 @@ namespace nil {
                     static inline bool process(const verification_key_type &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::pairing pairing_policy;
 
                         assert(vk.encoded_IC_query.domain_size() >= primary_input.size());
 
-                        affine_ate_G2_precomp pvk_pp_G2_one_precomp =
-                            pairing_policy::affine_ate_precompute_G2(g2_value_type::one());
-                        affine_ate_G2_precomp pvk_vk_alphaA_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(vk.alphaA_g2);
-                        affine_ate_G1_precomp pvk_vk_alphaB_g1_precomp =
-                            CurveType::affine_ate_precompute_G1(vk.alphaB_g1);
-                        affine_ate_G2_precomp pvk_vk_alphaC_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(vk.alphaC_g2);
-                        affine_ate_G2_precomp pvk_vk_rC_Z_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(vk.rC_Z_g2);
-                        affine_ate_G2_precomp pvk_vk_gamma_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(vk.gamma_g2);
-                        affine_ate_G1_precomp pvk_vk_gamma_beta_g1_precomp =
-                            CurveType::affine_ate_precompute_G1(vk.gamma_beta_g1);
-                        affine_ate_G2_precomp pvk_vk_gamma_beta_g2_precomp =
-                            pairing_policy::affine_ate_precompute_G2(vk.gamma_beta_g2);
+                        affine_ate_g2_precomp pvk_pp_G2_one_precomp =
+                            pairing_policy::affine_ate_precompute_g2(g2_value_type::one());
+                        affine_ate_g2_precomp pvk_vk_alphaA_g2_precomp =
+                            pairing_policy::affine_ate_precompute_g2(vk.alphaA_g2);
+                        affine_ate_g1_precomp pvk_vk_alphaB_g1_precomp =
+                            CurveType::affine_ate_precompute_g1(vk.alphaB_g1);
+                        affine_ate_g2_precomp pvk_vk_alphaC_g2_precomp =
+                            pairing_policy::affine_ate_precompute_g2(vk.alphaC_g2);
+                        affine_ate_g2_precomp pvk_vk_rC_Z_g2_precomp =
+                            pairing_policy::affine_ate_precompute_g2(vk.rC_Z_g2);
+                        affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
+                            pairing_policy::affine_ate_precompute_g2(vk.gamma_g2);
+                        affine_ate_g1_precomp pvk_vk_gamma_beta_g1_precomp =
+                            CurveType::affine_ate_precompute_g1(vk.gamma_beta_g1);
+                        affine_ate_g2_precomp pvk_vk_gamma_beta_g2_precomp =
+                            pairing_policy::affine_ate_precompute_g2(vk.gamma_beta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
                             vk.encoded_IC_query.template accumulate_chunk<scalar_field_type>(primary_input.begin(),
@@ -402,9 +402,9 @@ namespace nil {
                         const g1_value_type &acc = accumulated_IC.first;
 
                         bool result = true;
-                        affine_ate_G1_precomp proof_g_A_g_precomp = CurveType::affine_ate_precompute_G1(proof.g_A.g);
-                        affine_ate_G1_precomp proof_g_A_h_precomp = CurveType::affine_ate_precompute_G1(proof.g_A.h);
-                        typename Fqk_type::value_type kc_A_miller = CurveType::affine_ate_e_over_e_miller_loop(
+                        affine_ate_g1_precomp proof_g_A_g_precomp = CurveType::affine_ate_precompute_g1(proof.g_A.g);
+                        affine_ate_g1_precomp proof_g_A_h_precomp = CurveType::affine_ate_precompute_g1(proof.g_A.h);
+                        typename fqk_type::value_type kc_A_miller = CurveType::affine_ate_e_over_e_miller_loop(
                             proof_g_A_g_precomp, pvk_vk_alphaA_g2_precomp, proof_g_A_h_precomp, pvk_pp_G2_one_precomp);
                         gt_value_type kc_A = pairing_policy::final_exponentiation(kc_A_miller);
 
@@ -412,32 +412,32 @@ namespace nil {
                             result = false;
                         }
 
-                        affine_ate_G2_precomp proof_g_B_g_precomp =
-                            pairing_policy::affine_ate_precompute_G2(proof.g_B.g);
-                        affine_ate_G1_precomp proof_g_B_h_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_B.h);
-                        typename Fqk_type::value_type kc_B_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
+                        affine_ate_g2_precomp proof_g_B_g_precomp =
+                            pairing_policy::affine_ate_precompute_g2(proof.g_B.g);
+                        affine_ate_g1_precomp proof_g_B_h_precomp =
+                            pairing_policy::affine_ate_precompute_g1(proof.g_B.h);
+                        typename fqk_type::value_type kc_B_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
                             pvk_vk_alphaB_g1_precomp, proof_g_B_g_precomp, proof_g_B_h_precomp, pvk_pp_G2_one_precomp);
                         gt_value_type kc_B = pairing_policy::final_exponentiation(kc_B_miller);
                         if (kc_B != gt_value_type::one()) {
                             result = false;
                         }
 
-                        affine_ate_G1_precomp proof_g_C_g_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_C.g);
-                        affine_ate_G1_precomp proof_g_C_h_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_C.h);
-                        typename Fqk_type::value_type kc_C_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
+                        affine_ate_g1_precomp proof_g_C_g_precomp =
+                            pairing_policy::affine_ate_precompute_g1(proof.g_C.g);
+                        affine_ate_g1_precomp proof_g_C_h_precomp =
+                            pairing_policy::affine_ate_precompute_g1(proof.g_C.h);
+                        typename fqk_type::value_type kc_C_miller = pairing_policy::affine_ate_e_over_e_miller_loop(
                             proof_g_C_g_precomp, pvk_vk_alphaC_g2_precomp, proof_g_C_h_precomp, pvk_pp_G2_one_precomp);
                         gt_value_type kc_C = pairing_policy::final_exponentiation(kc_C_miller);
                         if (kc_C != gt_value_type::one()) {
                             result = false;
                         }
 
-                        affine_ate_G1_precomp proof_g_A_g_acc_precomp =
-                            pairing_policy::affine_ate_precompute_G1(proof.g_A.g + acc);
-                        affine_ate_G1_precomp proof_g_H_precomp = pairing_policy::affine_ate_precompute_G1(proof.g_H);
-                        typename Fqk_type::value_type QAP_miller =
+                        affine_ate_g1_precomp proof_g_A_g_acc_precomp =
+                            pairing_policy::affine_ate_precompute_g1(proof.g_A.g + acc);
+                        affine_ate_g1_precomp proof_g_H_precomp = pairing_policy::affine_ate_precompute_g1(proof.g_H);
+                        typename fqk_type::value_type QAP_miller =
                             pairing_policy::affine_ate_e_times_e_over_e_miller_loop(
                                 proof_g_H_precomp, pvk_vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk_pp_G2_one_precomp,
                                 proof_g_A_g_acc_precomp, proof_g_B_g_precomp);
@@ -446,10 +446,10 @@ namespace nil {
                             result = false;
                         }
 
-                        affine_ate_G1_precomp proof_g_K_precomp = pairing_policy::affine_ate_precompute_G1(proof.g_K);
-                        affine_ate_G1_precomp proof_g_A_g_acc_C_precomp =
-                            pairing_policy::affine_ate_precompute_G1((proof.g_A.g + acc) + proof.g_C.g);
-                        typename Fqk_type::value_type K_miller =
+                        affine_ate_g1_precomp proof_g_K_precomp = pairing_policy::affine_ate_precompute_g1(proof.g_K);
+                        affine_ate_g1_precomp proof_g_A_g_acc_C_precomp =
+                            pairing_policy::affine_ate_precompute_g1((proof.g_A.g + acc) + proof.g_C.g);
+                        typename fqk_type::value_type K_miller =
                             pairing_policy::affine_ate_e_times_e_over_e_miller_loop(
                                 proof_g_A_g_acc_C_precomp, pvk_vk_gamma_beta_g2_precomp, pvk_vk_gamma_beta_g1_precomp,
                                 proof_g_B_g_precomp, proof_g_K_precomp, pvk_vk_gamma_g2_precomp);

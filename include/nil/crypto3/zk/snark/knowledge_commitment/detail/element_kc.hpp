@@ -72,8 +72,8 @@ namespace nil {
                             return element_kc(this->g.doubled(), this->h.doubled());
                         }
 
-                        element_kc to_special() {
-                            return element_kc(this->g.to_special(), this->h.to_special());
+                        element_kc to_projective() {
+                            return element_kc(this->g.to_projective(), this->h.to_projective());
                         }
                         bool is_special() const {
                             return this->g->is_special() && this->h->is_special();
@@ -114,7 +114,7 @@ namespace nil {
 
                             Type1::value_type::batch_to_special_all_non_zeros(g_vec);
                             auto g_it = g_vec.begin();
-                            typename Type1::value_type Type1_zero_special = Type1::value_type::zero().to_special();
+                            typename Type1::value_type Type1_zero_special = Type1::value_type::zero().to_projective();
 
                             for (std::size_t i = 0; i < vec.size(); ++i) {
                                 if (!vec[i].g.is_zero()) {
@@ -139,7 +139,7 @@ namespace nil {
 
                             Type2::value_type::batch_to_special_all_non_zeros(h_vec);
                             auto h_it = h_vec.begin();
-                            typename Type2::value_type Type2_zero_special = Type2::value_type::zero().to_special();
+                            typename Type2::value_type Type2_zero_special = Type2::value_type::zero().to_projective();
 
                             for (std::size_t i = 0; i < vec.size(); ++i) {
                                 if (!vec[i].h.is_zero()) {

@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_HPP
-#define CRYPTO3_ZK_SNARK_ALGORITHMS_HPP
+#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_VERIFY_HPP
+#define CRYPTO3_ZK_SNARK_ALGORITHMS_VERIFY_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -39,11 +39,11 @@ namespace nil {
                 }
 
                 template<typename ProofSystemType>
-                bool online_verifier(const typename ProofSystemType::processed_verification_key_type &pvk,
-                                     const typename ProofSystemType::primary_input_type &primary_input,
-                                     const typename ProofSystemType::proof_type &proof) {
+                bool online_verify(const typename ProofSystemType::processed_verification_key_type &pvk,
+                                   const typename ProofSystemType::primary_input_type &primary_input,
+                                   const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::online_verify(pvk, primary_input, proof);
+                    return ProofSystemType::verify(pvk, primary_input, proof);
                 }
             }    // namespace snark
         }        // namespace zk

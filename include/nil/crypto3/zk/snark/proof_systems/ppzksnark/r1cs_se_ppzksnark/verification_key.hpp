@@ -101,17 +101,17 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_se_ppzksnark_processed_verification_key {
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
 
                     typename CurveType::g1_type::value_type G_alpha;
                     typename CurveType::g2_type::value_type H_beta;
-                    typename pairing_policy::Fqk_type G_alpha_H_beta_ml;
-                    typename pairing_policy::G1_precomp G_gamma_pc;
-                    typename pairing_policy::G2_precomp H_gamma_pc;
-                    typename pairing_policy::G2_precomp H_pc;
+                    typename pairing_policy::fqk_type G_alpha_H_beta_ml;
+                    typename pairing_policy::g1_precomp G_gamma_pc;
+                    typename pairing_policy::g2_precomp H_gamma_pc;
+                    typename pairing_policy::g2_precomp H_pc;
 
                     std::vector<typename CurveType::g1_type::value_type> query;
 

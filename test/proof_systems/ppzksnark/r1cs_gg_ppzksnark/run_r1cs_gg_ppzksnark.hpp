@@ -57,9 +57,9 @@ namespace nil {
                                          const bool expected_answer) {
                     const bool answer = r1cs_gg_ppzksnark<
                         CurveType,
-                        r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>::verifier(vk,
-                                                                                                       primary_input,
-                                                                                                       proof);
+                        r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>>::verify(vk,
+                                                                                                     primary_input,
+                                                                                                     proof);
                     BOOST_CHECK(answer == expected_answer);
                 }
 
@@ -116,7 +116,7 @@ namespace nil {
 
                     std::cout << "Starting online verifier" << std::endl;
 
-                    const bool ans2 = online_verifier<basic_proof_system>(pvk, example.primary_input, proof);
+                    const bool ans2 = online_verify<basic_proof_system>(pvk, example.primary_input, proof);
 
                     std::cout << "Online verifier finished, result: " << ans2 << std::endl;
 
@@ -128,7 +128,6 @@ namespace nil {
                         CurveType,
                         r1cs_gg_ppzksnark_generator<CurveType>,
                         r1cs_gg_ppzksnark_prover<CurveType>,
-                        r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>,
                         r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>>::verify(keypair.second,
                                                                                               example.primary_input,
                                                                                               proof);
@@ -143,9 +142,8 @@ namespace nil {
                         r1cs_gg_ppzksnark<CurveType,
                                           r1cs_gg_ppzksnark_generator<CurveType>,
                                           r1cs_gg_ppzksnark_prover<CurveType>,
-                                          r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>,
                                           r1cs_gg_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::
-                            online_verify(pvk, example.primary_input, proof);
+                            verify(pvk, example.primary_input, proof);
 
                     std::cout << "Online weak verifier finished, result: " << ans4 << std::endl;
 

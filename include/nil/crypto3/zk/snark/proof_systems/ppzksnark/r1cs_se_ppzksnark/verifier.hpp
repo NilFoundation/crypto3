@@ -90,11 +90,11 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-                        typedef typename CurveType::pairing_policy pairing_policy;
+                        typedef typename CurveType::pairing pairing_policy;
 
-                        typename pairing_policy::G1_precomp G_alpha_pc =
+                        typename pairing_policy::g1_precomp G_alpha_pc =
                             pairing_policy::precompute_g1(verification_key.G_alpha);
-                        typename pairing_policy::G2_precomp H_beta_pc =
+                        typename pairing_policy::g2_precomp H_beta_pc =
                             pairing_policy::precompute_g2(verification_key.H_beta);
 
                         processed_verification_key_type processed_verification_key;
@@ -135,7 +135,7 @@ namespace nil {
                 class r1cs_se_ppzksnark_online_verifier_weak_input_consistency {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
@@ -179,7 +179,7 @@ namespace nil {
                                 processed_verification_key.query.begin() + 1, processed_verification_key.query.end(),
                                 primary_input.begin(), primary_input.end(), chunks);
 
-                        typename pairing_policy::Fqk_type
+                        typename pairing_policy::fqk_type
                             test1_l = pairing_policy::miller_loop(
                                 pairing_policy::precompute_g1(proof.A + processed_verification_key.G_alpha),
                                 pairing_policy::precompute_g2(proof.B + processed_verification_key.H_beta)),
@@ -198,7 +198,7 @@ namespace nil {
                         /**
                          * e(A, H^{gamma}) = e(G^{gamma}, B)
                          */
-                        typename pairing_policy::Fqk_type test2_l = pairing_policy::miller_loop(
+                        typename pairing_policy::fqk_type test2_l = pairing_policy::miller_loop(
                                                               pairing_policy::precompute_g1(proof.A),
                                                               processed_verification_key.H_gamma_pc),
                                                           test2_r = pairing_policy::miller_loop(
@@ -224,7 +224,7 @@ namespace nil {
                 class r1cs_se_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 
-                    typedef typename CurveType::pairing_policy pairing_policy;
+                    typedef typename CurveType::pairing pairing_policy;
 
                 public:
                     typedef CurveType curve_type;
