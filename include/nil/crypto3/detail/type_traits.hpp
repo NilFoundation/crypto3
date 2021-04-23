@@ -97,7 +97,7 @@ namespace nil {
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(p)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(q)
 
-            BOOST_TTI_HAS_FUNCTION(to_affine_coordinates)
+            BOOST_TTI_HAS_FUNCTION(to_affine)
             BOOST_TTI_HAS_FUNCTION(to_special)
             BOOST_TTI_HAS_FUNCTION(is_special)
 

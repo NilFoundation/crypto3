@@ -68,7 +68,7 @@ namespace nil {
                     // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.1
                     static inline compressed_g1_octets point_to_octets_compress(const g1_value_type &point) {
                         compressed_g1_octets result = {0};
-                        g1_value_type point_affine = point.to_affine_coordinates();
+                        g1_value_type point_affine = point.to_affine();
                         auto m_byte = evaluate_m_byte(point_affine, true);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
@@ -81,7 +81,7 @@ namespace nil {
 
                     static inline uncompressed_g1_octets point_to_octets(const g1_value_type &point) {
                         uncompressed_g1_octets result = {0};
-                        g1_value_type point_affine = point.to_affine_coordinates();
+                        g1_value_type point_affine = point.to_affine();
                         auto m_byte = evaluate_m_byte(point_affine, false);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
@@ -98,7 +98,7 @@ namespace nil {
 
                     static inline compressed_g2_octets point_to_octets_compress(const g2_value_type &point) {
                         compressed_g2_octets result = {0};
-                        g2_value_type point_affine = point.to_affine_coordinates();
+                        g2_value_type point_affine = point.to_affine();
                         auto m_byte = evaluate_m_byte(point_affine, true);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {
@@ -117,7 +117,7 @@ namespace nil {
 
                     static inline uncompressed_g2_octets point_to_octets(const g2_value_type &point) {
                         uncompressed_g2_octets result = {0};
-                        g2_value_type point_affine = point.to_affine_coordinates();
+                        g2_value_type point_affine = point.to_affine();
                         auto m_byte = evaluate_m_byte(point_affine, false);
                         // TODO: check possibilities for TA
                         if (!(I_bit & m_byte)) {

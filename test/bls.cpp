@@ -1995,7 +1995,7 @@ BOOST_AUTO_TEST_SUITE_END()
 //         }
 //         signature_type agg_sig = scheme_type::aggregate(my_sigs);
 //
-//         BOOST_CHECK_EQUAL(agg_sig.to_affine_coordinates(), *agg_sigs_it);
+//         BOOST_CHECK_EQUAL(agg_sig.to_affine(), *agg_sigs_it);
 //         BOOST_CHECK_EQUAL(scheme_type::fast_aggregate_verify(my_pks, *msgs_it, PopSchemeDstMps, agg_sig), true);
 //
 //         sks_it++;
