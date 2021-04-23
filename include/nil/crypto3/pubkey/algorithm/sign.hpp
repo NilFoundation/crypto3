@@ -55,8 +55,9 @@ namespace nil {
          * signed message.
          *
          *
-         * @brief Algorithms are meant to provide hashing interface similar to STL algorithms' one.
          */
+
+
             template<typename Scheme>
             using signing_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::signing_policy;
         }

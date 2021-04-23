@@ -7,6 +7,8 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
+
+
 macro(define_pubkey_example name)
     add_executable(pubkey_${name}_example ${name}.cpp)
     target_link_libraries(pubkey_${name}_example PRIVATE
@@ -18,8 +20,10 @@ macro(define_pubkey_example name)
                           ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                           ${Boost_LIBRARIES})
-    set_target_properties(pubkey_${name}_example PROPERTIES CXX_STANDARD 17)
+    set_target_properties(pubkey_${name}_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)
 endmacro()
+
+
 
 set(EXAMPLES_NAMES
     "bls")
