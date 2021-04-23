@@ -80,18 +80,18 @@ template<typename group_value_type>
 struct print_curve_element;
 
 template<>
-            struct print_curve_element<typename curves::bls12<381>::g1_type::value_type> {
-                static void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
-                    print_fp_curve_group_element(os, e);
-                }
-            };
+struct print_curve_element<typename curves::bls12<381>::g1_type::value_type> {
+    void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
+        print_fp_curve_group_element(os, e);
+    }
+};
 
-            template<>
-            struct print_curve_element<typename curves::bls12<381>::g2_type::value_type> {
-                static void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
-                    print_fp2_curve_group_element(os, e);
-                }
-            };
+template<>
+struct print_curve_element<typename curves::bls12<381>::g2_type::value_type> {
+    void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
+        print_fp2_curve_group_element(os, e);
+    }
+};
 
 
 int main() {

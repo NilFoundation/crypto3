@@ -47,7 +47,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef HashType hash_type;
 
-                    typedef typename curve_type::pairing_policy pairing_type;
+                    typedef typename curve_type::pairing pairing_type;
                     typedef typename curve_type::scalar_field_type field_type;
                     typedef typename field_type::value_type private_key_type;
                     typedef typename private_key_type::modulus_type modulus_type;
@@ -92,7 +92,7 @@ namespace nil {
                     }
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        return pairing_type::reduced_pairing(U, V);
+                        return pairing_type::pair_reduced(U, V);
                     }
 
                     static inline typename bls_serializer::compressed_g2_octets point_to_pubkey(const public_key_type &pubkey) {
@@ -139,7 +139,7 @@ namespace nil {
                     }
 
                     static inline gt_value_type pairing(const signature_type &U, const public_key_type &V) {
-                        return pairing_type::reduced_pairing(V, U);
+                        return pairing_type::pair_reduced(V, U);
                     }
 
                     static inline typename bls_serializer::compressed_g1_octets point_to_pubkey(const public_key_type &pubkey) {
