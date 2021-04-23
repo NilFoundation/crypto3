@@ -30,8 +30,6 @@
 
 #include <nil/crypto3/detail/make_uint_t.hpp>
 
-#include <nil/crypto3/detail/predef.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace detail {
