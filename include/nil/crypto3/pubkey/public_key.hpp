@@ -37,7 +37,8 @@ namespace nil {
 
             public_key() = default;
 
-            explicit public_key(const key_type &key) : pubkey(key) {}
+            explicit public_key(const key_type &key) : pubkey(key) {
+            }
 
         protected:
             key_type pubkey;

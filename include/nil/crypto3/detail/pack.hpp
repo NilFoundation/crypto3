@@ -591,8 +591,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
@@ -639,8 +639,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<InputEndianness, stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,

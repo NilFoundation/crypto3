@@ -69,22 +69,20 @@ namespace nil {
          */
 
         template<std::size_t DigestBits>
-        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> { 
+        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> {
 
-            digest(): boost::container::small_vector<octet_type, DigestBits / octet_bits>(){};
+            digest() : boost::container::small_vector<octet_type, DigestBits / octet_bits>() {};
 
-            digest(std::size_t sz, octet_type ot): boost::container::small_vector<octet_type, DigestBits / octet_bits>(sz, ot){};
+            digest(std::size_t sz, octet_type ot) :
+                boost::container::small_vector<octet_type, DigestBits / octet_bits>(sz, ot) {};
         };
 
-
-        //template<std::size_t DigestBits>
-        //using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
-
+        // template<std::size_t DigestBits>
+        // using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
 
         namespace detail {
             template<std::size_t DigestBits, typename OutputIterator>
-            OutputIterator to_ascii(const digest<DigestBits> &d,
-                                    OutputIterator it) {
+            OutputIterator to_ascii(const digest<DigestBits> &d, OutputIterator it) {
                 for (std::size_t j = 0; j < d.size(); ++j) {
                     octet_type b = d[j];
                     *it++ = "0123456789abcdef"[(b >> 4) & 0xF];
@@ -94,8 +92,7 @@ namespace nil {
             }
 
             template<std::size_t DigestBits>
-            digest<DigestBits / 4 + 1>
-                c_str(const digest<DigestBits> &d) {
+            digest<DigestBits / 4 + 1> c_str(const digest<DigestBits> &d) {
                 digest<DigestBits / 4 + 1> s;
                 to_ascii<DigestBits>(d, std::back_inserter(s));
                 s.push_back('\0');
@@ -112,7 +109,7 @@ namespace nil {
          * (0, NewBits - OldBits) bits.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> reserve(const digest< OldBits > &od) {
+        digest<NewBits> reserve(const digest<OldBits> &od) {
             digest<NewBits> nd;
             unsigned bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
             std::memcpy(nd.data(), od.data(), bytes);
@@ -152,7 +149,7 @@ namespace nil {
          * amount necessitated by the shorted output size.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> truncate(const digest< OldBits > &od) {
+        digest<NewBits> truncate(const digest<OldBits> &od) {
             BOOST_STATIC_ASSERT(NewBits <= OldBits);
             return resize<NewBits>(od);
         }

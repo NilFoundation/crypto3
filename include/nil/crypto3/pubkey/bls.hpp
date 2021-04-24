@@ -85,7 +85,7 @@ namespace nil {
                 inline static key_type key_gen_impl(const SeedType &seed) {
                     // "BLS-SIG-KEYGEN-SALT-"
                     std::array<uint8_t, 20> salt = {66, 76, 83, 45, 83, 73, 71, 45, 75, 69,
-                                        89, 71, 69, 78, 45, 83, 65, 76, 84, 45};
+                                                    89, 71, 69, 78, 45, 83, 65, 76, 84, 45};
                     number_type sk(0);
                     // TODO: will work when hkdf finished
                     while (sk != 0) {
@@ -152,7 +152,6 @@ namespace nil {
                 }
 
             private:
-
             };
 
             template<typename CurveType>
@@ -165,7 +164,8 @@ namespace nil {
                 constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
                 constexpr static const std::size_t private_key_bits = private_key_type::key_bits;
 
-                explicit bls() {}
+                explicit bls() {
+                }
             };
         }    // namespace pubkey
     }        // namespace crypto3

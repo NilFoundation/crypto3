@@ -37,7 +37,7 @@ endmacro()
 
 set(TESTS_NAMES
     "ecdsa"
-)
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})

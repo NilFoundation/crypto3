@@ -38,7 +38,6 @@ namespace nil {
             typedef typename private_key<Scheme>::key_schedule_type key_schedule_type;
 
             agreement_key(const key_type &key) : private_key<Scheme>(key), agrkey(key) {
-
             }
 
             key_schedule_type agrkey;
