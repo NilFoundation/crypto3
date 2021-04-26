@@ -57,7 +57,7 @@ namespace nil {
                         word_type V0 = V[0], V1 = V[1], V2 = V[2], V3 = V[3];
 
                         V3 ^= M;
-#pragma clang loop unroll(full)
+
                         for (size_t i = 0; i != InternalRounds; ++i) {
                             V0 += V1;
                             V2 += V3;
