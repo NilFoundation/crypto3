@@ -101,11 +101,11 @@ namespace nil {
                 void update_n(InputIterator first, InputIterator last) {
                     std::size_t n = std::distance(first, last);
 #ifndef CRYPTO3_CODEC_NO_OPTIMIZATION
-#pragma clang loop unroll(full)
+
                     for (; n && (seen % input_block_bits); --n, ++first) {
                         update_one(*first);
                     }
-#pragma clang loop unroll(full)
+
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
@@ -125,7 +125,7 @@ namespace nil {
                     }
 #endif
 
-#pragma clang loop unroll(full)
+
                     for (; n; --n, ++first) {
                         update_one(*first);
                     }
@@ -156,7 +156,7 @@ namespace nil {
 
                 template<typename InputIterator, typename Category>
                 inline void operator()(InputIterator first, InputIterator last, Category) {
-#pragma clang loop unroll(full)
+
                     while (first != last) {
                         update_one(*first++);
                     }
