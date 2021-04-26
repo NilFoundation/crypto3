@@ -83,7 +83,8 @@ namespace nil {
                     secure_vector<uint8_t> r(sig, sig + size_r);
 
                     // check that 0 < s < q
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + size_r, order_bytes);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + size_r,
+                                                                                               order_bytes);
 
                     if (s <= 0 || s >= m_group.get_order()) {
                         return false;
@@ -91,7 +92,8 @@ namespace nil {
 
                     secure_vector<uint8_t> r_xor_e(r);
                     xor_buf(r_xor_e, msg, r.size());
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> w(r_xor_e.data(), r_xor_e.size());
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> w(r_xor_e.data(),
+                                                                                         r_xor_e.size());
                     w = m_group.mod_order(w);
 
                     const point_gfp q = m_group.point_multiply(w, m_public_point, s);
@@ -148,7 +150,8 @@ namespace nil {
                                         ->hash_block_size());    // use only the "hash input block size" leftmost bits
                                                                  //---------------------
 
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k =
+                        m_group.random_scalar(rng);
                     const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k_times_P_x =
                         m_group.blinded_base_point_multiply_x(k, rng, m_ws);
 

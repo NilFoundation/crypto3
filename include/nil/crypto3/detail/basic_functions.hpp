@@ -109,7 +109,8 @@ namespace nil {
                 }
 
                 static inline word_type rotr(word_type x, std::size_t n) {
-#if (BOOST_ARCH_X86)
+
+#if BOOST_ARCH_X86
                     asm("rorl %1,%0" : "+r"(x) : "c"(static_cast<uint8_t>(n)));
                     return x;
 #else
@@ -123,7 +124,8 @@ namespace nil {
                 }
 
                 static inline word_type rotl(word_type x, std::size_t n) {
-#if (BOOST_ARCH_X86)
+
+#if BOOST_ARCH_X86
                     asm("roll %1,%0" : "+r"(x) : "c"(static_cast<uint8_t>(n)));
                     return x;
 #else

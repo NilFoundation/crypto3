@@ -29,17 +29,16 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-
-        /*!
-         * @brief 
-         * 
-         * @ingroup pubkey_algorithms
-         * 
-         * Public key - a key that can be published and used to verify the authenticity 
-         * of the signed document, as well as to prevent fraud on the part of the certifying 
-         * person in the form of his refusal to sign the document.
-         *
-         */
+          /*!
+           * @brief 
+           * 
+           * @ingroup pubkey_algorithms
+           * 
+           * Public key - a key that can be published and used to verify the authenticity 
+           * of the signed document, as well as to prevent fraud on the part of the certifying 
+           * person in the form of his refusal to sign the document.
+           *
+           */
             template<typename Scheme, typename = void>
             struct public_key;
         }    // namespace pubkey

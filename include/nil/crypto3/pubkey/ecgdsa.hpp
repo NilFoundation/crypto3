@@ -65,11 +65,12 @@ namespace nil {
                         return false;
                     }
 
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> e(msg, msg_len,
-                                                                                        m_group.get_order_bits());
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> e(
+                        msg, msg_len, m_group.get_order_bits());
 
                     const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2,
+                                                                                               sig_len / 2);
 
                     if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order()) {
                         return false;
@@ -123,7 +124,8 @@ namespace nil {
                         const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
                             m(msg, msg_len, m_group.get_order_bits());
 
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k =
+                        m_group.random_scalar(rng);
 
                     const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r =
                         m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
@@ -139,8 +141,8 @@ namespace nil {
                         throw internal_error("During ECGDSA signature generated zero r/s");
                     }
 
-                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(
-                        r, s, m_group.get_order_bytes());
+                    return nil::crypto3::multiprecision::number<
+                        Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
                 }
             };
 

@@ -147,8 +147,10 @@ namespace nil {
             };
 
             std::vector<uint8_t> gost_3410_public_key::public_key_bits() const {
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x = public_point().get_affine_x();
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> y = public_point().get_affine_y();
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> x =
+                    public_point().get_affine_x();
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> y =
+                    public_point().get_affine_y();
 
                 size_t part_size = std::max(x.bytes(), y.bytes());
 
@@ -207,14 +209,15 @@ namespace nil {
             namespace {
 
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> decode_le(const uint8_t msg[],
-                                                                                      size_t msg_len) {
+                                                                                             size_t msg_len) {
                     secure_vector<uint8_t> msg_le(msg, msg + msg_len);
 
                     for (size_t i = 0; i != msg_le.size() / 2; ++i) {
                         std::swap(msg_le[i], msg_le[msg_le.size() - 1 - i]);
                     }
 
-                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(msg_le.data(), msg_le.size());
+                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(msg_le.data(),
+                                                                                              msg_le.size());
                 }
 
                 /**
@@ -242,7 +245,8 @@ namespace nil {
 
                 secure_vector<uint8_t> GOST_3410_Signature_Operation::raw_sign(const uint8_t msg[], size_t msg_len,
                                                                                random_number_generator &rng) {
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> k =
+                        m_group.random_scalar(rng);
 
                     nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> e = decode_le(msg, msg_len);
 
@@ -261,8 +265,8 @@ namespace nil {
                         throw internal_error("GOST 34.10 signature generation failed, r/s equal to zero");
                     }
 
-                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(
-                        s, r, m_group.get_order_bytes());
+                    return nil::crypto3::multiprecision::number<
+                        Backend, ExpressionTemplates>::encode_fixed_length_int_pair(s, r, m_group.get_order_bytes());
                 }
 
                 /**
@@ -297,9 +301,11 @@ namespace nil {
                     }
 
                     const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> s(sig, sig_len / 2);
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r(sig + sig_len / 2, sig_len / 2);
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> r(sig + sig_len / 2,
+                                                                                               sig_len / 2);
 
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &order = m_group.get_order();
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &order =
+                        m_group.get_order();
 
                     if (r <= 0 || r >= order || s <= 0 || s >= order) {
                         return false;

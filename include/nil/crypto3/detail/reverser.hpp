@@ -68,7 +68,7 @@ namespace nil {
                 b = unbounded_shr<16>(((b * 0x0802LU & 0x22110LU) | (b * 0x8020LU & 0x88440LU)) * 0x10101LU);
 #elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                 b = (b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
-#else                
+#else
 #error "BOOST_ARCH_CURRENT_WORD_BITS not set"
 #endif
             }

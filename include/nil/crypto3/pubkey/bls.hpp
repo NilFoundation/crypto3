@@ -181,6 +181,7 @@ namespace nil {
                 static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
                                                     const signature_type &signature) {
                     return basic_functions::aug_aggregate_verify(pubkeys, messages, public_params::dst, signature);
+
                 }
             };
 

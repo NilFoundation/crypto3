@@ -45,10 +45,10 @@ namespace nil {
                          typename Backend,
                          nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
                          typename MessageAuthenticationCode = mac::hmac<Hash>>
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                    generate_rfc6979_nonce(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &x,
-                                           const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &q,
-                                           const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &h) {
+                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> generate_rfc6979_nonce(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &x,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &q,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &h) {
                     m_order(order), m_qlen(m_order.bits()), m_rlen(m_qlen / 8 + (m_qlen % 8 ? 1 : 0)),
                         m_rng_in(m_rlen * 2),
                         m_rng_out(m_rlen)

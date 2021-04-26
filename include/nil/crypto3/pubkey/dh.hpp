@@ -144,7 +144,9 @@ namespace nil {
                         m_powermod_x_p(key.get_x(), m_p),
                         m_blinder(
                             m_p, rng,
-                            [](const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &k) { return k; },
+                            [](const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &k) {
+                                return k;
+                            },
                             [this](const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &k) {
                                 return m_powermod_x_p(inverse_mod(k, m_p));
                             }) {
@@ -171,7 +173,8 @@ namespace nil {
                     x = m_powermod_x_p(x);
                     x = m_blinder.unblind(x);
 
-                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x, m_p.bytes());
+                    return nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x,
+                                                                                                           m_p.bytes());
                 }
 
             }    // namespace

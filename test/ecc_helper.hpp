@@ -21,7 +21,8 @@ namespace {
 
         const size_t hlen = len / 2;
         const nil::crypto3::multiprecision::cpp_int a = nil::crypto3::multiprecision::cpp_int::decode(in, hlen);
-        const nil::crypto3::multiprecision::cpp_int b = nil::crypto3::multiprecision::cpp_int::decode(in + hlen, len - hlen);
+        const nil::crypto3::multiprecision::cpp_int b =
+            nil::crypto3::multiprecision::cpp_int::decode(in + hlen, len - hlen);
         const nil::crypto3::multiprecision::cpp_int c = a + b;
 
         const nil::crypto3::point_gfp P1 = base_point * a;

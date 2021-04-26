@@ -31,24 +31,34 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
 
-		/*!
-         * @brief 
-         * 
-         * @ingroup pubkey_algorithms
-         * 
-         * Key agreement refers to one form of key exchange  in which two or more users 
-         * execute a protocol to securely share a resultant key value. As an alternative 
-         * to key agreement, a key transport protocol may be used. The distinguishing 
-         * feature of a key agreement protocol is that participating users each contribute 
-         * an equal portion toward the computation of the resultant shared key value 
-         * (as opposed to one user computing and distributing a key value to other users).
-         *
-         */
+          /*!
+           * @brief 
+           * 
+           * @ingroup pubkey_algorithms
+           * 
+           * Key agreement refers to one form of key exchange  in which two or more users 
+           * execute a protocol to securely share a resultant key value. As an alternative 
+           * to key agreement, a key transport protocol may be used. The distinguishing 
+           * feature of a key agreement protocol is that participating users each contribute 
+           * an equal portion toward the computation of the resultant shared key value 
+           * (as opposed to one user computing and distributing a key value to other users).
+           *
+           */
+          template<typename Scheme>
+          struct agreement_key : public private_key<Scheme> {
+              typedef typename private_key<Scheme>::scheme_type scheme_type;
+              typedef typename Scheme::key_agreement_policy key_policy_type;
 
-            template<typename Scheme>
-            struct agreement_key;
-        }    // namespace pubkey
-    }        // namespace crypto3
+              typedef typename private_key<Scheme>::key_type key_type;
+              typedef typename private_key<Scheme>::key_schedule_type key_schedule_type;
+
+              agreement_key(const key_type &key) : private_key<Scheme>(key), agrkey(key) {
+              }
+
+              key_schedule_type agrkey;
+          };
+        } // namespace pubkey
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_PRIVATE_KEY_HPP
