@@ -325,23 +325,23 @@ namespace nil {
                    BOOST_ASSERT(eval_gt(n, 0));
                    BOOST_ASSERT(eval_gt(mod, 0));
                    BOOST_ASSERT(eval_lt(n, mod));
-                   BOOST_ASSERT(eval_ge(mod, 3) && eval_modulus(mod, 2) == 1);
+                   BOOST_ASSERT(eval_ge(mod, 3) && eval_modulus(mod, 2) == 1);*/
 
-                   /*
-                   This uses a modular inversion algorithm designed by Niels Möller
-                   and implemented in Nettle. The same algorithm was later also
-                   adapted to GMP in mpn_sec_invert.
-                   It can be easily implemented in a way that does not depend on
-                   secret branches or memory lookups, providing resistance against
-                   some forms of side channel attack.
-                   There is also a description of the algorithm in Appendix 5 of "Fast
-                   Software Polynomial Multiplication on ARM Processors using the NEON Engine"
-                   by Danilo Câmara, Conrado P. L. Gouvêa, Julio López, and Ricardo
-                   Dahab in LNCS 8182
-                      https://conradoplg.cryptoland.net/files/2010/12/mocrysen13.pdf
-                   Thanks to Niels for creating the algorithm, explaining some things
-                   about it, and the reference to the paper.
-                   */
+                /*
+                This uses a modular inversion algorithm designed by Niels Möller
+                and implemented in Nettle. The same algorithm was later also
+                adapted to GMP in mpn_sec_invert.
+                It can be easily implemented in a way that does not depend on
+                secret branches or memory lookups, providing resistance against
+                some forms of side channel attack.
+                There is also a description of the algorithm in Appendix 5 of "Fast
+                Software Polynomial Multiplication on ARM Processors using the NEON Engine"
+                by Danilo Câmara, Conrado P. L. Gouvêa, Julio López, and Ricardo
+                Dahab in LNCS 8182
+                   https://conradoplg.cryptoland.net/files/2010/12/mocrysen13.pdf
+                Thanks to Niels for creating the algorithm, explaining some things
+                about it, and the reference to the paper.
+                */
                 /*
                    const size_t mod_words = mod.size();
                    BOOST_ASSERT_MSG(mod_words > 0, "Not empty");
@@ -413,13 +413,13 @@ namespace nil {
 
                    // if b != 1 then gcd(n,mod) > 1 and inverse does not exist
                    // in which case zero out the result to indicate this
-                   (~b_is_1).if_set_zero_out(v_w, mod_words);
+                   (~b_is_1).if_set_zero_out(v_w, mod_words);*/
 
-                   /*
-                   * We've placed the result in the lowest words of the temp buffer.
-                   * So just clear out the other values and then give that buffer to a
-                   * BigInt.
-                   */
+                /*
+                 * We've placed the result in the lowest words of the temp buffer.
+                 * So just clear out the other values and then give that buffer to a
+                 * BigInt.
+                 */
                 /*
                    clear_mem(&tmp_mem[mod_words], 4 * mod_words);
 
@@ -428,7 +428,7 @@ namespace nil {
                    Backend r;
                    r.swap_reg(tmp_mem);
                    return r;
-                }
+                }*/
 
                 /*
                 template <typename Backend, expression_template_option ExpressionTemplates>
@@ -537,11 +537,11 @@ namespace nil {
                 template <typename Backend>
                 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
                 {
-                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
-                   /*
-                   * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
-                   * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
-                   */
+                   typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;*/
+                /*
+                 * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
+                 * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
+                 */
                 /*
                    if (eval_integer_modulus(a1, 2) == 0)
                       return 0;
@@ -609,7 +609,7 @@ namespace nil {
                       return 0;
                    }
                    if (eval_integer_modulus(n, 2) == 1)
-                   {
+                   {*/
                       /*
                       Fastpath for common case. This leaks information if n > mod
                       but we don't guarantee const time behavior in that case.
