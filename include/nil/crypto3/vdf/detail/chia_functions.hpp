@@ -297,7 +297,7 @@ namespace nil {
                             bb2 = 1;
                             bb1 = 0;
 
-#pragma clang loop unroll(full)
+
                             for (i = 0; rr1 != 0 && rr1 > bb; i++) {
                                 qq = rr2 / rr1;
 
@@ -1055,7 +1055,7 @@ namespace nil {
                             bb2 = 1;
                             bb1 = 0;
 
-#pragma clang loop unroll(full)
+
                             for (i = 0; rr1 != 0 && rr1 > bb; i++) {
                                 qq = rr2 / rr1;
 
