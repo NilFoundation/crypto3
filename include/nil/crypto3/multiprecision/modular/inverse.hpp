@@ -152,8 +152,8 @@ namespace nil {
 
                 /*
                 template <typename Backend>
-                inline void bigint_shr1(typename boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
-                                        size_t word_shift, size_t bit_shift)
+                inline void bigint_shr1(typename boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t
+                x_size, size_t word_shift, size_t bit_shift)
                 {
                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
 
@@ -280,7 +280,8 @@ namespace nil {
 
                 template <typename Backend>
                 inline void bigint_cnd_abs(typename boost::mpl::front<typename Backend::unsigned_types>::type cnd,
-                                           typename boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t size)
+                                           typename boost::mpl::front<typename Backend::unsigned_types>::type x[],
+                size_t size)
                 {
                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
                    const auto                                                          mask =
@@ -297,8 +298,8 @@ namespace nil {
                 template <typename Backend>
                 inline void bigint_cnd_swap(typename boost::mpl::front<typename Backend::unsigned_types>::type cnd,
                                             typename boost::mpl::front<typename Backend::unsigned_types>::type x[],
-                                            typename boost::mpl::front<typename Backend::unsigned_types>::type y[], size_t
-                size)
+                                            typename boost::mpl::front<typename Backend::unsigned_types>::type y[],
+                size_t size)
                 {
                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
                    const auto                                                          mask =
@@ -629,14 +630,14 @@ namespace nil {
                    {
                       // In this case we are performing an inversion modulo 2^k
                       return eval_inverse_mod_pow2(n, mod_lz);
-                   }
+                   }*/
 
-                   /*
-                   * In this case we are performing an inversion modulo 2^k*o for
-                   * some k > 1 and some odd (not necessarily prime) integer.
-                   * Compute the inversions modulo 2^k and modulo o, then combine them
-                   * using CRT, which is possible because 2^k and o are relatively prime.
-                   */
+                /*
+                 * In this case we are performing an inversion modulo 2^k*o for
+                 * some k > 1 and some odd (not necessarily prime) integer.
+                 * Compute the inversions modulo 2^k and modulo o, then combine them
+                 * using CRT, which is possible because 2^k and o are relatively prime.
+                 */
                 /*
                    Backend o = mod;
 
@@ -684,4 +685,3 @@ namespace nil {
 }    // namespace nil
 
 #endif
-
