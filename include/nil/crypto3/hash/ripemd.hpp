@@ -66,7 +66,7 @@ namespace nil {
                     word_type A2 = state[0], B2 = state[1], C2 = state[2], D2 = state[3];
 
                     // round 1
-#pragma clang loop unroll(full)
+
                     for (int j = 0; j < 16; ++j) {
                         policy_type::transform<policy_type::f1>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x00000000,
                                                                 policy_type::s1[j]);
@@ -74,7 +74,7 @@ namespace nil {
                                                                 policy_type::s2[j]);
                     }
                     // round 2
-#pragma clang loop unroll(full)
+
                     for (int j = 16; j < 32; ++j) {
                         policy_type::transform<policy_type::f2>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x5a827999,
                                                                 policy_type::s1[j]);
@@ -82,7 +82,7 @@ namespace nil {
                                                                 policy_type::s2[j]);
                     }
                     // round 3
-#pragma clang loop unroll(full)
+
                     for (int j = 32; j < 48; ++j) {
                         policy_type::transform<policy_type::f3>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x6ed9eba1,
                                                                 policy_type::s1[j]);
@@ -90,7 +90,7 @@ namespace nil {
                                                                 policy_type::s2[j]);
                     }
                     // round 4
-#pragma clang loop unroll(full)
+
                     for (int j = 48; j < 64; ++j) {
                         policy_type::transform<policy_type::f4>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x8f1bbcdc,
                                                                 policy_type::s1[j]);
@@ -113,7 +113,7 @@ namespace nil {
                     word_type A2 = state[0], B2 = state[1], C2 = state[2], D2 = state[3], E2 = state[4];
 
                     // round 1
-#pragma clang loop unroll(full)
+
                     for (int j = 0; j < 16; ++j) {
                         policy_type::transform<policy_type::f1>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
                                                                 0x00000000, policy_type::s1[j]);
@@ -121,7 +121,7 @@ namespace nil {
                                                                 0x50a28be6, policy_type::s2[j]);
                     }
                     // round 2
-#pragma clang loop unroll(full)
+
                     for (int j = 16; j < 32; ++j) {
                         policy_type::transform<policy_type::f2>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
                                                                 0x5a827999, policy_type::s1[j]);
@@ -129,7 +129,7 @@ namespace nil {
                                                                 0x5c4dd124, policy_type::s2[j]);
                     }
                     // round 3
-#pragma clang loop unroll(full)
+
                     for (int j = 32; j < 48; ++j) {
                         policy_type::transform<policy_type::f3>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
                                                                 0x6ed9eba1, policy_type::s1[j]);
@@ -137,7 +137,7 @@ namespace nil {
                                                                 0x6d703ef3, policy_type::s2[j]);
                     }
                     // round 4
-#pragma clang loop unroll(full)
+
                     for (int j = 48; j < 64; ++j) {
                         policy_type::transform<policy_type::f4>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
                                                                 0x8f1bbcdc, policy_type::s1[j]);
@@ -145,7 +145,7 @@ namespace nil {
                                                                 0x7a6d76e9, policy_type::s2[j]);
                     }
                     // round 5
-#pragma clang loop unroll(full)
+
                     for (int j = 64; j < 80; ++j) {
                         policy_type::transform<policy_type::f5>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
                                                                 0xa953fd4e, policy_type::s1[j]);
@@ -169,7 +169,7 @@ namespace nil {
                     std::copy(state.begin(), state.end(), Y.begin());
 
                     // round 1
-#pragma clang loop unroll(full)
+
                     for (int j = 0; j < 16; ++j) {
                         policy_type::transform<policy_type::f1>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
                                                                 0x00000000, policy_type::s1[j]);
@@ -178,7 +178,7 @@ namespace nil {
                     }
                     std::swap(Y[0], Y[4]);
                     // round 2
-#pragma clang loop unroll(full)
+
                     for (int j = 16; j < 32; ++j) {
                         policy_type::transform<policy_type::f2>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
                                                                 0x5a827999, policy_type::s1[j]);
@@ -187,7 +187,7 @@ namespace nil {
                     }
                     std::swap(Y[1], Y[5]);
                     // round 3
-#pragma clang loop unroll(full)
+
                     for (int j = 32; j < 48; ++j) {
                         policy_type::transform<policy_type::f3>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
                                                                 0x6ed9eba1, policy_type::s1[j]);
@@ -196,7 +196,7 @@ namespace nil {
                     }
                     std::swap(Y[2], Y[6]);
                     // round 4
-#pragma clang loop unroll(full)
+
                     for (int j = 48; j < 64; ++j) {
                         policy_type::transform<policy_type::f4>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
                                                                 0x8f1bbcdc, policy_type::s1[j]);
@@ -205,7 +205,7 @@ namespace nil {
                     }
                     std::swap(Y[3], Y[7]);
 
-#pragma clang loop unroll(full)
+
                     for (std::size_t i = 0; i < policy_type::state_words; ++i) {
                         state[i] += Y[i];
                     }
@@ -219,7 +219,7 @@ namespace nil {
                     std::copy(state.begin(), state.end(), Y.begin());
 
                     // round 1
-#pragma clang loop unroll(full)
+
                     for (int j = 0; j < 16; ++j) {
                         policy_type::transform<policy_type::f1>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
                                                                 0x00000000, policy_type::s1[j]);
@@ -228,7 +228,7 @@ namespace nil {
                     }
                     std::swap(Y[1], Y[6]);
                     // round 2
-#pragma clang loop unroll(full)
+
                     for (int j = 16; j < 32; ++j) {
                         policy_type::transform<policy_type::f2>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
                                                                 0x5a827999, policy_type::s1[j]);
@@ -237,7 +237,7 @@ namespace nil {
                     }
                     std::swap(Y[3], Y[8]);
                     // round 3
-#pragma clang loop unroll(full)
+
                     for (int j = 32; j < 48; ++j) {
                         policy_type::transform<policy_type::f3>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
                                                                 0x6ed9eba1, policy_type::s1[j]);
@@ -246,7 +246,7 @@ namespace nil {
                     }
                     std::swap(Y[0], Y[5]);
                     // round 4
-#pragma clang loop unroll(full)
+
                     for (int j = 48; j < 64; ++j) {
                         policy_type::transform<policy_type::f4>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
                                                                 0x8f1bbcdc, policy_type::s1[j]);
@@ -255,7 +255,7 @@ namespace nil {
                     }
                     std::swap(Y[2], Y[7]);
                     // round 5
-#pragma clang loop unroll(full)
+
                     for (int j = 64; j < 80; ++j) {
                         policy_type::transform<policy_type::f5>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
                                                                 0xa953fd4e, policy_type::s1[j]);
@@ -264,7 +264,7 @@ namespace nil {
                     }
                     std::swap(Y[4], Y[9]);
 
-#pragma clang loop unroll(full)
+
                     for (std::size_t i = 0; i < policy_type::state_words; ++i) {
                         state[i] += Y[i];
                     }
