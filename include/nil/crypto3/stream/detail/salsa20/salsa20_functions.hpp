@@ -67,7 +67,7 @@ namespace nil {
 
                     void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         // XSalsa20
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 6] = boost::endian::native_to_little(
                                 make_uint_t(iv[word_bytes * itr], iv[word_bytes * itr + 1], iv[word_bytes * itr + 2],
@@ -131,7 +131,7 @@ namespace nil {
                         schedule[10] = policy_type::tau()[2];
                         schedule[15] = policy_type::tau()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 1] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -183,7 +183,7 @@ namespace nil {
                         schedule[10] = policy_type::tau()[2];
                         schedule[15] = policy_type::tau()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 1] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -194,7 +194,7 @@ namespace nil {
 
                     void schedule_iv(block_type &block, key_schedule_type &state, const iv_type &iv) {
                         // XSalsa20
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             state[itr + 6] = boost::endian::native_to_little(
                                 make_uint_t(iv[4 * itr], iv[4 * itr + 1], iv[4 * itr + 2], iv[4 * itr + 3]));
@@ -259,7 +259,7 @@ namespace nil {
                         state[10] = policy_type::sigma()[2];
                         state[15] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             state[itr + 1] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -312,7 +312,7 @@ namespace nil {
                         state[10] = policy_type::sigma()[2];
                         state[15] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             state[itr + 1] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -324,7 +324,7 @@ namespace nil {
 
                     void schedule_iv(block_type &block, key_schedule_type &state, const iv_type &iv) {
                         // XSalsa20
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             state[itr + 6] = boost::endian::native_to_little(
                                 make_uint_t(iv[4 * itr], iv[4 * itr + 1], iv[4 * itr + 2], iv[4 * itr + 3]));

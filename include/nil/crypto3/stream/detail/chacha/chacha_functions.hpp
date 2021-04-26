@@ -74,7 +74,7 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -119,7 +119,7 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -173,7 +173,7 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -227,7 +227,7 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -273,7 +273,7 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -327,7 +327,7 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -380,7 +380,7 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
