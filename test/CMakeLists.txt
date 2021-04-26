@@ -12,6 +12,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::block
                        ${CMAKE_WORKSPACE_NAME}::hash
+                       ${CMAKE_WORKSPACE_NAME}::algebra
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                        ${Boost_LIBRARIES})
@@ -37,7 +38,9 @@ endmacro()
 
 set(TESTS_NAMES
     "ecdsa"
-    )
+    "bls"
+    "secret_sharing"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})

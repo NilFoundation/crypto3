@@ -25,6 +25,9 @@
 #ifndef CRYPTO3_PUBKEY_COMPLEXITY_HPP
 #define CRYPTO3_PUBKEY_COMPLEXITY_HPP
 
+#include <algorithm>
+#include <numeric>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {

@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,28 +23,26 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBLIC_KEY_HPP
-#define CRYPTO3_PUBLIC_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_PUBLIC_KEY_HPP
+#define CRYPTO3_PUBKEY_PUBLIC_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
-        template<typename Scheme>
-        struct public_key {
-            typedef Scheme scheme_type;
-            typedef typename scheme_type::public_key_type public_key_policy_type;
-
-            typedef typename public_key_policy_type::key_type key_type;
-            // typedef typename key_policy_type::key_schedule_type key_schedule_type;
-
-            public_key() = default;
-
-            explicit public_key(const key_type &key) : pubkey(key) {
-            }
-
-        protected:
-            key_type pubkey;
-        };
-    }    // namespace crypto3
+        namespace pubkey {
+          /*!
+           * @brief 
+           * 
+           * @ingroup pubkey_algorithms
+           * 
+           * Public key - a key that can be published and used to verify the authenticity 
+           * of the signed document, as well as to prevent fraud on the part of the certifying 
+           * person in the form of his refusal to sign the document.
+           *
+           */
+            template<typename Scheme, typename = void>
+            struct public_key;
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBLIC_KEY_HPP
+#endif    // CRYPTO3_PUBKEY_PUBLIC_KEY_HPP

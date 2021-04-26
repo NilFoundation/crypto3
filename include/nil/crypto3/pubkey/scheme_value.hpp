@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -33,7 +34,11 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/apply.hpp>
+
+#include <nil/crypto3/pubkey/accumulators/sign.hpp>
+#include <nil/crypto3/pubkey/accumulators/verify.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,10 +50,10 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename PubkeyAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::scheme_type scheme_type;
 
-                    ref_scheme_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
+                    ref_scheme_impl(accumulator_set_type &&acc) : accumulator_set(acc) {
                     }
 
                     accumulator_set_type &accumulator_set;
@@ -60,10 +65,11 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename PubkeyAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::scheme_type scheme_type;
 
-                    value_scheme_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
+                    value_scheme_impl(accumulator_set_type &&acc) :
+                        accumulator_set(std::forward<accumulator_set_type>(acc)) {
                     }
 
                     mutable accumulator_set_type accumulator_set;
@@ -77,40 +83,107 @@ namespace nil {
                     typedef typename pubkey_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename pubkey_state_impl_type::mode_type mode_type;
-                    typedef typename pubkey_state_impl_type::cipher_type cipher_type;
+                    typedef typename pubkey_state_impl_type::scheme_type scheme_type;
 
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename SinglePassRange>
-                    range_scheme_impl(const SinglePassRange &range, const accumulator_set_type &ise) :
-                        PubkeySchemeStateImpl(ise) {
+                    template<typename SinglePassRange,
+                             typename ValueType =
+                                 typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                             typename std::enable_if<std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    range_scheme_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
-                        typedef
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
-                        BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
-                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            std::numeric_limits<ValueType>::digits + std::numeric_limits<ValueType>::is_signed>::type
                             stream_processor;
 
                         stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
-                    template<typename InputIterator>
-                    range_scheme_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise) :
-                        PubkeySchemeStateImpl(ise) {
+                    template<typename InputIterator,
+                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                             typename std::enable_if<std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    range_scheme_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
-                        typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-                        BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
-                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            std::numeric_limits<ValueType>::digits + std::numeric_limits<ValueType>::is_signed>::type
                             stream_processor;
 
                         stream_processor(this->accumulator_set)(first, last);
+                    }
+
+                    template<
+                        typename SinglePassRange,
+                        typename ValueType =
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                        typename std::enable_if<!std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    range_scheme_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+
+                        typedef typename scheme_type::template stream_processor<mode_type, accumulator_set_type>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(range);
+                    }
+
+                    template<
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                        typename std::enable_if<!std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    range_scheme_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+
+                        typedef typename scheme_type::template stream_processor<mode_type, accumulator_set_type>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(first, last);
+                    }
+
+                    template<
+                        typename InputIterator1, typename InputIterator2,
+                        typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
+                        typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
+                        typename std::enable_if<std::numeric_limits<ValueType1>::is_specialized, bool>::type = true,
+                        typename std::enable_if<!std::numeric_limits<ValueType2>::is_specialized, bool>::type = true>
+                    range_scheme_impl(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
+                                      InputIterator2 last2, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator1>));
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator2>));
+
+                        typedef typename scheme_type::template stream_processor<
+                            mode_type, accumulator_set_type,
+                            std::numeric_limits<ValueType1>::digits + std::numeric_limits<ValueType1>::is_signed>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(first1, last1, first2, last2);
+                    }
+
+                    template<
+                        typename InputIterator1, typename InputIterator2,
+                        typename ValueType1 = typename std::iterator_traits<InputIterator1>::value_type,
+                        typename ValueType2 = typename std::iterator_traits<InputIterator2>::value_type,
+                        typename std::enable_if<!std::numeric_limits<ValueType1>::is_specialized, bool>::type = true,
+                        typename std::enable_if<!std::numeric_limits<ValueType2>::is_specialized, bool>::type = true>
+                    range_scheme_impl(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
+                                      InputIterator2 last2, accumulator_set_type &&ise) :
+                        PubkeySchemeStateImpl(std::forward<accumulator_set_type>(ise)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator1>));
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator2>));
+
+                        typedef typename scheme_type::template stream_processor<mode_type, accumulator_set_type>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(first1, last1, first2, last2);
                     }
 
                     template<typename T, std::size_t Size>
@@ -142,7 +215,7 @@ namespace nil {
                         return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-                    operator accumulator_set_type() const {
+                    operator accumulator_set_type &() const {
                         return this->accumulator_set;
                     }
 
@@ -169,49 +242,82 @@ namespace nil {
                     typedef typename pubkey_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename pubkey_state_impl_type::mode_type mode_type;
-                    typedef typename pubkey_state_impl_type::cipher_type cipher_type;
+                    typedef typename pubkey_state_impl_type::scheme_type scheme_type;
 
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename SinglePassRange>
-                    itr_scheme_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise) :
-                        PubkeyStateImpl(ise), out(std::move(out)) {
+                    template<typename SinglePassRange,
+                             typename ValueType =
+                                 typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                             typename std::enable_if<std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    itr_scheme_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
+                        PubkeyStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
 
-                        typedef
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
-                        BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
-                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            std::numeric_limits<ValueType>::digits + std::numeric_limits<ValueType>::is_signed>::type
                             stream_processor;
 
                         stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
-                    template<typename InputIterator>
+                    template<typename InputIterator,
+                             typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                             typename std::enable_if<std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
                     itr_scheme_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                    const accumulator_set_type &ise) :
-                        PubkeyStateImpl(ise),
+                                    accumulator_set_type &&ise) :
+                        PubkeyStateImpl(std::forward<accumulator_set_type>(ise)),
                         out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
 
-                        typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-                        BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<
+                        typedef typename scheme_type::template stream_processor<
                             mode_type, accumulator_set_type,
-                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            std::numeric_limits<ValueType>::digits + std::numeric_limits<ValueType>::is_signed>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(first, last);
+                    }
+
+                    template<
+                        typename SinglePassRange,
+                        typename ValueType =
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type,
+                        typename std::enable_if<!std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    itr_scheme_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
+                        PubkeyStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
+
+                        typedef typename scheme_type::template stream_processor<mode_type, accumulator_set_type>::type
+                            stream_processor;
+
+                        stream_processor(this->accumulator_set)(range);
+                    }
+
+                    template<
+                        typename InputIterator,
+                        typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                        typename std::enable_if<!std::numeric_limits<ValueType>::is_specialized, bool>::type = true>
+                    itr_scheme_impl(InputIterator first, InputIterator last, OutputIterator out,
+                                    accumulator_set_type &&ise) :
+                        PubkeyStateImpl(std::forward<accumulator_set_type>(ise)),
+                        out(std::move(out)) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+                        BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
+
+                        typedef typename scheme_type::template stream_processor<mode_type, accumulator_set_type>::type
                             stream_processor;
 
                         stream_processor(this->accumulator_set)(first, last);
                     }
 
                     operator OutputIterator() const {
-                        result_type result =
-                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-
-                        return std::move(result.cbegin(), result.cend(), out);
+                        *out++ = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        return out;
                     }
                 };
             }    // namespace detail

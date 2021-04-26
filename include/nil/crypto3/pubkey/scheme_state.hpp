@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,35 +23,77 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CIPHER_STATE_HPP
-#define CRYPTO3_PUBKEY_CIPHER_STATE_HPP
+#ifndef CRYPTO3_PUBKEY_SCHEME_STATE_HPP
+#define CRYPTO3_PUBKEY_SCHEME_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
+#include <nil/crypto3/pubkey/accumulators/sign.hpp>
+#include <nil/crypto3/pubkey/accumulators/verify.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate.hpp>
+#include <nil/crypto3/pubkey/accumulators/aggregate_verify.hpp>
+#include <nil/crypto3/pubkey/secret_sharing_scheme_state.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             /*!
-             * @brief Accumulator set with pre-defined block cipher accumulator params.
+             * @brief Accumulator set with pre-defined signing accumulator params.
              *
              * Meets the requirements of AccumulatorSet
              *
-             * @ingroup block
+             * @ingroup pubkey
              *
-             * @tparam Mode Cipher state preprocessing mode type (e.g. isomorphic_encryption_mode<aes128>)
-             * @tparam Endian
-             * @tparam ValueBits
-             * @tparam LengthBits
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_signing_policy<bls, nop_padding>)
              */
-            template<typename ProcessingMode>
-            using accumulator_set = boost::accumulators::accumulator_set<
-                digest<ProcessingMode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::scheme<ProcessingMode>>>;
+            template<typename Mode>
+            using signing_accumulator_set =
+                boost::accumulators::accumulator_set<typename Mode::result_type,
+                                                     boost::accumulators::features<accumulators::tag::sign<Mode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined verification accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_verification_policy<bls, nop_padding>)
+             */
+            template<typename Mode>
+            using verification_accumulator_set =
+                boost::accumulators::accumulator_set<typename Mode::result_type,
+                                                     boost::accumulators::features<accumulators::tag::verify<Mode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined aggregation accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_aggregation_policy<bls, nop_padding>)
+             */
+            template<typename Mode>
+            using aggregation_accumulator_set =
+                boost::accumulators::accumulator_set<typename Mode::result_type,
+                                                     boost::accumulators::features<accumulators::tag::aggregate<Mode>>>;
+
+            /*!
+             * @brief Accumulator set with pre-defined aggregation accumulator params.
+             *
+             * Meets the requirements of AccumulatorSet
+             *
+             * @ingroup pubkey
+             *
+             * @tparam Mode Scheme processing mode type (e.g. isomorphic_aggregation_policy<bls, nop_padding>)
+             */
+            template<typename Mode>
+            using aggregated_verification_accumulator_set = boost::accumulators::accumulator_set<
+                typename Mode::result_type, boost::accumulators::features<accumulators::tag::aggregate_verify<Mode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_CIPHER_STATE_HPP
+#endif    // CRYPTO3_PUBKEY_SCHEME_STATE_HPP
