@@ -57,7 +57,7 @@ namespace nil {
                     static inline key_schedule_word_type sub_word(const key_schedule_word_type &x,
                                                                   const constants_type &constants) {
                         key_schedule_word_type result = {0};
-#pragma clang loop unroll(full)
+
                         for (std::size_t i = 0; i < policy_type::word_bytes; ++i) {
                             result =
                                 result << CHAR_BIT | constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(x, i)];
@@ -67,7 +67,7 @@ namespace nil {
                     }
 
                     static inline void sub_bytes(block_type &state, const constants_type &sbox) {
-#pragma clang loop unroll(full)
+
                         for (std::size_t i = 0; i < policy_type::word_bytes * policy_type::block_words; ++i) {
                             state[i] = sbox[state[i]];
                         }
@@ -77,19 +77,19 @@ namespace nil {
                         std::array<typename policy_type::byte_type, policy_type::block_words> tmp = {0};
 
                         // row 0 never gets shifted
-#pragma clang loop unroll(full)
+
                         for (std::size_t row = 1; row < policy_type::word_bytes; ++row) {
                             const std::size_t off = offset[row - 1];
-#pragma clang loop unroll(full)
+
                             for (std::size_t i = 0; i < off; ++i) {
                                 tmp[i] = state[i * policy_type::word_bytes + row];
                             }
-#pragma clang loop unroll(full)
+
                             for (std::size_t i = 0; i < policy_type::block_words - 1; ++i) {
                                 state[i * policy_type::word_bytes + row] =
                                     state[(i + off) * policy_type::word_bytes + row];
                             }
-#pragma clang loop unroll(full)
+
                             for (std::size_t i = 0; i < off; ++i) {
                                 state[(policy_type::block_words - 1 - i) * policy_type::word_bytes + row] =
                                     tmp[off - 1 - i];
@@ -101,11 +101,11 @@ namespace nil {
                     static inline block_type mix_columns(const StateType &state, const mm_type &mm) {
                         block_type tmp = {0};
 
-#pragma clang loop unroll(full)
+
                         for (std::size_t col = 0; col < policy_type::block_words; ++col) {
-#pragma clang loop unroll(full)
+
                             for (std::size_t row = 0; row < policy_type::word_bytes; ++row) {
-#pragma clang loop unroll(full)
+
                                 for (std::size_t k = 0; k < policy_type::word_bytes; ++k) {
                                     tmp[col * policy_type::word_bytes + row] ^=
                                         policy_type::mul(mm[row * policy_type::word_bytes + k],
@@ -122,9 +122,9 @@ namespace nil {
                         BOOST_ASSERT(std::distance(first, last) == policy_type::block_words &&
                                      state.size() == policy_type::block_bytes);
 
-#pragma clang loop unroll(full)
+
                         for (std::size_t i = 0; i < policy_type::block_words && first != last; ++i && ++first) {
-#pragma clang loop unroll(full)
+
                             for (std::size_t j = 0; j < policy_type::word_bytes; ++j) {
                                 state[i * policy_type::word_bytes + j] ^=
                                     ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(*first,
@@ -150,7 +150,7 @@ namespace nil {
 
                         add_round_key(state, encryption_key.begin(), encryption_key.begin() + policy_type::block_words);
 
-#pragma clang loop unroll(full)
+
                         for (std::size_t round = 1; round < policy_type::rounds; ++round) {
                             apply_round(round, state, encryption_key, policy_type::constants,
                                         policy_type::shift_offsets, policy_type::mm);
@@ -171,7 +171,7 @@ namespace nil {
                         add_round_key(state, decryption_key.begin() + policy_type::rounds * policy_type::block_words,
                                       decryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
 
-#pragma clang loop unroll(full)
+
                         for (std::size_t round = policy_type::rounds - 1; round > 0; --round) {
                             apply_round(round, state, decryption_key, policy_type::inverted_constants,
                                         policy_type::inverted_shift_offsets, policy_type::inverted_mm);
@@ -193,7 +193,7 @@ namespace nil {
                             key.begin(), key.begin() + policy_type::key_words * policy_type::word_bytes,
                             encryption_key.begin());
 
-#pragma clang loop unroll(full)
+
                         for (std::size_t i = policy_type::key_words; i < policy_type::key_schedule_words; ++i) {
                             typename policy_type::key_schedule_word_type tmp = encryption_key[i - 1];
                             if (i % policy_type::key_words == 0) {
@@ -211,7 +211,7 @@ namespace nil {
                                                      CHAR_BIT>(encryption_key.begin(), encryption_key.end(),
                                                                bekey.begin());
 
-#pragma clang loop unroll(full)
+
                         for (std::uint8_t round = 1; round < policy_type::rounds; ++round) {
                             move(mix_columns(boost::adaptors::slice(bekey, round * policy_type::block_bytes,
                                                                     (round + 1) * policy_type::block_bytes),

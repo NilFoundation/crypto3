@@ -136,7 +136,7 @@ namespace nil {
 
                 template<typename InputIterator, typename Category>
                 inline void operator()(InputIterator first, InputIterator last, Category) {
-#pragma clang loop unroll(full)
+
                     while (first != last) {
                         update_one(*first++);
                     }

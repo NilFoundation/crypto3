@@ -378,7 +378,7 @@ namespace nil {
 
                         _mm_storeu_si128(encryption_key_mm, key);
 
-#pragma clang loop unroll(full)
+
                         for (size_t i = 1; i != policy_type::rounds; ++i) {
                             key = detail::aes_schedule_round(&rcon, key, key);
 
@@ -427,7 +427,7 @@ namespace nil {
                         // key2 with 8 high bytes masked off
                         __m128i t = _mm_slli_si128(_mm_srli_si128(key2, 8), 8);
 
-#pragma clang loop unroll(full)
+
                         for (size_t i = 0; i != 4; ++i) {
                             key2 = detail::aes_schedule_round(&rcon, key2, key1);
 
@@ -496,7 +496,7 @@ namespace nil {
 
                         _mm_storeu_si128(decryption_key_mm + 13, detail::aes_schedule_mangle_dec(key2, 1));
 
-#pragma clang loop unroll(full)
+
                         for (size_t i = 2; i != 14; i += 2) {
                             __m128i k_t = key2;
                             key1 = key2 = detail::aes_schedule_round(&rcon, key2, key1);
