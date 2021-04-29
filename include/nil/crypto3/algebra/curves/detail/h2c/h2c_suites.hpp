@@ -37,6 +37,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <boost/predef.h>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -96,7 +98,11 @@ namespace nil {
 
                         constexpr static inline field_value_type Ai = field_value_type(0, 240);
                         constexpr static inline field_value_type Bi = field_value_type(1012, 1012);
+#if BOOST_COMP_GNUC
                         constexpr static inline field_value_type Z = []() { return -field_value_type(2, 1); }();
+#else
+                        constexpr static inline field_value_type Z = -field_value_type(2, 1);
+#endif
                         constexpr static inline auto h_eff =
                             0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui636;
                     };
