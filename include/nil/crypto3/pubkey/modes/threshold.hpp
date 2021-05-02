@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2019-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,10 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_THRESHOLD_SCHEME_MODE_HPP
-#define CRYPTO3_PUBKEY_THRESHOLD_SCHEME_MODE_HPP
+#ifndef CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP
+#define CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP
 
-#include <nil/crypto3/pubkey/agreement_key.hpp>
+#include <nil/crypto3/pubkey/modes/detail/threshold_scheme.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -78,24 +79,93 @@ namespace nil {
                 template<typename Scheme, typename Padding>
                 struct threshold_signing_policy : public threshold_policy<Scheme, Padding> {
                     typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename threshold_policy<Scheme, Padding>::number_type number_type;
-
                     typedef private_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::sign(key, plaintext);
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type =
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef typename key_type::part_signature_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.sign(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct threshold_part_verification_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
+                    typedef public_key<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type =
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.part_verify(args...);
                     }
                 };
 
                 template<typename Scheme, typename Padding>
                 struct threshold_verification_policy : public threshold_policy<Scheme, Padding> {
                     typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
-                    typedef typename threshold_policy<Scheme, Padding>::number_type number_type;
-
                     typedef public_key<scheme_type> key_type;
 
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return scheme_type::verify(key, plaintext);
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type =
+                        typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type;
+
+                    typedef bool result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const key_type &key, const Args &...args) {
+                        return key.verify(args...);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct threshold_aggregation_policy : public threshold_policy<Scheme, Padding> {
+                    typedef typename threshold_policy<Scheme, Padding>::scheme_type scheme_type;
+                    typedef no_key_ops<scheme_type> key_type;
+
+                    constexpr static const auto input_block_bits = key_type::input_block_bits;
+                    typedef typename key_type::input_block_type input_block_type;
+
+                    constexpr static const auto input_value_bits = key_type::input_value_bits;
+                    typedef typename key_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type =
+                        typename key_type::sss_signature_no_key_ops_type::template check_indexed_public_element<
+                            ValueType>;
+
+                    typedef typename key_type::signature_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return key_type::aggregate(args...);
                     }
                 };
 
@@ -104,36 +174,44 @@ namespace nil {
                     typedef Policy policy_type;
 
                 public:
-                    typedef typename policy_type::number_type number_type;
-
-                    typedef typename policy_type::policy_type scheme_type;
+                    typedef typename policy_type::scheme_type scheme_type;
                     typedef typename policy_type::padding_type padding_type;
+                    typedef typename policy_type::key_type key_type;
 
-                    typedef typename scheme_type::key_type key_type;
+                    constexpr static const auto input_block_bits = policy_type::input_block_bits;
+                    typedef typename policy_type::input_block_type input_block_type;
 
-                    threshold(const scheme_type &cipher) : cipher(cipher) {
+                    constexpr static const auto input_value_bits = policy_type::input_value_bits;
+                    typedef typename policy_type::input_value_type input_value_type;
+
+                    template<typename ValueType>
+                    using check_input_value_type = typename policy_type::template check_input_value_type<ValueType>;
+
+                    typedef typename policy_type::result_type result_type;
+
+                    template<typename... Args>
+                    inline static result_type process(const Args &...args) {
+                        return policy_type::process(args...);
                     }
-
-                    inline static number_type process(const key_type &key, const number_type &plaintext) {
-                        return policy_type::process(key, plaintext);
-                    }
-
-                protected:
-                    scheme_type cipher;
                 };
             }    // namespace detail
 
             namespace modes {
-                template<typename Scheme, template<typename> class Padding>
+                template<typename Scheme, template<typename> class SecretSharingScheme,
+                         template<typename> class Padding>
                 struct threshold {
-                    typedef Scheme scheme_type;
+                    typedef Scheme base_scheme_type;
+                    typedef typename detail::threshold_scheme<base_scheme_type, SecretSharingScheme>::type scheme_type;
                     typedef Padding<Scheme> padding_type;
 
                     typedef detail::threshold_agreement_policy<scheme_type, padding_type> agreement_policy;
                     typedef detail::threshold_encryption_policy<scheme_type, padding_type> encryption_policy;
                     typedef detail::threshold_decryption_policy<scheme_type, padding_type> decryption_policy;
                     typedef detail::threshold_signing_policy<scheme_type, padding_type> signing_policy;
+                    typedef detail::threshold_part_verification_policy<scheme_type, padding_type>
+                        part_verification_policy;
                     typedef detail::threshold_verification_policy<scheme_type, padding_type> verification_policy;
+                    typedef detail::threshold_aggregation_policy<scheme_type, padding_type> aggregation_policy;
 
                     template<typename Policy>
                     struct bind {
@@ -145,4 +223,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MODE_HPP
+#endif    // CRYPTO3_PUBKEY_THRESHOLD_MODE_HPP

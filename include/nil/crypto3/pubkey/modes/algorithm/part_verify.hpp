@@ -23,13 +23,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_MODES_VERIFY_HPP
-#define CRYPTO3_PUBKEY_MODES_VERIFY_HPP
+#ifndef CRYPTO3_PUBKEY_MODES_PART_VERIFY_HPP
+#define CRYPTO3_PUBKEY_MODES_PART_VERIFY_HPP
 
 #include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
 
 #include <nil/crypto3/pubkey/scheme_value.hpp>
-#include <nil/crypto3/pubkey/scheme_state.hpp>
+#include <nil/crypto3/pubkey/modes/scheme_state.hpp>
 
 #include <nil/crypto3/pubkey/public_key.hpp>
 
@@ -37,7 +37,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Mode>
-            using verification_mode_policy = typename Mode::verification_policy;
+            using part_verification_mode_policy = typename Mode::part_verification_policy;
         }
 
         // /*!
@@ -59,13 +59,13 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename InputIterator, typename KeyInputIterator, typename OutputIterator>
-        // OutputIterator verify(InputIterator first, InputIterator last, KeyInputIterator key_first,
+        // OutputIterator part_verify(InputIterator first, InputIterator last, KeyInputIterator key_first,
         //                        KeyInputIterator key_last, OutputIterator out) {
         //
         //     typedef
-        //         typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //         typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //             VerificationMode;
-        //     typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+        //     typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamVerifyerImpl, OutputIterator> VerifyerImpl;
@@ -94,13 +94,13 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename InputIterator, typename KeySinglePassRange, typename OutputIterator>
-        // OutputIterator verify(InputIterator first, InputIterator last, const KeySinglePassRange &key,
+        // OutputIterator part_verify(InputIterator first, InputIterator last, const KeySinglePassRange &key,
         //                        OutputIterator out) {
         //
         //     typedef
-        //         typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //         typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //             VerificationMode;
-        //     typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+        //     typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamVerifyerImpl, OutputIterator> VerifyerImpl;
@@ -128,13 +128,14 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename InputIterator, typename KeyInputIterator,
-        //     typename ModeAccumulator = typename pubkey::verification_accumulator_set<typename Mode::template bind<
-        //         pubkey::verification_mode_policy<Mode>>::type>>
+        //     typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<typename Mode::template
+        //     bind<
+        //         pubkey::part_verification_mode_policy<Mode>>::type>>
         // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
-        // verify(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
+        // part_verify(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
@@ -161,13 +162,14 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename InputIterator, typename KeySinglePassRange,
-        //     typename ModeAccumulator = typename pubkey::verification_accumulator_set<typename Mode::template bind<
-        //         pubkey::verification_mode_policy<Mode>>::type>>
+        //     typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<typename Mode::template
+        //     bind<
+        //         pubkey::part_verification_mode_policy<Mode>>::type>>
         // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
-        // verify(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
+        // part_verify(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
@@ -195,12 +197,12 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
-        // OutputIterator verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
+        // OutputIterator part_verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
-        //     typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+        //     typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
         //     typedef pubkey::detail::itr_scheme_impl<StreamVerifyerImpl, OutputIterator> VerifyerImpl;
@@ -225,12 +227,12 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
-        // OutputRange &verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
+        // OutputRange &part_verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
-        //     typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+        //     typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
@@ -255,13 +257,14 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename SinglePassRange, typename KeySinglePassRange,
-        //     typename ModeAccumulator = typename pubkey::verification_accumulator_set<typename Mode::template bind<
-        //         pubkey::verification_mode_policy<Mode>>::type>>
+        //     typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<typename Mode::template
+        //     bind<
+        //         pubkey::part_verification_mode_policy<Mode>>::type>>
         // pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
-        // verify(const SinglePassRange &r, const KeySinglePassRange &key) {
+        // part_verify(const SinglePassRange &r, const KeySinglePassRange &key) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
@@ -287,13 +290,14 @@ namespace nil {
         //  * @return
         //  */
         // template<typename Mode, typename SinglePassRange, typename OutputRange>
-        // OutputRange &verify(const SinglePassRange &rng, const pubkey::public_key<typename Mode::scheme_type> &key,
+        // OutputRange &part_verify(const SinglePassRange &rng, const pubkey::public_key<typename Mode::scheme_type>
+        // &key,
         //                     OutputRange &out) {
         //
         //     typedef
-        //     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type
+        //     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type
         //         VerificationMode;
-        //     typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+        //     typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
         //
         //     typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
         //     typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
@@ -319,17 +323,19 @@ namespace nil {
          * @return
          */
         template<typename Mode, typename SinglePassRange, typename OutputIterator>
-        OutputIterator verify(const SinglePassRange &rng,
-                              const typename pubkey::public_key<typename Mode::scheme_type>::signature_type &sig,
-                              const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
+        OutputIterator
+            part_verify(const SinglePassRange &rng,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
 
-            typedef typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type VerificationMode;
-            typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
+            typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamVerifyerImpl, OutputIterator> VerifyerImpl;
 
-            return VerifyerImpl(rng, std::move(out), ModeAccumulator(key, nil::crypto3::accumulators::signature = sig));
+            return VerifyerImpl(rng, std::move(out),
+                                ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
         }
 
         /*!
@@ -349,18 +355,19 @@ namespace nil {
          * @return
          */
         template<typename Mode, typename InputIterator, typename OutputIterator>
-        OutputIterator verify(InputIterator first, InputIterator last,
-                              const typename pubkey::public_key<typename Mode::scheme_type>::signature_type &sig,
-                              const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
+        OutputIterator
+            part_verify(InputIterator first, InputIterator last,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key, OutputIterator out) {
 
-            typedef typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type VerificationMode;
-            typedef typename pubkey::verification_accumulator_set<VerificationMode> ModeAccumulator;
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
+            typedef typename pubkey::part_verification_accumulator_set<VerificationMode> ModeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamVerifyerImpl, OutputIterator> VerifyerImpl;
 
             return VerifyerImpl(first, last, std::move(out),
-                                ModeAccumulator(key, nil::crypto3::accumulators::signature = sig));
+                                ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
         }
 
         /*!
@@ -379,11 +386,11 @@ namespace nil {
          * @return
          */
         template<typename Mode, typename InputIterator,
-                 typename OutputAccumulator = typename pubkey::verification_accumulator_set<
-                     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type>>
+                 typename OutputAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            verify(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+            part_verify(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
@@ -407,16 +414,16 @@ namespace nil {
          */
 
         template<typename Mode, typename SinglePassRange,
-                 typename OutputAccumulator = typename pubkey::verification_accumulator_set<
-                     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type>>
+                 typename OutputAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                 OutputAccumulator>::type &
-            verify(const SinglePassRange &r, OutputAccumulator &acc) {
+            part_verify(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
 
-            return VerifyerImpl(r, acc);
+            return VerifyerImpl(r, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -436,19 +443,19 @@ namespace nil {
          * @return
          */
         template<typename Mode, typename InputIterator,
-                 typename ModeAccumulator = typename pubkey::verification_accumulator_set<
-                     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type>>
+                 typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
-            verify(InputIterator first, InputIterator last,
-                   const typename pubkey::public_key<typename Mode::scheme_type>::signature_type &sig,
-                   const pubkey::public_key<typename Mode::scheme_type> &key) {
+            part_verify(InputIterator first, InputIterator last,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key) {
 
-            typedef typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type VerificationMode;
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
 
-            return VerifyerImpl(first, last, ModeAccumulator(key, nil::crypto3::accumulators::signature = sig));
+            return VerifyerImpl(first, last, ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
         }
 
         /*!
@@ -466,19 +473,52 @@ namespace nil {
          * @return
          */
         template<typename Mode, typename SinglePassRange,
-                 typename ModeAccumulator = typename pubkey::verification_accumulator_set<
-                     typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type>>
+                 typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
-            verify(const SinglePassRange &r,
-                   const typename pubkey::public_key<typename Mode::scheme_type>::signature_type &sig,
-                   const pubkey::public_key<typename Mode::scheme_type> &key) {
+            part_verify(const SinglePassRange &r,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key) {
 
-            typedef typename Mode::template bind<pubkey::verification_mode_policy<Mode>>::type VerificationMode;
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
 
             typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
 
-            return VerifyerImpl(r, ModeAccumulator(key, nil::crypto3::accumulators::signature = sig));
+            return VerifyerImpl(r, ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam ModeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Mode, typename InputIterator1, typename InputIterator2,
+                 typename ModeAccumulator = typename pubkey::part_verification_accumulator_set<
+                     typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<ModeAccumulator>>
+            part_verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
+                        const typename pubkey::public_key<typename Mode::scheme_type>::part_signature_type &part_sig,
+                        const pubkey::public_key<typename Mode::scheme_type> &key) {
+
+            typedef typename Mode::template bind<pubkey::part_verification_mode_policy<Mode>>::type VerificationMode;
+
+            typedef pubkey::detail::value_scheme_impl<ModeAccumulator> StreamVerifyerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamVerifyerImpl> VerifyerImpl;
+
+            return VerifyerImpl(first1, last1, first2, last2,
+                                ModeAccumulator(key, nil::crypto3::accumulators::signature = part_sig));
         }
     }    // namespace crypto3
 }    // namespace nil
