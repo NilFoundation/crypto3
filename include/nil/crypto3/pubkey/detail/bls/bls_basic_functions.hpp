@@ -152,15 +152,14 @@ namespace nil {
                         return C1 == C2;
                     }
 
-                    static inline signature_type core_aggregate(const signature_type &init_sig,
-                                                                const signature_type &sig) {
+                    static inline signature_type aggregate(const signature_type &init_sig, const signature_type &sig) {
                         return init_sig + sig;
                     }
 
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type core_aggregate(const SignatureRangeType &sig_n) {
+                    static inline signature_type aggregate(const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
                         assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
@@ -176,8 +175,8 @@ namespace nil {
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type core_aggregate(const signature_type &init_sig,
-                                                                const SignatureRangeType &sig_n) {
+                    static inline signature_type aggregate(const signature_type &init_sig,
+                                                           const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
                         assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
@@ -194,8 +193,8 @@ namespace nil {
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
-                                                             const DstType &dst, const signature_type &sig) {
+                    static inline bool aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
+                                                        const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
                         assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&

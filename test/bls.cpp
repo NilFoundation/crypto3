@@ -304,8 +304,8 @@ BOOST_AUTO_TEST_SUITE_END()
 //     using curve_type = curves::bls12_381;
 //     using hash_type = sha2<256>;
 //
-//     using signature_variant = bls_signature_mss_ro_variant<curve_type, hash_type>;
-//     using scheme_type = bls_pop_scheme<signature_variant>;
+//     using signature_version = bls_signature_mss_ro_variant<curve_type, hash_type>;
+//     using scheme_type = bls_pop_scheme<signature_version>;
 //
 //     using private_key_type = typename scheme_type::private_key_type;
 //     using public_key_type = typename scheme_type::public_key_type;

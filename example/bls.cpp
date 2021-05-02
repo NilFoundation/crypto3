@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
@@ -41,26 +41,25 @@
 #include <utility>
 #include <random>
 
+using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::pubkey;
 using namespace nil::crypto3::hashes;
 using namespace nil::crypto3::multiprecision;
 
-	using curve_type = curves::bls12_381;
-    using hash_type = sha2<256>;
-    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
-    using scheme_type = bls<bls_variant, bls_basic_scheme>;
+using curve_type = curves::bls12_381;
+using hash_type = sha2<256>;
+using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
+using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
-    using privkey_type = private_key<scheme_type>;
-    using pubkey_type = public_key<scheme_type>;
-    using _privkey_type = typename privkey_type::private_key_type;
-    using _pubkey_type = typename pubkey_type::public_key_type;
-    using signature_type = typename pubkey_type::signature_type;
-    using modulus_type = typename _privkey_type::modulus_type;
+using privkey_type = private_key<scheme_type>;
+using pubkey_type = public_key<scheme_type>;
+using _privkey_type = typename privkey_type::private_key_type;
+using _pubkey_type = typename pubkey_type::public_key_type;
+using signature_type = typename pubkey_type::signature_type;
+using modulus_type = typename _privkey_type::modulus_type;
 
-
-
-    template<typename FieldParams>
+template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
     os << e.data << std::endl;
 }
@@ -93,19 +92,17 @@ struct print_curve_element<typename curves::bls12<381>::g2_type::value_type> {
     }
 };
 
-
 int main() {
-	std::string msg_str = "hello world";
-	std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
-	privkey_type sk = privkey_type(random_element<typename _privkey_type::field_type>());
+    std::string msg_str = "hello world";
+    std::vector<std::uint8_t> msg(msg_str.begin(), msg_str.end());
+    privkey_type sk = privkey_type(random_element<typename _privkey_type::field_type>());
 
-	signature_type sig = ::nil::crypto3::sign(msg, sk);
+    signature_type sig = sign(msg, sk);
     pubkey_type &pubkey = sk;
-    assert(static_cast<bool>(::nil::crypto3::verify(msg, sig, pubkey)));
+    assert(verify(msg, sig, pubkey));
 
-    print_field_element(std::cout, sk.get_privkey);
-    print_curve_element(std::cout, pubkey.get_pubkey);
+    print_field_element(std::cout, sk.get_privkey());
+    print_curve_element(std::cout, pubkey.get_pubkey());
 
-	
-	  return 0;
+    return 0;
 }

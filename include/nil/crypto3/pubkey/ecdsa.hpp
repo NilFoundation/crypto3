@@ -54,7 +54,9 @@ namespace nil {
                 constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
 
-                inline static bool verify(const signature_type &val, const key_schedule_type &key) {
+                template<typename MsgRange>
+                static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
+                                          const signature_type &signature) {
                     if (sig_len != m_group.get_order_bytes() * 2)
                         return false;
 

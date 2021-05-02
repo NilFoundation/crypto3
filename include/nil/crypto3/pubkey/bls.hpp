@@ -55,30 +55,30 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-        //
-        // Basic scheme
-        // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
-        /*!
-         * @brief 
-         * 
-         * @ingroup pubkey_algorithms
-         * 
-         * BLS is a digital signature scheme with aggregation properties.  Given set of signatures 
-         * (signature_1, ..., signature_n) anyone can produce an aggregated signature.  Aggregation 
-         * can also be done on secret keys and public keys.  Furthermore, the BLS signature scheme 
-         * is deterministic, non-malleable, and efficient.  Its simplicity and cryptographic properties 
-         * allows it to be useful in a variety of use- cases, specifically when minimal storage space or 
-         * bandwidth are required.
-         *
-         *
-         *
-         */
             //
-            template<typename SignatureVariant, typename public_params>
+            // Basic scheme
+            // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+            /*!
+             * @brief
+             *
+             * @ingroup pubkey_algorithms
+             *
+             * BLS is a digital signature scheme with aggregation properties.  Given set of signatures
+             * (signature_1, ..., signature_n) anyone can produce an aggregated signature.  Aggregation
+             * can also be done on secret keys and public keys.  Furthermore, the BLS signature scheme
+             * is deterministic, non-malleable, and efficient.  Its simplicity and cryptographic properties
+             * allows it to be useful in a variety of use- cases, specifically when minimal storage space or
+             * bandwidth are required.
+             *
+             *
+             *
+             */
+            //
+            template<typename SignatureVersion, typename ParamsType>
             struct bls_basic_scheme {
-                typedef SignatureVariant signature_variant;
-                typedef typename signature_variant::policy_type policy_type;
-                typedef typename signature_variant::basic_functions basic_functions;
+                typedef SignatureVersion signature_version;
+                typedef typename signature_version::policy_type policy_type;
+                typedef typename signature_version::basic_functions basic_functions;
 
                 typedef typename policy_type::private_key_type private_key_type;
                 typedef typename policy_type::public_key_type public_key_type;
@@ -95,36 +95,36 @@ namespace nil {
 
                 template<typename MsgRange>
                 static inline signature_type sign(const private_key_type &privkey, const MsgRange &message) {
-                    return basic_functions::core_sign(privkey, message, public_params::dst);
+                    return basic_functions::core_sign(privkey, message, ParamsType::dst);
                 }
 
                 template<typename MsgRange>
                 static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
                                           const signature_type &signature) {
-                    return basic_functions::core_verify(pubkey, message, public_params::dst, signature);
+                    return basic_functions::core_verify(pubkey, message, ParamsType::dst, signature);
                 }
 
                 static inline signature_type aggregate(const signature_type &init_signature,
                                                        const signature_type &signature) {
-                    return basic_functions::core_aggregate(init_signature, signature);
+                    return basic_functions::aggregate(init_signature, signature);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(signatures);
+                    return basic_functions::aggregate(signatures);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const signature_type &init_signature,
                                                        const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(init_signature, signatures);
+                    return basic_functions::aggregate(init_signature, signatures);
                 }
 
                 template<typename PubkeyRange, typename MsgsRange>
                 static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
                                                     const signature_type &signature) {
                     // TODO: add check - If any two input messages are equal, return INVALID.
-                    return basic_functions::core_aggregate_verify(pubkeys, messages, public_params::dst, signature);
+                    return basic_functions::aggregate_verify(pubkeys, messages, ParamsType::dst, signature);
                 }
             };
 
@@ -132,11 +132,11 @@ namespace nil {
             // Message augmentation
             // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
             //
-            template<typename SignatureVariant, typename public_params>
+            template<typename SignatureVersion, typename ParamsType>
             struct bls_aug_scheme {
-                typedef SignatureVariant signature_variant;
-                typedef typename signature_variant::policy_type policy_type;
-                typedef typename signature_variant::basic_functions basic_functions;
+                typedef SignatureVersion signature_version;
+                typedef typename signature_version::policy_type policy_type;
+                typedef typename signature_version::basic_functions basic_functions;
 
                 typedef typename policy_type::private_key_type private_key_type;
                 typedef typename policy_type::public_key_type public_key_type;
@@ -156,32 +156,31 @@ namespace nil {
                 static inline signature_type sign(const private_key_type &privkey, const MsgRange &message) {
                     public_key_type pubkey = generate_public_key(privkey);
                     return basic_functions::core_sign(privkey, basic_functions::pk_conc_msg(pubkey, message),
-                                                      public_params::dst);
+                                                      ParamsType::dst);
                 }
 
                 template<typename MsgRange>
                 static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
                                           const signature_type &signature) {
                     return basic_functions::core_verify(pubkey, basic_functions::pk_conc_msg(pubkey, message),
-                                                        public_params::dst, signature);
+                                                        ParamsType::dst, signature);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(signatures);
+                    return basic_functions::aggregate(signatures);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const signature_type &init_signature,
                                                        const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(init_signature, signatures);
+                    return basic_functions::aggregate(init_signature, signatures);
                 }
 
                 template<typename PubkeyRange, typename MsgsRange>
                 static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
                                                     const signature_type &signature) {
-                    return basic_functions::aug_aggregate_verify(pubkeys, messages, public_params::dst, signature);
-
+                    return basic_functions::aug_aggregate_verify(pubkeys, messages, ParamsType::dst, signature);
                 }
             };
 
@@ -189,11 +188,11 @@ namespace nil {
             // Proof of possession
             // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
             //
-            template<typename SignatureVariant, typename public_params>
+            template<typename SignatureVersion, typename ParamsType>
             struct bls_pop_scheme {
-                typedef SignatureVariant signature_variant;
-                typedef typename signature_variant::policy_type policy_type;
-                typedef typename signature_variant::basic_functions basic_functions;
+                typedef SignatureVersion signature_version;
+                typedef typename signature_version::policy_type policy_type;
+                typedef typename signature_version::basic_functions basic_functions;
 
                 typedef typename policy_type::private_key_type private_key_type;
                 typedef typename policy_type::public_key_type public_key_type;
@@ -209,46 +208,46 @@ namespace nil {
                 }
 
                 static inline signature_type pop_prove(const private_key_type &privkey) {
-                    return basic_functions::pop_prove(privkey, public_params::pop_dst);
+                    return basic_functions::pop_prove(privkey, ParamsType::pop_dst);
                 }
 
                 static inline bool pop_verify(const public_key_type &pubkey, const signature_type &proof) {
-                    return basic_functions::pop_verify(pubkey, public_params::pop_dst, proof);
+                    return basic_functions::pop_verify(pubkey, ParamsType::pop_dst, proof);
                 }
 
                 template<typename PubkeyRange, typename MsgRange>
                 static inline bool fast_aggregate_verify(const PubkeyRange &pubkeys, const MsgRange &message,
                                                          const signature_type &signature) {
-                    return basic_functions::fast_aggregate_verify(pubkeys, message, public_params::dst, signature);
+                    return basic_functions::fast_aggregate_verify(pubkeys, message, ParamsType::dst, signature);
                 }
 
                 // protected:
                 template<typename MsgRange>
                 static inline signature_type sign(const private_key_type &privkey, const MsgRange &message) {
-                    return basic_functions::core_sign(privkey, message, public_params::dst);
+                    return basic_functions::core_sign(privkey, message, ParamsType::dst);
                 }
 
                 template<typename MsgRange>
                 static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
                                           const signature_type &signature) {
-                    return basic_functions::core_verify(pubkey, message, public_params::dst, signature);
+                    return basic_functions::core_verify(pubkey, message, ParamsType::dst, signature);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(signatures);
+                    return basic_functions::aggregate(signatures);
                 }
 
                 template<typename SignatureRange>
                 static inline signature_type aggregate(const signature_type &init_signature,
                                                        const SignatureRange &signatures) {
-                    return basic_functions::core_aggregate(init_signature, signatures);
+                    return basic_functions::aggregate(init_signature, signatures);
                 }
 
                 template<typename PubkeyRange, typename MsgsRange>
                 static inline bool aggregate_verify(const PubkeyRange &pubkeys, const MsgsRange &messages,
                                                     const signature_type &signature) {
-                    return basic_functions::core_aggregate_verify(pubkeys, messages, public_params::dst, signature);
+                    return basic_functions::aggregate_verify(pubkeys, messages, ParamsType::dst, signature);
                 }
             };
 
@@ -287,10 +286,10 @@ namespace nil {
                 constexpr static std::array<std::uint8_t, 43> pop_dst = dst;
             };
 
-            template<typename SignatureVariant, template<typename, typename> class BlsScheme = bls_basic_scheme,
+            template<typename SignatureVersion, template<typename, typename> class BlsScheme = bls_basic_scheme,
                      typename PublicParams = bls_default_public_params>
             struct bls {
-                typedef BlsScheme<SignatureVariant, PublicParams> bls_scheme_type;
+                typedef BlsScheme<SignatureVersion, PublicParams> bls_scheme_type;
 
                 template<typename Mode, typename AccumulatorSet, std::size_t ValueBits = 0>
                 struct stream_processor {
@@ -304,9 +303,9 @@ namespace nil {
             };
 
             // TODO: add specialization for pop scheme
-            template<typename SignatureVariant, template<typename, typename> class BlsScheme, typename PublicParams>
-            struct public_key<bls<SignatureVariant, BlsScheme, PublicParams>> {
-                typedef bls<SignatureVariant, BlsScheme, PublicParams> scheme_type;
+            template<typename SignatureVersion, template<typename, typename> class SchemeType, typename ParamsType>
+            struct public_key<bls<SignatureVersion, SchemeType, ParamsType>> {
+                typedef bls<SignatureVersion, SchemeType, ParamsType> scheme_type;
                 typedef typename scheme_type::bls_scheme_type bls_scheme_type;
 
                 typedef typename bls_scheme_type::private_key_type private_key_type;
@@ -336,9 +335,7 @@ namespace nil {
                 template<typename AggregateData>
                 using check_aggregate_type = check_aggregate_value_type<typename AggregateData::value_type>;
 
-                public_key() {
-                }
-
+                public_key() = default;
                 public_key(const public_key_type &pubkey) : pubkey(pubkey) {
                 }
 
@@ -383,7 +380,7 @@ namespace nil {
                                                   InputIterator last) const {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
                     auto count = agg_data.count(pubkey);
-                    assert(0 == count || 1 == count);
+                    BOOST_ASSERT(0 == count || 1 == count);
                     if (!count) {
                         agg_data.emplace(*this, input_block_type(first, last));
                     } else if (1 == count) {
@@ -403,7 +400,7 @@ namespace nil {
                          typename std::enable_if<std::is_same<input_value_type, ValueType>::value, bool>::type = true>
                 inline void append_aggregate_data(AggregateData &agg_data, const ValueType &value) const {
                     auto count = agg_data.count(pubkey);
-                    assert(0 == count || 1 == count);
+                    BOOST_ASSERT(0 == count || 1 == count);
                     if (!count) {
                         agg_data.emplace(*this, input_block_type());
                     }
