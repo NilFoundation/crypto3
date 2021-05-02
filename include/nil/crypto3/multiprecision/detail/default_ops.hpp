@@ -14,6 +14,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/fold.hpp>
+#include <boost/mpl/iterator_range.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
@@ -1015,7 +1016,8 @@ namespace nil {
 
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<float>* result, const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type scalar_type;
+                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
+                        scalar_type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1025,7 +1027,8 @@ namespace nil {
 
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<double>* result, const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type scalar_type;
+                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
+                        scalar_type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1036,7 +1039,8 @@ namespace nil {
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<long double>* result,
                                                                      const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type scalar_type;
+                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
+                        scalar_type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1796,60 +1800,65 @@ namespace nil {
             // Default versions of floating point classification routines:
             //
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 using nil::crypto3::multiprecision::default_ops::eval_fpclassify;
                 return eval_fpclassify(arg.backend());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 int v = fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg);
                 return (v != (int)FP_INFINITE) && (v != (int)FP_NAN);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnan
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NAN;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnan
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return isnan BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isinf
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_INFINITE;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isinf
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return isinf BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NORMAL;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
 
@@ -1857,62 +1866,70 @@ namespace nil {
             // (for example with signed zero), then they should overload these functions further:
 
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int sign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR int sign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return arg.sign();
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int sign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int sign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return sign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
 
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int signbit
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 using default_ops::eval_signbit;
                 return eval_signbit(arg.backend());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int signbit
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return signbit BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> changesign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                changesign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return -arg;
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type changesign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return changesign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> copysign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
                 return (nil::crypto3::multiprecision::signbit)(a) != (nil::crypto3::multiprecision::signbit)(b) ?
                            (nil::crypto3::multiprecision::changesign)(a) :
                            a;
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
-                     class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> copysign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                     class tag, class A1, class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
                     a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
                      nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> copysign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
                     nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
@@ -1923,15 +1940,16 @@ namespace nil {
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
                     const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
                     const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
             //
             // real and imag:
             //
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR
-                typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
+                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
                 real(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a) {
                 using default_ops::eval_real;
                 typedef typename scalar_result_from_possible_complex<
@@ -1942,8 +1960,8 @@ namespace nil {
                 return result;
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR
-                typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
+                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
                 imag(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a) {
                 using default_ops::eval_imag;
                 typedef typename scalar_result_from_possible_complex<
@@ -1958,7 +1976,8 @@ namespace nil {
             inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 real(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return real(value_type(arg));
             }
@@ -1967,7 +1986,8 @@ namespace nil {
             inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 imag(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return imag(value_type(arg));
             }
@@ -2163,129 +2183,155 @@ namespace nil {
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type asinh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
+                    asinh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::asinh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
-                    number_kind_complex,
+                number_category<typename nil::crypto3::multiprecision::detail::expression<
+                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type asinh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return asinh(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type acosh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
+                    acosh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::acosh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
-                    number_kind_complex,
+                number_category<typename nil::crypto3::multiprecision::detail::expression<
+                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type acosh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return acosh(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type atanh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
+                    atanh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::atanh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
-                    number_kind_complex,
+                number_category<typename nil::crypto3::multiprecision::detail::expression<
+                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type atanh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return atanh(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::cbrt(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type cbrt
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return cbrt(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                erf BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                erf BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::erf(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erf
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return erf(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+                erfc BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::erfc(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erfc
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return erfc(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> expm1
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::expm1(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type expm1
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return expm1(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> lgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> result;
                 result = boost::math::lgamma(arg, c99_error_policy());
                 if ((nil::crypto3::multiprecision::isnan)(result) && !(nil::crypto3::multiprecision::isnan)(arg)) {
-                    result = std::numeric_limits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::infinity();
+                    result = std::numeric_limits<
+                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::infinity();
                     errno = ERANGE;
                 }
                 return result;
@@ -2293,18 +2339,22 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type lgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return lgamma(value_type(arg));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> tgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 if ((arg == 0) &&
-                    std::numeric_limits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::has_infinity) {
+                    std::numeric_limits<
+                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::has_infinity) {
                     errno = ERANGE;
                     return 1 / arg;
                 }
@@ -2313,75 +2363,83 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type tgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return tgamma(value_type(arg));
             }
 
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR long lrint
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return lround(arg);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR long lrint
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
                 return lround(arg);
             }
 #ifndef BOOST_NO_LONG_LONG
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return llround(arg);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(
+                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
                 return llround(arg);
             }
 #endif
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> log1p
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    arg);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                log1p BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(arg);
                 return boost::math::log1p(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type log1p
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return log1p(value_type(arg));
             }
 
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nextafter
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return boost::math::nextafter(a, b, c99_error_policy());
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
-                     class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nextafter
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                     class tag, class A1, class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
                     a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
                      nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nextafter
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
                     nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
@@ -2392,35 +2450,39 @@ namespace nil {
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
                     const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
                     const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
             template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nexttoward
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return boost::math::nextafter(a, b, c99_error_policy());
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
-                     class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nexttoward
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                                                 const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                     class tag, class A1, class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
                     a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
                      nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> nexttoward
-                BOOST_PREVENT_MACRO_SUBSTITUTION(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                                                 const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    a, b);
+            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
+                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
+                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
                     nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
@@ -2431,7 +2493,8 @@ namespace nil {
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
                     const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
                     const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
+                    value_type;
                 detail::scoped_default_precision<value_type> precision_guard(a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
@@ -2516,8 +2579,8 @@ namespace nil {
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>
                 trunc(const number<Backend, ExpressionTemplates>& v, const Policy&) {
                 using default_ops::eval_trunc;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
-                    v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
+                    precision_guard(v);
                 number<Backend, ExpressionTemplates> result;
                 eval_trunc(result.backend(), v.backend());
                 return result;
@@ -2622,7 +2685,8 @@ namespace nil {
             inline BOOST_MP_CXX14_CONSTEXPR number<T, ExpressionTemplates>
                 round(const number<T, ExpressionTemplates>& v, const Policy&) {
                 using default_ops::eval_round;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_round(result.backend(), v.backend());
                 return result;
@@ -2727,7 +2791,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, short* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
@@ -2747,7 +2812,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, int* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
@@ -2767,7 +2833,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, long* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
@@ -2787,7 +2854,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, boost::long_long_type* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
@@ -2812,7 +2880,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 modf(const number<T, ExpressionTemplates>& v, number<T, ExpressionTemplates>* pipart) {
                 using default_ops::eval_modf;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : 0);
                 return result;
@@ -2824,7 +2893,8 @@ namespace nil {
                                             number<T, ExpressionTemplates>>::type
                 modf(const detail::expression<tag, A1, A2, A3, A4>& v, number<T, ExpressionTemplates>* pipart) {
                 using default_ops::eval_modf;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
+                    precision_guard(v);
                 number<T, ExpressionTemplates> result, arg(v);
                 eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : 0);
                 return result;
@@ -2842,6 +2912,20 @@ namespace nil {
                 number<B, ExpressionTemplates> s, r;
                 eval_integer_sqrt(s.backend(), r.backend(), x.backend());
                 return s;
+            }
+
+            template<class tag, class A1, class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
+                    number_kind_integer,
+                typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+                sqrt(const detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using default_ops::eval_integer_sqrt;
+                using result_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                detail::scoped_default_precision<result_type> precision_guard(arg);
+                result_type result, v(arg), r;
+                eval_integer_sqrt(result.backend(), r.backend(), v.backend());
+                return result;
             }
             //
             // fma:
@@ -2894,7 +2978,8 @@ namespace nil {
                 number<Backend, et_off>>::type
                 fma(const number<Backend, et_off>& a, const U& b, const V& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -2938,7 +3023,8 @@ namespace nil {
                 number<Backend, et_off>>::type
                 fma(const U& a, const number<Backend, et_off>& b, const V& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -2979,7 +3065,8 @@ namespace nil {
                 number<Backend, et_off>>::type
                 fma(const U& a, const V& b, const number<Backend, et_off>& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -3049,7 +3136,8 @@ namespace nil {
                                             number<Backend, et_off>>::type
                 remquo(const number<Backend, et_off>& a, const U& b, int* pi) {
                 using default_ops::eval_remquo;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(a, b);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    a, b);
                 number<Backend, et_off> result;
                 eval_remquo(result.backend(), a.backend(), number<Backend, et_off>::canonical_value(b), pi);
                 return result;
@@ -3062,7 +3150,8 @@ namespace nil {
                                             number<Backend, et_off>>::type
                 remquo(const U& a, const number<Backend, et_off>& b, int* pi) {
                 using default_ops::eval_remquo;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(a, b);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    a, b);
                 number<Backend, et_off> result;
                 eval_remquo(result.backend(), number<Backend, et_off>::canonical_value(a), b.backend(), pi);
                 return result;
@@ -3074,8 +3163,22 @@ namespace nil {
                                             number<B, ExpressionTemplates>>::type
                 sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r) {
                 using default_ops::eval_integer_sqrt;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<B, ExpressionTemplates>> precision_guard(x, r);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<B, ExpressionTemplates>>
+                    precision_guard(x, r);
                 number<B, ExpressionTemplates> s;
+                eval_integer_sqrt(s.backend(), r.backend(), x.backend());
+                return s;
+            }
+
+            template<class B, expression_template_option ExpressionTemplates, class tag, class Arg1, class Arg2,
+                     class Arg3, class Arg4>
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+                                                                    number<B, ExpressionTemplates>>::type
+                sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, ExpressionTemplates>& r) {
+                using default_ops::eval_integer_sqrt;
+                detail::scoped_default_precision<multiprecision::number<B, ExpressionTemplates>> precision_guard(r);
+                number<B, ExpressionTemplates> s;
+                number<B, ExpressionTemplates> x(arg);
                 eval_integer_sqrt(s.backend(), r.backend(), x.backend());
                 return s;
             }
@@ -3504,7 +3607,8 @@ namespace nil {
                 typename boost::disable_if_c<number_category<Backend>::value == number_kind_complex,
                                              number<Backend, et_off>>::type
                 abs(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(arg);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_abs;
                 eval_abs(result.backend(), arg.backend());
@@ -3533,7 +3637,8 @@ namespace nil {
             }
             template<class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, et_off> conj(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(arg);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_conj;
                 eval_conj(result.backend(), arg.backend());
@@ -3562,7 +3667,8 @@ namespace nil {
             }
             template<class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, et_off> proj(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(arg);
+                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
+                    arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_proj;
                 eval_proj(result.backend(), arg.backend());
@@ -3668,10 +3774,11 @@ namespace nil {
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<detail::expression<tag, A1, A2, A3, A4>>::value == number_kind_floating_point,
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3,
-                                                            A4>::result_type::backend_type::exponent_type>::type
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename boost::enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4>>::value ==
+                                                number_kind_floating_point,
+                                            typename nil::crypto3::multiprecision::detail::expression<
+                                                tag, A1, A2, A3, A4>::result_type::backend_type::exponent_type>::type
                 ilogb(const detail::expression<tag, A1, A2, A3, A4>& val) {
                 using default_ops::eval_ilogb;
                 typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type arg(val);
@@ -3721,7 +3828,8 @@ namespace boost {
             return BOOST_MP_MOVE(detail::sinhc_pi_imp(x));
         }
 
-        template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class Policy>
+        template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                 class Policy>
         inline nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
             sinhc_pi(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& x, const Policy&) {
             nil::crypto3::multiprecision::detail::scoped_default_precision<

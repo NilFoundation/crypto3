@@ -13,6 +13,7 @@
 #include <nil/crypto3/multiprecision/detail/integer_ops.hpp>
 #include <nil/crypto3/multiprecision/detail/rebind.hpp>
 #include <boost/core/empty_value.hpp>
+#include <boost/mpl/list.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>

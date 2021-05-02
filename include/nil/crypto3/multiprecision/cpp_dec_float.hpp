@@ -26,6 +26,8 @@
 #endif
 #include <boost/cstdint.hpp>
 #include <boost/functional/hash_fwd.hpp>
+#include <boost/mpl/list.hpp>
+
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/detail/big_lanczos.hpp>
 #include <nil/crypto3/multiprecision/detail/dynamic_array.hpp>

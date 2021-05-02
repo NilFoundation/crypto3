@@ -13,6 +13,7 @@
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
 #include <nil/crypto3/multiprecision/detail/atomic.hpp>
 
+#include <boost/mpl/list.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/functional/hash_fwd.hpp>
