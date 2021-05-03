@@ -107,28 +107,22 @@ namespace nil {
                     }
 
                     static inline public_key_type privkey_to_pubkey(const private_key_type &sk) {
-                        assert(private_key_validate(sk));
+                        BOOST_ASSERT(private_key_validate(sk));
 
                         return sk * public_key_type::one();
                     }
 
                     static inline bool public_key_validate(const public_key_type &pk) {
-                        if (pk.is_zero()) {
-                            return false;
-                        }
-                        if (!pk.is_well_formed()) {
-                            return false;
-                        }
-                        return true;
+                        return !(pk.is_zero() || !pk.is_well_formed());
                     }
 
                     template<typename MsgType, typename DstType,
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline signature_type core_sign(const private_key_type &sk, const MsgType &msg,
+                    static inline signature_type sign(const private_key_type &sk, const MsgType &msg,
                                                            const DstType &dst) {
-                        assert(private_key_validate(sk));
+                        BOOST_ASSERT(private_key_validate(sk));
 
                         signature_type Q = policy_type::hash_to_point(msg, dst);
                         return sk * Q;
@@ -138,7 +132,7 @@ namespace nil {
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgType::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline bool core_verify(const public_key_type &pk, const MsgType &msg, const DstType &dst,
+                    static inline bool verify(const public_key_type &pk, const MsgType &msg, const DstType &dst,
                                                    const signature_type &sig) {
                         if (!sig.is_well_formed()) {
                             return false;
@@ -152,17 +146,16 @@ namespace nil {
                         return C1 == C2;
                     }
 
-                    static inline signature_type core_aggregate(const signature_type &init_sig,
-                                                                const signature_type &sig) {
+                    static inline signature_type aggregate(const signature_type &init_sig, const signature_type &sig) {
                         return init_sig + sig;
                     }
 
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type core_aggregate(const SignatureRangeType &sig_n) {
+                    static inline signature_type aggregate(const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
-                        assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
+                        BOOST_ASSERT(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
                         auto sig_n_iter = sig_n.begin();
                         signature_type aggregate_p = *sig_n_iter++;
@@ -176,10 +169,10 @@ namespace nil {
                     template<typename SignatureRangeType,
                              typename = typename std::enable_if<
                                  std::is_same<signature_type, typename SignatureRangeType::value_type>::value>::type>
-                    static inline signature_type core_aggregate(const signature_type &init_sig,
-                                                                const SignatureRangeType &sig_n) {
+                    static inline signature_type aggregate(const signature_type &init_sig,
+                                                           const SignatureRangeType &sig_n) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SignatureRangeType>));
-                        assert(std::distance(sig_n.begin(), sig_n.end()) > 0);
+                        BOOST_ASSERT(std::distance(sig_n.begin(), sig_n.end()) > 0);
 
                         auto sig_n_iter = sig_n.begin();
                         signature_type aggregate_p = init_sig;
@@ -194,11 +187,11 @@ namespace nil {
                              typename = typename std::enable_if<
                                  std::is_same<std::uint8_t, typename MsgRangeType::value_type::value_type>::value &&
                                  std::is_same<std::uint8_t, typename DstType::value_type>::value>::type>
-                    static inline bool core_aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
-                                                             const DstType &dst, const signature_type &sig) {
+                    static inline bool aggregate_verify(const PubkeyRangeType &pk_n, const MsgRangeType &msg_n,
+                                                        const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
-                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
+                        BOOST_ASSERT(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
                                std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
 
                         if (!sig.is_well_formed()) {
@@ -225,7 +218,7 @@ namespace nil {
                                                             const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<MsgRangeType>));
-                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
+                        BOOST_ASSERT(std::distance(pk_n.begin(), pk_n.end()) > 0 &&
                                std::distance(pk_n.begin(), pk_n.end()) == std::distance(msg_n.begin(), msg_n.end()));
 
                         if (!sig.is_well_formed()) {
@@ -247,7 +240,7 @@ namespace nil {
                     template<typename DstType, typename = typename std::enable_if<std::is_same<
                                                    std::uint8_t, typename DstType::value_type>::value>::type>
                     static inline signature_type pop_prove(const private_key_type &sk, const DstType &dst) {
-                        assert(private_key_validate(sk));
+                        BOOST_ASSERT(private_key_validate(sk));
 
                         public_key_type pk = privkey_to_pubkey(sk);
                         signature_type Q = hash_pubkey_to_point(pk, dst);
@@ -277,7 +270,7 @@ namespace nil {
                     static inline bool fast_aggregate_verify(const PubkeyRangeType &pk_n, const MsgType &msg,
                                                              const DstType &dst, const signature_type &sig) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<PubkeyRangeType>));
-                        assert(std::distance(pk_n.begin(), pk_n.end()) > 0);
+                        BOOST_ASSERT(std::distance(pk_n.begin(), pk_n.end()) > 0);
 
                         auto pk_n_iter = pk_n.begin();
                         public_key_type aggregate_p = *pk_n_iter++;
@@ -285,7 +278,7 @@ namespace nil {
                             public_key_type next_p = *pk_n_iter++;
                             aggregate_p = aggregate_p + next_p;
                         }
-                        return core_verify(aggregate_p, msg, dst, sig);
+                        return verify(aggregate_p, msg, dst, sig);
                     }
 
                     template<typename MsgType, typename = typename std::enable_if<std::is_same<
@@ -297,7 +290,7 @@ namespace nil {
                         return result;
                     }
 
-                    static inline pubkey_id_type get_pubkey_bits(const public_key_type &public_key) {
+                    static inline pubkey_id_type pubkey_bits(const public_key_type &public_key) {
                         return policy_type::point_to_pubkey(public_key);
                     }
 

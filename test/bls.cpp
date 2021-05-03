@@ -304,8 +304,8 @@ BOOST_AUTO_TEST_SUITE_END()
 //     using curve_type = curves::bls12_381;
 //     using hash_type = sha2<256>;
 //
-//     using signature_variant = bls_signature_mss_ro_variant<curve_type, hash_type>;
-//     using scheme_type = bls_pop_scheme<signature_variant>;
+//     using signature_version = bls_signature_mss_ro_variant<curve_type, hash_type>;
+//     using scheme_type = bls_pop_scheme<signature_version>;
 //
 //     using private_key_type = typename scheme_type::private_key_type;
 //     using public_key_type = typename scheme_type::public_key_type;
@@ -2061,14 +2061,14 @@ void conformity_test(std::vector<private_key<Scheme>> &sks,
     auto msgs_iter = msgs.begin();
     auto etalon_sigs_iter = etalon_sigs.begin();
 
-    // sign(range, privkey)
+    // sign(range, prkey)
     // verify(range, pubkey)
     signature_type sig = ::nil::crypto3::sign(*msgs_iter, *sks_iter);
     BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
     pubkey_type &pubkey = *sks_iter;
     BOOST_CHECK_EQUAL(static_cast<bool>(::nil::crypto3::verify(*msgs_iter, sig, pubkey)), true);
 
-    // sign(first, last, privkey)
+    // sign(first, last, prkey)
     // verify(first, last, pubkey)
     sig = ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter);
     BOOST_CHECK_EQUAL(sig, *etalon_sigs_iter);
@@ -2109,7 +2109,7 @@ void conformity_test(std::vector<private_key<Scheme>> &sks,
     verify_acc1(part_msg);
     BOOST_CHECK_EQUAL(boost::accumulators::extract_result<verification_acc>(verify_acc1), true);
 
-    // sign(range, privkey, out)
+    // sign(range, prkey, out)
     // verify(range, pubkey, out)
     std::vector<signature_type> sig_out;
     ::nil::crypto3::sign(*msgs_iter, *sks_iter, std::back_inserter(sig_out));
@@ -2118,7 +2118,7 @@ void conformity_test(std::vector<private_key<Scheme>> &sks,
     ::nil::crypto3::verify(*msgs_iter, sig_out.back(), pubkey, std::back_inserter(bool_out));
     BOOST_CHECK_EQUAL(bool_out.back(), true);
 
-    // sign(first, last, privkey, out)
+    // sign(first, last, prkey, out)
     // verify(first, last, pubkey, out)
     ::nil::crypto3::sign(msgs_iter->begin(), msgs_iter->end(), *sks_iter, std::back_inserter(sig_out));
     BOOST_CHECK_EQUAL(sig_out.back(), *etalon_sigs_iter);
@@ -2269,7 +2269,7 @@ BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
 BOOST_AUTO_TEST_CASE(bls_basic_mps) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
-    using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
+    using bls_variant = bls_mps_ro_version<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
     using privkey_type = private_key<scheme_type>;
@@ -2458,7 +2458,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
 BOOST_AUTO_TEST_CASE(bls_basic_mss) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
-    using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
+    using bls_variant = bls_mss_ro_version<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
     using privkey_type = private_key<scheme_type>;
@@ -2599,7 +2599,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
 BOOST_AUTO_TEST_CASE(bls_aug_mss) {
     using curve_type = curves::bls12_381;
     using hash_type = sha2<256>;
-    using bls_variant = bls_mss_ro_variant<curve_type, hash_type>;
+    using bls_variant = bls_mss_ro_version<curve_type, hash_type>;
     using scheme_type = bls<bls_variant, bls_aug_scheme>;
 
     using privkey_type = private_key<scheme_type>;
