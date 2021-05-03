@@ -555,12 +555,12 @@ namespace nil {
 
                    X.grow_to(round_up(k, sizeof(ui_type) * CHAR_BIT) / sizeof(ui_type) * CHAR_BIT);
                    b.grow_to(a_words);
-
-                   /*
-                   Hide the exact value of k. k is anyway known to word length
-                   granularity because of the length of a, so no point in doing more
-                   than this.
                    */
+                /*
+                Hide the exact value of k. k is anyway known to word length
+                granularity because of the length of a, so no point in doing more
+                than this.
+                */
                 /*
 
                    const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
@@ -610,10 +610,10 @@ namespace nil {
                    }
                    if (eval_integer_modulus(n, 2) == 1)
                    {*/
-                      /*
-                      Fastpath for common case. This leaks information if n > mod
-                      but we don't guarantee const time behavior in that case.
-                      */
+                /*
+                Fastpath for common case. This leaks information if n > mod
+                but we don't guarantee const time behavior in that case.
+                */
                 /*
                       if (eval_gt(mod, n))
                          return eval_inverse_mod_odd_modulus(n, mod);
