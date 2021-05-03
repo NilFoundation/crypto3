@@ -1,1 +1,3 @@
-# Manual {#blueprint_extension_manual}
+# Extension {#blueprint_extension_manual}
+
+@tableofcontents
