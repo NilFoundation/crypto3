@@ -49,7 +49,7 @@ using namespace nil::crypto3::multiprecision;
 
 using curve_type = curves::bls12_381;
 using hash_type = sha2<256>;
-using bls_variant = bls_mps_ro_variant<curve_type, hash_type>;
+using bls_variant = bls_mps_ro_version<curve_type, hash_type>;
 using scheme_type = bls<bls_variant, bls_basic_scheme>;
 
 using privkey_type = private_key<scheme_type>;
@@ -101,8 +101,8 @@ int main() {
     pubkey_type &pubkey = sk;
     assert(verify(msg, sig, pubkey));
 
-    print_field_element(std::cout, sk.get_privkey());
-    print_curve_element(std::cout, pubkey.get_pubkey());
+    print_field_element(std::cout, sk.privkey());
+    print_curve_element(std::cout, pubkey.pubkey());
 
     return 0;
 }
