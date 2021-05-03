@@ -1,4 +1,4 @@
-# Manual {#blueprint_usage_manual}
+# Usage {#blueprint_usage_manual}
 
 To use zk-SNARK you need to do the following steps:
 * Create constraint system
