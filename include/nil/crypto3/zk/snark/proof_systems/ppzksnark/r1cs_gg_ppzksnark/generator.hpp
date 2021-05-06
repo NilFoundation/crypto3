@@ -104,7 +104,7 @@ namespace nil {
                     typedef typename policy_type::proof_type proof_type;
 
                     template<typename DistributionType =
-                                 boost::random::uniform_int_distribution<typename CurveType::value_type::modulus_type>,
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
                     static inline keypair_type process(const constraint_system_type &cs) {
 

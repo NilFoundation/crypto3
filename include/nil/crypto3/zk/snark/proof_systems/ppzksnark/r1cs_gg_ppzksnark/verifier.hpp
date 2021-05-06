@@ -278,6 +278,13 @@ namespace nil {
                             r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
                             proof);
                     }
+
+                    static inline bool process(const processed_verification_key_type &processed_verification_key,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        return r1cs_gg_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                            processed_verification_key, primary_input, proof);
+                    }
                 };
 
                 /**
