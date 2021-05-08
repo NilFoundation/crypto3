@@ -3,17 +3,15 @@
 
 @tableofcontents
 
-## Pubkey Concept ## {#pubkey_concept}
+## PublicKeyScheme Concept ## {#pubkey_concept}
 
-A ```Pubkey``` is public a cryptosystem policy for which the output depends only on the input and has a very low probability of yielding the same output given different input values.
-
+A ```PublicKeyScheme``` is a stateless public-keyed cryptographic scheme policy.
 
 ### Requirements ### {#pubkey_concepts_requirements}
 
-The type ```X``` satisfies ```Pubkey``` if:
+The type ```X``` satisfies ```PublicKeyScheme``` if:
 
 Given
-
 
 * ```StreamProcessor```, the type template named by ```X::stream_processor```
 * ```PrivateKey```, the type template named by ```X::private_key_type```
@@ -30,16 +28,13 @@ The following type members must be valid and have their specified effects
 
 
 ## Private key Concept ## {#private_key_concept}
-A ```Private_key``` is function object perfoming operations with private key. For example: signing, decryption.
+A ```PrivateKey``` is function object perfoming operations with private key. For example: signing, decryption.
 
 ### Requirements ### {#private_key_concepts_requirements}
 
-
-
 The type ```X``` satisfies ``` PrivateKey``` if:
 
-	Given
-
+Given
 
 * ```SchemeType```, the type template named by ```X::scheme_type``` 
 * ```PrivateKeyType```, the type template named by ```X::private_key_type``` 
@@ -47,8 +42,6 @@ The type ```X``` satisfies ``` PrivateKey``` if:
 * ```SignatureType```, the type template named by ```X::signature_type``` 
 * ```InputBlockType```, the type template named by ```X::input_block_type``` 
 * ```InputValueType```, the type template named by ```X::input_value_type``` 
-
-
 
 
 |Expression                   |Type                    |Requirements and Notes |
@@ -59,9 +52,6 @@ The type ```X``` satisfies ``` PrivateKey``` if:
 |```X::signature_key_type```         |```SignatureKeyType```        |```SignatureKeyType``` is an element of  ```Algebra```|
 |```X::input_block_type```          |```InputBlockType```         |```InputBlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::vector<T>```|
 |```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
-
-
-
 
 
 The following static data member definitions must be valid and have their specified effects
@@ -84,19 +74,14 @@ The following expressions must be valid and have their specified effects
 |```X.decrypt(BlockType)```|Decrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PrivateKey``` object inner state of ```private_key_type``` type.|```BlockType```|
 
 
-
-
-## Public key Concept ## {#public_key_concept}
-A ```Public_key``` is function object perfoming operations with private key. For example: verify, encryption.
+## PublicKey Concept ## {#public_key_concept}
+A ```PublicKey``` is function object perfoming operations with public key. For example: verification, encryption.
 
 ### Requirements ### {#public_concepts_requirements}
 
-
-
 The type ```X``` satisfies ``` PublicKey``` if:
 
-	Given
-
+Given
 
 * ```SchemeType```, the type template named by ```X::scheme_type``` 
 * ```PrivateKeyType```, the type template named by ```X::private_key_type``` 
@@ -104,9 +89,6 @@ The type ```X``` satisfies ``` PublicKey``` if:
 * ```SignatureType```, the type template named by ```X::signature_type``` 
 * ```InputBlockType```, the type template named by ```X::input_block_type``` 
 * ```InputValueType```, the type template named by ```X::input_value_type``` 
-
-
-
 
 |Expression                   |Type                    |Requirements and Notes |
 |-----------------------------|------------------------|-----------------------|
@@ -116,9 +98,6 @@ The type ```X``` satisfies ``` PublicKey``` if:
 |```X::signature_key_type```         |```SignatureKeyType```        |```SignatureKeyType``` is an element of  ```Algebra```|
 |```X::input_block_type```          |```InputBlockType```         |```InputBlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::vector<T>```|
 |```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
-
-
-
 
 
 The following static data member definitions must be valid and have their specified effects
@@ -141,19 +120,14 @@ The following expressions must be valid and have their specified effects
 |```X.encrypt(BlockType)```|Encrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PublicKey``` object inner state of ```public_key_type``` type.|```BlockType```|
 
 
-
 ## No key Concept ## {#no_key_concept}
 A ```No_key``` is function object perfoming operations with private key. For example: aggregate.
 
 ### Requirements ### {#no_key_concepts_requirements}
 
-
-
-
 The type ```X``` satisfies ``` NoKey``` if:
 
-	Given
-
+Given
 
 * ```SchemeType```, the type template named by ```X::scheme_type``` 
 * ```PrivateKeyType```, the type template named by ```X::private_key_type``` 
@@ -175,9 +149,6 @@ The type ```X``` satisfies ``` NoKey``` if:
 |```X::input_value_type```           |```InputValueType```          |```InputValueType``` type satisfies ```Integral``` concept|
 
 
-
-
-
 The following static data member definitions must be valid and have their specified effects
 
 |Expression          |Type             |Requirements and Notes                 |
@@ -185,14 +156,11 @@ The following static data member definitions must be valid and have their specif
 |```X::input_value_bits```  |```std::size_t```|```Integral``` bits amount in ```InputValueType```|
 |```X::input_block_bits``` |```std::size_t```|```Integral``` bits amount in ```InputBlockType```|
 
-
 The following expressions must be valid and have their specified effects
  Given
  * ```BlockType```, the type satisfies ```SequenceContainer``` concept for wich BlockType::value_type is InputValueType
-
 
 |Expression                 |Requirements      |Return Type                    |
 |---------------------------|------------------|-------------------------------|
 |```X(NoKey::no_key_type)```|Constructs stateful ```NoKey``` object without input key.|```NoKey```|
 |```X.aggregate(BlockType)```|Aggregate a block of data in decoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```PrivateKey``` object inner state of ```no_key_type``` type.|```NoKey::signature_type```|
-

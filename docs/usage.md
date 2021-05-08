@@ -5,7 +5,7 @@
 ## Quick Start
 
 The easiest way to use Crypto3.Pubkey library is to use an algorithm with implicit state usage. Following example pubkey
- with BLS:
+with BLS:
 
 ```cpp
 
@@ -40,18 +40,16 @@ int main() {
 
     signature_type sig = ::nil::crypto3::sign(msg, sk);
     pubkey_type &pubkey = sk;
-    assert(static_cast<bool>(::nil::crypto3::verify(msg, sig, pubkey)));
 
     print_field_element(std::cout, sk.get_privkey);
     print_curve_element(std::cout, pubkey.get_pubkey);
- 
+    return !(nil::crypto3::verify(msg, sig, pubkey));
+}
 ```
 
+## Stateful Processing
 
-
-## Stateful hashing
-
-In case of accumulative hashes requirement is present, following example demonstrates
+In case of public-key scheme source data accumulation necessity is present, following example demonstrates
 [accumulator](@ref accumulator_set) usage:
 
 ```cpp
@@ -101,6 +99,6 @@ int main() {
     ::nil::crypto3::sign<scheme_type>(msg, sign_acc);
     signature_type sig = boost::accumulators::extract_result<signing_acc>(sign_acc);
     verification_acc_set verify_acc(pubkey, nil::crypto3::accumulators::signature = sig);
-    assert(static_cast<bool>(::nil::crypto3::verify<scheme_type>(msg, verify_acc)));
- 
+    return !(nil::crypto3::verify<scheme_type>(msg, verify_acc));
+}
 ```
