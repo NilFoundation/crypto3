@@ -83,9 +83,9 @@ namespace nil {
                             const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
                                 fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
-                            std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
-                            std::vector<std::map<std::size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
-                            std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> B_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis(cs.num_variables() + 1);
 
                             /**
                              * add and process the constraints

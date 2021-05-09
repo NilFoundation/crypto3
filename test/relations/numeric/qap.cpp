@@ -38,7 +38,19 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
+
+#include "../../proof_systems/ppzksnark/r1cs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -64,18 +76,18 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
 
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
-                                         d1 = algebra::random_element<FieldType>(),
-                                         d2 = algebra::random_element<FieldType>(),
-                                         d3 = algebra::random_element<FieldType>();
+    const typename FieldType::value_type t = random_element<FieldType>(),
+                                         d1 = random_element<FieldType>(),
+                                         d2 = random_element<FieldType>(),
+                                         d3 = random_element<FieldType>();
 
-    qap_instance<FieldType> qap_inst_1 = r1cs_to_qap::instance_map(example.constraint_system);
+    qap_instance<FieldType> qap_inst_1 = reductions::r1cs_to_qap<FieldType>::instance_map(example.constraint_system);
 
     qap_instance_evaluation<FieldType> qap_inst_2 =
-        r1cs_to_qap::instance_map_with_evaluation(example.constraint_system, t);
+        reductions::r1cs_to_qap<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
 
     qap_witness<FieldType> qap_wit =
-        r1cs_to_qap::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2, d3);
+        reductions::r1cs_to_qap<FieldType>::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2, d3);
 
     BOOST_CHECK(qap_inst_1.is_satisfied(qap_wit));
     BOOST_CHECK(qap_inst_2.is_satisfied(qap_wit));
@@ -86,20 +98,22 @@ BOOST_AUTO_TEST_SUITE(qap_test_suite)
 BOOST_AUTO_TEST_CASE(qap_test_case) {
     const std::size_t num_inputs = 10;
 
-    const std::size_t basic_domain_size = 1ul << algebra::mnt6_Fr::s;
+    using basic_curve_type = curves::mnt6<298>;
+
+    const std::size_t basic_domain_size = 1ul << basic_curve_type::scalar_field_type::s;
     const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
-    const std::size_t extended_domain_size = 1ul << (algebra::mnt6_Fr::s + 1);
+    const std::size_t extended_domain_size = 1ul << (basic_curve_type::scalar_field_type::s + 1);
     const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
-    test_qap<typename curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, true);
-    test_qap<typename curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, true);
-    test_qap<typename curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, true);
-    test_qap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
+    test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, true);
+    test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, true);
+    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, true);
+    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_qap<typename curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, false);
-    test_qap<typename curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, false);
-    test_qap<typename curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, false);
-    test_qap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
+    test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, false);
+    test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, false);
+    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, false);
+    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
