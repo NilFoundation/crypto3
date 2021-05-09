@@ -62,10 +62,7 @@ namespace nil {
                             data = data_type({in_data[0], in_data[1]});
                         };
 
-                        constexpr element_fp6_2over3(const element_fp6_2over3 &other) {
-                            data[0] = underlying_type(other.data[0]);
-                            data[1] = underlying_type(other.data[1]);
-                        };
+                        constexpr element_fp6_2over3(const element_fp6_2over3 &B) : data {B.data} {};
 
                         constexpr inline static element_fp6_2over3 zero() {
                             return element_fp6_2over3(underlying_type::zero(), underlying_type::zero());

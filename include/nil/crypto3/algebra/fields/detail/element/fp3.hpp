@@ -80,11 +80,7 @@ namespace nil {
                             data = data_type({in_data0, in_data1, in_data2});
                         }
 
-                        constexpr element_fp3(const element_fp3 &other) {
-                            data[0] = underlying_type(other.data[0]);
-                            data[1] = underlying_type(other.data[1]);
-                            data[2] = underlying_type(other.data[2]);
-                        };
+                        constexpr element_fp3(const element_fp3 &B) : data {B.data} {};
 
                         constexpr inline static element_fp3 zero() {
                             return element_fp3(

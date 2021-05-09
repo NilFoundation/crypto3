@@ -61,8 +61,6 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    constexpr static const modulus_type mul_generator = policy_type::mul_generator;
-
                     typedef typename detail::element_fp6_2over3<extension_policy> value_type;
 
                     constexpr static const std::size_t arity = 6;
@@ -71,9 +69,6 @@ namespace nil {
 
                 template<typename BaseField>
                 constexpr typename fp6_2over3<BaseField>::modulus_type const fp6_2over3<BaseField>::modulus;
-
-                template<typename BaseField>
-                constexpr typename fp6_2over3<BaseField>::modulus_type const fp6_2over3<BaseField>::mul_generator;
 
                 template<typename BaseField>
                 constexpr typename std::size_t const fp6_2over3<BaseField>::arity;
