@@ -61,22 +61,24 @@ namespace nil {
                 struct bacs_ppzksnark_proving_key {
                     typedef CurveType curve_type;
                     typedef CircuitType circuit_type;
-                    typedef typename r1cs_ppzksnark<CurveType>::proving_key_type proving_key_type;
+                    typedef typename r1cs_ppzksnark<CurveType>::proving_key_type r1cs_proving_key_type;
 
                     circuit_type crct;
-                    proving_key_type r1cs_pk;
+                    r1cs_proving_key_type r1cs_pk;
 
                     bacs_ppzksnark_proving_key() {};
 
                     bacs_ppzksnark_proving_key(const bacs_ppzksnark_proving_key &other) = default;
 
-                    bacs_ppzksnark_proving_key(proving_key_type &&other) = default;
+                    bacs_ppzksnark_proving_key(bacs_ppzksnark_proving_key &&other) = default;
 
-                    bacs_ppzksnark_proving_key(const circuit_type &crct, const proving_key_type &r1cs_pk) :
+                    bacs_ppzksnark_proving_key(const circuit_type &crct, 
+                                               const r1cs_proving_key_type &r1cs_pk) :
                         crct(crct), r1cs_pk(r1cs_pk) {
                     }
 
-                    bacs_ppzksnark_proving_key(circuit_type &&crct, proving_key_type &&r1cs_pk) :
+                    bacs_ppzksnark_proving_key(circuit_type &&crct, 
+                                               r1cs_proving_key_type &&r1cs_pk) :
                         crct(std::move(crct)), r1cs_pk(std::move(r1cs_pk)) {
                     }
 
@@ -102,7 +104,7 @@ namespace nil {
                         return r1cs_pk.size_in_bits();
                     }
 
-                    bool operator==(const proving_key_type &other) const {
+                    bool operator==(const bacs_ppzksnark_proving_key &other) const {
                         return (this->crct == other.crct && this->r1cs_pk == other.r1cs_pk);
                     }
                 };

@@ -29,9 +29,15 @@
 #ifndef CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_SE_PPZKSNARK_HPP
 
+#include <boost/config.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark.hpp>
 
-#include "r1cs_examples.hpp"
+#include "../r1cs_examples.hpp"
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -59,17 +65,19 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
+                    using basic_proof_system = r1cs_se_ppzksnark<CurveType>;
+
                     typename r1cs_se_ppzksnark<CurveType>::keypair_type keypair =
-                        r1cs_se_ppzksnark<CurveType>::generator(example.constraint_system);
+                        generate<basic_proof_system>(example.constraint_system);
 
                     typename r1cs_se_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        r1cs_se_ppzksnark<CurveType>::verifier_process_vk(keypair.vk);
+                        r1cs_se_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
 
-                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof = r1cs_se_ppzksnark<CurveType>::prover(
-                        keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof = prove<basic_proof_system>(
+                        keypair.first, example.primary_input, example.auxiliary_input);
 
                     const bool ans = r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(
-                        keypair.vk, example.primary_input, proof);
+                        keypair.second, example.primary_input, proof);
 
                     const bool ans2 = r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(
                         pvk, example.primary_input, proof);

@@ -67,7 +67,7 @@ namespace nil {
                     linear_combination<FieldType> lhs;
                     linear_combination<FieldType> rhs;
 
-                    blueprint_variable<FieldType> output;
+                    variable<FieldType> output;
                     bool is_circuit_output;
 
                     typename FieldType::value_type evaluate(const bacs_variable_assignment<FieldType> &input) const {

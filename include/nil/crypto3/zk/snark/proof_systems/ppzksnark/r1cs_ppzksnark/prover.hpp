@@ -105,15 +105,15 @@ namespace nil {
                     using scalar_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    typedef typename policy_type::constraint_system constraint_system_type;
-                    typedef typename policy_type::primary_input primary_input_type;
-                    typedef typename policy_type::auxiliary_input auxiliary_input_type;
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
 
-                    typedef typename policy_type::proving_key proving_key_type;
-                    typedef typename policy_type::verification_key verification_key_type;
-                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair keypair_type;
+                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,

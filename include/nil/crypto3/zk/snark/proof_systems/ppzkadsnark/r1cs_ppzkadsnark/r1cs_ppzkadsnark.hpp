@@ -39,9 +39,9 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::snark_pp snark_pp;
-                    typedef typename policy_type::constraint_system constraint_system;
-                    typedef typename policy_type::primary_input primary_input;
-                    typedef typename policy_type::auxiliary_input auxiliary_input;
+                    typedef typename policy_type::constraint_system_type constraint_system;
+                    typedef typename policy_type::primary_input_type primary_input;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input;
 
                     typedef typename policy_type::secret_key secret_key;
                     typedef typename policy_type::vkT vkT;
@@ -53,11 +53,11 @@ namespace nil {
                     typedef typename policy_type::pub_auth_key pub_auth_key_type;
                     typedef typename policy_type::auth_data auth_data_type;
 
-                    typedef typename policy_type::proving_key proving_key_type;
-                    typedef typename policy_type::verification_key verification_key_type;
-                    typedef typename policy_type::processed_verification_key processed_verification_key_type;
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
-                    typedef typename policy_type::keypair keypair_type;
+                    typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof proof_type;
 
                     using policy_type::generator;

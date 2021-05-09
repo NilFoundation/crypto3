@@ -73,7 +73,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < terms; ++i) {
                         const typename FieldType::value_type coeff = algebra::random_element<FieldType>();
-                        result = result + coeff * blueprint_variable<FieldType>(std::rand() % (num_variables + 1));
+                        result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
                     }
 
                     return result;
@@ -121,7 +121,7 @@ namespace nil {
                         bacs_gate<FieldType> gate;
                         gate.lhs = random_linear_combination<FieldType>(num_variables);
                         gate.rhs = random_linear_combination<FieldType>(num_variables);
-                        gate.output = blueprint_variable<FieldType>(num_variables + 1);
+                        gate.output = variable<FieldType>(num_variables + 1);
 
                         if (i >= num_gates - num_outputs) {
                             /* make gate a circuit output and fix */
@@ -134,11 +134,11 @@ namespace nil {
                             if (std::rand() % 2 == 0) {
                                 const typename FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);
                                 const typename FieldType::value_type coeff = -(lhs_val * var_val.inversed());
-                                gate.lhs = gate.lhs + coeff * blueprint_variable<FieldType>(var_idx);
+                                gate.lhs = gate.lhs + coeff * variable<FieldType>(var_idx);
                             } else {
                                 const typename FieldType::value_type rhs_val = gate.rhs.evaluate(all_vals);
                                 const typename FieldType::value_type coeff = -(rhs_val * var_val.inversed());
-                                gate.rhs = gate.rhs + coeff * blueprint_variable<FieldType>(var_idx);
+                                gate.rhs = gate.rhs + coeff * variable<FieldType>(var_idx);
                             }
 
                             assert(gate.evaluate(all_vals).is_zero());

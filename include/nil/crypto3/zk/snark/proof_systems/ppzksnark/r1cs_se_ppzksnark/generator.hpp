@@ -112,7 +112,7 @@ namespace nil {
                                                                                                      t);
 
                         std::size_t non_zero_At = 0;
-                        for (std::size_t i = 0; i < sap_inst.num_variables() + 1; ++i) {
+                        for (std::size_t i = 0; i < sap_inst.num_variables + 1; ++i) {
                             if (!sap_inst.At[i].is_zero()) {
                                 ++non_zero_At;
                             }
@@ -135,53 +135,53 @@ namespace nil {
                         const typename CurveType::g2_type::value_type H =
                             algebra::random_element<typename CurveType::g2_type>();
 
-                        std::size_t G_exp_count = sap_inst.num_inputs() + 1    // verifier_query
+                        std::size_t G_exp_count = sap_inst.num_inputs + 1    // verifier_query
                                                   + non_zero_At                // A_query
-                                                  + sap_inst.degree() +
+                                                  + sap_inst.degree +
                                                   1    // G_gamma2_Z_t
                                                   // C_query_1
-                                                  + sap_inst.num_variables() - sap_inst.num_inputs() +
-                                                  sap_inst.num_variables() + 1,    // C_query_2
+                                                  + sap_inst.num_variables - sap_inst.num_inputs +
+                                                  sap_inst.num_variables + 1,    // C_query_2
                             G_window = algebra::get_exp_window_size<typename CurveType::g1_type>(G_exp_count);
 
                         algebra::window_table<typename CurveType::g1_type> G_table =
-                            get_window_table(typename CurveType::scalar_field_type::value_bits, G_window, G);
+                            get_window_table(CurveType::scalar_field_type::value_bits, G_window, G);
 
                         typename CurveType::g2_type::value_type H_gamma = gamma * H;
                         std::size_t H_gamma_exp_count = non_zero_At,    // B_query
                             H_gamma_window =
                                 algebra::get_exp_window_size<typename CurveType::g2_type>(H_gamma_exp_count);
                         algebra::window_table<typename CurveType::g2_type> H_gamma_table = get_window_table(
-                            typename CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma);
+                            CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma);
 
                         typename CurveType::g1_type::value_type G_alpha = alpha * G;
                         typename CurveType::g2_type::value_type H_beta = beta * H;
 
                         std::vector<typename CurveType::scalar_field_type::value_type> tmp_exponents;
-                        tmp_exponents.reserve(sap_inst.num_inputs() + 1);
-                        for (std::size_t i = 0; i <= sap_inst.num_inputs(); ++i) {
+                        tmp_exponents.reserve(sap_inst.num_inputs + 1);
+                        for (std::size_t i = 0; i <= sap_inst.num_inputs; ++i) {
                             tmp_exponents.emplace_back(gamma * Ct[i] + (alpha + beta) * At[i]);
                         }
                         typename std::vector<typename CurveType::g1_type::value_type> verifier_query =
                             algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
+                                CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
                         tmp_exponents.clear();
 
-                        tmp_exponents.reserve(sap_inst.num_variables() + 1);
+                        tmp_exponents.reserve(sap_inst.num_variables + 1);
                         for (std::size_t i = 0; i < At.size(); i++) {
                             tmp_exponents.emplace_back(gamma * At[i]);
                         }
 
                         typename std::vector<typename CurveType::g1_type::value_type> A_query =
                             algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
+                                CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
                         tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(A_query);
 #endif
                         typename std::vector<typename CurveType::g2_type::value_type> B_query =
                             algebra::batch_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma_table, At);
+                                CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma_table, At);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g2_type>(B_query);
 #endif
@@ -191,42 +191,42 @@ namespace nil {
                         typename CurveType::g1_type::value_type G_ab_gamma_Z = (alpha + beta) * G_gamma_Z;
                         typename CurveType::g1_type::value_type G_gamma2_Z2 = (sap_inst.Zt * gamma) * G_gamma_Z;
 
-                        tmp_exponents.reserve(sap_inst.degree() + 1);
+                        tmp_exponents.reserve(sap_inst.degree + 1);
 
                         /* Compute the vector G_gamma2_Z_t := Z(t) * t^i * gamma^2 * G */
                         typename CurveType::scalar_field_type gamma2_Z_t = sap_inst.Zt * gamma.squared();
-                        for (std::size_t i = 0; i < sap_inst.degree() + 1; ++i) {
+                        for (std::size_t i = 0; i < sap_inst.degree + 1; ++i) {
                             tmp_exponents.emplace_back(gamma2_Z_t);
                             gamma2_Z_t *= t;
                         }
                         typename std::vector<typename CurveType::g1_type::value_type> G_gamma2_Z_t =
                             algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
+                                CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
                         tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(G_gamma2_Z_t);
 #endif
-                        tmp_exponents.reserve(sap_inst.num_variables() - sap_inst.num_inputs());
-                        for (std::size_t i = sap_inst.num_inputs() + 1; i <= sap_inst.num_variables(); ++i) {
+                        tmp_exponents.reserve(sap_inst.num_variables - sap_inst.num_inputs);
+                        for (std::size_t i = sap_inst.num_inputs + 1; i <= sap_inst.num_variables; ++i) {
                             tmp_exponents.emplace_back(gamma * (gamma * Ct[i] + (alpha + beta) * At[i]));
                         }
                         typename std::vector<typename CurveType::g1_type::value_type> C_query_1 =
                             algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
+                                CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
                         tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(C_query_1);
 #endif
 
-                        tmp_exponents.reserve(sap_inst.num_variables() + 1);
+                        tmp_exponents.reserve(sap_inst.num_variables + 1);
                         typename CurveType::scalar_field_type double_gamma2_Z = gamma * gamma * sap_inst.Zt;
                         double_gamma2_Z = double_gamma2_Z + double_gamma2_Z;
-                        for (std::size_t i = 0; i <= sap_inst.num_variables(); ++i) {
+                        for (std::size_t i = 0; i <= sap_inst.num_variables; ++i) {
                             tmp_exponents.emplace_back(double_gamma2_Z * At[i]);
                         }
                         typename std::vector<typename CurveType::g1_type::value_type> C_query_2 =
                             algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
-                                typename CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
+                                CurveType::scalar_field_type::value_bits, G_window, G_table, tmp_exponents);
                         tmp_exponents.clear();
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(C_query_2);

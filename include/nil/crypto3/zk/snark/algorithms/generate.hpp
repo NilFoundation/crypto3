@@ -36,6 +36,13 @@ namespace nil {
 
                     return ProofSystemType::generate(constraint_system);
                 }
+
+                template<typename ProofSystemType>
+                typename ProofSystemType::keypair_type
+                    generate(const typename ProofSystemType::circuit_type &circuit) {
+
+                    return ProofSystemType::generate(circuit);
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

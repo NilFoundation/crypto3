@@ -33,7 +33,15 @@
 #include "bacs_examples.hpp"
 #include "run_bacs_ppzksnark.hpp"
 
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+
 using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void test_bacs_ppzksnark(std::size_t primary_input_size, std::size_t auxiliary_input_size, std::size_t num_gates,
@@ -48,7 +56,7 @@ void test_bacs_ppzksnark(std::size_t primary_input_size, std::size_t auxiliary_i
 BOOST_AUTO_TEST_SUITE(bacs_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(bacs_ppzksnark_test) {
-    test_bacs_ppzksnark<default_bacs_ppzksnark_pp>(10, 10, 20, 5);
+    test_bacs_ppzksnark<curves::mnt4<298>>(10, 10, 20, 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -33,10 +33,17 @@
 #include <cassert>
 #include <cstdio>
 
-#include "r1cs_examples.hpp"
 #include "run_r1cs_se_ppzksnark.hpp"
 
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+
 using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void test_r1cs_se_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
@@ -49,7 +56,7 @@ void test_r1cs_se_ppzksnark(std::size_t num_constraints, std::size_t input_size)
 BOOST_AUTO_TEST_SUITE(r1cs_se_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_se_ppzksnark_test) {
-    test_r1cs_se_ppzksnark<default_r1cs_se_ppzksnark_pp>(1000, 100);
+    test_r1cs_se_ppzksnark<curves::mnt4<298>>(1000, 100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

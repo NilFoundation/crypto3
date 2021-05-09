@@ -29,13 +29,15 @@
 #ifndef CRYPTO3_RUN_R1CS_PPZKSNARK_HPP
 #define CRYPTO3_RUN_R1CS_PPZKSNARK_HPP
 
+#include <boost/config.hpp>
+
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/policies/r1cs_ppzksnark/verifier.hpp>
-
 #include "../r1cs_examples.hpp"
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,35 +78,37 @@ namespace nil {
                 template<typename CurveType>
                 bool run_r1cs_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
+                    using basic_proof_system = r1cs_ppzksnark<CurveType>;
+
                     std::cout << "Starting generator" << std::endl;
                     typename r1cs_ppzksnark<CurveType>::keypair_type keypair =
-                        r1cs_ppzksnark<CurveType>::generator(example.constraint_system);
+                        generate<basic_proof_system>(example.constraint_system);
 
                     std::cout << "Starting verification key processing" << std::endl;
 
                     typename r1cs_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        r1cs_ppzksnark_verifier_process_vk<CurveType>::process(keypair.vk);
+                        r1cs_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
 
                     std::cout << "Starting prover" << std::endl;
 
                     typename r1cs_ppzksnark<CurveType>::proof_type proof =
-                        r1cs_ppzksnark<CurveType>::prover(keypair.pk, example.primary_input, example.auxiliary_input);
+                        prove<basic_proof_system>(keypair.first, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
                         r1cs_ppzksnark<CurveType,
-                       policies::r1cs_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.vk,
+                       policies::r1cs_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.second,
                        example.primary_input, proof);*/
 
                     std::cout << "Starting verifier" << std::endl;
 
-                    const bool ans = r1cs_ppzksnark<CurveType>::verifier(keypair.vk, example.primary_input, proof);
+                    const bool ans = verify<basic_proof_system>(keypair.second, example.primary_input, proof);
 
                     std::cout << "Verifier finished, result: " << ans << std::endl;
 
                     /*std::cout << "Starting online verifier" << std::endl;
 
                     const bool ans2 =
-                        r1cs_ppzksnark<CurveType>::online_verifier(pvk, example.primary_input, proof);
+                        online_verify<basic_proof_system>(pvk, example.primary_input, proof);
 
                     std::cout << "Online verifier finished, result: " << ans2 << std::endl;
 
@@ -118,7 +122,7 @@ namespace nil {
                                           typename policies::r1cs_ppzksnark_prover<CurveType>,
                                           typename policies::r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>,
                                           typename
-                    policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::verifier(keypair.vk,
+                    policies::r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>>::verifier(keypair.second,
                     example.primary_input, proof);
 
                     std::cout << "Weak verifier finished, result: " << ans3 << std::endl;
@@ -139,7 +143,7 @@ namespace nil {
 
                     BOOST_CHECK(ans == ans4);*/
 
-                    /*test_affine_verifier<CurveType>(keypair.vk, example.primary_input, proof, ans);*/
+                    /*test_affine_verifier<CurveType>(keypair.second, example.primary_input, proof, ans);*/
 
                     return ans;
                 }

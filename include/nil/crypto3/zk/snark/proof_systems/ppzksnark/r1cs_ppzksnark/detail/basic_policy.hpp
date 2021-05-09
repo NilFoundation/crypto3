@@ -90,25 +90,25 @@ namespace nil {
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system;
+                        typedef r1cs_constraint_system<typename CurveType::scalar_field_type> constraint_system_type;
 
-                        typedef r1cs_primary_input<typename CurveType::scalar_field_type> primary_input;
+                        typedef r1cs_primary_input<typename CurveType::scalar_field_type> primary_input_type;
 
-                        typedef r1cs_auxiliary_input<typename CurveType::scalar_field_type> auxiliary_input;
+                        typedef r1cs_auxiliary_input<typename CurveType::scalar_field_type> auxiliary_input_type;
 
                         /******************************** Proving key ********************************/
 
                         /**
                          * A proving key for the R1CS ppzkSNARK.
                          */
-                        typedef r1cs_ppzksnark_proving_key<CurveType, constraint_system> proving_key;
+                        typedef r1cs_ppzksnark_proving_key<CurveType, constraint_system_type> proving_key_type;
 
                         /******************************* Verification key ****************************/
 
                         /**
                          * A verification key for the R1CS ppzkSNARK.
                          */
-                        typedef r1cs_ppzksnark_verification_key<CurveType> verification_key;
+                        typedef r1cs_ppzksnark_verification_key<CurveType> verification_key_type;
 
                         /************************ Processed verification key *************************/
 
@@ -119,14 +119,14 @@ namespace nil {
                          * contains a small constant amount of additional pre-computed information that
                          * enables a faster verification time.
                          */
-                        typedef r1cs_ppzksnark_processed_verification_key<CurveType> processed_verification_key;
+                        typedef r1cs_ppzksnark_processed_verification_key<CurveType> processed_verification_key_type;
 
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the R1CS ppzkSNARK, which consists of a proving key and a verification key.
                          */
-                        typedef r1cs_ppzksnark_keypair<proving_key, verification_key> keypair;
+                        typedef r1cs_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -137,7 +137,7 @@ namespace nil {
                          * serializes/deserializes, and verifies proofs. We only expose some information
                          * about the structure for statistics purposes.
                          */
-                        typedef r1cs_ppzksnark_proof<CurveType> proof;
+                        typedef r1cs_ppzksnark_proof<CurveType> proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark
