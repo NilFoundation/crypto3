@@ -41,7 +41,7 @@ namespace nil {
                 /// Note the size must be a power of two for the moment - if it is not, padding must be
                 /// applied.
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_srs_proving_key {
+                struct r1cs_gg_ppzksnark_proving_srs {
                     typedef CurveType curve_type;
                     typedef r1cs_gg_ppzksnark_ipp2_commitment<CurveType> commitment_type;
                     typedef typename commitment_type::vkey_type vkey_type;
@@ -78,7 +78,7 @@ namespace nil {
                 /// regardless of the number of proofs aggregated. However, a verifier SRS will be determined by
                 /// the number of proofs being aggregated.
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_srs_verification_key {
+                struct r1cs_gg_ppzksnark_verifying_srs {
                     typedef CurveType curve_type;
                     std::size_t n;
                     typename CurveType::g1_type::value_type g;
@@ -119,8 +119,7 @@ namespace nil {
                 /// panics otherwise. The number of proofs must be inferior to half of the
                 /// size of the generic srs otherwise it panics.
                 template<typename CurveType>
-                std::pair<r1cs_gg_ppzksnark_srs_proving_key<CurveType>,
-                          r1cs_gg_ppzksnark_srs_verification_key<CurveType>>
+                std::pair<r1cs_gg_ppzksnark_proving_srs<CurveType>, r1cs_gg_ppzksnark_verifying_srs<CurveType>>
                     specialize(const r1cs_gg_pp_zksnark_srs<CurveType> &srs, std::size_t num_proofs) {
                     BOOST_ASSERT((num_proofs & (num_proofs - 1)) == 0);
 
@@ -165,22 +164,22 @@ namespace nil {
 
                     typename r1cs_gg_pp_zksnark_srs<CurveType>::wkey_type wkey = {w1, w2};
                     BOOST_ASSERT(wkey.has_correct_len(n));
-                    r1cs_gg_ppzksnark_srs_proving_key<CurveType> pk = {g_alpha_powers_table,
-                                                                       g_beta_powers_table,
-                                                                       h_alpha_powers_table,
-                                                                       h_beta_powers_table,
-                                                                       vkey,
-                                                                       wkey,
-                                                                       n};
-                    r1cs_gg_ppzksnark_srs_verification_key<CurveType> vk = {n,
-                                                                            srs.g_alpha_powers[0].to_projective(),
-                                                                            srs.h_alpha_powers[0].to_projective(),
-                                                                            srs.g_alpha_powers[1].to_projective(),
-                                                                            srs.g_beta_powers[1].to_projective(),
-                                                                            srs.h_alpha_powers[1].to_projective(),
-                                                                            srs.h_beta_powers[1].to_projective(),
-                                                                            g_alpha_n1,
-                                                                            g_beta_n1};
+                    r1cs_gg_ppzksnark_proving_srs<CurveType> pk = {g_alpha_powers_table,
+                                                                   g_beta_powers_table,
+                                                                   h_alpha_powers_table,
+                                                                   h_beta_powers_table,
+                                                                   vkey,
+                                                                   wkey,
+                                                                   n};
+                    r1cs_gg_ppzksnark_verifying_srs<CurveType> vk = {n,
+                                                                     srs.g_alpha_powers[0].to_projective(),
+                                                                     srs.h_alpha_powers[0].to_projective(),
+                                                                     srs.g_alpha_powers[1].to_projective(),
+                                                                     srs.g_beta_powers[1].to_projective(),
+                                                                     srs.h_alpha_powers[1].to_projective(),
+                                                                     srs.h_beta_powers[1].to_projective(),
+                                                                     g_alpha_n1,
+                                                                     g_beta_n1};
                     return {pk, vk};
                 }
             }    // namespace snark

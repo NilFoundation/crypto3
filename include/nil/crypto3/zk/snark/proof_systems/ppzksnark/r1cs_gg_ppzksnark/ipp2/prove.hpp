@@ -87,7 +87,7 @@ namespace nil {
                 typename std::enable_if<std::is_same<typename std::iterator_traits<InputProofIterator>::value_type,
                                                      r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::value,
                                         r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::type
-                    aggregate_proofs(const r1cs_gg_ppzksnark_srs_proving_key<CurveType> &srs, InputProofIterator first,
+                    aggregate_proofs(const r1cs_gg_ppzksnark_proving_srs<CurveType> &srs, InputProofIterator first,
                                      InputProofIterator last) {
                     std::size_t size = std::distance(first, last);
                     BOOST_ASSERT((size & (size - 1)) == 0);
@@ -177,7 +177,7 @@ namespace nil {
                 /// challenges of GIPA would be different, two KZG proofs would be needed.
                 template<typename CurveType, typename InputG1Iterator, typename InputG2Iterator,
                          typename InputScalarIterator, typename Hash = hashes::sha2<256>>
-                tipp_mipp_proof<CurveType> prove_tipp_mipp(const r1cs_gg_ppzksnark_srs_proving_key<CurveType> &srs,
+                tipp_mipp_proof<CurveType> prove_tipp_mipp(const r1cs_gg_ppzksnark_proving_srs<CurveType> &srs,
                                                            const r1cs_gg_ppzksnark_ipp2_wkey<CurveType> &wkey,
                                                            InputG1Iterator afirst, InputG1Iterator alast,
                                                            InputG2Iterator bfirst, InputG2Iterator blast,
@@ -510,18 +510,6 @@ namespace nil {
                                    typename std::iterator_traits<InputScalarIterator>::value_type::zero() :
                                    quotient_polynomial_coeffs[i];
                     };
-
-                    // we do one proof over h^a and one proof over h^b (or g^a and g^b depending
-                    // on the curve we are on). that's the extra cost of the commitment scheme
-                    // used which is compatible with Groth16 CRS insteaf of the original paper
-                    // of Bunz'19
-                    Ok(rayon::join(
-                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_alpha_table,
-                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
-                                .into_affine()},
-                        || {par_multiscalar::<_, G>(&ScalarList::Getter(getter, srs_powers_len), srs_powers_beta_table,
-                                                    std::mem::size_of:: << G::Scalar as PrimeField > ::Repr > () * 8, )
-                                .into_affine()}, ))
                 }
             }    // namespace snark
         }        // namespace zk
