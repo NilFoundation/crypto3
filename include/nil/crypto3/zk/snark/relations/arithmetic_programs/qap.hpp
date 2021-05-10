@@ -274,22 +274,22 @@ namespace nil {
                         field_value_type ans_C = this->Ct[0] + witness.d3 * this->Zt;
                         field_value_type ans_H = field_value_type::zero();
 
-                        ans_A = ans_A + algebra::inner_product<field_type>(this->At.begin() + 1,
+                        ans_A = ans_A + algebra::inner_product(this->At.begin() + 1,
                                                                            this->At.begin() + 1 + this->num_variables,
                                                                            witness.coefficients_for_ABCs.begin(),
                                                                            witness.coefficients_for_ABCs.begin() +
                                                                                this->num_variables);
-                        ans_B = ans_B + algebra::inner_product<field_type>(this->Bt.begin() + 1,
+                        ans_B = ans_B + algebra::inner_product(this->Bt.begin() + 1,
                                                                            this->Bt.begin() + 1 + this->num_variables,
                                                                            witness.coefficients_for_ABCs.begin(),
                                                                            witness.coefficients_for_ABCs.begin() +
                                                                                this->num_variables);
-                        ans_C = ans_C + algebra::inner_product<field_type>(this->Ct.begin() + 1,
+                        ans_C = ans_C + algebra::inner_product(this->Ct.begin() + 1,
                                                                            this->Ct.begin() + 1 + this->num_variables,
                                                                            witness.coefficients_for_ABCs.begin(),
                                                                            witness.coefficients_for_ABCs.begin() +
                                                                                this->num_variables);
-                        ans_H = ans_H + algebra::inner_product<field_type>(this->Ht.begin(),
+                        ans_H = ans_H + algebra::inner_product(this->Ht.begin(),
                                                                            this->Ht.begin() + this->degree + 1,
                                                                            witness.coefficients_for_H.begin(),
                                                                            witness.coefficients_for_H.begin() +

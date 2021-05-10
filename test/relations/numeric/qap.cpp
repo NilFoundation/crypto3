@@ -100,9 +100,9 @@ BOOST_AUTO_TEST_CASE(qap_test_case) {
 
     using basic_curve_type = curves::mnt6<298>;
 
-    const std::size_t basic_domain_size = 1ul << basic_curve_type::scalar_field_type::s;
+    const std::size_t basic_domain_size = 1ul << fields::arithmetic_params<basic_curve_type::scalar_field_type>::s;
     const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
-    const std::size_t extended_domain_size = 1ul << (basic_curve_type::scalar_field_type::s + 1);
+    const std::size_t extended_domain_size = 1ul << (fields::arithmetic_params<basic_curve_type::scalar_field_type>::s + 1);
     const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
     test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, true);

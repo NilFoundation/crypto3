@@ -349,7 +349,7 @@ debug !("TIPP verify: gipa prep and accumulate took {}ms", now.elapsed().as_mill
                // MIPP
                // Verify base inner product commitment
                // Z ==  c ^ r
-               let final_z = inner_product::multiexponentiation::<E::G1Affine>(&[final_c.clone()], &[final_r.clone()]),
+               let final_z = algebra::inner_product<E::G1Affine>(&[final_c.clone()], &[final_r.clone()]),
                // Check commiment correctness
                // T = e(C,v1)
                let check_t = PairingCheck::<E>::from_miller_inputs(&[(final_c, &fvkey .0)], final_tc),
@@ -445,7 +445,7 @@ debug !("TIPP verify: gipa prep and accumulate took {}ms", now.elapsed().as_mill
         s.spawn(move | _ | {
             let tuple = PairingCheck::from_miller_one(E::miller_loop(&[(
                 // e(c^r vector form, h^delta)
-                // let agg_c = inner_product::multiexponentiation::<E::G1Affine>(&c, r_vec)
+                // let agg_c = algebra::inner_product<E::G1Affine>(&c, r_vec)
                 &proof.agg_c.into_affine().prepare(), &pvk.delta_g2, )]));
             p3.send(tuple).unwrap();
         });

@@ -255,17 +255,17 @@ namespace nil {
                         typename FieldType::value_type ans_C = this->Ct[0] + witness.d2 * this->Zt;
                         typename FieldType::value_type ans_H = typename FieldType::value_type::zero();
 
-                        ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
+                        ans_A = ans_A + algebra::inner_product(this->At.begin() + 1,
                                                                           this->At.begin() + 1 + this->num_variables,
                                                                           witness.coefficients_for_ACs.begin(),
                                                                           witness.coefficients_for_ACs.begin() +
                                                                               this->num_variables);
-                        ans_C = ans_C + algebra::inner_product<FieldType>(this->Ct.begin() + 1,
+                        ans_C = ans_C + algebra::inner_product(this->Ct.begin() + 1,
                                                                           this->Ct.begin() + 1 + this->num_variables,
                                                                           witness.coefficients_for_ACs.begin(),
                                                                           witness.coefficients_for_ACs.begin() +
                                                                               this->num_variables);
-                        ans_H = ans_H + algebra::inner_product<FieldType>(this->Ht.begin(),
+                        ans_H = ans_H + algebra::inner_product(this->Ht.begin(),
                                                                           this->Ht.begin() + this->degree + 1,
                                                                           witness.coefficients_for_H.begin(),
                                                                           witness.coefficients_for_H.begin() +
