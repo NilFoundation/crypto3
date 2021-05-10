@@ -49,7 +49,9 @@
 #ifndef CRYPTO3_ZK_R1CS_TO_SAP_BASIC_POLICY_HPP
 #define CRYPTO3_ZK_R1CS_TO_SAP_BASIC_POLICY_HPP
 
+#include <nil/crypto3/fft/coset.hpp>
 #include <nil/crypto3/fft/domains/evaluation_domain.hpp>
+#include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
@@ -98,8 +100,8 @@ namespace nil {
 
                             std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
-                            std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(sap_num_variables + 1);
-                            std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis(sap_num_variables + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis(sap_num_variables + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis(sap_num_variables + 1);
 
                             /**
                              * process R1CS constraints, converting a constraint of the form
@@ -136,8 +138,8 @@ namespace nil {
                                         times_four(cs.constraints[i].c.terms[j].coeff);
                                 }
 
-                                C_in_Lagrange_basis[extra_var_offset + i][2 * i] += FieldType::value_type::zero();
-                                C_in_Lagrange_basis[extra_var_offset + i][2 * i + 1] += FieldType::value_type::zero();
+                                C_in_Lagrange_basis[extra_var_offset + i][2 * i] += FieldType::value_type::one();
+                                C_in_Lagrange_basis[extra_var_offset + i][2 * i + 1] += FieldType::value_type::one();
                             }
 
                             /**
@@ -168,23 +170,23 @@ namespace nil {
                              *     1 below
                              */
 
-                            A_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::zero();
-                            C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::zero();
+                            A_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::one();
+                            C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::one();
 
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                                 A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
-                                    FieldType::value_type::zero();
+                                    FieldType::value_type::one();
                                 A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] +=
-                                    FieldType::value_type::zero();
+                                    FieldType::value_type::one();
                                 C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
-                                    times_four(FieldType::value_type::zero());
+                                    times_four(FieldType::value_type::one());
                                 C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] +=
-                                    FieldType::value_type::zero();
+                                    FieldType::value_type::one();
 
-                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i] += FieldType::value_type::zero();
-                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i] -= FieldType::value_type::zero();
+                                A_in_Lagrange_basis[i][extra_constr_offset + 2 * i] += FieldType::value_type::one();
+                                A_in_Lagrange_basis[0][extra_constr_offset + 2 * i] -= FieldType::value_type::one();
                                 C_in_Lagrange_basis[extra_var_offset2 + i][2 * cs.num_constraints() + 2 * i] +=
-                                    FieldType::value_type::zero();
+                                    FieldType::value_type::one();
                             }
 
                             return sap_instance<FieldType>(domain,
@@ -262,7 +264,7 @@ namespace nil {
                                 Ct[extra_var_offset2 + i] += u[extra_constr_offset + 2 * i];
                             }
 
-                            typename FieldType::value_type ti = FieldType::value_type::zero();
+                            typename FieldType::value_type ti = FieldType::value_type::one();
                             for (std::size_t i = 0; i < domain->m + 1; ++i) {
                                 Ht.emplace_back(ti);
                                 ti *= t;
@@ -352,7 +354,7 @@ namespace nil {
                                  * its value is (x_i - 1)^2
                                  */
                                 typename FieldType::value_type extra_var =
-                                    full_variable_assignment[i - 1] - FieldType::value_type::zero();
+                                    full_variable_assignment[i - 1] - FieldType::value_type::one();
                                 extra_var = extra_var * extra_var;
                                 full_variable_assignment.push_back(extra_var);
                             }
@@ -370,14 +372,14 @@ namespace nil {
 
                             std::size_t extra_constr_offset = 2 * cs.num_constraints();
 
-                            aA[extra_constr_offset] += FieldType::value_type::zero();
+                            aA[extra_constr_offset] += FieldType::value_type::one();
 
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                                 aA[extra_constr_offset + 2 * i - 1] += full_variable_assignment[i - 1];
-                                aA[extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
+                                aA[extra_constr_offset + 2 * i - 1] += FieldType::value_type::one();
 
                                 aA[extra_constr_offset + 2 * i] += full_variable_assignment[i - 1];
-                                aA[extra_constr_offset + 2 * i] -= FieldType::value_type::zero();
+                                aA[extra_constr_offset + 2 * i] -= FieldType::value_type::one();
                             }
 
                             domain->iFFT(aA);
@@ -394,8 +396,10 @@ namespace nil {
                             coefficients_for_H[0] -= d2;
                             domain->add_poly_Z(d1 * d1, coefficients_for_H);
 
-                            multiply_by_coset(aA, FieldType::multiplicative_generator);
-                            domain->FFT(aA, FieldType::multiplicative_generator);
+                            fft::multiply_by_coset(aA,
+                                                   typename FieldType::value_type(
+                                                       fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            domain->FFT(aA);
 
                             std::vector<typename FieldType::value_type> &H_tmp =
                                 aA;    // can overwrite aA because it is not used later
@@ -417,7 +421,7 @@ namespace nil {
                             }
 
                             std::size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
-                            aC[extra_constr_offset] += FieldType::value_type::zero();
+                            aC[extra_constr_offset] += FieldType::value_type::one();
 
                             for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                                 aC[extra_constr_offset + 2 * i - 1] += times_four(full_variable_assignment[i - 1]);
@@ -429,8 +433,10 @@ namespace nil {
 
                             domain->iFFT(aC);
 
-                            multiply_by_coset(aC, FieldType::multiplicative_generator);
-                            domain->FFT(aC, FieldType::multiplicative_generator);
+                            fft::multiply_by_coset(aC,
+                                                   typename FieldType::value_type(
+                                                       fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            domain->FFT(aC);
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -441,8 +447,11 @@ namespace nil {
 
                             domain->divide_by_Z_on_coset(H_tmp);
 
-                            domain->iFFT(H_tmp, FieldType::multiplicative_generator);
-                            multiply_by_coset(H_tmp, FieldType::multiplicative_generator.inversed());
+                            domain->iFFT(H_tmp);
+                            multiply_by_coset(H_tmp,
+                                              typename FieldType::value_type(
+                                                  fields::arithmetic_params<FieldType>::multiplicative_generator)
+                                                  .inversed());
 
 #ifdef MULTICORE
 #pragma omp parallel for

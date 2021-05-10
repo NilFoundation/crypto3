@@ -135,7 +135,7 @@ namespace nil {
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
                             typename FieldType::value_type res = constraints[c].evaluate(full_variable_assignment);
-                            if (!(res.squared() == typename FieldType::value_type_one())) {
+                            if (!(res.squared() == FieldType::value_type::one())) {
                                 return false;
                             }
                         }

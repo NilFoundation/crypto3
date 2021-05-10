@@ -120,9 +120,9 @@ namespace nil {
                         const typename FieldType::value_type t = algebra::random_element<FieldType>();
 
                         std::vector<typename FieldType::value_type> At(this->num_variables + 1,
-                                                                       typename FieldType::value_type::zero());
+                                                                       FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ct(this->num_variables + 1,
-                                                                       typename FieldType::value_type::zero());
+                                                                       FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
                         const typename FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
@@ -140,7 +140,7 @@ namespace nil {
                             }
                         }
 
-                        typename FieldType::value_type ti = typename FieldType::value_type::one();
+                        typename FieldType::value_type ti = FieldType::value_type::one();
                         for (std::size_t i = 0; i < this->degree + 1; ++i) {
                             Ht[i] = ti;
                             ti *= t;
@@ -253,7 +253,7 @@ namespace nil {
 
                         typename FieldType::value_type ans_A = this->At[0] + witness.d1 * this->Zt;
                         typename FieldType::value_type ans_C = this->Ct[0] + witness.d2 * this->Zt;
-                        typename FieldType::value_type ans_H = typename FieldType::value_type::zero();
+                        typename FieldType::value_type ans_H = FieldType::value_type::zero();
 
                         ans_A = ans_A + algebra::inner_product(this->At.begin() + 1,
                                                                           this->At.begin() + 1 + this->num_variables,

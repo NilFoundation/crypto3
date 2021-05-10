@@ -38,7 +38,19 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
+
+#include "../../proof_systems/ppzksnark/r1cs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -63,17 +75,17 @@ void test_sap(const std::size_t sap_degree, const std::size_t num_inputs, const 
     }
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
-                                         d1 = algebra::random_element<FieldType>(),
-                                         d2 = algebra::random_element<FieldType>();
+    const typename FieldType::value_type t = random_element<FieldType>(),
+                                         d1 = random_element<FieldType>(),
+                                         d2 = random_element<FieldType>();
 
-    sap_instance<FieldType> sap_inst_1 = r1cs_to_sap::instance_map(example.constraint_system);
+    sap_instance<FieldType> sap_inst_1 = reductions::r1cs_to_sap<FieldType>::instance_map(example.constraint_system);
 
     sap_instance_evaluation<FieldType> sap_inst_2 =
-        r1cs_to_sap::instance_map_with_evaluation(example.constraint_system, t);
+        reductions::r1cs_to_sap<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
 
     sap_witness<FieldType> sap_wit =
-        r1cs_to_sap::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2);
+        reductions::r1cs_to_sap<FieldType>::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2);
 
     BOOST_CHECK(sap_inst_1.is_satisfied(sap_wit));
     BOOST_CHECK(sap_inst_2.is_satisfied(sap_wit));
@@ -89,17 +101,19 @@ BOOST_AUTO_TEST_CASE(sap_test) {
      * degrees, so we can only test "special" versions of the domains
      */
 
-    const std::size_t basic_domain_size_special = (1ul << algebra::mnt6_Fr::s) - 1ul;
+    using basic_curve_type = curves::mnt6<298>;
+
+    const std::size_t basic_domain_size_special = (1ul << fields::arithmetic_params<basic_curve_type::scalar_field_type>::s) - 1ul;
     const std::size_t step_domain_size_special = (1ul << 10) + (1ul << 8) - 1ul;
-    const std::size_t extended_domain_size_special = (1ul << (algebra::mnt6_Fr::s + 1)) - 1ul;
+    const std::size_t extended_domain_size_special = (1ul << (fields::arithmetic_params<basic_curve_type::scalar_field_type>::s + 1)) - 1ul;
 
-    test_sap<typename curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, true);
-    test_sap<typename curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, true);
-    test_sap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
+    test_sap<typename basic_curve_type::scalar_field_type>(basic_domain_size_special, num_inputs, true);
+    test_sap<typename basic_curve_type::scalar_field_type>(step_domain_size_special, num_inputs, true);
+    test_sap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_sap<typename curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, false);
-    test_sap<typename curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, false);
-    test_sap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
+    test_sap<typename basic_curve_type::scalar_field_type>(basic_domain_size_special, num_inputs, false);
+    test_sap<typename basic_curve_type::scalar_field_type>(step_domain_size_special, num_inputs, false);
+    test_sap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

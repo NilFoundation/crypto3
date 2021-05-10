@@ -48,6 +48,7 @@
 #ifndef CRYPTO3_ZK_USCS_TO_SSP_REDUCTION_HPP
 #define CRYPTO3_ZK_USCS_TO_SSP_REDUCTION_HPP
 
+#include <nil/crypto3/fft/coset.hpp>
 #include <nil/crypto3/fft/domains/evaluation_domain.hpp>
 #include <nil/crypto3/fft/make_evaluation_domain.hpp>
 
@@ -73,10 +74,10 @@ namespace nil {
                          * and
                          *   each V_i is expressed in the Lagrange basis.
                          */
-                        ssp_instance<FieldType> instance_map(const uscs_constraint_system<FieldType> &cs) {
+                        static ssp_instance<FieldType> instance_map(const uscs_constraint_system<FieldType> &cs) {
                             const std::shared_ptr<evaluation_domain<FieldType>> domain =
                                 fft::make_evaluation_domain<FieldType>(cs.num_constraints());
-                            std::vector<std::map<std::size_t, FieldType>> V_in_Lagrange_basis(cs.num_variables() + 1);
+                            std::vector<std::map<std::size_t, typename FieldType::value_type>> V_in_Lagrange_basis(cs.num_variables() + 1);
                             for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                                 for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
                                     V_in_Lagrange_basis[cs.constraints[i].terms[j].index][i] +=
@@ -84,7 +85,7 @@ namespace nil {
                                 }
                             }
                             for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
-                                V_in_Lagrange_basis[0][i] += FieldType::value_type::zero();
+                                V_in_Lagrange_basis[0][i] += FieldType::value_type::one();
                             }
 
                             return ssp_instance<FieldType>(
@@ -104,7 +105,7 @@ namespace nil {
                          *   m = number of variables of the SSP
                          *   n = degree of the SSP
                          */
-                        ssp_instance_evaluation<FieldType>
+                        static ssp_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
                             const std::shared_ptr<evaluation_domain<FieldType>> domain =
@@ -126,7 +127,7 @@ namespace nil {
                             for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
                                 Vt[0] += u[i]; /* dummy constraint: 1^2 = 1 */
                             }
-                            typename FieldType::value_type ti = FieldType::value_type::zero();
+                            typename FieldType::value_type ti = FieldType::value_type::one();
                             for (std::size_t i = 0; i < domain->m + 1; ++i) {
                                 Ht[i] = ti;
                                 ti *= t;
@@ -169,7 +170,7 @@ namespace nil {
                          * The code below is not as simple as the above high-level description due to
                          * some reshuffling to save space.
                          */
-                        ssp_witness<FieldType> witness_map(const uscs_constraint_system<FieldType> &cs,
+                        static ssp_witness<FieldType> witness_map(const uscs_constraint_system<FieldType> &cs,
                                                            const uscs_primary_input<FieldType> &primary_input,
                                                            const uscs_auxiliary_input<FieldType> &auxiliary_input,
                                                            const typename FieldType::value_type &d) {
@@ -190,7 +191,7 @@ namespace nil {
                                 aA[i] += cs.constraints[i].evaluate(full_variable_assignment);
                             }
                             for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
-                                aA[i] += FieldType::value_type::zero();
+                                aA[i] += FieldType::value_type::one();
                             }
 
                             domain->iFFT(aA);
@@ -206,8 +207,10 @@ namespace nil {
                             }
                             domain->add_poly_Z(d.squared(), coefficients_for_H);
 
-                            multiply_by_coset(aA, FieldType::multiplicative_generator);
-                            domain->FFT(aA, FieldType::multiplicative_generator);
+                            fft::multiply_by_coset(aA,
+                                                   typename FieldType::value_type(
+                                                       fields::arithmetic_params<FieldType>::multiplicative_generator));
+                            domain->FFT(aA);
 
                             std::vector<typename FieldType::value_type> &H_tmp =
                                 aA;    // can overwrite aA because it is not used later
@@ -215,13 +218,13 @@ namespace nil {
 #pragma omp parallel for
 #endif
                             for (std::size_t i = 0; i < domain->m; ++i) {
-                                H_tmp[i] = aA[i].squared() - FieldType::value_type::zero();
+                                H_tmp[i] = aA[i].squared() - FieldType::value_type::one();
                             }
 
                             domain->divide_by_Z_on_coset(H_tmp);
 
-                            domain->iFFT(H_tmp, FieldType::multiplicative_generator);
-                            multiply_by_coset(H_tmp, FieldType::multiplicative_generator.inversed());
+                            domain->iFFT(H_tmp);
+                            multiply_by_coset(H_tmp, typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).inversed());
 
 #ifdef MULTICORE
 #pragma omp parallel for

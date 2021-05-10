@@ -38,7 +38,17 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
 #include "uscs_examples.hpp"
 
@@ -56,16 +66,16 @@ void test_ssp(const std::size_t num_constraints, const std::size_t num_inputs, c
 
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
 
-    const typename FieldType::value_type t = algebra::random_element<FieldType>(),
-                                         d = algebra::random_element<FieldType>();
+    const typename FieldType::value_type t = random_element<FieldType>(),
+                                         d = random_element<FieldType>();
 
-    ssp_instance<FieldType> ssp_inst_1 = uscs_to_ssp::instance_map(example.constraint_system);
+    ssp_instance<FieldType> ssp_inst_1 = reductions::uscs_to_ssp<FieldType>::instance_map(example.constraint_system);
 
     ssp_instance_evaluation<FieldType> ssp_inst_2 =
-        uscs_to_ssp::instance_map_with_evaluation(example.constraint_system, t);
+        reductions::uscs_to_ssp<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
 
     ssp_witness<FieldType> ssp_wit =
-        uscs_to_ssp::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
+        reductions::uscs_to_ssp<FieldType>::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d);
 
     BOOST_CHECK(ssp_inst_1.is_satisfied(ssp_wit));
     BOOST_CHECK(ssp_inst_2.is_satisfied(ssp_wit));
@@ -76,20 +86,22 @@ BOOST_AUTO_TEST_SUITE(ssp_test_suite)
 BOOST_AUTO_TEST_CASE(ssp_test) {
     const std::size_t num_inputs = 10;
 
-    const std::size_t basic_domain_size = 1ul << algebra::mnt6_Fr::s;
+    using basic_curve_type = curves::mnt6<298>;
+
+    const std::size_t basic_domain_size = 1ul << fields::arithmetic_params<basic_curve_type::scalar_field_type>::s;
     const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
-    const std::size_t extended_domain_size = 1ul << (algebra::mnt6_Fr::s + 1);
+    const std::size_t extended_domain_size = 1ul << (fields::arithmetic_params<basic_curve_type::scalar_field_type>::s + 1);
     const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
-    test_ssp<typename curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, true);
-    test_ssp<typename curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, true);
-    test_ssp<typename curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, true);
-    test_ssp<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
+    test_ssp<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, true);
+    test_ssp<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, true);
+    test_ssp<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, true);
+    test_ssp<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_ssp<typename curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, false);
-    test_ssp<typename curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, false);
-    test_ssp<typename curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, false);
-    test_ssp<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
+    test_ssp<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, false);
+    test_ssp<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, false);
+    test_ssp<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, false);
+    test_ssp<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

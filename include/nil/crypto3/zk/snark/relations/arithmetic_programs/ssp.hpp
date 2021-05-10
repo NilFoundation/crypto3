@@ -128,7 +128,7 @@ namespace nil {
                             }
                         }
 
-                        typename FieldType::value_type ti = typename FieldType::value_type::one();
+                        typename FieldType::value_type ti = FieldType::value_type::one();
                         for (std::size_t i = 0; i < this->degree + 1; ++i) {
                             Ht[i] = ti;
                             ti *= t;
@@ -237,7 +237,7 @@ namespace nil {
                         }
 
                         typename FieldType::value_type ans_V = this->Vt[0] + witness.d * this->Zt;
-                        typename FieldType::value_type ans_H = typename FieldType::value_type::zero();
+                        typename FieldType::value_type ans_H = FieldType::value_type::zero();
 
                         ans_V = ans_V + algebra::inner_product(this->Vt.begin() + 1,
                                                                           this->Vt.begin() + 1 + this->num_variables,
@@ -250,7 +250,7 @@ namespace nil {
                                                                           witness.coefficients_for_H.begin() +
                                                                               this->degree + 1);
 
-                        if (ans_V.squared() - typename FieldType::value_type::one() != ans_H * this->Zt) {
+                        if (ans_V.squared() - FieldType::value_type::one() != ans_H * this->Zt) {
                             return false;
                         }
 
