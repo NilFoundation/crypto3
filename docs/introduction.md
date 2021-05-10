@@ -14,8 +14,9 @@ Crypto3.Pubkey consists of several parts to review:
 
 Internal dependencies:
 
-1. [Crypto3.Mac](https://github.com/nilfoundation/block.git)
-2. [Crypto3.Hash](https://github.com/nilfoundation/hash.git)
+1. [Crypto3.Mac](https://github.com/nilfoundation/crypto3-block.git)
+2. [Crypto3.Hash](https://github.com/nilfoundation/crypto3-hash.git)
+2. [Crypto3.Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git)
 
 Outer dependencies:
 

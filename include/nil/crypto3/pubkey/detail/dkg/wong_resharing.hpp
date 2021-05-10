@@ -49,9 +49,9 @@ namespace nil {
                     // implicitly ordered in/out
 
                     template<typename OldPublicSharesRange,
-                             typename std::enable_if<
+                             typename = typename std::enable_if<
                                  std::is_same<public_element_type, typename OldPublicSharesRange::value_type>::value,
-                                 bool>::type = true>
+                                 bool>::type>
                     static inline bool verify_old_secret(const private_element_type &old_secret,
                                                          const OldPublicSharesRange &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const OldPublicSharesRange>));
@@ -60,9 +60,9 @@ namespace nil {
                     }
 
                     template<typename OldPublicSharesRange,
-                             typename std::enable_if<
+                             typename = typename std::enable_if<
                                  std::is_same<public_element_type, typename OldPublicSharesRange::value_type>::value,
-                                 bool>::type = true>
+                                 bool>::type>
                     static inline bool verify_old_secret(const public_element_type &old_public_secret,
                                                          const OldPublicSharesRange &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const OldPublicSharesRange>));
@@ -80,12 +80,12 @@ namespace nil {
                     //===========================================================================
                     // explicitly ordered in/out
 
-                    template<
-                        typename OldPublicSharesContainer,
-                        typename std::enable_if<std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
-                                                    std::is_same<public_element_type,
-                                                                 typename OldPublicSharesContainer::mapped_type>::value,
-                                                bool>::type = true>
+                    template<typename OldPublicSharesContainer,
+                             typename = typename std::enable_if<
+                                 std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
+                                     std::is_same<public_element_type,
+                                                  typename OldPublicSharesContainer::mapped_type>::value,
+                                 bool>::type>
                     static inline bool verify_old_secret(const private_element_type &old_secret,
                                                          const OldPublicSharesContainer &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const OldPublicSharesContainer>));
@@ -94,12 +94,12 @@ namespace nil {
                         return verify_old_secret(base_type::get_public_element(old_secret), old_public_shares);
                     }
 
-                    template<
-                        typename OldPublicSharesContainer,
-                        typename std::enable_if<std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
-                                                    std::is_same<public_element_type,
-                                                                 typename OldPublicSharesContainer::mapped_type>::value,
-                                                bool>::type = true>
+                    template<typename OldPublicSharesContainer,
+                             typename = typename std::enable_if<
+                                 std::is_integral<typename OldPublicSharesContainer::key_type>::value &&
+                                     std::is_same<public_element_type,
+                                                  typename OldPublicSharesContainer::mapped_type>::value,
+                                 bool>::type>
                     static inline bool verify_old_secret(const public_element_type &old_public_secret,
                                                          const OldPublicSharesContainer &old_public_shares) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::UniqueAssociativeContainer<const OldPublicSharesContainer>));
@@ -143,4 +143,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif CRYPTO3_PUBKEY_WONG_RESHARING_DKG_HPP
+#endif

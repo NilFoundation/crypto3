@@ -27,6 +27,8 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
+#include <nil/crypto3/pubkey/private_key.hpp>
+
 #include <nil/crypto3/pubkey/detail/consistency.hpp>
 #include <nil/crypto3/pubkey/detail/modes/rfc6979.hpp>
 
@@ -39,7 +41,18 @@ namespace nil {
             }
 
             template<typename CurveType>
-            struct ecdsa_public_key {
+            struct ecdsa {
+                typedef CurveType curve_type;
+
+                typedef public_key<ecdsa<CurveType>> public_key_type;
+                typedef private_key<ecdsa<CurveType>> private_key_type;
+
+                template<typename Hash>
+                using padding_types = std::tuple<padding::emsa1<ecdsa<CurveType>, Hash>>;
+            };
+
+            template<typename CurveType>
+            struct public_key<ecdsa<CurveType>> {
                 typedef CurveType curve_type;
 
                 typedef typename curve_type::value_type value_type;
@@ -54,7 +67,9 @@ namespace nil {
                 constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
 
-                inline static bool verify(const signature_type &val, const key_schedule_type &key) {
+                template<typename MsgRange>
+                static inline bool verify(const public_key_type &pubkey, const MsgRange &message,
+                                          const signature_type &signature) {
                     if (sig_len != m_group.get_order_bytes() * 2)
                         return false;
 
@@ -81,8 +96,10 @@ namespace nil {
             };
 
             template<typename CurveType>
-            struct ecdsa_private_key {
-                typedef CurveType curve_type;
+            struct private_key<ecdsa<CurveType>> : public public_key<ecdsa<CurveType>> {
+                typedef public_key<ecdsa<CurveType>> public_key_type;
+
+                typedef typename public_key_type::curve_type curve_type;
 
                 typedef typename curve_type::value_type value_type;
                 typedef typename curve_type::number_type number_type;
@@ -115,17 +132,6 @@ namespace nil {
                     //                    return BigInt::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
                     res = std::make_tuple(r, s);
                 }
-            };
-
-            template<typename CurveType>
-            struct ecdsa {
-                typedef CurveType curve_type;
-
-                typedef ecdsa_public_key<CurveType> public_key_type;
-                typedef ecdsa_private_key<CurveType> private_key_type;
-
-                template<typename Hash>
-                using padding_types = std::tuple<padding::emsa1<ecdsa<CurveType>, Hash>>;
             };
         }    // namespace pubkey
     }        // namespace crypto3
