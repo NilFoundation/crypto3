@@ -31,13 +31,7 @@
 #include <vector>
 
 #include <nil/crypto3/multiprecision/integer.hpp>
-
 #include <nil/crypto3/multiprecision/number.hpp>
-
-// temporary includes begin
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-// temporary includes end
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 
