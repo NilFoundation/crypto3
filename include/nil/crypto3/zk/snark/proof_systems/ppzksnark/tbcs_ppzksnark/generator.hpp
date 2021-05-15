@@ -55,6 +55,8 @@
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
 
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -84,9 +86,9 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type field_type;
 
                         const uscs_constraint_system<field_type> uscs_cs =
-                            tbcs_to_uscs_instance_map<field_type>(circuit);
+                            reductions::tbcs_to_uscs<field_type>::instance_map<field_type>(circuit);
                         const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair =
-                            uscs_ppzksnark<CurveType>::generator(uscs_cs);
+                            generate<uscs_ppzksnark<CurveType>>(uscs_cs);
 
                         return {{circuit, uscs_keypair.first}, uscs_keypair.second};
                     }

@@ -35,39 +35,7 @@ namespace nil {
                                const typename ProofSystemType::primary_input_type &primary_input,
                                const typename ProofSystemType::proof_type &proof) {
 
-                    return ProofSystemType::online_verify(pvk, primary_input, proof);
-                }
-
-                template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type
-                    generate_keys(const typename ProofSystemType::constraint_system_type &constraint_system) {
-
-                    return ProofSystemType::generate(constraint_system);
-                }
-
-                template<typename ProofSystemType>
-                typename ProofSystemType::proof_type
-                    prove(const typename ProofSystemType::proving_key_type &pk,
-                          const typename ProofSystemType::primary_input_type &primary_input,
-                          const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
-
-                    return ProofSystemType::prove(pk, primary_input, auxiliary_input);
-                }
-
-                template<typename ProofSystemType>
-                bool verity(const typename ProofSystemType::verification_key_type &vk,
-                            const typename ProofSystemType::primary_input_type &primary_input,
-                            const typename ProofSystemType::proof_type &proof) {
-
-                    return ProofSystemType::verify(vk, primary_input, proof);
-                }
-
-                template<typename ProofSystemType>
-                bool online_verifier(const typename ProofSystemType::processed_verification_key_type &pvk,
-                                     const typename ProofSystemType::primary_input_type &primary_input,
-                                     const typename ProofSystemType::proof_type &proof) {
-
-                    return ProofSystemType::online_verify(pvk, primary_input, proof);
+                    return ProofSystemType::verify(pvk, primary_input, proof);
                 }
             }    // namespace snark
         }        // namespace zk

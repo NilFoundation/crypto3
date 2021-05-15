@@ -37,13 +37,6 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Runs the ppzkSNARK (generator, prover, and verifier) for a given
-                 * USCS example (specified by a constraint system, input, and witness).
-                 */
-                template<typename CurveType>
-                bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example);
-
-                /**
                  * The code below provides an example of all stages of running a USCS ppzkSNARK.
                  *
                  * Of course, in a real-life scenario, we would have three distinct entities,
@@ -57,20 +50,20 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example) {
-                    uscs_ppzksnark_keypair<CurveType> keypair =
-                        uscs_ppzksnark_generator<CurveType>(example.constraint_system);
+                    using basic_proof_system = uscs_ppzksnark<CurveType>;
 
-                    uscs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        uscs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename basic_proof_system::keypair_type keypair =
+                        generate<basic_proof_system>(example.constraint_system);
 
-                    uscs_ppzksnark_proof<CurveType> proof =
-                        uscs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename basic_proof_system::processed_verification_key_type pvk =
+                        uscs_ppzksnark_verifier_process_vk<CurveType>(keypair.second);
 
-                    bool ans = uscs_ppzksnark_verifier_strong_input_consistency<CurveType>(
-                        keypair.vk, example.primary_input, proof);
+                    typename basic_proof_system::proof_type proof =
+                        prove<basic_proof_system>(keypair.first, example.primary_input, example.auxiliary_input);
 
-                    bool ans2 = uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
-                        pvk, example.primary_input, proof);
+                    bool ans = verify<basic_proof_system>(keypair.second, example.primary_input, proof);
+
+                    bool ans2 = verify<basic_proof_system>(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

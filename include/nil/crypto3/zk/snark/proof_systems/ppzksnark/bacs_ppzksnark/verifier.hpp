@@ -51,8 +51,11 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_VERIFIER_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/verifier.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
+
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -80,8 +83,7 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-                        return r1cs_ppzksnark_verifier_process_vk<CurveType>::template process<CurveType>(
-                            verification_key);
+                        return r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key);
                     }
                 };
 
@@ -99,15 +101,15 @@ namespace nil {
                      the primary input is implicitly padded with zeros up to length C.num_inputs).
                  */
 
-                /**
-                 * A verifier algorithm for the BACS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has weak input consistency.
-                 */
                 template<typename CurveType>
                 class bacs_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
 
+                    using r1cs_ppzksnark_weak_proof_system = r1cs_ppzksnark<CurveType,
+                                          r1cs_ppzksnark_generator<CurveType>,
+                                          r1cs_ppzksnark_prover<CurveType>,
+                                          r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>>;
+
                 public:
                     typedef typename policy_type::circuit_type circuit_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -120,26 +122,38 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
+                    /**
+                     * A verifier algorithm for the BACS ppzkSNARK that:
+                     * (1) accepts a non-processed verification key, and
+                     * (2) has weak input consistency.
+                     */
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::template process<
-                            CurveType>(bacs_ppzksnark_verifier_process_vk<CurveType>::template process<CurveType>(
+                        return verify<r1cs_ppzksnark_weak_proof_system>(bacs_ppzksnark_verifier_process_vk<CurveType>::process(
                                            verification_key),
                                        primary_input,
                                        proof);
                     }
+
+                    /**
+                     * A verifier algorithm for the BACS ppzkSNARK that:
+                     * (1) accepts a processed verification key, and
+                     * (2) has weak input consistency.
+                     */
+                    static inline bool process(const processed_verification_key_type &processed_verification_key,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        return verify<r1cs_ppzksnark_weak_proof_system>(processed_verification_key, primary_input, proof);
+                    }
                 };
 
-                /**
-                 * A verifier algorithm for the BACS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has strong input consistency.
-                 */
                 template<typename CurveType>
                 class bacs_ppzksnark_verifier_strong_input_consistency {
                     typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
 
+                    using r1cs_ppzksnark_proof_system = r1cs_ppzksnark<CurveType>;
+
                 public:
                     typedef typename policy_type::circuit_type circuit_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -152,72 +166,30 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
+                    /**
+                     * A verifier algorithm for the BACS ppzkSNARK that:
+                     * (1) accepts a non-processed verification key, and
+                     * (2) has strong input consistency.
+                     */
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::template process<
-                            CurveType>(
-                            bacs_ppzksnark_verifier_process_vk<CurveType>(verification_key), primary_input, proof);
+                        return verify<r1cs_ppzksnark_proof_system>(
+                            bacs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input, proof);
                     }
-                };
 
-                /**
-                 * A verifier algorithm for the BACS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                class bacs_ppzksnark_online_verifier_weak_input_consistency {
-                    typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
-
-                public:
-                    typedef typename policy_type::circuit_type circuit_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
-
+                    /**
+                     * A verifier algorithm for the BACS ppzkSNARK that:
+                     * (1) accepts a processed verification key, and
+                     * (2) has strong input consistency.
+                     */
                     static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::template process<
-                            CurveType>(processed_verification_key, primary_input, proof);
+                        return verify<r1cs_ppzksnark_proof_system>(processed_verification_key, primary_input, proof);
                     }
                 };
 
-                /**
-                 * A verifier algorithm for the BACS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                class bacs_ppzksnark_online_verifier_strong_input_consistency {
-                    typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
-
-                public:
-                    typedef typename policy_type::circuit_type circuit_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
-
-                    static inline bool process(const processed_verification_key_type &processed_verification_key,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::template process<
-                            CurveType>(processed_verification_key, primary_input, proof);
-                    }
-                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

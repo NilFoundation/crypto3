@@ -34,13 +34,6 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Runs the ppzkSNARK (generator, prover, and verifier) for a given
-                 * TBCS example (specified by a circuit, primary input, and auxiliary input).
-                 */
-                template<typename CurveType>
-                bool run_tbcs_ppzksnark(const tbcs_example &example);
-
-                /**
                  * The code below provides an example of all stages of running a TBCS ppzkSNARK.
                  *
                  * Of course, in a real-life scenario, we would have three distinct entities,
@@ -54,27 +47,27 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_tbcs_ppzksnark(const tbcs_example &example) {
+                    using basic_proof_system = tbcs_ppzksnark<CurveType>;
+
                     std::cout << "Call to run_tbcs_ppzksnark" << std::endl;
 
                     std::cout << "TBCS ppzkSNARK Generator" << std::endl;
-                    tbcs_ppzksnark_keypair<CurveType> keypair = tbcs_ppzksnark_generator<CurveType>(example.circuit);
+                    typename basic_proof_system::keypair_type keypair = generate<basic_proof_system>(example.circuit);
 
                     std::cout << "Preprocess verification key" << std::endl;
-                    tbcs_ppzksnark_processed_verification_key<CurveType> pvk =
-                        tbcs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
+                    typename basic_proof_system::processed_verification_key_type pvk =
+                        tbcs_ppzksnark_verifier_process_vk<CurveType>(keypair.second);
 
                     std::cout << "TBCS ppzkSNARK Prover" << std::endl;
-                    tbcs_ppzksnark_proof<CurveType> proof =
-                        tbcs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    typename basic_proof_system::proof_type proof =
+                        prove<basic_proof_system>(keypair.first, example.primary_input, example.auxiliary_input);
 
                     std::cout << "TBCS ppzkSNARK Verifier" << std::endl;
-                    bool ans = tbcs_ppzksnark_verifier_strong_input_consistency<CurveType>(
-                        keypair.vk, example.primary_input, proof);
+                    bool ans = verify<basic_proof_system>(keypair.second, example.primary_input, proof);
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     std::cout << "TBCS ppzkSNARK Online Verifier" << std::endl;
-                    bool ans2 = tbcs_ppzksnark_online_verifier_strong_input_consistency<CurveType>(
-                        pvk, example.primary_input, proof);
+                    bool ans2 = verify<basic_proof_system>(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

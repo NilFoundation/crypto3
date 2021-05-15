@@ -45,20 +45,20 @@ namespace nil {
                     typedef CircuitType circuit_type;
                     typedef typename curve_type::scalar_field_type field_type;
 
-                    circuit_type crct;
+                    circuit_type circuit;
                     uscs_ppzksnark_proving_key<CurveType, circuit_type> uscs_pk;
 
                     tbcs_ppzksnark_proving_key() {};
                     tbcs_ppzksnark_proving_key(const tbcs_ppzksnark_proving_key &other) = default;
                     tbcs_ppzksnark_proving_key(tbcs_ppzksnark_proving_key &&other) = default;
-                    tbcs_ppzksnark_proving_key(const circuit_type &crct,
+                    tbcs_ppzksnark_proving_key(const circuit_type &circuit,
                                                const uscs_ppzksnark_proving_key<CurveType, circuit_type> &uscs_pk) :
-                        crct(crct),
+                        circuit(circuit),
                         uscs_pk(uscs_pk) {
                     }
-                    tbcs_ppzksnark_proving_key(circuit_type &&crct,
+                    tbcs_ppzksnark_proving_key(circuit_type &&circuit,
                                                uscs_ppzksnark_proving_key<CurveType, circuit_type> &&uscs_pk) :
-                        crct(std::move(crct)),
+                        circuit(std::move(circuit)),
                         uscs_pk(std::move(uscs_pk)) {
                     }
 
@@ -85,7 +85,7 @@ namespace nil {
                     }
 
                     bool operator==(const tbcs_ppzksnark_proving_key &other) const {
-                        return (this->crct == other.crct && this->uscs_pk == other.uscs_pk);
+                        return (this->circuit == other.circuit && this->uscs_pk == other.uscs_pk);
                     }
                 };
             }    // namespace snark

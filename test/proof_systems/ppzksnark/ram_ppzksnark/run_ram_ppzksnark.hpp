@@ -35,13 +35,6 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Runs the ppzkSNARK (generator, prover, and verifier) for a given
-                 * RAM example (specified by an architecture, boot trace, auxiliary input, and time bound).
-                 */
-                template<typename ram_ppzksnark_ppT>
-                bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example);
-
-                /**
                  * The code below provides an example of all stages of running a RAM ppzkSNARK.
                  *
                  * Of course, in a real-life scenario, we would have three distinct entities,
@@ -53,8 +46,10 @@ namespace nil {
                  * (3) The "verifier", which runs the ppzkSNARK verifier on input the verification key,
                  *     a boot trace, and a proof.
                  */
-                template<typename ram_ppzksnark_ppT>
+                template<typename CurveType>
                 bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example) {
+                    using basic_proof_system = ram_ppzksnark<CurveType>;
+
                     std::cout << "Call to run_ram_ppzksnark" << std::endl;
 
                     printf("This run uses an example with the following parameters:\n");
@@ -65,15 +60,15 @@ namespace nil {
                            algebra::log2(example.boot_trace_size_bound + 2 * example.time_bound));
 
                     std::cout << "RAM ppzkSNARK Generator" << std::endl;
-                    ram_ppzksnark_keypair<ram_ppzksnark_ppT> keypair = ram_ppzksnark_generator<ram_ppzksnark_ppT>(
+                    typename basic_proof_system::keypair_type keypair = generate<basic_proof_system>(
                         example.ap, example.boot_trace_size_bound, example.time_bound);
 
                     std::cout << "RAM ppzkSNARK Prover" << std::endl;
-                    ram_ppzksnark_proof<ram_ppzksnark_ppT> proof = ram_ppzksnark_prover<ram_ppzksnark_ppT>(
-                        keypair.pk, example.boot_trace, example.auxiliary_input);
+                    typename basic_proof_system::proof_type proof = prove<basic_proof_system>(
+                        keypair.first, example.boot_trace, example.auxiliary_input);
 
                     std::cout << "RAM ppzkSNARK Verifier" << std::endl;
-                    bool ans = ram_ppzksnark_verifier<ram_ppzksnark_ppT>(keypair.vk, example.boot_trace, proof);
+                    bool ans = verify<basic_proof_system>(keypair.second, example.boot_trace, proof);
 
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 

@@ -45,13 +45,6 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Runs the SEppzkSNARK (generator, prover, and verifier) for a given
-                 * R1CS example (specified by a constraint system, input, and witness).
-                 */
-                template<typename CurveType>
-                bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example);
-
-                /**
                  * The code below provides an example of all stages of running a R1CS SEppzkSNARK.
                  *
                  * Of course, in a real-life scenario, we would have three distinct entities,
@@ -67,20 +60,19 @@ namespace nil {
                 bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
                     using basic_proof_system = r1cs_se_ppzksnark<CurveType>;
 
-                    typename r1cs_se_ppzksnark<CurveType>::keypair_type keypair =
+                    typename basic_proof_system::keypair_type keypair =
                         generate<basic_proof_system>(example.constraint_system);
 
-                    typename r1cs_se_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                    typename basic_proof_system::processed_verification_key_type pvk =
                         r1cs_se_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
 
-                    typename r1cs_se_ppzksnark<CurveType>::proof_type proof = prove<basic_proof_system>(
+                    typename basic_proof_system::proof_type proof = prove<basic_proof_system>(
                         keypair.first, example.primary_input, example.auxiliary_input);
 
-                    const bool ans = r1cs_se_ppzksnark<CurveType>::verifier_strong_input_consistency(
-                        keypair.second, example.primary_input, proof);
+                    const bool ans = verify<basic_proof_system>(keypair.second, example.primary_input, proof);
 
-                    const bool ans2 = r1cs_se_ppzksnark<CurveType>::online_verifier_strong_input_consistency(
-                        pvk, example.primary_input, proof);
+                    const bool ans2 = verify<basic_proof_system>(pvk, example.primary_input, proof);
+
                     BOOST_CHECK(ans == ans2);
 
                     return ans;

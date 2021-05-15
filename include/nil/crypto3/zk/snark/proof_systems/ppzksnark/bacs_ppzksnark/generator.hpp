@@ -51,9 +51,12 @@
 #define CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_GENERATOR_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs.hpp>
+#include <nil/crypto3/zk/snark/reductions/bacs_to_r1cs.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -85,11 +88,11 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type field_type;
 
                         const r1cs_constraint_system<field_type> r1cs_cs =
-                            bacs_to_r1cs_instance_map<field_type>(circuit);
+                            reductions::bacs_to_r1cs<field_type>::instance_map(circuit);
                         const typename r1cs_ppzksnark<CurveType>::keypair_type r1cs_keypair =
-                            r1cs_ppzksnark<CurveType>::generator::template process<CurveType>(r1cs_cs);
+                            generate<r1cs_ppzksnark<CurveType>>(r1cs_cs);
 
-                        return keypair_type(proving_key(circuit, r1cs_keypair.pk), r1cs_keypair.vk);
+                        return keypair_type(proving_key_type(circuit, r1cs_keypair.first), r1cs_keypair.second);
                     }
                 };
 

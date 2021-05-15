@@ -123,13 +123,8 @@ namespace nil {
                     }
                 };
 
-                /**
-                 * A verifier algorithm for the R1CS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has weak input consistency.
-                 */
                 template<typename CurveType>
-                class r1cs_ppzksnark_online_verifier_weak_input_consistency {
+                class r1cs_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                     using pairing_policy = typename CurveType::pairing;
@@ -156,6 +151,24 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
+                    /**
+                     * A verifier algorithm for the R1CS ppzkSNARK that:
+                     * (1) accepts a non-processed verification key, and
+                     * (2) has weak input consistency.
+                     */
+                    static inline bool process(const verification_key_type &verification_key,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        return process(
+                            r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
+                            proof);
+                    }
+
+                    /**
+                     * A verifier algorithm for the R1CS ppzkSNARK that:
+                     * (1) accepts a processed verification key, and
+                     * (2) has weak input consistency.
+                     */
                     static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
@@ -236,78 +249,6 @@ namespace nil {
                     }
                 };
 
-                /**
-                 * A verifier algorithm for the R1CS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                class r1cs_ppzksnark_verifier_weak_input_consistency {
-                    typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
-
-                public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
-
-                    static inline bool process(const verification_key_type &verification_key,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                            r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
-                            proof);
-                    }
-                };
-
-                /**
-                 * A verifier algorithm for the R1CS ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                class r1cs_ppzksnark_online_verifier_strong_input_consistency {
-                    typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
-
-                public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
-
-                    static inline bool process(const processed_verification_key_type &processed_verification_key,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
-                        bool result = true;
-
-                        if (processed_verification_key.encoded_IC_query.domain_size() != primary_input.size()) {
-                            result = false;
-                        } else {
-                            result = r1cs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                                processed_verification_key, primary_input, proof);
-                        }
-
-                        return result;
-                    }
-                };
-
-                /**
-                 * A verifier algorithm for the R1CS ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has strong input consistency.
-                 */
                 template<typename CurveType>
                 class r1cs_ppzksnark_verifier_strong_input_consistency {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
@@ -324,12 +265,37 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
+                    /**
+                     * A verifier algorithm for the R1CS ppzkSNARK that:
+                     * (1) accepts a non-processed verification key, and
+                     * (2) has strong input consistency.
+                     */
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return r1cs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                        return process(
                             r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
                             proof);
+                    }
+
+                    /**
+                     * A verifier algorithm for the R1CS ppzkSNARK that:
+                     * (1) accepts a processed verification key, and
+                     * (2) has strong input consistency.
+                     */
+                    static inline bool process(const processed_verification_key_type &processed_verification_key,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        bool result = true;
+
+                        if (processed_verification_key.encoded_IC_query.domain_size() != primary_input.size()) {
+                            result = false;
+                        } else {
+                            result = r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>::process(
+                                processed_verification_key, primary_input, proof);
+                        }
+
+                        return result;
                     }
                 };
 

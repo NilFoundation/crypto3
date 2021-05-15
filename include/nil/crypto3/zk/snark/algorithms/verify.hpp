@@ -39,7 +39,7 @@ namespace nil {
                 }
 
                 template<typename ProofSystemType>
-                bool online_verify(const typename ProofSystemType::processed_verification_key_type &pvk,
+                bool verify(const typename ProofSystemType::processed_verification_key_type &pvk,
                                    const typename ProofSystemType::primary_input_type &primary_input,
                                    const typename ProofSystemType::proof_type &proof) {
 

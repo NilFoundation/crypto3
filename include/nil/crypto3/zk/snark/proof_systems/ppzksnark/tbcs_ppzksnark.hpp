@@ -72,6 +72,12 @@ namespace nil {
                                                const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
                     }
+
+                    static inline bool verify(const typename Verifier::processed_verification_key_type &pvk,
+                                              const primary_input_type &primary_input,
+                                              const proof_type &proof) {
+                        return Verifier::process(pvk, primary_input, proof);
+                    }
                 };
             }    // namespace snark
         }        // namespace zk

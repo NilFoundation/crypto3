@@ -83,10 +83,10 @@ namespace nil {
                     std::cout << "Starting prover" << std::endl;
 
                     typename proof_system_policy::proof_type proof =
-                        prover<proof_system_policy>(keypair.pk, example.primary_input, example.auxiliary_input);
+                        prover<proof_system_policy>(keypair.first, example.primary_input, example.auxiliary_input);
 
                     std::vector<std::uint8_t> data = detail::verifier_data_to_bits<proof_system_policy>::process(
-                        keypair.vk, example.primary_input, proof);
+                        keypair.second, example.primary_input, proof);
 
                     std::cout << "Data converted to byte blob" << std::endl;
 
