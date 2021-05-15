@@ -101,7 +101,7 @@ namespace nil {
                     std::cout << "Starting verification key processing" << std::endl;
 
                     typename basic_proof_system::processed_verification_key_type pvk =
-                        r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
+                        r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     std::cout << "Starting prover" << std::endl;
 

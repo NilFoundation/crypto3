@@ -54,7 +54,7 @@ namespace nil {
                     std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                           r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
                         comms_c;
-                    std::vector<std::pair<typename CurveType::pairing::fqk_type, typename CurveType::pairing::fqk_type>>
+                    std::vector<std::pair<typename CurveType::pairing::fqk_type::value_type, typename CurveType::pairing::fqk_type::value_type>>
                         z_ab;
                     std::vector<
                         std::pair<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>>
@@ -90,7 +90,7 @@ namespace nil {
                     /// commit to C separate since we use it only in MIPP
                     r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
-                    typename curve_type::pairing::fqk_type ip_ab;
+                    typename curve_type::pairing::fqk_type::value_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
                     typename curve_type::g1_type::value_type agg_c;
                     tipp_mipp_proof<curve_type> tmipp;

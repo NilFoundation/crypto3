@@ -104,7 +104,7 @@ namespace nil {
                             d2 = algebra::random_element<typename CurveType::scalar_field_type>();
 
                         const sap_witness<typename CurveType::scalar_field_type> sap_wit =
-                            reductions::r1cs_to_sap<CurveType>::witness_map(
+                            reductions::r1cs_to_sap<typename CurveType::scalar_field_type>::witness_map(
                                 proving_key.constraint_system, primary_input, auxiliary_input, d1, d2);
 
 #ifdef MULTICORE
@@ -161,7 +161,7 @@ namespace nil {
                             algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
                                 proving_key.C_query_1.begin(),
                                 proving_key.C_query_1.end(),
-                                sap_wit.coefficients_for_ACs.begin() + sap_wit.num_inputs(),
+                                sap_wit.coefficients_for_ACs.begin() + sap_wit.num_inputs,
                                 sap_wit.coefficients_for_ACs.end(),
                                 chunks) +
                             (r * r) * proving_key.G_gamma2_Z2 + r * proving_key.G_ab_gamma_Z +

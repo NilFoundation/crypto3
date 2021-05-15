@@ -327,7 +327,7 @@ namespace nil {
 
                         // Fiat-Shamir challenge
                         typename CurveType::scalar_field_type::value_type default_transcript =
-                            typename CurveType::scalar_field_type::value_type::zero();
+                            CurveType::scalar_field_type::value_type::zero();
                         auto transcript = challenges.empty() ? default_transcript : *(challenges.end() - 1);
 
                         // combine both TIPP and MIPP transcript
@@ -423,13 +423,13 @@ namespace nil {
 
                     // 0 iteration
                     typename FieldType::value_type res =
-                        typename FieldType::value_type::one() + (*transcript_first * power_zr);
+                        FieldType::value_type::one() + (*transcript_first * power_zr);
                     power_zr *= power_zr;
                     ++transcript_first;
 
                     // the rest
                     while (transcript_first != transcript_last) {
-                        res *= typename FieldType::value_type::one() + (*transcript_first * power_zr);
+                        res *= FieldType::value_type::one() + (*transcript_first * power_zr);
                         power_zr *= power_zr;
                         ++transcript_first;
                     }
@@ -498,7 +498,7 @@ namespace nil {
                     DensePolynomial quotient_polynomial =
                         (vkey_poly - DensePolynomial(vkey_poly_z)) /
                         (DensePolynomial({neg_kzg_challenge,
-                                          typename std::iterator_traits<InputScalarIterator>::value_type::one()}));
+                                          std::iterator_traits<InputScalarIterator>::value_type::one()}));
 
                     std::vector<typename std::iterator_traits<InputScalarIterator>::value_type>
                         quotient_polynomial_coeffs = quotient_polynomial.into_coeffs();
@@ -507,7 +507,7 @@ namespace nil {
                     std::size_t quotient_polynomial_coeffs_len = quotient_polynomial_coeffs.size();
                     auto getter = [&](std::size_t i) -> typename CurveAffine::scalar_field_type::value_type {
                         return i >= quotient_polynomial_coeffs_len ?
-                                   typename std::iterator_traits<InputScalarIterator>::value_type::zero() :
+                                   std::iterator_traits<InputScalarIterator>::value_type::zero() :
                                    quotient_polynomial_coeffs[i];
                     };
                 }

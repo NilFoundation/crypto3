@@ -75,7 +75,7 @@ void print_ram_zksnark_verifier_profiling() {
                 profile_ram_zksnark_verifier<CurveType>(ap, input_size, program_size);
 
                 const double input_map = algebra::last_times["Call to ram_zksnark_verifier_input_map"];
-                const double preprocessing = algebra::last_times["Call to r1cs_ppzksnark_verifier_process_vk"];
+                const double preprocessing = algebra::last_times["Call to r1cs_ppzksnark_process_verification_key"];
                 const double accumulate = algebra::last_times["Call to r1cs_ppzksnark_IC_query::accumulate"];
                 const double pairings = algebra::last_times["Online pairing computations"];
                 const double total = algebra::last_times["Call to ram_zksnark_verifier"];

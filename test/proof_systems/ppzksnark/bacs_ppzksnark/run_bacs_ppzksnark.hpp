@@ -66,7 +66,7 @@ namespace nil {
 
                     std::cout << "Preprocess verification key" << std::endl;
                     typename basic_proof_system::processed_verification_key_type pvk =
-                        bacs_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
+                        bacs_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     std::cout << "BACS ppzkSNARK Prover" << std::endl;
                     typename basic_proof_system::proof_type proof =

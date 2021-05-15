@@ -145,13 +145,14 @@ namespace nil {
                             G_window = algebra::get_exp_window_size<typename CurveType::g1_type>(G_exp_count);
 
                         algebra::window_table<typename CurveType::g1_type> G_table =
-                            get_window_table(CurveType::scalar_field_type::value_bits, G_window, G);
+                            algebra::get_window_table<typename CurveType::g1_type>(CurveType::scalar_field_type::value_bits, G_window, G);
 
                         typename CurveType::g2_type::value_type H_gamma = gamma * H;
                         std::size_t H_gamma_exp_count = non_zero_At,    // B_query
                             H_gamma_window =
                                 algebra::get_exp_window_size<typename CurveType::g2_type>(H_gamma_exp_count);
-                        algebra::window_table<typename CurveType::g2_type> H_gamma_table = get_window_table(
+                        algebra::window_table<typename CurveType::g2_type> H_gamma_table = algebra::get_window_table<
+                            typename CurveType::g2_type>(
                             CurveType::scalar_field_type::value_bits, H_gamma_window, H_gamma);
 
                         typename CurveType::g1_type::value_type G_alpha = alpha * G;
@@ -194,7 +195,7 @@ namespace nil {
                         tmp_exponents.reserve(sap_inst.degree + 1);
 
                         /* Compute the vector G_gamma2_Z_t := Z(t) * t^i * gamma^2 * G */
-                        typename CurveType::scalar_field_type gamma2_Z_t = sap_inst.Zt * gamma.squared();
+                        typename CurveType::scalar_field_type::value_type gamma2_Z_t = sap_inst.Zt * gamma.squared();
                         for (std::size_t i = 0; i < sap_inst.degree + 1; ++i) {
                             tmp_exponents.emplace_back(gamma2_Z_t);
                             gamma2_Z_t *= t;
@@ -219,7 +220,7 @@ namespace nil {
 #endif
 
                         tmp_exponents.reserve(sap_inst.num_variables + 1);
-                        typename CurveType::scalar_field_type double_gamma2_Z = gamma * gamma * sap_inst.Zt;
+                        typename CurveType::scalar_field_type::value_type double_gamma2_Z = gamma * gamma * sap_inst.Zt;
                         double_gamma2_Z = double_gamma2_Z + double_gamma2_Z;
                         for (std::size_t i = 0; i <= sap_inst.num_variables; ++i) {
                             tmp_exponents.emplace_back(double_gamma2_Z * At[i]);

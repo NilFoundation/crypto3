@@ -195,10 +195,10 @@ namespace nil {
                         const std::size_t chunks = 1;
 #endif
 
-                        algebra::window_table<g1_type> g1_table = get_window_table<g1_type>(
+                        algebra::window_table<g1_type> g1_table = algebra::get_window_table<g1_type>(
                             scalar_field_type::value_bits, g1_window, g1_type::value_type::one());
 
-                        algebra::window_table<g2_type> g2_table = get_window_table<g2_type>(
+                        algebra::window_table<g2_type> g2_table = algebra::get_window_table<g2_type>(
                             scalar_field_type::value_bits, g2_window, g2_type::value_type::one());
 
                         knowledge_commitment_vector<g1_type, g1_type> A_query =

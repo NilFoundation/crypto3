@@ -69,7 +69,7 @@ namespace nil {
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
-                class r1cs_gg_ppzksnark_verifier_process_vk {
+                class r1cs_gg_ppzksnark_process_verification_key {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
@@ -148,7 +148,7 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return process(
-                            r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
+                            r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
                             proof);
                     }
 
@@ -222,7 +222,7 @@ namespace nil {
                                                const proof_type &proof) {
 
                         return process(
-                            r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
+                            r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
                             proof);
 
                     }
@@ -292,7 +292,7 @@ namespace nil {
                             pairing_policy::affine_ate_precompute_g2(verification_key.delta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
-                            verification_key.gamma_ABC_g1.template accumulate_chunk<scalar_field_type>(
+                            verification_key.gamma_ABC_g1.accumulate_chunk<scalar_field_type>(
                                 primary_input.begin(), primary_input.end(), 0);
                         const typename g1_type::value_type &acc = accumulated_IC.first;
 

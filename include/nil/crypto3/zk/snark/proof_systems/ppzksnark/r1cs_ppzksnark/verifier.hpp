@@ -79,7 +79,7 @@ namespace nil {
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
-                class r1cs_ppzksnark_verifier_process_vk {
+                class r1cs_ppzksnark_process_verification_key {
                     typedef detail::r1cs_ppzksnark_policy<CurveType> policy_type;
 
                 public:
@@ -160,7 +160,7 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return process(
-                            r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
+                            r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
                             proof);
                     }
 
@@ -274,7 +274,7 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return process(
-                            r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input,
+                            r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
                             proof);
                     }
 
@@ -362,7 +362,7 @@ namespace nil {
                             pairing_policy::affine_ate_precompute_g2(vk.gamma_beta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
-                            vk.encoded_IC_query.template accumulate_chunk<scalar_field_type>(primary_input.begin(),
+                            vk.encoded_IC_query.accumulate_chunk<scalar_field_type>(primary_input.begin(),
                                                                                              primary_input.end(), 0);
                         assert(accumulated_IC.is_fully_accumulated());
                         const g1_value_type &acc = accumulated_IC.first;

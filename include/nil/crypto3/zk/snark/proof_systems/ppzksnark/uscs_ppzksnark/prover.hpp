@@ -119,7 +119,7 @@ namespace nil {
                             ssp_wit.d * proving_key.V_g1_query[proving_key.V_g1_query.size() - 1];
                         typename CurveType::g1_type::value_type alpha_V_g1 =
                             ssp_wit.d * proving_key.alpha_V_g1_query[proving_key.alpha_V_g1_query.size() - 1];
-                        typename CurveType::g1_type::value_type H_g1 = typename CurveType::g1_type::value_type::zero();
+                        typename CurveType::g1_type::value_type H_g1 = CurveType::g1_type::value_type::zero();
                         typename CurveType::g2_type::value_type V_g2 =
                             proving_key.V_g2_query[0] +
                             ssp_wit.d * proving_key.V_g2_query[proving_key.V_g2_query.size() - 1];

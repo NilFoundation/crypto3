@@ -139,10 +139,12 @@ namespace nil {
                         std::size_t g1_window = algebra::get_exp_window_size<typename CurveType::g1_type>(g1_exp_count);
                         std::size_t g2_window = algebra::get_exp_window_size<typename CurveType::g2_type>(g2_exp_count);
 
-                        algebra::window_table<typename CurveType::g1_type> g1_table = get_window_table(
+                        algebra::window_table<typename CurveType::g1_type> g1_table = algebra::get_window_table<
+                            typename CurveType::g1_type>(
                             CurveType::scalar_field_type::value_bits, g1_window, CurveType::g1_type::value_type::one());
 
-                        algebra::window_table<typename CurveType::g2_type> g2_table = get_window_table(
+                        algebra::window_table<typename CurveType::g2_type> g2_table = algebra::get_window_table<
+                            typename CurveType::g2_type>(
                             CurveType::scalar_field_type::value_bits, g2_window, CurveType::g2_type::value_type::one());
 
                         typename std::vector<typename CurveType::g1_type::value_type> V_g1_query = batch_exp(
@@ -179,7 +181,7 @@ namespace nil {
                             ssp_inst.Zt * CurveType::g2_type::value_type::one();
 
                         typename CurveType::g1_type::value_type encoded_IC_base =
-                            Xt_table[0] * typename CurveType::g1_type::value_type::one();
+                            Xt_table[0] * CurveType::g1_type::value_type::one();
                         typename std::vector<typename CurveType::g1_type::value_type> encoded_IC_values =
                             batch_exp(CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                       std::vector<typename CurveType::scalar_field_type::value_type>(

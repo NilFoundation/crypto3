@@ -56,7 +56,7 @@ namespace nil {
                         generate<basic_proof_system>(example.constraint_system);
 
                     typename basic_proof_system::processed_verification_key_type pvk =
-                        uscs_ppzksnark_verifier_process_vk<CurveType>(keypair.second);
+                        uscs_ppzksnark_process_verification_key<CurveType>(keypair.second);
 
                     typename basic_proof_system::proof_type proof =
                         prove<basic_proof_system>(keypair.first, example.primary_input, example.auxiliary_input);

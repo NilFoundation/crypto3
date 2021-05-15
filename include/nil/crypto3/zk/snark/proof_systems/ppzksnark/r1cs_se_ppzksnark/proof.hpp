@@ -40,7 +40,7 @@ namespace nil {
                  * about the structure for statistics purposes.
                  */
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_proof {
+                struct r1cs_se_ppzksnark_proof {
                     typedef CurveType curve_type;
 
                     typename CurveType::g1_type::value_type A;

@@ -37,13 +37,6 @@ namespace nil {
                 using nil::crypto3::algebra;
 
                 /**
-                 * Runs the ppzkADSNARK (generator, prover, and verifier) for a given
-                 * R1CS example (specified by a constraint system, input, and witness).
-                 */
-                template<typename CurveType>
-                bool run_r1cs_ppzkadsnark(const r1cs_example<typename CurveType::scalar_field_type> &example);
-
-                /**
                  * The code below provides an example of all stages of running a R1CS ppzkADSNARK.
                  *
                  * Of course, in a real-life scenario, we would have three distinct entities,
@@ -64,7 +57,7 @@ namespace nil {
                         r1cs_ppzkadsnark_generator<CurveType>(example.constraint_system, auth_keys.pap);
 
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
-                        r1cs_ppzkadsnark_verifier_process_vk<CurveType>(keypair.vk);
+                        r1cs_ppzkadsnark_process_verification_key<CurveType>(keypair.vk);
 
                     std::vector<typename CurveType::scalar_field_type::value_type> data;
                     data.reserve(example.constraint_system.num_inputs());

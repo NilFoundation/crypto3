@@ -65,11 +65,11 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef typename curve_type::scalar_field_type::value_type fr_type;
 
-                    std::pair<typename curve_type::pairing::fqk_type, fr_type> tab;
-                    std::pair<typename curve_type::pairing::fqk_type, fr_type> uab;
-                    std::pair<typename curve_type::pairing::fqk_type, fr_type> zab;
-                    std::pair<typename curve_type::pairing::fqk_type, fr_type> tc;
-                    std::pair<typename curve_type::pairing::fqk_type, fr_type> uc;
+                    std::pair<typename curve_type::pairing::fqk_type::value_type, fr_type::value_type> tab;
+                    std::pair<typename curve_type::pairing::fqk_type::value_type, fr_type::value_type> uab;
+                    std::pair<typename curve_type::pairing::fqk_type::value_type, fr_type::value_type> zab;
+                    std::pair<typename curve_type::pairing::fqk_type::value_type, fr_type::value_type> tc;
+                    std::pair<typename curve_type::pairing::fqk_type::value_type, fr_type::value_type> uc;
                     std::pair<typename curve_type::pairing::g1_type, fr_type> zc;
                 };
 
@@ -103,8 +103,8 @@ namespace nil {
                                             proof.tmipp.gipa.comms_c.end(), proof.tmipp.gipa.z_c.end())),
                         [&](const std::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                              r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                             const std::pair<typename CurveType::pairing::fqk_type,
-                                                             typename CurveType::pairing::fqk_type> &,
+                                             const std::pair<typename CurveType::pairing::fqk_type::value_type,
+                                                             typename CurveType::pairing::fqk_type::value_type> &,
                                              const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                              r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                              const std::pair<typename CurveType::g1_type::value_type,
@@ -172,8 +172,8 @@ namespace nil {
                                             challenges.end(), challenges_inv.end())),
                         [&](const std::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                              r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                             const std::pair<typename CurveType::pairing::fqk_type,
-                                                             typename CurveType::pairing::fqk_type> &,
+                                             const std::pair<typename CurveType::pairing::fqk_type::value_type,
+                                                             typename CurveType::pairing::fqk_type::value_type> &,
                                              const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                              r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                              const std::pair<typename CurveType::g1_type::value_type,
@@ -222,7 +222,7 @@ namespace nil {
                 template<typename CurveType>
                 PairingCheck<CurveType> verify_tipp_mipp(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
                                                          const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
-                                                         const typename CurveType::scalar_field_type &r_shift) {
+                                                         const typename CurveType::scalar_field_type::value_type &r_shift) {
                     // (T,U), Z for TIPP and MIPP  and all challenges
                     std::tuple<gipa_tuz<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
                                std::vector<typename CurveType::scalar_field_type::value_type>>

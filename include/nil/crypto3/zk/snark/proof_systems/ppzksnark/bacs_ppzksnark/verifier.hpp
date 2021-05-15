@@ -66,7 +66,7 @@ namespace nil {
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
                 template<typename CurveType>
-                class bacs_ppzksnark_verifier_process_vk {
+                class bacs_ppzksnark_process_verification_key {
                     typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
 
                 public:
@@ -83,7 +83,7 @@ namespace nil {
 
                     static inline processed_verification_key_type
                         process(const verification_key_type &verification_key) {
-                        return r1cs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key);
+                        return r1cs_ppzksnark_process_verification_key<CurveType>::process(verification_key);
                     }
                 };
 
@@ -130,7 +130,7 @@ namespace nil {
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return verify<r1cs_ppzksnark_weak_proof_system>(bacs_ppzksnark_verifier_process_vk<CurveType>::process(
+                        return verify<r1cs_ppzksnark_weak_proof_system>(bacs_ppzksnark_process_verification_key<CurveType>::process(
                                            verification_key),
                                        primary_input,
                                        proof);
@@ -175,7 +175,7 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return verify<r1cs_ppzksnark_proof_system>(
-                            bacs_ppzksnark_verifier_process_vk<CurveType>::process(verification_key), primary_input, proof);
+                            bacs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input, proof);
                     }
 
                     /**
