@@ -36,6 +36,9 @@ namespace nil {
             namespace snark {
                 namespace detail {
 
+                    template<typename Type1, typename Type2>
+                    struct knowledge_commitment;
+
                     /********************** Knowledge commitment *********************************/
 
                     /**
@@ -49,6 +52,8 @@ namespace nil {
                      */
                     template<typename Type1, typename Type2>
                     struct element_kc {
+
+                        //using group_type = knowledge_commitment<Type1, Type2>;
 
                         typename Type1::value_type g;
                         typename Type2::value_type h;

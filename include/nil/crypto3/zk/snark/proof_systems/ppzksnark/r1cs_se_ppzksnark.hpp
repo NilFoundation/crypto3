@@ -66,7 +66,7 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verifiy(const typename Verifier::verification_key_type &vk,
+                    static inline bool verify(const typename Verifier::verification_key_type &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);

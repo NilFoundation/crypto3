@@ -114,7 +114,7 @@ namespace nil {
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof proof_type;
+                    typedef typename policy_type::proof_type proof_type;
 
                     static inline proof_type process(const proving_key_type &proving_key,
                                                      const primary_input_type &primary_input,
@@ -150,17 +150,17 @@ namespace nil {
                         g_A = g_A + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
                                         proving_key.A_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
-                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
+                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
                         g_B = g_B + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
                                         proving_key.B_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
-                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
+                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
                         g_C = g_C + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_bos_coster>(
                                         proving_key.C_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
-                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables, chunks);
+                                        qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
                         g_H = g_H + algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.H_query.begin(), proving_key.H_query.begin() + qap_wit.degree + 1,
