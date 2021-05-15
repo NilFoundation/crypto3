@@ -32,8 +32,8 @@
 
 #include <memory>
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
@@ -66,7 +66,7 @@ namespace nil {
                         typedef typename CurveType::pairing::fp_type field_type;
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         g1_precomputation<CurveType> prec_P;
@@ -153,7 +153,7 @@ namespace nil {
                         typedef typename CurveType::pairing::fp_type field_type;
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         bool invert_Q;
@@ -237,7 +237,7 @@ namespace nil {
                         typedef typename CurveType::pairing::fp_type field_type;
                         using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_Ps;
@@ -397,7 +397,7 @@ namespace nil {
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
                         using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P1s;
@@ -609,7 +609,7 @@ namespace nil {
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
                         using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         std::vector<std::shared_ptr<typename component_policy::Fqk_variable_type>> g_RR_at_P1s;

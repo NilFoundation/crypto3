@@ -47,12 +47,18 @@ namespace nil {
                 namespace components {
 
                     template<typename CurveType>
-                    struct check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
+                    class check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
+                        
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
+
+                        using Fqk_variable_type = typename component_policy::Fqk_variable_type;
+
+                    public:
 
                         typedef typename CurveType::scalar_field_type field_type;
 
-                        std::shared_ptr<Fqk_variable<CurveType>> ratio;
-                        std::shared_ptr<e_over_e_miller_loop_component<CurveType>> compute_ratio;
+                        std::shared_ptr<Fqk_variable_type> ratio;
+                        std::shared_ptr<mnt_e_over_e_miller_loop_component<CurveType>> compute_ratio;
                         std::shared_ptr<final_exp_component<CurveType>> check_finexp;
 
                         g1_precomputation<CurveType> lhs_G1;
@@ -70,9 +76,9 @@ namespace nil {
                                                    const variable<field_type> &result) :
                             component<field_type>(bp),
                             lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
-                            ratio.reset(new Fqk_variable<CurveType>(bp));
+                            ratio.reset(new Fqk_variable_type(bp));
                             compute_ratio.reset(
-                                new e_over_e_miller_loop_component<CurveType>(bp, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
+                                new mnt_e_over_e_miller_loop_component<CurveType>(bp, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
                             check_finexp.reset(new final_exp_component<CurveType>(bp, *ratio, result));
                         }
 
@@ -88,12 +94,18 @@ namespace nil {
                     };
 
                     template<typename CurveType>
-                    struct check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
+                    class check_e_equals_ee_component : public component<typename CurveType::scalar_field_type> {
+
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
+
+                        using Fqk_variable_type = typename component_policy::Fqk_variable_type;
+
+                    public:
 
                         typedef typename CurveType::scalar_field_type field_type;
 
-                        std::shared_ptr<Fqk_variable<CurveType>> ratio;
-                        std::shared_ptr<e_times_e_over_e_miller_loop_component<CurveType>> compute_ratio;
+                        std::shared_ptr<Fqk_variable_type> ratio;
+                        std::shared_ptr<mnt_e_times_e_over_e_miller_loop_component<CurveType>> compute_ratio;
                         std::shared_ptr<final_exp_component<CurveType>> check_finexp;
 
                         g1_precomputation<CurveType> lhs_G1;
@@ -116,8 +128,8 @@ namespace nil {
                             component<field_type>(bp),
                             lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
                             rhs2_G2(rhs2_G2), result(result) {
-                            ratio.reset(new Fqk_variable<CurveType>(bp));
-                            compute_ratio.reset(new e_times_e_over_e_miller_loop_component<CurveType>(
+                            ratio.reset(new Fqk_variable_type(bp));
+                            compute_ratio.reset(new mnt_e_times_e_over_e_miller_loop_component<CurveType>(
                                 bp, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
                             check_finexp.reset(new final_exp_component<CurveType>(bp, *ratio, result));
                         }

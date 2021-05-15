@@ -16,8 +16,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
@@ -26,7 +26,7 @@
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -39,7 +39,7 @@ void test_mnt_miller_loop() {
     using curve_pairing_policy = typename curve_type::pairing;
     using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
-    using component_policy = components::basic_pairing_component_policy<CurveType>;
+    using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P_val =
@@ -91,7 +91,7 @@ void test_mnt_e_over_e_miller_loop() {
     using curve_pairing_policy = typename curve_type::pairing;
     using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
-    using component_policy = components::basic_pairing_component_policy<CurveType>;
+    using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P1_val =
@@ -164,7 +164,7 @@ void test_mnt_e_times_e_over_e_miller_loop() {
     using curve_pairing_policy = typename curve_type::pairing;
     using other_curve_pairing_policy = typename pair_curve_type::pairing;
 
-    using component_policy = components::basic_pairing_component_policy<CurveType>;
+    using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
     blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P1_val =

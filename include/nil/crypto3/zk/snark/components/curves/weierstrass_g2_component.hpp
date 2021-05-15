@@ -33,8 +33,8 @@
 
 #include <memory>
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/detail/mnt4.hpp>

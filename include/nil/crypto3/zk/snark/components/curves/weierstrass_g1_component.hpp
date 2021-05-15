@@ -31,8 +31,8 @@
 #ifndef CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
 #define CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 
 #include <nil/crypto3/zk/snark/component.hpp>
 

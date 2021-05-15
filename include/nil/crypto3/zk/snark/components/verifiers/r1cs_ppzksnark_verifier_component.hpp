@@ -36,14 +36,13 @@
 #ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
 #define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_COMPONENT_HPP
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+//#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {

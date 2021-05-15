@@ -32,8 +32,8 @@
 
 #include <memory>
 
-#include <nil/crypto3/algebra/algorithms/pairing.hpp>
-#include <nil/crypto3/algebra/pairing/types.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
@@ -60,7 +60,7 @@ namespace nil {
                     template<typename CurveType>
                     class g1_precomputation {
                         typedef typename CurveType::pairing::fp_type FieldType;
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         std::shared_ptr<g1_variable<CurveType>> P;
@@ -89,7 +89,7 @@ namespace nil {
                     template<typename CurveType>
                     class precompute_G1_component : public component<typename CurveType::scalar_field_type> {
                         using curve_type = CurveType;
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
@@ -157,7 +157,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class precompute_G2_component_coeffs {
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;
@@ -191,7 +191,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class g2_precomputation {
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;
@@ -248,7 +248,7 @@ namespace nil {
                     template<typename CurveType>
                     class precompute_G2_component_doubling_step
                         : public component<typename CurveType::scalar_field_type> {
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;
@@ -281,7 +281,7 @@ namespace nil {
                                 new typename component_policy::Fqe_sqr_component_type(bp, *(cur.RX), *RXsquared));
                             three_RXsquared_plus_a.reset(new typename component_policy::Fqe_variable_type(
                                 (*RXsquared) * typename FieldType::value_type(0x03) +
-                                basic_pairing_component_policy<
+                                detail::basic_pairing_component_policy<
                                     typename CurveType::pairing::pair_curve_type>::g2_coeff_a));
 
                             two_RY.reset(new typename component_policy::Fqe_variable_type(
@@ -365,7 +365,7 @@ namespace nil {
                     template<typename CurveType>
                     class precompute_G2_component_addition_step
                         : public component<typename CurveType::scalar_field_type> {
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;
@@ -463,7 +463,7 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class precompute_G2_component : public component<typename CurveType::scalar_field_type> {
-                        using component_policy = basic_pairing_component_policy<CurveType>;
+                        using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;

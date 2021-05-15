@@ -44,9 +44,9 @@
 
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
+//#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
@@ -55,7 +55,7 @@
 #include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
-#include "../weierstrass_miller_loop.hpp"
+#include "../pairing/weierstrass_miller_loop.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;

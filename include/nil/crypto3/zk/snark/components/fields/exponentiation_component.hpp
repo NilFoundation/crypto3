@@ -47,12 +47,9 @@ namespace nil {
                      * Note that the power is a constant (i.e., hardcoded into the component).
                      */
                     template<typename FpkT,
-                             template<class>
-                             class Fpk_variableT,
-                             template<class>
-                             class Fpk_mul_componentT,
-                             template<class>
-                             class Fpk_sqr_componentT,
+                             template<class> class Fpk_variableT,
+                             template<class> class Fpk_mul_componentT,
+                             template<class> class Fpk_sqr_componentT,
                              typename NumberType = typename FpkT::number_type>
                     class exponentiation_component : component<typename FpkT::base_field_type> {
                     public:
