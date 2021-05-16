@@ -55,7 +55,7 @@ namespace nil {
                     std::vector<typename CurveType::g1_type::value_type> H_query;
                     std::vector<typename CurveType::g1_type::value_type> L_query;
 
-                    constraint_system_type cs;
+                    constraint_system_type constraint_system;
 
                     r1cs_gg_ppzksnark_proving_key() {};
                     r1cs_gg_ppzksnark_proving_key &operator=(const r1cs_gg_ppzksnark_proving_key &other) = default;
@@ -72,11 +72,11 @@ namespace nil {
                         knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> &&B_query,
                         std::vector<typename CurveType::g1_type::value_type> &&H_query,
                         std::vector<typename CurveType::g1_type::value_type> &&L_query,
-                        constraint_system_type &&cs) :
+                        constraint_system_type &&constraint_system) :
                         alpha_g1(std::move(alpha_g1)),
                         beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
                         delta_g2(std::move(delta_g2)), A_query(std::move(A_query)), B_query(std::move(B_query)),
-                        H_query(std::move(H_query)), L_query(std::move(L_query)), cs(std::move(cs)) {};
+                        H_query(std::move(H_query)), L_query(std::move(L_query)), constraint_system(std::move(constraint_system)) {};
 
                     std::size_t G1_size() const {
                         return 1 + A_query.size() + B_query.domain_size() + H_query.size() + L_query.size();
@@ -106,7 +106,7 @@ namespace nil {
                                 this->beta_g2 == other.beta_g2 && this->delta_g1 == other.delta_g1 &&
                                 this->delta_g2 == other.delta_g2 && this->A_query == other.A_query &&
                                 this->B_query == other.B_query && this->H_query == other.H_query &&
-                                this->L_query == other.L_query && this->cs == other.cs);
+                                this->L_query == other.L_query && this->constraint_system == other.constraint_system);
                     }
                 };
             }    // namespace snark

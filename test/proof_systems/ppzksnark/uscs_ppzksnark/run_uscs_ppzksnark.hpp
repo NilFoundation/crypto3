@@ -31,6 +31,12 @@
 
 #include "uscs_examples.hpp"
 
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -56,7 +62,7 @@ namespace nil {
                         generate<basic_proof_system>(example.constraint_system);
 
                     typename basic_proof_system::processed_verification_key_type pvk =
-                        uscs_ppzksnark_process_verification_key<CurveType>(keypair.second);
+                        uscs_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     typename basic_proof_system::proof_type proof =
                         prove<basic_proof_system>(keypair.first, example.primary_input, example.auxiliary_input);

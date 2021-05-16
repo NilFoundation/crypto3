@@ -26,7 +26,14 @@
 #ifndef CRYPTO3_RUN_TBCS_PPZKSNARK_HPP
 #define CRYPTO3_RUN_TBCS_PPZKSNARK_HPP
 
-#include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/examples/tbcs_examples.hpp>
+#include "tbcs_examples.hpp"
+
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
+
 
 namespace nil {
     namespace crypto3 {
@@ -56,7 +63,7 @@ namespace nil {
 
                     std::cout << "Preprocess verification key" << std::endl;
                     typename basic_proof_system::processed_verification_key_type pvk =
-                        tbcs_ppzksnark_process_verification_key<CurveType>(keypair.second);
+                        tbcs_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     std::cout << "TBCS ppzkSNARK Prover" << std::endl;
                     typename basic_proof_system::proof_type proof =

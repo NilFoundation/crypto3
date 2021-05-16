@@ -228,24 +228,6 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_online_verifier_strong_input_consistency {
-                    typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
-
-                public:
-                    typedef typename policy_type::constraint_system_type constraint_system_type;
-                    typedef typename policy_type::primary_input_type primary_input_type;
-                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
-
-                    typedef typename policy_type::proving_key_type proving_key_type;
-                    typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-
-                    typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::proof_type proof_type;
-
-                };
-
-                template<typename CurveType>
                 class r1cs_se_ppzksnark_verifier_strong_input_consistency {
                     typedef detail::r1cs_se_ppzksnark_types_policy<CurveType> policy_type;
 

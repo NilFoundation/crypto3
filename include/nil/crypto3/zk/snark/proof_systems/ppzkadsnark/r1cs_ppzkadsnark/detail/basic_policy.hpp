@@ -782,9 +782,6 @@ namespace nil {
                                                                                std::move(rA_i_Z_g1),
                                                                                std::move(cs_copy));
 
-                            pk.print_size();
-                            vk.print_size();
-
                             return keypair<CurveType>(std::move(pk), std::move(vk));
                         }
 
@@ -929,7 +926,6 @@ namespace nil {
                                                                       std::move(g_K),
                                                                       std::move(g_Ain),
                                                                       std::move(muA));
-                            proof.print_size();
 
                             return proof;
                         }

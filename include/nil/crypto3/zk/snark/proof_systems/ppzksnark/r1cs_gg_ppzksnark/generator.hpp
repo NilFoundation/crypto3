@@ -106,10 +106,10 @@ namespace nil {
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline keypair_type process(const constraint_system_type &cs) {
+                    static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                         /* Make the B_query "lighter" if possible */
-                        constraint_system_type r1cs_copy(cs);
+                        constraint_system_type r1cs_copy(constraint_system);
                         r1cs_copy.swap_AB_if_beneficial();
 
                         /* Generate secret randomness */

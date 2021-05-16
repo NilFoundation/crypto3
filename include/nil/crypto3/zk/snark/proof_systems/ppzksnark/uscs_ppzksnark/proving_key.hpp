@@ -46,7 +46,7 @@ namespace nil {
                     std::vector<typename CurveType::g1_type::value_type> H_g1_query;
                     std::vector<typename CurveType::g2_type::value_type> V_g2_query;
 
-                    constraint_system_type cs;
+                    constraint_system_type constraint_system;
 
                     uscs_ppzksnark_proving_key() {};
                     uscs_ppzksnark_proving_key &operator=(const uscs_ppzksnark_proving_key &other) = default;
@@ -56,10 +56,10 @@ namespace nil {
                                                std::vector<typename CurveType::g1_type::value_type> &&alpha_V_g1_query,
                                                std::vector<typename CurveType::g1_type::value_type> &&H_g1_query,
                                                std::vector<typename CurveType::g2_type::value_type> &&V_g2_query,
-                                               constraint_system_type &&cs) :
+                                               constraint_system_type &&constraint_system) :
                         V_g1_query(std::move(V_g1_query)),
                         alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
-                        V_g2_query(std::move(V_g2_query)), cs(std::move(cs)) {};
+                        V_g2_query(std::move(V_g2_query)), constraint_system(std::move(constraint_system)) {};
 
                     std::size_t G1_size() const {
                         return V_g1_query.size() + alpha_V_g1_query.size() + H_g1_query.size();
@@ -85,7 +85,7 @@ namespace nil {
                         return (this->V_g1_query == other.V_g1_query &&
                                 this->alpha_V_g1_query == other.alpha_V_g1_query &&
                                 this->H_g1_query == other.H_g1_query && this->V_g2_query == other.V_g2_query &&
-                                this->cs == other.cs);
+                                this->constraint_system == other.constraint_system);
                     }
                 };
             }    // namespace snark

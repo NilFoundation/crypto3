@@ -54,6 +54,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/proving_key.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 
@@ -86,11 +87,13 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type field_type;
 
                         const uscs_constraint_system<field_type> uscs_cs =
-                            reductions::tbcs_to_uscs<field_type>::instance_map<field_type>(circuit);
+                            reductions::tbcs_to_uscs<field_type>::instance_map(circuit);
                         const typename uscs_ppzksnark<CurveType>::keypair_type uscs_keypair =
                             generate<uscs_ppzksnark<CurveType>>(uscs_cs);
 
-                        return {{circuit, uscs_keypair.first}, uscs_keypair.second};
+                        proving_key_type pk = proving_key_type(std::move(circuit), std::move(uscs_keypair.first));
+
+                        return keypair_type(std::move(pk), std::move(uscs_keypair.second));
                     }
                 };
             }    // namespace snark

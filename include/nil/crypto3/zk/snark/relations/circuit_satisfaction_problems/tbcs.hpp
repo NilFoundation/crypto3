@@ -215,8 +215,11 @@ namespace nil {
 
                     bool is_satisfied(const tbcs_primary_input &primary_input,
                                       const tbcs_auxiliary_input &auxiliary_input) const {
-                        if (all_output) {
-                            return false;
+                        const tbcs_variable_assignment all_outputs = get_all_outputs(primary_input, auxiliary_input);
+                        for (size_t i = 0; i < all_outputs.size(); ++i) {
+                            if (all_outputs[i]) {
+                                return false;
+                            }
                         }
 
                         return true;

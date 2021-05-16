@@ -55,6 +55,8 @@
 #include <nil/crypto3/zk/snark/reductions/tbcs_to_uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
 
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -97,7 +99,7 @@ namespace nil {
                             uscs_va.begin() + primary_input.size(),
                             uscs_va.end());    // TODO: faster to just change bacs_to_r1cs<field_type>::witness_map into two :(
 
-                        return uscs_ppzksnark<CurveType>::prover(pk.uscs_pk, uscs_pi, uscs_ai);
+                        return prove<uscs_ppzksnark<CurveType>>(pk.uscs_pk, uscs_pi, uscs_ai);
                     }
                 };
             }    // namespace snark

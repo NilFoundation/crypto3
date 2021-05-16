@@ -107,11 +107,11 @@ namespace nil {
                                                      const primary_input_type &primary_input,
                                                      const auxiliary_input_type &auxiliary_input) {
 
-                        assert(proving_key.cs.is_satisfied(primary_input, auxiliary_input));
+                        assert(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
 
                         const qap_witness<scalar_field_type> qap_wit =
                             reductions::r1cs_to_qap<scalar_field_type>::witness_map(
-                                proving_key.cs, primary_input, auxiliary_input, scalar_field_type::value_type::zero(),
+                                proving_key.constraint_system, primary_input, auxiliary_input, scalar_field_type::value_type::zero(),
                                 scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero());
 
                         /* We are dividing degree 2(d-1) polynomial by degree d polynomial

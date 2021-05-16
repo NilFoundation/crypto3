@@ -125,7 +125,7 @@ namespace nil {
                                                                      d3 = algebra::random_element<scalar_field_type>();
 
                         const qap_witness<scalar_field_type> qap_wit =
-                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(proving_key.cs, primary_input,
+                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(proving_key.constraint_system, primary_input,
                                                                                     auxiliary_input, d1, d2, d3);
 
                         typename knowledge_commitment<g1_type, g1_type>::value_type g_A =

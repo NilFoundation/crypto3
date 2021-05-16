@@ -36,6 +36,13 @@
 #include "uscs_examples.hpp"
 #include "run_uscs_ppzksnark.hpp"
 
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
+
 using namespace nil::crypto3::zk::snark;
 
 template<typename CurveType>
@@ -49,7 +56,7 @@ void test_uscs_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
 BOOST_AUTO_TEST_SUITE(uscs_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(uscs_ppzksnark_test) {
-    test_uscs_ppzksnark<default_uscs_ppzksnark_pp>(1000, 100);
+    test_uscs_ppzksnark<curves::mnt4<298>>(1000, 100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -89,7 +89,7 @@ namespace nil {
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::proof_type proof_type;
 
-                    static inline keypair_type process(const constraint_system_type &cs) {
+                    static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                         /* draw random element at which the SSP is evaluated */
 
@@ -100,7 +100,7 @@ namespace nil {
 
                         ssp_instance_evaluation<typename CurveType::scalar_field_type> ssp_inst =
                             reductions::uscs_to_ssp<
-                                typename CurveType::scalar_field_type>::instance_map_with_evaluation(cs, t);
+                                typename CurveType::scalar_field_type>::instance_map_with_evaluation(constraint_system, t);
 
                         /* construct various tables of typename FieldType::value_type elements */
 
@@ -113,19 +113,19 @@ namespace nil {
 
                         std::vector<typename CurveType::scalar_field_type::value_type> Xt_table =
                             std::vector<typename CurveType::scalar_field_type::value_type>(
-                                Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
+                                Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs + 1);
                         std::vector<typename CurveType::scalar_field_type::value_type> Vt_table_minus_Xt_table =
                             std::vector<typename CurveType::scalar_field_type::value_type>(
-                                Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
+                                Vt_table.begin() + ssp_inst.num_inputs + 1, Vt_table.end());
 
                         /* sanity checks */
 
-                        assert(Vt_table.size() == ssp_inst.num_variables() + 2);
-                        assert(Ht_table.size() == ssp_inst.degree() + 1);
-                        assert(Xt_table.size() == ssp_inst.num_inputs() + 1);
+                        assert(Vt_table.size() == ssp_inst.num_variables + 2);
+                        assert(Ht_table.size() == ssp_inst.degree + 1);
+                        assert(Xt_table.size() == ssp_inst.num_inputs + 1);
                         assert(Vt_table_minus_Xt_table.size() ==
-                               ssp_inst.num_variables() + 2 - ssp_inst.num_inputs() - 1);
-                        for (std::size_t i = 0; i < ssp_inst.num_inputs() + 1; ++i) {
+                               ssp_inst.num_variables + 2 - ssp_inst.num_inputs - 1);
+                        for (std::size_t i = 0; i < ssp_inst.num_inputs + 1; ++i) {
                             assert(!Xt_table[i].is_zero());
                         }
 
@@ -147,27 +147,27 @@ namespace nil {
                             typename CurveType::g2_type>(
                             CurveType::scalar_field_type::value_bits, g2_window, CurveType::g2_type::value_type::one());
 
-                        typename std::vector<typename CurveType::g1_type::value_type> V_g1_query = batch_exp(
+                        typename std::vector<typename CurveType::g1_type::value_type> V_g1_query = algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(
                             CurveType::scalar_field_type::value_bits, g1_window, g1_table, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(V_g1_query);
 #endif
 
                         typename std::vector<typename CurveType::g1_type::value_type> alpha_V_g1_query =
-                            batch_exp_with_coeff(CurveType::scalar_field_type::value_bits, g1_window, g1_table, alpha,
+                            algebra::batch_exp_with_coeff<typename CurveType::g1_type, typename CurveType::scalar_field_type>(CurveType::scalar_field_type::value_bits, g1_window, g1_table, alpha,
                                                  Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(alpha_V_g1_query);
 #endif
 
                         typename std::vector<typename CurveType::g1_type::value_type> H_g1_query =
-                            batch_exp(CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht_table);
+                            algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(CurveType::scalar_field_type::value_bits, g1_window, g1_table, Ht_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g1_type>(H_g1_query);
 #endif
 
                         typename std::vector<typename CurveType::g2_type::value_type> V_g2_query =
-                            batch_exp(CurveType::scalar_field_type::value_bits, g2_window, g2_table, Vt_table);
+                            algebra::batch_exp<typename CurveType::g2_type, typename CurveType::scalar_field_type>(CurveType::scalar_field_type::value_bits, g2_window, g2_table, Vt_table);
 #ifdef USE_MIXED_ADDITION
                         algebra::batch_to_special<typename CurveType::g2_type>(V_g2_query);
 #endif
@@ -183,7 +183,7 @@ namespace nil {
                         typename CurveType::g1_type::value_type encoded_IC_base =
                             Xt_table[0] * CurveType::g1_type::value_type::one();
                         typename std::vector<typename CurveType::g1_type::value_type> encoded_IC_values =
-                            batch_exp(CurveType::scalar_field_type::value_bits, g1_window, g1_table,
+                            algebra::batch_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type>(CurveType::scalar_field_type::value_bits, g1_window, g1_table,
                                       std::vector<typename CurveType::scalar_field_type::value_type>(
                                           Xt_table.begin() + 1, Xt_table.end()));
 
@@ -193,15 +193,12 @@ namespace nil {
                         verification_key_type vk =
                             verification_key_type(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
 
-                        constraint_system_type cs_copy = cs;
+                        constraint_system_type cs_copy = constraint_system;
                         proving_key_type pk = proving_key_type(std::move(V_g1_query),
                                                                std::move(alpha_V_g1_query),
                                                                std::move(H_g1_query),
                                                                std::move(V_g2_query),
                                                                std::move(cs_copy));
-
-                        pk.print_size();
-                        vk.print_size();
 
                         return keypair_type(std::move(pk), std::move(vk));
                     }

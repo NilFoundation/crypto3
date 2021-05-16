@@ -89,6 +89,8 @@ namespace nil {
                 class uscs_ppzksnark_process_verification_key {
                     typedef detail::uscs_ppzksnark_policy<CurveType> policy_type;
 
+                    typedef typename CurveType::pairing pairing_policy;
+
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -106,15 +108,15 @@ namespace nil {
                         processed_verification_key_type pvk;
 
                         pvk.pp_G1_one_precomp =
-                            CurveType::precompute_g1(CurveType::g1_type::value_type::one());
+                            pairing_policy::precompute_g1(CurveType::g1_type::value_type::one());
                         pvk.pp_G2_one_precomp =
-                            CurveType::precompute_g2(CurveType::g2_type::value_type::one());
+                            pairing_policy::precompute_g2(CurveType::g2_type::value_type::one());
 
-                        pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
-                        pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);
-                        pvk.vk_Z_g2_precomp = CurveType::precompute_g2(vk.Z_g2);
+                        pvk.vk_tilde_g2_precomp = pairing_policy::precompute_g2(vk.tilde_g2);
+                        pvk.vk_alpha_tilde_g2_precomp = pairing_policy::precompute_g2(vk.alpha_tilde_g2);
+                        pvk.vk_Z_g2_precomp = pairing_policy::precompute_g2(vk.Z_g2);
 
-                        pvk.pairing_of_g1_and_g2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
+                        pvk.pairing_of_g1_and_g2 = pairing_policy::miller_loop(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
 
                         pvk.encoded_IC_query = vk.encoded_IC_query;
 
@@ -165,7 +167,7 @@ namespace nil {
                         assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
                         const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                            pvk.encoded_IC_query.accumulate_chunk<typename CurveType::scalar_field_type>(
+                            pvk.encoded_IC_query.accumulate_chunk(
                                 primary_input.begin(), primary_input.end(), 0);
                         assert(accumulated_IC.is_fully_accumulated());
                         const typename CurveType::g1_type::value_type &acc = accumulated_IC.first;
@@ -247,7 +249,7 @@ namespace nil {
                     static inline bool process(const verification_key_type &vk,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                        return uscs_ppzksnark_verifier_strong_input_consistency<CurveType>::process(
                             uscs_ppzksnark_process_verification_key<CurveType>::process(vk), primary_input, proof);
                     }
 
@@ -265,7 +267,7 @@ namespace nil {
                         if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
                             result = false;
                         } else {
-                            result = uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                            result = uscs_ppzksnark_verifier_weak_input_consistency<CurveType>::process(
                                 pvk, primary_input, proof);
                         }
 

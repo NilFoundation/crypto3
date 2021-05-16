@@ -28,6 +28,11 @@
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
 namespace nil {
     namespace crypto3 {

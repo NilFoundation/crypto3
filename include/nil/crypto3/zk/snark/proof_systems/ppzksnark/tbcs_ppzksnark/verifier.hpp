@@ -56,6 +56,8 @@
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/detail/basic_policy.hpp>
 
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -103,6 +105,11 @@ namespace nil {
                 class tbcs_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
+                    using uscs_ppzksnark_weak_proof_system = uscs_ppzksnark<CurveType,
+                                          uscs_ppzksnark_generator<CurveType>,
+                                          uscs_ppzksnark_prover<CurveType>,
+                                          uscs_ppzksnark_verifier_weak_input_consistency<CurveType>>;
+
                 public:
                     typedef CurveType curve_type;
 
@@ -128,7 +135,7 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type field_type;
                         const uscs_primary_input<field_type> uscs_input =
                             algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
-                        return uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
+                        return verify<uscs_ppzksnark_weak_proof_system>(
                             tbcs_ppzksnark_process_verification_key<CurveType>::process(vk), uscs_input, proof);
                     }
 
@@ -145,8 +152,7 @@ namespace nil {
                         const uscs_primary_input<field_type> uscs_input =
                             algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                        return uscs_ppzksnark_online_verifier_weak_input_consistency<CurveType>::process(
-                            pvk, uscs_input, proof);
+                        return verify<uscs_ppzksnark_weak_proof_system>(pvk, uscs_input, proof);
                     }
                 };
 
@@ -154,6 +160,7 @@ namespace nil {
                 class tbcs_ppzksnark_verifier_strong_input_consistency {
                     typedef detail::tbcs_ppzksnark_policy<CurveType> policy_type;
 
+                    using uscs_ppzksnark_proof_system = uscs_ppzksnark<CurveType>;
                 public:
                     typedef typename policy_type::circuit_type circuit_type;
                     typedef typename policy_type::primary_input_type primary_input_type;
@@ -178,7 +185,7 @@ namespace nil {
                         const uscs_primary_input<field_type> uscs_input =
                             algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
+                        return verify<uscs_ppzksnark_proof_system>(
                             tbcs_ppzksnark_process_verification_key<CurveType>::process(vk), uscs_input, proof);
                     }
 
@@ -194,8 +201,7 @@ namespace nil {
                         const uscs_primary_input<field_type> uscs_input =
                             algebra::convert_bit_vector_to_field_element_vector<field_type>(primary_input);
 
-                        return uscs_ppzksnark_online_verifier_strong_input_consistency<CurveType>::process(
-                            pvk, uscs_input, proof);
+                        return verify<uscs_ppzksnark_proof_system>(pvk, uscs_input, proof);
                     }
                 };
             }    // namespace snark
