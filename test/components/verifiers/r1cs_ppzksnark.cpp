@@ -56,6 +56,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark.hpp>
 
 #include "../pairing/weierstrass_miller_loop.hpp"
+#include "../r1cs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -75,8 +76,8 @@ void test_verifier() {
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
     const r1cs_ppzksnark_keypair<ppT_A> keypair = r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
     const r1cs_ppzksnark_proof<ppT_A> pi =
-        r1cs_ppzksnark_prover<ppT_A>(keypair.pk, example.primary_input, example.auxiliary_input);
-    bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.vk, example.primary_input, pi);
+        r1cs_ppzksnark_prover<ppT_A>(keypair.first, example.primary_input, example.auxiliary_input);
+    bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.second, example.primary_input, pi);
     BOOST_CHECK(bit);
 
     const std::size_t elt_size = FieldT_A::size_in_bits();
@@ -111,7 +112,7 @@ void test_verifier() {
 
     primary_input_bits.fill_with_bits(bp, input_as_bits);
 
-    vk.generate_r1cs_witness(keypair.vk);
+    vk.generate_r1cs_witness(keypair.second);
     proof.generate_r1cs_witness(pi);
     verifier.generate_r1cs_witness();
     bp.val(result) = FieldT_B::one();
@@ -143,15 +144,15 @@ void test_hardcoded_verifier() {
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
     const r1cs_ppzksnark_keypair<ppT_A> keypair = r1cs_ppzksnark_generator<ppT_A>(example.constraint_system);
     const r1cs_ppzksnark_proof<ppT_A> pi =
-        r1cs_ppzksnark_prover<ppT_A>(keypair.pk, example.primary_input, example.auxiliary_input);
-    bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.vk, example.primary_input, pi);
+        r1cs_ppzksnark_prover<ppT_A>(keypair.first, example.primary_input, example.auxiliary_input);
+    bool bit = r1cs_ppzksnark_verifier_strong_input_consistency<ppT_A>(keypair.second, example.primary_input, pi);
     BOOST_CHECK(bit);
 
     const std::size_t elt_size = FieldT_A::size_in_bits();
     const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
     blueprint<FieldT_B> bp;
-    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.vk);
+    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.second);
     blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(bp, primary_input_size_in_bits);
 

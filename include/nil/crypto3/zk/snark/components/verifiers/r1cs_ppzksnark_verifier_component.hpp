@@ -324,7 +324,7 @@ namespace nil {
 
                         r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable(
                             blueprint<FieldType> &bp,
-                            const r1cs_ppzksnark<typename CurveType::pairing::pair_curve_type>::verification_key
+                            const typename r1cs_ppzksnark<typename CurveType::pairing::pair_curve_type>::verification_key
                                 &r1cs_vk) {
 
                             encoded_IC_base.reset(new g1_variable<CurveType>(bp, r1cs_vk.encoded_IC_query.first));

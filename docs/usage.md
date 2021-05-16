@@ -175,7 +175,7 @@ are used.
 
 * The generator `grth16::generator` creates proving keys and verification keys for 
 our constraints system. 
-* The proving key `keypair.pk`, public input `bp.primary_input`, and private input 
+* The proving key `keypair.first`, public input `bp.primary_input`, and private input 
 `bp.auxiliary_input` are used for the constructing of the proof (`grth16::prover`). 
 
 ```c++
@@ -183,7 +183,7 @@ using grth16 = r1cs_gg_ppzksnark<curve_type>;
 typename grth16::keypair_type keypair = grth16::generator(bp.get_constraint_system());
 
 typename grth16::proof_type proof =
-    grth16::prover(keypair.pk, bp.primary_input, bp.auxiliary_input);
+    grth16::prover(keypair.first, bp.primary_input, bp.auxiliary_input);
 
 ```
 
