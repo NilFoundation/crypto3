@@ -29,8 +29,8 @@
 #include <nil/crypto3/zk/snark/relations/ram_computations/memory/examples/memory_contents_examples.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/examples/run_ram_zksnark.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/zksnark/ram_zksnark/ram_zksnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/zksnark/ram_zksnark/examples/run_ram_zksnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/zksnark/ram_zksnark/ram_zksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 

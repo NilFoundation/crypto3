@@ -27,7 +27,7 @@
 
 #include <nil/crypto3/zk/snark/default_types/bacs_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/examples/bacs_examples.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/bacs_ppzksnark/examples/run_bacs_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/bacs_ppzksnark/examples/run_bacs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 
