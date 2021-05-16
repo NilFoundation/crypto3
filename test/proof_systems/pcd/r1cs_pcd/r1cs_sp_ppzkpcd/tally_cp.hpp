@@ -29,8 +29,8 @@
 // (2) it enables us to test r1cs_pcd functionalities.
 //
 // See
-// - snark/proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/examples/run_r1cs_sp_ppzkpcd.hpp
-// - snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp
+// - snark/schemes/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/examples/run_r1cs_sp_ppzkpcd.hpp
+// - snark/schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/examples/run_r1cs_mp_ppzkpcd.hpp
 // for code that uses the tally compliance predicate.
 //---------------------------------------------------------------------------//
 
@@ -39,8 +39,8 @@
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
+#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate.hpp>
+#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
     namespace crypto3 {

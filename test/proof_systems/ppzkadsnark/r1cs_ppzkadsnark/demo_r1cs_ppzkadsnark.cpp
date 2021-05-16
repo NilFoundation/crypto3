@@ -30,7 +30,7 @@
 #include <vector>
 
 #include <nil/crypto3/zk/snark/default_types/r1cs_ppzkadsnark_pp.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/examples/run_r1cs_ppzkadsnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzkadsnark/r1cs_ppzkadsnark/examples/run_r1cs_ppzkadsnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
 

@@ -50,7 +50,7 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
-#include "../../proof_systems/ppzksnark/r1cs_examples.hpp"
+#include "../../schemes/ppzksnark/r1cs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;

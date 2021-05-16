@@ -27,8 +27,8 @@
 #define CRYPTO3_RUN_RAM_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp>
-#include <nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/ram_ppzksnark.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>

@@ -34,7 +34,7 @@
 
 #include "tally_cp.hpp"
 
-#include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd.hpp>
+#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd.hpp>
 
 namespace nil {
     namespace crypto3 {

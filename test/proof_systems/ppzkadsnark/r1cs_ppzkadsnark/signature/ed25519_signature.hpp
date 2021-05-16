@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_ED25519SIG_HPP
 #define CRYPTO3_ZK_ED25519SIG_HPP
 
-#include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
 namespace nil {
     namespace crypto3 {
