@@ -292,7 +292,7 @@ namespace nil {
                             pairing_policy::affine_ate_precompute_g2(verification_key.delta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
-                            verification_key.gamma_ABC_g1.accumulate_chunk<scalar_field_type>(
+                            verification_key.gamma_ABC_g1.accumulate_chunk(
                                 primary_input.begin(), primary_input.end(), 0);
                         const typename g1_type::value_type &acc = accumulated_IC.first;
 
