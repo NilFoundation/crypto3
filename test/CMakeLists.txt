@@ -46,17 +46,17 @@ set(TESTS_NAMES
     "relations/numeric/sap"
     "relations/numeric/ssp"
 
-    "proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
-    "proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
+    "schemes/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
+    "schemes/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
 
-    "proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
-    "proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
-    "proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
-    "proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
-    "proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
-    "proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
-    "proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
-    "proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark")
+    "schemes/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
+    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
+    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
+    "schemes/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
+    "schemes/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
+    "schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark"
+    "schemes/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
+    "schemes/ppzksnark/uscs_ppzksnark/uscs_ppzksnark")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
