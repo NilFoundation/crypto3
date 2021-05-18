@@ -14,6 +14,7 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::algebra;
 using namespace std;
 
 int main(){
@@ -21,13 +22,15 @@ int main(){
 
   default_r1cs_ppzksnark_pp::init_public_params();
 
-  typedef libff::Fr<default_r1cs_ppzksnark_pp> FieldT;
+
+  using curve_type = curves::bls12<381>;
+  using field_type = typename curve_type::scalar_field_type;
   
   // Create blueprint
 
-  blueprint<FieldT> bp;
-  blueprint_variable<FieldT> out;
-  blueprint_variable<FieldT> x;
+  blueprint<field_type> bp;
+  blueprint_variable<field_type> out;
+  blueprint_variable<field_type> x;
 
   // Allocate variables
 
@@ -42,7 +45,7 @@ int main(){
 
   // Initialize gadget
 
-  test_gadget<FieldT> g(bp, out, x);
+  test_gadget<field_type> g(bp, out, x);
   g.generate_r1cs_constraints();
   
   // Add witness values
@@ -52,20 +55,18 @@ int main(){
 
   g.generate_r1cs_witness();
   
-  const r1cs_constraint_system<FieldT> constraint_system = bp.get_constraint_system();
+  const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-  const typename r1cs_gg_ppzksnark<bls12<381>>::keypair_type keypair = generate<r1cs_gg_ppzksnark<bls12<381>>>(constraint_system);
+  const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
 
-  const typename r1cs_gg_ppzksnark<bls12<381>>::proof_type proof = prove<r1cs_gg_ppzksnark<bls12<381>>>(keypair.pk, bp.primary_input(), bp.auxiliary_input());
+  const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.pk, bp.primary_input(), bp.auxiliary_input());
 
-  bool verified = verify<r1cs_gg_ppzksnark<bls12<381>>>(keypair.vk, bp.primary_input(), proof);
+  bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.vk, bp.primary_input(), proof);
 
-  cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
-  cout << "Primary (public) input: " << bp.primary_input() << endl;
-  cout << "Auxiliary (private) input: " << bp.auxiliary_input() << endl;
-  cout << "Verification status: " << verified << endl;
+  std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
+  std::cout << "Verification status: " << verified << std::endl;
 
-  const typename r1cs_gg_ppzksnark<bls12<381>>::verification_key_type vk = keypair.vk;
+  const typename r1cs_gg_ppzksnark<curve_type>::verification_key_type vk = keypair.vk;
 
   return 0;
 }
