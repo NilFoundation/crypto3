@@ -50,10 +50,10 @@ primary input is allocated before the auxiliary input in the program.
 *Component* is a class for constructing a particular constraint system. The component's 
 constructor allocates intermediate variables, so the developer is responsible for 
 allocation only primary and auxiliary variables. Any Component has to implement 
-two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
+at least two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
 
 Now we initialize the simple component `inner_product_component`. The function `generate_r1cs_constraints()` 
-add R1CS constraints to the blueprint corresponding to the circuit. 
+adds R1CS constraints to the blueprint corresponding to the circuit. 
 
 
 ```c++
