@@ -29,7 +29,7 @@
 /*
   Split out from multiexp to prevent cyclical
   dependencies. I.e. previously multiexp dependend on
-  knowledge_commitment, which dependend on sparse_vector, which
+  commitments, which dependend on sparse_vector, which
   dependend on multiexp (to do accumulate).
 
   Will probably go away in more general exp refactoring.
@@ -188,7 +188,7 @@ namespace nil {
                             scalar_size, T1_window, T2_window, T1_table, T2_table, T1_coeff, T2_coeff, v, chunk_pos[i],
                             chunk_pos[i + 1], i == num_chunks - 1 ? last_chunk : chunk_size);
 #ifdef USE_MIXED_ADDITION
-                        algebra::batch_to_special<typename knowledge_commitment<T1, T2>::value_type>(tmp[i].values);
+                        algebra::batch_to_special<typename commitments<T1, T2>::value_type>(tmp[i].values);
 #endif
                     }
 
