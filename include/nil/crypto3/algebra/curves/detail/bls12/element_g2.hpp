@@ -426,13 +426,13 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_bls12_g2() : element_bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$
                          *
                          */
-                        element_bls12_g2(underlying_field_value_type X,
+                        constexpr element_bls12_g2(underlying_field_value_type X,
                                          underlying_field_value_type Y,
                                          underlying_field_value_type Z) {
                             this->X = X;
@@ -443,20 +443,20 @@ namespace nil {
                         /** @brief Get the point at infinity
                          *
                          */
-                        static element_bls12_g2 zero() {
+                        constexpr static element_bls12_g2 zero() {
                             return element_bls12_g2();
                         }
 
                         /** @brief Get the generator of group G2
                          *
                          */
-                        static element_bls12_g2 one() {
+                        constexpr static element_bls12_g2 one() {
                             return element_bls12_g2(one_fill[0], one_fill[1], one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        bool operator==(const element_bls12_g2 &other) const {
+                        constexpr bool operator==(const element_bls12_g2 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -491,7 +491,7 @@ namespace nil {
                             return true;
                         }
 
-                        bool operator!=(const element_bls12_g2 &other) const {
+                        constexpr bool operator!=(const element_bls12_g2 &other) const {
                             return !(operator==(other));
                         }
 
@@ -499,14 +499,14 @@ namespace nil {
                          *
                          * @return true if element from group G2 is the point at infinity
                          */
-                        bool is_zero() const {
+                        constexpr bool is_zero() const {
                             return (this->Z.is_zero());
                         }
                         /** @brief
                          *
                          * @return true if element from group G2 in affine coordinates
                          */
-                        bool is_special() const {
+                        constexpr bool is_special() const {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
@@ -514,7 +514,7 @@ namespace nil {
                          *
                          * @return true if element from group G2 lies on the elliptic curve
                          */
-                        bool is_well_formed() const {
+                        constexpr bool is_well_formed() const {
                             if (this->is_zero()) {
                                 return true;
                             } else {
@@ -541,7 +541,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        element_bls12_g2 operator=(const element_bls12_g2 &other) {
+                        constexpr element_bls12_g2 operator=(const element_bls12_g2 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -550,7 +550,7 @@ namespace nil {
                             return *this;
                         }
 
-                        element_bls12_g2 operator+(const element_bls12_g2 &other) const {
+                        constexpr element_bls12_g2 operator+(const element_bls12_g2 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -567,11 +567,11 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        element_bls12_g2 operator-() const {
+                        constexpr element_bls12_g2 operator-() const {
                             return element_bls12_g2(this->X, -(this->Y), this->Z);
                         }
 
-                        element_bls12_g2 operator-(const element_bls12_g2 &other) const {
+                        constexpr element_bls12_g2 operator-(const element_bls12_g2 &other) const {
                             return (*this) + (-other);
                         }
 
@@ -579,7 +579,7 @@ namespace nil {
                          *
                          * @return doubled element from group G2
                          */
-                        element_bls12_g2 doubled() const {
+                        constexpr element_bls12_g2 doubled() const {
                             // handle point at infinity
                             if (this->is_zero()) {
                                 return (*this);
@@ -610,7 +610,7 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
-                        element_bls12_g2 mixed_add(const element_bls12_g2 &other) const {
+                        constexpr element_bls12_g2 mixed_add(const element_bls12_g2 &other) const {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -670,7 +670,7 @@ namespace nil {
                         }
 
                     private:
-                        element_bls12_g2 add(const element_bls12_g2 &other) const {
+                        constexpr element_bls12_g2 add(const element_bls12_g2 &other) const {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
@@ -702,7 +702,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_bls12_g2 to_affine() const {
+                        constexpr element_bls12_g2 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -724,7 +724,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from group G2 in affine coordinates
                          */
-                        element_bls12_g2 to_projective() const {
+                        constexpr element_bls12_g2 to_projective() const {
                             return this->to_affine();
                         }
 
@@ -750,18 +750,6 @@ namespace nil {
                                 0x185067C6CA76D992F064A432BD9F9BE832B0CAC2D824D0518F77D39E76C3E146AFB825F2092218D038867D7F337A010_cppui377),
                             underlying_field_value_type::one()};
                     };
-
-                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
-                        element_bls12_g2<377>::zero_fill;
-
-                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
-                        element_bls12_g2<377>::one_fill;
-
-                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
-                        element_bls12_g2<377>::zero_fill;
-
-                    constexpr std::array<typename element_bls12_g2<377>::underlying_field_value_type, 3> const
-                        element_bls12_g2<377>::one_fill;
 
                 }    // namespace detail
             }        // namespace curves

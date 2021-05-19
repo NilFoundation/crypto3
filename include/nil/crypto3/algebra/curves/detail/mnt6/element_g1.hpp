@@ -376,12 +376,6 @@ namespace nil {
                             underlying_field_value_type::one()};
                     };
 
-                    constexpr std::array<typename element_mnt6_g1<298>::underlying_field_value_type, 3> const
-                        element_mnt6_g1<298>::zero_fill;
-
-                    constexpr std::array<typename element_mnt6_g1<298>::underlying_field_value_type, 3> const
-                        element_mnt6_g1<298>::one_fill;
-
                     constexpr typename element_mnt6_g1<298>::g1_field_type_value const element_mnt6_g1<298>::a;
                     constexpr typename element_mnt6_g1<298>::g1_field_type_value const element_mnt6_g1<298>::b;
 

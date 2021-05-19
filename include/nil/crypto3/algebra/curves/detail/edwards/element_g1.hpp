@@ -76,19 +76,13 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        element_edwards_g1() :
-                            element_edwards_g1(underlying_field_value_type::zero(),
-                                               underlying_field_value_type::one(),
-                                               underlying_field_value_type::zero()) {};
-                        // must be
-                        // element_edwards_g1() : element_edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                        // when constexpr fields will be finished
+                        constexpr element_edwards_g1() : element_edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        element_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
+                        constexpr element_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
                                            underlying_field_value_type in_Z) {
                             this->X = in_X;
                             this->Y = in_Y;
@@ -98,7 +92,7 @@ namespace nil {
                          *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
                          *
                          */
-                        element_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
+                        constexpr element_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
                             element_edwards_g1(X, Y, X * Y) {};
                         /** @brief Get the point at infinity
                          *
@@ -331,11 +325,6 @@ namespace nil {
                             underlying_field_value_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182),
                             underlying_field_value_type::zero()};    //< Third value is not correct!
                     };
-
-                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
-                        element_edwards_g1<183>::zero_fill;
-                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
-                        element_edwards_g1<183>::one_fill;
 
                     constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::a;
                     constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::d;

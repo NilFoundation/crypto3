@@ -380,8 +380,8 @@ namespace nil {
 
                         constexpr static const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
-                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = b * twist.non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = b * twist.non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c0 = b * g2_field_type_value::non_residue;
+                        constexpr static const g1_field_type_value twist_mul_by_b_c1 = b * g2_field_type_value::non_residue;
                         constexpr static const g2_field_type_value twist_mul_by_q_X = g2_field_type_value(
                             0x2FB347984F7911F74C0BEC3CF559B143B78CC310C2C3330C99E39557176F553D_cppui254,
                             0x16C9E55061EBAE204BA4CC8BD75A079432AE2A1D0B7C9DCE1665D51C640FCBA2_cppui253);
