@@ -37,7 +37,7 @@
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
