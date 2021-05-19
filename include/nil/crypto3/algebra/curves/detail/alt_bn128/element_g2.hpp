@@ -402,6 +402,12 @@ namespace nil {
                                 0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
                             underlying_field_value_type::one()};
                     };
+
+                    constexpr std::array<typename element_alt_bn128_g2<254>::underlying_field_value_type, 3> const
+                        element_alt_bn128_g2<254>::zero_fill;
+
+                    constexpr std::array<typename element_alt_bn128_g2<254>::underlying_field_value_type, 3> const
+                        element_alt_bn128_g2<254>::one_fill;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -365,6 +365,12 @@ namespace nil {
                             underlying_field_value_type::zero()};    //< Third value is not correct!
                     };
 
+                    constexpr std::array<typename element_edwards_g2<183>::underlying_field_value_type, 3> const
+                        element_edwards_g2<183>::zero_fill;
+
+                    constexpr std::array<typename element_edwards_g2<183>::underlying_field_value_type, 3> const
+                        element_edwards_g2<183>::one_fill;
+
                     constexpr typename element_edwards_g2<183>::g1_field_type_value const element_edwards_g2<183>::a;
                     constexpr typename element_edwards_g2<183>::g1_field_type_value const element_edwards_g2<183>::d;
 

@@ -372,6 +372,12 @@ namespace nil {
                             underlying_field_value_type(1), underlying_field_value_type(2),
                             underlying_field_value_type(1)};
                     };
+
+                    constexpr std::array<typename element_alt_bn128_g1<254>::underlying_field_value_type, 3> const
+                        element_alt_bn128_g1<254>::zero_fill;
+
+                    constexpr std::array<typename element_alt_bn128_g1<254>::underlying_field_value_type, 3> const
+                        element_alt_bn128_g1<254>::one_fill;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

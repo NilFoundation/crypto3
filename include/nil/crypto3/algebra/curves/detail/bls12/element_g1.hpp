@@ -765,6 +765,16 @@ namespace nil {
                             underlying_field_value_type::one()};
                     };
 
+                    constexpr std::array<typename element_bls12_g1<377>::underlying_field_value_type, 3> const
+                        element_bls12_g1<377>::zero_fill;
+                    constexpr std::array<typename element_bls12_g1<381>::underlying_field_value_type, 3> const
+                        element_bls12_g1<381>::zero_fill;
+
+                    constexpr std::array<typename element_bls12_g1<377>::underlying_field_value_type, 3> const
+                        element_bls12_g1<377>::one_fill;
+                    constexpr std::array<typename element_bls12_g1<381>::underlying_field_value_type, 3> const
+                        element_bls12_g1<381>::one_fill;
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
