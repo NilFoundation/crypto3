@@ -36,6 +36,33 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /*!
+                 * @brief ppzkSNARK for R1CS
+                 * @tparam CurveType
+                 * @tparam Generator
+                 * @tparam Prover
+                 * @tparam Verifier
+                 *
+                 * The implementation instantiates (a modification of) the protocol of \[PGHR13],
+                 * by following extending, and optimizing the approach described in \[BCTV14].
+                 *
+                 * Acronyms:
+                 * - R1CS = "Rank-1 Constraint Systems"
+                 * - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
+                 *
+                 * References:
+                 * \[BCTV14]:
+                 * "Succinct Non-Interactive Zero Knowledge for a von Neumann Architecture",
+                 * Eli Ben-Sasson, Alessandro Chiesa, Eran Tromer, Madars Virza,
+                 * USENIX Security 2014,
+                 * <http://eprint.iacr.org/2013/879>
+                 *
+                 * \[PGHR13]:
+                 * "Pinocchio: Nearly practical verifiable computation",
+                 * Bryan Parno, Craig Gentry, Jon Howell, Mariana Raykova,
+                 * IEEE S&P 2013,
+                 * <https://eprint.iacr.org/2013/279>
+                 */
                 template<typename CurveType,
                          typename Generator = r1cs_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_ppzksnark_prover<CurveType>,

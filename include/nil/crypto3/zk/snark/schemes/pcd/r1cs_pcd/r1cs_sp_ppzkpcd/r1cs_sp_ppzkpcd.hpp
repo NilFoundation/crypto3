@@ -22,7 +22,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a *single-predicate* ppzkPCD for R1CS.
+// Single-Predicate ppzkPCD for R1CS.
 //
 // This includes:
 // - class for proving key

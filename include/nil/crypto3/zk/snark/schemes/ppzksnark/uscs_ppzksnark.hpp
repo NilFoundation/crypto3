@@ -36,6 +36,34 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /*!
+                 * @brief ppzkSNARK for USCS
+                 * @tparam CurveType
+                 * @tparam Generator
+                 * @tparam Prover
+                 * @tparam Verifier
+                 *
+                 * The implementation instantiates the protocol of \[DFGK14], by following
+                 * extending, and optimizing the approach described in \[BCTV14].
+                 *
+                 * Acronyms:
+                 * - "ppzkSNARK" = "Pre-Processing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
+                 * - "USCS" = "Unitary-Square Constraint Systems"
+                 *
+                 * References:
+                 *
+                 * \[BCTV14]:
+                 * "Succinct Non-Interactive Zero Knowledge for a von Neumann Architecture",
+                 * Eli Ben-Sasson, Alessandro Chiesa, Eran Tromer, Madars Virza,
+                 * USENIX Security 2014,
+                 * <http://eprint.iacr.org/2013/879>
+                 *
+                 * \[DFGK14]:
+                 * "Square Span Programs with Applications to Succinct NIZK Arguments"
+                 * George Danezis, Cedric Fournet, Jens Groth, Markulf Kohlweiss,
+                 * ASIACRYPT 2014,
+                 * <http://eprint.iacr.org/2014/718>
+                 */
                 template<typename CurveType,
                          typename Generator = uscs_ppzksnark_generator<CurveType>,
                          typename Prover = uscs_ppzksnark_prover<CurveType>,
@@ -66,16 +94,11 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verify(const typename Verifier::verification_key_type &vk,
+                    template<typename VerificationKey>
+                    static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
                                               const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
-                    }
-
-                    static inline bool verify(const typename Verifier::processed_verification_key_type &pvk,
-                                              const primary_input_type &primary_input,
-                                              const proof_type &proof) {
-                        return Verifier::process(pvk, primary_input, proof);
                     }
                 };
             }    // namespace snark

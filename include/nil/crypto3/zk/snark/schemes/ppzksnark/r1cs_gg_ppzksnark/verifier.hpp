@@ -101,7 +101,7 @@ namespace nil {
                     }
                 };
 
-                /*
+                /**
                   Below are four variants of verifier algorithm for the R1CS GG-ppzkSNARK.
 
                   These are the four cases that arise from the following two choices:
@@ -147,9 +147,8 @@ namespace nil {
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return process(
-                            r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
-                            proof);
+                        return process(r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                                       primary_input, proof);
                     }
 
                     /**
@@ -221,10 +220,8 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
 
-                        return process(
-                            r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input,
-                            proof);
-
+                        return process(r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                                       primary_input, proof);
                     }
 
                     /**
@@ -284,7 +281,7 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
 
-                        assert(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
+                        BOOST_ASSERT(verification_key.gamma_ABC_g1.domain_size() >= primary_input.size());
 
                         affine_ate_g2_precomp pvk_vk_gamma_g2_precomp =
                             pairing_policy::affine_ate_precompute_g2(verification_key.gamma_g2);
@@ -292,8 +289,8 @@ namespace nil {
                             pairing_policy::affine_ate_precompute_g2(verification_key.delta_g2);
 
                         const accumulation_vector<g1_type> accumulated_IC =
-                            verification_key.gamma_ABC_g1.accumulate_chunk(
-                                primary_input.begin(), primary_input.end(), 0);
+                            verification_key.gamma_ABC_g1.accumulate_chunk(primary_input.begin(), primary_input.end(),
+                                                                           0);
                         const typename g1_type::value_type &acc = accumulated_IC.first;
 
                         bool result = true;

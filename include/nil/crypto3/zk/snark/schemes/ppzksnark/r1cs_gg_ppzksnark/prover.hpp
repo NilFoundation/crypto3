@@ -22,30 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for BACS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation is a straightforward combination of:
-// (1) a BACS-to-R1CS reduction, and
-// (2) a ppzkSNARK for R1CS.
-//
-//
-// Acronyms:
-//
-// - BACS = "Bilinear Arithmetic Circuit Satisfiability"
-// - R1CS = "Rank-1 Constraint System"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_PROVER_HPP
@@ -107,18 +83,19 @@ namespace nil {
                                                      const primary_input_type &primary_input,
                                                      const auxiliary_input_type &auxiliary_input) {
 
-                        assert(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
+                        BOOST_ASSERT(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
 
                         const qap_witness<scalar_field_type> qap_wit =
                             reductions::r1cs_to_qap<scalar_field_type>::witness_map(
-                                proving_key.constraint_system, primary_input, auxiliary_input, scalar_field_type::value_type::zero(),
-                                scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero());
+                                proving_key.constraint_system, primary_input, auxiliary_input,
+                                scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero(),
+                                scalar_field_type::value_type::zero());
 
                         /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                            and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
-                        assert(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
-                        assert(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
-                        assert(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
+                        BOOST_ASSERT(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
+                        BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
+                        BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 
                         /* Choose two random field elements for prover zero-knowledge. */
                         const typename scalar_field_type::value_type r = algebra::random_element<scalar_field_type>();
