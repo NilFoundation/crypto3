@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_SIMPLE_EXAMPLE_HPP
 #define CRYPTO3_SIMPLE_EXAMPLE_HPP
 
-#include "relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp"
-
 #include <nil/crypto3/algebra/random_element.hpp>
 
 namespace nil {
