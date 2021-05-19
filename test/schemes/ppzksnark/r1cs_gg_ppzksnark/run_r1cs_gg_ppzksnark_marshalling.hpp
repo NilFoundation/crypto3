@@ -30,15 +30,13 @@
 #define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_MARSHALLING_HPP
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
+#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/detail/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
 #include "../r1cs_examples.hpp"
-
-#include <nil/crypto3/zk/snark/algorithms/algorithms.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,7 +52,7 @@ namespace nil {
 
                     std::cout << "Data converted from byte blob" << std::endl;
 
-                    return verifier<proof_system_policy>(vd.vk, vd.pi, vd.pr);
+                    return verify<proof_system_policy>(vd.vk, vd.pi, vd.pr);
                 }
 
                 /**
@@ -78,12 +76,12 @@ namespace nil {
                     std::cout << "Starting generator" << std::endl;
 
                     typename proof_system_policy::keypair_type keypair =
-                        generator<proof_system_policy>(example.constraint_system);
+                        generate<proof_system_policy>(example.constraint_system);
 
                     std::cout << "Starting prover" << std::endl;
 
                     typename proof_system_policy::proof_type proof =
-                        prover<proof_system_policy>(keypair.first, example.primary_input, example.auxiliary_input);
+                        prove<proof_system_policy>(keypair.first, example.primary_input, example.auxiliary_input);
 
                     std::vector<std::uint8_t> data = detail::verifier_data_to_bits<proof_system_policy>::process(
                         keypair.second, example.primary_input, proof);

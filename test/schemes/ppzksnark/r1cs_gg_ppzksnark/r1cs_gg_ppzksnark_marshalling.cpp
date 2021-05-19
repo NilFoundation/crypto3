@@ -44,7 +44,7 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/detail/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
