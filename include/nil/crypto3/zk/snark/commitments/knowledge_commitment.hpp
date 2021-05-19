@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/detail/element_kc.hpp>
+#include <nil/crypto3/zk/snark/commitments/detail/element_kc.hpp>
 
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
