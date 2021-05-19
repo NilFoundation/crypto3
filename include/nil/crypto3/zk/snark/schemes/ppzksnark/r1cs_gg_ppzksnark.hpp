@@ -36,6 +36,26 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /*!
+                 * @brief ppzkSNARK for R1CS with a security proof in the generic group (GG) model
+                 * @tparam CurveType
+                 * @tparam Generator
+                 * @tparam Prover
+                 * @tparam Verifier
+                 *
+                 * The implementation instantiates the protocol of \[Gro16].
+                 *
+                 * Acronyms:
+                 * - R1CS = "Rank-1 Constraint Systems"
+                 * - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
+                 *
+                 * References:
+                 * \[Gro16]:
+                 * "On the Size of Pairing-based Non-interactive Arguments",
+                 * Jens Groth,
+                 * EUROCRYPT 2016,
+                 * <https://eprint.iacr.org/2016/260>
+                 */
                 template<typename CurveType,
                          typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
                          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
@@ -66,16 +86,11 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verify(const typename Verifier::verification_key_type &vk,
+                    template<typename VerificationKey>
+                    static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
                                               const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
-                    }
-
-                    static inline bool verify(const typename Verifier::processed_verification_key_type &pvk,
-                                              const primary_input_type &primary_input,
-                                              const proof_type &proof) {
-                        return Verifier::process(pvk, primary_input, proof);
                     }
                 };
             }    // namespace snark
