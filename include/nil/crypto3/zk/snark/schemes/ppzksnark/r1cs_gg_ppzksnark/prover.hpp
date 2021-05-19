@@ -52,7 +52,7 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -64,7 +64,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
