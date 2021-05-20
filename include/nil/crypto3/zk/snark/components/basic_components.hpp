@@ -82,8 +82,9 @@ namespace nil {
 
                         void generate_r1cs_witness_from_packed() {
                             packed.evaluate(this->bp);
+                            auto lc_val = this->bp.lc_val(packed).data;
 
-                            assert(multiprecision::msb(this->bp.lc_val(packed).data) + 1 <=
+                            assert(lc_val == 0 || multiprecision::msb(lc_val) + 1 <=
                                    bits.size());    // `bits` is large enough to represent this packed value
                             bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                         }
