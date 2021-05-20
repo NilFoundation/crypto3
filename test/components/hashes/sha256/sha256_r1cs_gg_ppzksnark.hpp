@@ -34,10 +34,6 @@
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
-
 
 #include "../../r1cs_examples.hpp"
 
@@ -98,7 +94,7 @@ namespace nil {
                     std::cout << "Starting verification key processing" << std::endl;
 
                     typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        r1cs_gg_ppzksnark_verifier_process_vk<CurveType>::process(keypair.second);
+                        r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     std::cout << "Starting prover" << std::endl;
 
@@ -118,7 +114,7 @@ namespace nil {
 
                     std::cout << "Starting online verifier" << std::endl;
 
-                    const bool ans2 = online_verify<basic_proof_system>(pvk, example.primary_input, proof);
+                    const bool ans2 = verify<basic_proof_system>(pvk, example.primary_input, proof);
 
                     std::cout << "Online verifier finished, result: " << ans2 << std::endl;
 
@@ -140,7 +136,7 @@ namespace nil {
 
                     std::cout << "Starting online weak verifier" << std::endl;
 
-                    const bool ans4 = online_verify<weak_proof_system>(pvk, example.primary_input, proof);
+                    const bool ans4 = verify<weak_proof_system>(pvk, example.primary_input, proof);
 
                     std::cout << "Online weak verifier finished, result: " << ans4 << std::endl;
 
