@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -23,14 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_SRS_HPP
-#define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_SRS_HPP
+#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_SRS_HPP
+#define CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_SRS_HPP
 
 #include <memory>
 #include <vector>
 #include <tuple>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/multiscalar.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,23 +53,24 @@ namespace nil {
                     /// It is necessary for the IPP scheme to work that commitment
                     /// key have the exact same number of arguments as the number of proofs to
                     /// aggregate.
-                    bool valid(std::size_t n) {
-                        return vkey.valid(n) && wkey.valid(n);
+                    bool has_correct_len(std::size_t n) {
+                        return vkey.has_correct_len(n) && wkey.has_correct_len(n);
                     }
 
                     /// number of proofs to aggregate
                     std::size_t n;
-                    /// $\{g^a^i\}_{i=n+1}^{2n}$ where n is the number of proofs to be aggregated table starts
-                    /// at i=n+1 since base is offset with commitment keys. Specially, during the KZG opening
-                    /// proof, we need the vector of the SRS for g to start at $g^{a^{n+1}}$ because the
-                    /// commitment key $w$ starts at the same power.
-                    MultiscalarPrecompOwned<typename CurveType::g1_type::value_type> g_alpha_powers_table;
-                    /// $\{h^a^i\}_{i=1}^{n}$
-                    MultiscalarPrecompOwned<typename CurveType::g2_type::value_type> h_alpha_powers_table;
-                    /// $\{g^b^i\}_{i=n+1}^{2n}$
-                    MultiscalarPrecompOwned<typename CurveType::g1_type::value_type> g_beta_powers_table;
-                    /// $\{h^b^i\}_{i=1}^{n}$
-                    MultiscalarPrecompOwned<typename CurveType::g2_type::value_type> h_beta_powers_table;
+                    /// $\{g^a^i\}_{i=0}^{2n-1}$ where n is the number of proofs to be aggregated
+                    /// We take all powers instead of only ones from n -> 2n-1 (w commitment key
+                    /// is formed from these powers) since the prover will create a shifted
+                    /// polynomial of degree 2n-1 when doing the KZG opening proof.
+                    multiscalar_precomp_owned<typename CurveType::g1_type> g_alpha_powers_table;
+                    /// $\{h^a^i\}_{i=0}^{n-1}$ - here we don't need to go to 2n-1 since v
+                    /// commitment key only goes up to n-1 exponent.
+                    multiscalar_precomp_owned<typename CurveType::g2_type> h_alpha_powers_table;
+                    /// $\{g^b^i\}_{i=0}^{2n-1}$
+                    multiscalar_precomp_owned<typename CurveType::g1_type> g_beta_powers_table;
+                    /// $\{h^b^i\}_{i=0}^{n-1}$
+                    multiscalar_precomp_owned<typename CurveType::g2_type> h_beta_powers_table;
                     /// commitment key using in MIPP and TIPP
                     vkey_type vkey;
                     /// commitment key using in TIPP
@@ -80,6 +83,7 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_verifying_srs {
                     typedef CurveType curve_type;
+
                     std::size_t n;
                     typename CurveType::g1_type::value_type g;
                     typename CurveType::g2_type::value_type h;
@@ -87,10 +91,6 @@ namespace nil {
                     typename CurveType::g1_type::value_type g_beta;
                     typename CurveType::g2_type::value_type h_alpha;
                     typename CurveType::g2_type::value_type h_beta;
-                    /// equals to $g^{alpha^{n+1}}$
-                    typename CurveType::g1_type::value_type g_alpha_n1;
-                    /// equals to $g^{beta^{n+1}}$
-                    typename CurveType::g1_type::value_type g_beta_n1;
                 };
 
                 /// It contains the maximum number of raw elements of the SRS needed to aggregate and verify
@@ -103,88 +103,96 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_pp_zksnark_srs {
                     typedef CurveType curve_type;
+                    typedef typename curve_type::g1_type g1_type;
+                    typedef typename curve_type::g2_type g2_type;
+                    typedef typename g1_type::value_type g1_value_type;
+                    typedef typename g2_type::value_type g2_value_type;
 
                     /// $\{g^a^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
-                    std::vector<typename CurveType::g1_type::value_type> g_alpha_powers;
+                    std::vector<g1_value_type> g_alpha_powers;
                     /// $\{h^a^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
-                    std::vector<typename CurveType::g2_type::value_type> h_alpha_powers;
+                    std::vector<g2_value_type> h_alpha_powers;
                     /// $\{g^b^i\}_{i=n}^{N}$ where N is the smallest size of the two Groth16 CRS.
-                    std::vector<typename CurveType::g1_type::value_type> g_beta_powers;
+                    std::vector<g1_value_type> g_beta_powers;
                     /// $\{h^b^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
-                    std::vector<typename CurveType::g2_type::value_type> h_beta_powers;
+                    std::vector<g2_value_type> h_beta_powers;
+
+                    /// Maximum size of the generic SRS constructed from Filecoin and Zcash power of
+                    /// taus.
+                    ///
+                    /// https://github.com/nikkolasg/taupipp/blob/baca1426266bf39416c45303e35c966d69f4f8b4/src/bin/assemble.rs#L12
+                    static constexpr std::size_t MAX_SRS_SIZE = (2 << 19) + 1;
+
+                    /// specializes returns the prover and verifier SRS for a specific number of
+                    /// proofs to aggregate. The number of proofs MUST BE a power of two, it
+                    /// panics otherwise. The number of proofs must be inferior to half of the
+                    /// size of the generic srs otherwise it panics.
+                    template<typename CurveType>
+                    std::pair<r1cs_gg_ppzksnark_proving_srs<CurveType>, r1cs_gg_ppzksnark_verifying_srs<CurveType>>
+                        specialize(std::size_t num_proofs) {
+                        BOOST_ASSERT((num_proofs & (num_proofs - 1)) == 0);
+
+                        std::size_t tn = 2 * num_proofs;    // size of the CRS we need
+                        BOOST_ASSERT(g_alpha_powers.size() >= tn);
+                        BOOST_ASSERT(h_alpha_powers.size() >= tn);
+                        BOOST_ASSERT(g_beta_powers.size() >= tn);
+                        BOOST_ASSERT(h_beta_powers.size() >= tn);
+
+                        std::size_t n = num_proofs;
+                        // when doing the KZG opening we need _all_ coefficients from 0
+                        // to 2n-1 because the polynomial is of degree 2n-1.
+                        std::size_t g_low = 0;
+                        std::size_t g_up = tn;
+                        std::size_t h_low = 0;
+                        std::size_t h_up = h_low + n;
+                        multiscalar_precomp_owned<g1_type> g_alpha_powers_table =
+                            precompute_fixed_window(g_alpha_powers.begin() + g_low, g_alpha_powers.begin() + g_up,
+                                                    multiscalar_precomp_owned<g1_type>::WINDOW_SIZE);
+                        multiscalar_precomp_owned<g1_type> g_beta_powers_table =
+                            precompute_fixed_window(g_beta_powers.begin() + g_low, g_beta_powers.begin() + g_up,
+                                                    multiscalar_precomp_owned<g1_type>::WINDOW_SIZE);
+                        multiscalar_precomp_owned<g2_type> h_alpha_powers_table =
+                            precompute_fixed_window(h_alpha_powers.begin() + h_low, h_alpha_powers.begin() + h_up,
+                                                    multiscalar_precomp_owned<g2_type>::WINDOW_SIZE);
+                        multiscalar_precomp_owned<g2_type> h_beta_powers_table =
+                            precompute_fixed_window(h_beta_powers.begin() + h_low, h_beta_powers.begin() + h_up,
+                                                    multiscalar_precomp_owned<g2_type>::WINDOW_SIZE);
+                        std::vector<typename CurveType::g2_type::value_type> v1 = {h_alpha_powers.begin() + h_low,
+                                                                                   h_alpha_powers.begin() + h_up};
+                        std::vector<typename CurveType::g2_type::value_type> v2 = {h_beta_powers.begin() + h_low,
+                                                                                   h_beta_powers.begin() + h_up};
+                        typename r1cs_gg_pp_zksnark_srs<CurveType>::vkey_type vkey = {v1, v2};
+                        BOOST_ASSERT(vkey.has_correct_len(n));
+                        // however, here we only need the "right" shifted bases for the
+                        // commitment scheme.
+                        std::vector<typename CurveType::g1_type::value_type> w1 = {g_alpha_powers.begin() + n,
+                                                                                   g_alpha_powers.begin() + g_up};
+                        std::vector<typename CurveType::g1_type::value_type> w2 = {g_beta_powers.begin() + n,
+                                                                                   g_beta_powers.begin() + g_up};
+                        typename r1cs_gg_pp_zksnark_srs<CurveType>::wkey_type wkey = {w1, w2};
+                        BOOST_ASSERT(wkey.has_correct_len(n));
+
+                        r1cs_gg_ppzksnark_proving_srs<CurveType> pk = {n,
+                                                                       g_alpha_powers_table,
+                                                                       h_alpha_powers_table,
+                                                                       g_beta_powers_table,
+                                                                       h_beta_powers_table,
+                                                                       vkey,
+                                                                       wkey};
+                        r1cs_gg_ppzksnark_verifying_srs<CurveType> vk = {n,
+                                                                         g_alpha_powers[0],
+                                                                         h_alpha_powers[0],
+                                                                         g_alpha_powers[1],
+                                                                         g_beta_powers[1],
+                                                                         h_alpha_powers[1],
+                                                                         h_beta_powers[1]};
+                        return std::make_pair(pk, vk);
+                    }
                 };
 
-                /// specializes returns the prover and verifier SRS for a specific number of
-                /// proofs to aggregate. The number of proofs MUST BE a power of two, it
-                /// panics otherwise. The number of proofs must be inferior to half of the
-                /// size of the generic srs otherwise it panics.
-                template<typename CurveType>
-                std::pair<r1cs_gg_ppzksnark_proving_srs<CurveType>, r1cs_gg_ppzksnark_verifying_srs<CurveType>>
-                    specialize(const r1cs_gg_pp_zksnark_srs<CurveType> &srs, std::size_t num_proofs) {
-                    BOOST_ASSERT((num_proofs & (num_proofs - 1)) == 0);
-
-                    std::size_t tn = 2 * num_proofs + 1;    // size of the CRS we need
-                    assert(srs.g_alpha_powers.size() >= tn);
-                    BOOST_ASSERT(srs.h_alpha_powers.size() >= tn);
-                    assert(srs.g_beta_powers.size() >= tn);
-                    assert(srs.h_beta_powers.size() >= tn);
-
-                    std::size_t n = num_proofs;
-                    // we skip the first one since g^a^0 = g which is not part of the commitment
-                    // key (i.e. we don't use it in the prover's code) so for g we skip directly to
-                    // g^a^{n+1}
-                    std::size_t g_low = n + 1;
-                    // we need powers up to 2n
-                    std::size_t g_up = g_low + n;
-                    std::size_t h_low = 1;
-                    std::size_t h_up = h_low + n;
-                    window_table g_alpha_powers_table = precompute_fixed_window(
-                        srs.g_alpha_powers.begin() + g_low, srs.g_alpha_powers.begin() + g_up, WINDOW_SIZE);
-                    window_table g_beta_powers_table = precompute_fixed_window(
-                        srs.g_beta_powers.begin() + g_low, srs.g_beta_powers.begin() + g_up, WINDOW_SIZE);
-                    window_table h_alpha_powers_table = precompute_fixed_window(
-                        srs.h_alpha_powers.begin() + h_low, srs.h_alpha_powers.begin() + h_up, WINDOW_SIZE);
-                    window_table h_beta_powers_table = precompute_fixed_window(
-                        srs.h_beta_powers.begin() + h_low, srs.h_beta_powers.begin() + h_up, WINDOW_SIZE);
-                    std::vector<typename CurveType::g2_type::value_type> v1 = {srs.h_alpha_powers.begin() + h_low,
-                                                                               srs.h_alpha_powers.begin() + h_up};
-                    std::vector<typename CurveType::g2_type::value_type> v2 = {srs.h_beta_powers.begin() + h_low,
-                                                                               srs.h_beta_powers.begin() + h_up};
-                    typename r1cs_gg_pp_zksnark_srs<CurveType>::vkey_type vkey = {v1, v2};
-                    BOOST_ASSERT(vkey.has_correct_len(n));
-
-                    std::vector<typename CurveType::g1_type::value_type> w1 = {srs.g_alpha_powers.begin() + g_low,
-                                                                               srs.g_alpha_powers.begin() + g_up};
-                    std::vector<typename CurveType::g1_type::value_type> w2 = {srs.g_beta_powers.begin() + g_low,
-                                                                               srs.g_beta_powers.begin() + g_up};
-                    // needed by the verifier to check KZG opening with a shifted base point for
-                    // the w commitment
-                    typename CurveType::g1_type::value_type g_alpha_n1 = w1[0].to_projective();
-                    typename CurveType::g1_type::value_type g_beta_n1 = w2[0].to_projective();
-
-                    typename r1cs_gg_pp_zksnark_srs<CurveType>::wkey_type wkey = {w1, w2};
-                    BOOST_ASSERT(wkey.has_correct_len(n));
-                    r1cs_gg_ppzksnark_proving_srs<CurveType> pk = {g_alpha_powers_table,
-                                                                   g_beta_powers_table,
-                                                                   h_alpha_powers_table,
-                                                                   h_beta_powers_table,
-                                                                   vkey,
-                                                                   wkey,
-                                                                   n};
-                    r1cs_gg_ppzksnark_verifying_srs<CurveType> vk = {n,
-                                                                     srs.g_alpha_powers[0].to_projective(),
-                                                                     srs.h_alpha_powers[0].to_projective(),
-                                                                     srs.g_alpha_powers[1].to_projective(),
-                                                                     srs.g_beta_powers[1].to_projective(),
-                                                                     srs.h_alpha_powers[1].to_projective(),
-                                                                     srs.h_beta_powers[1].to_projective(),
-                                                                     g_alpha_n1,
-                                                                     g_beta_n1};
-                    return {pk, vk};
-                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_TYPES_POLICY_HPP
+#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_AGGREGATE_IPP2_SRS_HPP

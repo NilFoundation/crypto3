@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -29,8 +30,10 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include <cmath>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,36 +50,41 @@ namespace nil {
                 struct gipa_proof {
                     typedef CurveType curve_type;
 
-                    std::uint32_t nproofs;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                          r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
+                    std::size_t nproofs;
+                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>,
+                                          r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>>>
                         comms_ab;
-                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
-                                          r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>>>
+                    std::vector<std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>,
+                                          r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type>>>
                         comms_c;
-                    std::vector<std::pair<typename CurveType::pairing::fqk_type::value_type, typename CurveType::pairing::fqk_type::value_type>>
+                    std::vector<
+                        std::pair<typename curve_type::gt_type::value_type, typename curve_type::gt_type::value_type>>
                         z_ab;
                     std::vector<
-                        std::pair<typename CurveType::g1_type::value_type, typename CurveType::g1_type::value_type>>
+                        std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type>>
                         z_c;
-                    typename CurveType::g1_type::value_type final_a;
-                    typename CurveType::g2_type::value_type final_b;
-                    typename CurveType::g1_type::value_type final_c;
-                    typename CurveType::scalar_field_type::value_type final_r;
+                    typename curve_type::g1_type::value_type final_a;
+                    typename curve_type::g2_type::value_type final_b;
+                    typename curve_type::g1_type::value_type final_c;
+                    typename curve_type::scalar_field_type::value_type final_r;
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    r1cs_gg_ppzksnark_ipp2_vkey<CurveType> final_vkey;
-                    r1cs_gg_ppzksnark_ipp2_wkey<CurveType> final_wkey;
+                    std::pair<typename curve_type::g2_type::value_type> final_vkey;
+                    std::pair<typename curve_type::g1_type::value_type> final_wkey;
+
+                    static std::size_t log_proofs(std::size_t nproofs) {
+                        return std::ceil(std::log2(nproofs));
+                    }
                 };
 
                 template<typename CurveType>
                 struct tipp_mipp_proof {
                     typedef CurveType curve_type;
 
-                    gipa_proof<CurveType> gipa;
-                    kzg_opening<typename CurveType::g2_type> vkey_opening;
-                    kzg_opening<typename CurveType::g1_type> wkey_opening;
+                    gipa_proof<curve_type> gipa;
+                    kzg_opening<typename curve_type::g2_type> vkey_opening;
+                    kzg_opening<typename curve_type::g1_type> wkey_opening;
                 };
                 /// AggregateProof contains all elements to verify n aggregated Groth16 proofs
                 /// using inner pairing product arguments. This proof can be created by any
@@ -90,10 +98,34 @@ namespace nil {
                     /// commit to C separate since we use it only in MIPP
                     r1cs_gg_ppzksnark_ipp2_commitment_output<curve_type> com_c;
                     /// $A^r * B = Z$ is the left value on the aggregated Groth16 equation
-                    typename curve_type::pairing::fqk_type::value_type ip_ab;
+                    typename curve_type::gt_type::value_type ip_ab;
                     /// $C^r$ is used on the right side of the aggregated Groth16 equation
                     typename curve_type::g1_type::value_type agg_c;
                     tipp_mipp_proof<curve_type> tmipp;
+
+                    /// Performs some high level checks on the length of vectors and others to
+                    /// make sure all items in the proofs are consistent with each other.
+                    bool is_valid() const {
+                        // 1. Check length of the proofs
+                        if (tmipp.gipa.nproofs < 2 ||
+                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_srs<curve_type>::MAX_SRS_SIZE) {
+                            return false;
+                        }
+                        // 2. Check if it's a power of two
+                        if ((num_proofs & (num_proofs - 1)) != 0) {
+                            return false;
+                        }
+                        // 3. Check all vectors are of the same length and of the correct length
+                        if (tmipp.gipa.comms_ab.size() != std::ceil(std::log2(tmipp.gipa.nproofs))) {
+                            return false;
+                        }
+                        if (!(tmipp.gipa.comms_ab.size() == tmipp.gipa.comms_c &&
+                              tmipp.gipa.comms_ab == tmipp.gipa.z_ab && tmipp.gipa.comms_ab == tmipp.gipa.z_c)) {
+                            return false;
+                        }
+
+                        return true;
+                    }
                 };
             }    // namespace snark
         }        // namespace zk
