@@ -29,7 +29,7 @@
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
 
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
+#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
 #include <cstddef>
 
@@ -74,7 +74,7 @@ namespace nil {
                     typedef typename curve_type::g2_type public_key_group_type;
                     typedef typename curve_type::g1_type signature_group_type;
 
-                    typedef serializer<curve_type> bls_serializer;
+                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
 
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;
@@ -121,7 +121,7 @@ namespace nil {
                     typedef typename curve_type::g1_type public_key_group_type;
                     typedef typename curve_type::g2_type signature_group_type;
 
-                    typedef serializer<curve_type> bls_serializer;
+                    typedef nil::marshalling::curve_element_serializer<curve_type> bls_serializer;
 
                     typedef typename basic_policy::private_key_type private_key_type;
                     typedef typename public_key_group_type::value_type public_key_type;

@@ -35,9 +35,9 @@
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
 
 #include <nil/crypto3/pubkey/bls.hpp>
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
 #include <vector>
 #include <string>
@@ -107,12 +107,12 @@ const std::vector<std::uint8_t> PopSchemeDstMps_hash_pubkey_to_point(PopSchemeDs
 BOOST_AUTO_TEST_SUITE(bls_serialization)
 
 BOOST_AUTO_TEST_CASE(g1_serialization_test) {
-    using nil::crypto3::pubkey::detail::serializer;
+    using nil::marshalling::curve_element_serializer;
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g1_type;
     using group_value_type = typename group_type::value_type;
     using modulus_type = typename group_value_type::g1_field_type_value::modulus_type;
-    using serializer_bls = serializer<curve_type>;
+    using serializer_bls = curve_element_serializer<curve_type>;
 
     // Affine point
     group_value_type p1 = group_value_type(
@@ -193,12 +193,12 @@ BOOST_AUTO_TEST_CASE(g1_serialization_test) {
 }
 
 BOOST_AUTO_TEST_CASE(g2_serialization_test) {
-    using nil::crypto3::pubkey::detail::serializer;
+    using nil::marshalling::curve_element_serializer;
     using curve_type = curves::bls12_381;
     using group_type = typename curve_type::g2_type;
     using group_value_type = typename group_type::value_type;
     using modulus_type = typename group_value_type::g1_field_type_value::modulus_type;
-    using serializer_bls = serializer<curve_type>;
+    using serializer_bls = curve_element_serializer<curve_type>;
 
     // Affine point
     group_value_type p1 = group_value_type(
