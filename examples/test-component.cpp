@@ -7,9 +7,6 @@
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/generator.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/prover.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/policies/r1cs_gg_ppzksnark/verifier.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
@@ -19,10 +16,6 @@ using namespace std;
 
 int main(){
   // Initialize the curve parameters
-
-  default_r1cs_ppzksnark_pp::init_public_params();
-
-
   using curve_type = curves::bls12<381>;
   using field_type = typename curve_type::scalar_field_type;
   
