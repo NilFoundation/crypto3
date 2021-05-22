@@ -22,30 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for BACS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation is a straightforward combination of:
-// (1) a BACS-to-R1CS reduction, and
-// (2) a ppzkSNARK for R1CS.
-//
-//
-// Acronyms:
-//
-// - BACS = "Bilinear Arithmetic Circuit Satisfiability"
-// - R1CS = "Rank-1 Constraint System"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_BASIC_GENERATOR_HPP
@@ -54,8 +30,8 @@
 #include <random>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>

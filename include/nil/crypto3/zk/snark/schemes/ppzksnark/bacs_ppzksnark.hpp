@@ -22,30 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for BACS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation is a straightforward combination of:
-// (1) a BACS-to-R1CS reduction, and
-// (2) a ppzkSNARK for R1CS.
-//
-//
-// Acronyms:
-//
-// - BACS = "Bilinear Arithmetic Circuit Satisfiability"
-// - R1CS = "Rank-1 Constraint System"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_HPP
@@ -60,6 +36,22 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                /*!
+                 * @brief ppzkSNARK for BACS.
+                 * @tparam CurveType
+                 * @tparam Generator
+                 * @tparam Prover
+                 * @tparam Verifier
+                 *
+                 * @details The implementation is a straightforward combination of:
+                 * (1) a BACS-to-R1CS reduction, and
+                 * (2) a ppzkSNARK for R1CS.
+                 *
+                 * Acronyms:
+                 * - BACS = "Bilinear Arithmetic Circuit Satisfiability"
+                 * - R1CS = "Rank-1 Constraint System"
+                 * - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
+                 */
                 template<typename CurveType,
                          typename Generator = bacs_ppzksnark_generator<CurveType>,
                          typename Prover = bacs_ppzksnark_prover<CurveType>,
@@ -90,16 +82,11 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verify(const typename Verifier::verification_key_type &vk,
+                    template<typename VerificationKey>
+                    static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
                                               const proof_type &proof) {
                         return Verifier::process(vk, primary_input, proof);
-                    }
-
-                    static inline bool verify(const typename Verifier::processed_verification_key_type &pvk,
-                                              const primary_input_type &primary_input,
-                                              const proof_type &proof) {
-                        return Verifier::process(pvk, primary_input, proof);
                     }
                 };
             }    // namespace snark

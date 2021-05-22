@@ -22,30 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for BACS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation is a straightforward combination of:
-// (1) a BACS-to-R1CS reduction, and
-// (2) a ppzkSNARK for R1CS.
-//
-//
-// Acronyms:
-//
-// - BACS = "Bilinear Arithmetic Circuit Satisfiability"
-// - R1CS = "Rank-1 Constraint System"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_VERIFIER_HPP
 #define CRYPTO3_ZK_BACS_PPZKSNARK_BASIC_VERIFIER_HPP
@@ -105,10 +81,11 @@ namespace nil {
                 class bacs_ppzksnark_verifier_weak_input_consistency {
                     typedef detail::bacs_ppzksnark_policy<CurveType> policy_type;
 
-                    using r1cs_ppzksnark_weak_proof_system = r1cs_ppzksnark<CurveType,
-                                          r1cs_ppzksnark_generator<CurveType>,
-                                          r1cs_ppzksnark_prover<CurveType>,
-                                          r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>>;
+                    using r1cs_ppzksnark_weak_proof_system =
+                        r1cs_ppzksnark<CurveType,
+                                       r1cs_ppzksnark_generator<CurveType>,
+                                       r1cs_ppzksnark_prover<CurveType>,
+                                       r1cs_ppzksnark_verifier_weak_input_consistency<CurveType>>;
 
                 public:
                     typedef typename policy_type::circuit_type circuit_type;
@@ -130,10 +107,10 @@ namespace nil {
                     static inline bool process(const verification_key_type &verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return verify<r1cs_ppzksnark_weak_proof_system>(bacs_ppzksnark_process_verification_key<CurveType>::process(
-                                           verification_key),
-                                       primary_input,
-                                       proof);
+                        return verify<r1cs_ppzksnark_weak_proof_system>(
+                            bacs_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                            primary_input,
+                            proof);
                     }
 
                     /**
@@ -144,7 +121,8 @@ namespace nil {
                     static inline bool process(const processed_verification_key_type &processed_verification_key,
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
-                        return verify<r1cs_ppzksnark_weak_proof_system>(processed_verification_key, primary_input, proof);
+                        return verify<r1cs_ppzksnark_weak_proof_system>(
+                            processed_verification_key, primary_input, proof);
                     }
                 };
 
@@ -175,7 +153,9 @@ namespace nil {
                                                const primary_input_type &primary_input,
                                                const proof_type &proof) {
                         return verify<r1cs_ppzksnark_proof_system>(
-                            bacs_ppzksnark_process_verification_key<CurveType>::process(verification_key), primary_input, proof);
+                            bacs_ppzksnark_process_verification_key<CurveType>::process(verification_key),
+                            primary_input,
+                            proof);
                     }
 
                     /**
@@ -189,7 +169,6 @@ namespace nil {
                         return verify<r1cs_ppzksnark_proof_system>(processed_verification_key, primary_input, proof);
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

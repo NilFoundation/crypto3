@@ -36,7 +36,22 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
+                /*!
+                 * @brief ppzkSNARK for TBCS
+                 * @tparam CurveType
+                 * @tparam Generator
+                 * @tparam Prover
+                 * @tparam Verifier
+                 *
+                 * The implementation is a straightforward combination of:
+                 * (1) a TBCS-to-USCS reduction, and
+                 * (2) a ppzkSNARK for USCS.
+                 *
+                 * Acronyms:
+                 * - TBCS = "Two-input Boolean Circuit Satisfiability"
+                 * - USCS = "Unitary-Square Constraint System"
+                 * - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
+                 */
                 template<typename CurveType,
                          typename Generator = tbcs_ppzksnark_generator<CurveType>,
                          typename Prover = tbcs_ppzksnark_prover<CurveType>,
@@ -67,16 +82,11 @@ namespace nil {
                         return Prover::process(pk, primary_input, auxiliary_input);
                     }
 
-                    static inline bool verify(const typename Verifier::verification_key_type &vk,
-                                               const primary_input_type &primary_input,
-                                               const proof_type &proof) {
-                        return Verifier::process(vk, primary_input, proof);
-                    }
-
-                    static inline bool verify(const typename Verifier::processed_verification_key_type &pvk,
+                    template<typename VerificationKey>
+                    static inline bool verify(const VerificationKey &vk,
                                               const primary_input_type &primary_input,
                                               const proof_type &proof) {
-                        return Verifier::process(pvk, primary_input, proof);
+                        return Verifier::process(vk, primary_input, proof);
                     }
                 };
             }    // namespace snark

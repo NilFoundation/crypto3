@@ -22,42 +22,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for a ppzkSNARK for R1CS.
-//
-// This includes:
-// - class for proving key
-// - class for verification key
-// - class for processed verification key
-// - class for key pair (proving key & verification key)
-// - class for proof
-// - generator algorithm
-// - prover algorithm
-// - verifier algorithm (with strong or weak input consistency)
-// - online verifier algorithm (with strong or weak input consistency)
-//
-// The implementation instantiates (a modification of) the protocol of \[PGHR13],
-// by following extending, and optimizing the approach described in \[BCTV14].
-//
-//
-// Acronyms:
-//
-// - R1CS = "Rank-1 Constraint Systems"
-// - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
-//
-// References:
-//
-// \[BCTV14]:
-// "Succinct Non-Interactive Zero Knowledge for a von Neumann Architecture",
-// Eli Ben-Sasson, Alessandro Chiesa, Eran Tromer, Madars Virza,
-// USENIX Security 2014,
-// <http://eprint.iacr.org/2013/879>
-//
-// \[PGHR13]:
-// "Pinocchio: Nearly practical verifiable computation",
-// Bryan Parno, Craig Gentry, Jon Howell, Mariana Raykova,
-// IEEE S&P 2013,
-// <https://eprint.iacr.org/2013/279>
-//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_R1CS_PPZKSNARK_BASIC_GENERATOR_HPP
 #define CRYPTO3_R1CS_PPZKSNARK_BASIC_GENERATOR_HPP
@@ -65,7 +29,7 @@
 #include <memory>
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
-#include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -74,7 +38,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
