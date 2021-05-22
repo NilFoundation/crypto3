@@ -90,8 +90,7 @@ namespace nil {
                         using chunk_type = std::uint8_t;
 
                         constexpr static const std::size_t chunk_size = 8;
-                        constexpr static const std::size_t modulus_chunks =
-                            modulus_bits / chunk_size + modulus_bits % chunk_size;
+                        constexpr static const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
                         template<typename FieldType>
                         static inline
@@ -311,8 +310,7 @@ namespace nil {
                         using chunk_type = std::uint8_t;
 
                         constexpr static const std::size_t chunk_size = 8;
-                        constexpr static const std::size_t modulus_chunks =
-                            modulus_bits / chunk_size + modulus_bits % chunk_size;
+                        constexpr static const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
                         template<typename FieldType>
 
