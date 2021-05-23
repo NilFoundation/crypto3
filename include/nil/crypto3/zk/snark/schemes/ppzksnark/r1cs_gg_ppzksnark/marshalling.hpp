@@ -66,18 +66,30 @@
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
+#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
 
 namespace nil {
     namespace marshalling {
 
+        using namespace nil::crypto3::zk::snark;
+        using namespace nil::crypto3;
+
         template<typename ProofSystem>
         struct verifier_data_from_bits;
 
         template<typename CurveType>
-        struct verifier_data_from_bits<r1cs_gg_ppzksnark<CurveType>> {
-            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
+        struct verifier_data_from_bits<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>> {
+
+            using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
             using modulus_type = typename CurveType::base_field_type::modulus_type;
             using number_type = typename CurveType::base_field_type::number_type;
@@ -291,12 +303,14 @@ namespace nil {
         };
 
         template<typename ProofSystem>
-        class verifier_data_to_bits;
+        struct verifier_data_to_bits;
 
         // TODO: reimplement private functions using field value type trait
         template<typename CurveType>
-        class verifier_data_to_bits<r1cs_gg_ppzksnark<CurveType>> {
-            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
+        struct verifier_data_to_bits<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>> {
+
+
+            using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
@@ -447,7 +461,7 @@ namespace nil {
                 std::size_t g2_size = modulus_chunks * 3 * CurveType::g2_type::underlying_field_type::arity;
                 std::size_t std_size_t_size = 4;
 
-                std::size_t gt_size = modulus_chunks * CurveType::gt_type::underlying_field_type::arity;
+                std::size_t gt_size = modulus_chunks * CurveType::gt_type::arity;
 
                 std::size_t sparse_vector_size =
                     std_size_t_size + vd.vk.gamma_ABC_g1.rest.size() * std_size_t_size + std_size_t_size +
@@ -491,9 +505,11 @@ namespace nil {
         struct verifier_input_deserializer_tvm;
 
         template<>
-        struct verifier_input_deserializer_tvm<r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
+        struct verifier_input_deserializer_tvm<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
+        
+
             using CurveType = typename algebra::curves::bls12<381>;
-            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
             using modulus_type = typename CurveType::base_field_type::modulus_type;
             using number_type = typename CurveType::base_field_type::number_type;
@@ -716,9 +732,12 @@ namespace nil {
         struct verifier_input_serializer_tvm;
 
         template<>
-        struct verifier_input_serializer_tvm<r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
+        struct verifier_input_serializer_tvm<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
+
+            
+
             using CurveType = typename algebra::curves::bls12<381>;
-            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
@@ -785,53 +804,22 @@ namespace nil {
                 write_iter += sizeof(std::size_t);
             }
 
-            template<typename T>
-            static inline void
-                sparse_vector_process(sparse_vector<T> input_sp,
-                                      typename std::vector<chunk_type>::iterator &write_iter) {
-
-                std::size_t indices_count = input_sp.size();
-
-                std_size_t_process(indices_count, write_iter);
-
-                for (std::size_t i = 0; i < indices_count; i++) {
-                    std_size_t_process(input_sp.indices[i], write_iter);
-                }
-
-                std::size_t values_count = input_sp.values.size();
-
-                std_size_t_process(values_count, write_iter);
-
-                for (std::size_t i = 0; i < values_count; i++) {
-                    group_type_process<T>(input_sp.values[i], write_iter);
-                }
-
-                std_size_t_process(input_sp.domain_size_, write_iter);
-            }
-
-            template<typename T>
-            static inline void
-                accumulation_vector_process(accumulation_vector<T> input_acc,
-                                            typename std::vector<chunk_type>::iterator &write_iter) {
-
-                group_type_process<T>(input_acc.first, write_iter);
-                sparse_vector_process(input_acc.rest, write_iter);
-            }
-
             static inline std::vector<chunk_type> process(typename scheme_type::verification_key_type vk) {
+
+                std::vector<typename CurveType::g1_type::value_type> ic = vk.gamma_ABC_g1.rest.values;
+                std::size_t ic_size = ic.size();
 
                 std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t std_size_t_size = 4;
 
-                std::size_t gt_size = modulus_chunks * CurveType::gt_type::underlying_field_type::arity;
+                std::size_t gt_byteblob_size = modulus_chunks * CurveType::gt_type::arity;
 
-                std::size_t sparse_vector_size =
-                    std_size_t_size + vk.gamma_ABC_g1.rest.size() * std_size_t_size + std_size_t_size +
-                    vk.gamma_ABC_g1.rest.values.size() * g1_byteblob_size + std_size_t_size;
+                std::size_t ic_byteblob_size = 
+                    std_size_t_size + ic_size * g1_byteblob_size;
 
                 std::size_t verification_key_size =
-                    gt_size + g2_byteblob_size + g2_byteblob_size + g1_byteblob_size + sparse_vector_size;
+                    gt_byteblob_size + g2_byteblob_size + g2_byteblob_size + ic_byteblob_size;
 
                 std::vector<chunk_type> output(verification_key_size);
 
@@ -841,7 +829,11 @@ namespace nil {
                 group_type_process<typename CurveType::g2_type>(vk.gamma_g2, write_iter);
                 group_type_process<typename CurveType::g2_type>(vk.delta_g2, write_iter);
 
-                accumulation_vector_process(vk.gamma_ABC_g1, write_iter);
+                std_size_t_process(ic.size(), write_iter);
+
+                for (auto ic_iter = ic.begin(); ic_iter != ic.end(); ic_iter++) {
+                    group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
+                }
 
                 return output;
             }

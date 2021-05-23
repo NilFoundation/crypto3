@@ -47,8 +47,8 @@ namespace nil {
                 bool run_verifier_with_byte_input(std::vector<std::uint8_t> data) {
                     using proof_system_policy = ProofSystem;
 
-                    typename detail::verifier_data_from_bits<proof_system_policy>::verifier_data vd =
-                        detail::verifier_data_from_bits<proof_system_policy>::process(data);
+                    typename nil::marshalling::verifier_data_from_bits<proof_system_policy>::verifier_data vd =
+                        nil::marshalling::verifier_data_from_bits<proof_system_policy>::process(data);
 
                     std::cout << "Data converted from byte blob" << std::endl;
 
@@ -83,7 +83,7 @@ namespace nil {
                     typename proof_system_policy::proof_type proof =
                         prove<proof_system_policy>(keypair.first, example.primary_input, example.auxiliary_input);
 
-                    std::vector<std::uint8_t> data = detail::verifier_data_to_bits<proof_system_policy>::process(
+                    std::vector<std::uint8_t> data = nil::marshalling::verifier_data_to_bits<proof_system_policy>::process(
                         keypair.second, example.primary_input, proof);
 
                     std::cout << "Data converted to byte blob" << std::endl;
