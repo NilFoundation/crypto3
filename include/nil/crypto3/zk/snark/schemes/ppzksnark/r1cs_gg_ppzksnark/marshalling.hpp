@@ -77,7 +77,7 @@ namespace nil {
 
         template<typename CurveType>
         struct verifier_data_from_bits<r1cs_gg_ppzksnark<CurveType>> {
-            using proof_system = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
 
             using modulus_type = typename CurveType::base_field_type::modulus_type;
             using number_type = typename CurveType::base_field_type::number_type;
@@ -203,10 +203,10 @@ namespace nil {
                 return accumulation_vector<T>(std::move(first), std::move(rest));
             }
 
-            static inline typename proof_system::verification_key_type
+            static inline typename scheme_type::verification_key_type
                 verification_key_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using verification_key_type = typename proof_system::verification_key_type;
+                using verification_key_type = typename scheme_type::verification_key_type;
 
                 typename CurveType::gt_type::value_type alpha_g1_beta_g2 =
                     field_type_process<typename CurveType::gt_type>(read_iter);
@@ -224,10 +224,10 @@ namespace nil {
                 return verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
             }
 
-            static inline typename proof_system::primary_input_type
+            static inline typename scheme_type::primary_input_type
                 primary_input_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using primary_input_type = typename proof_system::primary_input_type;
+                using primary_input_type = typename scheme_type::primary_input_type;
 
                 std::size_t pi_count = std_size_t_process(read_iter);
 
@@ -240,10 +240,10 @@ namespace nil {
                 return primary_input_type(pi);
             }
 
-            static inline typename proof_system::proof_type
+            static inline typename scheme_type::proof_type
                 proof_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using proof_type = typename proof_system::proof_type;
+                using proof_type = typename scheme_type::proof_type;
 
                 typename CurveType::g1_type::value_type g_A =
                     group_type_process<typename CurveType::g1_type>(read_iter);
@@ -258,15 +258,15 @@ namespace nil {
 
         public:
             struct verifier_data {
-                typename proof_system::verification_key_type vk;
-                typename proof_system::primary_input_type pi;
-                typename proof_system::proof_type pr;
+                typename scheme_type::verification_key_type vk;
+                typename scheme_type::primary_input_type pi;
+                typename scheme_type::proof_type pr;
 
                 verifier_data() {};
 
-                verifier_data(typename proof_system::verification_key_type vk,
-                              typename proof_system::primary_input_type pi,
-                              typename proof_system::proof_type pr) :
+                verifier_data(typename scheme_type::verification_key_type vk,
+                              typename scheme_type::primary_input_type pi,
+                              typename scheme_type::proof_type pr) :
                     vk(vk),
                     pi(pi), pr(pr) {};
             };
@@ -280,11 +280,11 @@ namespace nil {
 
                 typename std::vector<chunk_type>::const_iterator read_iter = data.begin();
 
-                typename proof_system::verification_key_type vk = verification_key_process(read_iter);
+                typename scheme_type::verification_key_type vk = verification_key_process(read_iter);
 
-                typename proof_system::primary_input_type pi = primary_input_process(read_iter);
+                typename scheme_type::primary_input_type pi = primary_input_process(read_iter);
 
-                typename proof_system::proof_type pr = proof_process(read_iter);
+                typename scheme_type::proof_type pr = proof_process(read_iter);
 
                 return verifier_data(vk, pi, pr);
             }
@@ -296,7 +296,7 @@ namespace nil {
         // TODO: reimplement private functions using field value type trait
         template<typename CurveType>
         class verifier_data_to_bits<r1cs_gg_ppzksnark<CurveType>> {
-            using proof_system = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
@@ -395,7 +395,7 @@ namespace nil {
             }
 
             static inline void
-                verification_key_process(typename proof_system::verification_key_type vk,
+                verification_key_process(typename scheme_type::verification_key_type vk,
                                          typename std::vector<chunk_type>::iterator &write_iter) {
 
                 field_type_process<typename CurveType::gt_type>(vk.alpha_g1_beta_g2, write_iter);
@@ -406,7 +406,7 @@ namespace nil {
             }
 
             static inline void
-                primary_input_process(typename proof_system::primary_input_type pi,
+                primary_input_process(typename scheme_type::primary_input_type pi,
                                       typename std::vector<chunk_type>::iterator &write_iter) {
 
                 std::size_t pi_count = pi.size();
@@ -418,7 +418,7 @@ namespace nil {
                 }
             }
 
-            static inline void proof_process(typename proof_system::proof_type pr,
+            static inline void proof_process(typename scheme_type::proof_type pr,
                                              typename std::vector<chunk_type>::iterator &write_iter) {
 
                 group_type_process<typename CurveType::g1_type>(pr.g_A, write_iter);
@@ -428,15 +428,15 @@ namespace nil {
 
         public:
             struct verifier_data {
-                typename proof_system::verification_key_type vk;
-                typename proof_system::primary_input_type pi;
-                typename proof_system::proof_type pr;
+                typename scheme_type::verification_key_type vk;
+                typename scheme_type::primary_input_type pi;
+                typename scheme_type::proof_type pr;
 
                 verifier_data() {};
 
-                verifier_data(typename proof_system::verification_key_type vk,
-                              typename proof_system::primary_input_type pi,
-                              typename proof_system::proof_type pr) :
+                verifier_data(typename scheme_type::verification_key_type vk,
+                              typename scheme_type::primary_input_type pi,
+                              typename scheme_type::proof_type pr) :
                     vk(vk),
                     pi(pi), pr(pr) {};
             };
@@ -472,9 +472,9 @@ namespace nil {
                 return output;
             }
 
-            static inline std::vector<chunk_type> process(typename proof_system::verification_key_type vk,
-                                                          typename proof_system::primary_input_type pi,
-                                                          typename proof_system::proof_type pr) {
+            static inline std::vector<chunk_type> process(typename scheme_type::verification_key_type vk,
+                                                          typename scheme_type::primary_input_type pi,
+                                                          typename scheme_type::proof_type pr) {
 
                 return process(verifier_data(vk, pi, pr));
             }
@@ -493,7 +493,7 @@ namespace nil {
         template<>
         struct verifier_input_deserializer_tvm<r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
             using CurveType = typename algebra::curves::bls12<381>;
-            using proof_system = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
 
             using modulus_type = typename CurveType::base_field_type::modulus_type;
             using number_type = typename CurveType::base_field_type::number_type;
@@ -546,26 +546,28 @@ namespace nil {
             static inline typename GroupType::value_type
                 g1_group_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                std::size_t compressed_group_element_size = curve_element_serializer<CurveType>::compressed_g1_octets;
+                typename curve_element_serializer<CurveType>::compressed_g1_octets input_array;
 
-                std::vector<chunk_type> input_vector (compressed_group_element_size);
+                for (std::size_t i = 0; i < curve_element_serializer<CurveType>::sizeof_field_element; ++i){
+                    input_array[i] = *read_iter;
+                    read_iter++;
+                }
 
-                copy(read_iter, read_iter + compressed_group_element_size, input_vector.begin());
-
-                return curve_element_serializer<CurveType>::compressed_to_g1_point(input_vector, ???);
+                return curve_element_serializer<CurveType>::octets_to_g1_point(input_array);
             }
 
             template<typename GroupType>
             static inline typename GroupType::value_type
                 g2_group_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                std::size_t compressed_group_element_size = curve_element_serializer<CurveType>::compressed_g2_octets;
+                typename curve_element_serializer<CurveType>::compressed_g2_octets input_array;
 
-                std::vector<chunk_type> input_vector (compressed_group_element_size);
+                for (std::size_t i = 0; i < 2 * curve_element_serializer<CurveType>::sizeof_field_element; ++i){
+                    input_array[i] = *read_iter;
+                    read_iter++;
+                }
 
-                copy(read_iter, read_iter + compressed_group_element_size, input_vector.begin());
-
-                return curve_element_serializer<CurveType>::compressed_to_g2_point(input_vector, ???);
+                return curve_element_serializer<CurveType>::octets_to_g2_point(input_array);
             }
 
             static inline std::size_t
@@ -629,10 +631,10 @@ namespace nil {
                 return accumulation_vector<T>(std::move(first), std::move(rest));
             }
 
-            static inline typename proof_system::verification_key_type
+            static inline typename scheme_type::verification_key_type
                 verification_key_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using verification_key_type = typename proof_system::verification_key_type;
+                using verification_key_type = typename scheme_type::verification_key_type;
 
                 typename CurveType::gt_type::value_type alpha_g1_beta_g2 =
                     field_type_process<typename CurveType::gt_type>(read_iter);
@@ -650,10 +652,10 @@ namespace nil {
                 return verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
             }
 
-            static inline typename proof_system::primary_input_type
+            static inline typename scheme_type::primary_input_type
                 primary_input_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using primary_input_type = typename proof_system::primary_input_type;
+                using primary_input_type = typename scheme_type::primary_input_type;
 
                 std::size_t pi_count = std_size_t_process(read_iter);
 
@@ -666,10 +668,10 @@ namespace nil {
                 return primary_input_type(pi);
             }
 
-            static inline typename proof_system::proof_type
+            static inline typename scheme_type::proof_type
                 proof_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                using proof_type = typename proof_system::proof_type;
+                using proof_type = typename scheme_type::proof_type;
 
                 typename CurveType::g1_type::value_type g_A =
                     g1_group_type_process<typename CurveType::g1_type>(read_iter);
@@ -682,18 +684,16 @@ namespace nil {
                 return pr;
             }
 
-        public:
-
             struct verifier_data {
-                typename proof_system::verification_key_type vk;
-                typename proof_system::primary_input_type pi;
-                typename proof_system::proof_type pr;
+                typename scheme_type::verification_key_type vk;
+                typename scheme_type::primary_input_type pi;
+                typename scheme_type::proof_type pr;
 
                 verifier_data() {};
 
-                verifier_data(typename proof_system::verification_key_type vk,
-                              typename proof_system::primary_input_type pi,
-                              typename proof_system::proof_type pr) :
+                verifier_data(typename scheme_type::verification_key_type vk,
+                              typename scheme_type::primary_input_type pi,
+                              typename scheme_type::proof_type pr) :
                     vk(vk),
                     pi(pi), pr(pr) {};
             };
@@ -702,23 +702,23 @@ namespace nil {
 
                 typename std::vector<chunk_type>::const_iterator read_iter = data.begin();
 
-                typename proof_system::verification_key_type vk = verification_key_process(read_iter);
+                typename scheme_type::verification_key_type vk = verification_key_process(read_iter);
 
-                typename proof_system::primary_input_type pi = primary_input_process(read_iter);
+                typename scheme_type::primary_input_type pi = primary_input_process(read_iter);
 
-                typename proof_system::proof_type pr = proof_process(read_iter);
+                typename scheme_type::proof_type pr = proof_process(read_iter);
 
                 return verifier_data(vk, pi, pr);
             }
         };
 
         template<typename ProofSystem>
-        class verifier_input_serializer_tvm;
+        struct verifier_input_serializer_tvm;
 
         template<>
-        class verifier_input_serializer_tvm<r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
+        struct verifier_input_serializer_tvm<r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
             using CurveType = typename algebra::curves::bls12<381>;
-            using proof_system = r1cs_gg_ppzksnark<CurveType>;
+            using scheme_type = r1cs_gg_ppzksnark<CurveType>;
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
@@ -769,6 +769,8 @@ namespace nil {
                 auto compressed_curve_group_element = curve_element_serializer<CurveType>::point_to_octets_compress(input_g);
 
                 copy(compressed_curve_group_element.begin(), compressed_curve_group_element.end(), write_iter);
+
+                write_iter += compressed_curve_group_element.size();
             }
 
             static inline void std_size_t_process(std::size_t input_s,
@@ -816,20 +818,20 @@ namespace nil {
                 sparse_vector_process(input_acc.rest, write_iter);
             }
 
-            static inline std::vector<chunk_type> process(typename proof_system::verification_key_type vk) {
+            static inline std::vector<chunk_type> process(typename scheme_type::verification_key_type vk) {
 
-                std::size_t g1_size = modulus_chunks * 3 * CurveType::g1_type::underlying_field_type::arity;
-                std::size_t g2_size = modulus_chunks * 3 * CurveType::g2_type::underlying_field_type::arity;
+                std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
+                std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t std_size_t_size = 4;
 
                 std::size_t gt_size = modulus_chunks * CurveType::gt_type::underlying_field_type::arity;
 
                 std::size_t sparse_vector_size =
                     std_size_t_size + vk.gamma_ABC_g1.rest.size() * std_size_t_size + std_size_t_size +
-                    vk.gamma_ABC_g1.rest.values.size() * g1_size + std_size_t_size;
+                    vk.gamma_ABC_g1.rest.values.size() * g1_byteblob_size + std_size_t_size;
 
                 std::size_t verification_key_size =
-                    gt_size + g2_size + g2_size + g1_size + sparse_vector_size;
+                    gt_size + g2_byteblob_size + g2_byteblob_size + g1_byteblob_size + sparse_vector_size;
 
                 std::vector<chunk_type> output(verification_key_size);
 
@@ -844,7 +846,7 @@ namespace nil {
                 return output;
             }
 
-            static inline std::vector<chunk_type> process(typename proof_system::primary_input_type pi) {
+            static inline std::vector<chunk_type> process(typename scheme_type::primary_input_type pi) {
 
                 std::size_t std_size_t_size = 4;
 
@@ -865,12 +867,12 @@ namespace nil {
                 return output;
             }
 
-            static inline std::vector<chunk_type> process(typename proof_system::proof_type pr) {
+            static inline std::vector<chunk_type> process(typename scheme_type::proof_type pr) {
 
-                std::size_t g1_size = modulus_chunks * 3 * CurveType::g1_type::underlying_field_type::arity;
-                std::size_t g2_size = modulus_chunks * 3 * CurveType::g2_type::underlying_field_type::arity;
+                std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
+                std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
 
-                std::size_t proof_size = g1_size + g2_size + g1_size;
+                std::size_t proof_size = g1_byteblob_size + g2_byteblob_size + g1_byteblob_size;
 
                 std::vector<chunk_type> output(proof_size);
 
