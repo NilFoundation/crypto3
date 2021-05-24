@@ -22,48 +22,28 @@ cm_setup_version(VERSION 1.74.0)
 
 option(BUILD_TESTS "Build unit tests" FALSE)
 
-if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
-    set(BOOST_CMAKE TRUE)
+cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
-    cm_project(random WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+find_package(Boost REQUIRED COMPONENTS random)
 
-    find_package(${CMAKE_WORKSPACE_NAME}_core)
-    find_package(${CMAKE_WORKSPACE_NAME}_config)
-    find_package(${CMAKE_WORKSPACE_NAME}_math)
+cm_project(random WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} "src/random_device.cpp")
-    set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME ${CURRENT_PROJECT_NAME})
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
+set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY
+             EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE ${CMAKE_WORKSPACE_NAME}::core)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE ${CMAKE_WORKSPACE_NAME}::config)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE ${CMAKE_WORKSPACE_NAME}::math)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
-                          ${CMAKE_WORKSPACE_NAME}::multiprecision)
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE 
-        crypto3::hash crypto3::mac crypto3::stream)
+                      crypto3::hash
+                      crypto3::mac
+                      crypto3::stream
 
-else()
-    cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
+                      ${Boost_LIBRARIES})
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
 
-    find_package(Boost REQUIRED)
-
-    cm_project(random WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
-
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} "src/random_device.cpp")
-    set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME ${CURRENT_PROJECT_NAME})
-
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
-    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                               $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-
-                               crypto3::hash
-                               crypto3::mac
-                               crypto3::stream
-
-                               ${Boost_INCLUDE_DIR})
-endif()
+                           ${Boost_INCLUDE_DIR})
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
