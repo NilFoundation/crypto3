@@ -92,7 +92,6 @@ namespace nil {
             using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
             using modulus_type = typename CurveType::base_field_type::modulus_type;
-            using number_type = typename CurveType::base_field_type::number_type;
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
@@ -157,6 +156,7 @@ namespace nil {
             static inline std::size_t
                 std_size_t_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
+                std::size_t std_size_t_size = 4;
                 std::vector<std::size_t> vector_s(1, 0);
                 auto iter = vector_s.begin();
 
@@ -169,7 +169,7 @@ namespace nil {
                 nil::crypto3::detail::pack_from<nil::crypto3::stream_endian::big_octet_big_bit, 8, 32>(
                     vector_c, iter);
 
-                read_iter += sizeof(std::size_t);
+                read_iter += std_size_t_size;
 
                 return vector_s[0];
             }
@@ -314,10 +314,6 @@ namespace nil {
 
             constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
 
-            typedef nil::crypto3::multiprecision::number<
-                nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                modulus_type;
-
             using chunk_type = std::uint8_t;
 
             constexpr static const std::size_t chunk_size = 8;
@@ -330,6 +326,10 @@ namespace nil {
                                         void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
+
+                typedef nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                    modulus_type;
 
                 nil::crypto3::multiprecision::export_bits(modulus_type(input_fp.data), write_iter,
                                                           chunk_size, false);
@@ -366,13 +366,15 @@ namespace nil {
             static inline void std_size_t_process(std::size_t input_s,
                                                   std::vector<chunk_type>::iterator &write_iter) {
 
+                std::size_t std_size_t_size = 4;
+
                 std::vector<std::size_t> vector_s = {input_s};
 
                 auto internal_write_iter = write_iter;
                 nil::crypto3::detail::pack_to<nil::crypto3::stream_endian::big_octet_big_bit, 32, 8>(
                     vector_s, internal_write_iter);
 
-                write_iter += sizeof(std::size_t);
+                write_iter += std_size_t_size;
             }
 
             template<typename T>
@@ -472,8 +474,7 @@ namespace nil {
                 std::size_t primary_input_size = std_size_t_size + vd.pi.size() * modulus_chunks;
                 std::size_t proof_size = g1_size + g2_size + g1_size;
 
-                std::vector<chunk_type> output(2 *
-                                               (verification_key_size + primary_input_size + proof_size));
+                std::vector<chunk_type> output(verification_key_size + primary_input_size + proof_size);
 
                 typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
@@ -507,19 +508,11 @@ namespace nil {
         template<>
         struct verifier_input_deserializer_tvm<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
         
-
             using CurveType = typename algebra::curves::bls12<381>;
             using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
 
-            using modulus_type = typename CurveType::base_field_type::modulus_type;
-            using number_type = typename CurveType::base_field_type::number_type;
-
-            constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
-
             using chunk_type = std::uint8_t;
-
             constexpr static const std::size_t chunk_size = 8;
-            constexpr static const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
             static inline
@@ -527,7 +520,13 @@ namespace nil {
                                         typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
+                using modulus_type = typename FieldType::modulus_type;
+
                 using field_type = FieldType;
+
+                constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
+
+                constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
                 modulus_type fp_out;
 
@@ -589,6 +588,7 @@ namespace nil {
             static inline std::size_t
                 std_size_t_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
+                std::size_t std_size_t_size = 4;
                 std::vector<std::size_t> vector_s(1, 0);
                 auto iter = vector_s.begin();
 
@@ -601,7 +601,7 @@ namespace nil {
                 nil::crypto3::detail::pack_from<nil::crypto3::stream_endian::big_octet_big_bit, 8, 32>(
                     vector_c, iter);
 
-                read_iter += sizeof(std::size_t);
+                read_iter += std_size_t_size;
 
                 return vector_s[0];
             }
@@ -734,21 +734,12 @@ namespace nil {
         template<>
         struct verifier_input_serializer_tvm<nil::crypto3::zk::snark::r1cs_gg_ppzksnark<algebra::curves::bls12<381>>> {
 
-            
-
             using CurveType = typename algebra::curves::bls12<381>;
             using scheme_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark<CurveType>;
-
-            constexpr static const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
-
-            typedef nil::crypto3::multiprecision::number<
-                nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                modulus_type;
 
             using chunk_type = std::uint8_t;
 
             constexpr static const std::size_t chunk_size = 8;
-            constexpr static const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
 
@@ -757,6 +748,14 @@ namespace nil {
                                         void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
+
+                typedef nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                    modulus_type;
+
+                constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
+
+                constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
                 nil::crypto3::multiprecision::export_bits(modulus_type(input_fp.data), write_iter,
                                                           chunk_size, false);
@@ -782,9 +781,20 @@ namespace nil {
             }
 
             template<typename GroupType>
-            static inline void group_type_process(typename GroupType::value_type input_g,
+            static inline void g1_group_type_process(typename GroupType::value_type input_g,
                                                   typename std::vector<chunk_type>::iterator &write_iter) {
 
+                auto compressed_curve_group_element = curve_element_serializer<CurveType>::point_to_octets_compress(input_g);
+
+                copy(compressed_curve_group_element.begin(), compressed_curve_group_element.end(), write_iter);
+
+                write_iter += compressed_curve_group_element.size();
+            }
+
+            template<typename GroupType>
+            static inline void g2_group_type_process(typename GroupType::value_type input_g,
+                                                  typename std::vector<chunk_type>::iterator &write_iter) {
+                
                 auto compressed_curve_group_element = curve_element_serializer<CurveType>::point_to_octets_compress(input_g);
 
                 copy(compressed_curve_group_element.begin(), compressed_curve_group_element.end(), write_iter);
@@ -795,19 +805,23 @@ namespace nil {
             static inline void std_size_t_process(std::size_t input_s,
                                                   std::vector<chunk_type>::iterator &write_iter) {
 
+                std::size_t std_size_t_size = 4;
                 std::vector<std::size_t> vector_s = {input_s};
 
                 auto internal_write_iter = write_iter;
                 nil::crypto3::detail::pack_to<nil::crypto3::stream_endian::big_octet_big_bit, 32, 8>(
                     vector_s, internal_write_iter);
 
-                write_iter += sizeof(std::size_t);
+                write_iter += std_size_t_size;
             }
 
             static inline std::vector<chunk_type> process(typename scheme_type::verification_key_type vk) {
 
-                std::vector<typename CurveType::g1_type::value_type> ic = vk.gamma_ABC_g1.rest.values;
-                std::size_t ic_size = ic.size();
+                constexpr const std::size_t modulus_bits = CurveType::base_field_type::modulus_bits;
+
+                constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
+
+                std::size_t ic_size = vk.gamma_ABC_g1.rest.values.size();
 
                 std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
@@ -826,13 +840,13 @@ namespace nil {
                 typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
                 field_type_process<typename CurveType::gt_type>(vk.alpha_g1_beta_g2, write_iter);
-                group_type_process<typename CurveType::g2_type>(vk.gamma_g2, write_iter);
-                group_type_process<typename CurveType::g2_type>(vk.delta_g2, write_iter);
+                g2_group_type_process<typename CurveType::g2_type>(vk.gamma_g2, write_iter);
+                g2_group_type_process<typename CurveType::g2_type>(vk.delta_g2, write_iter);
 
-                std_size_t_process(ic.size(), write_iter);
+                std_size_t_process(ic_size, write_iter);
 
-                for (auto ic_iter = ic.begin(); ic_iter != ic.end(); ic_iter++) {
-                    group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
+                for (auto ic_iter = vk.gamma_ABC_g1.rest.values.begin(); ic_iter != vk.gamma_ABC_g1.rest.values.end(); ic_iter++) {
+                    g1_group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
                 }
 
                 return output;
@@ -840,13 +854,17 @@ namespace nil {
 
             static inline std::vector<chunk_type> process(typename scheme_type::primary_input_type pi) {
 
+                constexpr const std::size_t modulus_bits = CurveType::scalar_field_type::modulus_bits;
+
+                constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
+
                 std::size_t std_size_t_size = 4;
 
                 std::size_t pi_count = pi.size();
 
-                std::size_t primary_input_size = std_size_t_size + pi_count * modulus_chunks;
+                std::size_t primary_byteblob_input_size = std_size_t_size + pi_count * modulus_chunks;
 
-                std::vector<chunk_type> output(primary_input_size);
+                std::vector<chunk_type> output(primary_byteblob_input_size);
 
                 typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
@@ -870,9 +888,9 @@ namespace nil {
 
                 typename std::vector<chunk_type>::iterator write_iter = output.begin();
 
-                group_type_process<typename CurveType::g1_type>(pr.g_A, write_iter);
-                group_type_process<typename CurveType::g2_type>(pr.g_B, write_iter);
-                group_type_process<typename CurveType::g1_type>(pr.g_C, write_iter);
+                g1_group_type_process<typename CurveType::g1_type>(pr.g_A, write_iter);
+                g2_group_type_process<typename CurveType::g2_type>(pr.g_B, write_iter);
+                g1_group_type_process<typename CurveType::g1_type>(pr.g_C, write_iter);
 
                 return output;
             }
