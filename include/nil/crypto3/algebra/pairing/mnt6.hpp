@@ -33,10 +33,10 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct mnt4;
 
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct mnt6;
 
             }    // namespace curves
@@ -45,12 +45,12 @@ namespace nil {
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                class pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions> {
+                template<std::size_t Version, typename PairingFunctions>
+                class pairing_policy<curves::mnt6<Version>, PairingFunctions> {
                     using policy_type = PairingFunctions;
 
                 public:
-                    typedef curves::mnt4<ModulusBits> pair_curve_type;
+                    typedef curves::mnt4<Version> pair_curve_type;
 
                     typedef typename policy_type::number_type number_type;
 
@@ -137,24 +137,24 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::number_type const
-                    pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::pairing_loop_count;
+                template<std::size_t Version, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::number_type const
+                    pairing_policy<curves::mnt6<Version>, PairingFunctions>::pairing_loop_count;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr bool const pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::ate_is_loop_count_neg;
+                template<std::size_t Version, typename PairingFunctions>
+                constexpr bool const pairing_policy<curves::mnt6<Version>, PairingFunctions>::ate_is_loop_count_neg;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::number_type const
-                    pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_abs_of_w0;
+                template<std::size_t Version, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::number_type const
+                    pairing_policy<curves::mnt6<Version>, PairingFunctions>::final_exponent_last_chunk_abs_of_w0;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
+                template<std::size_t Version, typename PairingFunctions>
                 constexpr bool const
-                    pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_is_w0_neg;
+                    pairing_policy<curves::mnt6<Version>, PairingFunctions>::final_exponent_last_chunk_is_w0_neg;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::number_type const
-                    pairing_policy<curves::mnt6<ModulusBits>, PairingFunctions>::final_exponent_last_chunk_w1;
+                template<std::size_t Version, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::number_type const
+                    pairing_policy<curves::mnt6<Version>, PairingFunctions>::final_exponent_last_chunk_w1;
 
             }    // namespace pairing
         }        // namespace algebra

@@ -46,10 +46,10 @@ namespace nil {
                  * Missing q doesn't matter for SRP, and nothing but SRP should be
                  * using these parameters.
                  *
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct modp_srp : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct modp_srp : public field<Version> { };
 
                 template<>
                 struct modp_srp<1024> : public field<1024> {

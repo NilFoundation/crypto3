@@ -43,11 +43,11 @@ namespace nil {
                     using namespace algebra;
 
                     /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
 
-                    template<std::size_t ModulusBits = 381>
+                    template<std::size_t Version = 381>
                     struct bls12_basic_policy { };
 
                     /** @brief A struct representing details about base and scalar fields of the size 381 bits and 255

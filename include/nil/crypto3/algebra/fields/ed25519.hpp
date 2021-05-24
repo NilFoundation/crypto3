@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief ED25519 groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct ed25519 : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct ed25519 : public field<Version> { };
 
                 template<>
                 struct ed25519<255> : public field<255> {

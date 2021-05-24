@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct bls12_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct bls12_base_field;
 
                 template<>
                 struct bls12_base_field<381> : public field<381> {
@@ -99,11 +99,11 @@ namespace nil {
                 constexpr typename bls12_base_field<381>::modulus_type const bls12_base_field<381>::modulus;
                 constexpr typename bls12_base_field<377>::modulus_type const bls12_base_field<377>::modulus;
 
-                template<std::size_t ModulusBits = 381>
-                using bls12_fq = bls12_base_field<ModulusBits>;
+                template<std::size_t Version = 381>
+                using bls12_fq = bls12_base_field<Version>;
 
-                template<std::size_t ModulusBits = 381>
-                using bls12 = bls12_base_field<ModulusBits>;
+                template<std::size_t Version = 381>
+                using bls12 = bls12_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

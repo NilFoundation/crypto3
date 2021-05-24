@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct sm2p_v1_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct sm2p_v1_scalar_field : public field<Version> { };
 
                 template<>
                 struct sm2p_v1_scalar_field<256> : public field<256> {
@@ -68,8 +68,8 @@ namespace nil {
 
                 constexpr typename sm2p_v1_scalar_field<256>::modulus_type const sm2p_v1_scalar_field<256>::modulus;
 
-                template<std::size_t ModulusBits = 256>
-                using sm2p_v1_fr = sm2p_v1_scalar_field<ModulusBits>;
+                template<std::size_t Version = 256>
+                using sm2p_v1_fr = sm2p_v1_scalar_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

@@ -40,14 +40,14 @@ namespace nil {
 
                 /*!
                  * @brief
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct bls12_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct bls12_scalar_field;
 
                 template<>
-                struct bls12_scalar_field<381> : public field<381> {
-                    typedef field<381> policy_type;
+                struct bls12_scalar_field<381> : public field<255> {
+                    typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -67,8 +67,8 @@ namespace nil {
                 };
 
                 template<>
-                struct bls12_scalar_field<377> : public field<377> {
-                    typedef field<377> policy_type;
+                struct bls12_scalar_field<377> : public field<253> {
+                    typedef field<253> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -99,8 +99,8 @@ namespace nil {
                 constexpr typename bls12_scalar_field<381>::modulus_type const bls12_scalar_field<381>::modulus;
                 constexpr typename bls12_scalar_field<377>::modulus_type const bls12_scalar_field<377>::modulus;
 
-                template<std::size_t ModulusBits = 381>
-                using bls12_fr = bls12_scalar_field<ModulusBits>;
+                template<std::size_t Version = 381>
+                using bls12_fr = bls12_scalar_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

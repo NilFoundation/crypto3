@@ -43,11 +43,11 @@ namespace nil {
 
                     /************************* BN128 ***********************************/
 
-                    template<std::size_t ModulusBits>
-                    class fp6_3over2_extension_params<fields::bn128<ModulusBits>>
-                        : public params<fields::bn128<ModulusBits>> {
+                    template<std::size_t Version>
+                    class fp6_3over2_extension_params<fields::bn128<Version>>
+                        : public params<fields::bn128<Version>> {
 
-                        typedef fields::bn128<ModulusBits> base_field_type;
+                        typedef fields::bn128<Version> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -82,18 +82,18 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
                     };
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue_type const
-                        fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::non_residue;
+                    template<std::size_t Version>
+                    constexpr typename fp6_3over2_extension_params<bn128_base_field<Version>>::non_residue_type const
+                        fp6_3over2_extension_params<bn128_base_field<Version>>::non_residue;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 6 * 2> const
-                        fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
-                    template<std::size_t ModulusBits>
+                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c1;
+                    template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::modulus_type, 6 * 2> const
-                        fp6_3over2_extension_params<bn128_base_field<ModulusBits>>::Frobenius_coeffs_c2;
+                        typename fp6_3over2_extension_params<bn128_base_field<Version>>::modulus_type, 6 * 2> const
+                        fp6_3over2_extension_params<bn128_base_field<Version>>::Frobenius_coeffs_c2;
 
                 }    // namespace detail
             }        // namespace fields

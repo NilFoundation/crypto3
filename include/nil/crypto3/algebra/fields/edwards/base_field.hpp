@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits = 183>
-                struct edwards_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct edwards_base_field;
 
                 template<>
                 struct edwards_base_field<183> : public field<183> {
@@ -74,11 +74,11 @@ namespace nil {
 
                 constexpr typename edwards_base_field<183>::modulus_type const edwards_base_field<183>::modulus;
 
-                template<std::size_t ModulusBits = 183>
-                using edwards_fq = edwards_base_field<ModulusBits>;
+                template<std::size_t Version = 183>
+                using edwards_fq = edwards_base_field<Version>;
 
-                template<std::size_t ModulusBits = 183>
-                using edwards = edwards_base_field<ModulusBits>;
+                template<std::size_t Version = 183>
+                using edwards = edwards_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

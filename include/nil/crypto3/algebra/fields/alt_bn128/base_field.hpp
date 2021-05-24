@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits = 254>
-                struct alt_bn128_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct alt_bn128_base_field;
 
                 template<>
                 struct alt_bn128_base_field<254> : public field<254> {
@@ -79,11 +79,11 @@ namespace nil {
                 constexpr
                     typename alt_bn128_base_field<254>::modulus_type const alt_bn128_base_field<254>::mul_generator;
 
-                template<std::size_t ModulusBits = 254>
-                using alt_bn128_fq = alt_bn128_base_field<ModulusBits>;
+                template<std::size_t Version = 254>
+                using alt_bn128_fq = alt_bn128_base_field<Version>;
 
-                template<std::size_t ModulusBits = 254>
-                using alt_bn128 = alt_bn128_base_field<ModulusBits>;
+                template<std::size_t Version = 254>
+                using alt_bn128 = alt_bn128_base_field<Version>;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

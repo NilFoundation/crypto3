@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct brainpool_r1_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct brainpool_r1_scalar_field;
 
                 template<>
                 struct brainpool_r1_scalar_field<160> : public field<160> {
@@ -188,20 +188,20 @@ namespace nil {
                 constexpr
                     typename brainpool_r1_scalar_field<512>::modulus_type const brainpool_r1_scalar_field<512>::modulus;
 
-                template<std::size_t ModulusBits = 160>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 224>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 256>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 320>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 384>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
-                template<std::size_t ModulusBits = 512>
-                using brainpool_r1_fr = brainpool_r1_scalar_field<ModulusBits>;
+                template<std::size_t Version = 160>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 192>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 224>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 256>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 320>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 384>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
+                template<std::size_t Version = 512>
+                using brainpool_r1_fr = brainpool_r1_scalar_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

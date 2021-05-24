@@ -34,7 +34,7 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 254>
+                    template<std::size_t Version = 254>
                     struct alt_bn128_basic_policy;
 
                     template<>

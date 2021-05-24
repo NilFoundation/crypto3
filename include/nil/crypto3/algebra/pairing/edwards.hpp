@@ -33,7 +33,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct edwards;
 
             }    // namespace curves
@@ -42,8 +42,8 @@ namespace nil {
                 template<typename PairingCurveType, typename PairingFunctions>
                 struct pairing_policy;
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                class pairing_policy<curves::edwards<ModulusBits>, PairingFunctions> {
+                template<std::size_t Version, typename PairingFunctions>
+                class pairing_policy<curves::edwards<Version>, PairingFunctions> {
 
                     using policy_type = PairingFunctions;
 
@@ -101,9 +101,9 @@ namespace nil {
                     }
                 };
 
-                template<std::size_t ModulusBits, typename PairingFunctions>
-                constexpr typename pairing_policy<curves::edwards<ModulusBits>, PairingFunctions>::number_type const
-                    pairing_policy<curves::edwards<ModulusBits>, PairingFunctions>::pairing_loop_count;
+                template<std::size_t Version, typename PairingFunctions>
+                constexpr typename pairing_policy<curves::edwards<Version>, PairingFunctions>::number_type const
+                    pairing_policy<curves::edwards<Version>, PairingFunctions>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

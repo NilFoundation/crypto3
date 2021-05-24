@@ -45,11 +45,11 @@ namespace nil {
 
                     /************************* EDWARDS ***********************************/
 
-                    template<std::size_t ModulusBits>
-                    class fp3_extension_params<fields::edwards_base_field<ModulusBits>>
-                        : public params<fields::edwards_base_field<ModulusBits>> {
+                    template<std::size_t Version>
+                    class fp3_extension_params<fields::edwards_base_field<Version>>
+                        : public params<fields::edwards_base_field<Version>> {
 
-                        typedef fields::edwards_base_field<ModulusBits> base_field_type;
+                        typedef fields::edwards_base_field<Version> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -97,44 +97,44 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x3D);
                     };
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp3_extension_params<edwards_base_field<ModulusBits>>::non_residue_type const
-                        fp3_extension_params<edwards_base_field<ModulusBits>>::non_residue;
+                    template<std::size_t Version>
+                    constexpr typename fp3_extension_params<edwards_base_field<Version>>::non_residue_type const
+                        fp3_extension_params<edwards_base_field<Version>>::non_residue;
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename std::size_t const fp3_extension_params<edwards_base_field<ModulusBits>>::s;
+                    template<std::size_t Version>
+                    constexpr typename std::size_t const fp3_extension_params<edwards_base_field<Version>>::s;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr
-                        typename fp3_extension_params<edwards_base_field<ModulusBits>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<ModulusBits>>::t;
+                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                            fp3_extension_params<edwards_base_field<Version>>::t;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr
-                        typename fp3_extension_params<edwards_base_field<ModulusBits>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<ModulusBits>>::t_minus_1_over_2;
+                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                            fp3_extension_params<edwards_base_field<Version>>::t_minus_1_over_2;
 
-                    template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp3_extension_params<edwards_base_field<ModulusBits>>::modulus_type,
-                                         3> const fp3_extension_params<edwards_base_field<ModulusBits>>::nqr;
+                    template<std::size_t Version>
+                    constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
+                                         3> const fp3_extension_params<edwards_base_field<Version>>::nqr;
 
-                    template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp3_extension_params<edwards_base_field<ModulusBits>>::modulus_type,
-                                         3> const fp3_extension_params<edwards_base_field<ModulusBits>>::nqr_to_t;
+                    template<std::size_t Version>
+                    constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
+                                         3> const fp3_extension_params<edwards_base_field<Version>>::nqr_to_t;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr
-                        typename fp3_extension_params<edwards_base_field<ModulusBits>>::extended_modulus_type const
-                            fp3_extension_params<edwards_base_field<ModulusBits>>::group_order;
+                        typename fp3_extension_params<edwards_base_field<Version>>::extended_modulus_type const
+                            fp3_extension_params<edwards_base_field<Version>>::group_order;
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp3_extension_params<edwards_base_field<ModulusBits>>::modulus_type const
-                        fp3_extension_params<edwards_base_field<ModulusBits>>::modulus;
+                    template<std::size_t Version>
+                    constexpr typename fp3_extension_params<edwards_base_field<Version>>::modulus_type const
+                        fp3_extension_params<edwards_base_field<Version>>::modulus;
 
-                    template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp3_extension_params<edwards_base_field<ModulusBits>>::modulus_type,
+                    template<std::size_t Version>
+                    constexpr std::array<typename fp3_extension_params<edwards_base_field<Version>>::modulus_type,
                                          3> const
-                        fp3_extension_params<edwards_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                        fp3_extension_params<edwards_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

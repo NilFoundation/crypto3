@@ -33,7 +33,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct edwards;
 
                 namespace detail {

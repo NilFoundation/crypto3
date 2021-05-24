@@ -35,7 +35,7 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 183>
+                    template<std::size_t Version = 183>
                     struct edwards_basic_policy;
 
                     template<>

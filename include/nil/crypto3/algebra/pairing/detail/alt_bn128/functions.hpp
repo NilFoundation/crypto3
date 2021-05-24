@@ -36,7 +36,7 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 254>
+                    template<std::size_t Version = 254>
                     class alt_bn128_pairing_functions;
 
                     template<>

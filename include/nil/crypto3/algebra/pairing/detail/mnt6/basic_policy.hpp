@@ -35,7 +35,7 @@ namespace nil {
             namespace pairing {
                 namespace detail {
 
-                    template<std::size_t ModulusBits = 298>
+                    template<std::size_t Version = 298>
                     class mnt6_basic_policy;
 
                     template<>

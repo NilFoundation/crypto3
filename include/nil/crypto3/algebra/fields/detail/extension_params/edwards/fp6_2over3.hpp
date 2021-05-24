@@ -43,11 +43,11 @@ namespace nil {
 
                     /************************* EDWARDS ***********************************/
 
-                    template<std::size_t ModulusBits>
-                    class fp6_2over3_extension_params<fields::edwards_base_field<ModulusBits>>
-                        : public params<fields::edwards_base_field<ModulusBits>> {
+                    template<std::size_t Version>
+                    class fp6_2over3_extension_params<fields::edwards_base_field<Version>>
+                        : public params<fields::edwards_base_field<Version>> {
 
-                        typedef fields::edwards_base_field<ModulusBits> base_field_type;
+                        typedef fields::edwards_base_field<Version> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -81,18 +81,18 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x3D);
                     };
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::non_residue_type const
-                        fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::non_residue;
+                    template<std::size_t Version>
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<Version>>::non_residue_type const
+                        fp6_2over3_extension_params<edwards_base_field<Version>>::non_residue;
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type const
-                        fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus;
+                    template<std::size_t Version>
+                    constexpr typename fp6_2over3_extension_params<edwards_base_field<Version>>::modulus_type const
+                        fp6_2over3_extension_params<edwards_base_field<Version>>::modulus;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr std::array<
-                        typename fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::modulus_type, 6> const
-                        fp6_2over3_extension_params<edwards_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                        typename fp6_2over3_extension_params<edwards_base_field<Version>>::modulus_type, 6> const
+                        fp6_2over3_extension_params<edwards_base_field<Version>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

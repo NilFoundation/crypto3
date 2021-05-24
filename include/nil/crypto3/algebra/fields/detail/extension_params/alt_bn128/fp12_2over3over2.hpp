@@ -47,11 +47,11 @@ namespace nil {
 
                     /************************* ALT_BN128 ***********************************/
 
-                    template<std::size_t ModulusBits>
-                    class fp12_2over3over2_extension_params<fields::alt_bn128<ModulusBits>>
-                        : public params<fields::alt_bn128<ModulusBits>> {
+                    template<std::size_t Version>
+                    class fp12_2over3over2_extension_params<fields::alt_bn128<Version>>
+                        : public params<fields::alt_bn128<Version>> {
 
-                        typedef fields::alt_bn128<ModulusBits> base_field_type;
+                        typedef fields::alt_bn128<Version> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -117,15 +117,15 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
                     };
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::non_residue_type
-                         const fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::non_residue;
+                    template<std::size_t Version>
+                    constexpr typename fp12_2over3over2_extension_params<alt_bn128_base_field<Version>>::non_residue_type
+                         const fp12_2over3over2_extension_params<alt_bn128_base_field<Version>>::non_residue;
 
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     constexpr std::array<
-                        typename fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::modulus_type,
+                        typename fp12_2over3over2_extension_params<alt_bn128_base_field<Version>>::modulus_type,
                         12 * 2> const
-                        fp12_2over3over2_extension_params<alt_bn128_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                        fp12_2over3over2_extension_params<alt_bn128_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

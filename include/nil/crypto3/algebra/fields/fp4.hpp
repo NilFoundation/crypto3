@@ -43,7 +43,7 @@ namespace nil {
 
                 /*!
                  * @brief
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
                 template<typename BaseField>
                 struct fp4 {

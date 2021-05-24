@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief DSA group
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct dsa_jce : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct dsa_jce : public field<Version> { };
 
                 template<>
                 struct dsa_jce<1024> : public field<1024> {

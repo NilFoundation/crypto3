@@ -45,7 +45,7 @@ namespace nil {
 
                 /*!
                  * @brief
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
                 template<typename BaseField>
                 struct fp12_2over3over2 {

@@ -39,13 +39,13 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 /** @brief A struct representing a mnt6 curve.
-                 *    @tparam ModulusBits size of the base field in bits
+                 *    @tparam Version size of the base field in bits
                  *
                  */
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 class mnt6 {
 
-                    using policy_type = detail::mnt6_basic_policy<ModulusBits>;
+                    using policy_type = detail::mnt6_basic_policy<Version>;
 
                 public:
                     typedef typename policy_type::base_field_type base_field_type;
@@ -63,11 +63,11 @@ namespace nil {
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
-                    typedef typename detail::mnt6_g1<ModulusBits> g1_type;
-                    typedef typename detail::mnt6_g2<ModulusBits> g2_type;
+                    typedef typename detail::mnt6_g1<Version> g1_type;
+                    typedef typename detail::mnt6_g2<Version> g2_type;
 
-                    typedef typename pairing::pairing_policy<mnt6<ModulusBits>,
-                                                             pairing::detail::mnt6_pairing_functions<ModulusBits>>
+                    typedef typename pairing::pairing_policy<mnt6<Version>,
+                                                             pairing::detail::mnt6_pairing_functions<Version>>
                         pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;
@@ -80,10 +80,10 @@ namespace nil {
 
                 typedef mnt6<298> mnt6_298;
 
-                template<std::size_t ModulusBits>
-                constexpr typename mnt6<ModulusBits>::number_type const mnt6<ModulusBits>::a;
-                template<std::size_t ModulusBits>
-                constexpr typename mnt6<ModulusBits>::number_type const mnt6<ModulusBits>::b;
+                template<std::size_t Version>
+                constexpr typename mnt6<Version>::number_type const mnt6<Version>::a;
+                template<std::size_t Version>
+                constexpr typename mnt6<Version>::number_type const mnt6<Version>::b;
 
             }    // namespace curves
         }        // namespace algebra

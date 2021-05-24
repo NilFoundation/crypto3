@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct gost_A_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct gost_A_base_field : public field<Version> { };
 
                 template<>
                 struct gost_A_base_field<256> : public field<256> {
@@ -68,11 +68,11 @@ namespace nil {
 
                 constexpr typename gost_A_base_field<256>::modulus_type const gost_A_base_field<256>::modulus;
 
-                template<std::size_t ModulusBits = 256>
-                using gost_A_fq = gost_A_base_field<ModulusBits>;
+                template<std::size_t Version = 256>
+                using gost_A_fq = gost_A_base_field<Version>;
 
-                template<std::size_t ModulusBits = 256>
-                using gost_A = gost_A_base_field<ModulusBits>;
+                template<std::size_t Version = 256>
+                using gost_A = gost_A_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

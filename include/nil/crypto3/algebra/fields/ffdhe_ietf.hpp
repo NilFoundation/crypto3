@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief TLS FFDHE groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct ffdhe_ietf : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct ffdhe_ietf : public field<Version> { };
 
                 template<>
                 struct ffdhe_ietf<2048> : public field<2048> {

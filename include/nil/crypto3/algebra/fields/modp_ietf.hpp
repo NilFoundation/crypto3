@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct modp_ietf : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct modp_ietf : public field<Version> { };
 
                 template<>
                 struct modp_ietf<1024> : public field<1024> {
@@ -176,11 +176,11 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
                 };
 
-                template<std::size_t ModulusBits>
-                constexpr typename modp_ietf<ModulusBits>::modulus_type const modp_ietf<ModulusBits>::modulus;
+                template<std::size_t Version>
+                constexpr typename modp_ietf<Version>::modulus_type const modp_ietf<Version>::modulus;
 
-                template<std::size_t ModulusBits>
-                constexpr typename modp_ietf<ModulusBits>::modulus_type const modp_ietf<ModulusBits>::mul_generator;
+                template<std::size_t Version>
+                constexpr typename modp_ietf<Version>::modulus_type const modp_ietf<Version>::mul_generator;
 
                 constexpr typename modp_ietf<1024>::modulus_type const modp_ietf<1024>::modulus;
                 constexpr typename modp_ietf<1536>::modulus_type const modp_ietf<1536>::modulus;

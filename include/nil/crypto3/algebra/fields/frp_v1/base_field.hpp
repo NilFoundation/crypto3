@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct frp_v1_base_fields : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct frp_v1_base_fields : public field<Version> { };
 
                 template<>
                 struct frp_v1_base_fields<256> : public field<256> {
@@ -68,11 +68,11 @@ namespace nil {
 
                 constexpr typename frp_v1_base_fields<256>::modulus_type const frp_v1_base_fields<256>::modulus;
 
-                template<std::size_t ModulusBits = 256>
-                using frp_v1_fq = frp_v1_base_field<ModulusBits>;
+                template<std::size_t Version = 256>
+                using frp_v1_fq = frp_v1_base_field<Version>;
 
-                template<std::size_t ModulusBits = 256>
-                using frp_v1 = frp_v1_base_field<ModulusBits>;
+                template<std::size_t Version = 256>
+                using frp_v1 = frp_v1_base_field<Version>;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

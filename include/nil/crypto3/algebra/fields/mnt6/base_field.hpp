@@ -40,10 +40,10 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits = 298>
-                struct mnt6_base_field : public field<ModulusBits> { };
+                template<std::size_t Version = 298>
+                struct mnt6_base_field : public field<Version> { };
 
                 template<>
                 struct mnt6_base_field<298> : public field<298> {
@@ -74,11 +74,11 @@ namespace nil {
 
                 constexpr typename mnt6_base_field<298>::modulus_type const mnt6_base_field<298>::modulus;
 
-                template<std::size_t ModulusBits = 298>
-                using mnt6_fq = mnt6_base_field<ModulusBits>;
+                template<std::size_t Version = 298>
+                using mnt6_fq = mnt6_base_field<Version>;
 
-                template<std::size_t ModulusBits = 298>
-                using mnt6 = mnt6_base_field<ModulusBits>;
+                template<std::size_t Version = 298>
+                using mnt6 = mnt6_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

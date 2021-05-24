@@ -107,10 +107,11 @@ namespace nil {
                                     typename CurveGroupType::value_type>::type
                 random_element() {
 
-                using field_type = typename CurveGroupType::underlying_field_type;
-                using distribution_type = DistributionType;
-                using generator_type = GeneratorType;
                 using curve_type = typename CurveGroupType::curve_type;
+                using field_type = typename curve_type::scalar_field_type;
+                using distribution_type = boost::random::uniform_int_distribution<typename field_type::modulus_type>;
+                using generator_type = GeneratorType;
+            
 
                 return random_element<typename curve_type::scalar_field_type, distribution_type, generator_type>() *
                        CurveGroupType::value_type::one();

@@ -40,14 +40,14 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a BLS12-381 and BLS12-377 curve.
-                 *  @tparam ModulusBits size of the base field in bits
+                 *  @tparam Version size of the base field in bits
                  *
                  *  The basic equation of the curve is y^2 = x^3 + 4.
                  */
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 class bls12 {
 
-                    using policy_type = detail::bls12_basic_policy<ModulusBits>;
+                    using policy_type = detail::bls12_basic_policy<Version>;
 
                 public:
                     typedef typename policy_type::base_field_type base_field_type;
@@ -65,13 +65,13 @@ namespace nil {
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
-                    typedef typename detail::bls12_g1<ModulusBits> g1_type;
-                    typedef typename detail::bls12_g2<ModulusBits> g2_type;
+                    typedef typename detail::bls12_g1<Version> g1_type;
+                    typedef typename detail::bls12_g2<Version> g2_type;
 
                     constexpr static const bool has_affine_pairing = false;
 
-                    typedef typename pairing::pairing_policy<bls12<ModulusBits>,
-                                                             pairing::detail::bls12_pairing_functions<ModulusBits>>
+                    typedef typename pairing::pairing_policy<bls12<Version>,
+                                                             pairing::detail::bls12_pairing_functions<Version>>
                         pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;

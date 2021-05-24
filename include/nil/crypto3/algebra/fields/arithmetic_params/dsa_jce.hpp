@@ -38,11 +38,11 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<dsa_jce_base_field<ModulusBits>>
-                    : public params<dsa_jce_base_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<dsa_jce_base_field<Version>>
+                    : public params<dsa_jce_base_field<Version>> {
                 private:
-                    typedef params<dsa_jce_base_field<ModulusBits>> policy_type;
+                    typedef params<dsa_jce_base_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -56,13 +56,13 @@ namespace nil {
                         0x9760508F15230BCCB292B982A2EB840BF0581CF5_cppui160;
                 };
 
-                template<std::size_t ModulusBits>
-                constexpr typename arithmetic_params<dsa_jce_base_field<ModulusBits>>::modulus_type const
-                    arithmetic_params<dsa_jce_base_field<ModulusBits>>::group_order;
+                template<std::size_t Version>
+                constexpr typename arithmetic_params<dsa_jce_base_field<Version>>::modulus_type const
+                    arithmetic_params<dsa_jce_base_field<Version>>::group_order;
 
-                template<std::size_t ModulusBits>
-                constexpr typename arithmetic_params<dsa_jce_base_field<ModulusBits>>::modulus_type const
-                    arithmetic_params<dsa_jce_base_field<ModulusBits>>::mul_generator;
+                template<std::size_t Version>
+                constexpr typename arithmetic_params<dsa_jce_base_field<Version>>::modulus_type const
+                    arithmetic_params<dsa_jce_base_field<Version>>::mul_generator;
 
             }    // namespace fields
         }        // namespace algebra

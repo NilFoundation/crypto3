@@ -40,16 +40,16 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct x962_p_v1_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v1_base_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct x962_p_v2_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v2_base_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct x962_p_v3_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v3_base_field : public field<Version> { };
 
                 template<>
                 struct x962_p_v2_base_field<192> : public field<192> {
@@ -150,27 +150,27 @@ namespace nil {
                 constexpr typename x962_p_v2_base_field<239>::modulus_type const x962_p_v2_base_field<239>::modulus;
                 constexpr typename x962_p_v3_base_field<239>::modulus_type const x962_p_v3_base_field<239>::modulus;
 
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v2_fq = x962_p_v2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v3_fq = x962_p_v3_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v1_fq = x962_p_v1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v2_fq = x962_p_v2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v3_fq = x962_p_v3_base_field<ModulusBits>;
+                template<std::size_t Version = 192>
+                using x962_p_v2_fq = x962_p_v2_base_field<Version>;
+                template<std::size_t Version = 192>
+                using x962_p_v3_fq = x962_p_v3_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v1_fq = x962_p_v1_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v2_fq = x962_p_v2_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v3_fq = x962_p_v3_base_field<Version>;
 
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v2 = x962_p_v2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v3 = x962_p_v3_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v1 = x962_p_v1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v2 = x962_p_v2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v3 = x962_p_v3_base_field<ModulusBits>;
+                template<std::size_t Version = 192>
+                using x962_p_v2 = x962_p_v2_base_field<Version>;
+                template<std::size_t Version = 192>
+                using x962_p_v3 = x962_p_v3_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v1 = x962_p_v1_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v2 = x962_p_v2_base_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v3 = x962_p_v3_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

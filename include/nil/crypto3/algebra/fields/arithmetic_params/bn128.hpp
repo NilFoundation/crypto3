@@ -39,10 +39,10 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<bn128_base_field<ModulusBits>> : public params<bn128_base_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<bn128_base_field<Version>> : public params<bn128_base_field<Version>> {
                 private:
-                    typedef params<bn128_base_field<ModulusBits>> policy_type;
+                    typedef params<bn128_base_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -71,11 +71,11 @@ namespace nil {
                         0x183227397098D014DC2822DB40C0AC2ECBC0B548B438E5469E10460B6C3E7EA3_cppui254;
                 };
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<fp2<bn128_base_field<ModulusBits>>>
-                    : public params<bn128_base_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<fp2<bn128_base_field<Version>>>
+                    : public params<bn128_base_field<Version>> {
                 private:
-                    typedef params<bn128_base_field<ModulusBits>> policy_type;
+                    typedef params<bn128_base_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -97,11 +97,11 @@ namespace nil {
                         0x492E25C3B1E5FCE2CCD37BE01A4690E5805C2A88B1BAB031376FD2E1A6359C682344F4ABD09216425280C4E36CB656E5301039684F560809DAA2C5113AEB4D8_cppui507;
                 };
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<bn128_scalar_field<ModulusBits>>
-                    : public params<bn128_scalar_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<bn128_scalar_field<Version>>
+                    : public params<bn128_scalar_field<Version>> {
                 private:
-                    typedef params<bn128_scalar_field<ModulusBits>> policy_type;
+                    typedef params<bn128_scalar_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

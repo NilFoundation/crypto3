@@ -40,14 +40,14 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a Barreto-Naehrig curve.
-                 *  @tparam ModulusBits size of the base field in bits
+                 *  @tparam Version size of the base field in bits
                  *
                  *  An alternative to `bn128`, somewhat slower but avoids dynamic code generation.
                  */
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct alt_bn128 {
 
-                    using policy_type = detail::alt_bn128_basic_policy<ModulusBits>;
+                    using policy_type = detail::alt_bn128_basic_policy<Version>;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -64,11 +64,11 @@ namespace nil {
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
-                    typedef typename detail::alt_bn128_g1<ModulusBits> g1_type;
-                    typedef typename detail::alt_bn128_g2<ModulusBits> g2_type;
+                    typedef typename detail::alt_bn128_g1<Version> g1_type;
+                    typedef typename detail::alt_bn128_g2<Version> g2_type;
 
-                    // typedef typename pairing::pairing_policy<alt_bn128<ModulusBits>,
-                    //    pairing::detail::alt_bn128_pairing_functions<ModulusBits>> pairing_policy;
+                    // typedef typename pairing::pairing_policy<alt_bn128<Version>,
+                    //    pairing::detail::alt_bn128_pairing_functions<Version>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
                 };

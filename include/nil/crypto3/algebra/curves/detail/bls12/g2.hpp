@@ -35,27 +35,27 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct bls12;
 
                 namespace detail {
 
                     /** @brief A struct representing a group G2 of BLS12 curve.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     struct bls12_g2 {
-                        using policy_type = bls12_basic_policy<ModulusBits>;
+                        using policy_type = bls12_basic_policy<Version>;
 
-                        using curve_type = bls12<ModulusBits>;
+                        using curve_type = bls12<Version>;
 
                         using underlying_field_type = typename policy_type::g2_field_type;
 
                         constexpr static const std::size_t value_bits =
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_bls12_g2<ModulusBits>;
+                        using value_type = element_bls12_g2<Version>;
                     };
 
                 }    // namespace detail

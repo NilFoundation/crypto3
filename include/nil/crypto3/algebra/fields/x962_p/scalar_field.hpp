@@ -40,16 +40,16 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct x962_p_v1_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v1_scalar_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct x962_p_v2_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v2_scalar_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct x962_p_v3_scalar_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct x962_p_v3_scalar_field : public field<Version> { };
 
                 template<>
                 struct x962_p_v2_scalar_field<192> : public field<192> {
@@ -150,16 +150,16 @@ namespace nil {
                 constexpr typename x962_p_v2_scalar_field<239>::modulus_type const x962_p_v2_scalar_field<239>::modulus;
                 constexpr typename x962_p_v3_scalar_field<239>::modulus_type const x962_p_v3_scalar_field<239>::modulus;
 
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v2_fr = x962_p_v2_scalar_field_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using x962_p_v3_fr = x962_p_v3_scalar_field_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v1_fr = x962_p_v1_scalar_field_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v2_fr = x962_p_v2_scalar_field_field<ModulusBits>;
-                template<std::size_t ModulusBits = 239>
-                using x962_p_v3_fr = x962_p_v3_scalar_field_field<ModulusBits>;
+                template<std::size_t Version = 192>
+                using x962_p_v2_fr = x962_p_v2_scalar_field_field<Version>;
+                template<std::size_t Version = 192>
+                using x962_p_v3_fr = x962_p_v3_scalar_field_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v1_fr = x962_p_v1_scalar_field_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v2_fr = x962_p_v2_scalar_field_field<Version>;
+                template<std::size_t Version = 239>
+                using x962_p_v3_fr = x962_p_v3_scalar_field_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra

@@ -39,11 +39,11 @@ namespace nil {
         namespace algebra {
             namespace fields {
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<edwards_base_field<ModulusBits>>
-                    : public params<edwards_base_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<edwards_base_field<Version>>
+                    : public params<edwards_base_field<Version>> {
                 private:
-                    typedef params<edwards_base_field<ModulusBits>> policy_type;
+                    typedef params<edwards_base_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -71,11 +71,11 @@ namespace nil {
                         0x206AFE4E951CAD89C5C9276B1A16A0DB75B485C0000000_cppui182;
                 };
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<fp3<edwards_base_field<ModulusBits>>>
-                    : public params<edwards_base_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<fp3<edwards_base_field<Version>>>
+                    : public params<edwards_base_field<Version>> {
                 private:
-                    typedef params<edwards_base_field<ModulusBits>> policy_type;
+                    typedef params<edwards_base_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -96,11 +96,11 @@ namespace nil {
                         0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui546;
                 };
 
-                template<std::size_t ModulusBits>
-                struct arithmetic_params<edwards_scalar_field<ModulusBits>>
-                    : public params<edwards_scalar_field<ModulusBits>> {
+                template<std::size_t Version>
+                struct arithmetic_params<edwards_scalar_field<Version>>
+                    : public params<edwards_scalar_field<Version>> {
                 private:
-                    typedef params<edwards_scalar_field<ModulusBits>> policy_type;
+                    typedef params<edwards_scalar_field<Version>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

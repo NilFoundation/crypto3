@@ -40,16 +40,16 @@ namespace nil {
 
                 /*!
                  * @brief IETF IPsec groups
-                 * @tparam ModulusBits
+                 * @tparam Version
                  */
-                template<std::size_t ModulusBits>
-                struct secp_k1_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct secp_k1_base_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct secp_r1_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct secp_r1_base_field : public field<Version> { };
 
-                template<std::size_t ModulusBits>
-                struct secp_r2_base_field : public field<ModulusBits> { };
+                template<std::size_t Version>
+                struct secp_r2_base_field : public field<Version> { };
 
                 template<>
                 struct secp_k1_base_field<160> : public field<160> {
@@ -204,39 +204,39 @@ namespace nil {
                 constexpr typename secp_r1_base_field<224>::modulus_type const secp_r1_base_field<224>::modulus;
                 constexpr typename secp_k1_base_field<256>::modulus_type const secp_k1_base_field<256>::modulus;
 
-                template<std::size_t ModulusBits = 160>
-                using secp_k1_fq = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 160>
-                using secp_r1_fq = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 160>
-                using secp_r2_fq = secp_r2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using secp_k1_fq = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using secp_r1_fq = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 224>
-                using secp_k1_fq = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 224>
-                using secp_r1_fq = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 256>
-                using secp_k1_fq = secp_k1_base_field<ModulusBits>;
+                template<std::size_t Version = 160>
+                using secp_k1_fq = secp_k1_base_field<Version>;
+                template<std::size_t Version = 160>
+                using secp_r1_fq = secp_r1_base_field<Version>;
+                template<std::size_t Version = 160>
+                using secp_r2_fq = secp_r2_base_field<Version>;
+                template<std::size_t Version = 192>
+                using secp_k1_fq = secp_k1_base_field<Version>;
+                template<std::size_t Version = 192>
+                using secp_r1_fq = secp_r1_base_field<Version>;
+                template<std::size_t Version = 224>
+                using secp_k1_fq = secp_k1_base_field<Version>;
+                template<std::size_t Version = 224>
+                using secp_r1_fq = secp_r1_base_field<Version>;
+                template<std::size_t Version = 256>
+                using secp_k1_fq = secp_k1_base_field<Version>;
 
-                template<std::size_t ModulusBits = 160>
-                using secp_k1 = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 160>
-                using secp_r1 = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 160>
-                using secp_r2 = secp_r2_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using secp_k1 = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 192>
-                using secp_r1 = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 224>
-                using secp_k1 = secp_k1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 224>
-                using secp_r1 = secp_r1_base_field<ModulusBits>;
-                template<std::size_t ModulusBits = 256>
-                using secp_k1 = secp_k1_base_field<ModulusBits>;
+                template<std::size_t Version = 160>
+                using secp_k1 = secp_k1_base_field<Version>;
+                template<std::size_t Version = 160>
+                using secp_r1 = secp_r1_base_field<Version>;
+                template<std::size_t Version = 160>
+                using secp_r2 = secp_r2_base_field<Version>;
+                template<std::size_t Version = 192>
+                using secp_k1 = secp_k1_base_field<Version>;
+                template<std::size_t Version = 192>
+                using secp_r1 = secp_r1_base_field<Version>;
+                template<std::size_t Version = 224>
+                using secp_k1 = secp_k1_base_field<Version>;
+                template<std::size_t Version = 224>
+                using secp_r1 = secp_r1_base_field<Version>;
+                template<std::size_t Version = 256>
+                using secp_k1 = secp_k1_base_field<Version>;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

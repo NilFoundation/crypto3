@@ -42,10 +42,10 @@ namespace nil {
 
                     using namespace algebra;
                     /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits = 183>
+                    template<std::size_t Version = 183>
                     struct edwards_basic_policy { };
                     /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
                      * bits respectively.

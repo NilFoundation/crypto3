@@ -40,13 +40,13 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a Edwards curve, providing 128 bits of security.
-                 *    @tparam ModulusBits size of the base field in bits
+                 *    @tparam Version size of the base field in bits
                  *
                  */
-                template<std::size_t ModulusBits>
+                template<std::size_t Version>
                 struct edwards {
 
-                    using policy_type = detail::edwards_basic_policy<ModulusBits>;
+                    using policy_type = detail::edwards_basic_policy<Version>;
 
                     typedef typename policy_type::base_field_type base_field_type;
                     typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -63,11 +63,11 @@ namespace nil {
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
-                    typedef typename detail::edwards_g1<ModulusBits> g1_type;
-                    typedef typename detail::edwards_g2<ModulusBits> g2_type;
+                    typedef typename detail::edwards_g1<Version> g1_type;
+                    typedef typename detail::edwards_g2<Version> g2_type;
 
-                    typedef typename pairing::pairing_policy<edwards<ModulusBits>,
-                                                             pairing::detail::edwards_pairing_functions<ModulusBits>>
+                    typedef typename pairing::pairing_policy<edwards<Version>,
+                                                             pairing::detail::edwards_pairing_functions<Version>>
                         pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;

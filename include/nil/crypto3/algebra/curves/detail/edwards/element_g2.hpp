@@ -40,16 +40,16 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     /** @brief A struct representing a group G2 of Edwards curve.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     struct edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     struct element_edwards_g2 { };
                     /** @brief A struct representing an elememnt from the group G2 of Edwards curve.
                      *

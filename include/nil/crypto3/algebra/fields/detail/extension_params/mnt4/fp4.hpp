@@ -43,11 +43,11 @@ namespace nil {
 
                     /************************* MNT4 ***********************************/
 
-                    template<std::size_t ModulusBits>
-                    class fp4_extension_params<fields::mnt4_base_field<ModulusBits>>
-                        : public params<fields::mnt4_base_field<ModulusBits>> {
+                    template<std::size_t Version>
+                    class fp4_extension_params<fields::mnt4_base_field<Version>>
+                        : public params<fields::mnt4_base_field<Version>> {
 
-                        typedef fields::mnt4_base_field<ModulusBits> base_field_type;
+                        typedef fields::mnt4_base_field<Version> base_field_type;
                         typedef params<base_field_type> policy_type;
 
                     public:
@@ -76,18 +76,18 @@ namespace nil {
                         constexpr static const non_residue_type non_residue = non_residue_type(0x11);
                     };
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits>>::non_residue_type const
-                        fp4_extension_params<mnt4_base_field<ModulusBits>>::non_residue;
+                    template<std::size_t Version>
+                    constexpr typename fp4_extension_params<mnt4_base_field<Version>>::non_residue_type const
+                        fp4_extension_params<mnt4_base_field<Version>>::non_residue;
 
-                    template<std::size_t ModulusBits>
-                    constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type const
-                        fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus;
+                    template<std::size_t Version>
+                    constexpr typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type const
+                        fp4_extension_params<mnt4_base_field<Version>>::modulus;
 
-                    template<std::size_t ModulusBits>
-                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<ModulusBits>>::modulus_type,
+                    template<std::size_t Version>
+                    constexpr std::array<typename fp4_extension_params<mnt4_base_field<Version>>::modulus_type,
                                          4> const
-                        fp4_extension_params<mnt4_base_field<ModulusBits>>::Frobenius_coeffs_c1;
+                        fp4_extension_params<mnt4_base_field<Version>>::Frobenius_coeffs_c1;
 
                 }    // namespace detail
             }        // namespace fields

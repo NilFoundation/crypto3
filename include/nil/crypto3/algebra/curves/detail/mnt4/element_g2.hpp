@@ -40,16 +40,16 @@ namespace nil {
                 namespace detail {
 
                     /** @brief A struct representing a group G2 of mnt4 curve.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     struct mnt4_g2;
                     /** @brief A struct representing an element from the group G2 of mnt4 curve.
-                     *    @tparam ModulusBits size of the base field in bits
+                     *    @tparam Version size of the base field in bits
                      *
                      */
-                    template<std::size_t ModulusBits>
+                    template<std::size_t Version>
                     struct element_mnt4_g2 { };
                     /** @brief A struct representing an elememnt from the group G2 of mnt4 curve.
                      *
