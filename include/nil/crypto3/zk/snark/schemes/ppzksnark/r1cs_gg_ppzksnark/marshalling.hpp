@@ -821,7 +821,7 @@ namespace nil {
 
                 constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
-                std::size_t ic_size = vk.gamma_ABC_g1.rest.values.size();
+                std::size_t ic_size = 1 + vk.gamma_ABC_g1.rest.values.size();
 
                 std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
@@ -844,6 +844,8 @@ namespace nil {
                 g2_group_type_process<typename CurveType::g2_type>(vk.delta_g2, write_iter);
 
                 std_size_t_process(ic_size, write_iter);
+
+                g1_group_type_process<typename CurveType::g1_type>(vk.gamma_ABC_g1.first, write_iter);
 
                 for (auto ic_iter = vk.gamma_ABC_g1.rest.values.begin(); ic_iter != vk.gamma_ABC_g1.rest.values.end(); ic_iter++) {
                     g1_group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
