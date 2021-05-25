@@ -82,8 +82,8 @@ namespace nil {
                 }
 
                 /** default seeds the underlying generator. */
-                void seed() {
-                    idx = 0;
+                void seed(std::size_t s = 0) {
+                    idx = s;
                 }
 
                 /** Seeds the underlying generator with first and last. */
