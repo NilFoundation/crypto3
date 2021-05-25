@@ -156,7 +156,7 @@ namespace nil {
             static inline std::size_t
                 std_size_t_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
                 std::vector<std::size_t> vector_s(1, 0);
                 auto iter = vector_s.begin();
 
@@ -169,7 +169,7 @@ namespace nil {
                 nil::crypto3::detail::pack_from<nil::crypto3::stream_endian::big_octet_big_bit, 8, 32>(
                     vector_c, iter);
 
-                read_iter += std_size_t_size;
+                read_iter += std_size_t_byteblob_size;
 
                 return vector_s[0];
             }
@@ -366,7 +366,7 @@ namespace nil {
             static inline void std_size_t_process(std::size_t input_s,
                                                   std::vector<chunk_type>::iterator &write_iter) {
 
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
 
                 std::vector<std::size_t> vector_s = {input_s};
 
@@ -374,7 +374,7 @@ namespace nil {
                 nil::crypto3::detail::pack_to<nil::crypto3::stream_endian::big_octet_big_bit, 32, 8>(
                     vector_s, internal_write_iter);
 
-                write_iter += std_size_t_size;
+                write_iter += std_size_t_byteblob_size;
             }
 
             template<typename T>
@@ -461,17 +461,17 @@ namespace nil {
 
                 std::size_t g1_size = modulus_chunks * 3 * CurveType::g1_type::underlying_field_type::arity;
                 std::size_t g2_size = modulus_chunks * 3 * CurveType::g2_type::underlying_field_type::arity;
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
 
                 std::size_t gt_size = modulus_chunks * CurveType::gt_type::arity;
 
                 std::size_t sparse_vector_size =
-                    std_size_t_size + vd.vk.gamma_ABC_g1.rest.size() * std_size_t_size + std_size_t_size +
-                    vd.vk.gamma_ABC_g1.rest.values.size() * g1_size + std_size_t_size;
+                    std_size_t_byteblob_size + vd.vk.gamma_ABC_g1.rest.size() * std_size_t_byteblob_size + std_size_t_byteblob_size +
+                    vd.vk.gamma_ABC_g1.rest.values.size() * g1_size + std_size_t_byteblob_size;
 
                 std::size_t verification_key_size =
                     gt_size + g2_size + g2_size + g1_size + sparse_vector_size;
-                std::size_t primary_input_size = std_size_t_size + vd.pi.size() * modulus_chunks;
+                std::size_t primary_input_size = std_size_t_byteblob_size + vd.pi.size() * modulus_chunks;
                 std::size_t proof_size = g1_size + g2_size + g1_size;
 
                 std::vector<chunk_type> output(verification_key_size + primary_input_size + proof_size);
@@ -519,13 +519,13 @@ namespace nil {
             static const std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
             static const std::size_t fp_byteblob_size = CurveType::base_field_bits / chunk_size + (CurveType::base_field_bits % chunk_size ? 1 : 0);
             static const std::size_t gt_byteblob_size = 2 * 3 * 2 * fp_byteblob_size;
-            static const std::size_t fr_byteblob_size = CurveType::scalar_field_bits / chunk_size + (CurveType::scalar_field_bits % chunk_size ? 1 : 0);
+            static const std::size_t fr_byteblob_size = CurveType::scalar_field_type::modulus_bits / chunk_size + (CurveType::scalar_field_type::modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
             static inline
                 typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                         typename FieldType::value_type>::type
-                field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                    typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 using modulus_type = typename FieldType::modulus_type;
@@ -535,7 +535,7 @@ namespace nil {
 
                 modulus_type fp_out;
 
-                nil::crypto3::multiprecision::import_bits(fp_out, read_iter_start, read_iter_start + modulus_chunks,
+                nil::crypto3::multiprecision::import_bits(fp_out, read_iter_begin, read_iter_begin + modulus_chunks,
                                                           chunk_size, false);
 
                 return typename field_type::value_type(fp_out);
@@ -545,7 +545,7 @@ namespace nil {
             static inline
                 typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
                                         typename FieldType::value_type>::type
-                field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                    typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 using modulus_type = typename FieldType::modulus_type;
@@ -558,8 +558,8 @@ namespace nil {
                     field_type::arity / field_type::underlying_field_type::arity;
 
                 for (int n = 0; n < data_dimension; ++n) {
-                    data[n] = field_type_process<typename field_type::underlying_field_type>(read_iter_start + n * field_type::underlying_field_type::arity * modulus_chunks, 
-                                                                                             read_iter_start + (n + 1) * field_type::underlying_field_type::arity * modulus_chunks);
+                    data[n] = field_type_process<typename field_type::underlying_field_type>(read_iter_begin + n * field_type::underlying_field_type::arity * modulus_chunks, 
+                                                                                             read_iter_begin + (n + 1) * field_type::underlying_field_type::arity * modulus_chunks);
                 }
 
                 return typename field_type::value_type(data);
@@ -567,13 +567,13 @@ namespace nil {
 
             template<typename GroupType>
             static inline typename GroupType::value_type
-                g1_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                g1_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                       typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 typename curve_element_serializer<CurveType>::compressed_g1_octets input_array;
 
                 for (std::size_t i = 0; i < g1_byteblob_size; ++i){
-                    input_array[i] = read_iter_start[i];
+                    input_array[i] = read_iter_begin[i];
                 }
 
                 return curve_element_serializer<CurveType>::octets_to_g1_point(input_array);
@@ -581,20 +581,20 @@ namespace nil {
 
             template<typename GroupType>
             static inline typename GroupType::value_type
-                g2_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                g2_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                       typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 typename curve_element_serializer<CurveType>::compressed_g2_octets input_array;
 
                 for (std::size_t i = 0; i < g2_byteblob_size; ++i){
-                    input_array[i] = read_iter_start[i];
+                    input_array[i] = read_iter_begin[i];
                 }
 
                 return curve_element_serializer<CurveType>::octets_to_g2_point(input_array);
             }
 
             static inline std::size_t
-                std_size_t_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                std_size_t_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                    typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 std::vector<std::size_t> vector_s(1, 0);
@@ -604,7 +604,7 @@ namespace nil {
                 std::vector<chunk_type> vector_c;
 
                 vector_c.reserve(vector_c_size);
-                vector_c.insert(vector_c.end(), read_iter_start, read_iter_start + vector_c_size);
+                vector_c.insert(vector_c.end(), read_iter_begin, read_iter_begin + vector_c_size);
 
                 nil::crypto3::detail::pack_from<nil::crypto3::stream_endian::big_octet_big_bit, 8, 32>(
                     vector_c, iter);
@@ -614,27 +614,27 @@ namespace nil {
 
             template<typename T>
             static inline sparse_vector<T>
-                g1_sparse_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                g1_sparse_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                          typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
-                std::size_t indices_count = std_size_t_process(read_iter_start, read_iter_start + std_size_t_byteblob_size);
+                std::size_t indices_count = std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size);
 
                 std::vector<std::size_t> indices(indices_count, 0);
 
                 for (std::size_t i = 0; i < indices_count; i++) {
-                    indices[i] = std_size_t_process(read_iter_start + std_size_t_byteblob_size + std_size_t_byteblob_size*i, 
-                                                    read_iter_start + std_size_t_byteblob_size + (i + 1)*std_size_t_byteblob_size);
+                    indices[i] = std_size_t_process(read_iter_begin + std_size_t_byteblob_size + std_size_t_byteblob_size*i, 
+                                                    read_iter_begin + std_size_t_byteblob_size + (i + 1)*std_size_t_byteblob_size);
                 }
 
                 std::vector<typename T::value_type> values(indices_count);
 
                 for (std::size_t i = 0; i < indices_count; i++) {
-                    values[i] = g1_group_type_process<T>(read_iter_start + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + i * g1_byteblob_size, 
-                                                         read_iter_start + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + (i + 1) * g1_byteblob_size);
+                    values[i] = g1_group_type_process<T>(read_iter_begin + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + i * g1_byteblob_size, 
+                                                         read_iter_begin + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + (i + 1) * g1_byteblob_size);
                 }
 
-                std::size_t domain_size_ = std_size_t_process(read_iter_start + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + indices_count * g1_byteblob_size,
-                                                              read_iter_start + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + indices_count * g1_byteblob_size + std_size_t_byteblob_size);
+                std::size_t domain_size_ = std_size_t_process(read_iter_begin + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + indices_count * g1_byteblob_size,
+                                                              read_iter_begin + std_size_t_byteblob_size + indices_count*std_size_t_byteblob_size + indices_count * g1_byteblob_size + std_size_t_byteblob_size);
 
                 sparse_vector<T> sv;
 
@@ -642,69 +642,72 @@ namespace nil {
                 sv.values = values;
                 sv.domain_size_ = domain_size_;
 
+                // assert (sv.is_valid());
+                assert (sv.values.size() == sv.indices.size());
+
                 return sv;
             }
 
             template<typename T>
             static inline accumulation_vector<T>
-                g1_accumulation_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                g1_accumulation_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                                typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
-                typename T::value_type first = g1_group_type_process<T>(read_iter_start, read_iter_start + g1_byteblob_size);
-                sparse_vector<T> rest = g1_sparse_vector_process<T>(read_iter_start + g1_byteblob_size, read_iter_end);
+                typename T::value_type first = g1_group_type_process<T>(read_iter_begin, read_iter_begin + g1_byteblob_size);
+                sparse_vector<T> rest = g1_sparse_vector_process<T>(read_iter_begin + g1_byteblob_size, read_iter_end);
 
                 return accumulation_vector<T>(std::move(first), std::move(rest));
             }
 
             static inline typename scheme_type::verification_key_type
-                verification_key_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                verification_key_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                          typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 typename CurveType::gt_type::value_type alpha_g1_beta_g2 =
-                    field_type_process<typename CurveType::gt_type>(read_iter_start, read_iter_start + gt_byteblob_size);
+                    field_type_process<typename CurveType::gt_type>(read_iter_begin, read_iter_begin + gt_byteblob_size);
                 typename CurveType::g2_type::value_type gamma_g2 =
-                    g2_group_type_process<typename CurveType::g2_type>(read_iter_start + gt_byteblob_size, 
-                                                                       read_iter_start + gt_byteblob_size + g2_byteblob_size);
+                    g2_group_type_process<typename CurveType::g2_type>(read_iter_begin + gt_byteblob_size, 
+                                                                       read_iter_begin + gt_byteblob_size + g2_byteblob_size);
                 typename CurveType::g2_type::value_type delta_g2 =
-                    g2_group_type_process<typename CurveType::g2_type>(read_iter_start + gt_byteblob_size + g2_byteblob_size, 
-                                                                read_iter_start + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size);
+                    g2_group_type_process<typename CurveType::g2_type>(read_iter_begin + gt_byteblob_size + g2_byteblob_size, 
+                                                                read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size);
 
                 accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1 =
-                    g1_accumulation_vector_process<typename CurveType::g1_type>(read_iter_start + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size, read_iter_end);
+                    g1_accumulation_vector_process<typename CurveType::g1_type>(read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size, read_iter_end);
 
                 return typename scheme_type::verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
             }
 
             static inline typename scheme_type::primary_input_type
-                primary_input_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                primary_input_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                                       typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
-                std::size_t pi_count = std_size_t_process(read_iter_start, read_iter_start + std_size_t_byteblob_size);
+                std::size_t pi_count = std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size);
 
                 std::vector<typename CurveType::scalar_field_type::value_type> pi(pi_count);
 
                 for (std::size_t i = 0; i < pi_count; i++) {
-                    pi[i] = field_type_process<typename CurveType::scalar_field_type>(read_iter_start + std_size_t_byteblob_size + i * fr_byteblob_size, 
-                                                                                      read_iter_start + std_size_t_byteblob_size + (i + 1) * fr_byteblob_size);
+                    pi[i] = field_type_process<typename CurveType::scalar_field_type>(read_iter_begin + std_size_t_byteblob_size + i * fr_byteblob_size, 
+                                                                                      read_iter_begin + std_size_t_byteblob_size + (i + 1) * fr_byteblob_size);
                 }
 
                 return typename scheme_type::primary_input_type(pi);
             }
 
             static inline typename scheme_type::proof_type
-                proof_process(typename std::vector<chunk_type>::const_iterator read_iter_start, 
+                proof_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
                               typename std::vector<chunk_type>::const_iterator read_iter_end) {
 
                 typename CurveType::g1_type::value_type g_A =
-                    g1_group_type_process<typename CurveType::g1_type>(read_iter_start, read_iter_start + g1_byteblob_size);
+                    g1_group_type_process<typename CurveType::g1_type>(read_iter_begin, read_iter_begin + g1_byteblob_size);
 
                 typename CurveType::g2_type::value_type g_B =
-                    g2_group_type_process<typename CurveType::g2_type>(read_iter_start + g1_byteblob_size, 
-                                                                       read_iter_start + g1_byteblob_size + g2_byteblob_size);
+                    g2_group_type_process<typename CurveType::g2_type>(read_iter_begin + g1_byteblob_size, 
+                                                                       read_iter_begin + g1_byteblob_size + g2_byteblob_size);
 
                 typename CurveType::g1_type::value_type g_C =
-                    g1_group_type_process<typename CurveType::g1_type>(read_iter_start + g1_byteblob_size + g2_byteblob_size, 
-                                                                       read_iter_start + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size);
+                    g1_group_type_process<typename CurveType::g1_type>(read_iter_begin + g1_byteblob_size + g2_byteblob_size, 
+                                                                       read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size);
 
                 return typename scheme_type::proof_type(std::move(g_A), std::move(g_B), std::move(g_C));
             }
@@ -787,14 +790,51 @@ namespace nil {
             static inline void std_size_t_process(std::size_t input_s,
                                                   std::vector<chunk_type>::iterator &write_iter) {
 
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
                 std::vector<std::size_t> vector_s = {input_s};
 
                 auto internal_write_iter = write_iter;
                 nil::crypto3::detail::pack_to<nil::crypto3::stream_endian::big_octet_big_bit, 32, 8>(
                     vector_s, internal_write_iter);
 
-                write_iter += std_size_t_size;
+                write_iter += std_size_t_byteblob_size;
+            }
+
+            template<typename T>
+            static inline void
+                g1_sparse_vector_process(sparse_vector<T> input_sv, 
+                                         std::vector<chunk_type>::iterator &write_iter) {
+
+                std::size_t ic_size = input_sv.values.size();
+                // assert (input_sv.is_valid());
+                assert (input_sv.values.size() == input_sv.indices.size());
+                // Actual sparse_vector byteblob size is equal to 
+                //     (2 + ic_size) * std_size_t_byteblob_size + ic_size * g1_byteblob_size;
+                // For accumulation vector it is
+                // g1_byteblob_size more because of accumulation_vector.first
+
+                std_size_t_process(ic_size, write_iter);
+
+                for (auto ic_iter = input_sv.indices.begin(); ic_iter != input_sv.indices.end(); ic_iter++) {
+                    std_size_t_process(*ic_iter, write_iter);
+                }
+
+                for (auto ic_iter = input_sv.values.begin(); ic_iter != input_sv.values.end(); ic_iter++) {
+                    g1_group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
+                }
+
+                std_size_t_process(input_sv.domain_size(), write_iter);
+
+            }
+
+            template<typename T>
+            static inline void
+                g1_accumulation_vector_process(accumulation_vector<T> input_av, 
+                                               std::vector<chunk_type>::iterator &write_iter) {
+
+                g1_group_type_process<typename CurveType::g1_type>(input_av.first, write_iter);
+
+                g1_sparse_vector_process(input_av.rest, write_iter);
             }
 
             static inline std::vector<chunk_type> process(typename scheme_type::verification_key_type vk) {
@@ -807,15 +847,18 @@ namespace nil {
 
                 std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
                 std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
 
                 std::size_t gt_byteblob_size = modulus_chunks * CurveType::gt_type::arity;
 
                 std::size_t ic_byteblob_size = 
-                    std_size_t_size + ic_size * g1_byteblob_size;
+                    std_size_t_byteblob_size + ic_size * g1_byteblob_size;
+                std::size_t sparse_vector_byteblob_size = 
+                    (2 + ic_size) * std_size_t_byteblob_size + ic_size * g1_byteblob_size;
+                std::size_t accumulation_vector_byteblob_size = sparse_vector_byteblob_size + g1_byteblob_size;
 
                 std::size_t verification_key_size =
-                    gt_byteblob_size + g2_byteblob_size + g2_byteblob_size + ic_byteblob_size;
+                    gt_byteblob_size + g2_byteblob_size + g2_byteblob_size + accumulation_vector_byteblob_size;
 
                 std::vector<chunk_type> output(verification_key_size);
 
@@ -825,13 +868,15 @@ namespace nil {
                 g2_group_type_process<typename CurveType::g2_type>(vk.gamma_g2, write_iter);
                 g2_group_type_process<typename CurveType::g2_type>(vk.delta_g2, write_iter);
 
-                std_size_t_process(ic_size, write_iter);
+                // std_size_t_process(ic_size, write_iter);
 
-                g1_group_type_process<typename CurveType::g1_type>(vk.gamma_ABC_g1.first, write_iter);
+                // g1_group_type_process<typename CurveType::g1_type>(vk.gamma_ABC_g1.first, write_iter);
 
-                for (auto ic_iter = vk.gamma_ABC_g1.rest.values.begin(); ic_iter != vk.gamma_ABC_g1.rest.values.end(); ic_iter++) {
-                    g1_group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
-                }
+                // for (auto ic_iter = vk.gamma_ABC_g1.rest.values.begin(); ic_iter != vk.gamma_ABC_g1.rest.values.end(); ic_iter++) {
+                //     g1_group_type_process<typename CurveType::g1_type>(*ic_iter, write_iter);
+                // }
+
+                g1_accumulation_vector_process(vk.gamma_ABC_g1, write_iter);
 
                 return output;
             }
@@ -842,11 +887,11 @@ namespace nil {
 
                 constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
-                std::size_t std_size_t_size = 4;
+                std::size_t std_size_t_byteblob_size = 4;
 
                 std::size_t pi_count = pi.size();
 
-                std::size_t primary_byteblob_input_size = std_size_t_size + pi_count * modulus_chunks;
+                std::size_t primary_byteblob_input_size = std_size_t_byteblob_size + pi_count * modulus_chunks;
 
                 std::vector<chunk_type> output(primary_byteblob_input_size);
 
