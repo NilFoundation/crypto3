@@ -31,7 +31,11 @@ namespace nil {
     namespace crypto3 {
         namespace random {
 
-            /**
+            /*!
+             * @brief
+             * @tparam StreamCipher
+             * @tparam MessageAuthenticationCode
+             *
              * ChaCha_RNG is a very fast but completely ad-hoc RNG created by
              * creating a 256-bit random value and using it as a key for ChaCha20.
              *
@@ -52,7 +56,6 @@ namespace nil {
              * The primary reason to use it is in cases where the other RNGs are
              * not fast enough.
              */
-
             template<typename StreamCipher = stream::chacha<64, 128, 20>,
                      typename MessageAuthenticationCode = mac::hmac<hashes::sha2<256>>>
             struct chacha : private boost::noncopyable {
