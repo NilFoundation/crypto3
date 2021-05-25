@@ -57,6 +57,7 @@
 #define CRYPTO3_MARSHALLING_R1CS_GG_PPZKSNARK_TYPES_HPP
 
 #include <vector>
+#include <tuple>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
@@ -710,6 +711,27 @@ namespace nil {
                                                                        read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size);
 
                 return typename scheme_type::proof_type(std::move(g_A), std::move(g_B), std::move(g_C));
+            }
+
+            static inline std::tuple<typename scheme_type::verification_key_type, 
+                                     typename scheme_type::primary_input_type,
+                                     typename scheme_type::proof_type>
+                verifier_input_process(typename std::vector<chunk_type>::const_iterator read_iter_begin, 
+                              typename std::vector<chunk_type>::const_iterator read_iter_end) {
+
+                const std::size_t proof_byteblob_size = g1_byteblob_size + g2_byteblob_size + g1_byteblob_size;
+
+                typename scheme_type::proof_type de_prf = proof_process(read_iter_begin, 
+                    read_iter_begin + proof_byteblob_size);
+                
+                const std::size_t primary_input_byteblob_size = std_size_t_byteblob_size + fr_byteblob_size * std_size_t_process(read_iter_begin + proof_byteblob_size, read_iter_begin + proof_byteblob_size + std_size_t_byteblob_size);
+
+                typename scheme_type::primary_input_type de_pi = primary_input_process(read_iter_begin + proof_byteblob_size, 
+                    read_iter_begin + proof_byteblob_size + primary_input_byteblob_size);
+                typename scheme_type::verification_key_type de_vk = verification_key_process(read_iter_begin + proof_byteblob_size + primary_input_byteblob_size, 
+                    read_iter_end);
+
+                return std::make_tuple(de_vk, de_pi, de_prf);
             }
         };
 
