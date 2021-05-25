@@ -8,8 +8,8 @@
 
 //  See http://www.boost.org/libs/random for documentation.
 
-#ifndef BOOST_RANDOM_CHACHA_HPP
-#define BOOST_RANDOM_CHACHA_HPP
+#ifndef CRYPTO3_RANDOM_CHACHA_HPP
+#define CRYPTO3_RANDOM_CHACHA_HPP
 
 #include <string>
 
