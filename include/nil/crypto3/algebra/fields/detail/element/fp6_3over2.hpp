@@ -234,6 +234,10 @@ namespace nil {
 
                         return rhs * lhs;
                     }
+
+                    template<typename FieldParams>
+                    constexpr const typename element_fp6_3over2<FieldParams>::non_residue_type
+                        element_fp6_3over2<FieldParams>::non_residue;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

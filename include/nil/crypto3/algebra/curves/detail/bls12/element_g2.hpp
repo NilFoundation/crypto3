@@ -759,6 +759,17 @@ namespace nil {
                     constexpr std::array<typename element_bls12_g2<381>::underlying_field_value_type, 3> const
                         element_bls12_g2<381>::one_fill;
 
+                    constexpr typename element_bls12_g2<377>::g1_field_type_value const element_bls12_g2<377>::b;
+                    constexpr typename element_bls12_g2<381>::g1_field_type_value const element_bls12_g2<381>::b;
+
+                    constexpr typename element_bls12_g2<377>::g2_field_type_value const element_bls12_g2<377>::twist;
+                    constexpr typename element_bls12_g2<381>::g2_field_type_value const element_bls12_g2<381>::twist;
+
+                    constexpr
+                        typename element_bls12_g2<377>::g2_field_type_value const element_bls12_g2<377>::twist_coeff_b;
+                    constexpr
+                        typename element_bls12_g2<381>::g2_field_type_value const element_bls12_g2<381>::twist_coeff_b;
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

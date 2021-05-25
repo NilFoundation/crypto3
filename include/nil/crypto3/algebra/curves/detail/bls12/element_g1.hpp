@@ -772,6 +772,9 @@ namespace nil {
                     constexpr std::array<typename element_bls12_g1<381>::underlying_field_value_type, 3> const
                         element_bls12_g1<381>::one_fill;
 
+                    constexpr typename element_bls12_g1<377>::g1_field_type_value const element_bls12_g1<377>::b;
+                    constexpr typename element_bls12_g1<381>::g1_field_type_value const element_bls12_g1<381>::b;
+
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
