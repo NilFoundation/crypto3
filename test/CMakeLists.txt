@@ -8,13 +8,15 @@
 
 include(CMTest)
 
-cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+cm_find_package(Boost REQUIRED COMPONENTS random unit_test_framework)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::algebra
                        ${CMAKE_WORKSPACE_NAME}::fft
+                       ${CMAKE_WORKSPACE_NAME}::hash
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::random
                        ${CMAKE_WORKSPACE_NAME}::zk
 
                        ${Boost_LIBRARIES})
