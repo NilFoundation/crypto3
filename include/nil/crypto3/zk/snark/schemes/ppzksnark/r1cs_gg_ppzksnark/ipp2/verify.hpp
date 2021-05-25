@@ -220,9 +220,10 @@ namespace nil {
                 /// the randomness used to produce a random linear combination of A and B and
                 /// used in the MIPP part with C
                 template<typename CurveType>
-                PairingCheck<CurveType> verify_tipp_mipp(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
-                                                         const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
-                                                         const typename CurveType::scalar_field_type::value_type &r_shift) {
+                PairingCheck<CurveType>
+                    verify_tipp_mipp(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                                     const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
+                                     const typename CurveType::scalar_field_type::value_type &r_shift) {
                     // (T,U), Z for TIPP and MIPP  and all challenges
                     std::tuple<gipa_tuz<CurveType>, std::vector<typename CurveType::scalar_field_type::value_type>,
                                std::vector<typename CurveType::scalar_field_type::value_type>>
