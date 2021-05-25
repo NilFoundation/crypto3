@@ -63,14 +63,9 @@ namespace nil {
                         using group_type = alt_bn128_g1<254>;
 
                         using policy_type = alt_bn128_basic_policy<254>;
-                        constexpr static const std::size_t g1_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
-                        typedef typename policy_type::base_field_type::value_type g1_field_type_value;
-
-                        constexpr static const std::size_t g2_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
-                        typedef
-                            typename fields::fp2<typename policy_type::base_field_type>::value_type g2_field_type_value;
+                        
+                        typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
+                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_value_type = g1_field_type_value;
 
@@ -96,11 +91,11 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        element_alt_bn128_g1(underlying_field_value_type X, underlying_field_value_type Y,
-                                             underlying_field_value_type Z) {
-                            this->X = X;
-                            this->Y = Y;
-                            this->Z = Z;
+                        element_alt_bn128_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
+                                             underlying_field_value_type in_Z) {
+                            this->X = in_X;
+                            this->Y = in_Y;
+                            this->Z = in_Z;
                         };
 
                         /** @brief Get the point at infinity

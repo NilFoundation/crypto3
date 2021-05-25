@@ -62,8 +62,7 @@ namespace nil {
                         using group_type = mnt4_g1<298>;
 
                         using policy_type = mnt4_basic_policy<298>;
-                        constexpr static const std::size_t g1_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
+                        
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 

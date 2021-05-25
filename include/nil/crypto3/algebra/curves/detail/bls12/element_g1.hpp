@@ -66,8 +66,6 @@ namespace nil {
 
                         using policy_type = bls12_basic_policy<381>;
 
-                        constexpr static const std::size_t g1_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
@@ -426,8 +424,7 @@ namespace nil {
                         using group_type = bls12_g1<377>;
 
                         using policy_type = bls12_basic_policy<377>;
-                        constexpr static const std::size_t g1_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
+                        
                         typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
                         typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 

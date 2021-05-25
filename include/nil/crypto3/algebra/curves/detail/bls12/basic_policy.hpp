@@ -57,8 +57,8 @@ namespace nil {
 
                     template<>
                     struct bls12_basic_policy<381> {
-                        constexpr static const std::size_t base_field_bits = 381;    ///< size of the base field in bits
-                        typedef fields::bls12_fq<base_field_bits> g1_field_type;
+                        constexpr static const std::size_t version = 381;
+                        typedef fields::bls12_fq<version> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
@@ -69,10 +69,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus =
                             base_field_type::modulus;    ///< characteristic of the base field
 
-                        constexpr static const std::size_t scalar_field_bits =
-                            381;    // actually, it's 255 ///< size of the scalar field (order of the group of points)
-                                    // in bits
-                        typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
+                        typedef fields::bls12_fr<version> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)
@@ -96,8 +93,8 @@ namespace nil {
 
                     template<>
                     struct bls12_basic_policy<377> {
-                        constexpr static const std::size_t base_field_bits = 377;    ///< size of the base field in bits
-                        typedef fields::bls12_fq<base_field_bits> g1_field_type;
+                        constexpr static const std::size_t version = 377;    ///< size of the base field in bits
+                        typedef fields::bls12_fq<version> g1_field_type;
                         using base_field_type = g1_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
@@ -107,10 +104,7 @@ namespace nil {
                             base_field_type::modulus;    ///< characteristic of the base field
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
-                        constexpr static const std::size_t scalar_field_bits =
-                            377;    // actually, it's 253 ///< size of the scalar field (order of the group of points)
-                                    // in bits
-                        typedef fields::bls12_fr<scalar_field_bits> scalar_field_type;
+                        typedef fields::bls12_fr<version> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)
@@ -132,12 +126,6 @@ namespace nil {
 
                     constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::b;
                     constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::b;
-
-                    constexpr typename std::size_t const bls12_basic_policy<381>::base_field_bits;
-                    constexpr typename std::size_t const bls12_basic_policy<377>::base_field_bits;
-
-                    constexpr typename std::size_t const bls12_basic_policy<381>::scalar_field_bits;
-                    constexpr typename std::size_t const bls12_basic_policy<377>::scalar_field_bits;
 
                     constexpr typename bls12_basic_policy<381>::number_type const bls12_basic_policy<381>::p;
                     constexpr typename bls12_basic_policy<377>::number_type const bls12_basic_policy<377>::p;

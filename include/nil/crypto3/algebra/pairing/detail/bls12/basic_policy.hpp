@@ -55,12 +55,12 @@ namespace nil {
                         using g2_type = curves::detail::bls12_g2<381>;
                         using gt_type = typename policy_type::gt_field_type;
 
-                        constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
-                        constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
-                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
-                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+                        constexpr static const std::size_t base_field_bits = policy_type::base_field_type::modulus_bits;
+                        constexpr static const number_type base_field_modulus = policy_type::base_field_type::modulus;
+                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_type::modulus_bits;
+                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_type::modulus;
 
-                        constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+                        constexpr static const std::size_t number_type_max_bits = base_field_bits;
 
                         constexpr static const number_type coef_b = policy_type::b;
 
@@ -93,12 +93,12 @@ namespace nil {
                         typedef typename Fq_field::value_type Fq;
                         typedef typename Fqe_field::value_type Fq2;
 
-                        constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
-                        constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
-                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
-                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+                        constexpr static const std::size_t base_field_bits = policy_type::base_field_type::modulus_bits;
+                        constexpr static const number_type base_field_modulus = policy_type::base_field_type::modulus;
+                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_type::modulus_bits;
+                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_type::modulus;
 
-                        constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+                        constexpr static const std::size_t number_type_max_bits = base_field_bits;
 
                         constexpr static const number_type ate_loop_count = number_type(0x8508C00000000001_cppui64);
                         constexpr static const bool ate_is_loop_count_neg = false;

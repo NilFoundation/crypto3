@@ -53,8 +53,8 @@ namespace nil {
                      */
                     template<>
                     struct edwards_basic_policy<183> {
-                        constexpr static const std::size_t base_field_bits = 183;    ///< size of the base field in bits
-                        typedef fields::edwards_fq<base_field_bits> g1_field_type;
+                        constexpr static const std::size_t version = 183;    ///< size of the base field in bits
+                        typedef fields::edwards_fq<version> g1_field_type;
                         typedef g1_field_type base_field_type;
                         typedef typename fields::fp3<base_field_type> g2_field_type;
                         typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
@@ -65,10 +65,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus =
                             base_field_type::modulus;    ///< characteristic of the base field
 
-                        constexpr static const std::size_t scalar_field_bits =
-                            183;    ///< size of the scalar field (order of the group of points) in bits (181) have to
-                                    ///< be
-                        typedef fields::edwards_fr<scalar_field_bits> scalar_field_type;
+                        typedef fields::edwards_fr<version> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)

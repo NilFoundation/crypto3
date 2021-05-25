@@ -88,9 +88,7 @@ namespace nil {
 
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(value_bits)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(modulus_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(base_field_bits)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(base_field_modulus)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(scalar_field_bits)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(scalar_field_modulus)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(arity)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(p)
@@ -214,10 +212,7 @@ namespace nil {
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_static_member_data_base_field_bits<T, const std::size_t>::value &&
-                                          has_type_base_field_type<T>::value && has_type_number_type<T>::value &&
-
-                                          has_static_member_data_scalar_field_bits<T, const std::size_t>::value &&
+                static const bool value = has_type_base_field_type<T>::value && has_type_number_type<T>::value &&
                                           has_type_scalar_field_type<T>::value && has_type_g1_type<T>::value &&
                                           has_type_g2_type<T>::value && has_type_gt_type<T>::value &&
                                           has_type_number_type<T>::value &&

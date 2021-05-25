@@ -54,9 +54,9 @@ namespace nil {
                      */
                     template<>
                     struct alt_bn128_basic_policy<254> {
-                        constexpr static const std::size_t base_field_bits = 254;    ///< size of the base field in bits
+                        constexpr static const std::size_t version = 254;    ///< curve version
 
-                        typedef fields::alt_bn128_fq<base_field_bits> g1_field_type;
+                        typedef fields::alt_bn128_fq<version> g1_field_type;
                         typedef g1_field_type base_field_type;
                         typedef typename fields::fp2<base_field_type> g2_field_type;
                         typedef typename fields::fp12_2over3over2<base_field_type> gt_field_type;
@@ -67,9 +67,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus =
                             base_field_type::modulus;    ///< characteristic of the base field
 
-                        constexpr static const std::size_t scalar_field_bits =
-                            254;    ///< size of the scalar field (order of the group of points) in bits
-                        typedef fields::alt_bn128_fr<scalar_field_bits> scalar_field_type;
+                        typedef fields::alt_bn128_fr<version> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)
@@ -89,10 +87,6 @@ namespace nil {
                     constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::a;
 
                     constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::b;
-
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::base_field_bits;
-
-                    constexpr typename std::size_t const alt_bn128_basic_policy<254>::scalar_field_bits;
 
                     constexpr typename alt_bn128_basic_policy<254>::number_type const alt_bn128_basic_policy<254>::p;
 

@@ -64,14 +64,9 @@ namespace nil {
                         using group_type = alt_bn128_g2<254>;
 
                         using policy_type = alt_bn128_basic_policy<254>;
-                        constexpr static const std::size_t g1_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
-                        typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
-                        constexpr static const std::size_t g2_field_bits =
-                            policy_type::base_field_bits;    ///< size of the base field in bits
-                        typedef
-                            typename fields::fp2<typename policy_type::base_field_type>::value_type g2_field_type_value;
+                        typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
+                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_value_type = g2_field_type_value;
 

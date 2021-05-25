@@ -55,12 +55,12 @@ namespace nil {
                         using g2_type = curves::detail::edwards_g2<183>;
                         using gt_type = typename policy_type::gt_field_type;
 
-                        constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
-                        constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
-                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
-                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+                        constexpr static const std::size_t base_field_bits = policy_type::base_field_type::modulus_bits;
+                        constexpr static const number_type base_field_modulus = policy_type::base_field_type::modulus;
+                        constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_type::modulus_bits;
+                        constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_type::modulus;
 
-                        constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+                        constexpr static const std::size_t number_type_max_bits = base_field_bits;
 
                         constexpr static const number_type ate_loop_count =
                             number_type(0xE841DEEC0A9E39280000003_cppui92);
