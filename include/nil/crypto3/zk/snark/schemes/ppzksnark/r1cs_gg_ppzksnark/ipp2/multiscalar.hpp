@@ -52,7 +52,9 @@ namespace nil {
                          typename ValueType = typename std::iterator_traits<InputGIterator>::value_type,
                          typename std::enable_if<std::is_same<typename GroupType::value_type, ValueType>::value,
                                                  bool>::type = true>
-                multiscalar_precomp_owned<GroupType> precompute_fixed_window(InputGIterator points_first, InputGIterator points_last, std::size_t window_size) {
+                multiscalar_precomp_owned<GroupType> precompute_fixed_window(InputGIterator points_first,
+                                                                             InputGIterator points_last,
+                                                                             std::size_t window_size) {
                     multiscalar_precomp_owned<GroupType> result;
                     result.num_points = std::distance(points_first, points_last);
                     result.window_size = window_size;
@@ -64,7 +66,8 @@ namespace nil {
                         std::vector<typename multiscalar_precomp_owned<GroupType>::group_value_type> table;
                         table.emplace_back(*points_iter);
 
-                        typename multiscalar_precomp_owned<GroupType>::group_value_type cur_precomp_point = *points_iter;
+                        typename multiscalar_precomp_owned<GroupType>::group_value_type cur_precomp_point =
+                            *points_iter;
                         for (auto i = 1; i < result.table_entries; i++) {
                             cur_precomp_point = cur_precomp_point + *points_iter;
                             table.emplace_back(cur_precomp_point);
