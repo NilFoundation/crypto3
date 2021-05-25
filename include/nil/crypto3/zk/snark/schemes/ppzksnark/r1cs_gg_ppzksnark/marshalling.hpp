@@ -517,7 +517,7 @@ namespace nil {
             static const std::size_t std_size_t_byteblob_size = 4;
             static const std::size_t g1_byteblob_size = curve_element_serializer<CurveType>::sizeof_field_element;
             static const std::size_t g2_byteblob_size = 2 * curve_element_serializer<CurveType>::sizeof_field_element;
-            static const std::size_t fp_byteblob_size = CurveType::base_field_bits / chunk_size + (CurveType::base_field_bits % chunk_size ? 1 : 0);
+            static const std::size_t fp_byteblob_size = CurveType::base_field_type::modulus_bits / chunk_size + (CurveType::base_field_type::modulus_bits % chunk_size ? 1 : 0);
             static const std::size_t gt_byteblob_size = 2 * 3 * 2 * fp_byteblob_size;
             static const std::size_t fr_byteblob_size = CurveType::scalar_field_type::modulus_bits / chunk_size + (CurveType::scalar_field_type::modulus_bits % chunk_size ? 1 : 0);
 
