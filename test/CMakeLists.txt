@@ -52,6 +52,7 @@ set(TESTS_NAMES
     "schemes/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
     "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
     "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
+    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
     "schemes/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
     "schemes/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
     "schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark"
