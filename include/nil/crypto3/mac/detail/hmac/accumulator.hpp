@@ -38,7 +38,7 @@
 #include <nil/crypto3/mac/accumulators/parameters/mac.hpp>
 #include <nil/crypto3/mac/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/hash/accumulators/parameters/hash.hpp>
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/digest.hpp>
@@ -57,10 +57,10 @@ namespace nil {
                 struct mac_impl;
 
                 template<typename Hash>
-                struct mac_impl<nil::crypto3::mac::hmac<Hash>> : boost::accumulators::accumulator_base {
+                struct mac_impl<mac::hmac<Hash>> : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
-                    typedef accumulators::hash<hash_type> hash_accumulator;
+                    typedef accumulators::impl::hash_impl<hash_type> hash_accumulator;
                     typedef nil::crypto3::mac::hmac<hash_type> mac_type;
 
                     typedef typename hash_type::construction::type construction_type;
@@ -101,10 +101,11 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        hash_type::digest_type step1_hash = hash_accumulator.result(args[boost::accumulators::sample]);
+                        typename hash_type::digest_type step1_hash =
+                            hash_accumulator.result(args[boost::accumulators::sample]);
 
-                        hash_type::digest_type step2_hash = hash<hash_type>(
-                            nil::crypto3::detail::concat_buf(nil::crypto3::detail::xor_buf(key, ipad), step1_hash));
+                        typename hash_type::digest_type step2_hash = hash<hash_type>(
+                            detail::concat_buf(nil::crypto3::detail::xor_buf(key, ipad), step1_hash));
 
                         return step2_hash;
                     }
