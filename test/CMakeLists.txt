@@ -25,7 +25,10 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
 
                     ${Boost_INCLUDE_DIRS})
 
-cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_chacha SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_chacha.cpp)
-set_target_properties(${CURRENT_PROJECT_NAME}_test_test_chacha PROPERTIES CXX_STANDARD 17)
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_chacha SOURCES ${CURRENT_TEST_SOURCES_DIR}/chacha.cpp)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_chacha PROPERTIES CXX_STANDARD 17)
+
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_hash SOURCES ${CURRENT_TEST_SOURCES_DIR}/hash.cpp)
+set_target_properties(${CURRENT_PROJECT_NAME}_test_hash PROPERTIES CXX_STANDARD 17)
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})

@@ -22,62 +22,35 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RANDOM_CHACHA_HPP
-#define CRYPTO3_RANDOM_CHACHA_HPP
+#ifndef BOOST_RANDOM_HASH_HPP
+#define BOOST_RANDOM_HASH_HPP
 
 #include <string>
 
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/random/detail/auto_link.hpp>
+#include <boost/tti/has_type.hpp>
 #include <boost/system/config.hpp>    // force autolink to find Boost.System
 
+#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/pack_numeric.hpp>
+
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+
 #include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
-
-#include <nil/crypto3/mac/algorithm/compute.hpp>
-#include <nil/crypto3/mac/hmac.hpp>
-
-#include <nil/crypto3/stream/algorithm/encrypt.hpp>
-#include <nil/crypto3/stream/chacha.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace random {
+            template<typename Hash, typename ResultType = multiprecision::cpp_int>
+            struct hash : private boost::noncopyable {
+                typedef Hash hash_type;
+                typedef ResultType result_type;
 
-            /*!
-             * @brief
-             * @tparam StreamCipher
-             * @tparam MessageAuthenticationCode
-             *
-             * ChaCha_RNG is a very fast but completely ad-hoc RNG created by
-             * creating a 256-bit random value and using it as a key for ChaCha20.
-             *
-             * The RNG maintains two 256-bit keys, one for HMAC_SHA256 (HK) and the
-             * other for ChaCha20 (CK). To compute a new key in response to
-             * reseeding request or add_entropy calls, ChaCha_RNG computes
-             *   CK' = HMAC_SHA256(HK, input_material)
-             * Then a new HK' is computed by running ChaCha20 with the new key to
-             * output 32 bytes:
-             *   HK' = ChaCha20(CK')
-             *
-             * Now output can be produced by continuing to produce output with ChaCha20
-             * under CK'
-             *
-             * The first HK (before seeding occurs) is taken as the all zero value.
-             *
-             * @warning This RNG construction is probably fine but is non-standard.
-             * The primary reason to use it is in cases where the other RNGs are
-             * not fast enough.
-             */
-            template<typename StreamCipher = stream::chacha<64, 128, 20>,
-                     typename MessageAuthenticationCode = mac::hmac<hashes::sha2<256>>>
-            struct chacha : private boost::noncopyable {
-                typedef StreamCipher stream_cipher_type;
-                typedef MessageAuthenticationCode mac_type;
-                typedef typename mac_type::key_type key_type;
-
-                typedef std::vector<std::uint8_t> result_type;
+                BOOST_STATIC_ASSERT(std::numeric_limits<result_type>::is_specialized ?
+                                        std::numeric_limits<result_type>::digits <= hash_type::digest_bits :
+                                        true);
 
                 BOOST_STATIC_CONSTANT(std::size_t, reseed_interval = 256);
 
@@ -89,12 +62,12 @@ namespace nil {
                 }
                 /** Returns the largest value that the \random_device can produce. */
                 static BOOST_CONSTEXPR std::size_t max BOOST_PREVENT_MACRO_SUBSTITUTION() {
-                    return ~0u;
+                    return std::numeric_limits<result_type>::is_specialized ? std::numeric_limits<result_type>::max :
+                                                                              ~0u;
                 }
 
                 /** Constructs a @c random_device, optionally using the default device. */
-                BOOST_RANDOM_DECL chacha() : cnt(0) {
-                    mac_key.fill(0);
+                BOOST_RANDOM_DECL hash() {
                 }
                 /**
                  * Constructs a @c random_device, optionally using the given token as an
@@ -102,29 +75,22 @@ namespace nil {
                  * service for monitoring a stochastic process.
                  */
                 template<typename SeedSinglePassRange>
-                BOOST_RANDOM_DECL explicit chacha(const SeedSinglePassRange &token) : cnt(0) {
-                    mac_key.fill(0);
+                BOOST_RANDOM_DECL explicit hash(const SeedSinglePassRange &token) {
                 }
 
-                BOOST_RANDOM_DECL ~chacha() {
-                    mac_key.fill(0);
-                    mac_key.clear();
+                BOOST_RANDOM_DECL ~hash() {
                 }
 
                 /** default seeds the underlying generator. */
                 void seed() {
-                    cnt = 0;
+                    idx = 0;
                 }
 
                 /** Seeds the underlying generator with first and last. */
                 template<typename InputIterator>
                 void seed(InputIterator &first, InputIterator last) {
-                    update(first, last);
-
-                    if (CHAR_BIT * std::distance(first, last) *
-                            sizeof(typename std::iterator_traits<InputIterator>::value_type) >=
-                        reseed_interval) {
-                        cnt = 0;
+                    while (first != last) {
+                        idx ^= *first++;
                     }
                 }
 
@@ -140,24 +106,31 @@ namespace nil {
                 }
                 /** Returns a random value in the range [min, max]. */
                 BOOST_RANDOM_DECL result_type operator()() {
-                    return accumulators::extract::stream<StreamCipher>(acc);
+                    result_type rval;
+
+                    do {
+                        uint64_t iter = 0;
+
+                        std::array<std::size_t, 2> input = {idx, iter};
+                        typename Hash::digest_type hash = crypto3::hash<Hash>(input);
+                        crypto3::detail::pack(hash, rval);
+
+                        iter++;
+                    } while (rval == result_type());
+
+                    return rval;
                 }
 
                 /** Fills a range with random values. */
                 template<class Iter>
                 void generate(Iter begin, Iter end) {
-                    detail::pack(accumulators::extract::stream<StreamCipher>(acc), begin, end);
+                    while (begin != end) {
+                        *begin++ = this->operator()();
+                    }
                 }
 
             protected:
-                template<typename InputIterator>
-                void update(InputIterator first, InputIterator last) {
-                    mac_key = encrypt<StreamCipher>({0}, mac::compute<mac_type>(first, last, mac_key), acc);
-                }
-
-                std::size_t cnt;
-                key_type mac_key;
-                accumulator_set<StreamCipher> acc;
+                std::size_t idx;
             };
         }    // namespace random
     }        // namespace crypto3
