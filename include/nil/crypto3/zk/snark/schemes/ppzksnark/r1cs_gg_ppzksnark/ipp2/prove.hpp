@@ -499,48 +499,86 @@ namespace nil {
                                                             vkey_poly_z, kzg_challenge);
                 }
 
+                template<typename CurveType, typename InputScalarIterator,
+                         typename std::enable_if<
+                             std::is_same<typename CurveType::scalar_field_type::value_type,
+                                          typename std::iterator_traits<InputScalarIterator>::value_type>::value,
+                             bool>::type = true>
+                kzg_opening<typename CurveType::g1_type> prove_commitment_w(
+                    const multiscalar_precomp_owned<typename CurveType::g1_type> &srs_powers_alpha_table,
+                    const multiscalar_precomp_owned<typename CurveType::g1_type> &srs_powers_beta_table, std::size_t n,
+                    InputScalarIterator transcript_first, InputScalarIterator transcript_last,
+                    typename CurveType::scalar_field_type::value_type r_shift,
+                    const typename CurveType::scalar_field_type::value_type &kzg_challenge) {
+                    // this computes f(X) = \prod (1 + x (rX)^{2^j})
+                    std::vector<typename CurveType::scalar_field_type::value_type> fcoeffs =
+                        polynomial_coefficients_from_transcript(transcript_first, transcript_last, r_shift);
+                    // this computes f_w(X) = X^n * f(X) - it simply shifts all coefficients to by n
+                    std::vector<typename CurveType::scalar_field_type::value_type> fwcoeffs {
+                        CurveType::scalar_field_type::value_type::one(), n};
+
+                    // this computes f(z)
+                    typename CurveType::scalar_field_type::value_type fz =
+                        polynomial_evaluation_product_form_from_transcript(transcript_first, transcript_last,
+                                                                           kzg_challenge, r_shift);
+                    // this computes the "shift" z^n
+                    typename CurveType::scalar_field_type::value_type zn = fz.pow(n);
+                    // this computes f_w(z) by multiplying by zn
+                    typename CurveType::scalar_field_type::value_type fwz = fz * zn;
+
+                    return prove_commitment_key_kzg_opening(srs_powers_alpha_table, srs_powers_beta_table, 2 * n,
+                                                            fwcoeffs, fwz, kzg_challenge);
+                }
+
                 /// Returns the KZG opening proof for the given commitment key. Specifically, it
                 /// returns $g^{f(alpha) - f(z) / (alpha - z)}$ for $a$ and $b$.
-                template<typename GroupType, typename InputScalarIterator,
-                         typename std::enable_if<
-                             std::is_same<typename GroupType::curve_type::scalar_field_type::value_type,
-                                          typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
-                             bool>::type = true>
+                template<
+                    typename GroupType, typename InputScalarIterator, typename InputScalarRange,
+                    typename std::enable_if<
+                        std::is_same<typename GroupType::curve_type::scalar_field_type::value_type,
+                                     typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
+                        bool>::type = true,
+                    typename std::enable_if<std::is_same<typename GroupType::curve_type::scalar_field_type::value_type,
+                                                         typename std::iterator_traits<
+                                                             typename InputScalarRange::iterator>::value_type>::value,
+                                            bool>::type = true>
                 kzg_opening<GroupType> prove_commitment_key_kzg_opening(
                     const multiscalar_precomp_owned<GroupType> &srs_powers_alpha_table,
                     const multiscalar_precomp_owned<GroupType> &srs_powers_beta_table, std::size_t srs_powers_len,
-                    InputScalarIterator transcript_first, InputScalarIterator transcript_last,
+                    const InputScalarRange &poly,
                     const typename GroupType::curve_type::scalar_field_type::value_type &eval_poly,
                     const typename GroupType::curve_type::scalar_field_type::value_type &kzg_challenge) {
-                    // f_v
-                    DensePolynomial vkey_poly(
-                        polynomial_coefficients_from_transcript(transcript_first, transcript_last, r_shift));
+                    typename GroupType::curve_type::scalar_field_type::value_type neg_kzg_challenge = -kzg_challenge;
 
-                    BOOST_ASSERT_MSG(srs_powers_len != vkey_poly.coeffs().size(), "Malformed SRS");
-                    // f_v(z)
-                    std::vector<typename std::iterator_traits<InputScalarIterator>::value_type> vkey_poly_z =
-                        polynomial_evaluation_product_form_from_transcript(transcript_first, transcript_last,
-                                                                           kzg_challenge, r_shift);
-
-                    typename std::iterator_traits<InputScalarIterator>::value_type neg_kzg_challenge =
-                        kzg_challenge.negate();
+                    BOOST_ASSERT(poly.size() == srs_power_len);
 
                     // f_v(X) - f_v(z) / (X - z)
-                    DensePolynomial quotient_polynomial =
-                        (vkey_poly - DensePolynomial(vkey_poly_z)) /
-                        (DensePolynomial(
-                            {neg_kzg_challenge, std::iterator_traits<InputScalarIterator>::value_type::one()}));
-
-                    std::vector<typename std::iterator_traits<InputScalarIterator>::value_type>
-                        quotient_polynomial_coeffs = quotient_polynomial.into_coeffs();
+                    std::vector<typename GroupType::curve_type::scalar_field_type::value_type> f_vX_sub_f_vZ;
+                    fft::_polynomial_subtraction(f_vX_sub_f_vZ, poly, {{eval_poly}});
+                    std::vector<typename GroupType::curve_type::scalar_field_type::value_type> quotient_polynomial,
+                        remainder_polynomial;
+                    fft::_polynomial_division(
+                        quotient_polynomial, remainder_polynomial, f_vX_sub_f_vZ,
+                        {{neg_kzh_challenge, GroupType::curve_type::scalar_field_type::value_type::one()}});
 
                     // multiexponentiation inner_product, inlined to optimize
-                    std::size_t quotient_polynomial_coeffs_len = quotient_polynomial_coeffs.size();
-                    auto getter = [&](std::size_t i) -> typename CurveAffine::scalar_field_type::value_type {
+                    // TODO:
+                    std::size_t quotient_polynomial_coeffs_len = quotient_polynomial.size();
+                    auto getter = [&](std::size_t i) -> typename GroupType::curve_type::scalar_field_type::value_type {
                         return i >= quotient_polynomial_coeffs_len ?
-                                   std::iterator_traits<InputScalarIterator>::value_type::zero() :
+                                   GroupType::curve_type::scalar_field_type::value_type::zero() :
                                    quotient_polynomial_coeffs[i];
                     };
+
+                    // we do one proof over h^a and one proof over h^b (or g^a and g^b depending
+                    // on the curve we are on). that's the extra cost of the commitment scheme
+                    // used which is compatible with Groth16 CRS insteaf of the original paper
+                    // of Bunz'19
+                    return kzg_opening<GroupType> {
+                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                            srs_powers_alpha_table.begin(), srs_powers_alpha_table.end(), quotient_polynomial.begin()),
+                        algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
+                            srs_powers_beta_table.begin(), srs_powers_beta_table.end(), quotient_polynomial.begin())};
                 }
 
                 /// It returns the evaluation of the polynomial $\prod (1 + x_{l-j}(rX)^{2j}$ at
