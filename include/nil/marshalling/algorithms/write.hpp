@@ -26,6 +26,9 @@
 #ifndef MARSHALLING_ALGORITHMS_WRITE_HPP
 #define MARSHALLING_ALGORITHMS_WRITE_HPP
 
+#include <iterator>
+#include <nil/marshalling/status_type.hpp>
+
 namespace nil {
     namespace marshalling {
         template<typename TypeToProcess, typename OutputIterator>
@@ -35,7 +38,7 @@ namespace nil {
         }
 
         template<typename TypeToProcess, typename OutputIterator>
-        status_type write(TypeToProcess field, OutputIterator &first, std::size_t buf_len) {
+        status_type write(TypeToProcess field, OutputIterator &first, typename std::iterator_traits<OutputIterator>::difference_type buf_len) {
 
             return field.write(first, buf_len);
         }

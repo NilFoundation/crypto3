@@ -56,6 +56,9 @@
 #include <nil/marshalling/msg_factory.hpp>
 #include <nil/marshalling/generic_message.hpp>
 
+#include <nil/marshalling/algorithms/read.hpp>
+#include <nil/marshalling/algorithms/write.hpp>
+
 static_assert(nil::marshalling::detail::has_clear_func<std::string>::value, "Invalid function presence detection");
 static_assert(nil::marshalling::detail::has_clear_func<std::vector<std::uint8_t>>::value,
               "Invalid function presence detection");
@@ -103,29 +106,26 @@ struct fields_fixture {
 
     enum class Enum2 : unsigned { Value1, Value2, Value3, Value4, NumOfValues };
 
-    template<typename TField>
-    static TField read_from_field(const char *buf, std::size_t size,
+    template<typename TField, typename InputIterator>
+    static TField read_from_field(const InputIterator buf, std::size_t buf_len,
                                    nil::marshalling::status_type expectedStatus
                                    = nil::marshalling::status_type::success){
 
         typedef TField field_type;
-        field_type field;
+        InputIterator iter = buf;
+        field_type field = nil::marshalling::read<field_type>(iter, buf_len, expectedStatus);
 
-        auto iter = buf;
-        auto status = field.read(iter, size);
-        BOOST_CHECK(status == expectedStatus);
-
-        if (status != nil::marshalling::status_type::success) {
+        if (expectedStatus != nil::marshalling::status_type::success) {
             return field;
         }
 
-        auto diff = static_cast<std::size_t>(std::distance(buf, iter));
+        std::size_t diff = static_cast<std::size_t>(std::distance(buf, iter));
         BOOST_CHECK_EQUAL(field.length(), diff);
 
         std::unique_ptr<char[]> outDataBuf(new char[diff]);
         auto writeIter = &outDataBuf[0];
 
-        status = field.write(writeIter, diff);
+        nil::marshalling::status_type status = nil::marshalling::write(field, writeIter, diff);
         BOOST_CHECK(status == nil::marshalling::status_type::success);
         BOOST_CHECK(std::equal(buf, buf + diff, static_cast<const char *>(&outDataBuf[0])));
 
@@ -135,8 +135,8 @@ struct fields_fixture {
         return field;
     }
 
-    template<typename TField>
-    void write_field(const TField &field, const char *expectedBuf, std::size_t size,
+    template<typename TField, typename OutputIterator>
+    void write_field(const TField &field, const OutputIterator expectedBuf, std::size_t size,
                      nil::marshalling::status_type expectedStatus = nil::marshalling::status_type::success){
      
         std::unique_ptr<char[]> outDataBuf(new char[size]);
@@ -154,13 +154,13 @@ struct fields_fixture {
         BOOST_CHECK(bufAsExpected);
     }
 
-    template<typename TField>
-    void write_read_field(const TField &field, const char *expectedBuf, std::size_t size,
+    template<typename TField, typename OutputIterator>
+    void write_read_field(const TField &field, const OutputIterator expectedBuf, std::size_t size,
                           nil::marshalling::status_type expectedStatus = nil::marshalling::status_type::success){
 
         std::unique_ptr<char[]> outDataBuf(new char[size]);
         auto writeIter = &outDataBuf[0];
-        auto es = field.write(writeIter, size);
+        nil::marshalling::status_type es = field.write(writeIter, size);
         BOOST_CHECK(es == expectedStatus);
         bool bufAsExpected = std::equal(expectedBuf, expectedBuf + size, static_cast<const char *>(&outDataBuf[0]));
         if (!bufAsExpected) {
@@ -174,9 +174,8 @@ struct fields_fixture {
 
         if (es == nil::marshalling::status_type::success) {
             auto readIter = &outDataBuf[0];
-            typename std::decay<decltype(field)>::type newField;
-            auto readEs = newField.read(readIter, size);
-            BOOST_CHECK(readEs == nil::marshalling::status_type::success);
+            typename std::decay<decltype(field)>::type newField = 
+                nil::marshalling::read<typename std::decay<decltype(field)>::type>(readIter, size, es);
             BOOST_CHECK(field == newField);
             BOOST_CHECK(field.value() == newField.value());
         }
@@ -1159,8 +1158,9 @@ BOOST_AUTO_TEST_CASE(test30) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
     const auto *readIter = &Buf[0];
-    auto es = field.read(readIter, BufSize);
-    BOOST_CHECK(es == nil::marshalling::status_type::success);
+    
+    field = nil::marshalling::read<field_type>(readIter, BufSize);
+
     BOOST_CHECK(field.value() == 0x2);
     BOOST_CHECK(field.valid());
 
@@ -1168,8 +1168,8 @@ BOOST_AUTO_TEST_CASE(test30) {
 
     static const std::size_t BufSize2 = std::extent<decltype(Buf2)>::value;
     readIter = &Buf2[0];
-    es = field.read(readIter, BufSize2);
-    BOOST_CHECK(es == nil::marshalling::status_type::success);
+    field = nil::marshalling::read<field_type>(readIter, BufSize2);
+
     BOOST_CHECK(field.value() == 0x2);
     BOOST_CHECK(field.valid());
 }
@@ -1194,8 +1194,9 @@ BOOST_AUTO_TEST_CASE(test31) {
 
     static const std::size_t BufSize = std::extent<decltype(Buf)>::value;
     const auto *readIter = &Buf[0];
-    auto es = field.read(readIter, BufSize);
-    BOOST_CHECK(es == nil::marshalling::status_type::success);
+    
+    field = nil::marshalling::read<field_type>(readIter, BufSize);
+
     BOOST_CHECK(field.field().value() == 0xff0);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.get_mode() == Mode::exists);
@@ -1205,7 +1206,7 @@ BOOST_AUTO_TEST_CASE(test31) {
     static const std::size_t BufTmpSize = std::extent<decltype(bufTmp)>::value;
 
     auto writeIter = &bufTmp[0];
-    es = field.write(writeIter, BufTmpSize);
+    auto es = field.write(writeIter, BufTmpSize);
     BOOST_CHECK(es == nil::marshalling::status_type::success);
     BOOST_CHECK(writeIter == &bufTmp[0]);
 }

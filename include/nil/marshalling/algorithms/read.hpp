@@ -26,6 +26,9 @@
 #ifndef MARSHALLING_ALGORITHMS_READ_HPP
 #define MARSHALLING_ALGORITHMS_READ_HPP
 
+#include <iterator>
+#include <nil/marshalling/status_type.hpp>
+
 namespace nil {
     namespace marshalling {
         template<typename TypeToProcess, typename InputIterator>
@@ -37,13 +40,13 @@ namespace nil {
         }
 
         template<typename TypeToProcess, typename InputIterator>
-        TypeToProcess read(InputIterator &first, std::size_t buf_len,
+        TypeToProcess read(InputIterator &first, typename std::iterator_traits<InputIterator>::difference_type buf_len,
                                    status_type expectedStatus
                                    = status_type::success) {
 
             TypeToProcess field;
 
-            BOOST_CHECK(field.read(iter, buf_len) == expectedStatus);
+            BOOST_CHECK(field.read(first, buf_len) == expectedStatus);
 
             return field;
         }
