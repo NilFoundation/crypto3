@@ -36,13 +36,13 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename Hash>
-                typename Hash::digest_type two_to_one_CRH(const typename Hash::digest_type &l,
-                                                          const typename Hash::digest_type &r) {
-                    typename Hash::digest_type new_input;
+                typename Hash::hash_value_type two_to_one_CRH(const typename Hash::hash_value_type &l,
+                                                          const typename Hash::hash_value_type &r) {
+                    typename Hash::hash_value_type new_input;
                     new_input.insert(new_input.end(), l.begin(), l.end());
                     new_input.insert(new_input.end(), r.begin(), r.end());
 
-                    const std::size_t digest_size = Hash::digest_bits;
+                    const std::size_t digest_size = Hash::get_digest_len();
                     assert(l.size() == digest_size);
                     assert(r.size() == digest_size);
 
@@ -68,7 +68,7 @@ namespace nil {
                 template<typename Hash, std::size_t BaseArity = 0, std::size_t SubTreeArity = 0,
                          std::size_t TopTreeArity = 0>
                 struct merkle_tree {
-                    typedef typename Hash::digest_type digest_type;
+                    typedef typename Hash::hash_value_type digest_type;
                     typedef typename Hash::merkle_authentication_path_type merkle_authentication_path_type;
 
                     constexpr static const std::size_t base_arity = BaseArity;
@@ -87,7 +87,7 @@ namespace nil {
                         depth(depth), value_size(value_size) {
                         assert(depth < sizeof(std::size_t) * 8);
 
-                        digest_size = Hash::digest_bits;
+                        digest_size = Hash::get_digest_len();
                         assert(value_size <= digest_size);
 
                         digest_type last;
