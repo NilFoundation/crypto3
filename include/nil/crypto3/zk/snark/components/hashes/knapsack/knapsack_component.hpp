@@ -222,8 +222,8 @@ namespace nil {
                                 output[i].assign(
                                     bp,
                                     blueprint_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
-                                        output_digest.bits.begin() + i * FieldType::size_in_bits(),
-                                        output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits())));
+                                        output_digest.bits.begin() + i * FieldType::value_bits,
+                                        output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
                             }
 
                             hasher.reset(new knapsack_crh_with_field_out_component<FieldType>(
@@ -247,14 +247,14 @@ namespace nil {
                             const std::vector<bool> input = input_block.bits.get_bits(this->bp);
                             for (std::size_t i = 0; i < dimension; ++i) {
                                 blueprint_variable_vector<FieldType> va(
-                                    output_digest.bits.begin() + i * FieldType::size_in_bits(),
-                                    output_digest.bits.begin() + (i + 1) * FieldType::size_in_bits());
+                                    output_digest.bits.begin() + i * FieldType::value_bits,
+                                    output_digest.bits.begin() + (i + 1) * FieldType::value_bits);
                                 va.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(output[i]));
                             }
                         }
 
                         static std::size_t get_digest_len() {
-                            return knapsack_dimension<FieldType>::dimension * FieldType::size_in_bits();
+                            return knapsack_dimension<FieldType>::dimension * FieldType::value_bits;
                         }
 
                         /* return 0 as block length, as the hash function is variable-input */

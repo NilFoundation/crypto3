@@ -119,7 +119,7 @@ namespace nil {
 
                     void fill_with_bits_of_field_element(blueprint<field_type> &bp, const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r, i) ?
+                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r.data, i) ?
                                                      field_value_type::one() :
                                                      field_value_type::zero();
                         }
