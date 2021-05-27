@@ -3,7 +3,7 @@ Below are quick examples on how to define fields as well as messages using
 Marshalling library. For proper and full tutorial please refer to proper documentation.
 
 ## Defining fields_type
-Almost every field definition class receives its base class as a template
+Almost every field definition type receives its base class as a template
 parameter. This base class is expected to be a variant of **nil::marshalling::field_type** with
 endian information.
 ```cpp
