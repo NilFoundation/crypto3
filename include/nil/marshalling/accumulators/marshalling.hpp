@@ -57,11 +57,9 @@ namespace nil {
                     }
 
                     template<typename ArgumentPack>
-                    inline nil::marshalling::status_type operator()(const ArgumentPack &args) {
-                        return resolve_type(args[boost::accumulators::sample],
+                    inline void operator()(const ArgumentPack &args) {
+                        status_type marshalling_status = resolve_type(args[boost::accumulators::sample],
                                      args[::nil::marshalling::accumulators::buffer_length | std::size_t()]);
-                        // should be better:
-                        // | std::iterator_traits<InputIterator>::difference_type()
                     }
 
                     inline field_type result(boost::accumulators::dont_care) const {
@@ -74,16 +72,19 @@ namespace nil {
                     template<typename InputIterator>
                     inline typename std::enable_if<
                                         marshalling::detail::is_iterator<InputIterator>::value && 
-                                        std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value, 
+                                        (std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value ||
+                                         std::is_same<std::int8_t, typename std::iterator_traits<InputIterator>::value_type>::value), 
                                     status_type>::type
-                     resolve_type(const InputIterator first, std::size_t buf_len) {
+                     resolve_type(InputIterator first, std::size_t buf_len) {
+
                         return processed_field.read(first, buf_len);
                     }
 
                     template<typename InputIterator>
                     inline typename std::enable_if<
                                         marshalling::detail::is_iterator<InputIterator>::value && 
-                                        !(std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value) &&
+                                        !(std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value ||
+                                         std::is_same<std::int8_t, typename std::iterator_traits<InputIterator>::value_type>::value) &&
                                         marshalling::detail::is_marshalling_field<typename std::iterator_traits<InputIterator>::value_type>::value, 
                                     status_type>::type
                     resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
@@ -102,7 +103,7 @@ namespace nil {
                                 type_to_process>;
                         using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
-                        nil_marshalling_array_internal_sequential_container_type sequentional_container();
+                        nil_marshalling_array_internal_sequential_container_type sequentional_container;
 
                         std::copy (other_field_begin, other_field_begin + buf_len, sequentional_container.begin());
                         
@@ -113,17 +114,21 @@ namespace nil {
 
                     // Probably there is a way to directly convert between marshalling fields
                     template<typename OtherFieldType>
-                    inline typename std::enable_if<marshalling::detail::is_marshalling_field<OtherFieldType>::value, 
+                    inline typename std::enable_if<
+                                    !marshalling::detail::is_iterator<OtherFieldType>::value && 
+                                    marshalling::detail::is_marshalling_field<OtherFieldType>::value, 
                                     status_type>::type
                     resolve_type(const OtherFieldType other_field, ...) {
 
                         std::vector<std::uint8_t> buffer (other_field.length());
-
+                        typename std::vector<std::uint8_t>::iterator buffer_begin = buffer.begin();
                         status_type write_status = 
-                            other_field.write(buffer.begin(), buffer.size());
+                            other_field.write(buffer_begin, buffer.size());
+
+
 
                         status_type read_status = 
-                            processed_field.read(buffer.begin(), buffer.size());
+                            processed_field.read(buffer_begin, buffer.size());
 
                         return read_status | write_status;
                     }

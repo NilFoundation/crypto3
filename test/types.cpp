@@ -99,7 +99,7 @@ static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::proc
 static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
-struct fields_fixture {
+struct types_fixture {
     typedef nil::marshalling::option::big_endian BigEndianOpt;
     typedef nil::marshalling::option::little_endian LittleEndianOpt;
 
@@ -188,7 +188,41 @@ struct fields_fixture {
     }
 };
 
-BOOST_FIXTURE_TEST_SUITE(fields_test_suite, fields_fixture)
+BOOST_FIXTURE_TEST_SUITE(types_accumulator_test_suite, types_fixture)
+
+BOOST_AUTO_TEST_CASE(types_accumulator_test1) {
+
+    using big_endian_array_type = 
+    nil::marshalling::types::array_list<
+        nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+        std::uint32_t
+    >;
+
+    static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04, 
+                               0x05, 0x06, 0x07, 0x08, 
+                               0x09, 0x0a, 0x0b, 0x0c, 
+                               0x0d, 0x0e, 0x0f, 0x10};
+
+    big_endian_array_type be_array = nil::marshalling::deserialize<big_endian_array_type>(Buf.begin(), Buf.end());
+
+    std::vector<std::uint32_t> v = be_array.value();
+
+    for (int i = 0; i < v.size(); ++i){
+        std::cout << std::hex << "be_array " << i << ": 0x" << v[i] << std::endl;
+    }
+
+    BOOST_CHECK_EQUAL(v[0], 0x01020304);
+    BOOST_CHECK_EQUAL(v[1], 0x05060708);
+    BOOST_CHECK_EQUAL(v[2], 0x090a0b0c);
+    BOOST_CHECK_EQUAL(v[3], 0x0d0e0f10);
+
+    BOOST_CHECK(be_array.valid());
+    BOOST_CHECK(!be_array.set_version(5));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(fields_test_suite, types_fixture)
 
 BOOST_AUTO_TEST_CASE(custom_test1) {
 
@@ -1042,7 +1076,7 @@ typedef std::tuple<
     nil::marshalling::types::int_value<Test27_FieldBase, std::uint8_t, nil::marshalling::option::fixed_bit_length<4>>,
     nil::marshalling::types::bitmask_value<Test27_FieldBase, nil::marshalling::option::fixed_length<1>,
                                            nil::marshalling::option::fixed_bit_length<8>>,
-    nil::marshalling::types::enum_value<Test27_FieldBase, fields_fixture::Enum1,
+    nil::marshalling::types::enum_value<Test27_FieldBase, types_fixture::Enum1,
                                         nil::marshalling::option::fixed_bit_length<4>>>
     Test27_BitfildMembers;
 
@@ -1913,10 +1947,10 @@ BOOST_AUTO_TEST_CASE(test50) {
 
 class Field_51
     : public nil::marshalling::types::bitfield<
-          nil::marshalling::field_type<fields_fixture::BigEndianOpt>,
-          std::tuple<nil::marshalling::types::int_value<nil::marshalling::field_type<fields_fixture::BigEndianOpt>,
+          nil::marshalling::field_type<types_fixture::BigEndianOpt>,
+          std::tuple<nil::marshalling::types::int_value<nil::marshalling::field_type<types_fixture::BigEndianOpt>,
                                                         std::uint8_t, nil::marshalling::option::fixed_bit_length<2>>,
-                     nil::marshalling::types::bitmask_value<nil::marshalling::field_type<fields_fixture::BigEndianOpt>,
+                     nil::marshalling::types::bitmask_value<nil::marshalling::field_type<types_fixture::BigEndianOpt>,
                                                             nil::marshalling::option::fixed_length<1>,
                                                             nil::marshalling::option::fixed_bit_length<6>>>> {
 public:
