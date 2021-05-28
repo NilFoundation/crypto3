@@ -72,8 +72,7 @@ namespace nil {
                     template<typename InputIterator>
                     inline typename std::enable_if<
                                         marshalling::detail::is_iterator<InputIterator>::value && 
-                                        (std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value ||
-                                         std::is_same<std::int8_t, typename std::iterator_traits<InputIterator>::value_type>::value), 
+                                        marshalling::detail::is_supported_representation_type<typename std::iterator_traits<InputIterator>::value_type>::value, 
                                     status_type>::type
                      resolve_type(InputIterator first, std::size_t buf_len) {
 
@@ -83,8 +82,7 @@ namespace nil {
                     template<typename InputIterator>
                     inline typename std::enable_if<
                                         marshalling::detail::is_iterator<InputIterator>::value && 
-                                        !(std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value ||
-                                         std::is_same<std::int8_t, typename std::iterator_traits<InputIterator>::value_type>::value) &&
+                                        !(marshalling::detail::is_supported_representation_type<typename std::iterator_traits<InputIterator>::value_type>::value) &&
                                         marshalling::detail::is_marshalling_field<typename std::iterator_traits<InputIterator>::value_type>::value, 
                                     status_type>::type
                     resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {

@@ -68,86 +68,86 @@ namespace nil {
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
 
-        // /*!
-        //  * @brief
-        //  *
-        //  * @ingroup marshalling_algorithms
-        //  *
-        //  * @tparam TypeToProcess
-        //  * @tparam InputIterator
-        //  * @tparam TypeToProcessAccumulator
-        //  *
-        //  * @param first
-        //  * @param last
-        //  * @param acc
-        //  *
-        //  * @return
-        //  */
-        // template<typename TypeToProcess, typename InputIterator, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
-        // typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
-        //                         TypeToProcess>::type &
-        //     deserialize(InputIterator first, InputIterator last, TypeToProcessAccumulator &acc) {
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TypeToProcess
+         * @tparam InputIterator
+         * @tparam TypeToProcessAccumulator
+         *
+         * @param first
+         * @param last
+         * @param acc
+         *
+         * @return
+         */
+        template<typename TypeToProcess, typename InputIterator, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
+                                TypeToProcess>::type &
+            deserialize(InputIterator first, InputIterator last, TypeToProcessAccumulator &acc) {
             
-        //     typedef TypeToProcessAccumulator accumulator_set_type;
-        //     typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
+            typedef TypeToProcessAccumulator accumulator_set_type;
+            typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-        //     acc(first, std::distance(first, last));
+            acc(first, std::distance(first, last));
 
-        //     return boost::accumulators::extract_result<accumulator_type>(acc);
-        // }
+            return boost::accumulators::extract_result<accumulator_type>(acc);
+        }
 
-        // /*!
-        //  * @brief
-        //  *
-        //  * @ingroup marshalling_algorithms
-        //  *
-        //  * @tparam TypeToProcess
-        //  * @tparam SinglePassRange
-        //  * @tparam TypeToProcessAccumulator
-        //  *
-        //  * @param rng
-        //  * @param acc
-        //  *
-        //  * @return
-        //  */
-        // template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
-        // typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
-        //                         TypeToProcess>::type &
-        //     deserialize(const SinglePassRange &rng, TypeToProcessAccumulator &acc) {
-        //     typedef TypeToProcessAccumulator accumulator_set_type;
-        //     typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TypeToProcess
+         * @tparam SinglePassRange
+         * @tparam TypeToProcessAccumulator
+         *
+         * @param rng
+         * @param acc
+         *
+         * @return
+         */
+        template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
+                                TypeToProcess>::type &
+            deserialize(const SinglePassRange &rng, TypeToProcessAccumulator &acc) {
+            typedef TypeToProcessAccumulator accumulator_set_type;
+            typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-        //     acc(rng.begin(), rng.size());
+            acc(rng.begin(), rng.size());
 
-        //     return boost::accumulators::extract_result<accumulator_type>(acc);
-        // }
+            return boost::accumulators::extract_result<accumulator_type>(acc);
+        }
 
-        // /*!
-        //  * @brief
-        //  *
-        //  * @ingroup marshalling_algorithms
-        //  *
-        //  * @tparam TypeToProcess
-        //  * @tparam SinglePassRange
-        //  * @tparam TypeToProcessAccumulator
-        //  *
-        //  * @param r
-        //  *
-        //  * @return
-        //  */
-        // template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
-        // TypeToProcess
-        //     deserialize(const SinglePassRange &rng) {
+        /*!
+         * @brief
+         *
+         * @ingroup marshalling_algorithms
+         *
+         * @tparam TypeToProcess
+         * @tparam SinglePassRange
+         * @tparam TypeToProcessAccumulator
+         *
+         * @param r
+         *
+         * @return
+         */
+        template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
+        TypeToProcess
+            deserialize(const SinglePassRange &rng) {
 
-        //     typedef accumulator_set<TypeToProcess> accumulator_set_type;
-        //     typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
+            typedef accumulator_set<TypeToProcess> accumulator_set_type;
+            typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-        //     accumulator_set_type acc;
+            accumulator_set_type acc;
 
-        //     acc(rng.begin(), rng.size());
+            acc(rng.begin(), rng.size());
 
-        //     return boost::accumulators::extract_result<accumulator_type>(acc);
-        // }
+            return boost::accumulators::extract_result<accumulator_type>(acc);
+        }
     }    // namespace crypto3
 }    // namespace nil
 

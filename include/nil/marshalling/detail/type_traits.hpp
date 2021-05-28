@@ -215,6 +215,13 @@ namespace nil {
             struct is_marshalling_field {
                 static const bool value = true;
             };
+
+            template<typename Container>
+            struct is_supported_representation_type {
+                static const bool value = std::is_same<std::uint8_t, Container>::value ||
+                                         std::is_same<std::int8_t, Container>::value || 
+                                         std::is_same<char, Container>::value;
+            };
         }    // namespace detail
     }        // namespace marshalling
 }    // namespace nil
