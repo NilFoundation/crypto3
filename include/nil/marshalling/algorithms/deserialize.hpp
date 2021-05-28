@@ -25,8 +25,10 @@
 #ifndef MARSHALLING_DESERIALIZE_HPP
 #define MARSHALLING_DESERIALIZE_HPP
 
+#include <nil/marshalling/marshalling_state.hpp>
 #include <nil/marshalling/accumulators/marshalling.hpp>
 #include <nil/marshalling/detail/type_traits.hpp>
+
 
 namespace nil {
     namespace marshalling {
@@ -60,7 +62,7 @@ namespace nil {
 
             accumulator_set_type acc;
 
-            status_type = acc(first, std::distance(first, last));
+            status_type marshalling_status = acc(first, std::distance(first, last));
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -88,7 +90,7 @@ namespace nil {
             typedef TypeToProcessAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            status_type = acc(first, std::distance(first, last));
+            status_type marshalling_status = acc(first, std::distance(first, last));
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -114,7 +116,7 @@ namespace nil {
             typedef TypeToProcessAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            status_type = acc(r.begin(), r.size());
+            status_type marshalling_status = acc(rng.begin(), rng.size());
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -134,14 +136,14 @@ namespace nil {
          */
         template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
         TypeToProcess
-            deserialize(const SinglePassRange &r) {
+            deserialize(const SinglePassRange &rng) {
 
             typedef accumulator_set<TypeToProcess> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
             accumulator_set_type acc;
 
-            status_type = acc(r.begin(), r.size());
+            status_type marshalling_status = acc(rng.begin(), rng.size());
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }

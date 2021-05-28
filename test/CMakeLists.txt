@@ -39,7 +39,7 @@ endmacro()
 set(TESTS_NAMES
     "processing"
     "checksum_prefix_layer"
-    "fields"
+    "types"
     "msg_size_layer"
     "message"
     "msg_id_layer"

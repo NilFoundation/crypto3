@@ -176,7 +176,7 @@
     };
 
 namespace nil {
-    namespace crypto3 {
+    namespace marshalling {
         namespace detail {
             GENERATE_HAS_MEMBER_TYPE(iterator)
             GENERATE_HAS_MEMBER_TYPE(const_iterator)
@@ -216,7 +216,7 @@ namespace nil {
                 static const bool value = true;
             };
         }    // namespace detail
-    }        // namespace crypto3
+    }        // namespace marshalling
 }    // namespace nil
 
 #endif    // MARSHALLING_TYPE_TRAITS_HPP

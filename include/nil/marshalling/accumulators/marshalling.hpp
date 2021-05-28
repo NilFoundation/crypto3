@@ -50,7 +50,7 @@ namespace nil {
                     typedef TypeToProcess field_type;
                     
                 public:
-                    typedef typename hash_type::digest_type result_type;
+                    typedef field_type result_type;
 
                     // The constructor takes an argument pack.
                     marshalling_impl(boost::accumulators::dont_care) {
@@ -72,21 +72,24 @@ namespace nil {
                     // for byte iterator only,
                     // because byte iterator can be directly processed
                     template<typename InputIterator>
-                    inline typename std::enable_if<detail::is_iterator<InputIterator>::value && 
-                                    std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>, 
-                                    nil::marshalling::status_type>::type
+                    inline typename std::enable_if<
+                                        marshalling::detail::is_iterator<InputIterator>::value && 
+                                        std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value, 
+                                    status_type>::type
                      resolve_type(const InputIterator first, std::size_t buf_len) {
                         return processed_field.read(first, buf_len);
                     }
 
                     template<typename InputIterator>
-                    inline typename std::enable_if<detail::is_iterator<InputIterator>::value && 
-                                    detail::is_marshalling_field<typename std::iterator_traits<InputIterator>::value_type>, 
-                                    nil::marshalling::status_type>::type
+                    inline typename std::enable_if<
+                                        marshalling::detail::is_iterator<InputIterator>::value && 
+                                        !(std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value) &&
+                                        marshalling::detail::is_marshalling_field<typename std::iterator_traits<InputIterator>::value_type>::value, 
+                                    status_type>::type
                     resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
 
                         using type_to_process = typename std::iterator_traits<InputIterator>::value_type;
-                        nil::marshalling::status_type final_status = nil::marshalling::status_type::success;
+                        status_type final_status = status_type::success;
 
                         // hardcoded to be little-endian by default. If the user wants to process a container
                         // in other order (for example, in reverse or by skipping some first elements), he should
@@ -94,8 +97,8 @@ namespace nil {
                         // processing it as marshaling type (at the moment it is the resolve_type function under 
                         // this one).
                         using marhsalling_array_type = 
-                            nil::marshalling::types::array_list<
-                                nil::marshalling::field_type<nil::marshalling::option::little_endian>,
+                            types::array_list<
+                                marshalling::field_type<nil::marshalling::option::little_endian>,
                                 type_to_process>;
                         using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
@@ -110,16 +113,16 @@ namespace nil {
 
                     // Probably there is a way to directly convert between marshalling fields
                     template<typename OtherFieldType>
-                    inline typename std::enable_if<detail::is_marshalling_field<OtherFieldType>, 
-                                    nil::marshalling::status_type>::type
+                    inline typename std::enable_if<marshalling::detail::is_marshalling_field<OtherFieldType>::value, 
+                                    status_type>::type
                     resolve_type(const OtherFieldType other_field, ...) {
 
                         std::vector<std::uint8_t> buffer (other_field.length());
 
-                        nil::marshalling::status_type write_status = 
+                        status_type write_status = 
                             other_field.write(buffer.begin(), buffer.size());
 
-                        nil::marshalling::status_type read_status = 
+                        status_type read_status = 
                             processed_field.read(buffer.begin(), buffer.size());
 
                         return read_status | write_status;

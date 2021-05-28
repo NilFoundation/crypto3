@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE marshalling_fields_test
+#define BOOST_TEST_MODULE marshalling_types_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -58,6 +58,7 @@
 
 #include <nil/marshalling/algorithms/read.hpp>
 #include <nil/marshalling/algorithms/write.hpp>
+#include <nil/marshalling/algorithms/deserialize.hpp>
 
 static_assert(nil::marshalling::detail::has_clear_func<std::string>::value, "Invalid function presence detection");
 static_assert(nil::marshalling::detail::has_clear_func<std::vector<std::uint8_t>>::value,
