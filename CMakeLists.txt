@@ -17,7 +17,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
-cm_find_package(CM)
 include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
@@ -31,6 +30,27 @@ endif()
 
 cm_project(stream WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
+macro(cm_find_package NAME)
+    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
+        find_package(${ARGV})
+    else()
+        set(${ARGV0}_FOUND ON CACHE BOOL "")
+    endif()
+endmacro()
+
+if(NOT Boost_FOUND OR NOT Boost_CONTAINER_FOUND)
+    cm_find_package(Boost REQUIRED COMPONENTS container)
+endif()
+
+include(TargetArchitecture)
+include(TargetConfiguration)
+include(PlatformConfiguration)
+
+include(CheckSSE)
+include(CheckAVX)
+
+cm_find_package(${CMAKE_WORKSPACE_NAME}_stream)
+
 check_sse()
 check_avx()
 
@@ -39,6 +59,14 @@ option(BUILD_TESTS "Build unit tests" FALSE)
 option(CRYPTO3_STREAM_CHACHA "Build with CHACHA stream encryption support" TRUE)
 option(CRYPTO3_STREAM_SALSA20 "Build with SALSA20 stream encryption support" TRUE)
 option(CRYPTO3_STREAM_RC4 "Build with RC4 stream encryption support" TRUE)
+
+set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
+
+if(BUILD_WITH_TARGET_ARCHITECTURE)
+    set(CMAKE_TARGET_ARCHITECTURE ${BUILD_WITH_TARGET_ARCHITECTURE})
+else()
+    target_architecture(CMAKE_TARGET_ARCHITECTURE)
+endif()
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
