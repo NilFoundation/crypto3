@@ -350,8 +350,8 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> or
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>
             ///     for their internal data storage. If this option is used, it will force
-            ///     such fields to use @ref nil::marshalling::utilities::static_vector or @ref
-            ///     nil::marshalling::utilities::StaticString with the capacity provided by this option.
+            ///     such fields to use @ref nil::marshalling::processing::static_vector or @ref
+            ///     nil::marshalling::processing::StaticString with the capacity provided by this option.
             /// @tparam TSize Size of the storage area in number of elements, for strings it does @b NOT include
             ///     the '\0' terminating character.
             /// @headerfile nil/marshalling/options.h
@@ -365,7 +365,7 @@ namespace nil {
             ///     and nil::marshalling::field::array_list uses
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> as
             ///     their internal storage types. The @ref fixed_size_storage option forces
-            ///     them to use nil::marshalling::utilities::StaticString and nil::marshalling::utilities::static_vector
+            ///     them to use nil::marshalling::processing::StaticString and nil::marshalling::processing::static_vector
             ///     instead. This option can be used to provide any other third party type.
             ///     Such type must define the same public interface as @b std::string (when used
             ///     with nil::marshalling::field::string) or @b std::vector (when used with
@@ -1240,8 +1240,8 @@ namespace nil {
             /// @brief Use "view" on original raw data instead of copying it.
             /// @details Can be used with @ref nil::marshalling::field::string and raw data @ref
             /// nil::marshalling::field::array_list,
-            ///     will force usage of @ref nil::marshalling::utilities::StringView and
-            ///     nil::marshalling::utilities::ArrayView respectively as data storage type.
+            ///     will force usage of @ref nil::marshalling::processing::StringView and
+            ///     nil::marshalling::processing::ArrayView respectively as data storage type.
             /// @note The original data must be preserved until destruction of the field
             ///     that uses the "view".
             /// @note Incompatible with other options that contol data storage type,

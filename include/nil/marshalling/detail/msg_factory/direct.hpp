@@ -74,7 +74,7 @@ namespace nil {
                     }
 
                 private:
-                    static_assert(nil::marshalling::utilities::is_tuple<all_messages_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static_assert(0U < std::tuple_size<all_messages_type>::value,
@@ -114,7 +114,7 @@ namespace nil {
 
                     void init_registry() {
                         std::fill(registry_.begin(), registry_.end(), nullptr);
-                        utilities::tuple_for_each_type<all_messages_type>(creator(registry_));
+                        processing::tuple_for_each_type<all_messages_type>(creator(registry_));
                     }
 
                     const factory_method_type *get_method(msg_id_param_type id) const {

@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/utilities/static_queue.hpp
+/// @file nil/marshalling/processing/static_queue.hpp
 /// This file contains the definition and implementation of the static queue,
 /// which also can be used as circular buffer.
 
@@ -41,7 +41,7 @@
 #include <algorithm>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/size_to_type.hpp>
+#include <nil/marshalling/processing/size_to_type.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -1582,10 +1582,10 @@ namespace nil {
                 class StaticQueueBaseOptimised<T *>
                     : public CastWrapperQueueBase<
                           T *,
-                          typename nil::marshalling::utilities::size_to_type<sizeof(T *)>::type> {
+                          typename nil::marshalling::processing::size_to_type<sizeof(T *)>::type> {
                     using Base
                         = CastWrapperQueueBase<T *,
-                                               typename nil::marshalling::utilities::size_to_type<sizeof(T *)>::type>;
+                                               typename nil::marshalling::processing::size_to_type<sizeof(T *)>::type>;
 
                 protected:
                     using Base = typename Base::StorageTypePtr;

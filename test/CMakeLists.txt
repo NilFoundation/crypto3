@@ -37,7 +37,7 @@ macro(define_marshalling_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "utilities"
+    "processing"
     "checksum_prefix_layer"
     "fields"
     "msg_size_layer"

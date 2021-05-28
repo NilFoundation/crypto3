@@ -37,7 +37,7 @@
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             namespace detail {
 
@@ -798,7 +798,7 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a>.
             /// @tparam T Type of the stored elements.
             /// @tparam TSize Maximum number of elements that static_vector can store.
-            /// @headerfile "marshalling/utilities/static_vector.h"
+            /// @headerfile "marshalling/processing/static_vector.h"
             template<typename T, std::size_t TSize>
             class static_vector : public detail::ChooseStaticVectorBase<T, TSize> {
                 using Base = detail::ChooseStaticVectorBase<T, TSize>;
@@ -1268,21 +1268,21 @@ namespace nil {
                 };
 
                 template<typename T, std::size_t TSize>
-                struct is_static_vector<nil::marshalling::utilities::static_vector<T, TSize>> {
+                struct is_static_vector<nil::marshalling::processing::static_vector<T, TSize>> {
                     static const bool value = true;
                 };
 
             }    // namespace detail
 
             /// @brief Compile time check whether the provided type is a variant of
-            ///     @ref nil::marshalling::utilities::static_vector
-            /// @related nil::marshalling::utilities::static_vector
+            ///     @ref nil::marshalling::processing::static_vector
+            /// @related nil::marshalling::processing::static_vector
             template<typename T>
             static constexpr bool is_static_vector() {
                 return detail::is_static_vector<T>::value;
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil
@@ -1291,10 +1291,10 @@ namespace std {
 
     /// @brief Specializes the std::swap algorithm.
     /// @see <a href="http://en.cppreference.com/w/cpp/container/vector/swap2">Reference</a>
-    /// @related nil::marshalling::utilities::static_vector
+    /// @related nil::marshalling::processing::static_vector
     template<typename T, std::size_t TSize1, std::size_t TSize2>
-    void swap(nil::marshalling::utilities::static_vector<T, TSize1> &v1,
-              nil::marshalling::utilities::static_vector<T, TSize2> &v2) {
+    void swap(nil::marshalling::processing::static_vector<T, TSize1> &v1,
+              nil::marshalling::processing::static_vector<T, TSize2> &v2) {
         v1.swap(v2);
     }
 

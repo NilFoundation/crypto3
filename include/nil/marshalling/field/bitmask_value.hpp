@@ -29,7 +29,7 @@
 #include <limits>
 #include <nil/marshalling/field_type.hpp>
 
-#include <nil/marshalling/utilities/size_to_type.hpp>
+#include <nil/marshalling/processing/size_to_type.hpp>
 #include <nil/marshalling/field/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/field/detail/options_parser.hpp>
 #include <nil/marshalling/detail/gen_enum.hpp>
@@ -49,7 +49,7 @@ namespace nil {
                 struct bitmask_undertlying_type<true> {
                     template<typename TOptionsBundle>
                     using type =
-                        typename nil::marshalling::utilities::size_to_type<TOptionsBundle::fixed_length, false>::type;
+                        typename nil::marshalling::processing::size_to_type<TOptionsBundle::fixed_length, false>::type;
                 };
 
                 template<>

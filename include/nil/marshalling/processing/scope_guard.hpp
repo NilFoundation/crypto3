@@ -49,11 +49,11 @@ namespace nil {
             ///          function. For example:
             ///          @code
             ///          // Binding function with parameters:
-            ///          auto guard = nil::marshalling::utilities::make_scope_guard(&func, std::ref(arg1), arg2);
+            ///          auto guard = nil::marshalling::processing::make_scope_guard(&func, std::ref(arg1), arg2);
             ///
             ///          // Binding lamda function:
             ///          auto guard =
-            ///              nil::marshalling::utilities::make_scope_guard([&argByRef, argByValue]()
+            ///              nil::marshalling::processing::make_scope_guard([&argByRef, argByValue]()
             ///                  {
             ///                      ...// Some code here
             ///                  });
@@ -64,7 +64,7 @@ namespace nil {
             ///          Also note that the guard doesn't provide copy constructor and
             ///          assignment operator, it supports only move semantics.
             /// @tparam TFunc Functor object type.
-            /// @headerfile nil/marshalling/utilities/ScopeGuard.h
+            /// @headerfile nil/marshalling/processing/ScopeGuard.h
             template<typename TFunc>
             class scope_guard {
             public:
@@ -120,7 +120,7 @@ namespace nil {
             ///          For example:
             ///          @code
             ///          auto guard =
-            ///              nil::marshalling::utilities::make_scope_guard([&argByRef, argByValue]()
+            ///              nil::marshalling::processing::make_scope_guard([&argByRef, argByValue]()
             ///                  {
             ///                      ...// Some code here
             ///                  });
@@ -142,7 +142,7 @@ namespace nil {
             ///          For example:
             ///          @code
             ///          // Binding function with parameters:
-            ///          auto guard = nil::marshalling::utilities::make_scope_guard(&func, std::ref(arg1), arg2);
+            ///          auto guard = nil::marshalling::processing::make_scope_guard(&func, std::ref(arg1), arg2);
             ///          @endcode
             ///          Note that all the bound parameters are passed by value, if there
             ///          is any need to bind function with reference to some object,

@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 
 /// @file
-/// @brief Contains nil::marshalling::utilities::string_view class.
+/// @brief Contains nil::marshalling::processing::string_view class.
 
 #ifndef MARSHALLING_STRING_VIEW_HPP
 #define MARSHALLING_STRING_VIEW_HPP
@@ -35,12 +35,12 @@
 #include <string>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/array_view.hpp>
+#include <nil/marshalling/processing/array_view.hpp>
 
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             /// @brief Describes an object that can refer to a constant contiguous
             ///     sequence of char-like objects with the first element of the
@@ -48,7 +48,7 @@ namespace nil {
             /// @details Similar to <a
             /// href="http://en.cppreference.com/w/cpp/string/basic_string_view">std::string_view</a>
             ///     introduced in C++17.
-            /// @headerfile "marshalling/utilities/StringView.h"
+            /// @headerfile "marshalling/processing/StringView.h"
             class string_view : public array_view<char> {
                 using base_type = array_view<char>;
 
@@ -596,7 +596,7 @@ namespace nil {
                 return !(str1 == str2);
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil
@@ -605,8 +605,8 @@ namespace std {
 
     /// @brief Specializes the std::swap algorithm.
     /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/swap2">Reference</a>
-    /// @related nil::marshalling::utilities::StringView
-    inline void swap(nil::marshalling::utilities::string_view &str1, nil::marshalling::utilities::string_view &str2) {
+    /// @related nil::marshalling::processing::StringView
+    inline void swap(nil::marshalling::processing::string_view &str1, nil::marshalling::processing::string_view &str2) {
         str1.swap(str2);
     }
 

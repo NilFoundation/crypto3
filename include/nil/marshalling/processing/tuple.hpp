@@ -32,12 +32,12 @@
 #include <type_traits>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/aligned_union.hpp>
+#include <nil/marshalling/processing/aligned_union.hpp>
 
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             /// @brief Check whether provided type is a variant of
             ///     <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>.
@@ -795,7 +795,7 @@ namespace nil {
                     std::forward<TFunc>(func));
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil

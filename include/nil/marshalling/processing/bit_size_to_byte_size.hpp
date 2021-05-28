@@ -23,45 +23,48 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_ALIGNED_UNION_HPP
-#define MARSHALLING_ALIGNED_UNION_HPP
+#ifndef MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP
+#define MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP
 
-#include <type_traits>
+#include <cstdint>
 
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             /// @cond SKIP_DOC
-            template<typename TType, typename... TTypes>
-            class aligned_union {
-                using other_storage_type = typename aligned_union<TTypes...>::type;
-                static const std::size_t other_size = sizeof(other_storage_type);
-                static const std::size_t other_alignment = std::alignment_of<other_storage_type>::value;
-                using first_storage_type = typename aligned_union<TType>::type;
-                static const std::size_t first_size = sizeof(first_storage_type);
-                static const std::size_t first_alignment = std::alignment_of<first_storage_type>::value;
-                static const std::size_t max_size = first_size > other_size ? first_size : other_size;
-                static const std::size_t max_alignment
-                    = first_alignment > other_alignment ? first_alignment : other_alignment;
-
-            public:
-                /// Type that has proper size and proper alignment to keep any of the
-                /// specified types
-                using type = typename std::aligned_storage<max_size, max_alignment>::type;
+            template<std::size_t TSize>
+            struct bit_size_to_byte_size {
+                static_assert(0 < TSize, "The number of bits must be greater than 0");
+                static_assert(TSize < 64, "The number of bits is too high.");
+                static const std::size_t value = bit_size_to_byte_size<TSize + 1>::value;
             };
 
-            template<typename TType>
-            class aligned_union<TType> {
-            public:
-                using type = typename std::aligned_storage<sizeof(TType), std::alignment_of<TType>::value>::type;
+            template<>
+            struct bit_size_to_byte_size<8> {
+                static const std::size_t value = sizeof(std::uint8_t);
+            };
+
+            template<>
+            struct bit_size_to_byte_size<16> {
+                static const std::size_t value = sizeof(std::uint16_t);
+            };
+
+            template<>
+            struct bit_size_to_byte_size<32> {
+                static const std::size_t value = sizeof(std::uint32_t);
+            };
+
+            template<>
+            struct bit_size_to_byte_size<64> {
+                static const std::size_t value = sizeof(std::uint64_t);
             };
 
             /// @endcond
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_ALIGNED_UNION_HPP
+#endif    // MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP

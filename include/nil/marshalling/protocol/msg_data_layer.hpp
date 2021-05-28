@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/field_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/field/array_list.hpp>
 #include <nil/marshalling/field/int_value.hpp>
 #include <nil/marshalling/message.hpp>
@@ -180,11 +180,11 @@ namespace nil {
                 static status_type read_fields_cached(TAllFields &allFields, TMsg &msg, TIter &iter, std::size_t size,
                                                       std::size_t *missingSize = nullptr) {
 
-                    static_assert(nil::marshalling::utilities::is_tuple<TAllFields>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<TAllFields>::value,
                                   "Expected Tall_fields_type to be tuple.");
 
                     using AllFieldsDecayed = typename std::decay<TAllFields>::type;
-                    static_assert(utilities::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
+                    static_assert(processing::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
                                   "Passed tuple is wrong.");
                     static const std::size_t Idx
                         = std::tuple_size<AllFieldsDecayed>::value - std::tuple_size<all_fields_type>::value;
@@ -287,11 +287,11 @@ namespace nil {
                 template<typename TAllFields, typename TMsg, typename TIter>
                 static status_type write_fields_cached(TAllFields &allFields, const TMsg &msg, TIter &iter,
                                                        std::size_t size) {
-                    static_assert(nil::marshalling::utilities::is_tuple<TAllFields>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<TAllFields>::value,
                                   "Expected TAllFields to be tuple.");
 
                     using AllFieldsDecayed = typename std::decay<TAllFields>::type;
-                    static_assert(utilities::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
+                    static_assert(processing::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
                                   "Passed tuple is wrong.");
                     static const std::size_t Idx
                         = std::tuple_size<AllFieldsDecayed>::value - std::tuple_size<all_fields_type>::value;
@@ -344,7 +344,7 @@ namespace nil {
                 /// @return Status of the update operation.
                 template<std::size_t TIdx, typename TAllFields, typename TIter>
                 static status_type update_fields_cached(TAllFields &allFields, TIter &iter, std::size_t size) {
-                    static_assert(nil::marshalling::utilities::is_tuple<TAllFields>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<TAllFields>::value,
                                   "Expected TAllFields to be tuple.");
 
                     static_assert((TIdx + 1) == std::tuple_size<TAllFields>::value,
@@ -393,7 +393,7 @@ namespace nil {
                     -> decltype(std::get<std::tuple_size<typename std::decay<TAllFields>::type>::value
                                          - std::tuple_size<all_fields_type>::value>(allFields)) {
                     using AllFieldsDecayed = typename std::decay<TAllFields>::type;
-                    static_assert(utilities::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
+                    static_assert(processing::tuple_is_tail_of<all_fields_type, AllFieldsDecayed>(),
                                   "Passed tuple is wrong.");
                     static const std::size_t Idx
                         = std::tuple_size<AllFieldsDecayed>::value - std::tuple_size<all_fields_type>::value;

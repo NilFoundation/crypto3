@@ -32,12 +32,12 @@
 #include <initializer_list>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/static_vector.hpp>
+#include <nil/marshalling/processing/static_vector.hpp>
 
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             namespace detail {
 
@@ -678,7 +678,7 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>.
             /// @tparam TSize Maximum length of the string, not including zero termination character.
             /// @tparam Type of the single character.
-            /// @headerfile "marshalling/utilities/StaticString.h"
+            /// @headerfile "marshalling/processing/StaticString.h"
             template<std::size_t TSize, typename TChar = char>
             class static_string : public detail::static_string_storage_base<TChar, TSize + 1>,
                                   public detail::static_string_base<TChar> {
@@ -1682,21 +1682,21 @@ namespace nil {
                 };
 
                 template<std::size_t TSize>
-                struct is_static_string<nil::marshalling::utilities::static_string<TSize>> {
+                struct is_static_string<nil::marshalling::processing::static_string<TSize>> {
                     static const bool value = true;
                 };
 
             }    // namespace detail
 
             /// @brief Compile time check whether the provided type is a variant of
-            ///     @ref nil::marshalling::utilities::StaticString
-            /// @related nil::marshalling::utilities::StaticString
+            ///     @ref nil::marshalling::processing::StaticString
+            /// @related nil::marshalling::processing::StaticString
             template<typename T>
             static constexpr bool is_static_string() {
                 return detail::is_static_string<T>::value;
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil
@@ -1705,10 +1705,10 @@ namespace std {
 
     /// @brief Specializes the std::swap algorithm.
     /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/swap2">Reference</a>
-    /// @related nil::marshalling::utilities::StaticString
+    /// @related nil::marshalling::processing::StaticString
     template<std::size_t TSize1, std::size_t TSize2, typename TChar>
-    void swap(nil::marshalling::utilities::static_string<TSize1, TChar> &str1,
-              nil::marshalling::utilities::static_string<TSize2, TChar> &str2) {
+    void swap(nil::marshalling::processing::static_string<TSize1, TChar> &str1,
+              nil::marshalling::processing::static_string<TSize2, TChar> &str2) {
         str1.swap(str2);
     }
 

@@ -31,8 +31,8 @@
 #include <memory>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
-#include <nil/marshalling/utilities/alloc.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
+#include <nil/marshalling/processing/alloc.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -47,7 +47,7 @@ namespace nil {
 
                 template<typename TAllMessages>
                 constexpr bool all_have_static_num_id() {
-                    return nil::marshalling::utilities::tuple_type_accumulate<TAllMessages>(
+                    return nil::marshalling::processing::tuple_type_accumulate<TAllMessages>(
                         true, static_num_id_check_helper());
                 }
 
@@ -83,8 +83,8 @@ namespace nil {
                     using all_messages_internal_type = all_messages_bundle_type<TAllMessages, parsed_options_internal_type>;
                     using allocator_type =
                         typename std::conditional<parsed_options_internal_type::has_in_place_allocation,
-                                                  utilities::alloc::in_place_single<TMsgBase, all_messages_internal_type>,
-                                                  utilities::alloc::dyn_memory<TMsgBase>>::type;
+                                                  processing::alloc::in_place_single<TMsgBase, all_messages_internal_type>,
+                                                  processing::alloc::dyn_memory<TMsgBase>>::type;
 
                 public:
                     using parsed_options_type = parsed_options_internal_type;
@@ -184,7 +184,7 @@ namespace nil {
 
                         static_assert(
                             (!parsed_options_internal_type::has_in_place_allocation)
-                                || nil::marshalling::utilities::is_in_tuple<TObj, all_messages_internal_type>::value,
+                                || nil::marshalling::processing::is_in_tuple<TObj, all_messages_internal_type>::value,
                             "TObj must be in provided tuple of supported messages");
 
                         return alloc_.template alloc<TObj>(std::forward<TArgs>(args)...);

@@ -129,7 +129,7 @@ using LeIdField2 = IdField2<LeField>;
 
 template<typename TField, std::size_t TLen>
 using ChecksumField
-    = nil::marshalling::field::int_value<TField, typename nil::marshalling::utilities::size_to_type<TLen>::type>;
+    = nil::marshalling::field::int_value<TField, typename nil::marshalling::processing::size_to_type<TLen>::type>;
 
 template<typename TField>
 using ChecksumField1 = ChecksumField<TField, 1U>;

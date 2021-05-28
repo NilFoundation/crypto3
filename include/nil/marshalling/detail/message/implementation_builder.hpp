@@ -32,8 +32,8 @@
 #include <tuple>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/access.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/detail/message/implementation_options_parser.hpp>
 
@@ -172,7 +172,7 @@ namespace nil {
                     }
 
                     constexpr static bool are_fields_version_dependent() {
-                        return nil::marshalling::utilities::tuple_type_is_any_of<all_fields_type>(version_dep_checker());
+                        return nil::marshalling::processing::tuple_type_is_any_of<all_fields_type>(version_dep_checker());
                     }
 
                     template<typename TIter>
@@ -185,7 +185,7 @@ namespace nil {
     #endif
 
                         using tag_type =
-                            typename std::conditional<nil::marshalling::utilities::tuple_type_accumulate<all_fields_type>(
+                            typename std::conditional<nil::marshalling::processing::tuple_type_accumulate<all_fields_type>(
                                                           true, read_no_status_detector()),
                                                       no_status_tag, use_status_tag>::type;
 
@@ -206,78 +206,78 @@ namespace nil {
                     }
 
                     bool eval_valid() const {
-                        return utilities::tuple_accumulate(fields(), true, field_validity_retriever());
+                        return processing::tuple_accumulate(fields(), true, field_validity_retriever());
                     }
 
                     std::size_t eval_length() const {
-                        return utilities::tuple_accumulate(fields(), 0U, field_length_retriever());
+                        return processing::tuple_accumulate(fields(), 0U, field_length_retriever());
                     }
 
                     template<std::size_t TFromIdx>
                     std::size_t eval_length_from() const {
-                        return utilities::tuple_accumulate_from_until<TFromIdx, std::tuple_size<all_fields_type>::value>(
+                        return processing::tuple_accumulate_from_until<TFromIdx, std::tuple_size<all_fields_type>::value>(
                             fields(), 0U, field_length_retriever());
                     }
 
                     template<std::size_t TUntilIdx>
                     std::size_t eval_length_until() const {
-                        return utilities::tuple_accumulate_from_until<0, TUntilIdx>(fields(), 0U, field_length_retriever());
+                        return processing::tuple_accumulate_from_until<0, TUntilIdx>(fields(), 0U, field_length_retriever());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     std::size_t eval_length_from_until() const {
-                        return utilities::tuple_accumulate_from_until<TFromIdx, TUntilIdx>(fields(), 0U,
+                        return processing::tuple_accumulate_from_until<TFromIdx, TUntilIdx>(fields(), 0U,
                                                                                            field_length_retriever());
                     }
 
                     static constexpr std::size_t eval_min_length() {
-                        return utilities::tuple_type_accumulate<all_fields_type>(0U, field_min_length_retriever());
+                        return processing::tuple_type_accumulate<all_fields_type>(0U, field_min_length_retriever());
                     }
 
                     template<std::size_t TFromIdx>
                     static constexpr std::size_t eval_min_length_from() {
-                        return utilities::tuple_type_accumulate_from_until<
+                        return processing::tuple_type_accumulate_from_until<
                             TFromIdx, std::tuple_size<all_fields_type>::value, all_fields_type>(
                             0U, field_min_length_retriever());
                     }
 
                     template<std::size_t TUntilIdx>
                     static constexpr std::size_t eval_min_length_until() {
-                        return utilities::tuple_type_accumulate_from_until<0, TUntilIdx, all_fields_type>(
+                        return processing::tuple_type_accumulate_from_until<0, TUntilIdx, all_fields_type>(
                             0U, field_min_length_retriever());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t eval_min_length_from_until() {
-                        return utilities::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx, all_fields_type>(
+                        return processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx, all_fields_type>(
                             0U, field_min_length_retriever());
                     }
 
                     static constexpr std::size_t eval_max_length() {
-                        return utilities::tuple_type_accumulate<all_fields_type>(0U, field_max_length_retriever());
+                        return processing::tuple_type_accumulate<all_fields_type>(0U, field_max_length_retriever());
                     }
 
                     template<std::size_t TFromIdx>
                     static constexpr std::size_t eval_max_length_from() {
-                        return utilities::tuple_type_accumulate_from_until<
+                        return processing::tuple_type_accumulate_from_until<
                             TFromIdx, std::tuple_size<all_fields_type>::value, all_fields_type>(
                             0U, field_max_length_retriever());
                     }
 
                     template<std::size_t TUntilIdx>
                     static constexpr std::size_t eval_max_length_until() {
-                        return utilities::tuple_type_accumulate_from_until<0, TUntilIdx, all_fields_type>(
+                        return processing::tuple_type_accumulate_from_until<0, TUntilIdx, all_fields_type>(
                             0U, field_max_length_retriever());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t eval_max_length_from_until() {
-                        return utilities::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx, all_fields_type>(
+                        return processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx, all_fields_type>(
                             0U, field_max_length_retriever());
                     }
 
                     bool eval_refresh() {
-                        return utilities::tuple_accumulate(fields(), false, field_refresher());
+                        return processing::tuple_accumulate(fields(), false, field_refresher());
                     }
 
                 protected:
@@ -286,7 +286,7 @@ namespace nil {
                     template<std::size_t TIdx, typename TIter>
                     nil::marshalling::status_type eval_read_fields_until(TIter &iter, std::size_t &size) {
                         auto status = nil::marshalling::status_type::success;
-                        utilities::tuple_for_each_until<TIdx>(fields(), makeFieldReader(iter, status, size));
+                        processing::tuple_for_each_until<TIdx>(fields(), makeFieldReader(iter, status, size));
                         return status;
                     }
 
@@ -297,7 +297,7 @@ namespace nil {
 
                     template<std::size_t TIdx, typename TIter>
                     void eval_read_fields_no_status_until(TIter &iter) {
-                        utilities::tuple_for_each_until<TIdx>(fields(), makeFieldNoStatusReader(iter));
+                        processing::tuple_for_each_until<TIdx>(fields(), makeFieldNoStatusReader(iter));
                     }
 
                     template<std::size_t TIdx, typename TIter>
@@ -308,7 +308,7 @@ namespace nil {
                     template<std::size_t TIdx, typename TIter>
                     nil::marshalling::status_type eval_read_fields_from(TIter &iter, std::size_t &size) {
                         auto status = nil::marshalling::status_type::success;
-                        utilities::tuple_for_each_from<TIdx>(fields(), makeFieldReader(iter, status, size));
+                        processing::tuple_for_each_from<TIdx>(fields(), makeFieldReader(iter, status, size));
                         return status;
                     }
 
@@ -319,7 +319,7 @@ namespace nil {
 
                     template<std::size_t TIdx, typename TIter>
                     void eval_read_fields_no_status_from(TIter &iter) {
-                        utilities::tuple_for_each_from<TIdx>(fields(), makeFieldNoStatusReader(iter));
+                        processing::tuple_for_each_from<TIdx>(fields(), makeFieldNoStatusReader(iter));
                     }
 
                     template<std::size_t TIdx, typename TIter>
@@ -330,7 +330,7 @@ namespace nil {
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     nil::marshalling::status_type eval_read_fields_from_until(TIter &iter, std::size_t &size) {
                         auto status = nil::marshalling::status_type::success;
-                        utilities::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(),
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(),
                                                                                   makeFieldReader(iter, status, size));
                         return status;
                     }
@@ -342,7 +342,7 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void eval_read_fields_no_status_from_until(TIter &iter) {
-                        utilities::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusReader(iter));
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusReader(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
@@ -354,7 +354,7 @@ namespace nil {
                     nil::marshalling::status_type eval_write_fields_until(TIter &iter, std::size_t size) const {
                         auto status = nil::marshalling::status_type::success;
                         std::size_t remainingSize = size;
-                        utilities::tuple_for_each_until<TIdx>(fields(), makeFieldWriter(iter, status, remainingSize));
+                        processing::tuple_for_each_until<TIdx>(fields(), makeFieldWriter(iter, status, remainingSize));
                         return status;
                     }
 
@@ -365,7 +365,7 @@ namespace nil {
 
                     template<std::size_t TIdx, typename TIter>
                     void eval_write_fields_no_status_until(TIter &iter) const {
-                        utilities::tuple_for_each_until<TIdx>(fields(), makeFieldNoStatusWriter(iter));
+                        processing::tuple_for_each_until<TIdx>(fields(), makeFieldNoStatusWriter(iter));
                     }
 
                     template<std::size_t TIdx, typename TIter>
@@ -377,7 +377,7 @@ namespace nil {
                     nil::marshalling::status_type eval_write_fields_from(TIter &iter, std::size_t size) const {
                         auto status = nil::marshalling::status_type::success;
                         std::size_t remainingSize = size;
-                        utilities::tuple_for_each_from<TIdx>(fields(), makeFieldWriter(iter, status, remainingSize));
+                        processing::tuple_for_each_from<TIdx>(fields(), makeFieldWriter(iter, status, remainingSize));
                         return status;
                     }
 
@@ -388,7 +388,7 @@ namespace nil {
 
                     template<std::size_t TIdx, typename TIter>
                     void eval_write_fields_no_status_from(TIter &iter) const {
-                        utilities::tuple_for_each_from<TIdx>(fields(), makeFieldNoStatusWriter(iter));
+                        processing::tuple_for_each_from<TIdx>(fields(), makeFieldNoStatusWriter(iter));
                     }
 
                     template<std::size_t TIdx, typename TIter>
@@ -400,7 +400,7 @@ namespace nil {
                     nil::marshalling::status_type eval_write_fields_from_until(TIter &iter, std::size_t size) const {
                         auto status = nil::marshalling::status_type::success;
                         std::size_t remainingSize = size;
-                        utilities::tuple_for_each_from_until<TFromIdx, TUntilIdx>(
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             fields(), makeFieldWriter(iter, status, remainingSize));
                         return status;
                     }
@@ -412,7 +412,7 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void eval_write_fields_no_status_from_until(TIter &iter) const {
-                        utilities::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusWriter(iter));
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusWriter(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
@@ -686,7 +686,7 @@ namespace nil {
                     using version_type = typename TBase::version_type;
 
                     bool eval_fields_version_update() {
-                        return utilities::tuple_accumulate(TBase::fields(), false, field_version_updater(TBase::version()));
+                        return processing::tuple_accumulate(TBase::fields(), false, field_version_updater(TBase::version()));
                     }
 
                     template<typename TIter>
@@ -768,7 +768,7 @@ namespace nil {
 
                 public:
                     constexpr static const bool value
-                        = utilities::tuple_type_is_any_of<typename TBase::all_fields_type>(refresh_checker());
+                        = processing::tuple_type_is_any_of<typename TBase::all_fields_type>(refresh_checker());
                 };
 
                 template<typename TBase>

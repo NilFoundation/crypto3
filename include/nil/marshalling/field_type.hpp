@@ -31,7 +31,7 @@
 
 #include <type_traits>
 
-#include <nil/marshalling/utilities/access.hpp>
+#include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/detail/field_base.hpp>
 #include <nil/marshalling/detail/macro_common.hpp>
 #include <nil/marshalling/detail/fields_access.hpp>
@@ -123,7 +123,7 @@ namespace nil {
             template<std::size_t TSize, typename T, typename TIter>
             static void write_data(T value, TIter &iter) {
                 static_assert(TSize <= sizeof(T), "Cannot put more bytes than type contains");
-                return utilities::write_data<TSize, T>(value, iter, endian_type());
+                return processing::write_data<TSize, T>(value, iter, endian_type());
             }
 
             /// @brief Read data from input buffer.
@@ -161,7 +161,7 @@ namespace nil {
             template<typename T, std::size_t TSize, typename TIter>
             static T read_data(TIter &iter) {
                 static_assert(TSize <= sizeof(T), "Cannot get more bytes than type contains");
-                return utilities::read_data<T, TSize>(iter, endian_type());
+                return processing::read_data<T, TSize>(iter, endian_type());
             }
         };
 

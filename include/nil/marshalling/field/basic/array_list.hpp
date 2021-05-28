@@ -33,9 +33,9 @@
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
-#include <nil/marshalling/utilities/static_vector.hpp>
-#include <nil/marshalling/utilities/static_string.hpp>
+#include <nil/marshalling/processing/access.hpp>
+#include <nil/marshalling/processing/static_vector.hpp>
+#include <nil/marshalling/processing/static_string.hpp>
 #include <nil/marshalling/detail/detect.hpp>
 #include <nil/marshalling/field/basic/common_funcs.hpp>
 
@@ -71,12 +71,12 @@ namespace nil {
                     };
 
                     template<typename T, std::size_t TSize>
-                    struct array_list_max_length_retrieve_helper<nil::marshalling::utilities::static_vector<T, TSize>> {
+                    struct array_list_max_length_retrieve_helper<nil::marshalling::processing::static_vector<T, TSize>> {
                         static const std::size_t value = TSize;
                     };
 
                     template<std::size_t TSize>
-                    struct array_list_max_length_retrieve_helper<nil::marshalling::utilities::static_string<TSize>> {
+                    struct array_list_max_length_retrieve_helper<nil::marshalling::processing::static_string<TSize>> {
                         static const std::size_t value = TSize - 1;
                     };
 
@@ -391,7 +391,7 @@ namespace nil {
                             return status_type::not_enough_data;
                         }
 
-                        elem = nil::marshalling::utilities::read_data<element_type>(iter, endian_type());
+                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
@@ -415,7 +415,7 @@ namespace nil {
 
                     template<typename TIter>
                     static void read_no_status_integral_element(element_type &elem, TIter &iter) {
-                        elem = nil::marshalling::utilities::read_data<element_type>(iter, endian_type());
+                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
                     }
 
                     template<typename TIter>

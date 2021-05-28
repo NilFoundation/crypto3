@@ -37,7 +37,7 @@
 #include <limits>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
 #include <nil/marshalling/msg_factory.hpp>
 #include <nil/marshalling/field/no_value.hpp>
@@ -65,7 +65,7 @@ namespace nil {
             class msg_id_layer
                 : public protocol_layer_base<TField, TNextLayer,
                                              msg_id_layer<TField, TMessage, TAllMessages, TNextLayer, TOptions...>> {
-                static_assert(utilities::is_tuple<TAllMessages>::value, "TAllMessages must be of std::tuple type");
+                static_assert(processing::is_tuple<TAllMessages>::value, "TAllMessages must be of std::tuple type");
                 using base_impl_type
                     = protocol_layer_base<TField, TNextLayer,
                                           msg_id_layer<TField, TMessage, TAllMessages, TNextLayer, TOptions...>>;

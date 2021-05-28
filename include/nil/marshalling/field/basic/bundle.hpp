@@ -31,7 +31,7 @@
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 
 #include <nil/marshalling/field/basic/common_funcs.hpp>
 
@@ -73,98 +73,98 @@ namespace nil {
                     }
 
                     constexpr std::size_t length() const {
-                        return nil::marshalling::utilities::tuple_accumulate(value(), std::size_t(0),
+                        return nil::marshalling::processing::tuple_accumulate(value(), std::size_t(0),
                                                                              length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
                     constexpr std::size_t length_from() const {
-                        return nil::marshalling::utilities::tuple_accumulate_from_until<
+                        return nil::marshalling::processing::tuple_accumulate_from_until<
                             TFromIdx, std::tuple_size<value_type>::value>(value(), std::size_t(0),
                                                                           length_calc_helper());
                     }
 
                     template<std::size_t TUntilIdx>
                     constexpr std::size_t length_until() const {
-                        return nil::marshalling::utilities::tuple_accumulate_from_until<0, TUntilIdx>(
+                        return nil::marshalling::processing::tuple_accumulate_from_until<0, TUntilIdx>(
                             value(), std::size_t(0), length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     constexpr std::size_t length_from_until() const {
-                        return nil::marshalling::utilities::tuple_accumulate_from_until<TFromIdx, TUntilIdx>(
+                        return nil::marshalling::processing::tuple_accumulate_from_until<TFromIdx, TUntilIdx>(
                             value(), std::size_t(0), length_calc_helper());
                     }
 
                     static constexpr std::size_t min_length() {
-                        return nil::marshalling::utilities::tuple_type_accumulate<value_type>(std::size_t(0),
+                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(std::size_t(0),
                                                                                               min_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
                     static constexpr std::size_t min_length_from() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<
                             TFromIdx, std::tuple_size<value_type>::value, value_type>(std::size_t(0),
                                                                                       min_length_calc_helper());
                     }
 
                     template<std::size_t TUntilIdx>
                     static constexpr std::size_t min_length_until() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<0, TUntilIdx, value_type>(
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<0, TUntilIdx, value_type>(
                             std::size_t(0), min_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t min_length_from_until() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
                                                                                              value_type>(
                             std::size_t(0), min_length_calc_helper());
                     }
 
                     static constexpr std::size_t max_length() {
-                        return nil::marshalling::utilities::tuple_type_accumulate<value_type>(std::size_t(0),
+                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(std::size_t(0),
                                                                                               max_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
                     static constexpr std::size_t max_length_from() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<
                             TFromIdx, std::tuple_size<value_type>::value, value_type>(std::size_t(0),
                                                                                       max_length_calc_helper());
                     }
 
                     template<std::size_t TUntilIdx>
                     static constexpr std::size_t max_length_until() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<0, TUntilIdx, value_type>(
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<0, TUntilIdx, value_type>(
                             std::size_t(0), max_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t max_length_from_until() {
-                        return nil::marshalling::utilities::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
+                        return nil::marshalling::processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
                                                                                              value_type>(
                             std::size_t(0), max_length_calc_helper());
                     }
 
                     constexpr bool valid() const {
-                        return nil::marshalling::utilities::tuple_accumulate(value(), true, valid_check_helper());
+                        return nil::marshalling::processing::tuple_accumulate(value(), true, valid_check_helper());
                     }
 
                     bool refresh() {
-                        return nil::marshalling::utilities::tuple_accumulate(value(), false, refresh_helper());
+                        return nil::marshalling::processing::tuple_accumulate(value(), false, refresh_helper());
                     }
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::tuple_for_each(value(), make_read_helper(es, iter, len));
+                        nil::marshalling::processing::tuple_for_each(value(), make_read_helper(es, iter, len));
                         return es;
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     status_type read_from(TIter &iter, std::size_t len) {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_from<TFromIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
                     }
@@ -172,7 +172,7 @@ namespace nil {
                     template<std::size_t TUntilIdx, typename TIter>
                     status_type read_until(TIter &iter, std::size_t len) {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_until<TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
                     }
@@ -180,45 +180,45 @@ namespace nil {
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     status_type read_from_until(TIter &iter, std::size_t len) {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
                     }
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        nil::marshalling::utilities::tuple_for_each(value(), make_read_no_status_helper(iter));
+                        nil::marshalling::processing::tuple_for_each(value(), make_read_no_status_helper(iter));
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     void read_from_no_status(TIter &iter) {
-                        nil::marshalling::utilities::template tuple_for_each_from<TFromIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_read_no_status_helper(iter));
                     }
 
                     template<std::size_t TUntilIdx, typename TIter>
                     void read_until_no_status(TIter &iter) {
-                        nil::marshalling::utilities::template tuple_for_each_until<TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_read_no_status_helper(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void read_from_until_no_status(TIter &iter) {
-                        nil::marshalling::utilities::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_read_no_status_helper(iter));
                     }
 
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::tuple_for_each(value(), make_write_helper(es, iter, len));
+                        nil::marshalling::processing::tuple_for_each(value(), make_write_helper(es, iter, len));
                         return es;
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     status_type write_from(TIter &iter, std::size_t len) const {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_from<TFromIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;
                     }
@@ -226,7 +226,7 @@ namespace nil {
                     template<std::size_t TUntilIdx, typename TIter>
                     status_type write_until(TIter &iter, std::size_t len) const {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_until<TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;
                     }
@@ -234,31 +234,31 @@ namespace nil {
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     status_type write_from_until(TIter &iter, std::size_t len) const {
                         auto es = status_type::success;
-                        nil::marshalling::utilities::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;
                     }
 
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
-                        nil::marshalling::utilities::tuple_for_each(value(), make_write_no_status_helper(iter));
+                        nil::marshalling::processing::tuple_for_each(value(), make_write_no_status_helper(iter));
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     void write_from_no_status(TIter &iter) const {
-                        nil::marshalling::utilities::template tuple_for_each_from<TFromIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_write_no_status_helper(iter));
                     }
 
                     template<std::size_t TUntilIdx, typename TIter>
                     void write_until_no_status(TIter &iter) const {
-                        nil::marshalling::utilities::template tuple_for_each_until<TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_write_no_status_helper(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void write_from_until_no_status(TIter &iter) const {
-                        nil::marshalling::utilities::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
+                        nil::marshalling::processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_write_no_status_helper(iter));
                     }
 
@@ -405,7 +405,7 @@ namespace nil {
                         return write_no_status_helper<TIter>(iter);
                     }
 
-                    static_assert(nil::marshalling::utilities::is_tuple<value_type>::value, "value_type must be tuple");
+                    static_assert(nil::marshalling::processing::is_tuple<value_type>::value, "value_type must be tuple");
                     value_type members_;
                 };
 

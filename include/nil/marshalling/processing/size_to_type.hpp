@@ -32,7 +32,7 @@
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             namespace detail {
 
@@ -105,7 +105,7 @@ namespace nil {
 
             /// @endcond
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil

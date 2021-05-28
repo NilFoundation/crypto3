@@ -32,8 +32,8 @@
 #include <tuple>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/access.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/detail/message/interface_options_parser.hpp>
 
@@ -84,7 +84,7 @@ namespace nil {
                     template<std::size_t TSize, typename T, typename TIter>
                     static void write_data(T value, TIter &iter) {
                         static_assert(TSize <= sizeof(T), "Cannot put more bytes than type contains");
-                        return utilities::write_data<TSize, T>(value, iter, endian_type());
+                        return processing::write_data<TSize, T>(value, iter, endian_type());
                     }
 
                     template<typename T, typename TIter>
@@ -95,7 +95,7 @@ namespace nil {
                     template<typename T, std::size_t TSize, typename TIter>
                     static T read_data(TIter &iter) {
                         static_assert(TSize <= sizeof(T), "Cannot get more bytes than type contains");
-                        return utilities::read_data<T, TSize>(iter, endian_type());
+                        return processing::read_data<T, TSize>(iter, endian_type());
                     }
                 };
 
@@ -159,7 +159,7 @@ namespace nil {
                 public:
                     using transport_fields_type = TFields;
 
-                    static_assert(nil::marshalling::utilities::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
                     transport_fields_type &transport_fields() {
@@ -205,7 +205,7 @@ namespace nil {
                 public:
                     using transport_fields_type = typename TBase::transport_fields_type;
 
-                    static_assert(nil::marshalling::utilities::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
                     static_assert(TIdx < std::tuple_size<transport_fields_type>::value,

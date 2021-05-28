@@ -33,9 +33,9 @@
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
-#include <nil/marshalling/utilities/static_vector.hpp>
-#include <nil/marshalling/utilities/static_string.hpp>
+#include <nil/marshalling/processing/access.hpp>
+#include <nil/marshalling/processing/static_vector.hpp>
+#include <nil/marshalling/processing/static_string.hpp>
 #include <nil/marshalling/detail/detect.hpp>
 
 #include <nil/marshalling/field/basic/common_funcs.hpp>
@@ -52,7 +52,7 @@ namespace nil {
                     };
 
                     template<std::size_t TSize>
-                    struct string_max_length_retrieve_helper<nil::marshalling::utilities::static_string<TSize>> {
+                    struct string_max_length_retrieve_helper<nil::marshalling::processing::static_string<TSize>> {
                         static const std::size_t value = TSize - 1;
                     };
 
@@ -192,14 +192,14 @@ namespace nil {
                             return status_type::not_enough_data;
                         }
 
-                        elem = nil::marshalling::utilities::read_data<element_type>(iter, endian_type());
+                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
 
                     template<typename TIter>
                     static void read_element_no_status(element_type &elem, TIter &iter) {
-                        elem = nil::marshalling::utilities::read_data<element_type>(iter, endian_type());
+                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
                     }
 
                     template<typename TIter>
@@ -252,14 +252,14 @@ namespace nil {
                             return status_type::buffer_overflow;
                         }
 
-                        nil::marshalling::utilities::write_data(elem, iter, endian_type());
+                        nil::marshalling::processing::write_data(elem, iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
 
                     template<typename TIter>
                     static void write_element_no_status(const element_type &elem, TIter &iter) {
-                        nil::marshalling::utilities::write_data(elem, iter, endian_type());
+                        nil::marshalling::processing::write_data(elem, iter, endian_type());
                     }
 
                     template<typename TIter>

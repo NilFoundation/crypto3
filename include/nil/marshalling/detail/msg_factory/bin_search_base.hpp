@@ -79,7 +79,7 @@ namespace nil {
 
                 template<bool TStrong, typename TMessage1>
                 struct bin_search_sorted_check_helper<TStrong, TMessage1> {
-                    static_assert(!nil::marshalling::utilities::is_tuple<TMessage1>::value, "TMessage1 mustn't be tuple");
+                    static_assert(!nil::marshalling::processing::is_tuple<TMessage1>::value, "TMessage1 mustn't be tuple");
                     static const bool value = true;
                 };
 
@@ -119,7 +119,7 @@ namespace nil {
                     }
 
                 protected:
-                    static_assert(nil::marshalling::utilities::is_tuple<all_messages_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static const std::size_t messages_amount = std::tuple_size<all_messages_type>::value;
@@ -186,7 +186,7 @@ namespace nil {
                     };
 
                     void init_registry() {
-                        utilities::tuple_for_each_type<all_messages_type>(creator(registry_));
+                        processing::tuple_for_each_type<all_messages_type>(creator(registry_));
                     }
 
                     void check_sorted(compile_time_sorted) {

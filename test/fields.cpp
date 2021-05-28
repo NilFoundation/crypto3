@@ -62,40 +62,40 @@
 static_assert(nil::marshalling::detail::has_clear_func<std::string>::value, "Invalid function presence detection");
 static_assert(nil::marshalling::detail::has_clear_func<std::vector<std::uint8_t>>::value,
               "Invalid function presence detection");
-static_assert(nil::marshalling::detail::has_clear_func<nil::marshalling::utilities::static_string<5>>::value,
+static_assert(nil::marshalling::detail::has_clear_func<nil::marshalling::processing::static_string<5>>::value,
               "Invalid function presence detection");
 static_assert(
-    nil::marshalling::detail::has_clear_func<nil::marshalling::utilities::static_vector<std::uint8_t, 5>>::value,
+    nil::marshalling::detail::has_clear_func<nil::marshalling::processing::static_vector<std::uint8_t, 5>>::value,
     "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_clear_func<nil::marshalling::utilities::string_view>::value,
+static_assert(!nil::marshalling::detail::has_clear_func<nil::marshalling::processing::string_view>::value,
               "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_clear_func<nil::marshalling::utilities::array_view<std::uint8_t>>::value,
+static_assert(!nil::marshalling::detail::has_clear_func<nil::marshalling::processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 static_assert(nil::marshalling::detail::has_resize_func<std::string>::value, "Invalid function presence detection");
 static_assert(nil::marshalling::detail::has_resize_func<std::vector<std::uint8_t>>::value,
               "Invalid function presence detection");
-static_assert(nil::marshalling::detail::has_resize_func<nil::marshalling::utilities::static_string<5>>::value,
+static_assert(nil::marshalling::detail::has_resize_func<nil::marshalling::processing::static_string<5>>::value,
               "Invalid function presence detection");
 static_assert(
-    nil::marshalling::detail::has_resize_func<nil::marshalling::utilities::static_vector<std::uint8_t, 5>>::value,
+    nil::marshalling::detail::has_resize_func<nil::marshalling::processing::static_vector<std::uint8_t, 5>>::value,
     "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_resize_func<nil::marshalling::utilities::string_view>::value,
+static_assert(!nil::marshalling::detail::has_resize_func<nil::marshalling::processing::string_view>::value,
               "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_resize_func<nil::marshalling::utilities::array_view<std::uint8_t>>::value,
+static_assert(!nil::marshalling::detail::has_resize_func<nil::marshalling::processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 static_assert(nil::marshalling::detail::has_reserve_func<std::string>::value, "Invalid function presence detection");
 static_assert(nil::marshalling::detail::has_reserve_func<std::vector<std::uint8_t>>::value,
               "Invalid function presence detection");
-static_assert(nil::marshalling::detail::has_reserve_func<nil::marshalling::utilities::static_string<5>>::value,
+static_assert(nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::static_string<5>>::value,
               "Invalid function presence detection");
 static_assert(
-    nil::marshalling::detail::has_reserve_func<nil::marshalling::utilities::static_vector<std::uint8_t, 5>>::value,
+    nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::static_vector<std::uint8_t, 5>>::value,
     "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::utilities::string_view>::value,
+static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::string_view>::value,
               "Invalid function presence detection");
-static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::utilities::array_view<std::uint8_t>>::value,
+static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 struct fields_fixture {
@@ -2972,7 +2972,7 @@ BOOST_AUTO_TEST_CASE(test71) {
 
 BOOST_AUTO_TEST_CASE(test72) {
     static_assert(
-        !nil::marshalling::field::basic::detail::string_has_push_back<nil::marshalling::utilities::string_view>::value,
+        !nil::marshalling::field::basic::detail::string_has_push_back<nil::marshalling::processing::string_view>::value,
         "string_view doesn't have push_back");
 
     typedef nil::marshalling::field::int_value<nil::marshalling::field_type<BigEndianOpt>, std::uint8_t> SizeField;
@@ -3082,7 +3082,7 @@ BOOST_AUTO_TEST_CASE(test74) {
     field.value() = "foo";
     BOOST_CHECK(field.value().size() == 3U);
     BOOST_CHECK(std::string(field.value().data()) == "foo");
-    BOOST_CHECK(field.value() == nil::marshalling::utilities::string_view("foo"));
+    BOOST_CHECK(field.value() == nil::marshalling::processing::string_view("foo"));
     BOOST_CHECK(field.length() == 6U);
 
     static const char ExpectedBuf2[] = {'f', 'o', 'o', 0x0, 0x0, 0x0};
@@ -3100,7 +3100,7 @@ BOOST_AUTO_TEST_CASE(test75) {
 
     static_assert(!field_type::is_version_dependent(), "Invalid version dependency assumption");
 
-    static_assert(std::is_same<field_type::value_type, nil::marshalling::utilities::array_view<std::uint8_t>>::value,
+    static_assert(std::is_same<field_type::value_type, nil::marshalling::processing::array_view<std::uint8_t>>::value,
                   "Expected to be array view");
 
     field_type field;
@@ -3385,7 +3385,7 @@ BOOST_AUTO_TEST_CASE(test83) {
     static_assert(field_type::min_length() == 5U, "Invalid min length");
     static_assert(field_type::max_length() == 5U, "Invalid max length");
 
-    static_assert(nil::marshalling::utilities::is_static_vector<field_type::value_type>(),
+    static_assert(nil::marshalling::processing::is_static_vector<field_type::value_type>(),
                   "The storage typ is incorrect");
 
     field_type field;
@@ -3409,7 +3409,7 @@ BOOST_AUTO_TEST_CASE(test84) {
 
     static_assert(field_type::min_length() == 5U, "Invalid min length");
     static_assert(field_type::max_length() == 5U, "Invalid max length");
-    static_assert(nil::marshalling::utilities::is_static_string<field_type::value_type>(), "Invalid storage type");
+    static_assert(nil::marshalling::processing::is_static_string<field_type::value_type>(), "Invalid storage type");
 
     field_type field;
     BOOST_CHECK(field.valid());

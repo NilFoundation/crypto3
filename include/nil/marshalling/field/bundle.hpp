@@ -83,7 +83,7 @@ namespace nil {
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             class bundle : private detail::adapt_basic_field_type<basic::bundle<TFieldBase, TMembers>, TOptions...> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::bundle<TFieldBase, TMembers>, TOptions...>;
-                static_assert(nil::marshalling::utilities::is_tuple<TMembers>::value,
+                static_assert(nil::marshalling::processing::is_tuple<TMembers>::value,
                               "TMembers is expected to be a tuple of std::tuple<...>");
 
                 static_assert(1U <= std::tuple_size<TMembers>::value,

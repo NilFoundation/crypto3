@@ -96,7 +96,7 @@ namespace nil {
                 using base_impl_type
                     = detail::adapt_basic_field_type<basic::variant<TFieldBase, TMembers>, TOptions...>;
 
-                static_assert(nil::marshalling::utilities::is_tuple<TMembers>::value,
+                static_assert(nil::marshalling::processing::is_tuple<TMembers>::value,
                               "TMembers is expected to be a tuple of std::tuple<...>");
 
                 static_assert(1U < std::tuple_size<TMembers>::value, "Number of members is expected to be at least 2.");

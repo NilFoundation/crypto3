@@ -35,7 +35,7 @@
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             namespace traits {
 
@@ -631,7 +631,7 @@ namespace nil {
                 return read_little<T, TSize>(iter);
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil

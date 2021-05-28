@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/utilities/alloc.h
+/// @file nil/marshalling/processing/alloc.h
 /// This file contains various generic allocator classes that may be used
 /// to allocate objects using dynamic memory or "in-place" allocations.
 
@@ -36,12 +36,12 @@
 #include <algorithm>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             namespace alloc {
 
@@ -175,7 +175,7 @@ namespace nil {
                         static_assert(std::is_base_of<TInterface, TObj>::value,
                                       "TObj does not inherit from TInterface");
 
-                        static_assert(nil::marshalling::utilities::is_in_tuple<TObj, TAllTypes>::value,
+                        static_assert(nil::marshalling::processing::is_in_tuple<TObj, TAllTypes>::value,
                                       ""
                                       "TObj must be in provided tuple of supported types");
 
@@ -285,7 +285,7 @@ namespace nil {
 
             }    // namespace alloc
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil

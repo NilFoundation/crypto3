@@ -30,7 +30,7 @@
 #include <limits>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/size_to_type.hpp>
+#include <nil/marshalling/processing/size_to_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 
 namespace nil {
@@ -50,7 +50,7 @@ namespace nil {
 
                     using serialized_type = typename std::conditional<
                         (TLen < sizeof(base_serialized_type)),
-                        typename nil::marshalling::utilities::
+                        typename nil::marshalling::processing::
                             size_to_type<TLen, std::is_signed<base_serialized_type>::value>::type,
                         base_serialized_type>::type;
 
@@ -102,7 +102,7 @@ namespace nil {
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
                         auto serializedValue
-                            = nil::marshalling::utilities::read_data<serialized_type, byte_length>(iter, endian_type());
+                            = nil::marshalling::processing::read_data<serialized_type, byte_length>(iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }
 

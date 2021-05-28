@@ -1,7 +1,7 @@
 /// @namespace marshalling
 /// @brief Main namespace for all classes / functions of Marshalling library.
 
-/// @namespace nil::marshalling::utilities
+/// @namespace nil::marshalling::processing
 /// @brief Namespace for various utility classes and/or functions used by Marshalling library.
 
 /// @namespace nil::marshalling::option

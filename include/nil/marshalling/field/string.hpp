@@ -30,8 +30,8 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/utilities/static_string.hpp>
-#include <nil/marshalling/utilities/string_view.hpp>
+#include <nil/marshalling/processing/static_string.hpp>
+#include <nil/marshalling/processing/string_view.hpp>
 #include <nil/marshalling/field/basic/string.hpp>
 #include <nil/marshalling/field/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/field/detail/options_parser.hpp>
@@ -48,7 +48,7 @@ namespace nil {
 
                 template<>
                 struct string_orig_data_view_storage_type<true> {
-                    using type = nil::marshalling::utilities::string_view;
+                    using type = nil::marshalling::processing::string_view;
                 };
 
                 template<>
@@ -62,7 +62,7 @@ namespace nil {
                 template<>
                 struct string_fixed_size_use_fixed_size_storage_type<true> {
                     template<typename TOpt>
-                    using type = nil::marshalling::utilities::static_string<TOpt::sequence_fixed_size>;
+                    using type = nil::marshalling::processing::static_string<TOpt::sequence_fixed_size>;
                 };
 
                 template<>
@@ -77,7 +77,7 @@ namespace nil {
                 template<>
                 struct string_fixed_size_storage_type<true> {
                     template<typename TOpt>
-                    using type = nil::marshalling::utilities::static_string<TOpt::fixed_size_storage>;
+                    using type = nil::marshalling::processing::static_string<TOpt::fixed_size_storage>;
                 };
 
                 template<>
@@ -118,7 +118,7 @@ namespace nil {
             /// @details By default uses
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>,
             ///     for internal storage, unless nil::marshalling::option::fixed_size_storage option is used,
-            ///     which forces usage of nil::marshalling::utilities::StaticString instead.
+            ///     which forces usage of nil::marshalling::processing::StaticString instead.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @tparam TOptions Zero or more options that modify/refine default behaviour
@@ -166,7 +166,7 @@ namespace nil {
                 /// @brief Type of underlying value.
                 /// @details If nil::marshalling::option::fixed_size_storage option is NOT used, the
                 ///     value_type is std::string, otherwise it becomes
-                ///     nil::marshalling::utilities::static_string<TSize>, where TSize is a size
+                ///     nil::marshalling::processing::static_string<TSize>, where TSize is a size
                 ///     provided to nil::marshalling::option::fixed_size_storage option.
                 using value_type = typename base_impl_type::value_type;
 

@@ -26,7 +26,7 @@
 #ifndef MARSHALLING_NUM_VALUE_MULTI_RANGE_VALIDATOR_HPP
 #define MARSHALLING_NUM_VALUE_MULTI_RANGE_VALIDATOR_HPP
 
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -37,7 +37,7 @@ namespace nil {
                 class num_value_multi_range_validator : public TBase {
                     using base_impl_type = TBase;
 
-                    static_assert(nil::marshalling::utilities::is_tuple<TRanges>::value, "TRanges must be a tuple");
+                    static_assert(nil::marshalling::processing::is_tuple<TRanges>::value, "TRanges must be a tuple");
 
                 public:
                     using value_type = typename base_impl_type::value_type;
@@ -64,7 +64,7 @@ namespace nil {
 
                     bool valid() const {
                         return base_impl_type::valid()
-                               && nil::marshalling::utilities::tuple_type_accumulate<TRanges>(
+                               && nil::marshalling::processing::tuple_type_accumulate<TRanges>(
                                    false, Validator(base_impl_type::value()));
                     }
 
@@ -77,7 +77,7 @@ namespace nil {
                         template<typename TRange>
                         bool operator()(bool val) const {
                             static_cast<void>(val);
-                            static_assert(nil::marshalling::utilities::is_tuple<TRange>::value,
+                            static_assert(nil::marshalling::processing::is_tuple<TRange>::value,
                                           "TRange must be a tuple");
                             static_assert(std::tuple_size<TRange>::value == 2, "Tuple with 2 elements is expected");
                             using MinVal = typename std::tuple_element<0, TRange>::type;

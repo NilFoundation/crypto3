@@ -32,7 +32,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -64,7 +64,7 @@ namespace nil {
         /// @headerfile nil/marshalling/generic_handler.h
         template<typename TDefault, typename TAll, typename TRetType = void>
         class generic_handler {
-            static_assert(utilities::is_tuple<TAll>::value, "TAll must be std::tuple");
+            static_assert(processing::is_tuple<TAll>::value, "TAll must be std::tuple");
 
 #ifdef FOR_DOXYGEN_DOC_ONLY
         public:

@@ -30,7 +30,7 @@
 #include <ratio>
 
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/utilities/size_to_type.hpp>
+#include <nil/marshalling/processing/size_to_type.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -47,7 +47,7 @@ namespace nil {
                     using value_type = T;
 
                     using serialized_type =
-                        typename nil::marshalling::utilities::size_to_type<sizeof(value_type), false>::type;
+                        typename nil::marshalling::processing::size_to_type<sizeof(value_type), false>::type;
 
                     using scaling_ratio_type = std::ratio<1, 1>;
 

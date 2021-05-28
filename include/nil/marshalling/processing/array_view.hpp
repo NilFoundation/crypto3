@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 
 /// @file
-/// @brief Contains nil::marshalling::utilities::array_view class.
+/// @brief Contains nil::marshalling::processing::array_view class.
 
 #ifndef MARSHALLING_ARRAY_VIEW_HPP
 #define MARSHALLING_ARRAY_VIEW_HPP
@@ -37,12 +37,12 @@
 namespace nil {
     namespace marshalling {
 
-        namespace utilities {
+        namespace processing {
 
             /// @brief Describes an object that can refer to a constant contiguous
             ///     sequence of other objects.
             /// @details Provides "view" on the original data.
-            /// @headerfile "marshalling/utilities/array_view.h"
+            /// @headerfile "marshalling/processing/array_view.h"
             template<typename T>
             class array_view {
             public:
@@ -265,7 +265,7 @@ namespace nil {
                 return !(view1 == view2);
             }
 
-        }    // namespace utilities
+        }    // namespace processing
 
     }    // namespace marshalling
 }    // namespace nil
@@ -273,9 +273,9 @@ namespace nil {
 namespace std {
 
     /// @brief Specializes the std::swap algorithm.
-    /// @related nil::marshalling::utilities::ArrayView
+    /// @related nil::marshalling::processing::ArrayView
     template<typename T>
-    void swap(nil::marshalling::utilities::array_view<T> &view1, nil::marshalling::utilities::array_view<T> &view2) {
+    void swap(nil::marshalling::processing::array_view<T> &view1, nil::marshalling::processing::array_view<T> &view2) {
         view1.swap(view2);
     }
 

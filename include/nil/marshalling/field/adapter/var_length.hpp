@@ -31,8 +31,8 @@
 #include <limits>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/size_to_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
+#include <nil/marshalling/processing/size_to_type.hpp>
+#include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/status_type.hpp>
 
 namespace nil {
@@ -52,7 +52,7 @@ namespace nil {
 
                     using serialized_type =
                         typename std::conditional<(TMaxLen < sizeof(base_serialized_type)),
-                                                  typename nil::marshalling::utilities::size_to_type<
+                                                  typename nil::marshalling::processing::size_to_type<
                                                       TMaxLen, std::is_signed<base_serialized_type>::value>::type,
                                                   base_serialized_type>::type;
 
@@ -116,7 +116,7 @@ namespace nil {
                                 return nil::marshalling::status_type::not_enough_data;
                             }
 
-                            auto byte = nil::marshalling::utilities::read_data<std::uint8_t>(iter, endian_type());
+                            auto byte = nil::marshalling::processing::read_data<std::uint8_t>(iter, endian_type());
                             auto byteValue = byte & var_length_value_bits_mask;
                             add_byte_to_serialized_value(byteValue, byteCount, val,
                                                          typename base_impl_type::endian_type());
@@ -163,7 +163,7 @@ namespace nil {
                                 byte |= var_length_continue_bit;
                             }
 
-                            nil::marshalling::utilities::write_data(byte, iter, endian_type());
+                            nil::marshalling::processing::write_data(byte, iter, endian_type());
                             ++byteCount;
                             MARSHALLING_ASSERT(byteCount <= max_length());
                             --size;
@@ -187,7 +187,7 @@ namespace nil {
                                 byte |= var_length_continue_bit;
                             }
 
-                            nil::marshalling::utilities::write_data(byte, iter, endian_type());
+                            nil::marshalling::processing::write_data(byte, iter, endian_type());
                             ++byteCount;
                             MARSHALLING_ASSERT(byteCount <= max_length());
                         }
