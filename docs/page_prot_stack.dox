@@ -68,7 +68,7 @@
 /// In the normal operation, when transport frame fields are not stored anywhere,
 /// it is never used. However, there is way to perform @b read operation while
 /// caching transport fields (by using @ref nil::marshalling::protocol::MsgDataLayer::read_fields_cached())
-/// The payload field is defined to be @ref nil::marshalling::field::array_list of raw data
+/// The payload field is defined to be @ref nil::marshalling::types::array_list of raw data
 /// (see @ref nil::marshalling::protocol::MsgDataLayer::field_type). It would be wise to provide
 /// a way to supply extra options to choose storage type for this field,
 /// when defining protocol stack. As the result the definition becomes:
@@ -95,7 +95,7 @@
 /// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>; // Use big endian for all fields serialization
 ///
 /// using MsgIdField = 
-///     nil::marshalling::field::EnumValue<
+///     nil::marshalling::types::EnumValue<
 ///         MyFieldBase, 
 ///         msg_id // enum type
 ///     >;
@@ -205,7 +205,7 @@
 /// without actually decoding the contents. In this case the default behaviour 
 /// cannot be used. The @b Marshalling library provides @ref nil::marshalling::generic_message
 /// message definition which has a single variable length data field 
-/// (defined using @ref nil::marshalling::field::array_list class). The @ref
+/// (defined using @ref nil::marshalling::types::array_list class). The @ref
 /// nil::marshalling::protocol::MsgIdLayer may also receive @ref nil::marshalling::option::support_generic_message
 /// option specifying type of the generic_message.
 /// In this case, if the appropriate message type hasn't been found in 
@@ -263,7 +263,7 @@
 /// {
 ///
 /// using RemSizeField =
-///     nil::marshalling::field::IntValue<
+///     nil::marshalling::types::IntValue<
 ///         MyFieldBase, 
 ///         std::uint16_t, 
 ///         nil::marshalling::option::num_value_ser_offset<sizeof(std::uint16_t)>
@@ -306,7 +306,7 @@
 /// namespace my_protocol
 /// {
 ///
-/// using ChecksumField = nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>;
+/// using ChecksumField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
 ///
 /// template <
 ///     typename TMessage, // common interface class defined by the application
@@ -373,7 +373,7 @@
 /// {
 ///
 /// using SyncField =
-///     nil::marshalling::field::IntValue<
+///     nil::marshalling::types::IntValue<
 ///         MyFieldBase, 
 ///         std::uint16_t, 
 ///         nil::marshalling::option::default_num_value<0xabcd>,
@@ -432,7 +432,7 @@
 /// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>;
 ///
 /// // field_type describing protocol version.
-/// using MyVersionField = nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>;
+/// using MyVersionField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
 ///
 /// // Payload control layer
 /// template <

@@ -37,10 +37,10 @@
 #include <nil/marshalling/message.hpp>
 #include <nil/marshalling/message_base.hpp>
 
-#include <nil/marshalling/field/bitmask_value.hpp>
-#include <nil/marshalling/field/bundle.hpp>
-#include <nil/marshalling/field/int_value.hpp>
-#include <nil/marshalling/field/optional.hpp>
+#include <nil/marshalling/types/bitmask_value.hpp>
+#include <nil/marshalling/types/bundle.hpp>
+#include <nil/marshalling/types/int_value.hpp>
+#include <nil/marshalling/types/optional.hpp>
 
 enum message_type {
     MessageType1,
@@ -59,7 +59,7 @@ template<typename TTraits>
 using TestMessageBase = nil::marshalling::message<TTraits>;
 
 template<typename TField>
-using FieldsMessage1 = std::tuple<nil::marshalling::field::int_value<TField, std::uint16_t>>;
+using FieldsMessage1 = std::tuple<nil::marshalling::types::int_value<TField, std::uint16_t>>;
 
 template<typename TMessage>
 class Message1 : public nil::marshalling::message_base<
@@ -117,12 +117,12 @@ public:
 
 template<typename TField>
 using Message3Fields = std::tuple<
-    nil::marshalling::field::int_value<TField, std::uint32_t>,
-    nil::marshalling::field::int_value<TField, std::int16_t, nil::marshalling::option::fixed_length<1>,
+    nil::marshalling::types::int_value<TField, std::uint32_t>,
+    nil::marshalling::types::int_value<TField, std::int16_t, nil::marshalling::option::fixed_length<1>,
                                        nil::marshalling::option::valid_num_value_range<-120, 120>,
                                        nil::marshalling::option::default_num_value<127>>,    // invalid upon creation
-    nil::marshalling::field::bitmask_value<TField, nil::marshalling::option::fixed_length<2>>,
-    nil::marshalling::field::bitmask_value<TField, nil::marshalling::option::fixed_length<3>>>;
+    nil::marshalling::types::bitmask_value<TField, nil::marshalling::option::fixed_length<2>>,
+    nil::marshalling::types::bitmask_value<TField, nil::marshalling::option::fixed_length<3>>>;
 
 template<typename TMessage>
 class Message3 : public nil::marshalling::message_base<
@@ -175,8 +175,8 @@ public:
 
 template<typename TField>
 using Message4Fields
-    = std::tuple<nil::marshalling::field::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
-                 nil::marshalling::field::optional<nil::marshalling::field::int_value<TField, std::uint16_t>>>;
+    = std::tuple<nil::marshalling::types::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
+                 nil::marshalling::types::optional<nil::marshalling::types::int_value<TField, std::uint16_t>>>;
 
 template<typename TMessage>
 class Message4 : public nil::marshalling::message_base<
@@ -220,9 +220,9 @@ public:
             return es;
         }
 
-        auto expectedNextFieldMode = nil::marshalling::field::optional_mode::missing;
+        auto expectedNextFieldMode = nil::marshalling::types::optional_mode::missing;
         if ((field_value1().value() & 0x1) != 0) {
-            expectedNextFieldMode = nil::marshalling::field::optional_mode::exists;
+            expectedNextFieldMode = nil::marshalling::types::optional_mode::exists;
         }
 
         field_value2().set_mode(expectedNextFieldMode);
@@ -231,9 +231,9 @@ public:
 
     bool eval_refresh() {
         auto &mask = field_value1();
-        auto expectedNextFieldMode = nil::marshalling::field::optional_mode::missing;
+        auto expectedNextFieldMode = nil::marshalling::types::optional_mode::missing;
         if ((mask.value() & 0x1) != 0) {
-            expectedNextFieldMode = nil::marshalling::field::optional_mode::exists;
+            expectedNextFieldMode = nil::marshalling::types::optional_mode::exists;
         }
 
         auto &optField = field_value2();
@@ -251,8 +251,8 @@ public:
 };
 
 template<typename TField>
-using FieldsMessage5 = std::tuple<nil::marshalling::field::int_value<TField, std::uint16_t>,
-                                  nil::marshalling::field::int_value<TField, std::int8_t>>;
+using FieldsMessage5 = std::tuple<nil::marshalling::types::int_value<TField, std::uint16_t>,
+                                  nil::marshalling::types::int_value<TField, std::int8_t>>;
 
 template<typename TMessage>
 class Message5 : public nil::marshalling::message_base<
@@ -289,16 +289,16 @@ public:
 template<typename TField>
 struct Message6Fields {
     class field
-        : public nil::marshalling::field::bundle<
+        : public nil::marshalling::types::bundle<
               TField,
-              std::tuple<nil::marshalling::field::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
-                         nil::marshalling::field::optional<nil::marshalling::field::int_value<TField, std::uint16_t>,
+              std::tuple<nil::marshalling::types::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
+                         nil::marshalling::types::optional<nil::marshalling::types::int_value<TField, std::uint16_t>,
                                                            nil::marshalling::option::missing_by_default>>,
               nil::marshalling::option::has_custom_read, nil::marshalling::option::has_custom_refresh> {
-        using Base = nil::marshalling::field::bundle<
+        using Base = nil::marshalling::types::bundle<
             TField,
-            std::tuple<nil::marshalling::field::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
-                       nil::marshalling::field::optional<nil::marshalling::field::int_value<TField, std::uint16_t>,
+            std::tuple<nil::marshalling::types::bitmask_value<TField, nil::marshalling::option::fixed_length<1>>,
+                       nil::marshalling::types::optional<nil::marshalling::types::int_value<TField, std::uint16_t>,
                                                          nil::marshalling::option::missing_by_default>>,
             nil::marshalling::option::has_custom_read, nil::marshalling::option::has_custom_refresh>;
 
@@ -312,9 +312,9 @@ struct Message6Fields {
                 return es;
             }
 
-            nil::marshalling::field::optional_mode mode = nil::marshalling::field::optional_mode::missing;
+            nil::marshalling::types::optional_mode mode = nil::marshalling::types::optional_mode::missing;
             if ((field_mask().value() & 0x1) != 0) {
-                mode = nil::marshalling::field::optional_mode::exists;
+                mode = nil::marshalling::types::optional_mode::exists;
             }
 
             field_val().set_mode(mode);
@@ -322,9 +322,9 @@ struct Message6Fields {
         }
 
         bool refresh() {
-            nil::marshalling::field::optional_mode mode = nil::marshalling::field::optional_mode::missing;
+            nil::marshalling::types::optional_mode mode = nil::marshalling::types::optional_mode::missing;
             if ((field_mask().value() & 0x1) != 0) {
-                mode = nil::marshalling::field::optional_mode::exists;
+                mode = nil::marshalling::types::optional_mode::exists;
             }
 
             if (mode == field_val().get_mode()) {
@@ -371,9 +371,9 @@ public:
 
 template<typename TField>
 struct Message7Fields {
-    using field1 = nil::marshalling::field::int_value<TField, std::uint16_t>;
+    using field1 = nil::marshalling::types::int_value<TField, std::uint16_t>;
 
-    using field2 = nil::marshalling::field::optional<nil::marshalling::field::int_value<TField, std::uint16_t>,
+    using field2 = nil::marshalling::types::optional<nil::marshalling::types::int_value<TField, std::uint16_t>,
                                                      nil::marshalling::option::exists_by_default,
                                                      nil::marshalling::option::exists_between_versions<5, 10>>;
 

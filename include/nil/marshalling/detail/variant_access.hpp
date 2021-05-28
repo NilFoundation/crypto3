@@ -48,9 +48,9 @@
 
 #else    // #ifdef MARSHALLING_MUST_DEFINE_BASE
 #define MARSHALLING_AS_VARIANT_FUNC \
-    FUNC_AUTO_REF_RETURN(as_variant, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN(as_variant, decltype(nil::marshalling::types::to_field_base(*this)))
 #define MARSHALLING_AS_VARIANT_CONST_FUNC \
-    FUNC_AUTO_REF_RETURN_CONST(as_variant, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN_CONST(as_variant, decltype(nil::marshalling::types::to_field_base(*this)))
 #define MARSHALLING_VARIANT_INIT_FIELD_FUNC(v_, n_)               \
     FUNC_ARGS_AUTO_REF_RETURN(                                    \
         MARSHALLING_CONCATENATE(initField_, n_), TArgs&&... args, \

@@ -28,7 +28,7 @@
 
 #include <iterator>
 #include <type_traits>
-#include <nil/marshalling/field/int_value.hpp>
+#include <nil/marshalling/types/int_value.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
 #include <nil/marshalling/protocol/detail/checksum_layer_options_parser.hpp>
 
@@ -223,7 +223,7 @@ namespace nil {
                 }
 
             private:
-                static_assert(nil::marshalling::field::is_int_value<field_type>(),
+                static_assert(nil::marshalling::types::is_int_value<field_type>(),
                               "The checksum field is expected to be of int_value type");
 
                 static_assert(field_type::min_length() == field_type::max_length(),

@@ -94,7 +94,7 @@ namespace nil {
                         // processing it as marshaling type (at the moment it is the resolve_type function under 
                         // this one).
                         using marhsalling_array_type = 
-                            nil::marshalling::field::array_list<
+                            nil::marshalling::types::array_list<
                                 nil::marshalling::field_type<nil::marshalling::option::little_endian>,
                                 type_to_process>;
                         using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;

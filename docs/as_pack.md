@@ -43,7 +43,7 @@ Using this function we can easily pack data from one type to another:
 
 ```cpp
 using big_endian_array_type = 
-    nil::marshalling::field::array_list<
+    nil::marshalling::types::array_list<
         nil::marshalling::field_type<nil::marshalling::option::big_endian>,
         std::uint32_t
     >;

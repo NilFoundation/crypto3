@@ -32,8 +32,8 @@
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
-#include <nil/marshalling/field/array_list.hpp>
-#include <nil/marshalling/field/int_value.hpp>
+#include <nil/marshalling/types/array_list.hpp>
+#include <nil/marshalling/types/int_value.hpp>
 #include <nil/marshalling/message.hpp>
 #include <nil/marshalling/message_base.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
@@ -46,7 +46,7 @@ namespace nil {
             /// @brief Message data layer.
             /// @details Must always be the last layer in protocol stack.
             /// @tparam TExtraOpts Extra options to inner @ref field_type type which is defined
-            ///     to be @ref nil::marshalling::field::array_list. This field is used only in @ref
+            ///     to be @ref nil::marshalling::types::array_list. This field is used only in @ref
             ///     all_fields_type type and @ref read_fields_cached() member function.
             /// @headerfile nil/marshalling/protocol/MsgDataLayer.h
             template<typename... TExtraOpts>
@@ -68,7 +68,7 @@ namespace nil {
                 /// @brief Raw data field type.
                 /// @details This field is used only in @ref all_fields_type field and @ref
                 ///     read_fields_cached() member function.
-                using field_type = nil::marshalling::field::array_list<
+                using field_type = nil::marshalling::types::array_list<
                     nil::marshalling::field_type<nil::marshalling::option::big_endian>, std::uint8_t, TExtraOpts...>;
 
                 /// @brief All fields of the remaining transport layers, contains only @ref field_type.

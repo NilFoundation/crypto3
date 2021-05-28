@@ -35,21 +35,21 @@
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/message_base.hpp>
 
-#include <nil/marshalling/field/array_list.hpp>
+#include <nil/marshalling/types/array_list.hpp>
 
 namespace nil {
     namespace marshalling {
 
         /// @brief Definition of fields for @ref nil::marshalling::generic_message message
         /// @details Defined as single variable length raw bytes sequence
-        ///     (@ref nil::marshalling::field::array_list).
+        ///     (@ref nil::marshalling::types::array_list).
         /// @tparam Base class for the sequence field definition, expected to be a
         ///     variant of @ref nil::marshalling::field_type
         /// @tparam Extra option(s) (bundled as @b std::tuple if multiple) to be
-        ///     passed to @ref nil::marshalling::field::array_list field definition.
+        ///     passed to @ref nil::marshalling::types::array_list field definition.
         template<typename TFieldBase, typename TExtraOpts = nil::marshalling::option::empty_option>
         using generic_message_fields
-            = std::tuple<nil::marshalling::field::array_list<TFieldBase, std::uint8_t, TExtraOpts>>;
+            = std::tuple<nil::marshalling::types::array_list<TFieldBase, std::uint8_t, TExtraOpts>>;
 
         /// @brief Generic message
         /// @details Generic message is there to substitute definition of actual message

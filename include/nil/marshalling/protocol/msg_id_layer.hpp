@@ -40,7 +40,7 @@
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
 #include <nil/marshalling/msg_factory.hpp>
-#include <nil/marshalling/field/no_value.hpp>
+#include <nil/marshalling/types/no_value.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -97,9 +97,9 @@ namespace nil {
                 /// @brief Type of the field object used to read/write message ID value.
                 using field_type = typename base_impl_type::field_type;
 
-                static_assert(nil::marshalling::field::is_int_value<field_type>()
-                                  || nil::marshalling::field::is_enum_value<field_type>()
-                                  || nil::marshalling::field::is_no_value<field_type>(),
+                static_assert(nil::marshalling::types::is_int_value<field_type>()
+                                  || nil::marshalling::types::is_enum_value<field_type>()
+                                  || nil::marshalling::types::is_no_value<field_type>(),
                               "field_type must be of int_value or enum_value types");
 
                 /// @brief Default constructor.

@@ -12,13 +12,13 @@ using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_e
 
 Now the definition of simple 2 byte unsigned integer value field looks like this:
 ```cpp
-using MyIntField = nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>;
+using MyIntField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>;
 ```
 
 The definition of unsigned integer with 3 bytes serialization length:
 ```cpp
 using My3ByteIntField = 
-    nil::marshalling::field::int_value<
+    nil::marshalling::types::int_value<
         MyFieldBase, // big endian serialization 
         std::uint32_t, // store as 4 byte unsigned integer
         nil::marshalling::option::fixed_length<3> // serialise using only 3 bytes
@@ -29,7 +29,7 @@ Definition of the year value, serialized using only 1 byte as an offset from
 year 2000, and default constructed as year 2017:
 ```cpp
 using MyYearField = 
-    nil::marshalling::field::int_value<
+    nil::marshalling::types::int_value<
         MyFieldBase, // big endian serialization
         std::int16_t, // store as 2 byte value
         nil::marshalling::option::fixed_length<1>, // serialise using only 1 byte
@@ -42,7 +42,7 @@ using MyYearField =
 Variant length (Base-128) integer value:
 ```cpp
 using MyVarLengthField = 
-    nil::marshalling::field::int_value<
+    nil::marshalling::types::int_value<
         MyFieldBase, // big endian serialization
         std::uint32_t, // store as 4 bytes value
         nil::marshalling::option::var_length<1, 4> // 1 to 4 bytes serialization length.
@@ -60,7 +60,7 @@ enum class MyEnum : std::uint8_t // Serialise using 1 byte
 };
 
 using MyEnumField = 
-    nil::marshalling::field::enum_value<
+    nil::marshalling::types::enum_value<
         MyFieldBase, // big endian serialization
         MyEnum, // use MyEnum as storage type
         nil::marshalling::option::valid_num_value_range<0, (int)MyEnum::NumOfValues - 1> // provide range of valid values
@@ -70,9 +70,9 @@ using MyEnumField =
 2 bytes bitmask value:
 ```cpp
 struct MyBitmaskField : public 
-    nil::marshalling::field::bitmask_value<
+    nil::marshalling::types::bitmask_value<
         MyFieldBase, // big endian serialization
-        nil::marshalling::field::fixed_length<2> // serialise using 2 bytes
+        nil::marshalling::types::fixed_length<2> // serialise using 2 bytes
         bitmask_reserved_bits<0xfff0> // Specify reserved bits 
     >
 {
@@ -83,12 +83,12 @@ struct MyBitmaskField : public
 Bitfields:
 ```cpp
 struct MyBitfield : public
-    nil::marshalling::field::bitfield<
+    nil::marshalling::types::bitfield<
         MyFieldBase,
         std::tuple<
-            nil::marshalling::field::int_value<MyFieldBase, std::uint8_t, nil::marshalling::option::fixed_bit_length<2> >, // 2 bits value
-            nil::marshalling::field::bitmask_value<MyFieldBase, nil::marshalling::option::fixed_bit_length<3> >, // 3 bits value
-            nil::marshalling::field::enum_value<MyFieldBase, MyEnum, nil::marshalling::option::fixed_bit_length<3> > // 3 bits value
+            nil::marshalling::types::int_value<MyFieldBase, std::uint8_t, nil::marshalling::option::fixed_bit_length<2> >, // 2 bits value
+            nil::marshalling::types::bitmask_value<MyFieldBase, nil::marshalling::option::fixed_bit_length<3> >, // 3 bits value
+            nil::marshalling::types::enum_value<MyFieldBase, MyEnum, nil::marshalling::option::fixed_bit_length<3> > // 3 bits value
         >
     >
 {
@@ -99,7 +99,7 @@ struct MyBitfield : public
 Simple raw data list:
 ```cpp
 using MyRawDataList = 
-    nil::marshalling::field::array_list<
+    nil::marshalling::types::array_list<
         MyFieldBase,
         std::uint8_t
     >;
@@ -108,11 +108,11 @@ using MyRawDataList =
 Raw data list with 2 byte size prefix:
 ```cpp
 using MyRawDataList2 = 
-    nil::marshalling::field::array_list<
+    nil::marshalling::types::array_list<
         MyFieldBase,
         std::uint8_t,
         nil::marshalling::option::sequence_size_field_prefix<
-            nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+            nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
         >
     >;
 ```
@@ -120,17 +120,17 @@ using MyRawDataList2 =
 Size prefixed list of complex (bundle) elements:
 ```cpp
 using MyComplexList = 
-    nil::marshalling::field::array_list<
+    nil::marshalling::types::array_list<
         MyFieldBase,
-        nil::marshalling::field::bundle<
+        nil::marshalling::types::bundle<
             MyFieldBase,
             std::tuple<
-                nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>, // 2 bytes int
-                nil::marshalling::field::enum_value<MyFieldBase, MyEnum> // 1 byte enum
+                nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>, // 2 bytes int
+                nil::marshalling::types::enum_value<MyFieldBase, MyEnum> // 1 byte enum
             >
         >,
         nil::marshalling::option::sequence_size_field_prefix<
-            nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+            nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
         >
     >;
 ```
@@ -138,10 +138,10 @@ using MyComplexList =
 String with 1 byte size prefix:
 ```cpp
 using MyString = 
-    nil::marshalling::field::string<
+    nil::marshalling::types::string<
         MyFieldBase,
         nil::marshalling::option::sequence_size_field_prefix<
-            nil::marshalling::field::int_value<MyFieldBase, std::uint8_t>
+            nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>
         >        
     >
 ```
@@ -149,9 +149,9 @@ using MyString =
 Optional 2 byte integer, default constructed as "missing".:
 ```cpp
 using MyOptInt = 
-    nil::marshalling::field::optional<
-        nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>,
-        nil::marshalling::option::default_optional_mode<nil::marshalling::field::optional_mode::missing>        
+    nil::marshalling::types::optional<
+        nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>,
+        nil::marshalling::option::default_optional_mode<nil::marshalling::types::optional_mode::missing>        
     >
 ```
 
@@ -247,10 +247,10 @@ For example, simple frame of just 2 bytes size followed by 2 byte message ID
 will look like this:
 ```cpp
 // Define field used to (de)serialise message id (see definition of msg_id enum earlier)
-using MsgIdField = nil::marshalling::field::enum_value<MyFieldBase, msg_id>
+using MsgIdField = nil::marshalling::types::enum_value<MyFieldBase, msg_id>
 
 // Define field used to (de)serialise remaining length of the message:
-using MsgSizeField = nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+using MsgSizeField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
 
 // Define transport stack by wrapping "layers"
 using Stack = 
@@ -268,21 +268,21 @@ may look like this:
 ```cpp
 
 // Define field used to (de)serialise message id (see definition of msg_id enum earlier)
-using MsgIdField = nil::marshalling::field::enum_value<MyFieldBase, msg_id>
+using MsgIdField = nil::marshalling::types::enum_value<MyFieldBase, msg_id>
 
 // Define field used to (de)serialise remaining length of the message:
-using MsgSizeField = nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+using MsgSizeField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
 
 // Define checksum value field
 using ChecksumField =
-    nil::marshalling::field::int_value<
+    nil::marshalling::types::int_value<
         MyFieldBase,
         std::uint16_t
     >;
 
 // Define field used as synchronisation prefix
 using SyncField =
-    nil::marshalling::field::int_value<
+    nil::marshalling::types::int_value<
         MyFieldBase,
         std::uint16_t,
         nil::marshalling::option::default_num_value<0xabcd>,

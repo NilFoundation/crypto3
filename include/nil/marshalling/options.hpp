@@ -38,7 +38,7 @@
 
 #include <nil/marshalling/traits.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/field/optional_mode.hpp>
+#include <nil/marshalling/types/optional_mode.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -233,8 +233,8 @@ namespace nil {
             struct support_generic_message { };
 
             /// @brief Option used to specify number of bytes that is used for field serialization.
-            /// @details Applicable only to numeric fields, such as nil::marshalling::field::int_value or
-            ///     nil::marshalling::field::enum_value.
+            /// @details Applicable only to numeric fields, such as nil::marshalling::types::int_value or
+            ///     nil::marshalling::types::enum_value.
             ///
             ///     For example, protocol specifies that some field is serialized using
             ///     only 3 bytes. There is no basic integral type that takes 3 bytes
@@ -243,7 +243,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::int_value<
+            ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::uint32_t,
             ///             nil::marshalling::option::fixed_length<3>
@@ -256,22 +256,22 @@ namespace nil {
             struct fixed_length { };
 
             /// @brief Option used to specify number of bits that is used for field serialization
-            ///     when a field is a member of nil::marshalling::field::bitfield.
+            ///     when a field is a member of nil::marshalling::types::bitfield.
             /// @details For example, the protocol specifies that two independent integer
             ///     values of 6 and 10 bits respectively packed into two bytes to save space.
             ///     Such combined field may be defined as:
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::bitfield<
+            ///         nil::marshalling::types::bitfield<
             ///             MyFieldBase,
             ///             std::tuple<
-            ///                 nil::marshalling::field::int_value<
+            ///                 nil::marshalling::types::int_value<
             ///                     MyFieldBase,
             ///                     std::uint8_t,
             ///                     nil::marshalling::option::fixed_bit_length<6>
             ///                 >,
-            ///                 nil::marshalling::field::int_value<
+            ///                 nil::marshalling::types::int_value<
             ///                     MyFieldBase,
             ///                     std::uint16_t,
             ///                     nil::marshalling::option::fixed_bit_length<10>
@@ -285,8 +285,8 @@ namespace nil {
             struct fixed_bit_length { };
 
             /// @brief Option used to specify that field may have variable serialization length
-            /// @details Applicable only to numeric fields, such as nil::marshalling::field::int_value
-            ///     or nil::marshalling::field::enum_value.
+            /// @details Applicable only to numeric fields, such as nil::marshalling::types::int_value
+            ///     or nil::marshalling::types::enum_value.
             ///     Use this option to specify that serialized value has
             ///     <a href="https://en.wikipedia.org/wiki/Variable-length_quantity">Base-128</a>
             ///     encoding, i.e. the most significant bit in the byte indicates whether
@@ -297,7 +297,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::int_value<
+            ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::uint32_t,
             ///             nil::marshalling::option::VarLength<1, 4>
@@ -313,8 +313,8 @@ namespace nil {
             };
 
             /// @brief Option to specify numeric value serialization offset.
-            /// @details Applicable only to numeric fields such as nil::marshalling::field::int_value or
-            ///     nil::marshalling::field::enum_value.
+            /// @details Applicable only to numeric fields such as nil::marshalling::types::int_value or
+            ///     nil::marshalling::types::enum_value.
             ///     The provided value will be added to the field's value and the
             ///     result will be written to the buffer when serialising. Good example
             ///     for such option would be serialising a "current year" value. Most protocols
@@ -326,7 +326,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::int_value<
+            ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::uint16_t,
             ///             nil::marshalling::option::fixed_length<1>,
@@ -345,7 +345,7 @@ namespace nil {
             /// @brief Option that forces usage of embedded uninitialised data area instead
             ///     of dynamic memory allocation.
             /// @details Applicable to fields that represent collection of raw data or other
-            ///     fields, such as nil::marshalling::field::array_list or nil::marshalling::field::string. By
+            ///     fields, such as nil::marshalling::types::array_list or nil::marshalling::types::string. By
             ///     default, these fields will use
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> or
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>
@@ -358,25 +358,25 @@ namespace nil {
             template<std::size_t TSize>
             struct fixed_size_storage { };
 
-            /// @brief Set custom storage type for fields like nil::marshalling::field::string or
-            ///     nil::marshalling::field::array_list.
-            /// @details By default nil::marshalling::field::string uses
+            /// @brief Set custom storage type for fields like nil::marshalling::types::string or
+            ///     nil::marshalling::types::array_list.
+            /// @details By default nil::marshalling::types::string uses
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>
-            ///     and nil::marshalling::field::array_list uses
+            ///     and nil::marshalling::types::array_list uses
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> as
             ///     their internal storage types. The @ref fixed_size_storage option forces
             ///     them to use nil::marshalling::processing::StaticString and nil::marshalling::processing::static_vector
             ///     instead. This option can be used to provide any other third party type.
             ///     Such type must define the same public interface as @b std::string (when used
-            ///     with nil::marshalling::field::string) or @b std::vector (when used with
-            ///     nil::marshalling::field::array_list).
+            ///     with nil::marshalling::types::string) or @b std::vector (when used with
+            ///     nil::marshalling::types::array_list).
             /// @tparam TType Custom storage type
             /// @headerfile nil/marshalling/options.h
             template<typename TType>
             struct custom_storage_type { };
 
             /// @brief Option to specify scaling ratio.
-            /// @details Applicable only to nil::marshalling::field::int_value.
+            /// @details Applicable only to nil::marshalling::types::int_value.
             ///     Sometimes the protocol specifies values being transmitted in
             ///     one units while when handling the message they are better to be handled
             ///     in another. For example, some distance information is transmitted as
@@ -385,14 +385,14 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::int_value<
+            ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::int32_t,
             ///             nil::marshalling::option::scaling_ratio_type<1, 100>
             ///         >;
             ///     @endcode
             ///     Then, to accessed the scaled value of the field use @b scale_as() or
-            ///     @b set_scaled() methods of nil::marshalling::field::int_value field:
+            ///     @b set_scaled() methods of nil::marshalling::types::int_value field:
             ///     @code
             ///     void processField(const MyField& field)
             ///     {
@@ -415,17 +415,17 @@ namespace nil {
             ///     prepended with one or more bytes indicating number of elements that will
             ///     follow.
             ///     Applicable to fields that represent collection of raw data or other
-            ///     fields, such as nil::marshalling::field::array_list or nil::marshalling::field::string.@n
+            ///     fields, such as nil::marshalling::types::array_list or nil::marshalling::types::string.@n
             ///     For example sequence of raw bytes must be prefixed with 2 bytes stating
             ///     the size of the sequence:
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::array_list<
+            ///         nil::marshalling::types::array_list<
             ///             MyFieldBase,
             ///             std::uint8_t,
             ///             nil::marshalling::option::sequence_size_field_prefix_type<
-            ///                 nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+            ///                 nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
             ///             >
             ///         >;
             ///     @endcode
@@ -442,16 +442,16 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::array_list<
+            ///         nil::marshalling::types::array_list<
             ///             MyFieldBase,
-            ///             nil::marshalling::field::bundle<
+            ///             nil::marshalling::types::bundle<
             ///                 std::tuple<
-            ///                     nil::marshalling::field::int_value<MyFieldBase, std::uint32_t>,
-            ///                     nil::marshalling::field::string<MyFieldBase>
+            ///                     nil::marshalling::types::int_value<MyFieldBase, std::uint32_t>,
+            ///                     nil::marshalling::types::string<MyFieldBase>
             ///                 >
             ///             >,
             ///             nil::marshalling::option::sequence_ser_length_field_prefix_type<
-            ///                 nil::marshalling::field::int_value<MyFieldBase, std::uint16_t>
+            ///                 nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
             ///             >
             ///         >;
             ///     @endcode
@@ -462,7 +462,7 @@ namespace nil {
                      nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
             struct sequence_ser_length_field_prefix { };
 
-            /// @brief Option that forces <b>every element</b> of @ref nil::marshalling::field::array_list to
+            /// @brief Option that forces <b>every element</b> of @ref nil::marshalling::types::array_list to
             ///     be prefixed with its serialization length.
             /// @details Similar to @ref sequence_ser_length_field_prefix_type but instead of the whole
             ///     list, every element is prepended with its serialization length.
@@ -473,7 +473,7 @@ namespace nil {
                      nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
             struct sequence_elem_ser_length_field_prefix { };
 
-            /// @brief Option that forces @b first element only of @ref nil::marshalling::field::array_list to
+            /// @brief Option that forces @b first element only of @ref nil::marshalling::types::array_list to
             ///     be prefixed with its serialization length.
             /// @details Similar to @ref sequence_elem_ser_length_field_prefix_type, but
             ///     applicable only to the lists where elements are of the same
@@ -494,10 +494,10 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::string<
+            ///         nil::marshalling::types::string<
             ///             MyFieldBase,
             ///             nil::marshalling::option::sequence_termination_field_suffix<
-            ///                 nil::marshalling::field::int_value<MyFieldBase, char,
+            ///                 nil::marshalling::types::int_value<MyFieldBase, char,
             ///                 nil::marshalling::option::DefaultNumValue<0> >
             ///             >
             ///         >;
@@ -518,11 +518,11 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::string<
+            ///         nil::marshalling::types::string<
             ///             MyFieldBase,
             ///             nil::marshalling::option::sequence_fixed_size<5>,
             ///             nil::marshalling::option::sequence_trailing_field_suffix<
-            ///                 nil::marshalling::field::int_value<MyFieldBase, char,
+            ///                 nil::marshalling::types::int_value<MyFieldBase, char,
             ///                 nil::marshalling::option::DefaultNumValue<0> >
             ///             >
             ///         >;
@@ -539,8 +539,8 @@ namespace nil {
             ///     impossible to use @ref sequence_size_field_prefix_type option. Instead, the size
             ///     information must be provided by external calls. Usage of this option
             ///     enables @b force_read_elem_count() and @b clear_read_elem_count() functions in
-            ///     the collection fields, such as nil::marshalling::field::array_list or
-            ///     nil::marshalling::field::string which can be used to specify the size information after it was read
+            ///     the collection fields, such as nil::marshalling::types::array_list or
+            ///     nil::marshalling::types::string which can be used to specify the size information after it was read
             ///     independently.
             /// @headerfile nil/marshalling/options.h
             struct sequence_size_forcing_enabled { };
@@ -553,8 +553,8 @@ namespace nil {
             ///     impossible to use @ref sequence_ser_length_field_prefix_type option. Instead, the length
             ///     information must be provided by external calls. Usage of this option
             ///     enables @b force_read_length() and @b clear_read_length_forcing() functions in
-            ///     the collection fields, such as nil::marshalling::field::array_list or
-            ///     nil::marshalling::field::string which can be used to specify the size information after it was read
+            ///     the collection fields, such as nil::marshalling::types::array_list or
+            ///     nil::marshalling::types::string which can be used to specify the size information after it was read
             ///     independently.
             /// @headerfile nil/marshalling/options.h
             struct sequence_length_forcing_enabled { };
@@ -565,7 +565,7 @@ namespace nil {
             ///     length of a <b>single element</b> in addition to the number of elements
             ///     in the list. Usage of this option
             ///     enables @b force_read_elem_length() and @b clear_read_elem_length_forcing() functions in
-            ///     the nil::marshalling::field::array_list
+            ///     the nil::marshalling::types::array_list
             ///     which can be used to specify the element serialization length after it was read
             ///     independently. @n
             /// @headerfile nil/marshalling/options.h
@@ -583,7 +583,7 @@ namespace nil {
             /// @brief Option that forces usage of fixed size storage for sequences with fixed
             ///     size.
             /// @details Equivalent to @ref fixed_size_storage option, but applicable only
-            ///     to sequence types @ref nil::marshalling::field::array_list or @ref nil::marshalling::field::string,
+            ///     to sequence types @ref nil::marshalling::types::array_list or @ref nil::marshalling::types::string,
             ///     that alrady use @ref sequence_fixed_size option. Usage of this option do not require knowledge of
             ///     the storage area size.
             /// @headerfile nil/marshalling/options.h
@@ -616,7 +616,7 @@ namespace nil {
             ///
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::string<
+            ///         nil::marshalling::types::string<
             ///             MyFieldBase,
             ///             nil::marshalling::option::default_value_initializer<MyStringInitialiser>
             ///         >;
@@ -656,7 +656,7 @@ namespace nil {
             ///
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::field::string<
+            ///         nil::marshalling::types::string<
             ///             MyFieldBase,
             ///             nil::marshalling::option::ContentsValidator<MyStringValidator>
             ///         >;
@@ -693,22 +693,22 @@ namespace nil {
 
             /// @brief Option that specifies custom value reader class.
             /// @details It may be useful to override default reading functionality for complex
-            ///     fields, such as nil::marshalling::field::bundle, where the way members are read is
+            ///     fields, such as nil::marshalling::types::bundle, where the way members are read is
             ///     defined by the values of other members. For example, bundle of two integer
             ///     fields, the first one is normal, and the second one is optional.
             ///     The optional mode of the latter is determined by
             ///     the value of the first field. If its value is 0, than the second
             ///     member exists, otherwise it's missing.
             ///     @code
-            ///     typedef nil::marshalling::field::bundle<
+            ///     typedef nil::marshalling::types::bundle<
             ///         nil::marshalling::field_type<BigEndianOpt>,
             ///         std::tuple<
-            ///             nil::marshalling::field::int_value<
+            ///             nil::marshalling::types::int_value<
             ///                 nil::marshalling::field_type<BigEndianOpt>,
             ///                 std::uint8_t
             ///             >,
-            ///             nil::marshalling::field::optional<
-            ///                 nil::marshalling::field::int_value<
+            ///             nil::marshalling::types::optional<
+            ///                 nil::marshalling::types::int_value<
             ///                     nil::marshalling::field_type<BigEndianOpt>,
             ///                     std::uint16_t
             ///                 >
@@ -748,10 +748,10 @@ namespace nil {
             ///             }
             ///
             ///             if (first.value() != 0) {
-            ///                 second.set_mode(nil::marshalling::field::optional_mode::missing);
+            ///                 second.set_mode(nil::marshalling::types::optional_mode::missing);
             ///             }
             ///             else {
-            ///                 second.set_mode(nil::marshalling::field::optional_mode::exists);
+            ///                 second.set_mode(nil::marshalling::types::optional_mode::exists);
             ///             }
             ///
             ///             return second.read(iter, len - first.length());
@@ -1058,7 +1058,7 @@ namespace nil {
                     }
                 };
 
-                template<nil::marshalling::field::optional_mode TVal>
+                template<nil::marshalling::types::optional_mode TVal>
                 struct default_opt_mode_initialiser {
                     template<typename TField>
                     void operator()(TField &field) const {
@@ -1101,8 +1101,8 @@ namespace nil {
                 = default_value_initialiser<detail::default_num_value_initialiser<std::uintmax_t, TVal>>;
 
             /// @brief Provide range of valid numeric values.
-            /// @details Quite often numeric fields such as nil::marshalling::field::int_value or
-            ///     nil::marshalling::field::enum_value have limited number of valid values ranges.
+            /// @details Quite often numeric fields such as nil::marshalling::types::int_value or
+            ///     nil::marshalling::types::enum_value have limited number of valid values ranges.
             ///     This option can be used multiple times to provide several valid ranges.@n
             ///     If values are too big to fit into @b std::intmax_t type, please use
             ///     @ref ValidBigUnsignedNumValueRange option instead.
@@ -1183,7 +1183,7 @@ namespace nil {
 
             /// @brief Alias to ContentsValidator, it defines validator class that checks
             ///     that reserved bits of the field have expected values.
-            /// @details It is usually used with nil::marshalling::field::BitmaskValue field to
+            /// @details It is usually used with nil::marshalling::types::BitmaskValue field to
             ///     specify values of the unused/reserved bits.
             ///     The custom validator will return true if
             ///     @code
@@ -1196,35 +1196,35 @@ namespace nil {
             using bitmask_reserved_bits = contents_validator<detail::bitmask_reserved_bits_validator<TMask, TValue>>;
 
             /// @brief Alias to default_value_initializer, it sets default mode
-            ///     to field::optional field.
+            ///     to types::optional field.
             /// @tparam TVal optional mode value is to be assigned to the field in default constructor.
             /// @see @ref MissingByDefault
             /// @see @ref ExistsByDefault
             /// @headerfile nil/marshalling/options.h
-            template<nil::marshalling::field::optional_mode TVal>
+            template<nil::marshalling::types::optional_mode TVal>
             using default_optional_mode = default_value_initialiser<detail::default_opt_mode_initialiser<TVal>>;
 
             /// @brief Alias to @ref DefaultOptionalMode.
             /// @details Equivalent to
             ///     @code
-            ///     DefaultOptionalMode<nil::marshalling::field::optional_mode::missing>
+            ///     DefaultOptionalMode<nil::marshalling::types::optional_mode::missing>
             ///     @endcode
-            using missing_by_default = default_optional_mode<nil::marshalling::field::optional_mode::missing>;
+            using missing_by_default = default_optional_mode<nil::marshalling::types::optional_mode::missing>;
 
             /// @brief Alias to @ref DefaultOptionalMode.
             /// @details Equivalent to
             ///     @code
-            ///     DefaultOptionalMode<nil::marshalling::field::optional_mode::exists>
+            ///     DefaultOptionalMode<nil::marshalling::types::optional_mode::exists>
             ///     @endcode
-            using exists_by_default = default_optional_mode<nil::marshalling::field::optional_mode::exists>;
+            using exists_by_default = default_optional_mode<nil::marshalling::types::optional_mode::exists>;
 
-            /// @brief Alias to DefaultOptionalMode<nil::marshalling::field::OptinalMode::missing>
+            /// @brief Alias to DefaultOptionalMode<nil::marshalling::types::OptinalMode::missing>
             using optional_missing_by_default = missing_by_default;
 
-            /// @brief Alias to DefaultOptionalMode<nil::marshalling::field::OptinalMode::exists>
+            /// @brief Alias to DefaultOptionalMode<nil::marshalling::types::OptinalMode::exists>
             using optional_exists_by_default = exists_by_default;
 
-            /// @brief Alias to default_value_initializer, it initalises nil::marshalling::field::variant field
+            /// @brief Alias to default_value_initializer, it initalises nil::marshalling::types::variant field
             ///     to contain valid default value of the specified member.
             /// @tparam TIdx Index of the default member.
             /// @headerfile nil/marshalling/options.h
@@ -1238,8 +1238,8 @@ namespace nil {
             struct checksum_layer_verify_before_read { };
 
             /// @brief Use "view" on original raw data instead of copying it.
-            /// @details Can be used with @ref nil::marshalling::field::string and raw data @ref
-            /// nil::marshalling::field::array_list,
+            /// @details Can be used with @ref nil::marshalling::types::string and raw data @ref
+            /// nil::marshalling::types::array_list,
             ///     will force usage of @ref nil::marshalling::processing::StringView and
             ///     nil::marshalling::processing::ArrayView respectively as data storage type.
             /// @note The original data must be preserved until destruction of the field
@@ -1315,7 +1315,7 @@ namespace nil {
             /// @headerfile nil/marshalling/options.h
             struct has_custom_version_update { };
 
-            /// @brief Mark an @ref nil::marshalling::field::optional field as existing
+            /// @brief Mark an @ref nil::marshalling::types::optional field as existing
             ///     between specified versions.
             /// @tparam TFrom First version when field has been added
             /// @tparam TUntil Last version when field still hasn't been removed.
@@ -1325,14 +1325,14 @@ namespace nil {
                 static_assert(TFrom <= TUntil, "Invalid version parameters");
             };
 
-            /// @brief Mark an @ref nil::marshalling::field::optional field as existing
+            /// @brief Mark an @ref nil::marshalling::types::optional field as existing
             ///     starting from specified version.
             /// @details Alias to @ref ExistsBetweenVersions
             /// @tparam TVer First version when field has been added
             template<std::uintmax_t TVer>
             using exists_since_version = exists_between_versions<TVer, std::numeric_limits<std::uintmax_t>::max()>;
 
-            /// @brief Mark an @ref nil::marshalling::field::optional field as existing
+            /// @brief Mark an @ref nil::marshalling::types::optional field as existing
             ///     only until specified version.
             /// @details Alias to @ref ExistsBetweenVersions
             /// @tparam TVer Last version when field still hasn't been removed.

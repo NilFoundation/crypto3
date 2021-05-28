@@ -314,7 +314,7 @@ static_assert(!BoolHandlerMsgBase::has_transport_fields(), "Wrong interface");
 static_assert(!BoolHandlerMsgBase::has_version_in_transport_fields(), "Wrong interface");
 
 typedef std::tuple<
-    nil::marshalling::field::int_value<nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+    nil::marshalling::types::int_value<nil::marshalling::field_type<nil::marshalling::option::big_endian>,
                                        std::uint16_t, 
                                        nil::marshalling::option::default_num_value<5>>>
     ExtraVersionTransport;
@@ -541,7 +541,7 @@ BOOST_AUTO_TEST_CASE(test8) {
     bool refreshResult = msg.refresh();
     BOOST_CHECK(refreshResult);
     BOOST_CHECK(msg.length() == 3U);
-    BOOST_CHECK(msg.field_value2().get_mode() == nil::marshalling::field::optional_mode::exists);
+    BOOST_CHECK(msg.field_value2().get_mode() == nil::marshalling::types::optional_mode::exists);
 
     outData.clear();
     outData.resize(msg.length());

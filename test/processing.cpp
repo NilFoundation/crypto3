@@ -29,8 +29,8 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/marshalling/field/basics.hpp>
-#include <nil/marshalling/field/basic/string.hpp>
+#include <nil/marshalling/types/basics.hpp>
+#include <nil/marshalling/types/basic/string.hpp>
 
 #include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
@@ -786,36 +786,36 @@ BOOST_AUTO_TEST_CASE(test24) {
     typedef nil::marshalling::processing::static_vector<std::uint8_t, 20> StaticVec;
     typedef nil::marshalling::processing::static_vector<char, 20> StaticVecChar;
 
-    static_assert(nil::marshalling::field::basic::detail::string_has_push_back<std::string>::value,
+    static_assert(nil::marshalling::types::basic::detail::string_has_push_back<std::string>::value,
                   "std::string must have push_back");
 
-    static_assert(nil::marshalling::field::basic::detail::string_has_push_back<StaticStr>::value,
+    static_assert(nil::marshalling::types::basic::detail::string_has_push_back<StaticStr>::value,
                   "static_string must have push_back");
 
     static_assert(
-        !nil::marshalling::field::basic::detail::string_has_push_back<nil::marshalling::processing::string_view>::value,
+        !nil::marshalling::types::basic::detail::string_has_push_back<nil::marshalling::processing::string_view>::value,
         "string_view doesn't have push_back");
 
-    static_assert(nil::marshalling::field::basic::detail::string_has_assign<std::string>::value,
+    static_assert(nil::marshalling::types::basic::detail::string_has_assign<std::string>::value,
                   "std::string must have "
                   "assign");
 
-    static_assert(nil::marshalling::field::basic::detail::string_has_assign<StaticStr>::value,
+    static_assert(nil::marshalling::types::basic::detail::string_has_assign<StaticStr>::value,
                   "static_string must have "
                   "assign");
 
     static_assert(
-        !nil::marshalling::field::basic::detail::string_has_assign<nil::marshalling::processing::string_view>::value,
+        !nil::marshalling::types::basic::detail::string_has_assign<nil::marshalling::processing::string_view>::value,
         "string_view doesn't have assign");
 
-    static_assert(nil::marshalling::field::basic::detail::vector_has_assign<std::vector<std::uint8_t>>::value,
+    static_assert(nil::marshalling::types::basic::detail::vector_has_assign<std::vector<std::uint8_t>>::value,
                   "std::vector doesn't have assign");
 
-    static_assert(nil::marshalling::field::basic::detail::vector_has_assign<StaticVec>::value,
+    static_assert(nil::marshalling::types::basic::detail::vector_has_assign<StaticVec>::value,
                   "static_vector doesn't "
                   "have assign");
 
-    static_assert(!nil::marshalling::field::basic::detail::vector_has_assign<
+    static_assert(!nil::marshalling::types::basic::detail::vector_has_assign<
                       nil::marshalling::processing::array_view<std::uint8_t>>::value,
                   "array_view has assign");
 

@@ -28,7 +28,7 @@
 
 #include <iterator>
 #include <type_traits>
-#include <nil/marshalling/field/int_value.hpp>
+#include <nil/marshalling/types/int_value.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
 
 namespace nil {
@@ -55,7 +55,7 @@ namespace nil {
                 /// @brief Type of the field object used to read/write remaining size value.
                 using field_type = typename base_impl_type::field_type;
 
-                static_assert(nil::marshalling::field::is_int_value<field_type>(),
+                static_assert(nil::marshalling::types::is_int_value<field_type>(),
                               "field_type must be of int_value type");
 
                 /// @brief Default constructor
