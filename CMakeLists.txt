@@ -24,7 +24,7 @@ option(BUILD_TESTS "Build unit tests" FALSE)
 
 cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
-find_package(Boost REQUIRED COMPONENTS random)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
 
 cm_project(random WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
