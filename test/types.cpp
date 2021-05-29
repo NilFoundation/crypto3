@@ -108,35 +108,12 @@ struct types_fixture {
     enum class Enum2 : unsigned { Value1, Value2, Value3, Value4, NumOfValues };
 
     template<typename TField, typename OutputIterator>
-    void write_field(const TField &field, const OutputIterator expectedBuf, std::size_t size,
-                     status_type expectedStatus = status_type::success){
-     
-        std::unique_ptr<char[]> outDataBuf(new char[size]);
-        auto writeIter = &outDataBuf[0];
-        auto es = field.write(writeIter, size);
-        BOOST_CHECK(es == expectedStatus);
-        bool bufAsExpected = std::equal(expectedBuf, expectedBuf + size, static_cast<const char *>(&outDataBuf[0]));
-        if (!bufAsExpected) {
-            std::cout << "Expected buffer: " << std::hex;
-            std::copy_n(expectedBuf, size, std::ostream_iterator<unsigned>(std::cout, " "));
-            std::cout << "\nActual buffer: ";
-            std::copy_n(&outDataBuf[0], size, std::ostream_iterator<unsigned>(std::cout, " "));
-            std::cout << std::dec << std::endl;
-        }
-        BOOST_CHECK(bufAsExpected);
-    }
-
-    template<typename TField, typename OutputIterator>
     void write_read_field(const TField &field, const OutputIterator expectedBuf, std::size_t size,
                           status_type expectedStatus = status_type::success){
 
         std::vector<char> outDataBuf(size);
-        status_type es = status_type::success;
-        // auto writeIter = &outDataBuf[0];
-        // status_type es = field.write(writeIter, size);
         marshal<TField>(field, outDataBuf.begin(), expectedStatus);
 
-        // BOOST_CHECK(es == expectedStatus);
         bool bufAsExpected = std::equal(expectedBuf, expectedBuf + size, outDataBuf.begin());
         if (!bufAsExpected) {
             std::cout << "Expected buffer: " << std::hex;
@@ -147,11 +124,9 @@ struct types_fixture {
         }
         BOOST_CHECK(bufAsExpected);
 
-        if (es == status_type::success) {
-            TField newField = marshal<TField>(outDataBuf.begin(), outDataBuf.begin() + size, es);
-            BOOST_CHECK(field == newField);
-            BOOST_CHECK(field.value() == newField.value());
-        }
+        TField newField = marshal<TField>(outDataBuf.begin(), outDataBuf.begin() + size, expectedStatus);
+        BOOST_CHECK(field == newField);
+        BOOST_CHECK(field.value() == newField.value());
     }
 
     template<typename TFP>
@@ -693,7 +668,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test17) {
     BOOST_CHECK(staticStorageField.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(staticStorageField.length() == field.value().size() + 1U);
     BOOST_CHECK(!staticStorageField.valid());
-    //        BOOST_CHECK(staticStorageField.value().c_str() == "hello");
+    BOOST_CHECK(std::string(staticStorageField.value().c_str()) == std::string("hello"));
 }
 
 struct HelloInitialiser {
@@ -737,11 +712,11 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test18) {
     StaticStorageField staticStorageField;
     BOOST_CHECK(staticStorageField.valid());
     BOOST_CHECK(!staticStorageField.value().empty());
-    //        BOOST_CHECK(staticStorageField.value().c_str() == "hello");
+    BOOST_CHECK(std::string(staticStorageField.value().c_str()) == std::string("hello"));
     staticStorageField.value().clear();
     BOOST_CHECK(staticStorageField.value().empty());
     staticStorageField.value() = "bla";
-    //        BOOST_CHECK(staticStorageField.value().c_str() == "bla");
+    BOOST_CHECK(std::string(staticStorageField.value().c_str()) == std::string("bla"));
     BOOST_CHECK(staticStorageField.value().size() == 3);
     BOOST_CHECK(staticStorageField.length() == 5);
 
@@ -787,7 +762,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test19) {
     std::copy(Str.begin(), Str.end(), std::back_inserter(staticStorageFieldStr));
     BOOST_CHECK(!staticStorageFieldStr.empty());
     BOOST_CHECK(staticStorageFieldStr.size() == Str.size());
-    //        BOOST_CHECK(staticStorageFieldStr.c_str() == Str.c_str());
+    BOOST_CHECK(std::string(staticStorageFieldStr.c_str()) == std::string(Str.c_str()));
 
     static const std::vector<char> ExpectedBuf = {0x5, 'h', 'e', 'l', 'l', 'o'};
     write_read_field(field, ExpectedBuf.begin(), ExpectedBuf.size());
@@ -838,7 +813,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test21) {
     BOOST_CHECK_EQUAL(field.length(), 1U);
     BOOST_CHECK_EQUAL(field.value(), 0x7f);
     static const std::vector<char> ExpectedBuf2 = {(char)0x7f};
-    write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf.size());
+    write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
     static const std::vector<char> Buf2 = {(char)0x91, (char)0xc2, (char)0x3f, (char)0xff};
     field = marshal<testing_type>(Buf2.begin(), Buf2.end());
@@ -1113,13 +1088,6 @@ BOOST_AUTO_TEST_CASE(test31) {
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.get_mode() == Mode::exists);
     field.set_mode(Mode::missing);
-
-    // char bufTmp[16] = {0};
-
-    // auto writeIter = &bufTmp[0];
-    // auto es = field.write(writeIter, bufTmp.size());
-    // BOOST_CHECK(es == status_type::success);
-    // BOOST_CHECK(writeIter == &bufTmp[0]);
 }
 
 BOOST_AUTO_TEST_CASE(test32) {
@@ -3036,7 +3004,12 @@ BOOST_AUTO_TEST_CASE(test77) {
     BOOST_CHECK(field.length() == 6U);
 
     static const std::vector<char> ExpectedBuf = {0x3, 0x4, 0x5, 0x0, 0x0, 0x0};
-    write_field(field, ExpectedBuf.begin(), ExpectedBuf.size());
+
+    std::vector<char> outDataBuf(ExpectedBuf.size());
+    marshal<testing_type>(field, outDataBuf.begin());
+
+    bool bufAsExpected = std::equal(ExpectedBuf.begin(), ExpectedBuf.end(), outDataBuf.begin());
+    BOOST_CHECK(bufAsExpected);
 }
 
 class Test78_Field : public types::variant<Test70_FieldBase, std::tuple<Test70_Mem1, Test70_Mem2>> {
@@ -3261,7 +3234,7 @@ BOOST_AUTO_TEST_CASE(test84) {
     field.value() = HelloStr;
     BOOST_CHECK(field.value().size() == 5U);
     BOOST_CHECK(field.length() == 5U);
-    //        BOOST_CHECK(&(*field.value().begin()) == HelloStr);
+    // BOOST_CHECK(&(*field.value().begin()) == HelloStr);
 
     static const std::vector<char> ExpectedBuf = {'h', 'e', 'l', 'l', 'o'};
     write_read_field(field, ExpectedBuf.begin(), ExpectedBuf.size());
