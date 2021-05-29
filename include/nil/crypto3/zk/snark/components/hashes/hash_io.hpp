@@ -122,6 +122,51 @@ namespace nil {
                         }
                     };
 
+                    template<typename FieldType>
+                    class merkle_damagard_padding : public component<FieldType> {
+                    public:
+                        blueprint_variable_vector<FieldType> bits;
+                        blueprint_variable<FieldType> one;
+                        blueprint_variable<FieldType> zero;
+
+                        merkle_damagard_padding(blueprint<FieldType>& bp,
+                            size_t message_length,
+                            size_t message_length_bits_size,
+                            size_t block_bits
+                        ): component<FieldType>(bp) {
+                            assert(message_length_bits_size <= block_bits);
+                            one.allocate(bp);
+                            zero.allocate(bp);
+                            std::size_t message_remainder =  message_length % block_bits;
+                            size_t padding_length = 2*block_bits - message_remainder - message_length_bits_size;
+                            padding_length = padding_length % block_bits;
+
+                            bits.resize(padding_length + message_length_bits_size);
+                            if(padding_length > 0) {
+                                bits[0] = one;
+                                for(size_t i = 1; i < padding_length; ++i) {
+                                    bits[i] = zero;
+                                }
+                            }
+
+                            unsigned long long message_length_iter = message_length;
+                            for(int i = message_length_bits_size-1; i >= 0; --i) {
+                                bits[padding_length + i] = (message_length_iter & 1 ? one : zero);
+                                message_length_iter = message_length_iter >> 1;
+                            }
+                            assert(message_length_iter == 0);
+                        }                        
+
+                        void generate_r1cs_constraints() {
+                            generate_r1cs_equals_const_constraint<FieldType>(this->bp, one, FieldType::value_type::one());
+                            generate_r1cs_equals_const_constraint<FieldType>(this->bp, zero, FieldType::value_type::zero());
+                        }
+
+                        void generate_r1cs_witness() {
+                            this->bp.val(one) = 1;
+                            this->bp.val(zero) = 0;
+                        }
+                    };
                 }    // namespace components        
             }    // namespace snark
         }        // namespace zk
