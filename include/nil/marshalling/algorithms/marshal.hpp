@@ -374,7 +374,6 @@ namespace nil {
                 types::array_list<
                     marshalling::field_type<nil::marshalling::option::little_endian>,
                     type_to_process>;
-            using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
             typedef accumulator_set<marhsalling_array_type> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -383,10 +382,9 @@ namespace nil {
 
             acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
 
-            nil_marshalling_array_internal_sequential_container_type sequentional_container = 
-                boost::accumulators::extract_result<accumulator_type>(acc).value();
+            marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
-            std::copy(sequentional_container.begin(), sequentional_container.end(), out);
+            std::copy(array_list_element.value().begin(), array_list_element.value().end(), out);
 
             return out;
         }
@@ -427,17 +425,15 @@ namespace nil {
                 types::array_list<
                     marshalling::field_type<nil::marshalling::option::little_endian>,
                     type_to_process>;
-            using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
             acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
 
-            nil_marshalling_array_internal_sequential_container_type sequentional_container = 
-                boost::accumulators::extract_result<accumulator_type>(acc).value();
+            marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
-            std::copy(sequentional_container.begin(), sequentional_container.end(), out);
+            std::copy(array_list_element.value().begin(), array_list_element.value().end(), out);
 
             return out;
         }
@@ -474,7 +470,6 @@ namespace nil {
                 types::array_list<
                     marshalling::field_type<nil::marshalling::option::little_endian>,
                     type_to_process>;
-            using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
             typedef accumulator_set<marhsalling_array_type> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -483,10 +478,9 @@ namespace nil {
 
             acc(rng.begin(), accumulators::buffer_length = rng.size(), accumulators::expected_status = expectedStatus);
 
-            nil_marshalling_array_internal_sequential_container_type sequentional_container = 
-                boost::accumulators::extract_result<accumulator_type>(acc).value();
+            marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
-            std::copy(sequentional_container.begin(), sequentional_container.end(), out);
+            std::copy(array_list_element.value().begin(), array_list_element.value().end(), out);
 
             return out;
         }
@@ -525,17 +519,15 @@ namespace nil {
                 types::array_list<
                     marshalling::field_type<nil::marshalling::option::little_endian>,
                     type_to_process>;
-            using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
             acc(rng.begin(), accumulators::buffer_length = rng.size(), accumulators::expected_status = expectedStatus);
 
-            nil_marshalling_array_internal_sequential_container_type sequentional_container = 
-                boost::accumulators::extract_result<accumulator_type>(acc).value();
+            marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
-            std::copy(sequentional_container.begin(), sequentional_container.end(), out);
+            std::copy(array_list_element.value().begin(), array_list_element.value().end(), out);
 
             return out;
         }
