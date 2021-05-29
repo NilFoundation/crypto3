@@ -38,6 +38,7 @@
 #include <boost/container/static_vector.hpp>
 
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
+#include <nil/marshalling/accumulators/parameters/expected_status.hpp>
 #include <nil/marshalling/detail/type_traits.hpp>
 
 namespace nil {
@@ -52,12 +53,14 @@ namespace nil {
                 public:
                     typedef field_type result_type;
 
-                    // The constructor takes an argument pack.
-                    marshalling_impl(boost::accumulators::dont_care) {
+                    template<typename Args>
+                    marshalling_impl(const Args &args) : processed_field(args[boost::accumulators::sample]){
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
+                        status_type expected_status = args[::nil::marshalling::accumulators::expected_status | status_type::success];
+
                         status_type marshalling_status = resolve_type(args[boost::accumulators::sample],
                                      args[::nil::marshalling::accumulators::buffer_length | std::size_t()]);
                     }
@@ -78,6 +81,14 @@ namespace nil {
 
                         return processed_field.read(first, buf_len);
                     }
+
+                    // inline status_type
+                    //  resolve_type(field_type new_processed_field, ...) {
+
+                    //     processed_field = new_processed_field;
+
+                    //     return status_type::success;
+                    // }
 
                     template<typename InputIterator>
                     inline typename std::enable_if<

@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -22,25 +23,20 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_MARSHALLING_STATE_HPP
-#define MARSHALLING_MARSHALLING_STATE_HPP
+#ifndef MARSHALLING_ACCUMULATORS_PARAMETERS_EXPECTED_STATUS_HPP
+#define MARSHALLING_ACCUMULATORS_PARAMETERS_EXPECTED_STATUS_HPP
 
-#include <boost/accumulators/framework/accumulator_set.hpp>
-#include <boost/accumulators/framework/features.hpp>
+#include <boost/parameter/keyword.hpp>
 
-#include <nil/marshalling/detail/type_traits.hpp>
-
-#include <nil/marshalling/accumulators/marshalling.hpp>
+#include <boost/accumulators/accumulators_fwd.hpp>
 
 namespace nil {
     namespace marshalling {
-        template<typename TypeToProcess, typename = 
-        	typename std::enable_if<marshalling::detail::is_marshalling_field<TypeToProcess>::value>::type>
-        using accumulator_set =
-            boost::accumulators::accumulator_set<TypeToProcess,
-                                                 boost::accumulators::features<accumulators::tag::marshalling<TypeToProcess>>,
-                                                 std::size_t>;
-    }    // namespace marshalling
+        namespace accumulators {
+            BOOST_PARAMETER_KEYWORD(tag, expected_status)
+            BOOST_ACCUMULATORS_IGNORE_GLOBAL(expected_status)
+        }    // namespace accumulators
+    }        // namespace marshalling
 }    // namespace nil
 
-#endif    // MARSHALLING_MARSHALLING_STATE_HPP
+#endif    // MARSHALLING_ACCUMULATORS_PARAMETERS_EXPECTED_STATUS_HPP

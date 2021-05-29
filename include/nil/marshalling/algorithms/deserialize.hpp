@@ -28,6 +28,7 @@
 #include <nil/marshalling/marshalling_state.hpp>
 #include <nil/marshalling/accumulators/marshalling.hpp>
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
+#include <nil/marshalling/accumulators/parameters/expected_status.hpp>
 #include <nil/marshalling/detail/type_traits.hpp>
 
 
@@ -57,13 +58,14 @@ namespace nil {
          * @return
          */
         template<typename TypeToProcess, typename InputIterator>
-        TypeToProcess deserialize(InputIterator first, InputIterator last) {
+        TypeToProcess deserialize(InputIterator first, InputIterator last, status_type expectedStatus
+                                   = status_type::success) {
             typedef accumulator_set<TypeToProcess> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            accumulator_set_type acc;
+            accumulator_set_type acc = accumulator_set_type(TypeToProcess());
 
-            acc(first, accumulators::buffer_length = std::distance(first, last));
+            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -85,15 +87,18 @@ namespace nil {
          */
         template<typename TypeToProcess, typename InputIterator, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
-                                TypeToProcess>::type &
-            deserialize(InputIterator first, InputIterator last, TypeToProcessAccumulator &acc) {
+                                TypeToProcess>::type
+            deserialize(InputIterator first, InputIterator last, TypeToProcessAccumulator &acc, status_type expectedStatus
+                                   = status_type::success) {
             
             typedef TypeToProcessAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            acc(first, std::distance(first, last));
+            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
 
-            return boost::accumulators::extract_result<accumulator_type>(acc);
+            TypeToProcess result = boost::accumulators::extract_result<accumulator_type>(acc);
+
+            return result;
         }
 
         /*!
@@ -113,11 +118,12 @@ namespace nil {
         template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<TypeToProcessAccumulator>::value,
                                 TypeToProcess>::type &
-            deserialize(const SinglePassRange &rng, TypeToProcessAccumulator &acc) {
+            deserialize(const SinglePassRange &rng, TypeToProcessAccumulator &acc, status_type expectedStatus
+                                   = status_type::success) {
             typedef TypeToProcessAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            acc(rng.begin(), rng.size());
+            acc(rng.begin(), accumulators::buffer_length = rng.size(), accumulators::expected_status = expectedStatus);
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -137,18 +143,19 @@ namespace nil {
          */
         template<typename TypeToProcess, typename SinglePassRange, typename TypeToProcessAccumulator = accumulator_set<TypeToProcess>>
         TypeToProcess
-            deserialize(const SinglePassRange &rng) {
+            deserialize(const SinglePassRange &rng, status_type expectedStatus
+                                   = status_type::success) {
 
             typedef accumulator_set<TypeToProcess> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            accumulator_set_type acc;
+            accumulator_set_type acc = accumulator_set_type(TypeToProcess());
 
-            acc(rng.begin(), rng.size());
+            acc(rng.begin(), accumulators::buffer_length = rng.size(), accumulators::expected_status = expectedStatus);
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
-    }    // namespace crypto3
+    }    // namespace marshalling
 }    // namespace nil
 
 #endif    // MARSHALLING_DESERIALIZE_HPP
