@@ -2,6 +2,7 @@
 
 This library is used throughout the project to transform data from one type to another.
 To define representation rules for custom type we use template-defined pseudo-DSL.
+
 ## Building
 
 This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git). 
