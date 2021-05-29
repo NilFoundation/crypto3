@@ -473,6 +473,11 @@ namespace nil {
                 return std::is_same<typename T::tag, tag::array_list>::value;
             }
 
+            template<typename T>
+            constexpr bool is_raw_array_list() {
+                return std::is_same<typename T::tag, tag::raw_array_list>::value;
+            }
+
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::array_list type
             ///     in order to have access to its internal types.
             /// @related nil::marshalling::types::array_list

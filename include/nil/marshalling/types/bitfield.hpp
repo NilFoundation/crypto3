@@ -366,7 +366,7 @@ namespace nil {
             /// @return true in case provided type is any variant of @ref bitfield
             /// @related nil::marshalling::types::bitfield
             template<typename T>
-            constexpr bool isbitfield() {
+            constexpr bool is_bitfield() {
                 return std::is_same<typename T::tag, tag::bitfield>::value;
             }
 

@@ -214,6 +214,18 @@ namespace nil {
             template<typename Container>
             struct is_marshalling_field {
                 static const bool value = true;
+                // static const bool value = types::is_array_list<Container>() || 
+                //                           types::is_raw_array_list<Container>() || 
+                //                           types::is_bitfield<Container>() || 
+                //                           types::is_bitmask_value<Container>() || 
+                //                           types::is_bundle<Container>() || 
+                //                           types::is_enum_value<Container>() || 
+                //                           types::is_float_value<Container>() || 
+                //                           types::is_int_value<Container>() || 
+                //                           types::is_no_value<Container>() || 
+                //                           types::is_optional<Container>() || 
+                //                           types::is_string<Container>() || 
+                //                           types::is_variant<Container>();
             };
 
             template<typename Container>

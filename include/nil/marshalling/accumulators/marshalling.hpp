@@ -134,8 +134,6 @@ namespace nil {
                         status_type write_status = 
                             other_field.write(buffer_begin, buffer.size());
 
-
-
                         status_type read_status = 
                             processed_field.read(buffer_begin, buffer.size());
 
