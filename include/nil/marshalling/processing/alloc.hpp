@@ -122,7 +122,7 @@ namespace nil {
                     /// @tparam TArgs types of arguments to be passed to the constructor.
                     /// @return Smart pointer to the allocated object.
                     template<typename TObj, typename... TArgs>
-                    static ptr_type alloc(TArgs &&... args) {
+                    static ptr_type alloc(TArgs &&...args) {
                         static_assert(std::is_base_of<TInterface, TObj>::value,
                                       "TObj does not inherit from TInterface");
                         return ptr_type(new TObj(std::forward<TArgs>(args)...));
@@ -167,7 +167,7 @@ namespace nil {
                     /// @pre If @b TObj is NOT the same as @b TInterface, i.e. @b TInterface is a base
                     ///     class of @b TObj, then @b TInterface must have virtual destructor.
                     template<typename TObj, typename... TArgs>
-                    ptr_type alloc(TArgs &&... args) {
+                    ptr_type alloc(TArgs &&...args) {
                         if (allocated_) {
                             return ptr_type();
                         }
@@ -248,7 +248,7 @@ namespace nil {
 
                     /// @copydoc in_place_single::alloc
                     template<typename TObj, typename... TArgs>
-                    ptr_type alloc(TArgs &&... args) {
+                    ptr_type alloc(TArgs &&...args) {
                         auto iter = std::find_if(pool_.begin(), pool_.end(), [](const pool_element_type &elem) -> bool {
                             return !elem.allocated();
                         });

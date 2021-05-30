@@ -29,7 +29,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/marshalling/types/basics.hpp>
+#include <nil/marshalling/types/basic/array_list.hpp>
 #include <nil/marshalling/types/basic/string.hpp>
 
 #include <nil/marshalling/processing/static_vector.hpp>

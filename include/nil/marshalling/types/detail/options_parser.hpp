@@ -423,7 +423,7 @@ namespace nil {
                     : public options_parser<TTupleOptions..., TOptions...> { };
 
             }    // namespace detail
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_OPTIONS_PARSER_HPP

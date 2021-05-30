@@ -45,6 +45,6 @@ namespace nil {
             };
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_OPTIONAL_MODE_HPP

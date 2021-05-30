@@ -231,6 +231,6 @@ namespace nil {
             }
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_NO_VALUE_HPP

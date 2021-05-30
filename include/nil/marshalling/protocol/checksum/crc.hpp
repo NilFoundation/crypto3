@@ -249,7 +249,8 @@ namespace nil {
                     struct no_reflect_tag { };
                     struct eval_reflect_tag { };
 
-                    using reflect_tag_type = typename std::conditional<TReflect, eval_reflect_tag, no_reflect_tag>::type;
+                    using reflect_tag_type =
+                        typename std::conditional<TReflect, eval_reflect_tag, no_reflect_tag>::type;
 
                     using reflect_rem_tag_type =
                         typename std::conditional<TRefrectRem, eval_reflect_tag, no_reflect_tag>::type;

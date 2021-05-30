@@ -51,11 +51,11 @@ namespace nil {
             error_status_amount    ///< Number of supported error statuses, must be last.
         };
 
-        status_type operator|(const status_type &l_status, const status_type &r_status){
-            if (l_status == status_type::success){
+        status_type operator|(const status_type &l_status, const status_type &r_status) {
+            if (l_status == status_type::success) {
                 return r_status;
             }
-            if (r_status == status_type::success){
+            if (r_status == status_type::success) {
                 return l_status;
             }
 

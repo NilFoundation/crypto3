@@ -56,7 +56,7 @@ namespace nil {
                 struct variant { };
 
             }    // namespace tag
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_TAG_HPP

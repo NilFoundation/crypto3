@@ -107,8 +107,8 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue
-                            = nil::marshalling::processing::read_data<serialized_type, byte_length>(iter, endian_type());
+                        auto serializedValue = nil::marshalling::processing::read_data<serialized_type, byte_length>(
+                            iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }
 
@@ -140,8 +140,7 @@ namespace nil {
 
                     using sign_ext_tag =
                         typename std::conditional
-                        < bit_length<static_cast<std::size_t>
-                                    (std::numeric_limits<unsigned_serialized_type>::digits),
+                        < bit_length<static_cast<std::size_t>(std::numeric_limits<unsigned_serialized_type>::digits),
                                      must_sign_ext_tag,
                                      no_sign_ext_tag>::type;
 
@@ -195,7 +194,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_FIXED_BIT_LENGTH_HPP

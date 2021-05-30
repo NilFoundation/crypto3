@@ -120,7 +120,7 @@ namespace nil {
             ///          assertion object of type TAssert.
             /// @param args Arguments to pass to the assertion class constructor.
             template<typename... TParams>
-            enable_assert(TParams &&... args) :
+            enable_assert(TParams &&...args) :
                 assert_(std::forward<TParams>(args)...), prevAssert_(assert_manager::instance().reset(&assert_)) {
             }
 

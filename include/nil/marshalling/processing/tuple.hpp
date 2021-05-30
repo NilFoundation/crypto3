@@ -279,7 +279,7 @@ namespace nil {
 #ifdef _MSC_VER
                         // VS compiler
                         func.operator()<ElemType>();
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                         func.template operator()<ElemType>();
 #endif    // #ifdef _MSC_VER
                         tuple_for_each_type_helper<TRem - 1>::template exec<TTuple>(std::forward<TFunc>(func));
@@ -390,7 +390,7 @@ namespace nil {
 #ifdef _MSC_VER
                         // VS compiler
                         func.operator()<Idx>(std::get<Idx>(std::forward<TTuple>(tuple)));
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                         func.template operator()<Idx>(std::get<Idx>(std::forward<TTuple>(tuple)));
 #endif    // #ifdef _MSC_VER
                         tuple_for_each_with_template_param_idx_helper<TRem - 1>::exec(std::forward<TTuple>(tuple),
@@ -616,8 +616,8 @@ namespace nil {
                 static_assert(is_tuple<TSecond>::value, "TSecond must be tuple");
 
                 /// @brief Result type of tuples concatenation.
-                using type = typename std::decay<decltype(
-                    std::tuple_cat(std::declval<TFirst>(), std::declval<TSecond>()))>::type;
+                using type = typename std::decay<decltype(std::tuple_cat(std::declval<TFirst>(),
+                                                                         std::declval<TSecond>()))>::type;
             };
 
             /// @brief Alias to typename TupleCat<TField, TTuple>::type
@@ -678,7 +678,7 @@ namespace nil {
 #ifdef _MSC_VER
                         // VS compiler
                         func.operator()<TFromIdx, ElemType>();
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                         func.template operator()<TFromIdx, ElemType>();
 #endif    // #ifdef _MSC_VER
                     }
@@ -769,7 +769,7 @@ namespace nil {
 #ifdef _MSC_VER
                             // VS compiler
                             func.operator()<ElemType>() ||
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                             func.template operator()<ElemType>() ||
 #endif    // #ifdef _MSC_VER
                             tuple_type_is_any_of_helper<TRem - 1>::template check<TTuple>(std::forward<TFunc>(func));

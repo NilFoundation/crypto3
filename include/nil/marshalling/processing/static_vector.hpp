@@ -265,7 +265,7 @@ namespace nil {
                     }
 
                     template<typename... TArgs>
-                    T *emplace(const T *iter, TArgs &&... args) {
+                    T *emplace(const T *iter, TArgs &&...args) {
                         auto *insertIter = begin() + std::distance(cbegin(), iter);
                         if (iter == cend()) {
                             emplace_back(std::forward<TArgs>(args)...);
@@ -312,7 +312,7 @@ namespace nil {
                     }
 
                     template<typename... TArgs>
-                    void emplace_back(TArgs &&... args) {
+                    void emplace_back(TArgs &&...args) {
                         MARSHALLING_ASSERT(size() < capacity());
                         new (cellPtr(size())) T(std::forward<TArgs>(args)...);
                         ++size_;
@@ -742,7 +742,7 @@ namespace nil {
                     }
 
                     template<typename... TArgs>
-                    iterator emplace(const_iterator iter, TArgs &&... args) {
+                    iterator emplace(const_iterator iter, TArgs &&...args) {
                         return reinterpret_cast<iterator>(Base::emplace(
                             reinterpret_cast<typename Base::const_iterator>(iter), std::forward<TArgs>(args)...));
                     }
@@ -1144,7 +1144,7 @@ namespace nil {
                 /// @brief Constructs elements in place.
                 /// @see <a href="http://en.cppreference.com/w/cpp/container/vector/emplace">Reference</a>
                 template<typename... TArgs>
-                iterator emplace(const_iterator iter, TArgs &&... args) {
+                iterator emplace(const_iterator iter, TArgs &&...args) {
                     return Base::emplace(iter, std::forward<TArgs>(args)...);
                 }
 
@@ -1178,7 +1178,7 @@ namespace nil {
                 /// @see <a href="http://en.cppreference.com/w/cpp/container/vector/emplace_back">Reference</a>
                 /// @pre The vector mustn't be full.
                 template<typename... TArgs>
-                void emplace_back(TArgs &&... args) {
+                void emplace_back(TArgs &&...args) {
                     Base::emplace_back(std::forward<TArgs>(args)...);
                 }
 

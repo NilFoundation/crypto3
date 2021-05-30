@@ -246,7 +246,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SEQUENCE_ELEM_SER_LENGTH_FIELD_PREFIX_HPP

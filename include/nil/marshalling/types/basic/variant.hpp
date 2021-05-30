@@ -215,8 +215,8 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(idx,
-                                                                                           construct_helper(&storage_));
+                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                            idx, construct_helper(&storage_));
                         memIdx_ = idx;
                     }
 
@@ -243,7 +243,7 @@ namespace nil {
                     }
 
                     template<std::size_t TIdx, typename... TArgs>
-                    typename std::tuple_element<TIdx, members_type>::type &init_field(TArgs &&... args) {
+                    typename std::tuple_element<TIdx, members_type>::type &init_field(TArgs &&...args) {
                         static_assert(is_idx_valid(TIdx), "Only valid field index can be used");
                         check_destruct();
 
@@ -406,7 +406,7 @@ namespace nil {
 #ifdef _MSC_VER
                             // VS compiler
                             func_.operator()<TIdx>(*(reinterpret_cast<TField *>(storage_)));
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                             func_.template operator()<TIdx>(*(reinterpret_cast<TField *>(storage_)));
 #endif    // #ifdef _MSC_VER
                         }
@@ -438,7 +438,7 @@ namespace nil {
 #ifdef _MSC_VER
                             // VS compiler
                             func_.operator()<TIdx>(*(reinterpret_cast<const TField *>(storage_)));
-#else    // #ifdef _MSC_VER
+#else     // #ifdef _MSC_VER
                             func_.template operator()<TIdx>(*(reinterpret_cast<const TField *>(storage_)));
 #endif    // #ifdef _MSC_VER
                         }
@@ -581,7 +581,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BASIC_VARIANT_HPP

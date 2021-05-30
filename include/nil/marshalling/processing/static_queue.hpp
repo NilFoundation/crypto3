@@ -573,7 +573,7 @@ namespace nil {
                     }
 
                     template<typename... TArgs>
-                    void emplace_back(TArgs &&... args) {
+                    void emplace_back(TArgs &&...args) {
                         MARSHALLING_ASSERT(!full());
                         if (full()) {
                             return;
@@ -668,7 +668,7 @@ namespace nil {
                     }
 
                     template<typename... TArgs>
-                    void emplace_back_not_full(TArgs &&... args) {
+                    void emplace_back_not_full(TArgs &&...args) {
                         MARSHALLING_ASSERT(!full());
                         reference elementRef = element_at_index(size());
                         auto elementPtr = new (&elementRef) value_type(std::forward<TArgs>(args)...);
@@ -1937,7 +1937,7 @@ namespace nil {
                 /// @note Exception guarantee: No throw in case the copy constructor
                 ///       of the stored elements doesn't throw. Basic guarantee otherwise.
                 template<typename... TArgs>
-                void emplaceBack(TArgs &&... args) {
+                void emplaceBack(TArgs &&...args) {
                     Base::emplaceBack(std::forward<TArgs>(args)...);
                 }
 

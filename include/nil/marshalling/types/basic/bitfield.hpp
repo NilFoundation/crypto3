@@ -179,7 +179,7 @@ namespace nil {
                         auto serValue = base_impl_type::template read_data<serialized_type, length_>(iter);
                         status_type es = status_type::success;
                         nil::marshalling::processing::tuple_for_each_with_template_param_idx(members_,
-                                                                                            read_helper(serValue, es));
+                                                                                             read_helper(serValue, es));
                         return es;
                     }
 
@@ -198,8 +198,8 @@ namespace nil {
 
                         serialized_type serValue = 0;
                         status_type es = status_type::success;
-                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(members_,
-                                                                                            write_helper(serValue, es));
+                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(
+                            members_, write_helper(serValue, es));
                         if (es == status_type::success) {
                             nil::marshalling::processing::write_data<length_>(serValue, iter, endian_type());
                         }
@@ -415,7 +415,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BASIC_BITFIELD_HPP

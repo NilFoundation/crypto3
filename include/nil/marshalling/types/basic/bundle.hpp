@@ -74,7 +74,7 @@ namespace nil {
 
                     constexpr std::size_t length() const {
                         return nil::marshalling::processing::tuple_accumulate(value(), std::size_t(0),
-                                                                             length_calc_helper());
+                                                                              length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
@@ -97,8 +97,8 @@ namespace nil {
                     }
 
                     static constexpr std::size_t min_length() {
-                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(std::size_t(0),
-                                                                                              min_length_calc_helper());
+                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(
+                            std::size_t(0), min_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
@@ -117,13 +117,13 @@ namespace nil {
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t min_length_from_until() {
                         return nil::marshalling::processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
-                                                                                             value_type>(
+                                                                                              value_type>(
                             std::size_t(0), min_length_calc_helper());
                     }
 
                     static constexpr std::size_t max_length() {
-                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(std::size_t(0),
-                                                                                              max_length_calc_helper());
+                        return nil::marshalling::processing::tuple_type_accumulate<value_type>(
+                            std::size_t(0), max_length_calc_helper());
                     }
 
                     template<std::size_t TFromIdx>
@@ -142,7 +142,7 @@ namespace nil {
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     static constexpr std::size_t max_length_from_until() {
                         return nil::marshalling::processing::tuple_type_accumulate_from_until<TFromIdx, TUntilIdx,
-                                                                                             value_type>(
+                                                                                              value_type>(
                             std::size_t(0), max_length_calc_helper());
                     }
 
@@ -405,7 +405,8 @@ namespace nil {
                         return write_no_status_helper<TIter>(iter);
                     }
 
-                    static_assert(nil::marshalling::processing::is_tuple<value_type>::value, "value_type must be tuple");
+                    static_assert(nil::marshalling::processing::is_tuple<value_type>::value,
+                                  "value_type must be tuple");
                     value_type members_;
                 };
 

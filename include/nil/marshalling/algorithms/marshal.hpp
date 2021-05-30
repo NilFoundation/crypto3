@@ -31,7 +31,6 @@
 #include <nil/marshalling/accumulators/parameters/expected_status.hpp>
 #include <nil/marshalling/detail/type_traits.hpp>
 
-
 namespace nil {
     namespace marshalling {
 
@@ -45,7 +44,9 @@ namespace nil {
          * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
          */
 
-        /*************************  Marshalling with both input and output types, which are marshalling types, not a std iterator of elements with a marshalling type ***********************************/
+        /*************************
+         * Marshalling with both input and output types, which are marshalling types, not a std
+         * iterator of elements with a marshalling type ***********************************/
 
         /*!
          * @brief
@@ -61,12 +62,10 @@ namespace nil {
          * @return
          */
         template<typename MarshallingInputType, typename MarshallingOutputType>
-        typename std::enable_if<
-                    marshalling::detail::is_marshalling_field<MarshallingInputType>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value, 
-                MarshallingOutputType>::type
-        marshal(MarshallingInputType input_field, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type
+            marshal(MarshallingInputType input_field, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -92,15 +91,15 @@ namespace nil {
          *
          * @return
          */
-        template<typename MarshallingInputType, typename MarshallingOutputType, typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingInputType>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
-                MarshallingOutputType>::type
-            marshal(MarshallingInputType input_field, MarshallingOutputTypeAccumulator &acc, status_type expectedStatus
-                                   = status_type::success) {
-            
+        template<typename MarshallingInputType, typename MarshallingOutputType,
+                 typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type
+            marshal(MarshallingInputType input_field, MarshallingOutputTypeAccumulator &acc,
+                    status_type expectedStatus = status_type::success) {
+
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -111,7 +110,10 @@ namespace nil {
             return result;
         }
 
-        /*************************  Marshalling with input type, which is not a marshalling type and output type, which is a marshalling type, not a std iterator of elements with a marshalling type ***********************************/
+        /*************************
+         * Marshalling with input type, which is not a marshalling type and output type, which
+         * is a marshalling type, not a std iterator of elements with a marshalling type
+         * ***********************************/
 
         /*!
          * @brief
@@ -128,18 +130,17 @@ namespace nil {
          * @return
          */
         template<typename MarshallingOutputType, typename InputIterator>
-        typename std::enable_if<
-                    marshalling::detail::is_iterator<InputIterator>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value, 
-                MarshallingOutputType>::type
-        marshal(InputIterator first, InputIterator last, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type
+            marshal(InputIterator first, InputIterator last, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
             accumulator_set_type acc = accumulator_set_type(MarshallingOutputType());
 
-            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
+            acc(first, accumulators::buffer_length = std::distance(first, last),
+                accumulators::expected_status = expectedStatus);
 
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
@@ -160,19 +161,20 @@ namespace nil {
          *
          * @return
          */
-        template<typename MarshallingOutputType, typename InputIterator, typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value && 
-                    marshalling::detail::is_iterator<InputIterator>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
-                MarshallingOutputType>::type
-            marshal(InputIterator first, InputIterator last, MarshallingOutputTypeAccumulator &acc, status_type expectedStatus
-                                   = status_type::success) {
-            
+        template<typename MarshallingOutputType, typename InputIterator,
+                 typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_iterator<InputIterator>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type
+            marshal(InputIterator first, InputIterator last, MarshallingOutputTypeAccumulator &acc,
+                    status_type expectedStatus = status_type::success) {
+
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
+            acc(first, accumulators::buffer_length = std::distance(first, last),
+                accumulators::expected_status = expectedStatus);
 
             MarshallingOutputType result = boost::accumulators::extract_result<accumulator_type>(acc);
 
@@ -193,12 +195,10 @@ namespace nil {
          * @return
          */
         template<typename MarshallingOutputType, typename SinglePassRange>
-        typename std::enable_if<
-                    marshalling::detail::is_range<SinglePassRange>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value, 
-                MarshallingOutputType>::type
-            marshal(const SinglePassRange &rng, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type
+            marshal(const SinglePassRange &rng, status_type expectedStatus = status_type::success) {
 
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -225,14 +225,14 @@ namespace nil {
          *
          * @return
          */
-        template<typename MarshallingOutputType, typename SinglePassRange, typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value && 
-                    marshalling::detail::is_range<SinglePassRange>::value && 
-                    marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
-                MarshallingOutputType>::type &
-            marshal(const SinglePassRange &rng, MarshallingOutputTypeAccumulator &acc, status_type expectedStatus
-                                   = status_type::success) {
+        template<typename MarshallingOutputType, typename SinglePassRange,
+                 typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_range<SinglePassRange>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                MarshallingOutputType>::type &
+            marshal(const SinglePassRange &rng, MarshallingOutputTypeAccumulator &acc,
+                    status_type expectedStatus = status_type::success) {
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -241,7 +241,9 @@ namespace nil {
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
 
-        /*************************  Marshalling with input type, which is a marshalling type and output type, which is a std iterators of elements with a marshalling type ***********************************/
+        /*************************
+         * Marshalling with input type, which is a marshalling type and output type, which is a
+         * std iterators of elements with a marshalling type ***********************************/
 
         /*!
          * @brief
@@ -258,23 +260,20 @@ namespace nil {
          * @return
          */
         template<typename MarshallingInputType, typename OutputIterator>
-        typename std::enable_if<
-                    marshalling::detail::is_marshalling_field<MarshallingInputType>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value, 
-                OutputIterator>::type
-         marshal(MarshallingInputType input_field, OutputIterator out, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(MarshallingInputType input_field, OutputIterator out,
+                    status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
 
             typedef accumulator_set<marhsalling_array_type> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -307,25 +306,23 @@ namespace nil {
          * @return
          */
         template<typename MarshallingInputType, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value &&
-                    marshalling::detail::is_marshalling_field<MarshallingInputType>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value,
-                OutputIterator>::type
-            marshal(MarshallingInputType input_field, OutputIterator out, MarshallingOutputTypeAccumulator &acc, 
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(MarshallingInputType input_field, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
                     status_type expectedStatus = status_type::success) {
-            
+
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
-            using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
+            using nil_marshalling_array_internal_sequential_container_type =
+                typename marhsalling_array_type::value_type;
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -339,7 +336,9 @@ namespace nil {
             return out;
         }
 
-        /*************************  Marshalling with both input and output type, which are std iterators of elements with a marshalling type ***********************************/
+        /*************************
+         * Marshalling with both input and output type, which are std iterators of elements
+         * with a marshalling type ***********************************/
 
         /*!
          * @brief
@@ -357,30 +356,28 @@ namespace nil {
          * @return
          */
         template<typename InputIterator, typename OutputIterator>
-        typename std::enable_if<
-                    marshalling::detail::is_iterator<InputIterator>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value, 
-                OutputIterator>::type
-         marshal(InputIterator first, InputIterator last, OutputIterator out, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(InputIterator first, InputIterator last, OutputIterator out,
+                    status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
 
             typedef accumulator_set<marhsalling_array_type> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
             accumulator_set_type acc = accumulator_set_type(marhsalling_array_type());
 
-            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
+            acc(first, accumulators::buffer_length = std::distance(first, last),
+                accumulators::expected_status = expectedStatus);
 
             marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
@@ -407,29 +404,27 @@ namespace nil {
          * @return
          */
         template<typename InputIterator, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value &&
-                    marshalling::detail::is_iterator<InputIterator>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value,
-                OutputIterator>::type
-            marshal(InputIterator first, InputIterator last, OutputIterator out, MarshallingOutputTypeAccumulator &acc, 
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_iterator<InputIterator>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(InputIterator first, InputIterator last, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
                     status_type expectedStatus = status_type::success) {
-            
+
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-            acc(first, accumulators::buffer_length = std::distance(first, last), accumulators::expected_status = expectedStatus);
+            acc(first, accumulators::buffer_length = std::distance(first, last),
+                accumulators::expected_status = expectedStatus);
 
             marhsalling_array_type array_list_element = boost::accumulators::extract_result<accumulator_type>(acc);
 
@@ -453,23 +448,19 @@ namespace nil {
          * @return
          */
         template<typename SinglePassRange, typename OutputIterator>
-        typename std::enable_if<
-                    marshalling::detail::is_range<SinglePassRange>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value, 
-                OutputIterator>::type
-            marshal(const SinglePassRange &rng, OutputIterator out, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(const SinglePassRange &rng, OutputIterator out, status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
 
             typedef accumulator_set<marhsalling_array_type> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -501,24 +492,21 @@ namespace nil {
          * @return
          */
         template<typename SinglePassRange, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
-        typename std::enable_if<
-                    boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value && 
-                    marshalling::detail::is_range<SinglePassRange>::value && 
-                    marshalling::detail::is_iterator<OutputIterator>::value,
-                OutputIterator>::type &
-            marshal(const SinglePassRange &rng, OutputIterator out, MarshallingOutputTypeAccumulator &acc, status_type expectedStatus
-                                   = status_type::success) {
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
+                                    && marshalling::detail::is_range<SinglePassRange>::value
+                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                OutputIterator>::type
+            marshal(const SinglePassRange &rng, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
+                    status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
             // hardcoded to be little-endian by default. If the user wants to process a container
             // in other order (for example, in reverse or by skipping some first elements), he should
-            // define type of the container using array_list and process it not by iterator, but by 
+            // define type of the container using array_list and process it not by iterator, but by
             // processing it as marshaling type.
-            using marhsalling_array_type = 
-                types::array_list<
-                    marshalling::field_type<nil::marshalling::option::little_endian>,
-                    type_to_process>;
+            using marhsalling_array_type
+                = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>, type_to_process>;
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;

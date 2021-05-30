@@ -70,14 +70,14 @@ namespace nil {
 
                 template<typename TMsgBase, typename TAllMessages, typename... TOptions>
                 struct selector {
-                    using type = typename std::conditional<
-                        all_have_static_num_id<TAllMessages>(),
-                        static_num_id_selector_type<TMsgBase, TAllMessages, TOptions...>,
-                        generic<TMsgBase, TAllMessages, TOptions...>>::type;
+                    using type =
+                        typename std::conditional<all_have_static_num_id<TAllMessages>(),
+                                                  static_num_id_selector_type<TMsgBase, TAllMessages, TOptions...>,
+                                                  generic<TMsgBase, TAllMessages, TOptions...>>::type;
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_SELECTOR_HPP

@@ -34,12 +34,11 @@
 
 namespace nil {
     namespace marshalling {
-        template<typename TypeToProcess, typename = 
-        	typename std::enable_if<marshalling::detail::is_marshalling_field<TypeToProcess>::value>::type>
-        using accumulator_set =
-            boost::accumulators::accumulator_set<TypeToProcess,
-                                                 boost::accumulators::features<accumulators::tag::marshalling<TypeToProcess>>,
-                                                 std::size_t>;
+        template<typename TypeToProcess,
+                 typename =
+                     typename std::enable_if<marshalling::detail::is_marshalling_field<TypeToProcess>::value>::type>
+        using accumulator_set = boost::accumulators::accumulator_set<
+            TypeToProcess, boost::accumulators::features<accumulators::tag::marshalling<TypeToProcess>>, std::size_t>;
     }    // namespace marshalling
 }    // namespace nil
 

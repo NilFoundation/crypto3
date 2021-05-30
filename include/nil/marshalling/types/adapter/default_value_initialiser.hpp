@@ -61,7 +61,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_DEFAULT_VALUE_INITIALISER_HPP

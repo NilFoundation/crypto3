@@ -207,32 +207,32 @@ namespace nil {
 
             template<typename Container>
             struct is_container {
-                static const bool value =
-                    has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
+                static const bool value
+                    = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
             };
 
             template<typename Container>
             struct is_marshalling_field {
                 static const bool value = true;
-                // static const bool value = types::is_array_list<Container>() || 
-                //                           types::is_raw_array_list<Container>() || 
-                //                           types::is_bitfield<Container>() || 
-                //                           types::is_bitmask_value<Container>() || 
-                //                           types::is_bundle<Container>() || 
-                //                           types::is_enum_value<Container>() || 
-                //                           types::is_float_value<Container>() || 
-                //                           types::is_int_value<Container>() || 
-                //                           types::is_no_value<Container>() || 
-                //                           types::is_optional<Container>() || 
-                //                           types::is_string<Container>() || 
+                // static const bool value = types::is_array_list<Container>() ||
+                //                           types::is_raw_array_list<Container>() ||
+                //                           types::is_bitfield<Container>() ||
+                //                           types::is_bitmask_value<Container>() ||
+                //                           types::is_bundle<Container>() ||
+                //                           types::is_enum_value<Container>() ||
+                //                           types::is_float_value<Container>() ||
+                //                           types::is_int_value<Container>() ||
+                //                           types::is_no_value<Container>() ||
+                //                           types::is_optional<Container>() ||
+                //                           types::is_string<Container>() ||
                 //                           types::is_variant<Container>();
             };
 
             template<typename Container>
             struct is_supported_representation_type {
-                static const bool value = std::is_same<std::uint8_t, Container>::value ||
-                                         std::is_same<std::int8_t, Container>::value || 
-                                         std::is_same<char, Container>::value;
+                static const bool value = std::is_same<std::uint8_t, Container>::value
+                                          || std::is_same<std::int8_t, Container>::value
+                                          || std::is_same<char, Container>::value;
             };
         }    // namespace detail
     }        // namespace marshalling

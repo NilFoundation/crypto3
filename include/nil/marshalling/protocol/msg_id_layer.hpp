@@ -160,7 +160,7 @@ namespace nil {
                 ///       returns nil::marshalling::ErrorStatus::NotEnoughData.
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read(field_type &field, TMsg &msg, TIter &iter, std::size_t size,
-                                                      std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
+                                                        std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
                     auto es = field.read(iter, size);
                     if (es == nil::marshalling::status_type::not_enough_data) {
                         base_impl_type::update_missing_size(field, size, missingSize);
@@ -175,7 +175,7 @@ namespace nil {
                         direct_op_tag, polymorphic_op_tag>::type;
 
                     return eval_read_internal(field, msg, iter, size - field.length(), missingSize,
-                                            std::forward<TNextLayerReader>(nextLayerReader), tag());
+                                              std::forward<TNextLayerReader>(nextLayerReader), tag());
                 }
 
                 /// @brief Customized write functionality, invoked by @ref write().
@@ -206,7 +206,7 @@ namespace nil {
                 /// @return Status of the write operation.
                 template<typename TMsg, typename TIter, typename TNextLayerWriter>
                 status_type eval_write(field_type &field, const TMsg &msg, TIter &iter, std::size_t size,
-                                     TNextLayerWriter &&nextLayerWriter) const {
+                                       TNextLayerWriter &&nextLayerWriter) const {
                     using msg_type = typename std::decay<decltype(msg)>::type;
                     field.value() = get_msg_id(msg, id_retrieve_tag<msg_type>());
                     auto es = field.write(iter, size);
@@ -264,9 +264,10 @@ namespace nil {
                 }
 
                 template<typename TIter, typename TNextLayerReader>
-                nil::marshalling::status_type
-                    eval_read_internal_polymorphic(field_type &field, msg_ptr_type &msgPtr, TIter &iter, std::size_t size,
-                                                 std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
+                nil::marshalling::status_type eval_read_internal_polymorphic(field_type &field, msg_ptr_type &msgPtr,
+                                                                             TIter &iter, std::size_t size,
+                                                                             std::size_t *missingSize,
+                                                                             TNextLayerReader &&nextLayerReader) {
                     MARSHALLING_ASSERT(!msgPtr);
                     auto &id = field.value();
                     auto remLen = size;
@@ -323,8 +324,8 @@ namespace nil {
 
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read_internal_direct(field_type &field, TMsg &msg, TIter &iter,
-                                                                      std::size_t size, std::size_t *missingSize,
-                                                                      TNextLayerReader &&nextLayerReader) {
+                                                                        std::size_t size, std::size_t *missingSize,
+                                                                        TNextLayerReader &&nextLayerReader) {
                     using msg_type = typename std::decay<decltype(msg)>::type;
                     static_assert(detail::protocol_layer_has_do_get_id<msg_type>::value,
                                   "Explicit message type is expected to expose compile type message ID by "
@@ -340,18 +341,19 @@ namespace nil {
 
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read_internal(field_type &field, TMsg &msg, TIter &iter,
-                                                               std::size_t size, std::size_t *missingSize,
-                                                               TNextLayerReader &&nextLayerReader, polymorphic_op_tag) {
+                                                                 std::size_t size, std::size_t *missingSize,
+                                                                 TNextLayerReader &&nextLayerReader,
+                                                                 polymorphic_op_tag) {
                     return eval_read_internal_polymorphic(field, msg, iter, size, missingSize,
-                                                        std::forward<TNextLayerReader>(nextLayerReader));
+                                                          std::forward<TNextLayerReader>(nextLayerReader));
                 }
 
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read_internal(field_type &field, TMsg &msg, TIter &iter,
-                                                               std::size_t size, std::size_t *missingSize,
-                                                               TNextLayerReader &&nextLayerReader, direct_op_tag) {
+                                                                 std::size_t size, std::size_t *missingSize,
+                                                                 TNextLayerReader &&nextLayerReader, direct_op_tag) {
                     return eval_read_internal_direct(field, msg, iter, size, missingSize,
-                                                   std::forward<TNextLayerReader>(nextLayerReader));
+                                                     std::forward<TNextLayerReader>(nextLayerReader));
                 }
 
                 template<typename TId>

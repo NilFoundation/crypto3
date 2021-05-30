@@ -71,7 +71,8 @@ namespace nil {
                     };
 
                     template<typename T, std::size_t TSize>
-                    struct array_list_max_length_retrieve_helper<nil::marshalling::processing::static_vector<T, TSize>> {
+                    struct array_list_max_length_retrieve_helper<
+                        nil::marshalling::processing::static_vector<T, TSize>> {
                         static const std::size_t value = TSize;
                     };
 
@@ -631,7 +632,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BASIC_ARRAY_LIST_HPP

@@ -90,7 +90,7 @@ namespace nil {
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
                         nil::marshalling::processing::write_data(to_serialized(base_impl_type::value()), iter,
-                                                                endian_type());
+                                                                 endian_type());
                     }
 
                     static constexpr serialized_type to_serialized(value_type val) {
@@ -112,7 +112,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SER_OFFSET_HPP

@@ -101,8 +101,8 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue
-                            = nil::marshalling::processing::read_data<serialized_type, byte_length>(iter, endian_type());
+                        auto serializedValue = nil::marshalling::processing::read_data<serialized_type, byte_length>(
+                            iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }
 
@@ -185,7 +185,7 @@ namespace nil {
                 };
 
             }    // namespace adapter
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_FIXED_LENGTH_HPP

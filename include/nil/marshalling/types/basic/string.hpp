@@ -323,7 +323,8 @@ namespace nil {
                         }
                     }
 
-                    void eval_push_dack(typename value_type::const_pointer str, std::size_t len, push_back_missing_tag) {
+                    void
+                        eval_push_dack(typename value_type::const_pointer str, std::size_t len, push_back_missing_tag) {
                         value_ = value_type(str, len);
                     }
 
@@ -364,7 +365,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BASIC_STRING_HPP

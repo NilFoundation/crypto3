@@ -389,6 +389,6 @@ namespace nil {
             }
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BITFIELD_HPP

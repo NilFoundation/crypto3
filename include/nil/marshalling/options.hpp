@@ -365,10 +365,10 @@ namespace nil {
             ///     and nil::marshalling::types::array_list uses
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> as
             ///     their internal storage types. The @ref fixed_size_storage option forces
-            ///     them to use nil::marshalling::processing::StaticString and nil::marshalling::processing::static_vector
-            ///     instead. This option can be used to provide any other third party type.
-            ///     Such type must define the same public interface as @b std::string (when used
-            ///     with nil::marshalling::types::string) or @b std::vector (when used with
+            ///     them to use nil::marshalling::processing::StaticString and
+            ///     nil::marshalling::processing::static_vector instead. This option can be used to provide any other
+            ///     third party type. Such type must define the same public interface as @b std::string (when used with
+            ///     nil::marshalling::types::string) or @b std::vector (when used with
             ///     nil::marshalling::types::array_list).
             /// @tparam TType Custom storage type
             /// @headerfile nil/marshalling/options.h
@@ -1347,6 +1347,6 @@ namespace nil {
             struct version_storage { };
 
         }    // namespace option
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_OPTIONS_HPP

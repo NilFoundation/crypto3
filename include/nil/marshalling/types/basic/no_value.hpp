@@ -106,7 +106,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BASIC_NO_VALUE_HPP

@@ -49,20 +49,22 @@ namespace nil {
                 struct marshalling_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef TypeToProcess field_type;
-                    
+
                 public:
                     typedef field_type result_type;
 
                     template<typename Args>
-                    marshalling_impl(const Args &args) : processed_field(args[boost::accumulators::sample]){
+                    marshalling_impl(const Args &args) : processed_field(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        status_type expected_status = args[::nil::marshalling::accumulators::expected_status | status_type::success];
+                        status_type expected_status
+                            = args[::nil::marshalling::accumulators::expected_status | status_type::success];
 
-                        status_type marshalling_status = resolve_type(args[boost::accumulators::sample],
-                                     args[::nil::marshalling::accumulators::buffer_length | std::size_t()]);
+                        status_type marshalling_status
+                            = resolve_type(args[boost::accumulators::sample],
+                                           args[::nil::marshalling::accumulators::buffer_length | std::size_t()]);
                     }
 
                     inline field_type result(boost::accumulators::dont_care) const {
@@ -74,10 +76,11 @@ namespace nil {
                     // because byte iterator can be directly processed
                     template<typename InputIterator>
                     inline typename std::enable_if<
-                                        marshalling::detail::is_iterator<InputIterator>::value && 
-                                        marshalling::detail::is_supported_representation_type<typename std::iterator_traits<InputIterator>::value_type>::value, 
-                                    status_type>::type
-                     resolve_type(InputIterator first, std::size_t buf_len) {
+                        marshalling::detail::is_iterator<InputIterator>::value
+                            && marshalling::detail::is_supported_representation_type<
+                                typename std::iterator_traits<InputIterator>::value_type>::value,
+                        status_type>::type
+                        resolve_type(InputIterator first, std::size_t buf_len) {
 
                         return processed_field.read(first, buf_len);
                     }
@@ -92,52 +95,50 @@ namespace nil {
 
                     template<typename InputIterator>
                     inline typename std::enable_if<
-                                        marshalling::detail::is_iterator<InputIterator>::value && 
-                                        !(marshalling::detail::is_supported_representation_type<typename std::iterator_traits<InputIterator>::value_type>::value) &&
-                                        marshalling::detail::is_marshalling_field<typename std::iterator_traits<InputIterator>::value_type>::value, 
-                                    status_type>::type
-                    resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
+                        marshalling::detail::is_iterator<InputIterator>::value
+                            && !(marshalling::detail::is_supported_representation_type<
+                                 typename std::iterator_traits<InputIterator>::value_type>::value)
+                            && marshalling::detail::is_marshalling_field<
+                                typename std::iterator_traits<InputIterator>::value_type>::value,
+                        status_type>::type
+                        resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
 
                         using type_to_process = typename std::iterator_traits<InputIterator>::value_type;
                         status_type final_status = status_type::success;
 
                         // hardcoded to be little-endian by default. If the user wants to process a container
                         // in other order (for example, in reverse or by skipping some first elements), he should
-                        // define type of the container using array_list and process it not by iterator, but by 
-                        // processing it as marshaling type (at the moment it is the resolve_type function under 
+                        // define type of the container using array_list and process it not by iterator, but by
+                        // processing it as marshaling type (at the moment it is the resolve_type function under
                         // this one).
-                        using marhsalling_array_type = 
-                            types::array_list<
-                                marshalling::field_type<nil::marshalling::option::little_endian>,
-                                type_to_process>;
-                        using nil_marshalling_array_internal_sequential_container_type = typename marhsalling_array_type::value_type;
+                        using marhsalling_array_type
+                            = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>,
+                                                type_to_process>;
 
-                        nil_marshalling_array_internal_sequential_container_type sequentional_container;
+                        typename marhsalling_array_type::value_type sequential_container;
 
-                        std::copy (other_field_begin, other_field_begin + buf_len, sequentional_container.begin());
-                        
-                        marhsalling_array_type input_data(sequentional_container);
+                        std::copy(other_field_begin, other_field_begin + buf_len, sequential_container.begin());
+
+                        marhsalling_array_type input_data(sequential_container);
 
                         return resolve_type(input_data, 1);
                     }
 
                     // Probably there is a way to directly convert between marshalling fields
                     template<typename OtherFieldType>
-                    inline typename std::enable_if<
-                                    !marshalling::detail::is_iterator<OtherFieldType>::value && 
-                                    marshalling::detail::is_marshalling_field<OtherFieldType>::value, 
-                                    status_type>::type
-                    resolve_type(const OtherFieldType other_field, ...) {
+                    inline
+                        typename std::enable_if<!marshalling::detail::is_iterator<OtherFieldType>::value
+                                                    && marshalling::detail::is_marshalling_field<OtherFieldType>::value,
+                                                status_type>::type
+                        resolve_type(const OtherFieldType other_field, ...) {
 
-                        std::vector<std::uint8_t> buffer (other_field.length());
+                        std::vector<std::uint8_t> buffer(other_field.length());
                         typename std::vector<std::uint8_t>::iterator buffer_begin = buffer.begin();
-                        status_type write_status = 
-                            other_field.write(buffer_begin, buffer.size());
+                        status_type write_status = other_field.write(buffer_begin, buffer.size());
 
                         buffer_begin = buffer.begin();
 
-                        status_type read_status = 
-                            processed_field.read(buffer_begin, buffer.size());
+                        status_type read_status = processed_field.read(buffer_begin, buffer.size());
 
                         return read_status | write_status;
                     }

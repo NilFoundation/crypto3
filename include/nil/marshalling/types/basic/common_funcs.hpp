@@ -158,7 +158,7 @@ namespace nil {
                     template<typename TFields, typename TVersionType>
                     static bool set_version_for_members(TFields &fields, TVersionType version) {
                         return nil::marshalling::processing::tuple_accumulate(fields, false,
-                                                                             make_version_updater(version));
+                                                                              make_version_updater(version));
                     }
 
                 private:
@@ -191,7 +191,7 @@ namespace nil {
                 };
 
             }    // namespace basic
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_COMMON_FUNCS_HPP

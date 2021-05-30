@@ -150,9 +150,9 @@ namespace nil {
                 ///     wrapped in std::tuple.
                 /// @details The @ref field_type type is prepended to the @ref all_fields_type type
                 ///     of the @ref next_layer_type and reported as @ref all_fields_type of this one.
-                using all_fields_type = typename std::decay<decltype(
-                    std::tuple_cat(std::declval<std::tuple<field_type>>(),
-                                   std::declval<typename TNextLayer::all_fields_type>()))>::type;
+                using all_fields_type = typename std::decay<decltype(std::tuple_cat(
+                    std::declval<std::tuple<field_type>>(),
+                    std::declval<typename TNextLayer::all_fields_type>()))>::type;
 
                 /// @brief All supported messages.
                 /// @details Same as next_layer_type::all_messages_type or void if such doesn't exist.
@@ -179,7 +179,7 @@ namespace nil {
                 ///     @ref next_layer_type object.
                 /// @param args Arguments to be passed to the constructor of the next layer
                 template<typename... TArgs>
-                explicit protocol_layer_base(TArgs &&... args) : nextLayer_(std::forward<TArgs>(args)...) {
+                explicit protocol_layer_base(TArgs &&...args) : nextLayer_(std::forward<TArgs>(args)...) {
                 }
 
                 /// @brief Desctructor
@@ -302,7 +302,7 @@ namespace nil {
                     field_type field;
                     auto &derivedObj = static_cast<TDerived &>(*this);
                     return derivedObj.eval_read(field, msg, iter, size, missingSize,
-                                              create_next_layer_until_data_reader());
+                                                create_next_layer_until_data_reader());
                 }
 
                 /// @brief Finalise the read operation by reading the message payload.
@@ -367,7 +367,7 @@ namespace nil {
                     auto &field = get_field<Idx>(allFields);
                     auto &derivedObj = static_cast<TDerived &>(*this);
                     return derivedObj.eval_read(field, msg, iter, size, missingSize,
-                                              create_next_layer_cached_fields_reader(allFields));
+                                                create_next_layer_cached_fields_reader(allFields));
                 }
 
                 /// @brief Perform read of data fields until data layer (message payload) while caching
@@ -406,7 +406,7 @@ namespace nil {
                     auto &field = get_field<Idx>(allFields);
                     auto &derivedObj = static_cast<TDerived &>(*this);
                     return derivedObj.eval_read(field, msg, iter, size, missingSize,
-                                              create_next_layer_cached_fields_until_data_reader(allFields));
+                                                create_next_layer_cached_fields_until_data_reader(allFields));
                 }
 
                 /// @brief Finalise the read operation by reading the message payload while caching
@@ -512,7 +512,7 @@ namespace nil {
                     auto &field = get_field<Idx>(allFields);
                     auto &derivedObj = static_cast<const TDerived &>(*this);
                     return derivedObj.eval_write(field, msg, iter, size,
-                                               create_next_layer_cached_fields_writer(allFields));
+                                                 create_next_layer_cached_fields_writer(allFields));
                 }
 
                 /// @brief Get remaining length of wrapping transport information.
@@ -613,7 +613,8 @@ namespace nil {
 
                     auto &field = get_field<Idx>(allFields);
                     auto &derivedObj = static_cast<const TDerived &>(*this);
-                    return derivedObj.eval_update(field, iter, size, create_next_layer_cached_fields_updater(allFields));
+                    return derivedObj.eval_update(field, iter, size,
+                                                  create_next_layer_cached_fields_updater(allFields));
                 }
 
                 /// @brief Default implementation of the "update" functaionality.
@@ -630,7 +631,7 @@ namespace nil {
                 /// @param[in] nextLayerUpdater Next layer updater object.
                 template<typename TIter, typename TNextLayerUpdater>
                 nil::marshalling::status_type eval_update(field_type &field, TIter &iter, std::size_t size,
-                                                        TNextLayerUpdater &&nextLayerUpdater) const {
+                                                          TNextLayerUpdater &&nextLayerUpdater) const {
                     return update_internal(field, iter, size, std::forward<TNextLayerUpdater>(nextLayerUpdater),
                                            length_tag());
                 }
@@ -978,7 +979,7 @@ namespace nil {
             }
 
         }    // namespace protocol
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 
 /// @brief Provide names and convenience access functions to protocol

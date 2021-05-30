@@ -311,7 +311,7 @@ namespace nil {
                 /// @param[in] args Arguments for the constructed field.
                 /// @return Reference to the constructed field.
                 template<std::size_t TIdx, typename... TArgs>
-                typename std::tuple_element<TIdx, members_type>::type &init_field(TArgs &&... args) {
+                typename std::tuple_element<TIdx, members_type>::type &init_field(TArgs &&...args) {
                     return base_impl_type::template init_field<TIdx>(std::forward<TArgs>(args)...);
                 }
 
@@ -705,6 +705,6 @@ namespace nil {
     MARSHALLING_DO_VARIANT_MEM_ACC_FUNC_NOTEMPLATE(__VA_ARGS__)
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_VARIANT_HPP

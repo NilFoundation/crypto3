@@ -683,6 +683,6 @@ namespace nil {
     MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE(__VA_ARGS__)
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_BITMASK_VALUE_HPP

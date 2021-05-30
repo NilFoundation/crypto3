@@ -72,8 +72,9 @@ namespace nil {
                 };
 
                 template<typename TBase, typename TOpt>
-                using impl_static_num_id_base_type = typename impl_process_static_num_id_base<
-                    TBase::interface_options_type::has_msg_id_type && TOpt::has_static_msg_id>::template type<TBase, TOpt>;
+                using impl_static_num_id_base_type =
+                    typename impl_process_static_num_id_base<TBase::interface_options_type::has_msg_id_type
+                                                             && TOpt::has_static_msg_id>::template type<TBase, TOpt>;
 
                 template<typename TBase, typename TOpt>
                 class impl_polymorhpic_static_num_id_base : public TBase {
@@ -115,11 +116,10 @@ namespace nil {
                 };
 
                 template<typename TBase, typename TOpt>
-                using impl_polymorhpic_static_num_id_base_type =
-                    typename impl_process_polymorhpic_static_num_id_base<
-                        TBase::interface_options_type::has_msg_id_type && TBase::interface_options_type::has_msg_id_info
-                        && (TOpt::has_static_msg_id || (TOpt::has_msg_type && TOpt::has_do_get_id))>::template type<TBase,
-                                                                                                                    TOpt>;
+                using impl_polymorhpic_static_num_id_base_type = typename impl_process_polymorhpic_static_num_id_base<
+                    TBase::interface_options_type::has_msg_id_type && TBase::interface_options_type::has_msg_id_info
+                    && (TOpt::has_static_msg_id || (TOpt::has_msg_type && TOpt::has_do_get_id))>::template type<TBase,
+                                                                                                                TOpt>;
 
                 //----------------------------------------------------
 
@@ -153,8 +153,8 @@ namespace nil {
                 template<typename TBase, typename TOpt>
                 using impl_no_id_base_type =
                     typename impl_process_no_id_base<TBase::interface_options_type::has_msg_id_type
-                                                             && TBase::interface_options_type::has_msg_id_info
-                                                             && TOpt::has_no_id_impl>::template type<TBase>;
+                                                     && TBase::interface_options_type::has_msg_id_info
+                                                     && TOpt::has_no_id_impl>::template type<TBase>;
 
                 //----------------------------------------------------
 
@@ -172,26 +172,27 @@ namespace nil {
                     }
 
                     constexpr static bool are_fields_version_dependent() {
-                        return nil::marshalling::processing::tuple_type_is_any_of<all_fields_type>(version_dep_checker());
+                        return nil::marshalling::processing::tuple_type_is_any_of<all_fields_type>(
+                            version_dep_checker());
                     }
 
                     template<typename TIter>
                     nil::marshalling::status_type eval_read(TIter &iter, std::size_t size) {
-    #ifdef _MSC_VER
+#ifdef _MSC_VER
                         // For some reason VS2015 32 bit compiler may generate "integral constant overflow"
                         // warning on the code below
-    #pragma warning(push)
-    #pragma warning(disable : 4307)
-    #endif
+#pragma warning(push)
+#pragma warning(disable : 4307)
+#endif
 
                         using tag_type =
-                            typename std::conditional<nil::marshalling::processing::tuple_type_accumulate<all_fields_type>(
-                                                          true, read_no_status_detector()),
+                            typename std::conditional<nil::marshalling::processing::tuple_type_accumulate<
+                                                          all_fields_type>(true, read_no_status_detector()),
                                                       no_status_tag, use_status_tag>::type;
 
-    #ifdef _MSC_VER
-    #pragma warning(pop)
-    #endif
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
                         return eval_read_internal(iter, size, tag_type());
                     }
 
@@ -215,19 +216,21 @@ namespace nil {
 
                     template<std::size_t TFromIdx>
                     std::size_t eval_length_from() const {
-                        return processing::tuple_accumulate_from_until<TFromIdx, std::tuple_size<all_fields_type>::value>(
+                        return processing::tuple_accumulate_from_until<TFromIdx,
+                                                                       std::tuple_size<all_fields_type>::value>(
                             fields(), 0U, field_length_retriever());
                     }
 
                     template<std::size_t TUntilIdx>
                     std::size_t eval_length_until() const {
-                        return processing::tuple_accumulate_from_until<0, TUntilIdx>(fields(), 0U, field_length_retriever());
+                        return processing::tuple_accumulate_from_until<0, TUntilIdx>(fields(), 0U,
+                                                                                     field_length_retriever());
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx>
                     std::size_t eval_length_from_until() const {
                         return processing::tuple_accumulate_from_until<TFromIdx, TUntilIdx>(fields(), 0U,
-                                                                                           field_length_retriever());
+                                                                                            field_length_retriever());
                     }
 
                     static constexpr std::size_t eval_min_length() {
@@ -331,7 +334,7 @@ namespace nil {
                     nil::marshalling::status_type eval_read_fields_from_until(TIter &iter, std::size_t &size) {
                         auto status = nil::marshalling::status_type::success;
                         processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(),
-                                                                                  makeFieldReader(iter, status, size));
+                                                                                   makeFieldReader(iter, status, size));
                         return status;
                     }
 
@@ -342,7 +345,8 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void eval_read_fields_no_status_from_until(TIter &iter) {
-                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusReader(iter));
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(),
+                                                                                   makeFieldNoStatusReader(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
@@ -412,7 +416,8 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     void eval_write_fields_no_status_from_until(TIter &iter) const {
-                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(), makeFieldNoStatusWriter(iter));
+                        processing::tuple_for_each_from_until<TFromIdx, TUntilIdx>(fields(),
+                                                                                   makeFieldNoStatusWriter(iter));
                     }
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
@@ -686,7 +691,8 @@ namespace nil {
                     using version_type = typename TBase::version_type;
 
                     bool eval_fields_version_update() {
-                        return processing::tuple_accumulate(TBase::fields(), false, field_version_updater(TBase::version()));
+                        return processing::tuple_accumulate(TBase::fields(), false,
+                                                            field_version_updater(TBase::version()));
                     }
 
                     template<typename TIter>
@@ -820,7 +826,8 @@ namespace nil {
                     struct has_actual { };
                     struct no_actual { };
 
-                    using tag = typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
+                    using tag =
+                        typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
 
                     nil::marshalling::status_type read_impl_internal(typename base_impl_type::read_iterator &iter,
                                                                      std::size_t size, no_actual) {
@@ -855,9 +862,10 @@ namespace nil {
                 };
 
                 template<typename TBase, typename TImplOpt>
-                using impl_fields_read_impl_base_type = typename impl_process_fields_read_impl_base<
-                    TBase::interface_options_type::has_read_iterator && (!TImplOpt::has_no_read_impl),
-                    TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
+                using impl_fields_read_impl_base_type =
+                    typename impl_process_fields_read_impl_base<TBase::interface_options_type::has_read_iterator
+                                                                    && (!TImplOpt::has_no_read_impl),
+                                                                TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
 
                 //----------------------------------------------------
 
@@ -877,7 +885,8 @@ namespace nil {
                     struct has_actual { };
                     struct no_actual { };
 
-                    using tag = typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
+                    using tag =
+                        typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
 
                     nil::marshalling::status_type write_impl_internal(typename base_impl_type::write_iterator &iter,
                                                                       std::size_t size, no_actual) const {
@@ -933,7 +942,8 @@ namespace nil {
                     struct has_actual { };
                     struct no_actual { };
 
-                    using tag = typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
+                    using tag =
+                        typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
 
                     bool validImplInternal(no_actual) const {
                         return base_impl_type::eval_valid();
@@ -968,8 +978,8 @@ namespace nil {
                 template<typename TBase, typename TImplOpt>
                 using impl_fields_valid_base_type =
                     typename impl_process_fields_valid_base<TBase::interface_options_type::has_valid
-                                                                        && (!TImplOpt::has_no_valid_impl),
-                                                                    TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
+                                                                && (!TImplOpt::has_no_valid_impl),
+                                                            TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
 
                 //----------------------------------------------------
 
@@ -988,7 +998,8 @@ namespace nil {
                     struct has_actual { };
                     struct no_actual { };
 
-                    using tag = typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
+                    using tag =
+                        typename std::conditional<std::is_same<TActual, void>::value, no_actual, has_actual>::type;
 
                     std::size_t length_impl_internal(no_actual) const {
                         return base_impl_type::eval_length();
@@ -1021,9 +1032,10 @@ namespace nil {
                 };
 
                 template<typename TBase, typename TImplOpt>
-                using impl_fields_length_base_type = typename impl_process_fields_length_base<
-                    TBase::interface_options_type::has_length && (!TImplOpt::has_no_length_impl),
-                    TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
+                using impl_fields_length_base_type =
+                    typename impl_process_fields_length_base<TBase::interface_options_type::has_length
+                                                                 && (!TImplOpt::has_no_length_impl),
+                                                             TImplOpt::has_msg_type>::template type<TBase, TImplOpt>;
 
                 //----------------------------------------------------
 
@@ -1105,7 +1117,7 @@ namespace nil {
                 template<typename TBase, typename TImplOpt>
                 using impl_name_base_type =
                     typename impl_process_name_base<TBase::interface_options_type::has_name
-                                                            && TImplOpt::has_name>::template type<TBase, TImplOpt>;
+                                                    && TImplOpt::has_name>::template type<TBase, TImplOpt>;
 
                 //----------------------------------------------------
 
@@ -1116,7 +1128,8 @@ namespace nil {
                 protected:
                     ~impl_dispatch_base() noexcept = default;
 
-                    virtual typename TBase::DispatchRetType dispatch_impl(typename TBase::handler_type &handler) override {
+                    virtual typename TBase::DispatchRetType
+                        dispatch_impl(typename TBase::handler_type &handler) override {
                         static_assert(std::is_base_of<TBase, TActual>::value, "TActual is not derived class");
                         return handler.handle(static_cast<TActual &>(*this));
                     }
@@ -1178,7 +1191,7 @@ namespace nil {
                 using impl_builder_type = typename impl_builder<TMessage, TOptions...>::type;
 
             }    // namespace message
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MESSAGE_IMPL_BUILDER_HPP

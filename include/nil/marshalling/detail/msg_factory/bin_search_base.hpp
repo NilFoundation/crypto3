@@ -79,7 +79,8 @@ namespace nil {
 
                 template<bool TStrong, typename TMessage1>
                 struct bin_search_sorted_check_helper<TStrong, TMessage1> {
-                    static_assert(!nil::marshalling::processing::is_tuple<TMessage1>::value, "TMessage1 mustn't be tuple");
+                    static_assert(!nil::marshalling::processing::is_tuple<TMessage1>::value,
+                                  "TMessage1 mustn't be tuple");
                     static const bool value = true;
                 };
 
@@ -139,16 +140,17 @@ namespace nil {
                     struct compile_time_sorted { };
                     struct run_time_sorted { };
 
-                    using sorted_check_tag_type =
-                        typename std::conditional<all_have_static_num_id<all_messages_type>(),
-                                                  compile_time_sorted,
-                                                  run_time_sorted>::type;
+                    using sorted_check_tag_type = typename std::conditional<all_have_static_num_id<all_messages_type>(),
+                                                                            compile_time_sorted,
+                                                                            run_time_sorted>::type;
 
                     template<typename TMessage>
-                    using num_id_factory_method_type = typename base_impl_type::template num_id_factory_method<TMessage>;
+                    using num_id_factory_method_type =
+                        typename base_impl_type::template num_id_factory_method<TMessage>;
 
                     template<typename TMessage>
-                    using generic_factory_method_type = typename base_impl_type::template generic_factory_method<TMessage>;
+                    using generic_factory_method_type =
+                        typename base_impl_type::template generic_factory_method<TMessage>;
 
                     class creator {
                     public:
@@ -209,7 +211,7 @@ namespace nil {
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_BIN_SEARCH_BASE_HPP

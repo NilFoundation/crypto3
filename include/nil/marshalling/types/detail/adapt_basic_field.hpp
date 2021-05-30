@@ -710,7 +710,7 @@ namespace nil {
                 using adapt_basic_field_type = typename adapt_basic_field<TBasic, TOptions...>::type;
 
             }    // namespace detail
-        }    // namespace types
-    }    // namespace marshalling
+        }        // namespace types
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ADAPT_BASIC_FIELD_HPP

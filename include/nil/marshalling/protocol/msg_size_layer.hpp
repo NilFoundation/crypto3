@@ -122,7 +122,7 @@ namespace nil {
                 ///       returns nil::marshalling::ErrorStatus::NotEnoughData.
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read(field_type &field, TMsg &msg, TIter &iter, std::size_t size,
-                                                      std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
+                                                        std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
                     using IterType = typename std::decay<decltype(iter)>::type;
                     using IterTag = typename std::iterator_traits<IterType>::iterator_category;
                     static_assert(std::is_base_of<std::random_access_iterator_tag, IterTag>::value,
@@ -190,7 +190,7 @@ namespace nil {
                 ///       and advanced will pinpoint the location of the error.
                 template<typename TMsg, typename TIter, typename TNextLayerWriter>
                 status_type eval_write(field_type &field, const TMsg &msg, TIter &iter, std::size_t size,
-                                     TNextLayerWriter &&nextLayerWriter) const {
+                                       TNextLayerWriter &&nextLayerWriter) const {
                     using msg_type = typename std::decay<decltype(msg)>::type;
                     return write_internal(field, msg, iter, size, std::forward<TNextLayerWriter>(nextLayerWriter),
                                           msg_length_tag<msg_type>());
@@ -208,7 +208,7 @@ namespace nil {
                 /// @return Status of the update operation.
                 template<typename TIter, typename TNextLayerUpdater>
                 nil::marshalling::status_type eval_update(field_type &field, TIter &iter, std::size_t size,
-                                                        TNextLayerUpdater &&nextLayerUpdater) const {
+                                                          TNextLayerUpdater &&nextLayerUpdater) const {
                     field.value() = size - field_type::max_length();
                     if (field.length() != field_type::max_length()) {
                         field.value() = size - field.length();
@@ -359,6 +359,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_SIZE_LAYER_HPP

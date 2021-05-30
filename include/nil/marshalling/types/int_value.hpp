@@ -450,6 +450,6 @@ namespace nil {
             }
 
         }    // namespace types
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_INT_VALUE_HPP
