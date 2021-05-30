@@ -47,9 +47,9 @@
 
 #else    // #ifdef MARSHALLING_MUST_DEFINE_BASE
 #define MARSHALLING_FIELD_VALUE_ACCESS_FUNC \
-    FUNC_AUTO_REF_RETURN(value, decltype(nil::marshalling::field::to_field_base(*this).value()))
+    FUNC_AUTO_REF_RETURN(value, decltype(nil::marshalling::types::to_field_base(*this).value()))
 #define MARSHALLING_FIELD_VALUE_ACCESS_CONST_FUNC \
-    FUNC_AUTO_REF_RETURN_CONST(value, decltype(nil::marshalling::field::to_field_base(*this).value()))
+    FUNC_AUTO_REF_RETURN_CONST(value, decltype(nil::marshalling::types::to_field_base(*this).value()))
 #define MARSHALLING_ACCESS_MEMBER_FIELD_FUNC(T_, t_, n_)      \
     FUNC_AUTO_REF_RETURN(MARSHALLING_CONCATENATE(field_, n_), \
                          decltype(std::get<MARSHALLING_CONCATENATE(FieldIdx_, n_)>(t_)))

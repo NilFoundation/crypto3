@@ -62,10 +62,11 @@ namespace nil {
 
                     static_assert(!base_impl_type::has_static_msg_id,
                                   "nil::marshalling::option::static_num_id_impl option is used more than once");
-                    static_assert(!base_impl_type::has_no_id_impl,
-                                  "nil::marshalling::option::no_id_impl and nil::marshalling::option::static_num_id_impl "
-                                  "options cannot "
-                                  "be used together");
+                    static_assert(
+                        !base_impl_type::has_no_id_impl,
+                        "nil::marshalling::option::no_id_impl and nil::marshalling::option::static_num_id_impl "
+                        "options cannot "
+                        "be used together");
 
                 public:
                     constexpr static const bool has_static_msg_id = true;
@@ -99,10 +100,11 @@ namespace nil {
 
                     static_assert(!base_impl_type::has_no_id_impl,
                                   "nil::marshalling::option::no_id_impl option is used more than once");
-                    static_assert(!base_impl_type::has_static_msg_id,
-                                  "nil::marshalling::option::no_id_impl and nil::marshalling::option::static_num_id_impl "
-                                  "options cannot "
-                                  "be used together");
+                    static_assert(
+                        !base_impl_type::has_static_msg_id,
+                        "nil::marshalling::option::no_id_impl and nil::marshalling::option::static_num_id_impl "
+                        "options cannot "
+                        "be used together");
 
                 public:
                     constexpr static const bool has_no_id_impl = true;
@@ -186,7 +188,7 @@ namespace nil {
                     : public impl_options_parser<TBundledOptions..., TOptions...> { };
 
             }    // namespace message
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MESSAGE_IMPL_OPTIONS_PARSER_HPP

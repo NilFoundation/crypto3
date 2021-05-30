@@ -79,7 +79,8 @@ namespace nil {
 
                 template<bool TStrong, typename TMessage1>
                 struct bin_search_sorted_check_helper<TStrong, TMessage1> {
-                    static_assert(!nil::marshalling::utilities::is_tuple<TMessage1>::value, "TMessage1 mustn't be tuple");
+                    static_assert(!nil::marshalling::processing::is_tuple<TMessage1>::value,
+                                  "TMessage1 mustn't be tuple");
                     static const bool value = true;
                 };
 
@@ -119,7 +120,7 @@ namespace nil {
                     }
 
                 protected:
-                    static_assert(nil::marshalling::utilities::is_tuple<all_messages_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static const std::size_t messages_amount = std::tuple_size<all_messages_type>::value;
@@ -139,16 +140,17 @@ namespace nil {
                     struct compile_time_sorted { };
                     struct run_time_sorted { };
 
-                    using sorted_check_tag_type =
-                        typename std::conditional<all_have_static_num_id<all_messages_type>(),
-                                                  compile_time_sorted,
-                                                  run_time_sorted>::type;
+                    using sorted_check_tag_type = typename std::conditional<all_have_static_num_id<all_messages_type>(),
+                                                                            compile_time_sorted,
+                                                                            run_time_sorted>::type;
 
                     template<typename TMessage>
-                    using num_id_factory_method_type = typename base_impl_type::template num_id_factory_method<TMessage>;
+                    using num_id_factory_method_type =
+                        typename base_impl_type::template num_id_factory_method<TMessage>;
 
                     template<typename TMessage>
-                    using generic_factory_method_type = typename base_impl_type::template generic_factory_method<TMessage>;
+                    using generic_factory_method_type =
+                        typename base_impl_type::template generic_factory_method<TMessage>;
 
                     class creator {
                     public:
@@ -186,7 +188,7 @@ namespace nil {
                     };
 
                     void init_registry() {
-                        utilities::tuple_for_each_type<all_messages_type>(creator(registry_));
+                        processing::tuple_for_each_type<all_messages_type>(creator(registry_));
                     }
 
                     void check_sorted(compile_time_sorted) {
@@ -209,7 +211,7 @@ namespace nil {
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_BIN_SEARCH_BASE_HPP

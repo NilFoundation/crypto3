@@ -38,9 +38,9 @@
 #define MARSHALLING_AS_BITMASK_CONST_FUNC const Base& asBitmask() const
 #else    // #ifdef MARSHALLING_MUST_DEFINE_BASE
 #define MARSHALLING_AS_BITMASK_FUNC \
-    FUNC_AUTO_REF_RETURN(asBitmask, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN(asBitmask, decltype(nil::marshalling::types::to_field_base(*this)))
 #define MARSHALLING_AS_BITMASK_CONST_FUNC \
-    FUNC_AUTO_REF_RETURN_CONST(asBitmask, decltype(nil::marshalling::field::to_field_base(*this)))
+    FUNC_AUTO_REF_RETURN_CONST(asBitmask, decltype(nil::marshalling::types::to_field_base(*this)))
 #endif    // #ifdef MARSHALLING_MUST_DEFINE_BASE
 
 #define MARSHALLING_BIT_ACC_FUNC(f_, n_)                               \

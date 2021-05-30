@@ -45,11 +45,11 @@ namespace nil {
                     using msg_id_type = typename base_impl_type::msg_id_type;
 
                     msg_ptr_type create_msg(msg_id_param_type id, unsigned idx = 0) const {
-                        auto range
-                            = std::equal_range(base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
-                                               [](const comp_wrapper &idWrapper1, const comp_wrapper &idWrapper2) -> bool {
-                                                   return idWrapper1.get_id() < idWrapper2.get_id();
-                                               });
+                        auto range = std::equal_range(
+                            base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
+                            [](const comp_wrapper &idWrapper1, const comp_wrapper &idWrapper2) -> bool {
+                                return idWrapper1.get_id() < idWrapper2.get_id();
+                            });
 
                         auto dist = static_cast<unsigned>(std::distance(range.first, range.second));
                         if (dist <= idx) {
@@ -62,11 +62,11 @@ namespace nil {
                     }
 
                     std::size_t msg_count(msg_id_param_type id) const {
-                        auto range
-                            = std::equal_range(base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
-                                               [](const comp_wrapper &idWrapper1, const comp_wrapper &idWrapper2) -> bool {
-                                                   return idWrapper1.get_id() < idWrapper2.get_id();
-                                               });
+                        auto range = std::equal_range(
+                            base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
+                            [](const comp_wrapper &idWrapper1, const comp_wrapper &idWrapper2) -> bool {
+                                return idWrapper1.get_id() < idWrapper2.get_id();
+                            });
 
                         return static_cast<std::size_t>(std::distance(range.first, range.second));
                     }
@@ -96,7 +96,7 @@ namespace nil {
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_GENERIC_HPP

@@ -31,8 +31,8 @@
 #include <memory>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
-#include <nil/marshalling/utilities/alloc.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
+#include <nil/marshalling/processing/alloc.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -47,7 +47,7 @@ namespace nil {
 
                 template<typename TAllMessages>
                 constexpr bool all_have_static_num_id() {
-                    return nil::marshalling::utilities::tuple_type_accumulate<TAllMessages>(
+                    return nil::marshalling::processing::tuple_type_accumulate<TAllMessages>(
                         true, static_num_id_check_helper());
                 }
 
@@ -57,9 +57,9 @@ namespace nil {
                 template<>
                 struct all_messages_retrieve_helper<true> {
                     template<typename TAll, typename TOpt>
-                    using type = typename std::decay<decltype(
-                        std::tuple_cat(std::declval<TAll>(),
-                                       std::declval<std::tuple<typename TOpt::generic_message>>()))>::type;
+                    using type = typename std::decay<decltype(std::tuple_cat(
+                        std::declval<TAll>(),
+                        std::declval<std::tuple<typename TOpt::generic_message>>()))>::type;
                 };
 
                 template<>
@@ -69,22 +69,23 @@ namespace nil {
                 };
 
                 template<typename TAll, typename TOpt>
-                using all_messages_bundle_type =
-                    typename all_messages_retrieve_helper<TOpt::has_in_place_allocation
-                                                          && TOpt::has_support_generic_message>::template type<TAll, TOpt>;
+                using all_messages_bundle_type = typename all_messages_retrieve_helper<
+                    TOpt::has_in_place_allocation && TOpt::has_support_generic_message>::template type<TAll, TOpt>;
 
                 template<typename TMsgBase, typename TAllMessages, typename... TOptions>
                 class base {
-                    static_assert(TMsgBase::interface_options_type::has_msg_id_type,
-                                  "Usage of base requires message interface to provide ID type. "
-                                  "Use nil::marshalling::option::msg_id_type option in message interface type definition.");
+                    static_assert(
+                        TMsgBase::interface_options_type::has_msg_id_type,
+                        "Usage of base requires message interface to provide ID type. "
+                        "Use nil::marshalling::option::msg_id_type option in message interface type definition.");
                     using parsed_options_internal_type = options_parser<TOptions...>;
 
-                    using all_messages_internal_type = all_messages_bundle_type<TAllMessages, parsed_options_internal_type>;
-                    using allocator_type =
-                        typename std::conditional<parsed_options_internal_type::has_in_place_allocation,
-                                                  utilities::alloc::in_place_single<TMsgBase, all_messages_internal_type>,
-                                                  utilities::alloc::dyn_memory<TMsgBase>>::type;
+                    using all_messages_internal_type
+                        = all_messages_bundle_type<TAllMessages, parsed_options_internal_type>;
+                    using allocator_type = typename std::conditional<
+                        parsed_options_internal_type::has_in_place_allocation,
+                        processing::alloc::in_place_single<TMsgBase, all_messages_internal_type>,
+                        processing::alloc::dyn_memory<TMsgBase>>::type;
 
                 public:
                     using parsed_options_type = parsed_options_internal_type;
@@ -179,12 +180,12 @@ namespace nil {
                     friend class generic_factory_method;
 
                     template<typename TObj, typename... TArgs>
-                    msg_ptr_type alloc_msg(TArgs &&... args) const {
+                    msg_ptr_type alloc_msg(TArgs &&...args) const {
                         static_assert(std::is_base_of<message_type, TObj>::value, "TObj is not a proper message type");
 
                         static_assert(
                             (!parsed_options_internal_type::has_in_place_allocation)
-                                || nil::marshalling::utilities::is_in_tuple<TObj, all_messages_internal_type>::value,
+                                || nil::marshalling::processing::is_in_tuple<TObj, all_messages_internal_type>::value,
                             "TObj must be in provided tuple of supported messages");
 
                         return alloc_.template alloc<TObj>(std::forward<TArgs>(args)...);
@@ -197,7 +198,8 @@ namespace nil {
                     msg_ptr_type create_generic_msg_internal(msg_id_param_type id, AllocGenericTag) const {
                         static_assert(
                             std::is_base_of<message_type, typename parsed_options_type::generic_message>::value,
-                            "The requested generic_message class must have the same interface class as all other messages");
+                            "The requested generic_message class must have the same interface class as all other "
+                            "messages");
                         return alloc_msg<typename parsed_options_type::generic_message>(id);
                     }
 
@@ -209,7 +211,7 @@ namespace nil {
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_BASE_HPP

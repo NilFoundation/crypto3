@@ -94,7 +94,7 @@ namespace nil {
                 ///       returns nil::marshalling::ErrorStatus::NotEnoughData.
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read(field_type &field, TMsg &msg, TIter &iter, std::size_t size,
-                                                      std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
+                                                        std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
                     auto es = field.read(iter, size);
                     if (es == nil::marshalling::status_type::not_enough_data) {
                         base_impl_type::update_missing_size(field, size, missingSize);
@@ -131,7 +131,7 @@ namespace nil {
                 ///       and advanced will pinpoint the location of the error.
                 template<typename TMsg, typename TIter, typename TNextLayerWriter>
                 nil::marshalling::status_type eval_write(field_type &field, const TMsg &msg, TIter &iter,
-                                                       std::size_t size, TNextLayerWriter &&nextLayerWriter) const {
+                                                         std::size_t size, TNextLayerWriter &&nextLayerWriter) const {
                     auto es = field.write(iter, size);
                     if (es != status_type::success) {
                         return es;
@@ -164,6 +164,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SYNC_PREFIX_LAYER_HPP

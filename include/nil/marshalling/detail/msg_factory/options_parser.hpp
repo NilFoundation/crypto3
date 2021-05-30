@@ -66,12 +66,11 @@ namespace nil {
                 template<typename... TBundledOptions, typename... TOptions>
                 class options_parser<std::tuple<TBundledOptions...>
 
-                                                 ,
-                                                 TOptions...>
-                    : public options_parser<TBundledOptions..., TOptions...> { };
+                                     ,
+                                     TOptions...> : public options_parser<TBundledOptions..., TOptions...> { };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_OPTIONS_PARSER_HPP

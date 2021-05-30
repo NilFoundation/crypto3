@@ -32,7 +32,7 @@
 
 #include <ratio>
 
-#include <nil/marshalling/utilities/access.hpp>
+#include <nil/marshalling/processing/access.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -40,10 +40,10 @@ namespace nil {
             namespace endian {
 
                 /// @brief Empty class used in traits to indicate big endian.
-                using big = utilities::traits::endian::big;
+                using big = processing::traits::endian::big;
 
                 /// @brief Empty class used in traits to indicate little endian.
-                using little = utilities::traits::endian::little;
+                using little = processing::traits::endian::little;
 
             }    // namespace endian
 

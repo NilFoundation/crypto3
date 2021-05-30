@@ -138,10 +138,10 @@
 /// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>;
 ///
 /// // field_type describing protocol version.
-/// using MyVersionField = nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>;
+/// using MyVersionField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
 ///
 /// // field_type describing protocol version.
-/// using MyFlagsField = nil::marshalling::field::BitmaskValue<MyFieldBase, nil::marshalling::option::fixed_length<1> >;
+/// using MyFlagsField = nil::marshalling::types::BitmaskValue<MyFieldBase, nil::marshalling::option::fixed_length<1> >;
 ///
 /// // Relevant extra transport fields, bundled in std::tuple
 /// using MyExtraTransportFields =
@@ -356,7 +356,7 @@
 ///
 /// struct Message1Fields
 /// {
-///     using field1 = nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>;
+///     using field1 = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
 ///     using field2 = ...
 ///     using field3 = ...
 ///
@@ -669,15 +669,15 @@
 /// class Message2Fields
 /// {
 ///     using field1 =     
-///         nil::marshalling::field::BitmaskValue<
+///         nil::marshalling::types::BitmaskValue<
 ///             MyFieldBase, 
 ///             nil::marshalling::option::fixed_length<1>,
 ///             nil::marshalling::option::bitmask_reserved_bits<0xfe, 0>
 ///         >;
 ///
 ///     using field2 = 
-///         nil::marshalling::field::Optional<
-///             nil::marshalling::field::IntValue<MyFieldBase, std::uint16_t>,
+///         nil::marshalling::types::Optional<
+///             nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>,
 ///             nil::marshalling::option::missing_by_default
 ///         >;
 ///
@@ -775,9 +775,9 @@
 ///     
 ///     bool do_refresh()
 ///     {
-///         auto expectedDataMode = nil::marshalling::field::OptionalMode::missing;
+///         auto expectedDataMode = nil::marshalling::types::OptionalMode::missing;
 ///         if ((field_flags().value() & 0x1) != 0U) {
-///             expectedDataMode = nil::marshalling::field::OptionalMode::exists;
+///             expectedDataMode = nil::marshalling::types::OptionalMode::exists;
 ///         }
 ///
 ///         if (field_data().get_mode() == expectedDataMode) {
@@ -1040,7 +1040,7 @@
 /// @section page_define_prot_customisation Application Specific Customisation
 /// As was mentioned in @ref page_field_tutorial, there may be a need to provide a way for
 /// extra application specific customisation for used fields, especially for fields like lists
-/// (@ref nil::marshalling::field::array_list) or strings (@ref nil::marshalling::field::String). By
+/// (@ref nil::marshalling::types::array_list) or strings (@ref nil::marshalling::types::String). By
 /// default they use @b std::vector and @b std::string respectively as
 /// their inner value storage types. They may be un-applicable to some aplications,
 /// especially bare-metal ones. In order to solve such problem the message classes
@@ -1088,7 +1088,7 @@
 ///     using field1 = ...;
 ///     using field2 = ...
 ///     using field3 = 
-///         nil::marshalling::field::String<
+///         nil::marshalling::types::String<
 ///             MyFieldBase,
 ///             typename TOpt::message::Message1Fields::field3 // Extra option(s) 
 ///         >
@@ -1124,11 +1124,11 @@
 /// and overriding selected number inner types with its own extension options.
 ///
 /// @b NOTE, that allowing additional customisation for fields like @b list
-/// (@ref nil::marshalling::field::array_list) and @b string (@ref nil::marshalling::field::String) is
+/// (@ref nil::marshalling::types::array_list) and @b string (@ref nil::marshalling::types::String) is
 /// a <b>must have</b> feature to allow usage of the same protocol definition in
 /// bare-metal applications. However, it would be wise to allow extra customisation
-/// for @b all the used fields, even for ones like <b>integral values</b> (@ref nil::marshalling::field::IntValue)
-/// or @b enum (@ref nil::marshalling::field::IntValue). The client application developer
+/// for @b all the used fields, even for ones like <b>integral values</b> (@ref nil::marshalling::types::IntValue)
+/// or @b enum (@ref nil::marshalling::types::IntValue). The client application developer
 /// may want to change the default value of some field, maybe even add or
 /// change (override) provided ranges of valid values, force failing of read
 /// operation on invalid values, etc... @b NOTE, that when allowing such
@@ -1137,7 +1137,7 @@
 /// @code
 /// template <typename... TExtraOpts>
 /// using MyField = 
-///     nil::marshalling::field::IntValue<
+///     nil::marshalling::types::IntValue<
 ///         MyFieldBase,
 ///         std::uint16_t,
 ///         TExtraOpts..., // extra options

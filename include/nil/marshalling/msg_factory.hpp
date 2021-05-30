@@ -34,8 +34,8 @@
 #include <algorithm>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
-#include <nil/marshalling/utilities/alloc.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
+#include <nil/marshalling/processing/alloc.hpp>
 
 #include <nil/marshalling/detail/msg_factory/options_parser.hpp>
 #include <nil/marshalling/detail/msg_factory/selector.hpp>

@@ -86,15 +86,16 @@ namespace nil {
                     using methods_registry_type = typename base_impl_type::methods_registry_type;
 
                     typename methods_registry_type::const_iterator find_method(msg_id_param_type id) const {
-                        return std::lower_bound(base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
-                                                [](const factory_method_type *method, msg_id_param_type idParam) -> bool {
-                                                    return method->get_id() < idParam;
-                                                });
+                        return std::lower_bound(
+                            base_impl_type::registry().begin(), base_impl_type::registry().end(), id,
+                            [](const factory_method_type *method, msg_id_param_type idParam) -> bool {
+                                return method->get_id() < idParam;
+                            });
                     }
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_UNIQ_HPP

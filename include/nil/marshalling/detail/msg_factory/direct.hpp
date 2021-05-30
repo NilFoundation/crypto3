@@ -74,20 +74,21 @@ namespace nil {
                     }
 
                 private:
-                    static_assert(nil::marshalling::utilities::is_tuple<all_messages_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static_assert(0U < std::tuple_size<all_messages_type>::value,
                                   "TAllMessages is expected to be a non-empty tuple.");
 
-                    using last_message_type =
-                        typename std::tuple_element<std::tuple_size<all_messages_type>::value - 1, all_messages_type>::type;
+                    using last_message_type = typename std::tuple_element<std::tuple_size<all_messages_type>::value - 1,
+                                                                          all_messages_type>::type;
 
                     static const std::size_t messages_amount
                         = static_cast<std::size_t>(last_message_type::impl_options_type::msg_id) + 1U;
 
                     template<typename TMessage>
-                    using num_id_factory_method_type = typename base_impl_type::template num_id_factory_method<TMessage>;
+                    using num_id_factory_method_type =
+                        typename base_impl_type::template num_id_factory_method<TMessage>;
 
                     using factory_method_type = typename base_impl_type::factory_method;
                     using methods_registry_type = std::array<const factory_method_type *, messages_amount>;
@@ -99,7 +100,8 @@ namespace nil {
 
                         template<typename TMessage>
                         void operator()() {
-                            static const std::size_t Idx = static_cast<std::size_t>(TMessage::impl_options_type::msg_id);
+                            static const std::size_t Idx
+                                = static_cast<std::size_t>(TMessage::impl_options_type::msg_id);
 
                             static_assert(Idx < messages_amount, "Invalid message id");
 
@@ -114,7 +116,7 @@ namespace nil {
 
                     void init_registry() {
                         std::fill(registry_.begin(), registry_.end(), nullptr);
-                        utilities::tuple_for_each_type<all_messages_type>(creator(registry_));
+                        processing::tuple_for_each_type<all_messages_type>(creator(registry_));
                     }
 
                     const factory_method_type *get_method(msg_id_param_type id) const {
@@ -130,7 +132,7 @@ namespace nil {
                 };
 
             }    // namespace msg_factory
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MSG_FACTORY_DIRECT_HPP

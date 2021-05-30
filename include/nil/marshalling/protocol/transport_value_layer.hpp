@@ -122,7 +122,7 @@ namespace nil {
                 ///       returns nil::marshalling::ErrorStatus::NotEnoughData.
                 template<typename TMsg, typename TIter, typename TNextLayerReader>
                 nil::marshalling::status_type eval_read(field_type &field, TMsg &msg, TIter &iter, std::size_t size,
-                                                      std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
+                                                        std::size_t *missingSize, TNextLayerReader &&nextLayerReader) {
                     auto es = read_field_internal(field, iter, size, missingSize, value_tag());
                     if (es != nil::marshalling::status_type::success) {
                         return es;
@@ -165,7 +165,7 @@ namespace nil {
                 ///       and advanced will pinpoint the location of the error.
                 template<typename TMsg, typename TIter, typename TNextLayerWriter>
                 nil::marshalling::status_type eval_write(field_type &field, const TMsg &msg, TIter &iter,
-                                                       std::size_t size, TNextLayerWriter &&nextLayerWriter) const {
+                                                         std::size_t size, TNextLayerWriter &&nextLayerWriter) const {
                     using msg_type = typename std::decay<decltype(msg)>::type;
                     static_assert(msg_type::has_transport_fields(),
                                   "message interface class hasn't defined transport fields, "
@@ -330,6 +330,6 @@ namespace nil {
             }
 
         }    // namespace protocol
-    }    // namespace marshalling
+    }        // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_TRANSPORT_VALUE_LAYER_HPP

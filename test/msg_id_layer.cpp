@@ -32,7 +32,7 @@
 #include <cstdint>
 #include <iterator>
 
-#include <nil/marshalling/field/enum_value.hpp>
+#include <nil/marshalling/types/enum_value.hpp>
 
 #include <nil/marshalling/protocol/msg_data_layer.hpp>
 #include <nil/marshalling/protocol/msg_id_layer.hpp>
@@ -73,13 +73,13 @@ typedef Message1<BeNonPolymorphicMessageBase> NonPolymorphicBeMsg1;
 typedef Message2<BeNonPolymorphicMessageBase> NonPolymorphicBeMsg2;
 
 template<typename TField>
-using Field1 = nil::marshalling::field::enum_value<TField, message_type, nil::marshalling::option::fixed_length<1>>;
+using Field1 = nil::marshalling::types::enum_value<TField, message_type, nil::marshalling::option::fixed_length<1>>;
 
 template<typename TField>
-using Field2 = nil::marshalling::field::enum_value<TField, message_type, nil::marshalling::option::fixed_length<2>>;
+using Field2 = nil::marshalling::types::enum_value<TField, message_type, nil::marshalling::option::fixed_length<2>>;
 
 template<typename TField>
-using Field3 = nil::marshalling::field::enum_value<TField, message_type, nil::marshalling::option::fixed_length<3>>;
+using Field3 = nil::marshalling::types::enum_value<TField, message_type, nil::marshalling::option::fixed_length<3>>;
 
 typedef Field1<BeField> BeField1;
 typedef Field1<LeField> LeField1;

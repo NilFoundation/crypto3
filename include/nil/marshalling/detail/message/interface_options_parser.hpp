@@ -31,7 +31,7 @@
 #include <tuple>
 
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -142,11 +142,12 @@ namespace nil {
                 };
 
                 template<typename TFields, typename... TOptions>
-                class interface_options_parser<nil::marshalling::option::extra_transport_fields<TFields>,
-                                                       TOptions...> : public interface_options_parser<TOptions...> {
-                    static_assert(nil::marshalling::utilities::is_tuple<TFields>::value,
-                                  "Template parameter to nil::marshalling::option::extra_transport_fields is expected to "
-                                  "be std::tuple.");
+                class interface_options_parser<nil::marshalling::option::extra_transport_fields<TFields>, TOptions...>
+                    : public interface_options_parser<TOptions...> {
+                    static_assert(
+                        nil::marshalling::processing::is_tuple<TFields>::value,
+                        "Template parameter to nil::marshalling::option::extra_transport_fields is expected to "
+                        "be std::tuple.");
 
                 public:
                     static const bool has_extra_transport_fields = true;
@@ -155,7 +156,7 @@ namespace nil {
 
                 template<std::size_t TIdx, typename... TOptions>
                 class interface_options_parser<nil::marshalling::option::version_in_extra_transport_fields<TIdx>,
-                                                       TOptions...> : public interface_options_parser<TOptions...> {
+                                               TOptions...> : public interface_options_parser<TOptions...> {
                 public:
                     static const bool has_version_in_extra_transport_fields = true;
                     static const std::size_t version_in_extra_transport_fields = TIdx;
@@ -170,7 +171,7 @@ namespace nil {
                     : public interface_options_parser<TBundledOptions..., TOptions...> { };
 
             }    // namespace message
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MESSAGE_INTERFACE_OPTIONS_PARSER_HPP

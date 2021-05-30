@@ -32,8 +32,8 @@
 #include <tuple>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/utilities/access.hpp>
-#include <nil/marshalling/utilities/tuple.hpp>
+#include <nil/marshalling/processing/access.hpp>
+#include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/detail/message/interface_options_parser.hpp>
 
@@ -84,7 +84,7 @@ namespace nil {
                     template<std::size_t TSize, typename T, typename TIter>
                     static void write_data(T value, TIter &iter) {
                         static_assert(TSize <= sizeof(T), "Cannot put more bytes than type contains");
-                        return utilities::write_data<TSize, T>(value, iter, endian_type());
+                        return processing::write_data<TSize, T>(value, iter, endian_type());
                     }
 
                     template<typename T, typename TIter>
@@ -95,7 +95,7 @@ namespace nil {
                     template<typename T, std::size_t TSize, typename TIter>
                     static T read_data(TIter &iter) {
                         static_assert(TSize <= sizeof(T), "Cannot get more bytes than type contains");
-                        return utilities::read_data<T, TSize>(iter, endian_type());
+                        return processing::read_data<T, TSize>(iter, endian_type());
                     }
                 };
 
@@ -124,10 +124,10 @@ namespace nil {
                 class interface_id_type_base : public TBase {
                 public:
                     using msg_id_type = TId;
-                    using msg_id_param_type =
-                        typename std::conditional<std::is_integral<msg_id_type>::value || std::is_enum<msg_id_type>::value,
-                                                  msg_id_type,
-                                                  const msg_id_type &>::type;
+                    using msg_id_param_type = typename std::conditional<std::is_integral<msg_id_type>::value
+                                                                            || std::is_enum<msg_id_type>::value,
+                                                                        msg_id_type,
+                                                                        const msg_id_type &>::type;
 
                 protected:
                     ~interface_id_type_base() noexcept = default;
@@ -159,7 +159,7 @@ namespace nil {
                 public:
                     using transport_fields_type = TFields;
 
-                    static_assert(nil::marshalling::utilities::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
                     transport_fields_type &transport_fields() {
@@ -205,12 +205,13 @@ namespace nil {
                 public:
                     using transport_fields_type = typename TBase::transport_fields_type;
 
-                    static_assert(nil::marshalling::utilities::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
-                    static_assert(TIdx < std::tuple_size<transport_fields_type>::value,
-                                  "Index provided to nil::marshalling::option::version_in_extra_transport_fields exceeds "
-                                  "size of the tuple");
+                    static_assert(
+                        TIdx < std::tuple_size<transport_fields_type>::value,
+                        "Index provided to nil::marshalling::option::version_in_extra_transport_fields exceeds "
+                        "size of the tuple");
 
                     using version_type = typename std::tuple_element<TIdx, transport_fields_type>::type::value_type;
 
@@ -234,7 +235,7 @@ namespace nil {
                     template<typename TBase, typename TOpt>
                     using type
                         = interface_version_in_extra_transport_fields_base<TBase,
-                                                                                   TOpt::version_in_extra_transport_fields>;
+                                                                           TOpt::version_in_extra_transport_fields>;
                 };
 
                 template<>
@@ -283,7 +284,7 @@ namespace nil {
                 template<typename TBase, typename TOpt>
                 using interface_id_info_base_type =
                     typename interface_process_id_info_base<TOpt::has_msg_id_type
-                                                                    && TOpt::has_msg_id_info>::template type<TBase>;
+                                                            && TOpt::has_msg_id_info>::template type<TBase>;
 
                 //----------------------------------------------------
 
@@ -390,15 +391,14 @@ namespace nil {
                 template<>
                 struct interface_process_read_write_base<true, true> {
                     template<typename TBase, typename TOpt>
-                    using type = interface_read_write_base<TBase,
-                                                                   typename TOpt::read_iterator,
-                                                                   typename TOpt::write_iterator>;
+                    using type
+                        = interface_read_write_base<TBase, typename TOpt::read_iterator, typename TOpt::write_iterator>;
                 };
 
                 template<typename TBase, typename TOpt>
                 using interface_read_write_base_type =
-                    typename interface_process_read_write_base<TOpt::has_read_iterator, TOpt::has_write_iterator>::
-                        template type<TBase, TOpt>;
+                    typename interface_process_read_write_base<TOpt::has_read_iterator,
+                                                               TOpt::has_write_iterator>::template type<TBase, TOpt>;
 
                 //----------------------------------------------------
 
@@ -629,10 +629,11 @@ namespace nil {
                 class interface_builder {
                     using parsed_options_type = interface_options_parser<TOptions...>;
 
-                    static_assert((!parsed_options_type::has_version_in_extra_transport_fields)
-                                      || parsed_options_type::has_extra_transport_fields,
-                                  "nil::marshalling::option::version_in_extra_transport_fields option should not be used "
-                                  "without nil::marshalling::option::extra_transport_fields.");
+                    static_assert(
+                        (!parsed_options_type::has_version_in_extra_transport_fields)
+                            || parsed_options_type::has_extra_transport_fields,
+                        "nil::marshalling::option::version_in_extra_transport_fields option should not be used "
+                        "without nil::marshalling::option::extra_transport_fields.");
 
                     using endian_base_type = interface_endian_base_type<parsed_options_type>;
                     using id_type_base_type = interface_id_type_base_type<endian_base_type, parsed_options_type>;
@@ -640,11 +641,10 @@ namespace nil {
                         = interface_extra_transport_fields_base_type<id_type_base_type, parsed_options_type>;
                     using version_in_transport_fields_base_type
                         = interface_version_in_extra_transport_fields_base_type<transport_fields_base_type,
-                                                                                        parsed_options_type>;
+                                                                                parsed_options_type>;
                     using id_info_base_type
                         = interface_id_info_base_type<version_in_transport_fields_base_type, parsed_options_type>;
-                    using read_write_base_type
-                        = interface_read_write_base_type<id_info_base_type, parsed_options_type>;
+                    using read_write_base_type = interface_read_write_base_type<id_info_base_type, parsed_options_type>;
                     using valid_base_type = interface_valid_base_type<read_write_base_type, parsed_options_type>;
                     using length_base_type = interface_length_base_type<valid_base_type, parsed_options_type>;
                     using handler_base_type = interface_handler_base_type<length_base_type, parsed_options_type>;
@@ -662,7 +662,7 @@ namespace nil {
                 using interface_builder_type = typename interface_builder<TOptions...>::type;
 
             }    // namespace message
-        }    // namespace detail
-    }    // namespace marshalling
+        }        // namespace detail
+    }            // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_MESSAGE_INTERFACE_BUILDER_HPP
