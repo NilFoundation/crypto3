@@ -99,6 +99,7 @@ namespace nil {
                             for (auto &part : parts) {
                                 bits.insert(bits.end(), part.begin(), part.end());
                             }
+                            block_size = bits.size();
                         }
 
                         block_variable(blueprint<FieldType> &bp,
