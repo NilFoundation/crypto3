@@ -358,7 +358,9 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!(OutputValueBits % InputValueBits));
 
-                typedef detail::imploder<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> imploder;
+                typedef nil::crypto3::detail::imploder<InputEndianness, OutputEndianness, InputValueBits,
+                                                       OutputValueBits>
+                    imploder;
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
@@ -404,7 +406,9 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!(InputValueBits % OutputValueBits));
 
-                typedef detail::exploder<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> exploder;
+                typedef nil::crypto3::detail::exploder<InputEndianness, OutputEndianness, InputValueBits,
+                                                       OutputValueBits>
+                    exploder;
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
@@ -591,8 +595,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
@@ -639,8 +643,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<InputEndianness, stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
@@ -761,8 +765,8 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename InCatT, typename OutputIterator,
-                     typename = typename std::enable_if<detail::is_iterator<InputIterator>::value>::type,
-                     typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
+                     typename = typename std::enable_if<nil::crypto3::detail::is_iterator<InputIterator>::value>::type,
+                     typename = typename std::enable_if<nil::crypto3::detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::value_type InputType;
                 typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
@@ -793,7 +797,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator,
-                     typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
+                     typename = typename std::enable_if<nil::crypto3::detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
 
