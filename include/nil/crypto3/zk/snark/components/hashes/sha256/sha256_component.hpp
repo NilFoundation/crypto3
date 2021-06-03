@@ -263,6 +263,107 @@ namespace nil {
                             return 27280;                                                /* hardcoded for now */
                         }
                     };
+
+
+                    /**
+                    * Component for arbitary length sha256 hash based on
+                    * Merkle-Damagard padding. (i.e. standard sha256).
+                    */
+                    template<typename FieldType>
+                    class sha256_hash_component: component<FieldType> {
+                    public:
+                        typedef std::vector<bool> hash_value_type;
+                        typedef merkle_authentication_path merkle_authentication_path_type;
+
+                        std::vector<std::shared_ptr<sha256_compression_function_component<FieldType>>> blocks_components;
+                        std::vector<blueprint_variable_vector<FieldType>> blocks_bits;
+                        std::vector<std::shared_ptr<digest_variable<FieldType>>> intermediate_outputs;
+                        std::shared_ptr<merkle_damagard_padding<FieldType>> padding;
+
+                        sha256_hash_component(blueprint<FieldType> &bp,
+                                            std::size_t input_len,
+                                            const block_variable<FieldType> &block_input,
+                                            const digest_variable<FieldType> &output) :
+                            component<FieldType>(bp) {
+                                
+                                assert(input_len == block_input.block_size);
+                                const int length_bits_size = 64;
+
+                                padding.reset(
+                                    new merkle_damagard_padding<FieldType>(bp,input_len,length_bits_size,hashes::sha2<256>::block_bits));
+                                blueprint_variable_vector<FieldType> bits = block_input.bits;
+                                bits.insert(bits.end(),padding->bits.begin(),padding->bits.end());
+                                assert(bits.size() % hashes::sha2<256>::block_bits == 0);
+                                std::size_t num_blocks = bits.size() / hashes::sha2<256>::block_bits;
+
+                                intermediate_outputs.resize(num_blocks - 1);
+                                blocks_components.resize(num_blocks);
+                                blocks_bits.resize(num_blocks);
+                                
+                                const std::size_t chunk = hashes::sha2<256>::block_bits;
+
+                                for(std::size_t i = 0; i < num_blocks; ++i) {
+                                    blocks_bits[i] = blueprint_variable_vector<FieldType>(bits.begin() + i*chunk,
+                                    bits.begin() + (i+1)*chunk);
+                                }
+
+                                for(std::size_t i = 0; i < num_blocks - 1; ++i) {
+                                    intermediate_outputs[i].reset(new digest_variable<FieldType>(bp, hashes::sha2<256>::digest_bits));
+                                }
+                                
+                                if(num_blocks == 1) {
+                                    blocks_components[0].reset(new sha256_compression_function_component<FieldType> (
+                                        bp, SHA256_default_IV(bp), blocks_bits[0], output
+                                    ));
+                                } else {
+                                    blocks_components[0].reset(new sha256_compression_function_component<FieldType> (
+                                        bp, SHA256_default_IV(bp), blocks_bits[0], *intermediate_outputs[0]
+                                    ));
+                                    for(std::size_t i = 1; i < num_blocks - 1; ++i) {
+                                        blueprint_linear_combination_vector<FieldType> lcv(intermediate_outputs[i-1]->bits);
+                                        blocks_components[i].reset(new sha256_compression_function_component<FieldType> (
+                                            bp, lcv, blocks_bits[i], *intermediate_outputs[i]
+                                        ));
+                                    }
+                                    blueprint_linear_combination_vector<FieldType> lcv(intermediate_outputs[num_blocks-2]->bits);
+                                    blocks_components[num_blocks-1].reset(new sha256_compression_function_component<FieldType> (
+                                        bp, lcv, blocks_bits[num_blocks-1], output
+                                    ));
+                                }
+                            }
+
+                            void generate_r1cs_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
+                                padding->generate_r1cs_constraints();
+                                for(auto f: blocks_components) {
+                                    f->generate_r1cs_constraints();
+                                }
+                            }
+
+                            void generate_r1cs_witness() {
+                                padding->generate_r1cs_witness();
+                                for(auto f: blocks_components) {
+                                    f->generate_r1cs_witness();
+                                }
+                            }
+
+                            static std::size_t get_digest_len() {
+                                return hashes::sha2<256>::digest_bits;
+                            }
+
+                            static std::vector<bool> get_hash(const std::vector<bool> &input) {
+                                blueprint<FieldType> bp;
+
+                                block_variable<FieldType> input_variable(bp, input.size());
+                                digest_variable<FieldType> output_variable(bp, hashes::sha2<256>::digest_bits);
+                                sha256_hash_component<FieldType> f(bp, input_variable.block_size,
+                                                                                input_variable, output_variable);
+
+                                input_variable.generate_r1cs_witness(input);
+                                f.generate_r1cs_witness();
+
+                                return output_variable.get_digest();
+                            }
+                    };
                 }    // namespace components
             }        // namespace snark
         }            // namespace zk
