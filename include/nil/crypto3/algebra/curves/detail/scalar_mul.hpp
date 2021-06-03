@@ -50,6 +50,9 @@ namespace nil {
                     constexpr GroupValueType
                         scalar_mul(const GroupValueType &base,
                                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
+                        if (scalar.is_zero()) {
+                            return GroupValueType::zero();
+                        }
                         GroupValueType result;
 
                         bool found_one = false;
