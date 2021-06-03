@@ -70,8 +70,8 @@ namespace nil {
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    std::pair<typename curve_type::g2_type::value_type> final_vkey;
-                    std::pair<typename curve_type::g1_type::value_type> final_wkey;
+                    std::pair<typename curve_type::g2_type::value_type, typename curve_type::g2_type::value_type> final_vkey;
+                    std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type> final_wkey;
 
                     static std::size_t log_proofs(std::size_t nproofs) {
                         return std::ceil(std::log2(nproofs));
@@ -112,7 +112,7 @@ namespace nil {
                             return false;
                         }
                         // 2. Check if it's a power of two
-                        if ((num_proofs & (num_proofs - 1)) != 0) {
+                        if ((tmipp.gipa.nproofs & (tmipp.gipa.nproofs - 1)) != 0) {
                             return false;
                         }
                         // 3. Check all vectors are of the same length and of the correct length

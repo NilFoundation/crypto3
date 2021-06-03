@@ -32,7 +32,6 @@
 #include <tuple>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/multiscalar.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,6 +44,12 @@ namespace nil {
                 template<typename CurveType>
                 struct r1cs_gg_ppzksnark_proving_srs {
                     typedef CurveType curve_type;
+
+                    typedef typename curve_type::g1_type g1_type;
+                    typedef typename curve_type::g2_type g2_type;
+                    typedef typename g1_type::value_type g1_value_type;
+                    typedef typename g2_type::value_type g2_value_type;
+
                     typedef r1cs_gg_ppzksnark_ipp2_commitment<CurveType> commitment_type;
                     typedef typename commitment_type::vkey_type vkey_type;
                     typedef typename commitment_type::wkey_type wkey_type;
@@ -59,18 +64,14 @@ namespace nil {
 
                     /// number of proofs to aggregate
                     std::size_t n;
-                    /// $\{g^a^i\}_{i=0}^{2n-1}$ where n is the number of proofs to be aggregated
-                    /// We take all powers instead of only ones from n -> 2n-1 (w commitment key
-                    /// is formed from these powers) since the prover will create a shifted
-                    /// polynomial of degree 2n-1 when doing the KZG opening proof.
-                    multiscalar_precomp_owned<typename CurveType::g1_type> g_alpha_powers_table;
-                    /// $\{h^a^i\}_{i=0}^{n-1}$ - here we don't need to go to 2n-1 since v
-                    /// commitment key only goes up to n-1 exponent.
-                    multiscalar_precomp_owned<typename CurveType::g2_type> h_alpha_powers_table;
-                    /// $\{g^b^i\}_{i=0}^{2n-1}$
-                    multiscalar_precomp_owned<typename CurveType::g1_type> g_beta_powers_table;
-                    /// $\{h^b^i\}_{i=0}^{n-1}$
-                    multiscalar_precomp_owned<typename CurveType::g2_type> h_beta_powers_table;
+                    /// $\{g^a^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
+                    std::vector<g1_value_type> g_alpha_powers;
+                    /// $\{h^a^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
+                    std::vector<g2_value_type> h_alpha_powers;
+                    /// $\{g^b^i\}_{i=n}^{N}$ where N is the smallest size of the two Groth16 CRS.
+                    std::vector<g1_value_type> g_beta_powers;
+                    /// $\{h^b^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
+                    std::vector<g2_value_type> h_beta_powers;
                     /// commitment key using in MIPP and TIPP
                     vkey_type vkey;
                     /// commitment key using in TIPP
@@ -127,7 +128,6 @@ namespace nil {
                     /// proofs to aggregate. The number of proofs MUST BE a power of two, it
                     /// panics otherwise. The number of proofs must be inferior to half of the
                     /// size of the generic srs otherwise it panics.
-                    template<typename CurveType>
                     std::pair<r1cs_gg_ppzksnark_proving_srs<CurveType>, r1cs_gg_ppzksnark_verifying_srs<CurveType>>
                         specialize(std::size_t num_proofs) {
                         BOOST_ASSERT((num_proofs & (num_proofs - 1)) == 0);
@@ -145,23 +145,11 @@ namespace nil {
                         std::size_t g_up = tn;
                         std::size_t h_low = 0;
                         std::size_t h_up = h_low + n;
-                        multiscalar_precomp_owned<g1_type> g_alpha_powers_table =
-                            precompute_fixed_window(g_alpha_powers.begin() + g_low, g_alpha_powers.begin() + g_up,
-                                                    multiscalar_precomp_owned<g1_type>::WINDOW_SIZE);
-                        multiscalar_precomp_owned<g1_type> g_beta_powers_table =
-                            precompute_fixed_window(g_beta_powers.begin() + g_low, g_beta_powers.begin() + g_up,
-                                                    multiscalar_precomp_owned<g1_type>::WINDOW_SIZE);
-                        multiscalar_precomp_owned<g2_type> h_alpha_powers_table =
-                            precompute_fixed_window(h_alpha_powers.begin() + h_low, h_alpha_powers.begin() + h_up,
-                                                    multiscalar_precomp_owned<g2_type>::WINDOW_SIZE);
-                        multiscalar_precomp_owned<g2_type> h_beta_powers_table =
-                            precompute_fixed_window(h_beta_powers.begin() + h_low, h_beta_powers.begin() + h_up,
-                                                    multiscalar_precomp_owned<g2_type>::WINDOW_SIZE);
                         std::vector<typename CurveType::g2_type::value_type> v1 = {h_alpha_powers.begin() + h_low,
                                                                                    h_alpha_powers.begin() + h_up};
                         std::vector<typename CurveType::g2_type::value_type> v2 = {h_beta_powers.begin() + h_low,
                                                                                    h_beta_powers.begin() + h_up};
-                        typename r1cs_gg_pp_zksnark_srs<CurveType>::vkey_type vkey = {v1, v2};
+                        typename r1cs_gg_ppzksnark_proving_srs<CurveType>::vkey_type vkey = {v1, v2};
                         BOOST_ASSERT(vkey.has_correct_len(n));
                         // however, here we only need the "right" shifted bases for the
                         // commitment scheme.
@@ -169,16 +157,17 @@ namespace nil {
                                                                                    g_alpha_powers.begin() + g_up};
                         std::vector<typename CurveType::g1_type::value_type> w2 = {g_beta_powers.begin() + n,
                                                                                    g_beta_powers.begin() + g_up};
-                        typename r1cs_gg_pp_zksnark_srs<CurveType>::wkey_type wkey = {w1, w2};
+                        typename r1cs_gg_ppzksnark_proving_srs<CurveType>::wkey_type wkey = {w1, w2};
                         BOOST_ASSERT(wkey.has_correct_len(n));
 
-                        r1cs_gg_ppzksnark_proving_srs<CurveType> pk = {n,
-                                                                       g_alpha_powers_table,
-                                                                       h_alpha_powers_table,
-                                                                       g_beta_powers_table,
-                                                                       h_beta_powers_table,
-                                                                       vkey,
-                                                                       wkey};
+                        r1cs_gg_ppzksnark_proving_srs<CurveType> pk = {
+                            n,
+                            {g_alpha_powers.begin() + g_low, g_alpha_powers.begin() + g_up},
+                            {h_alpha_powers.begin() + h_low, h_alpha_powers.begin() + h_up},
+                            {g_beta_powers.begin() + g_low, g_beta_powers.begin() + g_up},
+                            {h_beta_powers.begin() + h_low, h_beta_powers.begin() + h_up},
+                            vkey,
+                            wkey};
                         r1cs_gg_ppzksnark_verifying_srs<CurveType> vk = {n,
                                                                          g_alpha_powers[0],
                                                                          h_alpha_powers[0],
@@ -190,6 +179,20 @@ namespace nil {
                     }
                 };
 
+                template<typename GroupType,
+                         typename ScalarFieldType = typename GroupType::curve_type::scalar_field_type>
+                std::vector<typename GroupType::value_type>
+                    structured_generators_scalar_power(std::size_t n, typename ScalarFieldType::value_type s) {
+                    BOOST_ASSERT(n > 0);
+
+                    std::vector<typename GroupType::value_type> powers_of_g {GroupType::value_type::one()};
+
+                    for (std::size_t i = 1; i < n; i++) {
+                        powers_of_g.emplace_back(powers_of_g.back() * s);
+                    }
+
+                    return powers_of_g;
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
