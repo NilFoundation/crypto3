@@ -95,7 +95,7 @@ namespace nil {
                     /// It is necessary for the IPP scheme to work that commitment
                     /// key have the exact same number of arguments as the number of proofs to
                     /// aggregate.
-                    inline bool has_correct_len(std::size_t n) {
+                    inline bool has_correct_len(std::size_t n) const {
                         return a.size() == n && n == b.size();
                     }
 
@@ -133,11 +133,20 @@ namespace nil {
                         r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result_l;
                         r1cs_gg_ppzksnark_ipp2_commitment_key<group_type> result_r;
 
-                        result_l.a.emplace_back(a.begin(), a.begin() + at);
-                        result_l.b.emplace_back(b.begin(), b.begin() + at);
-
-                        result_r.a.emplace_back(a.begin() + at, a.end());
-                        result_r.b.emplace_back(b.begin() + at, b.end());
+                        auto a_it = a.begin();
+                        auto b_it = b.begin();
+                        while (a_it != a.begin() + at && b_it != b.begin() + at) {
+                            result_l.a.emplace_back(*a_it);
+                            result_l.b.emplace_back(*b_it);
+                            ++a_it;
+                            ++b_it;
+                        }
+                        while (a_it != a.end() && b_it != b.end()) {
+                            result_r.a.emplace_back(*a_it);
+                            result_r.b.emplace_back(*b_it);
+                            ++a_it;
+                            ++b_it;
+                        }
 
                         return std::make_pair(result_l, result_r);
                     }
@@ -156,12 +165,12 @@ namespace nil {
 
                         std::for_each(
                             boost::make_zip_iterator(
-                                std::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
-                            boost::make_zip_iterator(std::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
-                            [&](const std::tuple<const group_value_type &, const group_value_type &,
-                                                 const group_value_type &, const group_value_type &> &t) {
-                                result.a.emplace_back(std::get<0>(t) + std::get<2>(t) * scale);
-                                result.b.emplace_back(std::get<1>(t) + std::get<3>(t) * scale);
+                                boost::make_tuple(a.begin(), b.begin(), right.a.begin(), right.b.begin())),
+                            boost::make_zip_iterator(boost::make_tuple(a.end(), b.end(), right.a.end(), right.b.end())),
+                            [&](const boost::tuple<const group_value_type &, const group_value_type &,
+                                                   const group_value_type &, const group_value_type &> &t) {
+                                result.a.emplace_back(t.template get<0>() + t.template get<2>() * scale);
+                                result.b.emplace_back(t.template get<1>() + t.template get<3>() * scale);
                             });
 
                         return result;
@@ -179,9 +188,12 @@ namespace nil {
                  * Returns both vectors scaled by the given vector entrywise.
                  * In other words, it returns $\{v_i^{s_i}\}$
                  */
-                template<typename GroupType, typename InputIterator,
-                         typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                         typename std::enable_if<std::is_same<field_value_type, ValueType>::value, bool>::type = true>
+                template<
+                    typename GroupType, typename InputIterator,
+                    typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                    typename std::enable_if<
+                        std::is_same<typename GroupType::curve_type::scalar_field_type::value_type, ValueType>::value,
+                        bool>::type = true>
                 r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
                     scale(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &key,
                           InputIterator s_first,
@@ -192,10 +204,11 @@ namespace nil {
                 /// Takes a left and right commitment key and returns a commitment
                 /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
                 /// required step during GIPA recursion.
-                typename<typename GroupType> r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
+                template<typename GroupType>
+                r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
                     compress(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &left,
                              const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &right,
-                             const field_value_type &scale) {
+                             const typename GroupType::curve_type::scalar_field_type::value_type &scale) {
                     return left.compress(right, scale);
                 }
 
@@ -230,8 +243,8 @@ namespace nil {
                     /// $U = \prod_{i=0}^n e(A_i, v_{2,i})e(B_i,w_{2,i})$
                     /// Output is $(T,U)$
                     template<typename InputG1Iterator, typename InputG2Iterator,
-                             typename ValueType1 = std::iterator_traits<InputG1Iterator>::value_type,
-                             typename ValueType2 = std::iterator_traits<InputG2Iterator>::value_type,
+                             typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
+                             typename ValueType2 = typename std::iterator_traits<InputG2Iterator>::value_type,
                              typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true,
                              typename std::enable_if<std::is_same<g2_value_type, ValueType2>::value, bool>::type = true>
                     static output_type pair(const vkey_type &vkey, const wkey_type &wkey, InputG1Iterator a_first,
@@ -242,32 +255,36 @@ namespace nil {
 
                         // (A * v)
                         gt_value_type t1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(a_first, vkey.a.begin())),
-                                      boost::make_zip_iterator(std::make_tuple(a_last, vkey.a.end())),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          t1 = t1 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.a.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.a.end())),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          t1 = t1 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         // (B * v)
                         gt_value_type t2 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(wkey.a.begin(), b_first)),
-                                      boost::make_zip_iterator(std::make_tuple(wkey.a.end(), b_last)),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          t2 = t2 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.a.begin(), b_first)),
+                                      boost::make_zip_iterator(boost::make_tuple(wkey.a.end(), b_last)),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          t2 = t2 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         gt_value_type u1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(a_first, vkey.b.begin())),
-                                      boost::make_zip_iterator(std::make_tuple(a_last, vkey.b.end())),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          u1 = u1 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.b.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          u1 = u1 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         gt_value_type u2 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(wkey.b.begin(), b_first)),
-                                      boost::make_zip_iterator(std::make_tuple(wkey.b.end(), b_last)),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          u2 = u2 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(wkey.b.begin(), b_first)),
+                                      boost::make_zip_iterator(boost::make_tuple(wkey.b.end(), b_last)),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          u2 = u2 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         // (A * v)(w * B)
@@ -279,23 +296,25 @@ namespace nil {
                     /// $U = \prod_{i=0}^n e(A_i, v_{2,i})$
                     /// Output is $(T,U)$
                     template<typename InputG1Iterator,
-                             typename ValueType1 = std::iterator_traits<InputG1Iterator>::value_type,
+                             typename ValueType1 = typename std::iterator_traits<InputG1Iterator>::value_type,
                              typename std::enable_if<std::is_same<g1_value_type, ValueType1>::value, bool>::type = true>
                     static output_type single(const vkey_type &vkey, InputG1Iterator a_first, InputG1Iterator a_last) {
                         BOOST_ASSERT(vkey.has_correct_len(std::distance(a_first, a_last)));
 
                         gt_value_type t1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(a_first, vkey.a.begin())),
-                                      boost::make_zip_iterator(std::make_tuple(a_last, vkey.a.end())),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          t1 = t1 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.a.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.a.end())),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          t1 = t1 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         gt_value_type u1 = gt_value_type::one();
-                        std::for_each(boost::make_zip_iterator(std::make_tuple(a_first, vkey.b.begin())),
-                                      boost::make_zip_iterator(std::make_tuple(a_last, vkey.b.end())),
-                                      [&](const std::tuple<const G1_value_type &, const G2_value_type &> &t) {
-                                          u1 = u1 * algebra::pair<curve_type>(std::get<0>(t), std::get<1>(t));
+                        std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, vkey.b.begin())),
+                                      boost::make_zip_iterator(boost::make_tuple(a_last, vkey.b.end())),
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
+                                          u1 = u1 * algebra::pair_reduced<curve_type>(t.template get<0>(),
+                                                                                      t.template get<1>());
                                       });
 
                         return std::make_pair(t1, u1);
