@@ -604,10 +604,10 @@ namespace nil {
                     // on the curve we are on). that's the extra cost of the commitment scheme
                     // used which is compatible with Groth16 CRS insteaf of the original paper
                     // of Bunz'19
-                    return kzg_opening<GroupType> {algebra::multiexp<algebra::policies::multiexp_method_naive_plain>(
+                    return kzg_opening<GroupType> {algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                                        srs_powers_alpha_first, srs_powers_alpha_last,
                                                        quotient_polynomial.begin(), quotient_polynomial.end(), 1),
-                                                   algebra::multiexp<algebra::policies::multiexp_method_naive_plain>(
+                                                   algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(
                                                        srs_powers_beta_first, srs_powers_beta_last,
                                                        quotient_polynomial.begin(), quotient_polynomial.end(), 1)};
                 }
