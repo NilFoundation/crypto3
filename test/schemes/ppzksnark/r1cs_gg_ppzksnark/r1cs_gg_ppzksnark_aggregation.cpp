@@ -40,10 +40,13 @@
 #include <boost/iterator/zip_iterator.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
+
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
@@ -146,6 +149,7 @@ namespace boost {
 }    // namespace boost
 
 using curve_type = curves::bls12_381;
+using scheme_type = r1cs_gg_ppzksnark<curve_type>;
 
 using g1_type = typename curve_type::g1_type;
 using g2_type = typename curve_type::g2_type;
@@ -907,6 +911,119 @@ BOOST_AUTO_TEST_CASE(bls381_prove_commitment_test) {
                                                                  r_shift,
                                                                  kzg_challenge);
     BOOST_CHECK_EQUAL(et_comm_w, comm_w);
+}
+
+BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
+    scalar_field_value_type a(0x57aa5df37b9bd97a5e5f84f4797eac33e5ebe0c6e2ca2fbca1b3b3d7052ce35d_cppui255);
+    std::vector<std::uint8_t> et_a_ser = {
+        93, 227, 44,  5,   215, 179, 179, 161, 188, 47,  202, 226, 198, 224, 235, 229,
+        51, 172, 126, 121, 244, 132, 95,  94,  122, 217, 155, 123, 243, 93,  170, 87,
+    };
+    std::vector<std::uint8_t> a_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::fr_octets_num);
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_to_bytes<scalar_field_type>(
+        a, a_ser.begin(), a_ser.end());
+    BOOST_CHECK_EQUAL(et_a_ser, a_ser);
+    scalar_field_value_type a_deser =
+        nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_from_bytes<scalar_field_type>(
+            a_ser.begin(), a_ser.end());
+    BOOST_CHECK_EQUAL(a_deser, a);
+
+    G1_value_type b(
+        0x12b8f3abf50782b18f37410b10cf408e88b7749a40e344f562f7cc171612daa1981b9beae698180202993bcdeb42af53_cppui381,
+        0x15800fa0ba4aefb8af1a7ca4af19511799fb01492444a070d485c7a3fe9b22bcfabb6bc2007f76a3adc6560ecf990a47_cppui381,
+        fq_value_type::one());
+    std::vector<std::uint8_t> et_b_ser = {
+        178, 184, 243, 171, 245, 7,   130, 177, 143, 55,  65,  11,  16,  207, 64,  142,
+        136, 183, 116, 154, 64,  227, 68,  245, 98,  247, 204, 23,  22,  18,  218, 161,
+        152, 27,  155, 234, 230, 152, 24,  2,   2,   153, 59,  205, 235, 66,  175, 83,
+    };
+    std::vector<std::uint8_t> b_ser;
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g1_type>(b, std::back_inserter(b_ser));
+    BOOST_CHECK_EQUAL(et_b_ser, b_ser);
+    G1_value_type b_deser =
+        nil::marshalling::ipp2_aggregation_bincode<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
+    BOOST_CHECK_EQUAL(b_deser, b);
+
+    G2_value_type c(
+        fq2_value_type(
+            0x0c23b14b42d3825f16b9e9b2c3a92fe3a82ac2cf8a5635a9d60188b43ef1408627230c5b6e3958d073ebe7c239ea391e_cppui381,
+            0x0c45a0c4d7bda23c7e09ac5d43a9d2ea1898c36e7cb164a5cfcb91cb17c9e8d3d6ba5d177f9ab83a6d1ae554fab749f0_cppui381),
+        fq2_value_type(
+            0x03a257633aa8a4f3d03541ecda1ed72f30af7660891d39c9c24da7560d22fbc145c6817d3c2833e54454e664cf528c36_cppui381,
+            0x01856f2127eaf9be53b902ff71a6a9b4dfb597f085fb3a2a35980683e82f1e2169beee9943a0ecbca676b4bc9370282e_cppui381),
+        fq2_value_type::one());
+    std::vector<std::uint8_t> et_c_ser = {
+        140, 69,  160, 196, 215, 189, 162, 60,  126, 9,   172, 93,  67,  169, 210, 234, 24,  152, 195, 110,
+        124, 177, 100, 165, 207, 203, 145, 203, 23,  201, 232, 211, 214, 186, 93,  23,  127, 154, 184, 58,
+        109, 26,  229, 84,  250, 183, 73,  240, 12,  35,  177, 75,  66,  211, 130, 95,  22,  185, 233, 178,
+        195, 169, 47,  227, 168, 42,  194, 207, 138, 86,  53,  169, 214, 1,   136, 180, 62,  241, 64,  134,
+        39,  35,  12,  91,  110, 57,  88,  208, 115, 235, 231, 194, 57,  234, 57,  30,
+    };
+    std::vector<std::uint8_t> c_ser;
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g2_type>(c, std::back_inserter(c_ser));
+    BOOST_CHECK_EQUAL(et_c_ser, c_ser);
+    G2_value_type c_deser =
+        nil::marshalling::ipp2_aggregation_bincode<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
+    BOOST_CHECK_EQUAL(c_deser, c);
+
+    fq12_value_type d(
+        fq6_value_type(
+            fq2_value_type(
+                0x005db8a7f4d34ee8386fbdd094280f8cab08317945342ae713c2304055ad78397ca6e8174af0752c3757efe813f06a3b_cppui381,
+                0x0c3c7febcc53d75eca6b47c27efbcfa8a2f394bcc5087c1308aa768415ad37fa6d7b2778482ec5d10425b2434974f0fa_cppui381),
+            fq2_value_type(
+                0x0f681a396bb919c9bd0582afcc6d75fe578df8968266082c18129d8ebc769a5b816efb78fdf962d7719a89bc804ea9b4_cppui381,
+                0x041e0cc3da511cde05956a4a90ef1d74732ff001d6694d75a35d4546bd9e4f26b8427da499000e0c2bb282713ff23eea_cppui381),
+            fq2_value_type(
+                0x027423d44d437b22cebc4b79153c0a6f077507c0fdc5aa30a61249faa72ddce8e956a9e489d69a79bee9e16a79ab2022_cppui381,
+                0x0958c21e079b0140de7ca150e1d021f065d2f277d78c138048d47f72b4ea0e943ae07bafbd890270cf152facd09aeb8a_cppui381)),
+        fq6_value_type(
+            fq2_value_type(
+                0x0d96831921809f76a8fb439c4e2ca0266fda8500b2cf4eb31d2281fd352dd9d8fe911fb81a1da00bf52d6e81abfd231a_cppui381,
+                0x001cc9dca3d826bce7af86210eda9b0f0df5fc7e951c7904f0eccfc3c07ed4efdb793552757212172a2302e4314155a3_cppui381),
+            fq2_value_type(
+                0x0624b2b4826178f5eba880e953e8343d1afefe52b47f5c98187fd5361d2a3714bf2b62bf148ae91ab6e24ff4e579976f_cppui381,
+                0x00ecad906407071532cf7730a6d3f46515d1a70ca123890fcc313d75100fc835bfe1f7c02c026eeda7221cb2a406ffde_cppui381),
+            fq2_value_type(
+                0x02d254206dd3c9cbc9c5a99a9b21f4776a7c1bc4745b59b71efa508566f2d97e2da95f19cfaaf702e6efe214f6abe45e_cppui381,
+                0x1175ac9f5fd87dc2adecabf2ad3fc65bfe2e4054383e07e201d40dbf4bef2df006a4f8588f93bd872f66ad48982a9fb1_cppui381)));
+    std::vector<std::uint8_t> et_d_ser = {
+        59,  106, 240, 19,  232, 239, 87,  55,  44,  117, 240, 74,  23,  232, 166, 124, 57,  120, 173, 85,  64,  48,
+        194, 19,  231, 42,  52,  69,  121, 49,  8,   171, 140, 15,  40,  148, 208, 189, 111, 56,  232, 78,  211, 244,
+        167, 184, 93,  0,   250, 240, 116, 73,  67,  178, 37,  4,   209, 197, 46,  72,  120, 39,  123, 109, 250, 55,
+        173, 21,  132, 118, 170, 8,   19,  124, 8,   197, 188, 148, 243, 162, 168, 207, 251, 126, 194, 71,  107, 202,
+        94,  215, 83,  204, 235, 127, 60,  12,  180, 169, 78,  128, 188, 137, 154, 113, 215, 98,  249, 253, 120, 251,
+        110, 129, 91,  154, 118, 188, 142, 157, 18,  24,  44,  8,   102, 130, 150, 248, 141, 87,  254, 117, 109, 204,
+        175, 130, 5,   189, 201, 25,  185, 107, 57,  26,  104, 15,  234, 62,  242, 63,  113, 130, 178, 43,  12,  14,
+        0,   153, 164, 125, 66,  184, 38,  79,  158, 189, 70,  69,  93,  163, 117, 77,  105, 214, 1,   240, 47,  115,
+        116, 29,  239, 144, 74,  106, 149, 5,   222, 28,  81,  218, 195, 12,  30,  4,   34,  32,  171, 121, 106, 225,
+        233, 190, 121, 154, 214, 137, 228, 169, 86,  233, 232, 220, 45,  167, 250, 73,  18,  166, 48,  170, 197, 253,
+        192, 7,   117, 7,   111, 10,  60,  21,  121, 75,  188, 206, 34,  123, 67,  77,  212, 35,  116, 2,   138, 235,
+        154, 208, 172, 47,  21,  207, 112, 2,   137, 189, 175, 123, 224, 58,  148, 14,  234, 180, 114, 127, 212, 72,
+        128, 19,  140, 215, 119, 242, 210, 101, 240, 33,  208, 225, 80,  161, 124, 222, 64,  1,   155, 7,   30,  194,
+        88,  9,   26,  35,  253, 171, 129, 110, 45,  245, 11,  160, 29,  26,  184, 31,  145, 254, 216, 217, 45,  53,
+        253, 129, 34,  29,  179, 78,  207, 178, 0,   133, 218, 111, 38,  160, 44,  78,  156, 67,  251, 168, 118, 159,
+        128, 33,  25,  131, 150, 13,  163, 85,  65,  49,  228, 2,   35,  42,  23,  18,  114, 117, 82,  53,  121, 219,
+        239, 212, 126, 192, 195, 207, 236, 240, 4,   121, 28,  149, 126, 252, 245, 13,  15,  155, 218, 14,  33,  134,
+        175, 231, 188, 38,  216, 163, 220, 201, 28,  0,   111, 151, 121, 229, 244, 79,  226, 182, 26,  233, 138, 20,
+        191, 98,  43,  191, 20,  55,  42,  29,  54,  213, 127, 24,  152, 92,  127, 180, 82,  254, 254, 26,  61,  52,
+        232, 83,  233, 128, 168, 235, 245, 120, 97,  130, 180, 178, 36,  6,   222, 255, 6,   164, 178, 28,  34,  167,
+        237, 110, 2,   44,  192, 247, 225, 191, 53,  200, 15,  16,  117, 61,  49,  204, 15,  137, 35,  161, 12,  167,
+        209, 21,  101, 244, 211, 166, 48,  119, 207, 50,  21,  7,   7,   100, 144, 173, 236, 0,   94,  228, 171, 246,
+        20,  226, 239, 230, 2,   247, 170, 207, 25,  95,  169, 45,  126, 217, 242, 102, 133, 80,  250, 30,  183, 89,
+        91,  116, 196, 27,  124, 106, 119, 244, 33,  155, 154, 169, 197, 201, 203, 201, 211, 109, 32,  84,  210, 2,
+        177, 159, 42,  152, 72,  173, 102, 47,  135, 189, 147, 143, 88,  248, 164, 6,   240, 45,  239, 75,  191, 13,
+        212, 1,   226, 7,   62,  56,  84,  64,  46,  254, 91,  198, 63,  173, 242, 171, 236, 173, 194, 125, 216, 95,
+        159, 172, 117, 17,
+    };
+    std::vector<std::uint8_t> d_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::gt_octets_num);
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_to_bytes<fq12_type>(
+        d, d_ser.begin(), d_ser.end());
+    BOOST_CHECK_EQUAL(et_d_ser, d_ser);
+    fq12_value_type d_deser =
+        nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_from_bytes<fq12_type>(d_ser.begin(),
+                                                                                                    d_ser.end());
+    BOOST_CHECK_EQUAL(d_deser, d);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
