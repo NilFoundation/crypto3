@@ -85,9 +85,9 @@ namespace nil {
                     multiprecision::export_bits(
                         point_affine.Y.data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
                     multiprecision::export_bits(point_affine.X.data.template convert_to<modulus_type>(),
-                                result.rbegin() + sizeof_field_element,
-                                8,
-                                false);
+                                                result.rbegin() + sizeof_field_element,
+                                                8,
+                                                false);
                 }
                 result[0] |= m_byte;
                 return result;
@@ -99,14 +99,12 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<modulus_type>(),
-                                result.rbegin(),
-                                8,
-                                false);
+                    multiprecision::export_bits(
+                        point_affine.X.data[0].data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
                     multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
-                                result.rbegin() + sizeof_field_element,
-                                8,
-                                false);
+                                                result.rbegin() + sizeof_field_element,
+                                                8,
+                                                false);
                 }
                 result[0] |= m_byte;
                 return result;
@@ -118,27 +116,26 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(point_affine.Y.data[0].data.template convert_to<modulus_type>(),
-                                result.rbegin(),
-                                8,
-                                false);
+                    multiprecision::export_bits(
+                        point_affine.Y.data[0].data.template convert_to<modulus_type>(), result.rbegin(), 8, false);
                     multiprecision::export_bits(point_affine.Y.data[1].data.template convert_to<modulus_type>(),
-                                result.rbegin() + sizeof_field_element,
-                                8,
-                                false);
+                                                result.rbegin() + sizeof_field_element,
+                                                8,
+                                                false);
                     multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<modulus_type>(),
-                                result.rbegin() + 2 * sizeof_field_element,
-                                8,
-                                false);
+                                                result.rbegin() + 2 * sizeof_field_element,
+                                                8,
+                                                false);
                     multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<modulus_type>(),
-                                result.rbegin() + 3 * sizeof_field_element,
-                                8,
-                                false);
+                                                result.rbegin() + 3 * sizeof_field_element,
+                                                8,
+                                                false);
                 }
                 result[0] |= m_byte;
                 return result;
             }
 
+            // TODO: use iterators
             // Deserialization procedure according to
             // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C.2
             template<typename PointOctetsRange,
@@ -160,6 +157,7 @@ namespace nil {
                 return uncompressed_to_g1_point(point_octets, m_byte);
             }
 
+            // TODO: use iterators
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
                          std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
@@ -189,13 +187,11 @@ namespace nil {
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
                          std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-            static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets,
-                                                               std::uint8_t m_byte) {
+            static inline g1_value_type compressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
                 BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == sizeof_field_element);
 
                 if (m_byte & I_bit) {
-                    BOOST_ASSERT(point_octets.end() ==
-                                 std::find(point_octets.begin(), point_octets.end(), true));
+                    BOOST_ASSERT(point_octets.end() == std::find(point_octets.begin(), point_octets.end(), true));
                     return g1_value_type();    // point at infinity
                 }
 
@@ -219,22 +215,20 @@ namespace nil {
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
                          std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-            static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets,
-                                                                 std::uint8_t m_byte) {
-                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
-                             2 * sizeof_field_element);
+            static inline g1_value_type uncompressed_to_g1_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == 2 * sizeof_field_element);
 
                 if (m_byte & I_bit) {
-                    BOOST_ASSERT(point_octets.end() ==
-                                 std::find(point_octets.begin(), point_octets.end(), true));
+                    BOOST_ASSERT(point_octets.end() == std::find(point_octets.begin(), point_octets.end(), true));
                     return g1_value_type();    // point at infinity
                 }
 
                 modulus_type x, y;
-                multiprecision::import_bits(y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                multiprecision::import_bits(x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
-                g1_value_type result(
-                    g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
+                multiprecision::import_bits(
+                    y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
+                multiprecision::import_bits(
+                    x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
+                g1_value_type result(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
                 BOOST_ASSERT(result.is_well_formed());
                 return result;
             }
@@ -242,20 +236,19 @@ namespace nil {
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
                          std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-            static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets,
-                                                               std::uint8_t m_byte) {
-                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
-                             2 * sizeof_field_element);
+            static inline g2_value_type compressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == 2 * sizeof_field_element);
 
                 if (m_byte & I_bit) {
-                    BOOST_ASSERT(point_octets.end() ==
-                                 std::find(point_octets.begin(), point_octets.end(), true));
+                    BOOST_ASSERT(point_octets.end() == std::find(point_octets.begin(), point_octets.end(), true));
                     return g2_value_type();    // point at infinity
                 }
 
                 modulus_type x_0, x_1;
-                multiprecision::import_bits(x_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                multiprecision::import_bits(x_1, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
+                multiprecision::import_bits(
+                    x_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
+                multiprecision::import_bits(
+                    x_1, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
                 g2_field_value_type x_mod(x_0, x_1);
                 g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
                 BOOST_ASSERT(y2_mod.is_square());
@@ -274,29 +267,27 @@ namespace nil {
             template<typename PointOctetsRange,
                      typename = typename std::enable_if<
                          std::is_same<std::uint8_t, typename PointOctetsRange::value_type>::value>::type>
-            static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets,
-                                                                 std::uint8_t m_byte) {
-                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) ==
-                             4 * sizeof_field_element);
+            static inline g2_value_type uncompressed_to_g2_point(PointOctetsRange &point_octets, std::uint8_t m_byte) {
+                BOOST_ASSERT(std::distance(point_octets.begin(), point_octets.end()) == 4 * sizeof_field_element);
 
                 if (m_byte & I_bit) {
-                    BOOST_ASSERT(point_octets.end() ==
-                                 std::find(point_octets.begin(), point_octets.end(), true));
+                    BOOST_ASSERT(point_octets.end() == std::find(point_octets.begin(), point_octets.end(), true));
                     return g2_value_type();    // point at infinity
                 }
 
                 modulus_type x_0, x_1, y_0, y_1;
-                multiprecision::import_bits(y_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
+                multiprecision::import_bits(
+                    y_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
                 multiprecision::import_bits(y_1,
-                            point_octets.rbegin() + sizeof_field_element,
-                            point_octets.rbegin() + 2 * sizeof_field_element,
-                            8,
-                            false);
+                                            point_octets.rbegin() + sizeof_field_element,
+                                            point_octets.rbegin() + 2 * sizeof_field_element,
+                                            8,
+                                            false);
                 multiprecision::import_bits(x_0,
-                            point_octets.rbegin() + 2 * sizeof_field_element,
-                            point_octets.rbegin() + 3 * sizeof_field_element,
-                            8,
-                            false);
+                                            point_octets.rbegin() + 2 * sizeof_field_element,
+                                            point_octets.rbegin() + 3 * sizeof_field_element,
+                                            8,
+                                            false);
                 multiprecision::import_bits(
                     x_1, point_octets.rbegin() + 3 * sizeof_field_element, point_octets.rend(), 8, false);
                 g2_value_type result(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
@@ -338,7 +329,7 @@ namespace nil {
                 return result;
             }
         };
-    }            // namespace marshalling
+    }    // namespace marshalling
 }    // namespace nil
 
 #endif    // CRYPTO3_MARSHALLING_ALGEBRA_CURVES_HPP
