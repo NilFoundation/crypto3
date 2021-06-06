@@ -31,11 +31,6 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
-// temporary includes begin
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
-// temporary includes end
-
 #include <cstdint>
 
 namespace nil {
@@ -43,25 +38,24 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-
                     template<typename GroupValueType,
                              typename Backend,
-                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                             multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType
                         scalar_mul(const GroupValueType &base,
-                                   const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
+                                   const multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         if (scalar.is_zero()) {
                             return GroupValueType::zero();
                         }
                         GroupValueType result;
 
                         bool found_one = false;
-                        for (auto i = static_cast<std::int64_t>(nil::crypto3::multiprecision::msb(scalar)); i >= 0; --i) {
+                        for (auto i = static_cast<std::int64_t>(multiprecision::msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }
 
-                            if (nil::crypto3::multiprecision::bit_test(scalar, i)) {
+                            if (multiprecision::bit_test(scalar, i)) {
                                 found_one = true;
                                 result = result + base;
                             }
@@ -72,18 +66,19 @@ namespace nil {
 
                     template<typename GroupValueType,
                              typename Backend,
-                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType operator*(const GroupValueType &left,
-                                             const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &right) {
+                             multiprecision::expression_template_option ExpressionTemplates>
+                    constexpr GroupValueType
+                        operator*(const GroupValueType &left,
+                                  const multiprecision::number<Backend, ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
                              typename Backend,
-                             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType operator*(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> &left,
-                                             const GroupValueType &right) {
+                             multiprecision::expression_template_option ExpressionTemplates>
+                    constexpr GroupValueType operator*(const multiprecision::number<Backend, ExpressionTemplates> &left,
+                                                       const GroupValueType &right) {
 
                         return right * left;
                     }
@@ -117,11 +112,7 @@ namespace nil {
                         GroupValueType>::type
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
-                            non_fixed_precision_modulus_type;
-
-                        return left * non_fixed_precision_modulus_type(right.data);
+                        return left * right.data;
                     }
 
                     template<typename GroupValueType, typename FieldValueType>
