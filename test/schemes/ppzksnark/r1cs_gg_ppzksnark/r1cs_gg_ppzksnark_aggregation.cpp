@@ -45,6 +45,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
@@ -153,6 +154,7 @@ using scheme_type = r1cs_gg_ppzksnark<curve_type>;
 
 using g1_type = typename curve_type::g1_type;
 using g2_type = typename curve_type::g2_type;
+using gt_type = typename curve_type::gt_type;
 using G1_value_type = typename g1_type::value_type;
 using G2_value_type = typename g2_type::value_type;
 
@@ -942,8 +944,8 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         136, 183, 116, 154, 64,  227, 68,  245, 98,  247, 204, 23,  22,  18,  218, 161,
         152, 27,  155, 234, 230, 152, 24,  2,   2,   153, 59,  205, 235, 66,  175, 83,
     };
-    std::vector<std::uint8_t> b_ser;
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g1_type>(b, std::back_inserter(b_ser));
+    std::vector<std::uint8_t> b_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::g1_octets_num);
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g1_type>(b, b_ser.begin(), b_ser.end());
     BOOST_CHECK_EQUAL(et_b_ser, b_ser);
     G1_value_type b_deser =
         nil::marshalling::ipp2_aggregation_bincode<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
@@ -964,8 +966,8 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         195, 169, 47,  227, 168, 42,  194, 207, 138, 86,  53,  169, 214, 1,   136, 180, 62,  241, 64,  134,
         39,  35,  12,  91,  110, 57,  88,  208, 115, 235, 231, 194, 57,  234, 57,  30,
     };
-    std::vector<std::uint8_t> c_ser;
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g2_type>(c, std::back_inserter(c_ser));
+    std::vector<std::uint8_t> c_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::g2_octets_num);
+    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g2_type>(c, c_ser.begin(), c_ser.end());
     BOOST_CHECK_EQUAL(et_c_ser, c_ser);
     G2_value_type c_deser =
         nil::marshalling::ipp2_aggregation_bincode<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
@@ -1039,59 +1041,13 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
     std::string domain_separator_str = "random-r";
     std::vector<std::uint8_t> domain_separator(domain_separator_str.begin(), domain_separator_str.end());
 
-    // accumulator_set<hash_type> acc;
-    // hash<hash_type>(application_tag, acc);
-    // hash<hash_type>(domain_separator, acc);
-    // hash<hash_type>(a_ser, acc);
-    // hash<hash_type>(b_ser, acc);
-    // hash<hash_type>(c_ser, acc);
-    // hash<hash_type>(d_ser, acc);
-    std::vector<std::uint8_t> hashed_val;
-    hashed_val.insert(hashed_val.end(), application_tag.begin(), application_tag.end());
-    hashed_val.insert(hashed_val.end(), domain_separator.begin(), domain_separator.end());
-    hashed_val.insert(hashed_val.end(), a_ser.begin(), a_ser.end());
-    hashed_val.insert(hashed_val.end(), b_ser.begin(), b_ser.end());
-    hashed_val.insert(hashed_val.end(), c_ser.begin(), c_ser.end());
-    hashed_val.insert(hashed_val.end(), d_ser.begin(), d_ser.end());
-
-    std::size_t counter_nonce = 0;
-    std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
-    while (true) {
-        ++counter_nonce;
-        // nil::crypto3::detail::pack_to<stream_endian::big_octet_big_bit, sizeof(std::size_t) * 8, 8>(
-        //     std::vector<std::size_t> {
-        //         counter_nonce,
-        //     },
-        //     counter_nonce_bytes.begin());
-        nil::crypto3::detail::
-            pack<stream_endian::big_byte_big_bit, stream_endian::little_byte_big_bit, sizeof(std::size_t) * 8, 8>(
-                std::vector<std::size_t> {
-                    counter_nonce,
-                },
-                counter_nonce_bytes);
-        for (auto i : counter_nonce_bytes) {
-            std::cout << int(i) << ", ";
-        }
-        std::cout << std::endl;
-
-        // hash<hash_type>(counter_nonce_bytes, acc);
-        // auto acc_copy = acc;
-        // typename hash_type::digest_type res = accumulators::extract::hash<hash_type>(acc_copy);
-        hashed_val.insert(hashed_val.end(), counter_nonce_bytes.begin(), counter_nonce_bytes.end());
-        typename hash_type::digest_type res = hash<hash_type>(hashed_val);
-
-        scalar_field_value_type res_deser =
-            nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_from_bytes<scalar_field_type>(
-                res.begin(), res.end());
-        if (res_deser == scalar_field_value_type::one()) {
-            continue;
-        }
-        print_field_element(std::cout, res_deser);
-        print_field_element(std::cout, res_deser.inversed());
-        BOOST_CHECK_EQUAL(et_res, res_deser);
-        break;
-    }
-
+    transcript<> tr(application_tag.begin(), application_tag.end());
+    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
+    tr.write<scalar_field_type>(a);
+    tr.write<g1_type>(b);
+    tr.write<g2_type>(c);
+    tr.write<gt_type>(d);
+    BOOST_CHECK_EQUAL(et_res, tr.read_challenge());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

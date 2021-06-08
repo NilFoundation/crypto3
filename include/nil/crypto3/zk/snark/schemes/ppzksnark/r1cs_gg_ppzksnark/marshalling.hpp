@@ -955,6 +955,7 @@ namespace nil {
             typedef typename curve_type::scalar_field_type fr_type;
             typedef typename curve_type::g1_type g1_type;
             typedef typename curve_type::g2_type g2_type;
+            typedef typename curve_type::gt_type gt_type;
 
             typedef std::uint8_t chunk_type;
             constexpr static const std::size_t chunk_size = 8;
@@ -969,7 +970,43 @@ namespace nil {
 
             constexpr static std::size_t g1_octets_num = fp_octets_num;
             constexpr static std::size_t g2_octets_num = 2 * fp_octets_num;
-            constexpr static std::size_t gt_octets_num = 2 * 3 * 2 * fp_octets_num;
+            constexpr static std::size_t gt_octets_num = gt_type::arity * fp_octets_num;
+
+            // template<typename FieldType>
+            // constexpr static inline std::size_t get_field_element_size() {
+            //     return (FieldType::modulus_bits / chunk_size + (FieldType::modulus_bits % chunk_size ? 1 : 0)) *
+            //            FieldType::arity;
+            // }
+
+            template<typename FieldType>
+            constexpr static inline typename std::enable_if<std::is_same<fr_type, FieldType>::value, std::size_t>::type
+                get_element_size() {
+                return fr_octets_num;
+            }
+
+            template<typename FieldType>
+            constexpr static inline typename std::enable_if<std::is_same<fp_type, FieldType>::value, std::size_t>::type
+                get_element_size() {
+                return fp_octets_num;
+            }
+
+            template<typename FieldType>
+            constexpr static inline typename std::enable_if<std::is_same<gt_type, FieldType>::value, std::size_t>::type
+                get_element_size() {
+                return gt_octets_num;
+            }
+
+            template<typename GroupType>
+            constexpr static inline typename std::enable_if<std::is_same<g1_type, GroupType>::value, std::size_t>::type
+                get_element_size() {
+                return g1_octets_num;
+            }
+
+            template<typename GroupType>
+            constexpr static inline typename std::enable_if<std::is_same<g2_type, GroupType>::value, std::size_t>::type
+                get_element_size() {
+                return g2_octets_num;
+            }
 
             template<typename FieldType, typename InputFieldValueIterator>
             static inline typename std::enable_if<
@@ -1084,9 +1121,18 @@ namespace nil {
             template<typename GroupType, typename OutputIterator>
             static inline typename std::enable_if<
                 std::is_same<g1_type, GroupType>::value || std::is_same<g2_type, GroupType>::value, std::size_t>::type
-                point_to_bytes(const typename GroupType::value_type &point, OutputIterator out) {
+                point_to_bytes(const typename GroupType::value_type &point, OutputIterator out_first,
+                               OutputIterator out_last) {
+                if (std::is_same<g1_type, GroupType>::value) {
+                    BOOST_ASSERT(g1_octets_num == std::distance(out_first, out_last));
+                } else if (std::is_same<g2_type, GroupType>::value) {
+                    BOOST_ASSERT(g2_octets_num == std::distance(out_first, out_last));
+                } else {
+                    BOOST_ASSERT_MSG(false, "incorrect group");
+                }
+
                 auto out_array = curve_element_serializer<curve_type>::point_to_octets_compress(point);
-                copy(out_array.begin(), out_array.end(), out);
+                copy(out_array.begin(), out_array.end(), out_first);
                 return out_array.size();
             }
         };
