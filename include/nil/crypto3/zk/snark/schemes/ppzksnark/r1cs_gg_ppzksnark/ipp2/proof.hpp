@@ -66,7 +66,6 @@ namespace nil {
                     typename curve_type::g1_type::value_type final_a;
                     typename curve_type::g2_type::value_type final_b;
                     typename curve_type::g1_type::value_type final_c;
-                    typename curve_type::scalar_field_type::value_type final_r;
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
