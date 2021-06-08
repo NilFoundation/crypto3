@@ -47,8 +47,6 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
-
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
 
@@ -1048,6 +1046,184 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
     tr.write<g2_type>(c);
     tr.write<gt_type>(d);
     BOOST_CHECK_EQUAL(et_res, tr.read_challenge());
+}
+
+BOOST_AUTO_TEST_CASE(bls381_gipa_tipp_mipp_test) {
+    std::size_t n = 8;
+    scalar_field_value_type u(0x57aa5df37b9bd97a5e5f84f4797eac33e5ebe0c6e2ca2fbca1b3b3d7052ce35d_cppui255);
+    scalar_field_value_type v(0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255);
+
+    auto w1 = structured_generators_scalar_power<g1_type>(n, u);
+    auto w2 = structured_generators_scalar_power<g1_type>(n, v);
+    r1cs_gg_ppzksnark_ipp2_wkey<curve_type> wkey {w1, w2};
+
+    auto v1 = structured_generators_scalar_power<g2_type>(n, u);
+    auto v2 = structured_generators_scalar_power<g2_type>(n, v);
+    r1cs_gg_ppzksnark_ipp2_vkey<curve_type> vkey {v1, v2};
+
+    scalar_field_value_type foo_in_tr(0x70ba0c24f7ef40a196a336804288ebe616f02e36c9ff599a6ab759cd4a0a5712_cppui255);
+
+    std::string application_tag_str = "snarkpack";
+    std::vector<std::uint8_t> application_tag(application_tag_str.begin(), application_tag_str.end());
+    std::string domain_separator_str = "random-r";
+    std::vector<std::uint8_t> domain_separator(domain_separator_str.begin(), domain_separator_str.end());
+
+    transcript<> tr(application_tag.begin(), application_tag.end());
+    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
+    tr.write<scalar_field_type>(foo_in_tr);
+
+    std::vector<G1_value_type> a = {{
+        G1_value_type(
+            0x19382d09ee3fbfb35c5a7784acd3a8b7e26e3c4d2ca1e3b9b954a19961ddf5a04bc3ee1e964b3df3995290247c348ec7_cppui381,
+            0x0e1429c57d0b11abeed302fe450ee728b9944a731765408533ea89b81f868ea1086c9d7e62909640641d7c916b19ad33_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x0d76e41234948369334b432362d0704bd88599200d80645a69ed47acf10464822776a5ba8efaad891d98bf9b104f9d24_cppui381,
+            0x08a8c2ae10d589f38a9d983feba2241cbf0d292d44bc082e8fc9ff872f8eb280f6c6cfd1c34928fa81274781a4f4770e_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x02e080ea7883f56025b965fe7fa27315af7bf0f532fb031075467cc78dbce6319645e23e8febb6660cc864ba9e985afd_cppui381,
+            0x0f25c2c8aaceff02da0d5b85030767c64b3ed2ffd3e3f69e9aee42025c737e95fce00d5269eb151c4d22a5f77ef8c815_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x0d3541b03376d07cbb7f9f48b3a1cc43cf48160152c20c00c7bad75986839b0f9ef7cc71f1ffb4d254d9ec15ce6bf336_cppui381,
+            0x01e48935c827f8ec79129124e8baf1deccf99d8ca0324fae41e037f4854ff4f389a4df3bc9ab2549b6ef949e4acdedb7_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x100462d4d96fcf47dd6f6dd3957f8c2d15cc72fe0f2ab0540813e73a16c74b4bb932722e96a33e2a26ca1ab9bc879e49_cppui381,
+            0x0b2d223ea7a3275108aa52b3e4eaba948dc93cb6ae29c3c472a022eab55356e51755a6486e7fa94f3b8b4a06b3ea735c_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x1320c3ca0de8f268ff78f461e5b342960432064eec51743c386fe93f2f1ff8d4592d04605092b7302c217a72e6137632_cppui381,
+            0x1613b77929282de9c0a3baf3285394260a50660b2f5168c6924973b44f35dc1a236796b3251c5a748039b78d0b377576_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x16bfa39559ac6ddfd3c63ef03bfd11ae6de4d08e66f82dc4ec4e2ca4318c266a705134204f2aaf99b91f95610d356bdb_cppui381,
+            0x0c2dccca4ef18b3cf50f18ff13de4443eb6f5e6160ae985568fc5557232c892599e27285254360f797e4b59da1c19406_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x09f4ebbbaaaf5d2ea52abcb591412f6851539e1919d34de4f00900e60591438a6668d48070b5fb22c3b59a3cdae45799_cppui381,
+            0x0aad9a2d04fbced844ab0811af6deefb18e9d67660073ec96954f2f0edf3a884a4ddcef6d8b7889a9bfbf7e2f151b1b5_cppui381,
+            fq_value_type::one()),
+    }};
+    std::vector<G2_value_type> b = {{
+        G2_value_type(
+            fq2_value_type(
+                0x0badfb692a2a7ca4970d2733fc2565afa8e09428453ef5cc916a6d5ab43b8be8b9ef920af378f1823f426bafd1d096c9_cppui381,
+                0x0d523776965ea36bab19da0387d38305d628d63fb7da6736f4620b7fce92539fcbaafe7dabd96e98693d9973ecf0544a_cppui381),
+            fq2_value_type(
+                0x020203c10b37edef960e6921c624ee57a3c2b256385b3c68f8fd611f1deba8ab91cea15d77452639429c74086a322eb7_cppui381,
+                0x1498dcc1d84eb92d7e41ee99596e1825901ea430fcb0ff64d346e19375981ba8579d6ebf325c8809f1aee58542bd6c98_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x1634b13dec932a66d5b3ea6406bacd702e020970d533c29a3d6fd80a4ce1e8138744eb41b0f1e66e956fbace9af6a151_cppui381,
+                0x0a4edb2465192b1b32c84bd6791aa9795b8533df963b1626c8ee548bb5f7430a563d0e662b3053cc12cd256f9e8471a4_cppui381),
+            fq2_value_type(
+                0x049004fe74f14513aa607d429e78203f86e08100dc70243fef9fe73cf9f04f9c3793b3fbc1d4833f9db371ee94e60bc2_cppui381,
+                0x0f2277dafecdf791e560c89086d7abc21e5f0314fabd492a0926e588acf7a34d30c0713ee2cb03054f44a7dae8288694_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x0147be5fd09e02e8d64eec3e6737b40d4099ccfdd88651c692c7d4407a2822c35756ba40ca412f61e201b5cb649391a6_cppui381,
+                0x165fd26d77e79da63ffbfaa5771426f4fc6c925a92bd593d1075e84ae1db5e9cb0a7dffaea46dd46a44f6cf904cb873a_cppui381),
+            fq2_value_type(
+                0x1507d32ecb1783a069322547839ffeadd5bc4e04562dc36914686df787f6f82d5a84f32786996fd56ab2ed75e25264cb_cppui381,
+                0x0302e3dd0ef0b642fc55af194e4906d57bcbcfa1a3822f078fd7fa1ea0d665ef6f60531068bd7a6834b92618db91ea23_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x04c0d40f727b43aa40d5a66de08182abf5c15f6d3726a9f43085c7a9c8b535ab17bafbc6d90a6677905271c845768ff2_cppui381,
+                0x10e288228d368ee8fbfe240e2a0ac3214bc232334d901feb02f41fbb459c11ae6fb381a4022232b66f8a98ec5ed2425e_cppui381),
+            fq2_value_type(
+                0x0285029f076803949ea0d635d716ddff562a8ba9a652e43da0e1df737978432082cce2435e857a2b78c886fa7a6dce84_cppui381,
+                0x0a52fcec1a0fc4ec51022181a0e1e44aee18f8d2cda18c8ce5acc789838b03205919870c83b4ec54cc523d89a40ef62f_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x113b921ff6a06df8c8ee87288df68472b00f7f8dc243c12731f1177ecb8780fbd3765069e0fd5a8c1c7a67649b00d2a0_cppui381,
+                0x12d96c166c7292b72c7bb9e0e9e91ffdf7ca3926f67ce4894f0b7ae0d826d397c7fb8bba8e2e29abcb8aa9e7de01c42b_cppui381),
+            fq2_value_type(
+                0x0b9231a10b1066269677672e76235e7864d7bc0bc99d9de649c1ecca732e887c6c5975c486b44fae713541d130497bf6_cppui381,
+                0x011a97bd656717d31c74a17fec650e2a04894d04631792f14183ccacee8db3ddd731f4ced99488a133f66d12a66d2eaa_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x159a7f20fc1f1fe0f794fa735c6ee28b2837aa5d70d70d1f53f1d7cbae31ca04782e9261818ae6bda542076fb61c8bb1_cppui381,
+                0x03d48c028b98f10345bd40a59c2bf27229947241472986bbff174ea87d1a1d4721e2a03ccd0af2fad6d014fbc93f55d9_cppui381),
+            fq2_value_type(
+                0x0c5b2aa2ac824a6a3df42b895d61832e71202b8fa896eb7bd52e4f1360c696385db9fb84783aaea4e8ad86f80e2703a9_cppui381,
+                0x07fc3cf1d974627a821f223dac339045ede041850e3b6b542dc66b0d3bfd3a582c68c65ace31bb3986c70b4f59754e62_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x0f228b023d7881ed41446c45cbc1fd05aecb0708291131bb189a6d826921780e1c28864cb0d84f68d4d1933d5bb57c15_cppui381,
+                0x14292b6aaa6b19596e452bef413171d6fbf68e1d7642dc0e815c8dda280c32d63279dcb9bd16effa5789722dd403c188_cppui381),
+            fq2_value_type(
+                0x05e1e5b8555c4d238726565fbca0b37042fd10cf5b7f6e0396d71f5660db2aeaa053b0be570f33c1349503829695eb98_cppui381,
+                0x0896a44ec87960d640a89fde02f969a079c781ecf6c29f8c3115f6792cdd20eb5046ae8aaedab29b0b6d12728b9863a9_cppui381),
+            fq2_value_type::one()),
+        G2_value_type(
+            fq2_value_type(
+                0x108b91795a87e98f1fee29fa53b60f7bd6f397f6e716654e508303a0f5cf9adf44cda4c8698319da3b7f2f417823e127_cppui381,
+                0x1389b59456bc26b56b1ec04cd3deb42033519f78255e3569231d551c121bee2b42151c2ef3513c48851519133c7b24be_cppui381),
+            fq2_value_type(
+                0x13d4e1d3f953e836bdf9602d2fbb7496b8a922638cbca415d171de4a7df0a9ce630c9d14e3804a662ee558d415308993_cppui381,
+                0x0b154e4f42109dd3a7857f02cd95c480d205ba5427fd49389051f7fa927ea6e2b6c4373c145349e8cbd9ca1098fba447_cppui381),
+            fq2_value_type::one()),
+    }};
+    std::vector<G1_value_type> c = {{
+        G1_value_type(
+            0x0ae765904fababf7bd5d5edab78752b69917962c150f3b0311446579a083a667412ea18f009817a6051cf852e09e9c40_cppui381,
+            0x127fb89d20a2b31725091c033f14986b33878ef4853806987412126bd8135731c09d5222fddf44441eb4e04cee8b9469_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x140e91d114a6dbb835d2ae1ab50729b0553e3e988ca0451b29ac1458caf71b1f1c47ef2255814b4a3ccfb924f57cbe33_cppui381,
+            0x0ac830f2ed3435b2b9b3900d0bc0d74407467abdde9f72e922859ae1d2cb094299a7ad467680e7eff331e8a6f92df194_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x186aabfcbe235db4a2dcbacbdd571d0b2e857ada26ee83f0a4121c1bed70ee6609bc0f24b3ffc6ea8af50b1b4de25af5_cppui381,
+            0x053ea1258a76b5dc15460676bd2380558bd26cbd98266cb04bbe3d18656f68b8ea11c6db24fdffc28470fa8778e08882_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x0642350f1aae9598397a7da3190e07b7b896696682c37641cbbede18f05495bcc822cc8bf34b87709372f3b8cb895a38_cppui381,
+            0x140f5cb0dc31c1db82e845f53882f8a7a0679380acb7262411d8f9b7877586192f1d306f5eba7b42fe937c3885542c1e_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x04eecaeb1aab1d88696f17a3fb205e7d0bf517c16ccce694f196cf456b45a3983fe40aebbd2c0a5da701c63933d0c388_cppui381,
+            0x18dd9108754b69d09b2ad191b8c4f431431030619765f109a0ab1fc9a64e71d483ad96c95a777a0e73aa72703b97f59f_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x16dd473a6acb01617eb7b690657196e837013062c9a20d0afb16f8604882182b65ab55e112265e510b4a0a95ca2fe1e1_cppui381,
+            0x1937d9afd12b5a1334475224f967fae496c1b7ad9277845cfe9acb789d9d207d7bd3c2464b337669c9ffb3d5f643a163_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x19bd07f7ce52c9efe33aa9e93c98c9bc2ddaa4c762c52f988064438ed82dff92c49b5799124116af8ea46d9dab5cd5f6_cppui381,
+            0x08f805c413e0a8087b32052148a63dda612c34a988e42e8cd12b3fb3d72942201571bf46298c6dc697c1e51be539295a_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x00352edd966153a5fd28fe8ac333ddc95a4dd00a6ef16f7b59095e705c3bd5d6e8805071f3c8ab2a66f70e7a703233bc_cppui381,
+            0x0499e107ae36ceb8da7e1da2b83a8217b428976311420b4281bd428bc18b0db518e125d8a21e92efe1d68bc766ac4ffe_cppui381,
+            fq_value_type::one()),
+    }};
+    std::vector<scalar_field_value_type> r = {{
+        0x05beb4119e1356ef39f98c7a7115452a3c4c1e2a48975c85d875aae91185fa25_cppui255,
+        0x256d4004ff9591bbaeaaf85cac883eed808de37eff2b45c6d05e6670b3cd1fdc_cppui255,
+        0x3973e132b07e7b2244f1172a11387054f7c9593b3b258475db005459a0e4bcff_cppui255,
+        0x669073a3f8b48ee66412051fc614f73fa8e4e967a81e82562d23bfe430d1e2b4_cppui255,
+        0x2d571b235843a47ecc75978a95b3cceb9fb28a6a2919e0304eb79201c4ef0352_cppui255,
+        0x622551c093e4773c3e1ffb69e99fcd4a31a1f727369f47b1df49b03b9534a8ad_cppui255,
+        0x0b8cb847f81048e85f5843218c1e273b56ce2608d7d9947cd1527a1fca0001f8_cppui255,
+        0x3dd77c298708150d79e47bc4afccf78a6e2f32a17bbbcab1ea41e05551c0e96e_cppui255,
+    }};
+
+    auto [g_proof, challenges, challenges_inv] = gipa_tipp_mipp<curve_type>(tr, a.begin(), a.end(), b.begin(), b.end(), c.begin(), c.end(), vkey, wkey, r.begin(), r.end());
+
+    for (auto &c : challenges) {
+        print_field_element(std::cout, c);
+        std::cout << ", ";
+    }
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

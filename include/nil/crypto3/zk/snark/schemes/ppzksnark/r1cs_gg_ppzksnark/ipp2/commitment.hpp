@@ -184,33 +184,33 @@ namespace nil {
                     }
                 };
 
-                /*!
-                 * Returns both vectors scaled by the given vector entrywise.
-                 * In other words, it returns $\{v_i^{s_i}\}$
-                 */
-                template<
-                    typename GroupType, typename InputIterator,
-                    typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
-                    typename std::enable_if<
-                        std::is_same<typename GroupType::curve_type::scalar_field_type::value_type, ValueType>::value,
-                        bool>::type = true>
-                r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
-                    scale(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &key,
-                          InputIterator s_first,
-                          InputIterator s_last) {
-                    return key.scale(s_first, s_last);
-                }
-
-                /// Takes a left and right commitment key and returns a commitment
-                /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
-                /// required step during GIPA recursion.
-                template<typename GroupType>
-                r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
-                    compress(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &left,
-                             const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &right,
-                             const typename GroupType::curve_type::scalar_field_type::value_type &scale) {
-                    return left.compress(right, scale);
-                }
+                // /*!
+                //  * Returns both vectors scaled by the given vector entrywise.
+                //  * In other words, it returns $\{v_i^{s_i}\}$
+                //  */
+                // template<
+                //     typename GroupType, typename InputIterator,
+                //     typename ValueType = typename std::iterator_traits<InputIterator>::value_type,
+                //     typename std::enable_if<
+                //         std::is_same<typename GroupType::curve_type::scalar_field_type::value_type, ValueType>::value,
+                //         bool>::type = true>
+                // r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
+                //     scale(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &key,
+                //           InputIterator s_first,
+                //           InputIterator s_last) {
+                //     return key.scale(s_first, s_last);
+                // }
+                //
+                // /// Takes a left and right commitment key and returns a commitment
+                // /// key $left \circ right^{scale} = (left_i*right_i^{scale} ...)$. This is
+                // /// required step during GIPA recursion.
+                // template<typename GroupType>
+                // r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType>
+                //     compress(const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &left,
+                //              const r1cs_gg_ppzksnark_ipp2_commitment_key<GroupType> &right,
+                //              const typename GroupType::curve_type::scalar_field_type::value_type &scale) {
+                //     return left.compress(right, scale);
+                // }
 
                 /// Commitment key used by the "single" commitment on G1 values as
                 /// well as in the "pair" commitment.

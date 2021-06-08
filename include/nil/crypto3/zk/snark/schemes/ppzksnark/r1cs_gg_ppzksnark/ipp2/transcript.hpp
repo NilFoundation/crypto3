@@ -91,6 +91,7 @@ namespace nil {
                     }
 
                     inline typename curve_type::scalar_field_type::value_type read_challenge() {
+                        std::vector<std::uint8_t> state = buffer;
                         std::size_t counter_nonce = 0;
                         std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
                         while (true) {
@@ -104,8 +105,8 @@ namespace nil {
                                 },
                                 counter_nonce_bytes);
 
-                            buffer.insert(buffer.end(), counter_nonce_bytes.begin(), counter_nonce_bytes.end());
-                            typename hash_type::digest_type res = hash<hash_type>(buffer);
+                            state.insert(state.end(), counter_nonce_bytes.begin(), counter_nonce_bytes.end());
+                            typename hash_type::digest_type res = hash<hash_type>(state);
                             typename curve_type::scalar_field_type::value_type res_deser =
                                 bincode::template field_element_from_bytes<typename curve_type::scalar_field_type>(
                                     res.begin(), res.end());
