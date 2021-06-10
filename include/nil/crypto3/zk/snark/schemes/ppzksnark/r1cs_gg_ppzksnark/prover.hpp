@@ -93,7 +93,7 @@ namespace nil {
 
                         /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                            and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
-                        BOOST_ASSERT(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
+                        //BOOST_ASSERT(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
                         BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                         BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 
