@@ -111,6 +111,9 @@ namespace nil {
                         typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         std::size_t length = std::distance(bases, bases_end);
+                        std::size_t scalars_length = std::distance(exponents, exponents_end);
+
+                        assert (length == scalars_length);
 
                         // empirically, this seems to be a decent estimate of the optimal value of c
                         std::size_t log2_length = std::log2(length);
@@ -119,7 +122,13 @@ namespace nil {
                         std::size_t num_bits = 0;
 
                         for (std::size_t i = 0; i < length; i++) {
-                            std::size_t bn_exponents_i_msb = multiprecision::msb(exponents[i].data) + 1;
+                            // Should be
+                            // std::size_t bn_exponents_i_msb = multiprecision::msb(exponents[i].data) + 1;
+                            // But multiprecision::msb doesn't work for zero value
+                            std::size_t bn_exponents_i_msb = 1;
+                            if (exponents[i].data != 0){
+                                bn_exponents_i_msb = multiprecision::msb(exponents[i].data) + 1;
+                            }
                             num_bits = std::max(num_bits, bn_exponents_i_msb);
                         }
 
