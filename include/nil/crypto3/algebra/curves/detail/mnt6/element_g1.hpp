@@ -346,23 +346,6 @@ namespace nil {
                                                 g2_field_type_value::underlying_type::one(),
                                                 g2_field_type_value::underlying_type::zero());
 
-                        constexpr static const g1_field_type_value twist_mul_by_a_c0 =
-                            element_mnt6_g1<298>::a * g2_field_type_value::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_a_c1 =
-                            element_mnt6_g1<298>::a * g2_field_type_value::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_a_c2 = element_mnt6_g1<298>::a;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c0 =
-                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c1 =
-                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
-                        constexpr static const g1_field_type_value twist_mul_by_b_c2 =
-                            element_mnt6_g1<298>::b * g2_field_type_value::non_residue;
-
-                        constexpr static const g1_field_type_value twist_mul_by_q_X =
-                            0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298;
-                        constexpr static const g1_field_type_value twist_mul_by_q_Y =
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298;
-
                         constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
                             underlying_field_value_type::zero(), underlying_field_value_type::one(),
                             underlying_field_value_type::zero()};

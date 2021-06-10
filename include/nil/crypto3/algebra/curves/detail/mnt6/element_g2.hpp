@@ -378,7 +378,6 @@ namespace nil {
                         constexpr static const g2_field_type_value twist_coeff_a = a;
                         constexpr static const g2_field_type_value twist_coeff_b = b;
 
-                    private:
                         constexpr static const g1_field_type_value twist_mul_by_a_c0 =
                             g1_a * underlying_field_value_type::non_residue;
                         constexpr static const g1_field_type_value twist_mul_by_a_c1 =
@@ -390,6 +389,8 @@ namespace nil {
                             g1_b * underlying_field_value_type::non_residue;
                         constexpr static const g1_field_type_value twist_mul_by_b_c2 =
                             g1_b * underlying_field_value_type::non_residue;
+                    
+                    private:
 
                         constexpr static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                             0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
@@ -425,6 +426,13 @@ namespace nil {
 
                     constexpr
                         typename element_mnt6_g2<298>::g2_field_type_value const element_mnt6_g2<298>::twist_coeff_b;
+
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_a_c0;
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_a_c1;
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_a_c2;
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_b_c0;
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_b_c1;
+                    constexpr typename element_mnt6_g2<298>::g1_field_type_value const element_mnt6_g2<298>::twist_mul_by_b_c2;
 
                 }    // namespace detail
             }        // namespace curves
