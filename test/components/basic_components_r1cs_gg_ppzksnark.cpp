@@ -60,7 +60,94 @@ using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
-void test_comparison_component(size_t a, size_t b) {
+void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
+    using field_type = typename CurveType::scalar_field_type;
+    using curve_type = CurveType;
+
+    const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
+
+    const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
+
+    const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
+
+    bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
+
+    std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
+    std::cout << "Verification status: " << verified << std::endl;
+
+    BOOST_CHECK(verified);
+}
+
+template<typename CurveType>
+void test_disjunction_component(std::size_t w) {
+
+    using field_type = typename CurveType::scalar_field_type;
+    using curve_type = CurveType;
+
+    std::size_t n = std::log2(w) + 
+        ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
+
+    blueprint<field_type> bp;
+    blueprint_variable<field_type> output;
+    output.allocate(bp);
+
+    bp.set_input_sizes(1);
+
+    blueprint_variable_vector<field_type> inputs;
+    inputs.allocate(bp, n);
+
+    components::disjunction_component<field_type> d(bp, inputs, output);
+    d.generate_r1cs_constraints();
+
+    for (std::size_t j = 0; j < n; ++j) {
+        bp.val(inputs[j]) = typename field_type::value_type((w & (1ul << j)) ? 1 : 0);
+    }
+
+    d.generate_r1cs_witness();
+
+    BOOST_CHECK(bp.val(output) == (w ? field_type::value_type::one() : field_type::value_type::zero()));
+    BOOST_CHECK(bp.is_satisfied());
+
+    verify_component<curve_type>(bp);
+}
+
+template<typename CurveType>
+void test_conjunction_component(std::size_t w) {
+
+    using field_type = typename CurveType::scalar_field_type;
+    using curve_type = CurveType;
+
+    std::size_t n = std::log2(w) + 
+        ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
+
+    blueprint<field_type> bp;
+
+    blueprint_variable<field_type> output;
+    output.allocate(bp);
+
+    bp.set_input_sizes(1);
+
+    blueprint_variable_vector<field_type> inputs;
+    inputs.allocate(bp, n);
+
+    components::conjunction_component<field_type> c(bp, inputs, output);
+    c.generate_r1cs_constraints();
+
+    for (std::size_t j = 0; j < n; ++j) {
+        bp.val(inputs[j]) = (w & (1ul << j)) ? field_type::value_type::one() : field_type::value_type::zero();
+    }
+
+    c.generate_r1cs_witness();
+
+    BOOST_CHECK(bp.val(output) ==
+                (w == (1ul << n) - 1 ? field_type::value_type::one() : field_type::value_type::zero()));
+    BOOST_CHECK(bp.is_satisfied());
+
+    verify_component<curve_type>(bp);
+}
+
+template<typename CurveType>
+void test_comparison_component(std::size_t a, std::size_t b) {
     
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
@@ -89,20 +176,30 @@ void test_comparison_component(size_t a, size_t b) {
     BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.is_satisfied());
 
-    const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
-
-    const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
-
-    const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
-
-    bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
-
-    std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
-    std::cout << "Verification status: " << verified << std::endl;
-
+    verify_component<curve_type>(bp);
 }
 
 BOOST_AUTO_TEST_SUITE(basic_components_test_suite)
+
+BOOST_AUTO_TEST_CASE(basic_components_disjunction_r1cs_gg_ppzksnark_test) {
+    std::cout << "Disjunction component test started" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
+    test_disjunction_component<curves::bls12<381>>(10);
+    std::cout << "Started for mnt4<298>" << std::endl;
+    test_disjunction_component<curves::mnt4<298>>(10);
+    std::cout << "Started for mnt6<298>" << std::endl;
+    test_disjunction_component<curves::mnt6<298>>(10);
+}
+
+BOOST_AUTO_TEST_CASE(basic_components_conjunction_r1cs_gg_ppzksnark_test) {
+    std::cout << "Conjunction component test started" << std::endl;
+    std::cout << "Started for bls12<381>" << std::endl;
+    test_conjunction_component<curves::bls12<381>>(10);
+    std::cout << "Started for mnt4<298>" << std::endl;
+    test_conjunction_component<curves::mnt4<298>>(10);
+    std::cout << "Started for mnt6<298>" << std::endl;
+    test_conjunction_component<curves::mnt6<298>>(10);
+}
 
 BOOST_AUTO_TEST_CASE(basic_components_comparison_r1cs_gg_ppzksnark_test) {
     std::cout << "Comparison component r1cs_gg_ppzksnark test started" << std::endl;
