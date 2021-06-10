@@ -26,7 +26,7 @@
 // prover, then verifier) on a synthetic R1CS instance.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE r1cs_gg_ppzksnark_test
+#define BOOST_TEST_MODULE sha256_r1cs_gg_ppzksnark_test
 
 #include <boost/test/unit_test.hpp>
 

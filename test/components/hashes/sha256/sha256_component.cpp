@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE sha2_256_component_test
+#define BOOST_TEST_MODULE sha256_component_test
 
 #include <boost/test/unit_test.hpp>
 

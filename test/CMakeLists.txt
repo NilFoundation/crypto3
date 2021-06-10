@@ -56,6 +56,7 @@ set(TESTS_NAMES
 
     "components/verifiers/r1cs_ppzksnark"
     "components/basic_components"
+    "components/basic_components_r1cs_gg_ppzksnark"
     "components/exponentiation_component"
     "components/merkle_tree_components"
     "components/set_commitment_component")
