@@ -37,6 +37,7 @@ include(FindPkgConfig)
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_WITH_PROCPS "Build with procps for memory profiling" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
+option(BUILD_EXAMPLES "Build examples" FALSE)
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
@@ -157,4 +158,8 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
 if(BUILD_TESTS)
     add_subdirectory(test)
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory(example)
 endif()

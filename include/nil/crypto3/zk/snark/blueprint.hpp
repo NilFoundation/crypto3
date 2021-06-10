@@ -41,12 +41,6 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class r1cs_constraint;
-
-                template<typename FieldType>
-                class r1cs_constraint_system;
-
-                template<typename FieldType>
                 class blueprint {
                     r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
                                                                 variable of the blueprint, *NOT* constant 1 */
