@@ -200,30 +200,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-
-            template<typename CodecStateImpl>
-            std::ostream &operator<<(std::ostream &os, const detail::range_codec_impl<CodecStateImpl> &r) {
-                return os << r.operator typename detail::range_codec_impl<CodecStateImpl>::result_type();
-            }
-
-            template<typename CodecStateImpl, typename OutputIterator>
-            std::ostream &operator<<(std::ostream &os,
-                                     const detail::itr_codec_impl<CodecStateImpl, OutputIterator> &r) {
-                return os << r.operator typename detail::itr_codec_impl<CodecStateImpl, OutputIterator>::result_type();
-            }
         }    // namespace codec
-
-        template<typename CodecStateImpl>
-        std::ostream &operator<<(std::ostream &os, const codec::detail::range_codec_impl<CodecStateImpl> &r) {
-            return os << r.operator typename codec::detail::range_codec_impl<CodecStateImpl>::result_type();
-        }
-
-        template<typename CodecStateImpl, typename OutputIterator>
-        std::ostream &operator<<(std::ostream &os,
-                                 const codec::detail::itr_codec_impl<CodecStateImpl, OutputIterator> &r) {
-            return os
-                   << r.operator typename codec::detail::itr_codec_impl<CodecStateImpl, OutputIterator>::result_type();
-        }
     }    // namespace crypto3
 }    // namespace nil
 
