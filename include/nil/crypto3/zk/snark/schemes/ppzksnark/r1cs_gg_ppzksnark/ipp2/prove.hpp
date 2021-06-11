@@ -360,7 +360,7 @@ namespace nil {
                                           zab_l = zab_l *
                                                   algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                       });
-                        zab_l = CurveType::pairing::final_exponentiation(zab_l);
+                        zab_l = algebra::final_exponentiation<CurveType>(zab_l);
                         typename CurveType::gt_type::value_type zab_r = CurveType::gt_type::value_type::one();
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(m_a.begin(), m_b.begin() + split)),
                                       boost::make_zip_iterator(boost::make_tuple(m_a.begin() + split, m_b.end())),
@@ -369,7 +369,7 @@ namespace nil {
                                           zab_r = zab_r *
                                                   algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                       });
-                        zab_r = CurveType::pairing::final_exponentiation(zab_r);
+                        zab_r = algebra::final_exponentiation<CurveType>(zab_r);
 
                         // MIPP part
                         // z_l = c[n':] ^ r[:n']
@@ -582,7 +582,7 @@ namespace nil {
                                       ip_ab =
                                           ip_ab * algebra::pair<CurveType>(t.template get<0>(), t.template get<1>());
                                   });
-                    ip_ab = CurveType::pairing::final_exponentiation(ip_ab);
+                    ip_ab = algebra::final_exponentiation<CurveType>(ip_ab);
                     // compute C^r for the verifier
                     typename CurveType::g1_type::value_type agg_c =
                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c.begin(), c.end(),

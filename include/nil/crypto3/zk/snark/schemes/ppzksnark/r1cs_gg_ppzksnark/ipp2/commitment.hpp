@@ -254,8 +254,8 @@ namespace nil {
                                       });
 
                         // (A * v)(w * B)
-                        return std::make_pair(curve_type::pairing::final_exponentiation(t1 * t2),
-                                              curve_type::pairing::final_exponentiation(u1 * u2));
+                        return std::make_pair(algebra::final_exponentiation<curve_type>(t1 * t2),
+                                              algebra::final_exponentiation<curve_type>(u1 * u2));
                     }
 
                     /// Commits to a single vector of G1 elements in the following way:
@@ -282,8 +282,8 @@ namespace nil {
                                           u1 = u1 * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
                                       });
 
-                        return std::make_pair(curve_type::pairing::final_exponentiation(t1),
-                                              curve_type::pairing::final_exponentiation(u1));
+                        return std::make_pair(algebra::final_exponentiation<curve_type>(t1),
+                                              algebra::final_exponentiation<curve_type>(u1));
                     }
                 };
             }    // namespace snark
