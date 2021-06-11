@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -51,7 +51,7 @@ namespace nil {
                     using namespace nil::crypto3::algebra::pairing;
 
                     /**
-                     * Gadget that represents a G2 variable.
+                     * Component that represents a G2 variable.
                      */
                     template<typename CurveType>
                     class g2_variable : public component<typename CurveType::scalar_field_type> {
@@ -108,7 +108,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that creates constraints for the validity of a G2 variable.
+                     * Component that creates constraints for the validity of a G2 variable.
                      */
                     template<typename CurveType>
                     class G2_checker_component : public component<typename CurveType::scalar_field_type> {

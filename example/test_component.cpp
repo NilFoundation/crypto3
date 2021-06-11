@@ -46,7 +46,7 @@ int main(){
 
     bp.set_input_sizes(1);
 
-    // Initialize gadget
+    // Initialize component
 
     test_component<field_type> g(bp, out, x);
     g.generate_r1cs_constraints();

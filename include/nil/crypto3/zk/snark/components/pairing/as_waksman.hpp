@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -84,7 +84,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that verifies correct precomputation of the G1 variable.
+                     * Component that verifies correct precomputation of the G1 variable.
                      */
                     template<typename CurveType>
                     class precompute_G1_component : public component<typename CurveType::scalar_field_type> {
@@ -459,7 +459,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that verifies correct precomputation of the G2 variable.
+                     * Component that verifies correct precomputation of the G2 variable.
                      */
                     template<typename CurveType>
                     class precompute_G2_component : public component<typename CurveType::scalar_field_type> {

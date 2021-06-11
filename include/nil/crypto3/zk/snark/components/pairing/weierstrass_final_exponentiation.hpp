@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -206,7 +206,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for final exponentiation with embedding degree 6.
+                     * Component for final exponentiation with embedding degree 6.
                      */
                     template<std::size_t Version>
                     class final_exp_component<curves::mnt6<Version>>

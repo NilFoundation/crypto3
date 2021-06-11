@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -40,7 +40,7 @@ namespace nil {
                 namespace components {
 
                     /**
-                     * Gadget for the SHA256 compression function.
+                     * Component for the SHA256 compression function.
                      */
                     template<typename FieldType>
                     class sha256_compression_function_component : public component<FieldType> {
@@ -187,7 +187,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for the SHA256 compression function, viewed as a 2-to-1 hash
+                     * Component for the SHA256 compression function, viewed as a 2-to-1 hash
                      * function, and using the same initialization vector as in SHA256
                      * specification. Thus, any collision for
                      * sha256_two_to_one_hash_component trivially extends to a collision for

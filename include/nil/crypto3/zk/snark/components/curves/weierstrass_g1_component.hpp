@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -47,7 +47,7 @@ namespace nil {
                     using namespace nil::crypto3::algebra::pairing;
 
                     /**
-                     * Gadget that represents a G1 variable.
+                     * Component that represents a G1 variable.
                      */
                     template<typename CurveType>
                     class g1_variable : public component<typename CurveType::scalar_field_type> {
@@ -106,7 +106,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that creates constraints for the validity of a G1 variable.
+                     * Component that creates constraints for the validity of a G1 variable.
                      */
                     template<typename CurveType>
                     class G1_checker_component : public component<typename CurveType::scalar_field_type> {
@@ -139,7 +139,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that creates constraints for G1 addition.
+                     * Component that creates constraints for G1 addition.
                      */
                     template<typename CurveType>
                     class G1_add_component : public component<typename CurveType::scalar_field_type> {
@@ -204,7 +204,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that creates constraints for G1 doubling.
+                     * Component that creates constraints for G1 doubling.
                      */
                     template<typename CurveType>
                     class G1_dbl_component : public component<typename CurveType::scalar_field_type> {
@@ -255,7 +255,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget that creates constraints for G1 multi-scalar multiplication.
+                     * Component that creates constraints for G1 multi-scalar multiplication.
                      */
                     template<typename CurveType>
                     class G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
@@ -286,6 +286,7 @@ namespace nil {
                             component<FieldType>(bp),
                             base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
                             num_points(points.size()), scalar_size(scalars.size()) {
+
                             assert(num_points >= 1);
                             assert(num_points * elt_size == scalar_size);
 

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -49,7 +49,7 @@ namespace nil {
                     using namespace nil::crypto3::algebra::pairing;
 
                     /**
-                     * Gadget for doubling step in the Miller loop.
+                     * Component for doubling step in the Miller loop.
                      *
                      * Technical note:
                      *
@@ -136,7 +136,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for addition step in the Miller loop.
+                     * Component for addition step in the Miller loop.
                      *
                      * Technical note:
                      *
@@ -229,7 +229,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for verifying a single Miller loop.
+                     * Component for verifying a single Miller loop.
                      */
                     template<typename CurveType>
                     class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
@@ -388,7 +388,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for verifying a double Miller loop (where the second is inverted).
+                     * Component for verifying a double Miller loop (where the second is inverted).
                      */
                     template<typename CurveType>
                     class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
@@ -599,7 +599,7 @@ namespace nil {
                     };
 
                     /**
-                     * Gadget for verifying a triple Miller loop (where the third is inverted).
+                     * Component for verifying a triple Miller loop (where the third is inverted).
                      */
                     template<typename CurveType>
                     class mnt_e_times_e_over_e_miller_loop_component
