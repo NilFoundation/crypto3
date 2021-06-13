@@ -144,8 +144,7 @@ namespace nil {
                             check_finexp->generate_r1cs_witness();
                         }
                     };
-                    
-                }    // namespace components    
+                }    // namespace components
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

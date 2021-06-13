@@ -584,7 +584,6 @@ namespace nil {
                             }
                         }
                     };
-
                 }    // namespace components
             }        // namespace snark
         }            // namespace zk
