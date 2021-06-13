@@ -138,6 +138,10 @@ namespace nil {
                 };
 
                 template<std::size_t Version, typename PairingFunctions>
+                constexpr  typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::g2_type::underlying_field_type::value_type 
+                    pairing_policy<curves::mnt6<Version>, PairingFunctions>::twist;
+
+                template<std::size_t Version, typename PairingFunctions>
                 constexpr typename pairing_policy<curves::mnt6<Version>, PairingFunctions>::number_type const
                     pairing_policy<curves::mnt6<Version>, PairingFunctions>::pairing_loop_count;
 
