@@ -27,6 +27,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -35,18 +36,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                // template<typename CurveType>
-                // struct Op {
-                //     typedef CurveType curve_type;
-                //
-                //     typedef typename curve_type::gt_type::value_type TAB;
-                //     typedef typename curve_type::gt_type::value_type UAB;
-                //     typedef typename curve_type::gt_type::value_type ZAB;
-                //     typedef typename curve_type::gt_type::value_type TC;
-                //     typedef typename curve_type::gt_type::value_type UC;
-                //     typedef typename curve_type::g1_type::value_type ZC;
-                // };
-
                 /// Keeps track of the variables that have been sent by the prover and must
                 /// be multiplied together by the verifier. Both MIPP and TIPP are merged
                 /// together.
@@ -73,7 +62,7 @@ namespace nil {
                         zab = zab * other.zab;
                         tc = tc * other.tc;
                         uc = uc * other.uc;
-                        zc = zc * other.zc;
+                        zc = zc + other.zc;
                     }
                 };
 
@@ -125,7 +114,7 @@ namespace nil {
                                                   typename std::iterator_traits<InputG2Iterator>::value_type>::value,
                                  bool>::type = true>
                     inline pairing_check(InputG1Iterator a_first, InputG1Iterator a_last, InputG2Iterator b_first,
-                                         InputG2Iterator b_last, gt_value_type out) :
+                                         InputG2Iterator b_last, const gt_value_type &out) :
                         left(gt_value_type::one()),
                         right(gt_value_type::one()), non_random_check_done(false) {
                         merge_random(a_first, a_last, b_first, b_last, out);
@@ -141,7 +130,7 @@ namespace nil {
                         std::is_same<g2_value_type,
                                      typename std::iterator_traits<InputG2Iterator>::value_type>::value>::type
                         merge_random(InputG1Iterator a_first, InputG1Iterator a_last, InputG2Iterator b_first,
-                                     InputG2Iterator b_last, gt_value_type out) {
+                                     InputG2Iterator b_last, const gt_value_type &out) {
                         std::size_t len = std::distance(a_first, a_last);
                         BOOST_ASSERT(len > 0);
                         BOOST_ASSERT(len == std::distance(b_first, b_last));
@@ -157,27 +146,17 @@ namespace nil {
                         right = right * (out.is_one() ? out : out.pow(coeff));
                     }
 
-                    template<typename InputG1Iterator, typename InputG2Iterator>
-                    inline typename std::enable_if<
-                        std::is_same<g1_value_type,
-                                     typename std::iterator_traits<InputG1Iterator>::value_type>::value &&
-                        std::is_same<g2_value_type,
-                                     typename std::iterator_traits<InputG2Iterator>::value_type>::value>::type
-                        merge_nonrandom(InputG1Iterator a_first, InputG1Iterator a_last, InputG2Iterator b_first,
-                                        InputG2Iterator b_last, gt_value_type out) {
-                        std::size_t len = std::distance(a_first, a_last);
-                        BOOST_ASSERT(len > 0);
-                        BOOST_ASSERT(len == std::distance(b_first, b_last));
+                    template<typename InputGTIterator>
+                    inline typename std::enable_if<std::is_same<
+                        gt_value_type, typename std::iterator_traits<InputGTIterator>::value_type>::value>::type
+                        merge_nonrandom(InputGTIterator a_first, InputGTIterator a_last, const gt_value_type &out) {
                         BOOST_ASSERT(!non_random_check_done);
+                        BOOST_ASSERT(std::distance(a_first, a_last) > 0);
 
-                        std::for_each(
-                            boost::make_zip_iterator(boost::make_tuple(a_first, b_first, out_first)),
-                            boost::make_zip_iterator(boost::make_tuple(a_last, b_last, out_last)),
-                            [&](const boost::tuple<const g1_value_type &, const g2_value_type &, const gt_value_type &>
-                                    &t) {
-                                left = left * algebra::pair<curve_type>(t.template get<0>(), t.template get<1>());
-                                right = right * t.template get<2>();
-                            });
+                        for (auto a_it = a_first; a_it != last; ++a_it) {
+                            left = left * (*a_it);
+                        }
+                        right = right * out;
 
                         non_random_check_done = true;
                     }
@@ -544,8 +523,103 @@ namespace nil {
                 /// non-fixed part of the public inputs are the challenges derived from a seed. Even though this
                 /// seed comes from a random beeacon, we are hashing this as a safety precaution.
                 template<typename CurveType, typename DistributionType, typename GeneratorType,
-                    typename Hash = hashes::sha2<256>, typename InputIteratorRange, typename InputIterator>
-                inline typename std::enable_if<std::is_same<>::value, bool>::type
+                         typename Hash = hashes::sha2<256>, typename InputRanges, typename InputIterator>
+                inline typename std::enable_if<
+                    std::is_same<typename CurveType::scalar_field_type::value_type,
+                                 typename std::iterator_traits<typename std::iterator_traits<
+                                     typename InputRanges::iterator>::value_type::iterator>::value_type>::value &&
+                        std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value,
+                    bool>::type
+                    verify_aggregate_proof(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &ip_verifier_srs,
+                                           const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                                           const InputRanges &public_inputs,
+                                           const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
+                                           InputIterator transcript_include_first,
+                                           InputIterator transcript_include_last) {
+                    for (const auto &public_input : public_inputs) {
+                        BOOST_ASSERT((public_input.size() + 1) == vk.gamma_ABC_g1.size());
+                    }
+
+                    // Random linear combination of proofs
+                    constexpr std::array<std::uint8_t, 9> application_tag = {'s', 'n', 'a', 'r', 'k',
+                                                                             'p', 'a', 'c', 'k'};
+                    constexpr std::array<std::uint8_t, 8> domain_separator {'r', 'a', 'n', 'd', 'o', 'm', '-', 'r'};
+                    transcript<CurveType, Hash> tr(application_tag.begin(), application_tag.end());
+                    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
+                    tr.template write<typename CurveType::gt_type>(proof.com_ab.first);
+                    tr.template write<typename CurveType::gt_type>(proof.com_ab.second);
+                    tr.template write<typename CurveType::gt_type>(proof.com_c.first);
+                    tr.template write<typename CurveType::gt_type>(proof.com_c.second);
+                    tr.write_domain_separator(transcript_include_first, transcript_include_last);
+                    typename CurveType::scalar_field_type::value_type r = tr.read_challenge();
+                    tr.template write<typename CurveType::gt_type>(proof.ip_ab);
+                    tr.template write<typename CurveType::g1_type>(proof.agg_c);
+
+                    pairing_check<CurveType, DistributionType, GeneratorType> pc;
+
+                    // 1.Check TIPA proof ab
+                    // 2.Check TIPA proof c
+                    verify_tipp_mipp<CurveType, DistributionType, GeneratorType, Hash>(
+                        tr,
+                        ip_verifier_srs,
+                        proof,
+                        // we give the extra r as it's not part of the proof itself - it is simply used on top for the
+                        // groth16 aggregation
+                        r,
+                        pc);
+
+                    // Check aggregate pairing product equation
+                    // SUM of a geometric progression
+                    // SUM a^i = (1 - a^n) / (1 - a) = -(1-a^n)/-(1-a)
+                    // = (a^n - 1) / (a - 1)
+                    typename CurveType::scalar_field_type::value_type r_sum =
+                        (r.pow(public_inputs.size()) - CurveType::scalar_field_type::value_type::one()) *
+                        (r - CurveType::scalar_field_type::value_type::one()).inversed();
+
+                    // The following parts 3 4 5 are independently computing the parts of the Groth16
+                    // verification equation
+                    // NOTE From this point on, we are only checking *one* pairing check (the Groth16
+                    // verification equation) so we don't need to randomize as all other checks are being
+                    // randomized already. When merging all pairing checks together, this will be the only one
+                    // non-randomized.
+                    //
+                    std::vector<typename CurveType::scalar_field_type::value_type> r_vec =
+                        structured_scalar_power<typename CurveType::scalar_field_type>(public_inputs.size(), r);
+                    std::vector<typename CurveType::scalar_field_type::value_type> multi_r_vec;
+                    // i denotes the column of the public input, and j denotes which public input
+                    for (std::size_t i = 0; i < public_inputs[0].size(); ++i) {
+                        typename CurveType::scalar_field_type::value_type c = public_inputs[0][i];
+                        for (std::size_t j = 1; j < public_inputs.size(); ++j) {
+                            c = c + public_inputs[j][i] * r_vec[j];
+                        }
+                    }
+
+                    // 3. Compute left part of the final pairing equation
+                    typename CurveType::gt_type::value_type left = vk.alpha_g1_beta_g2.pow(r_sum);
+
+                    // 4. Compute right part of the final pairing equation
+                    typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, vk.delta_g2);
+
+                    // 5. compute the middle part of the final pairing equation, the one
+                    //    with the public inputs
+                    // We want to compute MUL(i:0 -> l) S_i ^ (SUM(j:0 -> n) ai,j * r^j)
+                    // this table keeps tracks of incremental computation of each i-th
+                    // exponent to later multiply with S_i
+                    // The index of the table is i, which is an index of the public
+                    // input element
+                    // We incrementally build the r vector and the table
+                    // NOTE: in this version it's not r^2j but simply r^j
+                    // TODO: how to get element of accumulation vector
+                    typename CurveType::g1_type::value_type g_ic = vk.gamma_ABC_g1.first * r_sum;
+                    // TODO: it seems to be incorrect
+                    typename CurveType::g1_type::value_type totsi = vk.gamma_ABC_g1.template accumulate_chunk(r_vec.begin(), r_vec.end(), 1).first;
+                    g_ic = g_ic + totsi;
+                    typename CurveType::gt_type::value_type ml = algebra::pair<CurveType>(g_ic, vk.gamma_g2);
+
+                    std::vector<typename CurveType::scalar_field_type::value_type> a_input {left, middle, right};
+                    pc.template merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
+                    return pc.verify();
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
