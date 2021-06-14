@@ -44,38 +44,6 @@ namespace nil {
                  * @brief IETF IPsec groups
                  * @tparam Version
                  */
-                /*template<std::size_t Version>
-                struct mnt4_scalar_field : public field<Version> { };
-
-                template<>
-                struct mnt4_scalar_field<298> : public field<298> {
-                    typedef field<298> policy_type;
-
-                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::modulus_type modulus_type;
-
-                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
-
-                    constexpr static const std::size_t number_bits = policy_type::number_bits;
-                    typedef typename policy_type::number_type number_type;
-
-                    constexpr static const modulus_type modulus =
-                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000001_cppui298;
-
-                    typedef typename detail::element_fp<params<mnt4_scalar_field<298>>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
-                };
-
-                constexpr typename std::size_t const mnt4_scalar_field<298>::modulus_bits;
-
-                constexpr typename std::size_t const mnt4_scalar_field<298>::number_bits;
-
-                constexpr typename std::size_t const mnt4_scalar_field<298>::value_bits;
-
-                constexpr typename mnt4_scalar_field<298>::modulus_type const mnt4_scalar_field<298>::modulus;*/
-
                 template<std::size_t Version = 298>
                 using mnt4_scalar_field = mnt6_base_field<Version>;
 

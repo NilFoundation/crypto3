@@ -23,12 +23,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
-#define CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
+#ifndef CRYPTO3_ALGEBRA_FIELDS_JUBJUB_SCALAR_FIELD_HPP
+#define CRYPTO3_ALGEBRA_FIELDS_JUBJUB_SCALAR_FIELD_HPP
 
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
-
-#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
@@ -44,15 +42,44 @@ namespace nil {
                  * @brief IETF IPsec groups
                  * @tparam Version
                  */
-                template<std::size_t Version = 298>
-                using mnt6_scalar_field = mnt4_base_field<Version>;
+                template<std::size_t Version>
+                struct jubjub_scalar_field;
 
-                template<std::size_t Version = 298>
-                using mnt6_fr = mnt6_scalar_field<Version>;
+                template<>
+                struct jubjub_scalar_field<255> : public field<252> {
+                    typedef field<252> policy_type;
+
+                    constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
+                    constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    typedef typename policy_type::number_type number_type;
+
+                    constexpr static const modulus_type modulus =
+                        0xE7DB4EA6533AFA906673B0101343B00A6682093CCC81082D0970E5ED6F72CB7_cppui252;
+
+                    typedef typename detail::element_fp<params<jubjub_scalar_field<255>>> value_type;
+
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+                };
+
+                constexpr typename std::size_t const jubjub_scalar_field<255>::modulus_bits;
+
+                constexpr typename std::size_t const jubjub_scalar_field<255>::number_bits;
+
+                constexpr typename std::size_t const jubjub_scalar_field<255>::value_bits;
+
+                constexpr typename jubjub_scalar_field<255>::modulus_type const jubjub_scalar_field<255>::modulus;
+
+                template<std::size_t Version = 255>
+                using jubjub_fr = jubjub_scalar_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_JUBJUB_SCALAR_FIELD_HPP

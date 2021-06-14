@@ -23,12 +23,12 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
-#define CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
+#ifndef CRYPTO3_ALGEBRA_FIELDS_BABYJUBJUB_BASE_FIELD_HPP
+#define CRYPTO3_ALGEBRA_FIELDS_BABYJUBJUB_BASE_FIELD_HPP
 
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 
-#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
@@ -44,15 +44,18 @@ namespace nil {
                  * @brief IETF IPsec groups
                  * @tparam Version
                  */
-                template<std::size_t Version = 298>
-                using mnt6_scalar_field = mnt4_base_field<Version>;
+                template<std::size_t Version = 254>
+                using babyjubjub_base_field = alt_bn128_scalar_field<254>;
 
-                template<std::size_t Version = 298>
-                using mnt6_fr = mnt6_scalar_field<Version>;
+                template<std::size_t Version = 254>
+                using babyjubjub_fq = babyjubjub_base_field<Version>;
+
+                template<std::size_t Version = 254>
+                using babyjubjub = babyjubjub_base_field<Version>;
 
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_FIELDS_MNT6_SCALAR_FIELD_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_BABYJUBJUB_BASE_FIELD_HPP
