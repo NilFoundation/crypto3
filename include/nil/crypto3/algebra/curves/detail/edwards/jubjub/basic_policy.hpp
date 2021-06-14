@@ -23,14 +23,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_MNT4_BASIC_POLICY_HPP
-#define CRYPTO3_ALGEBRA_CURVES_MNT4_BASIC_POLICY_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_BASIC_POLICY_HPP
+#define CRYPTO3_ALGEBRA_CURVES_JUBJUB_BASIC_POLICY_HPP
 
-#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
-#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/jubjub/base_field.hpp>
+#include <nil/crypto3/algebra/fields/jubjub/scalar_field.hpp>
 
-#include <nil/crypto3/algebra/fields/fp2.hpp>
-#include <nil/crypto3/algebra/fields/fp4.hpp>
+#include <nil/crypto3/algebra/fields/fp3.hpp>
+#include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -45,19 +45,20 @@ namespace nil {
                      *    @tparam Version version of the curve
                      *
                      */
-                    template<std::size_t Version = 298>
-                    struct mnt4_basic_policy { };
-
-                    /** @brief A struct representing details about base and scalar fields of the size 298 bits.
+                    template<std::size_t Version>
+                    struct edwards_basic_policy;
+                    /** @brief A struct representing details about base and scalar fields of the size 183 bits and 181
+                     * bits respectively. Corresponds to [JubJub](https://raw.githubusercontent.com/zcash/zips/master/protocol/protocol.pdf#jubjub)
+                     * twisted Edwards elliptic curve defined over Bls12-381 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
                      *
                      */
                     template<>
-                    struct mnt4_basic_policy<298> {
-                        constexpr static const std::size_t version = 298;    ///< size of the base field in bits
-                        typedef fields::mnt4_fq<version> g1_field_type;
-                        using base_field_type = g1_field_type;
-                        typedef typename fields::fp2<base_field_type> g2_field_type;
-                        typedef typename fields::fp4<base_field_type> gt_field_type;
+                    struct edwards_basic_policy<255> {
+                        constexpr static const std::size_t version = 255;    ///< size of the base field in bits
+                        typedef fields::jubjub_fq<version> g1_field_type;
+                        typedef g1_field_type base_field_type;
+                        typedef typename fields::fp3<base_field_type> g2_field_type;
+                        typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
 
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
@@ -65,7 +66,7 @@ namespace nil {
                         constexpr static const number_type base_field_modulus =
                             base_field_type::modulus;    ///< characteristic of the base field
 
-                        typedef fields::mnt4_scalar_field<version> scalar_field_type;
+                        typedef fields::jubjub_fr<version> scalar_field_type;
                         constexpr static const number_type scalar_field_modulus =
                             scalar_field_type::modulus;    ///< characteristic of the scalar field (order of the group
                                                            ///< of points)
@@ -76,19 +77,26 @@ namespace nil {
                             scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
                                                      ///< points)
 
-                        constexpr static const number_type a =
-                            number_type(0x02);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
-                        constexpr static const number_type b = number_type(
-                            0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+                        constexpr static const number_type a =                                              ///< twisted Edwards elliptic curve 
+                            0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                        constexpr static const number_type d =                                              ///< twisted Edwards elliptic curve 
+                            0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                                                                                        
                     };
 
-                    constexpr typename mnt4_basic_policy<298>::number_type const mnt4_basic_policy<298>::a;
+                    constexpr typename edwards_basic_policy<255>::number_type const
+                        edwards_basic_policy<255>::base_field_modulus;
 
-                    constexpr typename mnt4_basic_policy<298>::number_type const mnt4_basic_policy<298>::b;
+                    constexpr typename edwards_basic_policy<255>::number_type const
+                        edwards_basic_policy<255>::scalar_field_modulus;
 
-                    constexpr typename mnt4_basic_policy<298>::number_type const mnt4_basic_policy<298>::p;
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::a;
 
-                    constexpr typename mnt4_basic_policy<298>::number_type const mnt4_basic_policy<298>::q;
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::d;
+
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::p;
+
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::q;
 
                 }    // namespace detail
             }        // namespace curves
@@ -96,4 +104,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_CURVES_MNT4_BASIC_POLICY_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_JUBJUB_BASIC_POLICY_HPP

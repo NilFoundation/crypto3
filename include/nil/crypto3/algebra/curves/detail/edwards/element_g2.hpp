@@ -27,9 +27,9 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_ELEMENT_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_ELEMENT_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
-#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/literals.hpp>
@@ -40,13 +40,13 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     /** @brief A struct representing a group G2 of Edwards curve.
-                     *    @tparam Version size of the base field in bits
+                     *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
                     struct edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
-                     *    @tparam Version size of the base field in bits
+                     *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>

@@ -30,6 +30,7 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
 
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(18)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(64)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(92)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(94)

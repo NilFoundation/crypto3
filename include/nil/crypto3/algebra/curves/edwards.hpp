@@ -27,7 +27,9 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/g2.hpp>
 
@@ -40,7 +42,7 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a Edwards curve, providing 128 bits of security.
-                 *    @tparam Version size of the base field in bits
+                 *    @tparam Version version of the curve
                  *
                  */
                 template<std::size_t Version>

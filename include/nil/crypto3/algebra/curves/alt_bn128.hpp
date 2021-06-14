@@ -40,7 +40,7 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a Barreto-Naehrig curve.
-                 *  @tparam Version size of the base field in bits
+                 *  @tparam Version version of the curve
                  *
                  *  An alternative to `bn128`, somewhat slower but avoids dynamic code generation.
                  */

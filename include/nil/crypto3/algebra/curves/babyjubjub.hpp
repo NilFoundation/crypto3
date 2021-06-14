@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -24,42 +23,27 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_HPP
+#define CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
 
-                template<std::size_t Version>
-                struct edwards;
+                /** @brief A struct representing a [BabyJubJub](https://eips.ethereum.org/EIPS/eip-2494) 
+                 * twisted Edwards elliptic curve defined over alt_bn128 scalar field and described by equation ax^2 + y^2 = 1 + dx^2y^2
+                 *  @tparam Version version of the curve
+                 *
+                 */
+                template<std::size_t Version = 254>
+                using babyjubjub = edwards<254>;
 
-                namespace detail {
-                    /** @brief A struct representing a group G2 of Edwards curve.
-                     *    @tparam Version version of the curve
-                     *
-                     */
-                    template<std::size_t Version>
-                    struct edwards_g2 {
-
-                        using policy_type = edwards_basic_policy<Version>;
-
-                        using curve_type = edwards<Version>;
-
-                        using underlying_field_type = typename policy_type::g2_field_type;
-
-                        constexpr static const std::size_t value_bits =
-                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
-
-                        using value_type = element_edwards_g2<Version>;
-                    };
-                }    // namespace detail
-            }        // namespace curves
-        }            // namespace algebra
-    }                // namespace crypto3
+            }    // namespace curves
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
+
+#endif    // CRYPTO3_ALGEBRA_CURVES_BABYJUBJUB_HPP

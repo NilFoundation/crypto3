@@ -43,7 +43,7 @@ namespace nil {
                     using namespace algebra;
 
                     /** @brief A struct representing details about base and scalar fields.
-                     *    @tparam Version size of the base field in bits
+                     *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version = 254>

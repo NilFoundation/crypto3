@@ -40,7 +40,7 @@ namespace nil {
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of mnt4 curve.
-                     *    @tparam Version size of the base field in bits
+                     *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>

@@ -40,7 +40,7 @@ namespace nil {
             namespace curves {
 
                 /** @brief A struct representing a BLS12-381 and BLS12-377 curve.
-                 *  @tparam Version size of the base field in bits
+                 *  @tparam Version version of the curve
                  *
                  *  The basic equation of the curve is y^2 = x^3 + 4.
                  */
