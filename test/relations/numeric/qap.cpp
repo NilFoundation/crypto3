@@ -32,6 +32,7 @@
 #include <cstdio>
 #include <cstring>
 #include <vector>
+#include <chrono>
 
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
@@ -50,7 +51,7 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_examples.hpp>
+#include "../../schemes/ppzksnark/r1cs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
@@ -67,6 +68,11 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
 
     const std::size_t num_constraints = qap_degree - num_inputs - 1;
 
+    std::cout << "Num constraints " << num_constraints << std::endl;
+    std::cout << "Binary input " << bool(binary_input) << std::endl;
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
     r1cs_example<FieldType> example;
     if (binary_input) {
         example = generate_r1cs_example_with_binary_input<FieldType>(num_constraints, num_inputs);
@@ -74,20 +80,47 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
         example = generate_r1cs_example_with_field_input<FieldType>(num_constraints, num_inputs);
     }
 
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    std::cout << "Example generated, time: " << elapsed.count() * 1e-9 << std::endl;
+
     BOOST_CHECK(example.constraint_system.is_satisfied(example.primary_input, example.auxiliary_input));
+
+    std::cout << "Constraint system satisfied" << std::endl;
 
     const typename FieldType::value_type t = random_element<FieldType>(),
                                          d1 = random_element<FieldType>(),
                                          d2 = random_element<FieldType>(),
                                          d3 = random_element<FieldType>();
+    begin = std::chrono::high_resolution_clock::now();
 
     qap_instance<FieldType> qap_inst_1 = reductions::r1cs_to_qap<FieldType>::instance_map(example.constraint_system);
+
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    std::cout << "Instance 1 evaluated, time: " << elapsed.count() * 1e-9 << std::endl;
+
+    begin = std::chrono::high_resolution_clock::now();
 
     qap_instance_evaluation<FieldType> qap_inst_2 =
         reductions::r1cs_to_qap<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
 
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    std::cout << "Instance 2 evaluated, time: " << elapsed.count() * 1e-9 << std::endl;
+
+    begin = std::chrono::high_resolution_clock::now();
+
     qap_witness<FieldType> qap_wit =
         reductions::r1cs_to_qap<FieldType>::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2, d3);
+
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    std::cout << "Witness evaluated, time: " << elapsed.count() * 1e-9 << std::endl;
 
     BOOST_CHECK(qap_inst_1.is_satisfied(qap_wit));
     BOOST_CHECK(qap_inst_2.is_satisfied(qap_wit));
