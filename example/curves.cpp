@@ -33,6 +33,8 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/jubjub.hpp>
+#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
@@ -190,6 +192,16 @@ int main() {
 
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
     fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
+
+    std::cout << "----------------------------" << std::endl;
+
+    std::cout << "JubJub curve g1 group basic math:" << std::endl;
+    fp_curve_group_basic_math_examples<curves::jubjub::g1_type>();
+
+    std::cout << "----------------------------" << std::endl;
+
+    std::cout << "JubJub curve g2 group basic math:" << std::endl;
+    fp3_curve_group_basic_math_examples<curves::jubjub::g2_type>();
 
     std::cout << "----------------------------" << std::endl;
 

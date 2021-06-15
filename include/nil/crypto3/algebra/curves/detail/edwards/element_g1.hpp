@@ -55,14 +55,14 @@ namespace nil {
                     struct element_edwards_g1 { };
                     /** @brief A struct representing an element from the group G1 of edwards curve.
                      *
-                     * The size of the group G1 in bits equals 181.
                      */
                     template<>
                     struct element_edwards_g1<183> {
+                        constexpr static const std::size_t version = 183;
 
-                        using group_type = edwards_g1<183>;
+                        using group_type = edwards_g1<version>;
 
-                        using policy_type = edwards_basic_policy<183>;
+                        using policy_type = edwards_basic_policy<version>;
                         using underlying_field_type = typename policy_type::g1_field_type;
 
                         using g1_field_type_value = typename policy_type::g1_field_type::value_type;
@@ -79,7 +79,8 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_edwards_g1() : element_edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_edwards_g1() : element_edwards_g1(policy_type::g1_zero_fill[0], 
+                            policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
@@ -107,7 +108,8 @@ namespace nil {
                          *
                          */
                         static element_edwards_g1 one() {
-                            return element_edwards_g1(one_fill[0], one_fill[1], one_fill[2]);
+                            return element_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], 
+                                policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -318,25 +320,15 @@ namespace nil {
                     private:
                         constexpr static const g1_field_type_value a = policy_type::a;
                         constexpr static const g1_field_type_value d = policy_type::d;
-
-                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
-                            underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                            underlying_field_value_type::zero()};
-
-                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
-                            underlying_field_value_type(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
-                            underlying_field_value_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182),
-                            underlying_field_value_type::zero()};    //< Third value is not correct!
                     };
 
-                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
-                        element_edwards_g1<183>::zero_fill;
-
-                    constexpr std::array<typename element_edwards_g1<183>::underlying_field_value_type, 3> const
-                        element_edwards_g1<183>::one_fill;
-
                     constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::a;
+                    // constexpr typename element_edwards_g1<255>::g1_field_type_value const element_edwards_g1<255>::a;
+                    // constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::a;
+
                     constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::d;
+                    // constexpr typename element_edwards_g1<255>::g1_field_type_value const element_edwards_g1<255>::d;
+                    // constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::d;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

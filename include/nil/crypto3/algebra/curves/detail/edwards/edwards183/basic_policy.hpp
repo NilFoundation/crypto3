@@ -82,6 +82,27 @@ namespace nil {
                             0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179;    ///< coefficient of short
                                                                                          ///< Weierstrass curve
                                                                                          ///< $y^2=x^3+a*x+b$
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
+                            g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
+                            g1_field_type::value_type::zero()};
+
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
+                            typename g1_field_type::value_type(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
+                            typename g1_field_type::value_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182),
+                            g1_field_type::value_type::zero()};    //< Third value is not correct!
+
+                        constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
+                            g2_field_type::value_type::zero(), g2_field_type::value_type::one(),
+                            g2_field_type::value_type::zero()};
+
+                        constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
+                            g2_field_type::value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                                                        0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
+                                                        0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
+                            g2_field_type::value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                                                        0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
+                                                        0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),
+                            g2_field_type::value_type::zero()};    //< Third value is not correct!
                     };
 
                     constexpr typename edwards_basic_policy<183>::number_type const
@@ -97,6 +118,18 @@ namespace nil {
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::p;
 
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::q;
+
+                    constexpr std::array<typename edwards_basic_policy<183>::g1_field_type::value_type, 3> const
+                        edwards_basic_policy<183>::g1_zero_fill;
+
+                    constexpr std::array<typename edwards_basic_policy<183>::g1_field_type::value_type, 3> const
+                        edwards_basic_policy<183>::g1_one_fill;
+
+                    constexpr std::array<typename edwards_basic_policy<183>::g2_field_type::value_type, 3> const
+                        edwards_basic_policy<183>::g2_zero_fill;
+
+                    constexpr std::array<typename edwards_basic_policy<183>::g2_field_type::value_type, 3> const
+                        edwards_basic_policy<183>::g2_one_fill;
 
                 }    // namespace detail
             }        // namespace curves

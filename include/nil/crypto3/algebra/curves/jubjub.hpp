@@ -38,7 +38,6 @@ namespace nil {
                  *    @tparam Version version of the curve
                  *
                  */
-                template<std::size_t Version = 255>
                 using jubjub = edwards<255>;
 
             }    // namespace curves
