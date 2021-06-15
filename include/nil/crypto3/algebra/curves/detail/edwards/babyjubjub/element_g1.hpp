@@ -24,10 +24,9 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP
+#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP
 
-#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
 
@@ -52,13 +51,13 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version>
-                    struct element_edwards_g1 { };
+                    struct element_edwards_g1;
                     /** @brief A struct representing an element from the group G1 of edwards curve.
                      *
                      */
                     template<>
-                    struct element_edwards_g1<183> {
-                        constexpr static const std::size_t version = 183;
+                    struct element_edwards_g1<254> {
+                        constexpr static const std::size_t version = 254;
 
                         using group_type = edwards_g1<version>;
 
@@ -98,6 +97,7 @@ namespace nil {
                          */
                         constexpr element_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
                             element_edwards_g1(X, Y, X * Y) {};
+
                         /** @brief Get the point at infinity
                          *
                          */
@@ -200,22 +200,11 @@ namespace nil {
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
-                                // NOTE: does not handle O and pts of order 2,4
-                                // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#doubling-dbl-2007-bl
-
-                                underlying_field_value_type A = (this->X).squared();                  // A = X1^2
-                                underlying_field_value_type B = (this->Y).squared();                  // B = Y1^2
-                                underlying_field_value_type C = A + B;                                // C = A+B
-                                underlying_field_value_type D = A - B;                                // D = A-B
-                                underlying_field_value_type E = (this->X + this->Y).squared() - C;    // E = (X1+Y1)^2-C
-                                underlying_field_value_type X3 = C * D;                               // X3 = C*D
-                                underlying_field_value_type dZZ = d * this->Z.squared();
-                                underlying_field_value_type Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
-                                underlying_field_value_type Z3 = D * E;                  // Z3 = D*E
-
-                                return element_edwards_g1(X3, Y3, Z3);
+                                
+                                return this->add(*this); // Temporary intil we find something more efficient
                             }
                         }
+
                         /** @brief
                          *
                          * “Mixed addition” refers to the case Z2 known to be 1.
@@ -251,24 +240,20 @@ namespace nil {
                         }
 
                     private:
+
                         element_edwards_g1 add(const element_edwards_g1 &other) const {
+                            underlying_field_value_type XX = (this->X)*(other.X);
+                            underlying_field_value_type YY = (this->Y)*(other.Y);
+                            underlying_field_value_type XY = (this->X)*(other.Y);
+                            underlying_field_value_type YX = (this->Y)*(other.X);
 
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
+                            underlying_field_value_type lambda = d * XX * YY;
+                            underlying_field_value_type X3 = (XY + YX) * 
+                                (underlying_field_value_type::one() + lambda).inversed();
+                            underlying_field_value_type Y3 = (YY - a * XX) * 
+                                (underlying_field_value_type::one() - lambda).inversed();
 
-                            underlying_field_value_type A = (this->Z) * (other.Z);    // A = Z1*Z2
-                            underlying_field_value_type B = d * A.squared();          // B = d*A^2
-                            underlying_field_value_type C = (this->X) * (other.X);    // C = X1*X2
-                            underlying_field_value_type D = (this->Y) * (other.Y);    // D = Y1*Y2
-                            underlying_field_value_type E = C * D;                    // E = C*D
-                            underlying_field_value_type H = C - D;                    // H = C-D
-                            underlying_field_value_type I =
-                                (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            underlying_field_value_type X3 = (E + B) * H;             // X3 = c*(E+B)*H
-                            underlying_field_value_type Y3 = (E - B) * I;             // Y3 = c*(E-B)*I
-                            underlying_field_value_type Z3 = A * H * I;               // Z3 = A*H*I
-
-                            return element_edwards_g1(X3, Y3, Z3);
+                            return element_edwards_g1(X3, Y3);
                         }
 
                     public:
@@ -322,16 +307,12 @@ namespace nil {
                         constexpr static const g1_field_type_value d = policy_type::d;
                     };
 
-                    constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::a;
-                    // constexpr typename element_edwards_g1<255>::g1_field_type_value const element_edwards_g1<255>::a;
-                    // constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::a;
+                    constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::a;
+                    constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::d;
 
-                    constexpr typename element_edwards_g1<183>::g1_field_type_value const element_edwards_g1<183>::d;
-                    // constexpr typename element_edwards_g1<255>::g1_field_type_value const element_edwards_g1<255>::d;
-                    // constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::d;
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_G1_ELEMENT_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP

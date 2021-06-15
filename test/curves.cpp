@@ -40,6 +40,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 // #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/jubjub.hpp>
+#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 // #include <nil/crypto3/algebra/curves/frp_v1.hpp>
 // #include <nil/crypto3/algebra/curves/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -307,6 +309,22 @@ void curve_operation_test(const TestSet &test_set,
 }
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
+
+BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
+    using policy_type = curves::babyjubjub::g1_type;
+
+    typename policy_type::value_type P1(typename policy_type::underlying_field_type::value_type(0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui254),
+                          typename policy_type::underlying_field_type::value_type(0x5CE98C61B05F47FE2EAE9A542BD99F6B2E78246231640B54595FEBFD51EB853_cppui251)), 
+                       P2(typename policy_type::underlying_field_type::value_type(0x2491ABA8D3A191A76E35BC47BD9AFE6CC88FEE14D607CBE779F2349047D5C157_cppui254),
+                          typename policy_type::underlying_field_type::value_type(0x2E07297F8D3C3D7818DBDDFD24C35583F9A9D4ED0CB0C1D1348DD8F7F99152D7_cppui254)),
+                       P3(typename policy_type::underlying_field_type::value_type(0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui253),
+                          typename policy_type::underlying_field_type::value_type(0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui253));
+
+    typename policy_type::value_type P1pP2 = P1 + P2;
+
+    BOOST_CHECK(P1pP2 == P3);
+    //curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+}
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
