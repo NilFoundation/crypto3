@@ -82,6 +82,13 @@ namespace boost {
         namespace tt_detail {
 
             template<>
+            struct print_log_value<typename curves::jubjub::g1_type::value_type> {
+                void operator()(std::ostream &os, typename curves::jubjub::g1_type::value_type const &e) {
+                    print_fp_curve_group_element(os, e);
+                }
+            };
+
+            template<>
             struct print_log_value<typename curves::edwards<183>::g1_type::value_type> {
                 void operator()(std::ostream &os, typename curves::edwards<183>::g1_type::value_type const &e) {
                     print_fp_curve_group_element(os, e);
@@ -222,6 +229,29 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
                       points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
 }
 
+// temporary separated test for JubJub and BabyJubJub
+template<typename CurveGroup>
+void check_curve_operations_twisted_edwards(const std::vector<typename CurveGroup::value_type> &points,
+                            const std::vector<std::size_t> &constants) {
+    using nil::crypto3::multiprecision::cpp_int;
+
+    BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
+    BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
+    // BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
+    // BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
+    // typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
+    // BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
+    // typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
+    // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
+    // BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
+    // BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          // (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      // points[p2_mul_C1_plus_p2_mul_C2]);
+    // BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          // (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      // points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
+}
+
 template<typename FpCurveGroup, typename TestSet>
 void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
                         std::vector<std::size_t> &constants,
@@ -308,7 +338,64 @@ void curve_operation_test(const TestSet &test_set,
     check_curve_operations<CurveGroup>(points, constants);
 }
 
+template<typename CurveGroup, typename TestSet>
+void curve_operation_test_twisted_edwards(const TestSet &test_set,
+                          void (&test_init)(std::vector<typename CurveGroup::value_type> &,
+                                            std::vector<std::size_t> &,
+                                            const TestSet &)) {
+
+    std::vector<typename CurveGroup::value_type> points;
+    std::vector<std::size_t> constants;
+
+    test_init(points, constants, test_set);
+
+    check_curve_operations_twisted_edwards<CurveGroup>(points, constants);
+}
+
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
+
+BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
+    using policy_type = curves::jubjub::g1_type;
+
+    typename policy_type::value_type P1(typename policy_type::underlying_field_type::value_type(0x07573f2e83f6b00594e8b165d078db94eb5d9d36058707a629dc0cd723dc3d13_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x675e75c4f99ebf2650116c5aac9c5b4854befafd32058921b16a2ab03b09bb87_cppui255)), 
+                       P2(typename policy_type::underlying_field_type::value_type(0x51ea3efbd880edab46bcd6d4f25a3e51183edc9747d68639d90f2a56b2400cdd_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x24851474b035954123775ebb90e4a686b675c2441f129cad31fc74ba3195c09c_cppui255)),
+                       P1pP2(typename policy_type::underlying_field_type::value_type(0x48aca52483a763779bc66e971ba5544aaef229428c1564f238fef37ec9304124_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x0e0f60baa5175659ab7b7475c733b3799a728e139bde7fc6dbaa0fc5582c6c8e_cppui255)),
+                       P1mP2(typename policy_type::underlying_field_type::value_type(0x01397f5c1cb8b01d50f2de0ea7b4313c3cde9092ce7be8b296e161b8acd11ca5_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x12817dc216db8b3f2912895ea74503c5898bb6ad2031551d3b6dd85bd31949fe_cppui255)),
+                       P1mulC1(typename policy_type::underlying_field_type::value_type(0x54159bc9b43c36f888bcc71d1d6872c5066cb696d50ea8e474dafee60a32c765_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x0903cbf05cbb1c940c7ef202006cff0ac85d5930acf8a5a1ec0ac1bc7c3588b7_cppui255)),
+                       P2mulC1plusP2mulC2(typename policy_type::underlying_field_type::value_type(0x68b2b1f0c4b6a7b459ab849f7e5f18bc5ad096af5352213c5d9caf97b00dd224_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x336631c01b140040bbed152255f98540d9d40a75dc4fdf69699c3ac489027e3f_cppui255));
+
+    // std::cout << "P1 - P2:" << std::endl;
+    // print_fp_curve_group_element(std::cout, P1 - P2);
+
+    // std::cout << std::endl;
+    // std::cout << "P1mP2:" << std::endl;
+    // print_fp_curve_group_element(std::cout, P1mP2);
+
+    BOOST_CHECK(P1 + P2 == P1pP2);
+
+    BOOST_CHECK(P1 - P2 == P1mP2);
+
+    typename policy_type::value_type 
+                       P1dbl(typename policy_type::underlying_field_type::value_type(0x2bfd313640c85b796710432b3d38ac694f77d136d39be1e4065c809206bfcd47_cppui255),
+                          typename policy_type::underlying_field_type::value_type(0x46d3a20408233f9bb5772f27ab2fc0653c8eac3d01b56e01b87cb6f9c084ab29_cppui255));
+
+    BOOST_CHECK(P1.doubled() == P1dbl);
+
+    typename curves::jubjub::scalar_field_type::value_type C1 = typename curves::jubjub::scalar_field_type::value_type(0x0aa7d8962e0c9834889e553aaae3f7ac694ca24069b111291cd0150e786038dc_cppui252);
+    typename curves::jubjub::scalar_field_type::value_type C2 = typename curves::jubjub::scalar_field_type::value_type(0x0635ed2fa92d60296d9585a8927947ebf6bd9233cd116320abff907354205e88_cppui252);
+
+    // print_fp_curve_group_element(std::cout, P1 * C1);
+    BOOST_CHECK(P1 * C1 == P1mulC1);
+
+    BOOST_CHECK((P2 * C1) + (P2 * C2) == P2mulC1plusP2mulC2);
+    // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
+}
 
 BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::babyjubjub::g1_type;
@@ -329,7 +416,8 @@ BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_g1, string_data("curve_oper
                           typename policy_type::underlying_field_type::value_type(0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui252));
 
     BOOST_CHECK(P1.doubled() == P4);
-    //curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+
+    // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {

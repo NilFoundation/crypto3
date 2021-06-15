@@ -81,7 +81,15 @@ namespace nil {
                             0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                         constexpr static const number_type d =                                              ///< twisted Edwards elliptic curve 
                             0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
-                                                                                        
+                        
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
+                            g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
+                            g1_field_type::value_type::zero()};
+
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
+                            typename g1_field_type::value_type(0x187D2619FF114316D237E86684FB6E3C6B15E9B924FA4E322764D3177508297A_cppui253),
+                            typename g1_field_type::value_type(0x6230C613F1B460E026221BE21CF4EABD5A8EA552DB565CB18D3CABC39761EB9B_cppui255),
+                            g1_field_type::value_type::zero()};    //< Third value is not correct!                                                                  
                     };
 
                     constexpr typename edwards_basic_policy<255>::number_type const
@@ -91,12 +99,15 @@ namespace nil {
                         edwards_basic_policy<255>::scalar_field_modulus;
 
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::a;
-
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::d;
 
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::p;
-
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::q;
+
+                    constexpr std::array<typename edwards_basic_policy<255>::g1_field_type::value_type, 3> const
+                        edwards_basic_policy<255>::g1_zero_fill;
+                    constexpr std::array<typename edwards_basic_policy<255>::g1_field_type::value_type, 3> const
+                        edwards_basic_policy<255>::g1_one_fill;
 
                 }    // namespace detail
             }        // namespace curves
