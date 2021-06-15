@@ -27,7 +27,9 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_BLS12_HPP
 #define CRYPTO3_ALGEBRA_CURVES_BLS12_HPP
 
-#include <nil/crypto3/algebra/curves/detail/bls12/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/basic_policy.hpp>
+
 #include <nil/crypto3/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/bls12/g2.hpp>
 

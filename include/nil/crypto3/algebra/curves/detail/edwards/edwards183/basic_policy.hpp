@@ -96,10 +96,10 @@ namespace nil {
                             g2_field_type::value_type::zero()};
 
                         constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
-                            g2_field_type::value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                            typename g2_field_type::value_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
                                                         0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
                                                         0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
-                            g2_field_type::value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                            typename g2_field_type::value_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
                                                         0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
                                                         0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182),
                             g2_field_type::value_type::zero()};    //< Third value is not correct!
@@ -107,27 +107,21 @@ namespace nil {
 
                     constexpr typename edwards_basic_policy<183>::number_type const
                         edwards_basic_policy<183>::base_field_modulus;
-
                     constexpr typename edwards_basic_policy<183>::number_type const
                         edwards_basic_policy<183>::scalar_field_modulus;
 
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::a;
-
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::d;
 
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::p;
-
                     constexpr typename edwards_basic_policy<183>::number_type const edwards_basic_policy<183>::q;
 
                     constexpr std::array<typename edwards_basic_policy<183>::g1_field_type::value_type, 3> const
                         edwards_basic_policy<183>::g1_zero_fill;
-
                     constexpr std::array<typename edwards_basic_policy<183>::g1_field_type::value_type, 3> const
                         edwards_basic_policy<183>::g1_one_fill;
-
                     constexpr std::array<typename edwards_basic_policy<183>::g2_field_type::value_type, 3> const
                         edwards_basic_policy<183>::g2_zero_fill;
-
                     constexpr std::array<typename edwards_basic_policy<183>::g2_field_type::value_type, 3> const
                         edwards_basic_policy<183>::g2_one_fill;
 
