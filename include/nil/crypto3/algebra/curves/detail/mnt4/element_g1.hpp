@@ -78,7 +78,7 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_mnt4_g1() : element_mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        constexpr element_mnt4_g1() : element_mnt4_g1(policy_type::g1_zero_fill[0], policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected affine point $(X:Y:1)$
@@ -110,7 +110,8 @@ namespace nil {
                          *
                          */
                         constexpr static element_mnt4_g1 one() {
-                            return element_mnt4_g1(one_fill[0], one_fill[1], one_fill[2]);
+                            return element_mnt4_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], 
+                                policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -358,24 +359,7 @@ namespace nil {
                         constexpr static const g2_field_type_value twist =
                             g2_field_type_value(g2_field_type_value::underlying_type::zero(),
                                                 g2_field_type_value::underlying_type::one());
-
-                        constexpr static const std::array<underlying_field_value_type, 3> zero_fill = {
-                            underlying_field_value_type::zero(), underlying_field_value_type::one(),
-                            underlying_field_value_type::zero()};
-
-                        constexpr static const std::array<underlying_field_value_type, 3> one_fill = {
-                            underlying_field_value_type(
-                                0x7A2CAF82A1BA85213FE6CA3875AEE86ABA8F73D69060C4079492B948DEA216B5B9C8D2AF46_cppui295),
-                            underlying_field_value_type(
-                                0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
-                            underlying_field_value_type::one()};
                     };
-
-                    constexpr std::array<typename element_mnt4_g1<298>::underlying_field_value_type, 3> const
-                        element_mnt4_g1<298>::zero_fill;
-
-                    constexpr std::array<typename element_mnt4_g1<298>::underlying_field_value_type, 3> const
-                        element_mnt4_g1<298>::one_fill;
 
                     constexpr typename element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::a;
                     constexpr typename element_mnt4_g1<298>::g1_field_type_value const element_mnt4_g1<298>::b;

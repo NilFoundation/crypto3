@@ -80,15 +80,48 @@ namespace nil {
                             number_type(0x0B);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
                         constexpr static const number_type b = number_type(
                             0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);    ///< coefficient of short Weierstrass curve $y^2=x^3+a*x+b$
+
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
+                            g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
+                            g1_field_type::value_type::zero()};
+
+                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
+                            typename g1_field_type::value_type(
+                                0x2A4FEEE24FD2C69D1D90471B2BA61ED56F9BAD79B57E0B4C671392584BDADEBC01ABBC0447D_cppui298),
+                            typename g1_field_type::value_type(
+                                0x32986C245F6DB2F82F4E037BF7AFD69CBFCBFF07FC25D71E9C75E1B97208A333D73D91D3028_cppui298),
+                            g1_field_type::value_type::one()};
+                            
+                        constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
+                            g2_field_type::value_type::zero(), g2_field_type::value_type::one(),
+                            g2_field_type::value_type::zero()};
+
+                        constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
+                            typename g2_field_type::value_type(
+                                0x34F7320A12B56CE532BCCB3B44902CBAA723CD60035ADA7404B743AD2E644AD76257E4C6813_cppui298,
+                                0xCF41620BAA52EEC50E61A70AB5B45F681952E0109340FEC84F1B2890ABA9B15CAC5A0C80FA_cppui296,
+                                0x11F99170E10E326433CCCB8032FB48007CA3C4E105CF31B056AC767E2CB01258391BD4917CE_cppui297),
+                            typename g2_field_type::value_type(
+                                0x3A65968F03CC64D62AD05C79C415E07EBD38B363EC48309487C0B83E1717A582C1B60FECC91_cppui298,
+                                0xCA5E8427E5DB1506C1A24CEFC2451AB3ACCAEA5DB82DCB0C7117CC74402FAA5B2C37685C6E_cppui296,
+                                0xF75D2DD88302C9A4EF941307629A1B3E197277D83ABB715F647C2E55A27BAF782F5C60E7F7_cppui296),
+                            g2_field_type::value_type::one()};
                     };
 
                     constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::a;
-
                     constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::b;
 
                     constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::p;
-
                     constexpr typename mnt6_basic_policy<298>::number_type const mnt6_basic_policy<298>::q;
+
+                    constexpr std::array<typename mnt6_basic_policy<298>::g1_field_type::value_type, 3> const
+                        mnt6_basic_policy<298>::g1_zero_fill;
+                    constexpr std::array<typename mnt6_basic_policy<298>::g1_field_type::value_type, 3> const
+                        mnt6_basic_policy<298>::g1_one_fill;
+                    constexpr std::array<typename mnt6_basic_policy<298>::g2_field_type::value_type, 3> const
+                        mnt6_basic_policy<298>::g2_zero_fill;
+                    constexpr std::array<typename mnt6_basic_policy<298>::g2_field_type::value_type, 3> const
+                        mnt6_basic_policy<298>::g2_one_fill;
 
                 }    // namespace detail
             }        // namespace curves

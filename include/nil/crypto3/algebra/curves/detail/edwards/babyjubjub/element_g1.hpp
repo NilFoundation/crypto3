@@ -51,7 +51,7 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version>
-                    struct element_twisted_edwards_g1<Version> {
+                    struct element_twisted_edwards_g1 {
                         constexpr static const std::size_t version = Version;
 
                         using group_type = edwards_g1<version>;

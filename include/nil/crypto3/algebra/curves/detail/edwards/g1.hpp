@@ -57,16 +57,16 @@ namespace nil {
                     struct edwards_g1<183> {
                         constexpr static const std::size_t version = 183;
 
-                        using policy_type = edwards_basic_policy<Version>;
+                        using policy_type = edwards_basic_policy<version>;
 
-                        using curve_type = edwards<Version>;
+                        using curve_type = edwards<version>;
 
                         using underlying_field_type = typename policy_type::g1_field_type;
 
                         constexpr static const std::size_t value_bits =
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_edwards_g1<Version>;
+                        using value_type = element_edwards_g1<version>;
                     };
 
                     // JubJub
@@ -74,7 +74,7 @@ namespace nil {
                     struct edwards_g1<255> {
                         constexpr static const std::size_t version = 255;
 
-                        using policy_type = edwards_basic_policy<Version>;
+                        using policy_type = edwards_basic_policy<version>;
 
                         using curve_type = jubjub;
 
@@ -83,7 +83,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_twisted_edwards_g1<Version>;
+                        using value_type = element_twisted_edwards_g1<version>;
                     };
 
                     // BabyJubJub
@@ -91,7 +91,7 @@ namespace nil {
                     struct edwards_g1<254> {
                         constexpr static const std::size_t version = 254;
 
-                        using policy_type = edwards_basic_policy<Version>;
+                        using policy_type = edwards_basic_policy<version>;
 
                         using curve_type = babyjubjub;
 
@@ -100,7 +100,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
-                        using value_type = element_twisted_edwards_g1<Version>;
+                        using value_type = element_twisted_edwards_g1<version>;
                     };
                 }    // namespace detail
             }        // namespace curves
