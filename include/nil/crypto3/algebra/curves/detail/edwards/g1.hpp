@@ -41,13 +41,21 @@ namespace nil {
                 template<std::size_t Version>
                 struct edwards;
 
+                struct jubjub;
+
+                struct babyjubjub;
+
                 namespace detail {
                     /** @brief A struct representing a group G1 of Edwards curve.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct edwards_g1 {
+                    struct edwards_g1;
+
+                    template<>
+                    struct edwards_g1<183> {
+                        constexpr static const std::size_t version = 183;
 
                         using policy_type = edwards_basic_policy<Version>;
 
@@ -59,6 +67,40 @@ namespace nil {
                             underlying_field_type::value_bits + 1;    ///< size of the base field in bits
 
                         using value_type = element_edwards_g1<Version>;
+                    };
+
+                    // JubJub
+                    template<>
+                    struct edwards_g1<255> {
+                        constexpr static const std::size_t version = 255;
+
+                        using policy_type = edwards_basic_policy<Version>;
+
+                        using curve_type = jubjub;
+
+                        using underlying_field_type = typename policy_type::g1_field_type;
+
+                        constexpr static const std::size_t value_bits =
+                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+
+                        using value_type = element_twisted_edwards_g1<Version>;
+                    };
+
+                    // BabyJubJub
+                    template<>
+                    struct edwards_g1<254> {
+                        constexpr static const std::size_t version = 254;
+
+                        using policy_type = edwards_basic_policy<Version>;
+
+                        using curve_type = babyjubjub;
+
+                        using underlying_field_type = typename policy_type::g1_field_type;
+
+                        constexpr static const std::size_t value_bits =
+                            underlying_field_type::value_bits + 1;    ///< size of the base field in bits
+
+                        using value_type = element_twisted_edwards_g1<Version>;
                     };
                 }    // namespace detail
             }        // namespace curves

@@ -322,7 +322,13 @@ BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_g1, string_data("curve_oper
 
     typename policy_type::value_type P1pP2 = P1 + P2;
 
-    BOOST_CHECK(P1pP2 == P3);
+    BOOST_CHECK(P1 + P2 == P3);
+
+    typename policy_type::value_type 
+                       P4(typename policy_type::underlying_field_type::value_type(0xF3C160E26FC96C347DD9E705EB5A3E8D661502728609FF95B3B889296901AB5_cppui252),
+                          typename policy_type::underlying_field_type::value_type(0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui252));
+
+    BOOST_CHECK(P1.doubled() == P4);
     //curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 

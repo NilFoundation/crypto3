@@ -26,7 +26,11 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_JUBJUB_HPP
 #define CRYPTO3_ALGEBRA_CURVES_JUBJUB_HPP
 
-#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/g1.hpp>
+
+// #include <nil/crypto3/algebra/pairing/edwards.hpp>
+// #include <nil/crypto3/algebra/pairing/detail/edwards/functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,7 +42,29 @@ namespace nil {
                  *    @tparam Version version of the curve
                  *
                  */
-                using jubjub = edwards<255>;
+                struct jubjub {
+                    constexpr static const std::size_t version = 255;
+
+                    using policy_type = detail::edwards_basic_policy<version>;
+
+                    typedef typename policy_type::base_field_type base_field_type;
+                    typedef typename policy_type::scalar_field_type scalar_field_type;
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::extended_number_type extended_number_type;
+
+                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
+
+                    constexpr static const number_type q =
+                        policy_type::q;    ///< scalar field characteristic (order of the group of points)
+
+                    typedef typename detail::edwards_g1<version> g1_type;
+
+                    // typedef typename pairing::pairing_policy<edwards<version>,
+                    //                                          pairing::detail::edwards_pairing_functions<Version>>
+                    //     pairing;
+
+                    // constexpr static const bool has_affine_pairing = false;
+                };
 
             }    // namespace curves
         }        // namespace algebra

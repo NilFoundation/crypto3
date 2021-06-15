@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP
-#define CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP
+#ifndef CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_HPP
+#define CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
@@ -46,18 +46,13 @@ namespace nil {
                      */
                     template<std::size_t Version>
                     struct edwards_g1;
+                    
                     /** @brief A struct representing an element from the group G1 of edwards curve.
-                     *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct element_edwards_g1;
-                    /** @brief A struct representing an element from the group G1 of edwards curve.
-                     *
-                     */
-                    template<>
-                    struct element_edwards_g1<254> {
-                        constexpr static const std::size_t version = 254;
+                    struct element_twisted_edwards_g1<Version> {
+                        constexpr static const std::size_t version = Version;
 
                         using group_type = edwards_g1<version>;
 
@@ -78,14 +73,14 @@ namespace nil {
                          *    @return the point at infinity by default
                          *
                          */
-                        constexpr element_edwards_g1() : element_edwards_g1(policy_type::g1_zero_fill[0], 
+                        constexpr element_twisted_edwards_g1() : element_twisted_edwards_g1(policy_type::g1_zero_fill[0], 
                             policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        constexpr element_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
+                        constexpr element_twisted_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
                                            underlying_field_value_type in_Z) {
                             this->X = in_X;
                             this->Y = in_Y;
@@ -95,26 +90,26 @@ namespace nil {
                          *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
                          *
                          */
-                        constexpr element_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
-                            element_edwards_g1(X, Y, X * Y) {};
+                        constexpr element_twisted_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
+                            element_twisted_edwards_g1(X, Y, X * Y) {};
 
                         /** @brief Get the point at infinity
                          *
                          */
-                        static element_edwards_g1 zero() {
-                            return element_edwards_g1();
+                        static element_twisted_edwards_g1 zero() {
+                            return element_twisted_edwards_g1();
                         }
                         /** @brief Get the generator of group G1
                          *
                          */
-                        static element_edwards_g1 one() {
-                            return element_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], 
+                        static element_twisted_edwards_g1 one() {
+                            return element_twisted_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], 
                                 policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
 
-                        bool operator==(const element_edwards_g1 &other) const {
+                        bool operator==(const element_twisted_edwards_g1 &other) const {
                             if (this->is_zero()) {
                                 return other.is_zero();
                             }
@@ -138,7 +133,7 @@ namespace nil {
                             return true;
                         }
 
-                        bool operator!=(const element_edwards_g1 &other) const {
+                        bool operator!=(const element_twisted_edwards_g1 &other) const {
                             return !(operator==(other));
                         }
                         /** @brief
@@ -158,7 +153,7 @@ namespace nil {
 
                         /*************************  Arithmetic operations  ***********************************/
 
-                        element_edwards_g1 operator=(const element_edwards_g1 &other) {
+                        element_twisted_edwards_g1 operator=(const element_twisted_edwards_g1 &other) {
                             // handle special cases having to do with O
                             this->X = other.X;
                             this->Y = other.Y;
@@ -167,7 +162,7 @@ namespace nil {
                             return *this;
                         }
 
-                        element_edwards_g1 operator+(const element_edwards_g1 &other) const {
+                        element_twisted_edwards_g1 operator+(const element_twisted_edwards_g1 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
@@ -184,18 +179,18 @@ namespace nil {
                             return this->add(other);
                         }
 
-                        element_edwards_g1 operator-() const {
-                            return element_edwards_g1(-(this->X), this->Y, this->Z);
+                        element_twisted_edwards_g1 operator-() const {
+                            return element_twisted_edwards_g1(-(this->X), this->Y, this->Z);
                         }
 
-                        element_edwards_g1 operator-(const element_edwards_g1 &B) const {
+                        element_twisted_edwards_g1 operator-(const element_twisted_edwards_g1 &B) const {
                             return (*this) + (-B);
                         }
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        element_edwards_g1 doubled() const {
+                        element_twisted_edwards_g1 doubled() const {
 
                             if (this->is_zero()) {
                                 return (*this);
@@ -205,43 +200,9 @@ namespace nil {
                             }
                         }
 
-                        /** @brief
-                         *
-                         * “Mixed addition” refers to the case Z2 known to be 1.
-                         * @return addition of two elements from group G1
-                         */
-                        element_edwards_g1 mixed_add(const element_edwards_g1 &other) const {
-
-                            // handle special cases having to do with O
-                            if (this->is_zero()) {
-                                return other;
-                            }
-
-                            if (other.is_zero()) {
-                                return *this;
-                            }
-
-                            // NOTE: does not handle O and pts of order 2,4
-                            // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
-
-                            underlying_field_value_type A = this->Z;                  // A = Z1
-                            underlying_field_value_type B = d * A.squared();          // B = d*A^2
-                            underlying_field_value_type C = (this->X) * (other.X);    // C = X1*X2
-                            underlying_field_value_type D = (this->Y) * (other.Y);    // D = Y1*Y2
-                            underlying_field_value_type E = C * D;                    // E = C*D
-                            underlying_field_value_type H = C - D;                    // H = C-D
-                            underlying_field_value_type I =
-                                (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            underlying_field_value_type X3 = (E + B) * H;             // X3 = c*(E+B)*H
-                            underlying_field_value_type Y3 = (E - B) * I;             // Y3 = c*(E-B)*I
-                            underlying_field_value_type Z3 = A * H * I;               // Z3 = A*H*I
-
-                            return element_edwards_g1(X3, Y3, Z3);
-                        }
-
                     private:
 
-                        element_edwards_g1 add(const element_edwards_g1 &other) const {
+                        element_twisted_edwards_g1 add(const element_twisted_edwards_g1 &other) const {
                             underlying_field_value_type XX = (this->X)*(other.X);
                             underlying_field_value_type YY = (this->Y)*(other.Y);
                             underlying_field_value_type XY = (this->X)*(other.Y);
@@ -253,7 +214,7 @@ namespace nil {
                             underlying_field_value_type Y3 = (YY - a * XX) * 
                                 (underlying_field_value_type::one() - lambda).inversed();
 
-                            return element_edwards_g1(X3, Y3);
+                            return element_twisted_edwards_g1(X3, Y3);
                         }
 
                     public:
@@ -262,7 +223,7 @@ namespace nil {
                          *
                          * @return return the corresponding element from inverted coordinates to affine coordinates
                          */
-                        element_edwards_g1 to_affine() const {
+                        element_twisted_edwards_g1 to_affine() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->is_zero()) {
@@ -281,13 +242,13 @@ namespace nil {
                                 p_out[2] = underlying_field_value_type::one();
                             }
 
-                            return element_edwards_g1(p_out[0], p_out[1], p_out[2]);
+                            return element_twisted_edwards_g1(p_out[0], p_out[1], p_out[2]);
                         }
                         /** @brief
                          *
                          * @return return the corresponding element from projective coordinates to affine coordinates
                          */
-                        element_edwards_g1 to_projective() const {
+                        element_twisted_edwards_g1 to_projective() const {
                             underlying_field_value_type p_out[3];
 
                             if (this->Z.is_zero()) {
@@ -299,7 +260,7 @@ namespace nil {
                             p_out[1] = this->Y * Z_inv;
                             p_out[2] = underlying_field_value_type::one();
 
-                            return element_edwards_g1(p_out[0], p_out[1], p_out[2]);
+                            return element_twisted_edwards_g1(p_out[0], p_out[1], p_out[2]);
                         }
 
                     private:
@@ -307,12 +268,17 @@ namespace nil {
                         constexpr static const g1_field_type_value d = policy_type::d;
                     };
 
-                    constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::a;
-                    constexpr typename element_edwards_g1<254>::g1_field_type_value const element_edwards_g1<254>::d;
+                    template <std::size_t Version>
+                    constexpr typename element_twisted_edwards_g1<Version>::g1_field_type_value const 
+                        element_twisted_edwards_g1<Version>::a;
+                    
+                    template <std::size_t Version>
+                    constexpr typename element_twisted_edwards_g1<Version>::g1_field_type_value const 
+                        element_twisted_edwards_g1<Version>::d;
 
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ALGEBRA_CURVES_EDWARDS_BABYJUBJUB_G1_ELEMENT_HPP
+#endif    // CRYPTO3_ALGEBRA_CURVES_TWISTED_EDWARDS_G1_ELEMENT_HPP
