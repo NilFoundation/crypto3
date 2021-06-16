@@ -65,6 +65,8 @@ namespace nil {
                                                              pairing::detail::mnt6_pairing_functions<Version>>
                         pairing;
 
+                    typedef typename pairing::pair_curve_type chained_on_curve_type;
+
                     typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;

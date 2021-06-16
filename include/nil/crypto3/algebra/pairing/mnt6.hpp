@@ -50,7 +50,8 @@ namespace nil {
                     using policy_type = PairingFunctions;
 
                 public:
-                    typedef curves::mnt4<Version> pair_curve_type;
+                    using pair_curve_type = curves::mnt4<Version>;
+                    using chained_curve_type = pair_curve_type;
 
                     typedef typename policy_type::number_type number_type;
 

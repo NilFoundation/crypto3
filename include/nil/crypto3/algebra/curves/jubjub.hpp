@@ -53,12 +53,16 @@ namespace nil {
                     typedef typename policy_type::extended_number_type extended_number_type;
 
                     constexpr static const number_type p = policy_type::p;    ///< base field characteristic
-
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
+                    constexpr static const number_type a = policy_type::a;
+                    constexpr static const number_type d = policy_type::d;
+
                     typedef typename detail::edwards_g1<version> g1_type;
 
+                    typedef typename curves::bls12<381> chained_on_curve_type;
+                    
                     // typedef typename pairing::pairing_policy<edwards<version>,
                     //                                          pairing::detail::edwards_pairing_functions<Version>>
                     //     pairing;
@@ -66,6 +70,11 @@ namespace nil {
                     // constexpr static const bool has_affine_pairing = false;
                 };
 
+                constexpr typename jubjub::number_type const jubjub::a;
+                constexpr typename jubjub::number_type const jubjub::d;
+
+                constexpr typename jubjub::number_type const jubjub::p;
+                constexpr typename jubjub::number_type const jubjub::q;
             }    // namespace curves
         }        // namespace algebra
     }            // namespace crypto3

@@ -28,6 +28,8 @@
 
 #include <numeric>
 
+#include <nil/crypto3/algebra/curves/jubjub.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -47,6 +49,8 @@ namespace nil {
                     using policy_type = PairingFunctions;
 
                 public:
+                    using chained_curve_type = curves::jubjub;
+
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const typename policy_type::number_type pairing_loop_count =

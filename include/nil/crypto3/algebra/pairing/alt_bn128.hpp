@@ -36,6 +36,8 @@ namespace nil {
                 template<std::size_t Version>
                 struct alt_bn128;
 
+                struct babyjubjub;
+
             }    // namespace curves
             namespace pairing {
 
@@ -48,6 +50,8 @@ namespace nil {
                     using policy_type = PairingFunctions;
 
                 public:
+                    using chained_curve_type = curves::babyjubjub;
+
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const typename policy_type::number_type pairing_loop_count =

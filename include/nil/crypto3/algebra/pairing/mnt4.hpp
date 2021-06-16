@@ -51,6 +51,7 @@ namespace nil {
 
                 public:
                     using pair_curve_type = curves::mnt6<Version>;
+                    using chained_curve_type = pair_curve_type;
 
                     using number_type = typename policy_type::number_type;
 

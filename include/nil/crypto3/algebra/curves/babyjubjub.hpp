@@ -59,6 +59,8 @@ namespace nil {
 
                     typedef typename detail::edwards_g1<version> g1_type;
 
+                    typedef typename curves::alt_bn128<254> chained_on_curve_type;
+
                     // typedef typename pairing::pairing_policy<edwards<version>,
                     //                                          pairing::detail::edwards_pairing_functions<Version>>
                     //     pairing;
