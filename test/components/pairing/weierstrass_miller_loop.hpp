@@ -19,11 +19,11 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g1.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g2.hpp>
 
-#include <nil/crypto3/zk/snark/components/pairing/as_waksman.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass/precomputation.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass/miller_loop.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>

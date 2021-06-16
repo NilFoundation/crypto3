@@ -38,8 +38,8 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g1.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g2.hpp>
 
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>

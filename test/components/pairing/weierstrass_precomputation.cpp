@@ -33,7 +33,7 @@
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation_components.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass/precomputation.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

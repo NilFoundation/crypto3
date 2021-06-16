@@ -54,10 +54,10 @@ namespace nil {
                     class basic_curve_component_policy<curves::mnt4<Version>> {
                         using curve_type = typename curves::mnt4<Version>;
 
-                        typedef typename curve_type::pairing::pair_curve_type pair_curve_type;    // mnt6
+                        typedef typename curve_type::chained_on_curve_type chained_on_curve_type;    // mnt6
 
-                        typedef typename pair_curve_type::pairing::fqe_type fqe_type;
-                        typedef typename pair_curve_type::pairing::fqk_type fqk_type;
+                        typedef typename chained_on_curve_type::pairing::fqe_type fqe_type;
+                        typedef typename chained_on_curve_type::pairing::fqk_type fqk_type;
 
                         typedef typename curve_type::pairing::fp_type field_type;
 

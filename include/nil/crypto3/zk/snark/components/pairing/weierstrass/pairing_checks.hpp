@@ -37,8 +37,8 @@
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp>
-#include <nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass/final_exponentiation.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/weierstrass/miller_loop.hpp>
 
 namespace nil {
     namespace crypto3 {

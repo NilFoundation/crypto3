@@ -38,7 +38,7 @@
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/snark/components/pairing/as_waksman.hpp>
+#include <nil/crypto3/zk/snark/components/pairing/precomputations.hpp>
 
 namespace nil {
     namespace crypto3 {

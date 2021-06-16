@@ -39,8 +39,8 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
-#include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g1.hpp>
+#include <nil/crypto3/zk/snark/components/curves/weierstrass/element_g2.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp>
 //#include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>

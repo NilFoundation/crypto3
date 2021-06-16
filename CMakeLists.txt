@@ -78,11 +78,10 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
      include/nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp
      include/nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp
-     include/nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp
-     include/nil/crypto3/zk/snark/components/pairing/pairing_params.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass_miller_loop.hpp
-     include/nil/crypto3/zk/snark/components/pairing/as_waksman.hpp
+     include/nil/crypto3/zk/snark/components/pairing/weierstrass/pairing_checks.hpp
+     include/nil/crypto3/zk/snark/components/pairing/weierstrass/final_exponentiation.hpp
+     include/nil/crypto3/zk/snark/components/pairing/weierstrass/miller_loop.hpp
+     include/nil/crypto3/zk/snark/components/pairing/weierstrass/precomputation.hpp
 
      include/nil/crypto3/zk/snark/components/routing/as_waksman_routing_component.hpp
      include/nil/crypto3/zk/snark/components/routing/benes_routing_component.hpp
