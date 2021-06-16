@@ -32,8 +32,8 @@
 #define CRYPTO3_ZK_FP6_2OVER3_COMPONENTS_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
-#include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
-#include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp2.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp3.hpp>
 
 #include <nil/crypto3/zk/snark/blueprint_variable.hpp>
 

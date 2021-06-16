@@ -23,18 +23,19 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 // @file Declaration of specializations of basic_curve_component_policy<CurveType> to
-// - basic_curve_component_policy<curves::mnt6>.
+// - basic_curve_component_policy<curves::babyjubjub>.
 //
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
-#define CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
+#ifndef CRYPTO3_ZK_BABYJUBJUB_BASIC_CURVE_COMPONENT_POLICY_HPP
+#define CRYPTO3_ZK_BABYJUBJUB_BASIC_CURVE_COMPONENT_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/element_fp2.hpp>
-#include <nil/crypto3/zk/snark/components/fields/element_fp4.hpp>
+// #include <nil/crypto3/zk/snark/components/fields/element_fp12_2over3over2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,13 +49,15 @@ namespace nil {
                     class basic_curve_component_policy;
 
                     /**
-                     * Specialization for MNT6.
+                     * Specialization for babyjubjub.
                      */
-                    template<std::size_t Version>
-                    class basic_curve_component_policy<curves::mnt6<Version>> {
-                        using curve_type = typename curves::mnt6<Version>;
+                    template<>
+                    class basic_curve_component_policy<curves::babyjubjub> {
+                        using curve_type = typename curves::babyjubjub;
 
-                        typedef typename curve_type::pairing::pair_curve_type pair_curve_type;    // mnt4
+                        // Maybe the name "pair_curve_type" is a little bit confusing
+                        // We shouldn transfer this defention to algebra and remove this struct
+                        typedef typename curves::alt_bn128<254> pair_curve_type;
 
                         typedef typename pair_curve_type::pairing::fqe_type fqe_type;
                         typedef typename pair_curve_type::pairing::fqk_type fqk_type;
@@ -67,10 +70,10 @@ namespace nil {
                         typedef Fp2_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
                         typedef Fp2_sqr_component<fqe_type> Fqe_sqr_component_type;
 
-                        typedef Fp4_variable<fqk_type> Fqk_variable_type;
-                        typedef Fp4_mul_component<fqk_type> Fqk_mul_component_type;
-                        typedef Fp4_mul_component<fqk_type> Fqk_special_mul_component_type;
-                        typedef Fp4_sqr_component<fqk_type> Fqk_sqr_component_type;
+                        // typedef Fp12_2over3over2_variable<fqk_type> Fqk_variable_type;
+                        // typedef Fp12_2over3over2_mul_component<fqk_type> Fqk_mul_component_type;
+                        // typedef Fp12_2over3over2_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
+                        // typedef Fp12_2over3over2_sqr_component<fqk_type> Fqk_sqr_component_type;
                     };
                 }    // namespace components
             }        // namespace snark
@@ -78,4 +81,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP
+#endif    // CRYPTO3_ZK_BABYJUBJUB_BASIC_CURVE_COMPONENT_POLICY_HPP

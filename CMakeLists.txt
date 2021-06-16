@@ -53,31 +53,14 @@ endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
-     include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/bar_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/components/fooram_blueprint.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/fooram/fooram_cpu_checker.hpp
-
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_arithmetic.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_control_flow.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/argument_decoder_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/consistency_enforcer_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/memory_masking_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/word_variable_component.hpp
-     include/nil/crypto3/zk/snark/components/cpu_checkers/tinyram/tinyram_cpu_checker.hpp
-
-     include/nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp
-     include/nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp
-
-     include/nil/crypto3/zk/snark/components/delegated_ra_memory/memory_load_component.hpp
-     include/nil/crypto3/zk/snark/components/delegated_ra_memory/memory_load_store_component.hpp
+     include/nil/crypto3/zk/snark/components/curves/weierstrass/element_g1.hpp
+     include/nil/crypto3/zk/snark/components/curves/weierstrass/element_g2.hpp
 
      include/nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp
-     include/nil/crypto3/zk/snark/components/fields/fp2_components.hpp
-     include/nil/crypto3/zk/snark/components/fields/fp3_components.hpp
-     include/nil/crypto3/zk/snark/components/fields/fp4_components.hpp
-     include/nil/crypto3/zk/snark/components/fields/fp6_components.hpp
+     include/nil/crypto3/zk/snark/components/fields/element_fp2.hpp
+     include/nil/crypto3/zk/snark/components/fields/element_fp3.hpp
+     include/nil/crypto3/zk/snark/components/fields/element_fp4.hpp
+     include/nil/crypto3/zk/snark/components/fields/element_fp6.hpp
 
      include/nil/crypto3/zk/snark/components/hashes/knapsack/knapsack_component.hpp
 
@@ -93,8 +76,8 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_read_component.hpp
      include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_update_component.hpp
 
-     include/nil/crypto3/zk/snark/components/pairing/params/mnt4.hpp
-     include/nil/crypto3/zk/snark/components/pairing/params/mnt6.hpp
+     include/nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp
+     include/nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp
      include/nil/crypto3/zk/snark/components/pairing/pairing_checks.hpp
      include/nil/crypto3/zk/snark/components/pairing/pairing_params.hpp
      include/nil/crypto3/zk/snark/components/pairing/weierstrass_final_exponentiation.hpp

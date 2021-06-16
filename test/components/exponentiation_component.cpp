@@ -41,8 +41,8 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp>
-#include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
-#include <nil/crypto3/zk/snark/components/fields/fp6_2over3_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp4.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp6_2over3.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
