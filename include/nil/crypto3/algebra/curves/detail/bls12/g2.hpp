@@ -28,9 +28,9 @@
 #define CRYPTO3_ALGEBRA_CURVES_BLS12_G2_HPP
 
 #include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_377/element_g2.hpp>
 #include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/basic_policy.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/bls12/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/bls12/bls12_381/element_g2.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -28,10 +28,8 @@
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/edwards183/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
-#include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
 
-#include <nil/crypto3/algebra/curves/detail/edwards/element_g2.hpp>
+#include <nil/crypto3/algebra/curves/detail/edwards/edwards183/element_g2.hpp>
 
 namespace nil {
     namespace crypto3 {
