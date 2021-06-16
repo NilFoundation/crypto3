@@ -90,6 +90,24 @@ namespace nil {
                             x, buffer.end() - bincode::template get_element_size<GroupType>(), buffer.end());
                     }
 
+                    template<typename InputIterator>
+                    inline typename std::enable_if<
+                        std::is_same<std::uint8_t,
+                                     typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                        write(InputIterator first, InputIterator last) {
+                        std::array<std::uint8_t, sizeof(std::uint64_t)> len_bytes;
+                        nil::crypto3::detail::pack<stream_endian::little_byte_big_bit,
+                                                   stream_endian::big_byte_big_bit,
+                                                   sizeof(std::uint64_t) * 8,
+                                                   8>(
+                            std::vector<std::uint64_t> {
+                                static_cast<std::uint64_t>(std::distance(first, last)),
+                            },
+                            len_bytes);
+                        buffer.insert(buffer.end(), len_bytes.begin(), len_bytes.end());
+                        buffer.insert(buffer.end(), first, last);
+                    }
+
                     inline typename curve_type::scalar_field_type::value_type read_challenge() {
                         std::vector<std::uint8_t> state = buffer;
                         std::size_t counter_nonce = 0;

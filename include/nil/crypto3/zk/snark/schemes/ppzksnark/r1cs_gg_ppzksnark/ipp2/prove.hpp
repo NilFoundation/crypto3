@@ -279,8 +279,8 @@ namespace nil {
                 /// It returns a proof containing all intermdiate committed values, as well as
                 /// the challenges generated necessary to do the polynomial commitment proof
                 /// later in TIPP.
-                template<typename CurveType, typename InputG1Iterator1, typename InputG2Iterator,
-                         typename InputG1Iterator2, typename InputScalarIterator, typename Hash = hashes::sha2<256>>
+                template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputG1Iterator1,
+                         typename InputG2Iterator, typename InputG1Iterator2, typename InputScalarIterator>
                 typename std::enable_if<
                     std::is_same<typename CurveType::g1_type::value_type,
                                  typename std::iterator_traits<InputG1Iterator1>::value_type>::value &&
@@ -449,8 +449,8 @@ namespace nil {
                 /// commitment key v is used to commit to A and C recursively in GIPA such that
                 /// only one KZG proof is needed for v. In the original paper version, since the
                 /// challenges of GIPA would be different, two KZG proofs would be needed.
-                template<typename CurveType, typename InputG1Iterator1, typename InputG2Iterator,
-                         typename InputG1Iterator2, typename InputScalarIterator, typename Hash = hashes::sha2<256>>
+                template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputG1Iterator1,
+                         typename InputG2Iterator, typename InputG1Iterator2, typename InputScalarIterator>
                 typename std::enable_if<
                     std::is_same<typename CurveType::g1_type::value_type,
                                  typename std::iterator_traits<InputG1Iterator1>::value_type>::value &&
@@ -482,27 +482,27 @@ namespace nil {
                     // KZG challenge point
                     constexpr std::array<std::uint8_t, 8> domain_separator {'r', 'a', 'n', 'd', 'o', 'm', '-', 'z'};
                     tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
-                    tr.template write(challenges[0]);
-                    tr.template write(proof.final_vkey.first);
-                    tr.template write(proof.final_vkey.second);
-                    tr.template write(proof.final_wkey.first);
-                    tr.template write(proof.final_wkey.second);
+                    tr.template write<typename CurveType::scalar_field_type>(challenges[0]);
+                    tr.template write<typename CurveType::g2_type>(proof.final_vkey.first);
+                    tr.template write<typename CurveType::g2_type>(proof.final_vkey.second);
+                    tr.template write<typename CurveType::g1_type>(proof.final_wkey.first);
+                    tr.template write<typename CurveType::g1_type>(proof.final_wkey.second);
                     typename CurveType::scalar_field_type::value_type z = tr.read_challenge();
 
                     // Complete KZG proofs
                     return tipp_mipp_proof<CurveType> {
                         proof,
-                        prove_commitment_v(srs.h_alpha_powers.begin(), srs.h_alpha_powers.end(),
-                                           srs.h_beta_powers.begin(), srs.h_beta_powers.end(), challenges_inv.begin(),
-                                           challenges_inv.end(), z),
-                        prove_commitment_w(srs.g_alpha_powers.begin(), srs.g_alpha_powers.end(),
-                                           srs.g_beta_powers.begin(), srs.g_beta_powers.end(), challenges.begin(),
-                                           challenges.end(), r_inverse, z)};
+                        prove_commitment_v<CurveType>(srs.h_alpha_powers.begin(), srs.h_alpha_powers.end(),
+                                                      srs.h_beta_powers.begin(), srs.h_beta_powers.end(),
+                                                      challenges_inv.begin(), challenges_inv.end(), z),
+                        prove_commitment_w<CurveType>(srs.g_alpha_powers.begin(), srs.g_alpha_powers.end(),
+                                                      srs.g_beta_powers.begin(), srs.g_beta_powers.end(),
+                                                      challenges.begin(), challenges.end(), r_inverse, z)};
                 }
 
                 /// Aggregate `n` zkSnark proofs, where `n` must be a power of two.
-                template<typename CurveType, typename InputTranscriptIncludeIterator, typename InputProofIterator,
-                         typename Hash = hashes::sha2<256>>
+                template<typename CurveType, typename Hash = hashes::sha2<256>, typename InputTranscriptIncludeIterator,
+                         typename InputProofIterator>
                 typename std::enable_if<
                     std::is_same<std::uint8_t,
                                  typename std::iterator_traits<InputTranscriptIncludeIterator>::value_type>::value &&
@@ -525,9 +525,9 @@ namespace nil {
                     std::vector<typename CurveType::g2_type::value_type> b;
                     auto proofs_it = proofs_first;
                     while (proofs_it != proofs_last) {
-                        a.emplace_back(*proofs_it.g_A);
-                        b.emplace_back(*proofs_it.g_B);
-                        c.emplace_back(*proofs_it.g_C);
+                        a.emplace_back(proofs_it->g_A);
+                        b.emplace_back(proofs_it->g_B);
+                        c.emplace_back(proofs_it->g_C);
                         ++proofs_it;
                     }
 
@@ -546,11 +546,11 @@ namespace nil {
                     constexpr std::array<std::uint8_t, 8> domain_separator {'r', 'a', 'n', 'd', 'o', 'm', '-', 'r'};
                     transcript<CurveType, Hash> tr(application_tag.begin(), application_tag.end());
                     tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
-                    tr.template write(com_ab.first);
-                    tr.template write(com_ab.second);
-                    tr.template write(com_c.first);
-                    tr.template write(com_c.second);
-                    tr.write_domain_separator(tr_include_first, tr_include_last);
+                    tr.template write<typename CurveType::gt_type>(com_ab.first);
+                    tr.template write<typename CurveType::gt_type>(com_ab.second);
+                    tr.template write<typename CurveType::gt_type>(com_c.first);
+                    tr.template write<typename CurveType::gt_type>(com_c.second);
+                    tr.write(tr_include_first, tr_include_last);
                     typename CurveType::scalar_field_type::value_type r = tr.read_challenge();
 
                     // 1,r, r^2, r^3, r^4 ...
@@ -574,7 +574,7 @@ namespace nil {
                     // TODO: parallel
                     // compute A * B^r for the verifier
                     // auto ip_ab = algebra::pair<CurveType>(a, b_r);
-                    typename CurveType::gt_type::value_type ip_ab = typename CurveType::gt_type::value_type::one();
+                    typename CurveType::gt_type::value_type ip_ab = CurveType::gt_type::value_type::one();
                     std::for_each(boost::make_zip_iterator(boost::make_tuple(a.begin(), b_r.begin())),
                                   boost::make_zip_iterator(boost::make_tuple(a.end(), b_r.end())),
                                   [&](const boost::tuple<const typename CurveType::g1_type::value_type &,

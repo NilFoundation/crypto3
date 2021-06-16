@@ -58,7 +58,7 @@ namespace nil {
                     /// It is necessary for the IPP scheme to work that commitment
                     /// key have the exact same number of arguments as the number of proofs to
                     /// aggregate.
-                    bool has_correct_len(std::size_t n) {
+                    bool has_correct_len(std::size_t n) const {
                         return vkey.has_correct_len(n) && wkey.has_correct_len(n);
                     }
 
