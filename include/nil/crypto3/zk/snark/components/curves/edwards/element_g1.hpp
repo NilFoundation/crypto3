@@ -177,8 +177,8 @@ namespace nil {
 
                             // this->bp.val(this->X) = x;
                             // this->bp.val(this->Y) = y;
-                            // this->bp.val(this->A) = temp_a;
-                            // this->bp.val(this->D) = temp_d;
+                            // this->bp.val(this->a) = temp_a;
+                            // this->bp.val(this->d) = temp_d;
 
                             this->bp.val(this->XX) = x*x;
                             this->bp.val(this->YY) = y*y;
@@ -200,12 +200,13 @@ namespace nil {
                         typedef typename CurveType::scalar_field_type scalar_field_type;
 
                     public:
+
+                        blueprint_variable<scalar_field_type> a;
+                        blueprint_variable<scalar_field_type> d;
+
                         element_g1<CurveType> P1;
                         element_g1<CurveType> P2;
                         element_g1<CurveType> P1pP2;
-
-                        blueprint_variable<scalar_field_type> A;
-                        blueprint_variable<scalar_field_type> D;
 
                         std::shared_ptr<element_g1_is_well_formed<CurveType>> el_is_well_formed;
 
@@ -219,13 +220,13 @@ namespace nil {
                         blueprint_variable<scalar_field_type> aX1X2;
 
                         element_g1_add(blueprint<scalar_field_type> &bp,
-                            blueprint_variable<scalar_field_type> A, 
-                            blueprint_variable<scalar_field_type> D,
+                            blueprint_variable<scalar_field_type> a, 
+                            blueprint_variable<scalar_field_type> d,
                             const element_g1<CurveType> &P1,
                             const element_g1<CurveType> &P2,
                             const element_g1<CurveType> &P1pP2) :
                             component<scalar_field_type>(bp), P1(P1), P2(P2), P1pP2(P1pP2), 
-                                A(A), D(D) {
+                                a(a), d(d) {
 
                             el_is_well_formed.reset( 
                                 new element_g1_is_well_formed <CurveType> (
@@ -300,6 +301,131 @@ namespace nil {
                                     (temp_d*x1*x2*y1*y2)).inversed());
 
                             //el_is_well_formed->generate_r1cs_witness();
+                        }
+                    };
+
+                    /**
+                     * Component that creates constraints for the validity of a G1 variable.
+                     */
+                    template<typename CurveType>
+                    class element_g1_conditional_add : public component<typename CurveType::scalar_field_type> {
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
+
+                    public:
+
+                        blueprint_variable<scalar_field_type> a;
+                        blueprint_variable<scalar_field_type> d;
+
+                        element_g1<CurveType> P1;
+                        element_g1<CurveType> P2;
+                        element_g1<CurveType> P1pP2;
+
+                        blueprint_variable<scalar_field_type> canAdd;
+
+                        //intermeditate variables 
+                        element_g1<CurveType> P_toAdd;
+                        // blueprint_variable<scalar_field_type> x_toAdd;
+                        // blueprint_variable<scalar_field_type> y_toAdd;
+                        blueprint_variable<scalar_field_type> Y_intermediate_toAdd1;
+                        blueprint_variable<scalar_field_type> Y_intermediate_toAdd2;
+                        blueprint_variable<scalar_field_type> not_canAdd;
+
+                        std::shared_ptr<element_g1_add<CurveType>> el_add;
+
+                        element_g1_conditional_add(blueprint<scalar_field_type> &bp,
+                            blueprint_variable<scalar_field_type> a, 
+                            blueprint_variable<scalar_field_type> d,
+                            const element_g1<CurveType> &P1,
+                            const element_g1<CurveType> &P2,
+                            const element_g1<CurveType> &P1pP2,
+                            blueprint_variable<scalar_field_type> canAdd) :
+                            component<scalar_field_type>(bp), P1(P1), P2(P2), P1pP2(P1pP2), 
+                                a(a), d(d), canAdd(canAdd), P_toAdd() {
+
+                            Y_intermediate_toAdd1.allocate(this->bp);
+                            Y_intermediate_toAdd2.allocate(this->bp);
+
+                            not_canAdd.allocate(this->bp);
+
+                            el_add.reset( 
+                                new element_g1_add<CurveType> (
+                                    this->bp, a, d, P1, P_toAdd, P1pP2));
+                        }
+
+                        void generate_r1cs_constraints() {
+                            // if coef == 1 then x_ret[i] + x_base 
+                            //x_add[i] = coef[i] * x_base;
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>({P2.X} , {canAdd}, {P_toAdd.X}));
+
+                            // else do nothing. Ie add the zero point (0, 1)
+                            //y_add[i] = coef[i] * y_base + !coef[i];    
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>({P2.Y} , {canAdd}, {Y_intermediate_toAdd1}));
+                            
+                            //not coef
+                            // make sure canAdd == 0 or canAdd == 1
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>(canAdd, 
+                                    scalar_field_type::value_type::one()-canAdd, 
+                                    scalar_field_type::value_type::zero()));
+
+                            // make sure not_canAdd == 0 or not_canAdd == 1
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>(not_canAdd, 
+                                    scalar_field_type::value_type::one()-not_canAdd, 
+                                    scalar_field_type::value_type::zero()));
+
+                            // make sure that the sum of canAdd, not_canAdd == 1 which means canAdd!=not_canAdd
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>({not_canAdd, canAdd}, 
+                                    {scalar_field_type::value_type::one()}, 
+                                    {scalar_field_type::value_type::one()}));
+
+                            // because the are bool and because they are not equal we know that the inverse of one
+                            // is the other. 
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>(
+                                    {not_canAdd} , 
+                                    {scalar_field_type::value_type::one()}, 
+                                    {Y_intermediate_toAdd2}));
+
+                            this->bp.add_r1cs_constraint(
+                                r1cs_constraint<scalar_field_type>(
+                                    {Y_intermediate_toAdd1, Y_intermediate_toAdd2} , 
+                                    {scalar_field_type::value_type::one()}, 
+                                    {P_toAdd.Y}));
+
+                            // do the addition of either y1 , y1 plus x2, y2 if canAdd == true else x1 , y1 + 0
+                            el_add->generate_r1cs_constraints();
+                        }
+                        void generate_r1cs_witness() {
+                            this->bp.lc_val(P_toAdd.X) = this->bp.lc_val(this->P2.X) * 
+                                this->bp.val(this->canAdd);
+
+                            this->bp.val(this->Y_intermediate_toAdd1) = 
+                                this->bp.lc_val(this->P2.Y) * this->bp.val(this->canAdd);
+
+                            if (this->bp.val(this->canAdd) == scalar_field_type::value_type::one()) {
+
+                                this->bp.val(this->not_canAdd) = 
+                                    scalar_field_type::value_type::zero();
+                                this->bp.val(this->Y_intermediate_toAdd2) = 
+                                    this->bp.val(this->not_canAdd) * scalar_field_type::value_type::one();
+                                this->bp.lc_val(this->P_toAdd.Y) = this->bp.val(this->Y_intermediate_toAdd1);
+
+                            } else {
+
+                                this->bp.val(this->not_canAdd) = 
+                                    scalar_field_type::value_type::one();
+                                this->bp.val(this->Y_intermediate_toAdd2) = 
+                                    this->bp.val(this->not_canAdd) * scalar_field_type::value_type::one();
+                                this->bp.lc_val(this->P_toAdd.Y) = scalar_field_type::value_type::one();
+                                //this->bp.lc_val(this->Y_intermediate_toAdd2));
+
+                            }
+
+                            el_add->generate_r1cs_witness();
                         }
                     };
 
