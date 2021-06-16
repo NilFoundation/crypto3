@@ -73,11 +73,12 @@ namespace nil {
                         element_g1(blueprint<scalar_field_type> &bp,
                                     const typename CurveType::pairing::chained_curve_type::g1_type::value_type &P) :
                             component<scalar_field_type>(bp) {
-                            typename CurveType::pairing::chained_curve_type::g1_type::value_type Pcopy =
-                                P.to_affine();
 
-                            X.assign(bp, Pcopy.X);
-                            Y.assign(bp, Pcopy.Y);
+                            // typename CurveType::pairing::chained_curve_type::g1_type::value_type Pcopy =
+                            //     P.to_affine();
+
+                            X.assign(bp, P.X);
+                            Y.assign(bp, P.Y);
                             X.evaluate(bp);
                             Y.evaluate(bp);
                             all_vars.emplace_back(X);
@@ -145,9 +146,9 @@ namespace nil {
                             // A check, that a*X*X + Y*Y = 1 + d*X*X*Y*Y
 
                             this->bp.add_r1cs_constraint(r1cs_constraint<scalar_field_type>(
-                                {X}, {X}, {XX}));
+                                {P.X}, {P.X}, {XX}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<scalar_field_type>(
-                                {Y}, {Y}, {YY}));
+                                {P.Y}, {P.Y}, {YY}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<scalar_field_type>(
                                 {a}, {XX}, {aXX}));
                             this->bp.add_r1cs_constraint(r1cs_constraint<scalar_field_type>(
@@ -167,9 +168,9 @@ namespace nil {
                         }
                         void generate_r1cs_witness() {
                             typename scalar_field_type::value_type x = 
-                                this->bp.lc_val(this->X);
+                                this->bp.lc_val(this->P.X);
                             typename scalar_field_type::value_type y = 
-                                this->bp.lc_val(this->Y);
+                                this->bp.lc_val(this->P.Y);
                             typename scalar_field_type::value_type temp_a = 
                                 this->bp.val(this->a);
                             typename scalar_field_type::value_type temp_d = 

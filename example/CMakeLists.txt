@@ -26,6 +26,7 @@ endmacro()
 
 
 set(EXAMPLES_NAMES
+    "curves"
     "test_component")
 
 foreach(EXAMPLE_NAME ${EXAMPLES_NAMES})

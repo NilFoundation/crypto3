@@ -23,11 +23,10 @@
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
-// Initialize the curve parameters
-using curve_type = curves::bls12<381>;
-using field_type = typename curve_type::scalar_field_type;
-
 int main(){
+
+    using curve_type = curves::bls12<381>;
+    using field_type = typename curve_type::scalar_field_type;
         
     // Create blueprint
 
