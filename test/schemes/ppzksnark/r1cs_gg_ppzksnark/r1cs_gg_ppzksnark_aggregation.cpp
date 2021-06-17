@@ -924,12 +924,12 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         93, 227, 44,  5,   215, 179, 179, 161, 188, 47,  202, 226, 198, 224, 235, 229,
         51, 172, 126, 121, 244, 132, 95,  94,  122, 217, 155, 123, 243, 93,  170, 87,
     };
-    std::vector<std::uint8_t> a_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::fr_octets_num);
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_to_bytes<scalar_field_type>(
+    std::vector<std::uint8_t> a_ser(nil::marshalling::algebra_bincode<curve_type>::fr_octets_num);
+    nil::marshalling::algebra_bincode<curve_type>::field_element_to_bytes<scalar_field_type>(
         a, a_ser.begin(), a_ser.end());
     BOOST_CHECK_EQUAL(et_a_ser, a_ser);
     scalar_field_value_type a_deser =
-        nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_from_bytes<scalar_field_type>(
+        nil::marshalling::algebra_bincode<curve_type>::field_element_from_bytes<scalar_field_type>(
             a_ser.begin(), a_ser.end());
     BOOST_CHECK_EQUAL(a_deser, a);
 
@@ -942,11 +942,11 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         136, 183, 116, 154, 64,  227, 68,  245, 98,  247, 204, 23,  22,  18,  218, 161,
         152, 27,  155, 234, 230, 152, 24,  2,   2,   153, 59,  205, 235, 66,  175, 83,
     };
-    std::vector<std::uint8_t> b_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::g1_octets_num);
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g1_type>(b, b_ser.begin(), b_ser.end());
+    std::vector<std::uint8_t> b_ser(nil::marshalling::algebra_bincode<curve_type>::g1_octets_num);
+    nil::marshalling::algebra_bincode<curve_type>::point_to_bytes<g1_type>(b, b_ser.begin(), b_ser.end());
     BOOST_CHECK_EQUAL(et_b_ser, b_ser);
     G1_value_type b_deser =
-        nil::marshalling::ipp2_aggregation_bincode<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
+        nil::marshalling::algebra_bincode<curve_type>::g1_point_from_bytes(b_ser.begin(), b_ser.end());
     BOOST_CHECK_EQUAL(b_deser, b);
 
     G2_value_type c(
@@ -964,11 +964,11 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         195, 169, 47,  227, 168, 42,  194, 207, 138, 86,  53,  169, 214, 1,   136, 180, 62,  241, 64,  134,
         39,  35,  12,  91,  110, 57,  88,  208, 115, 235, 231, 194, 57,  234, 57,  30,
     };
-    std::vector<std::uint8_t> c_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::g2_octets_num);
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::point_to_bytes<g2_type>(c, c_ser.begin(), c_ser.end());
+    std::vector<std::uint8_t> c_ser(nil::marshalling::algebra_bincode<curve_type>::g2_octets_num);
+    nil::marshalling::algebra_bincode<curve_type>::point_to_bytes<g2_type>(c, c_ser.begin(), c_ser.end());
     BOOST_CHECK_EQUAL(et_c_ser, c_ser);
     G2_value_type c_deser =
-        nil::marshalling::ipp2_aggregation_bincode<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
+        nil::marshalling::algebra_bincode<curve_type>::g2_point_from_bytes(c_ser.begin(), c_ser.end());
     BOOST_CHECK_EQUAL(c_deser, c);
 
     fq12_value_type d(
@@ -1021,12 +1021,12 @@ BOOST_AUTO_TEST_CASE(bls381_transcript_test) {
         212, 1,   226, 7,   62,  56,  84,  64,  46,  254, 91,  198, 63,  173, 242, 171, 236, 173, 194, 125, 216, 95,
         159, 172, 117, 17,
     };
-    std::vector<std::uint8_t> d_ser(nil::marshalling::ipp2_aggregation_bincode<curve_type>::gt_octets_num);
-    nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_to_bytes<fq12_type>(
+    std::vector<std::uint8_t> d_ser(nil::marshalling::algebra_bincode<curve_type>::gt_octets_num);
+    nil::marshalling::algebra_bincode<curve_type>::field_element_to_bytes<fq12_type>(
         d, d_ser.begin(), d_ser.end());
     BOOST_CHECK_EQUAL(et_d_ser, d_ser);
     fq12_value_type d_deser =
-        nil::marshalling::ipp2_aggregation_bincode<curve_type>::field_element_from_bytes<fq12_type>(d_ser.begin(),
+        nil::marshalling::algebra_bincode<curve_type>::field_element_from_bytes<fq12_type>(d_ser.begin(),
                                                                                                     d_ser.end());
     BOOST_CHECK_EQUAL(d_deser, d);
 
@@ -2180,6 +2180,58 @@ BOOST_AUTO_TEST_CASE(bls381_gipa_tipp_mipp_test) {
     BOOST_CHECK_EQUAL(com_c_1, agg_proof.com_c.second);
     // TODO: complete
     // TODO: shrink
+}
+
+BOOST_AUTO_TEST_CASE(bls381_verification) {
+    fq12_value_type pvk_alpha_g1_beta_g2(
+        fq6_value_type(
+            fq2_value_type(
+                0x0aa81811bb28216360cc6f57f12fe1dfd293607693e2b8fdbdc378773f03f5412ce641e0c656f12b28d1d7d333ad78f0_cppui381,
+                0x140d55024df5c9a7c6ba02f8f510c891f691ae4b1951ece8a7c2e06f0aaef38f45b96caf0cd85cac418ec613ffe5e431_cppui381),
+            fq2_value_type(
+                0x0144c6f0a2f5e54416dc631b9e3d378ba31c28ddcefe8f4e6732a45c029452681641375841987f17f912a80ca9dc86d5_cppui381,
+                0x002f20f85d577bbde71ff8650b982d367e88a66c3a6387ddaeeacc54eb3f36c18687a7103c88dec1c8b8c1182887c331_cppui381),
+            fq2_value_type(
+                0x090fed6e61fb38670e310dd6bb62fc9f83de455650053c69aac46887d60afbc590324ac83fc6fd2719583821249cee46_cppui381,
+                0x0106304bcffad07a17050a237e89dc49fce562ca7c46f35ef9e617ea2eb475da8f401021f6eb03ce672d9f7cbbf53cf4_cppui381)),
+        fq6_value_type(
+            fq2_value_type(
+                0x0232cc692a114f4def3fb38c266fc52d72d8c3bf02ae7734970028e877f8764f44e1a3a9d96417ff9cc45e48a05bf5c6_cppui381,
+                0x19833af420b359496b156c09f8f28a9dee7c446159b06df32392bae5f491cfb05ffb12d5f2806db465e8e70bda25be1f_cppui381),
+            fq2_value_type(
+                0x05686dfea41ece87de5f348b8d9dd860ddfb2d9514ec470603eb0d567bb5e3f7ae628de1fb5279103f11f8f69bdf14ec_cppui381,
+                0x17464bcf3d0de930181d7988d8a29f3be32a8b99d2dbee305575818df9e90010a62cf9ce4ae574bdf842131e24f015d1_cppui381),
+            fq2_value_type(
+                0x000d956e4b7a1d122247edf85734dac2df30e89bc2d09cb5278e9c2ca1b814c64a9787d25cca42ab6908248773c6d8f8_cppui381,
+                0x0ea9ae7c562f168ac2ad57fb8c1cebfc2ab66d4ceae0701387bddbdc19e3dea782ef01f2e47029d31003418a3f58cff2_cppui381)));
+    G2_value_type pvk_gamma_g2(
+        fq2_value_type(
+            0x021cd836d798f907c3b73824e1b84d0427a6a0bbc695049f58a3b5dcca75430280c8171ab1c16bf4eb2deda356bcfb51_cppui381,
+            0x039e4a0dcd774d78540a461ca6b07d91fbe395ddb02e7934106d0a822c985809d960c2a8269b5c9a2a49647ebbce867b_cppui381),
+        fq2_value_type(
+            0x0d6e0aeb7429a1079ac21c9252307fa1271c21c14c4e7ac9dd4192fcd3284f60fde0efdb570111f51669187416c88c98_cppui381,
+            0x18e5ec06b14be70900ba8b1c5da1bb5a309ee96e746d6aa8cad096a8a0de7fd8c2f95a5943d84b14c2078930c5c46802_cppui381),
+        fq2_value_type::one());
+    G2_value_type pvk_delta_g2(
+        fq2_value_type(
+            0x00ac6394f709a2ef3a8df034d1222d60e80c63e64668e8e3d6761ac02e91fc5481bbc56d995c56384b750a04c5937dd0_cppui381,
+            0x00beffad20e73086e140adca13b6414d8f31f6a30c11f273b7d9948c9530d892255cdfafb1b8d0e7c0402942e4f33d9c_cppui381),
+        fq2_value_type(
+            0x08f72550571ef685122ea9c90d5775be6ee78bc40c26710e32f5e90fcfb6aba1f7b89f9fd1970f95b12e2be0503aaf4f_cppui381,
+            0x05759f1829923f4ac5538b7daac7203c093853827bf3e65bc05a015a37776844e8759f1bc8a722977b0cb23ef602c0ac_cppui381),
+        fq2_value_type::one());
+    std::vector<G1_value_type> pvk_ic = {
+        G1_value_type(
+            0x02a08a97776a482e72670d49f55d48b6978b1572e77024c3c6b55f8fb65e50d2c735bed502dd8371d6a4fc1792f1ce11_cppui381,
+            0x03793e5a45aa9ce3c173f8d17923bdf9f483e3b975dab075630b34710b9bce2f52989b532075710dcdf507d08e148ecb_cppui381,
+            fq_value_type::one()),
+        G1_value_type(
+            0x04043f1d9436bab64ce43f167931ab7e4e0ccdd688cfc2793e1f63f3d84e024b1516c9ca82296ad8011219cf43c55408_cppui381,
+            0x107506c05d8f79a88c33449a6d1e37037762f05a5d7eefe3e23856f96d62a9be60e3c58ed2ab2f86aa3ff2ddda13e9b8_cppui381,
+            fq_value_type::one()),
+    };
+
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

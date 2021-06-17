@@ -37,6 +37,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
+#include <nil/crypto3/algebra/marshalling.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +49,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::ipp2_aggregation_bincode<curve_type> bincode;
+                    typedef marshalling::algebra_bincode<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
 
