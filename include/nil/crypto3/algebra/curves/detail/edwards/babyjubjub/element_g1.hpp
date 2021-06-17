@@ -74,7 +74,7 @@ namespace nil {
                          *
                          */
                         constexpr element_twisted_edwards_g1() : element_twisted_edwards_g1(policy_type::g1_zero_fill[0], 
-                            policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
+                            policy_type::g1_zero_fill[1]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
@@ -103,8 +103,7 @@ namespace nil {
                          *
                          */
                         static element_twisted_edwards_g1 one() {
-                            return element_twisted_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1], 
-                                policy_type::g1_one_fill[2]);
+                            return element_twisted_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1]);
                         }
 
                         /*************************  Comparison operations  ***********************************/

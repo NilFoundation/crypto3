@@ -55,9 +55,26 @@
 // #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 using namespace nil::crypto3::algebra;
+
+template<typename FieldParams>
+void print_field_element(typename fields::detail::element_fp<FieldParams> e) {
+    std::cout << e.data << std::endl;
+}
+
+template<typename FieldParams>
+void print_field_element(typename fields::detail::element_fp2<FieldParams> e) {
+    std::cout << e.data[0].data << " " << e.data[1].data << std::endl;
+}
+
+template<typename FieldParams>
+void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
+    std::cout << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
+}
 
 template<typename FpCurveGroupElement>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
@@ -370,8 +387,13 @@ BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operatio
                        P2mulC1plusP2mulC2(typename policy_type::underlying_field_type::value_type(0x68b2b1f0c4b6a7b459ab849f7e5f18bc5ad096af5352213c5d9caf97b00dd224_cppui255),
                           typename policy_type::underlying_field_type::value_type(0x336631c01b140040bbed152255f98540d9d40a75dc4fdf69699c3ac489027e3f_cppui255));
 
-    // std::cout << "P1 - P2:" << std::endl;
-    // print_fp_curve_group_element(std::cout, P1 - P2);
+    typename policy_type::value_type one_point = policy_type::value_type::one();
+    typename policy_type::value_type random_point = random_element<policy_type>();
+
+    BOOST_CHECK(one_point.is_well_formed());
+    BOOST_CHECK((one_point * curves::jubjub::number_type(5)).is_well_formed());
+    BOOST_CHECK((one_point.doubled()).is_well_formed());
+    BOOST_CHECK(random_point.is_well_formed());
 
     // std::cout << std::endl;
     // std::cout << "P1mP2:" << std::endl;
