@@ -48,10 +48,9 @@ namespace nil {
             typedef std::uint8_t chunk_type;
             constexpr static const std::size_t chunk_size = 8;
 
-            constexpr static std::size_t field_octets_num =
-                field_type::modulus_bits / chunk_size + (field_type::modulus_bits % chunk_size ? 1 : 0);
             constexpr static std::size_t modulus_chunks =
                 field_type::modulus_bits / chunk_size + (field_type::modulus_bits % chunk_size ? 1 : 0);
+            constexpr static std::size_t field_octets_num = field_type::arity * modulus_chunks;
 
             constexpr static inline std::size_t get_element_size() {
                 return field_octets_num;
@@ -63,7 +62,7 @@ namespace nil {
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
                 field_value_type>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
-                BOOST_ASSERT(modulus_chunks == std::distance(first, last));
+                BOOST_ASSERT(field_octets_num == std::distance(first, last));
 
                 typename FieldType::modulus_type result;
                 ::nil::crypto3::multiprecision::import_bits(result, first, last, chunk_size, false);
@@ -78,7 +77,7 @@ namespace nil {
                 field_value_type>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 constexpr std::size_t data_dimension = field_type::arity / field_type::underlying_field_type::arity;
-                BOOST_ASSERT(field_type::arity * modulus_chunks == std::distance(first, last));
+                BOOST_ASSERT(field_octets_num == std::distance(first, last));
 
                 typename field_value_type::data_type data;
                 for (std::size_t n = 0; n < data_dimension; ++n) {
@@ -97,12 +96,12 @@ namespace nil {
                 std::size_t>::type
                 field_element_to_bytes(const field_value_type &element, OutputIterator out_first,
                                        OutputIterator out_last) {
-                BOOST_ASSERT(modulus_chunks == std::distance(out_first, out_last));
+                BOOST_ASSERT(field_octets_num == std::distance(out_first, out_last));
 
                 ::nil::crypto3::multiprecision::export_bits(
                     element.data.template convert_to<typename FieldType::modulus_type>(), out_first, chunk_size, false);
 
-                return modulus_chunks;
+                return field_octets_num;
             }
 
             template<typename OutputIterator>
@@ -112,7 +111,7 @@ namespace nil {
                 std::size_t>::type
                 field_element_to_bytes(const field_value_type &element, OutputIterator out_first,
                                        OutputIterator out_last) {
-                BOOST_ASSERT(field_type::arity * modulus_chunks == std::distance(out_first, out_last));
+                BOOST_ASSERT(field_octets_num == std::distance(out_first, out_last));
 
                 std::size_t offset = 0;
                 for (auto data_it = element.data.begin(); data_it != element.data.end(); ++data_it) {
@@ -121,7 +120,7 @@ namespace nil {
                         out_first + offset + field_type::underlying_field_type::arity * modulus_chunks);
                 }
 
-                return field_type::arity * modulus_chunks;
+                return field_octets_num;
             }
         };
 
