@@ -130,23 +130,31 @@ namespace nil {
                     return !(*this == other);
                 }
 
-                template<typename OS>
-                inline OS &operator<<(OS &os) const {
-                    os << state;
-                    return os;
-                }
+                template<typename OS, typename HashT, typename ResultT>
+                friend OS &operator<<(OS &, const libff_hash_based_algebraic_engine<HashT, ResultT> &);
 
-                template<typename IS>
-                inline IS &operator>>(IS &is) {
-                    is >> state;
-                    return is;
-                }
+                template<typename IS, typename HashT, typename ResultT>
+                friend IS &operator>>(IS &, libff_hash_based_algebraic_engine<HashT, ResultT> &);
 
             protected:
                 input_type state;
                 result_type cache;
                 bool cached;
             };
+
+            template<typename OS, typename Hash, typename ResultType>
+            OS &operator<<(OS &os, const libff_hash_based_algebraic_engine<Hash, ResultType> &e) {
+                os << e.state;
+                return os;
+            }
+
+            template<typename IS, typename HashT, typename ResultT>
+            IS &operator>>(IS &is, libff_hash_based_algebraic_engine<HashT, ResultT> &e) {
+                typename libff_hash_based_algebraic_engine<HashT, ResultT>::input_type x;
+                is >> x;
+                e.seed(x);
+                return is;
+            }
         }    // namespace random
     }        // namespace crypto3
 }    // namespace nil
