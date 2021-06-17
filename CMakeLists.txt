@@ -34,6 +34,7 @@ set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
+                      crypto3::algebra
                       crypto3::hash
                       crypto3::mac
                       crypto3::stream
