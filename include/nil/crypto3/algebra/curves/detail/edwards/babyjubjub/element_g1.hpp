@@ -151,6 +151,26 @@ namespace nil {
                             return (this->is_zero() || this->Z == underlying_field_value_type::one());
                         }
 
+                        /** @brief
+                         *
+                         * @return true if element from group G1 lies on the elliptic curve
+                         * 
+                         * A check, that a*X*X + Y*Y = 1 + d*X*X*Y*Y
+                         */
+                        constexpr bool is_well_formed() const {
+                            if (this->is_zero()) {
+                                return true;
+                            } else {
+                                
+                                underlying_field_value_type XX = this->X.squared();
+                                underlying_field_value_type YY = this->Y.squared();
+
+                                return (underlying_field_value_type(policy_type::a)*XX + YY == 
+                                    underlying_field_value_type::one() + 
+                                    underlying_field_value_type(policy_type::d)*XX*YY);
+                            }
+                        }
+
                         /*************************  Arithmetic operations  ***********************************/
 
                         element_twisted_edwards_g1 operator=(const element_twisted_edwards_g1 &other) {

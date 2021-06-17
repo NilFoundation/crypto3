@@ -365,7 +365,7 @@ namespace nil {
                     private:
                         constexpr static const g1_field_type_value a = g1_field_type_value(policy_type::a);
                         constexpr static const g1_field_type_value b = g1_field_type_value(policy_type::b);
-
+                    public:
                         constexpr static const g2_field_type_value twist = g2_field_type_value(0x09, 0x01);
 
                         constexpr static const g2_field_type_value twist_coeff_b = b * twist.inversed();

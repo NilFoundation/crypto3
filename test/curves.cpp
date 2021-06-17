@@ -381,19 +381,27 @@ BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operatio
 
     BOOST_CHECK(P1 - P2 == P1mP2);
 
+    BOOST_CHECK(P1.is_well_formed());
+    BOOST_CHECK(P2.is_well_formed());
+    BOOST_CHECK(P1pP2.is_well_formed());
+    BOOST_CHECK(P1mP2.is_well_formed());
+
     typename policy_type::value_type 
                        P1dbl(typename policy_type::underlying_field_type::value_type(0x2bfd313640c85b796710432b3d38ac694f77d136d39be1e4065c809206bfcd47_cppui255),
                           typename policy_type::underlying_field_type::value_type(0x46d3a20408233f9bb5772f27ab2fc0653c8eac3d01b56e01b87cb6f9c084ab29_cppui255));
 
     BOOST_CHECK(P1.doubled() == P1dbl);
+    BOOST_CHECK(P1dbl.is_well_formed());
 
     typename curves::jubjub::scalar_field_type::value_type C1 = typename curves::jubjub::scalar_field_type::value_type(0x0aa7d8962e0c9834889e553aaae3f7ac694ca24069b111291cd0150e786038dc_cppui252);
     typename curves::jubjub::scalar_field_type::value_type C2 = typename curves::jubjub::scalar_field_type::value_type(0x0635ed2fa92d60296d9585a8927947ebf6bd9233cd116320abff907354205e88_cppui252);
 
     // print_fp_curve_group_element(std::cout, P1 * C1);
     BOOST_CHECK(P1 * C1 == P1mulC1);
+    BOOST_CHECK(P1mulC1.is_well_formed());
 
     BOOST_CHECK((P2 * C1) + (P2 * C2) == P2mulC1plusP2mulC2);
+    BOOST_CHECK(P2mulC1plusP2mulC2.is_well_formed());
     // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
