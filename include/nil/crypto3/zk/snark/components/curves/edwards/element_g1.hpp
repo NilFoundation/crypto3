@@ -176,8 +176,8 @@ namespace nil {
                             typename scalar_field_type::value_type temp_d = 
                                 this->bp.val(this->d);
 
-                            // this->bp.val(this->X) = x;
-                            // this->bp.val(this->Y) = y;
+                            // this->bp.val(this->P.X) = x;
+                            // this->bp.val(this->P.Y) = y;
                             // this->bp.val(this->a) = temp_a;
                             // this->bp.val(this->d) = temp_d;
 
@@ -209,7 +209,7 @@ namespace nil {
                         element_g1<CurveType> P2;
                         element_g1<CurveType> P1pP2;
 
-                        std::shared_ptr<element_g1_is_well_formed<CurveType>> el_is_well_formed;
+                        // std::shared_ptr<element_g1_is_well_formed<CurveType>> el_is_well_formed;
 
                         //intermeditate variables 
                         blueprint_variable<scalar_field_type> X1X2;
@@ -229,9 +229,9 @@ namespace nil {
                             component<scalar_field_type>(bp), P1(P1), P2(P2), P1pP2(P1pP2), 
                                 a(a), d(d) {
 
-                            el_is_well_formed.reset( 
-                                new element_g1_is_well_formed <CurveType> (
-                                    this->bp, a, d, P1pP2));
+                            // el_is_well_formed.reset( 
+                            //     new element_g1_is_well_formed <CurveType> (
+                            //         this->bp, a, d, P1pP2));
 
                             X1X2.allocate(this->bp);
                             X1Y2.allocate(this->bp);
@@ -429,7 +429,6 @@ namespace nil {
                             el_add->generate_r1cs_witness();
                         }
                     };
-
                 }    // namespace components
             }        // namespace snark
         }            // namespace zk

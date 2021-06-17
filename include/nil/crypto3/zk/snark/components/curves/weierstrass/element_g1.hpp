@@ -45,7 +45,7 @@ namespace nil {
                      * Component that represents a G1 variable.
                      */
                     template<typename CurveType>
-                    class g1_variable : public component<typename CurveType::scalar_field_type> {
+                    class element_g1 : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                     public:
@@ -54,7 +54,7 @@ namespace nil {
 
                         blueprint_linear_combination_vector<FieldType> all_vars;
 
-                        g1_variable(blueprint<FieldType> &bp) : component<FieldType>(bp) {
+                        element_g1(blueprint<FieldType> &bp) : component<FieldType>(bp) {
                             blueprint_variable<FieldType> X_var, Y_var;
 
                             X_var.allocate(bp);
@@ -67,7 +67,7 @@ namespace nil {
                             all_vars.emplace_back(Y);
                         }
 
-                        g1_variable(blueprint<FieldType> &bp,
+                        element_g1(blueprint<FieldType> &bp,
                                     const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P) :
                             component<FieldType>(bp) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type Pcopy =
@@ -104,15 +104,15 @@ namespace nil {
                      * Component that creates constraints for the validity of a G1 variable.
                      */
                     template<typename CurveType>
-                    class G1_checker_component : public component<typename CurveType::scalar_field_type> {
+                    class element_g1_is_well_formed : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                     public:
-                        g1_variable<CurveType> P;
+                        element_g1<CurveType> P;
                         blueprint_variable<FieldType> P_X_squared;
                         blueprint_variable<FieldType> P_Y_squared;
 
-                        G1_checker_component(blueprint<FieldType> &bp, const g1_variable<CurveType> &P) :
+                        element_g1_is_well_formed(blueprint<FieldType> &bp, const element_g1<CurveType> &P) :
                             component<FieldType>(bp), P(P) {
                             P_X_squared.allocate(bp);
                             P_Y_squared.allocate(bp);
@@ -137,21 +137,21 @@ namespace nil {
                      * Component that creates constraints for G1 addition.
                      */
                     template<typename CurveType>
-                    class G1_add_component : public component<typename CurveType::scalar_field_type> {
+                    class element_g1_add : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                     public:
                         blueprint_variable<FieldType> lambda;
                         blueprint_variable<FieldType> inv;
 
-                        g1_variable<CurveType> A;
-                        g1_variable<CurveType> B;
-                        g1_variable<CurveType> C;
+                        element_g1<CurveType> A;
+                        element_g1<CurveType> B;
+                        element_g1<CurveType> C;
 
-                        G1_add_component(blueprint<FieldType> &bp,
-                                         const g1_variable<CurveType> &A,
-                                         const g1_variable<CurveType> &B,
-                                         const g1_variable<CurveType> &C) :
+                        element_g1_add(blueprint<FieldType> &bp,
+                                         const element_g1<CurveType> &A,
+                                         const element_g1<CurveType> &B,
+                                         const element_g1<CurveType> &C) :
                             component<FieldType>(bp),
                             A(A), B(B), C(C) {
                             /*
@@ -202,19 +202,19 @@ namespace nil {
                      * Component that creates constraints for G1 doubling.
                      */
                     template<typename CurveType>
-                    class G1_dbl_component : public component<typename CurveType::scalar_field_type> {
+                    class element_g1_doubled : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type FieldType;
 
                     public:
                         blueprint_variable<FieldType> Xsquared;
                         blueprint_variable<FieldType> lambda;
 
-                        g1_variable<CurveType> A;
-                        g1_variable<CurveType> B;
+                        element_g1<CurveType> A;
+                        element_g1<CurveType> B;
 
-                        G1_dbl_component(blueprint<FieldType> &bp,
-                                         const g1_variable<CurveType> &A,
-                                         const g1_variable<CurveType> &B) :
+                        element_g1_doubled(blueprint<FieldType> &bp,
+                                         const element_g1<CurveType> &A,
+                                         const element_g1<CurveType> &B) :
                             component<FieldType>(bp),
                             A(A), B(B) {
                             Xsquared.allocate(bp);
@@ -246,118 +246,6 @@ namespace nil {
                             this->bp.lc_val(B.Y) =
                                 this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(B.X)) -
                                 this->bp.lc_val(A.Y);
-                        }
-                    };
-
-                    /**
-                     * Component that creates constraints for G1 multi-scalar multiplication.
-                     */
-                    template<typename CurveType>
-                    class G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
-                        typedef typename CurveType::scalar_field_type FieldType;
-
-                    public:
-                        std::vector<g1_variable<CurveType>> computed_results;
-                        std::vector<g1_variable<CurveType>> chosen_results;
-                        std::vector<G1_add_component<CurveType>> adders;
-                        std::vector<G1_dbl_component<CurveType>> doublers;
-
-                        g1_variable<CurveType> base;
-                        blueprint_variable_vector<FieldType> scalars;
-                        std::vector<g1_variable<CurveType>> points;
-                        std::vector<g1_variable<CurveType>> points_and_powers;
-                        g1_variable<CurveType> result;
-
-                        const std::size_t elt_size;
-                        const std::size_t num_points;
-                        const std::size_t scalar_size;
-
-                        G1_multiscalar_mul_component(blueprint<FieldType> &bp,
-                                                     const g1_variable<CurveType> &base,
-                                                     const blueprint_variable_vector<FieldType> &scalars,
-                                                     const std::size_t elt_size,
-                                                     const std::vector<g1_variable<CurveType>> &points,
-                                                     const g1_variable<CurveType> &result) :
-                            component<FieldType>(bp),
-                            base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
-                            num_points(points.size()), scalar_size(scalars.size()) {
-
-                            assert(num_points >= 1);
-                            assert(num_points * elt_size == scalar_size);
-
-                            for (std::size_t i = 0; i < num_points; ++i) {
-                                points_and_powers.emplace_back(points[i]);
-                                for (std::size_t j = 0; j < elt_size - 1; ++j) {
-                                    points_and_powers.emplace_back(g1_variable<CurveType>(bp));
-                                    doublers.emplace_back(
-                                        G1_dbl_component<CurveType>(bp,
-                                                                    points_and_powers[i * elt_size + j],
-                                                                    points_and_powers[i * elt_size + j + 1]));
-                                }
-                            }
-
-                            chosen_results.emplace_back(base);
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                computed_results.emplace_back(g1_variable<CurveType>(bp));
-                                if (i < scalar_size - 1) {
-                                    chosen_results.emplace_back(g1_variable<CurveType>(bp));
-                                } else {
-                                    chosen_results.emplace_back(result);
-                                }
-
-                                adders.emplace_back(G1_add_component<CurveType>(
-                                    bp, chosen_results[i], points_and_powers[i], computed_results[i]));
-                            }
-                        }
-
-                        void generate_r1cs_constraints() {
-                            const std::size_t num_constraints_before = this->bp.num_constraints();
-
-                            for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                                doublers[i].generate_r1cs_constraints();
-                            }
-
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                adders[i].generate_r1cs_constraints();
-
-                                /*
-                                  chosen_results[i+1].X = scalars[i] * computed_results[i].X + (1-scalars[i]) *
-                                  chosen_results[i].X chosen_results[i+1].X - chosen_results[i].X = scalars[i] *
-                                  (computed_results[i].X - chosen_results[i].X)
-                                */
-                                this->bp.add_r1cs_constraint(
-                                    r1cs_constraint<FieldType>(scalars[i],
-                                                               computed_results[i].X - chosen_results[i].X,
-                                                               chosen_results[i + 1].X - chosen_results[i].X));
-                                this->bp.add_r1cs_constraint(
-                                    r1cs_constraint<FieldType>(scalars[i],
-                                                               computed_results[i].Y - chosen_results[i].Y,
-                                                               chosen_results[i + 1].Y - chosen_results[i].Y));
-                            }
-
-                            const std::size_t num_constraints_after = this->bp.num_constraints();
-                            assert(num_constraints_after - num_constraints_before ==
-                                   4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
-                        }
-
-                        void generate_r1cs_witness() {
-                            for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                                doublers[i].generate_r1cs_witness();
-                            }
-
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                adders[i].generate_r1cs_witness();
-                                this->bp.lc_val(chosen_results[i + 1].X) =
-                                    (this->bp.val(scalars[i]) ==
-                                             typename CurveType::scalar_field_type::value_type::zero() ?
-                                         this->bp.lc_val(chosen_results[i].X) :
-                                         this->bp.lc_val(computed_results[i].X));
-                                this->bp.lc_val(chosen_results[i + 1].Y) =
-                                    (this->bp.val(scalars[i]) ==
-                                             typename CurveType::scalar_field_type::value_type::zero() ?
-                                         this->bp.lc_val(chosen_results[i].Y) :
-                                         this->bp.lc_val(computed_results[i].Y));
-                            }
                         }
                     };
                 }    // namespace components

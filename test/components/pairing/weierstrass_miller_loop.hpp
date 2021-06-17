@@ -47,8 +47,8 @@ void test_mnt_miller_loop() {
     typename pair_curve_type::g2_type::value_type Q_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g2_type::value_type::one();
 
-    components::g1_variable<curve_type> P(bp);
-    components::g2_variable<curve_type> Q(bp);
+    components::element_g1<curve_type> P(bp);
+    components::element_g2<curve_type> Q(bp);
 
     components::g1_precomputation<curve_type> prec_P;
     components::g2_precomputation<curve_type> prec_Q;
@@ -104,10 +104,10 @@ void test_mnt_e_over_e_miller_loop() {
     typename pair_curve_type::g2_type::value_type Q2_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g2_type::value_type::one();
 
-    components::g1_variable<curve_type> P1(bp);
-    components::g2_variable<curve_type> Q1(bp);
-    components::g1_variable<curve_type> P2(bp);
-    components::g2_variable<curve_type> Q2(bp);
+    components::element_g1<curve_type> P1(bp);
+    components::element_g2<curve_type> Q1(bp);
+    components::element_g1<curve_type> P2(bp);
+    components::element_g2<curve_type> Q2(bp);
 
     components::g1_precomputation<curve_type> prec_P1;
     components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);
@@ -182,12 +182,12 @@ void test_mnt_e_times_e_over_e_miller_loop() {
     typename pair_curve_type::g2_type::value_type Q3_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g2_type::value_type::one();
 
-    components::g1_variable<curve_type> P1(bp);
-    components::g2_variable<curve_type> Q1(bp);
-    components::g1_variable<curve_type> P2(bp);
-    components::g2_variable<curve_type> Q2(bp);
-    components::g1_variable<curve_type> P3(bp);
-    components::g2_variable<curve_type> Q3(bp);
+    components::element_g1<curve_type> P1(bp);
+    components::element_g2<curve_type> Q1(bp);
+    components::element_g1<curve_type> P2(bp);
+    components::element_g2<curve_type> Q2(bp);
+    components::element_g1<curve_type> P3(bp);
+    components::element_g2<curve_type> Q3(bp);
 
     components::g1_precomputation<curve_type> prec_P1;
     components::precompute_G1_component<curve_type> compute_prec_P1(bp, P1, prec_P1);

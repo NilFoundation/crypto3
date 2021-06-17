@@ -81,8 +81,12 @@ blueprint<typename CurveType::scalar_field_type> addition_example(
     a.allocate(bp);
     d.allocate(bp);
 
-    bp.val(a) = chained_curve_type::a;
-    bp.val(d) = chained_curve_type::d;
+    bp.val(a) = typename scalar_field_type::value_type(chained_curve_type::a);
+    bp.val(d) = typename scalar_field_type::value_type(chained_curve_type::d);
+
+    std::cout << "a: " << chained_curve_type::a << std::endl;
+    std::cout << "modulus: " << scalar_field_type::modulus << std::endl;
+    std::cout << "d: " << chained_curve_type::d << std::endl;
 
     components::element_g1<main_curve_type> P1(bp, p1);
     components::element_g1<main_curve_type> P2(bp, p2);
@@ -105,16 +109,14 @@ blueprint<typename CurveType::scalar_field_type> addition_example(
     print_field_element(bp.lc_val(P2.Y));
 
     components::element_g1_add<main_curve_type> el_add(bp, a, d, P1, P2, P1pP2);
+    components::element_g1_is_well_formed<main_curve_type> 
+        el_is_well_formed(bp, a, d, P1);
 
     el_add.generate_r1cs_constraints();
+    el_is_well_formed.generate_r1cs_constraints();
+
     el_add.generate_r1cs_witness();
-
-    std::cout << "P1pP2:" << std::endl;
-    print_field_element(bp.lc_val(P1pP2.X));
-    print_field_element(bp.lc_val(P1pP2.Y));
-
-    std::cout << "P1 + P2:" << std::endl;
-    print_fp_curve_group_element(p1 + p2);
+    el_is_well_formed.generate_r1cs_witness();
 
     std::cout << "blueprint size: " << bp.num_variables() << std::endl;
 
@@ -128,13 +130,9 @@ int main(){
     using scalar_field_type = typename main_curve_type::scalar_field_type;
 
     typename chained_curve_type::g1_type::value_type p1 = 
-        typename chained_curve_type::g1_type::value_type(
-        random_element<typename chained_curve_type::g1_type::underlying_field_type>(),
-        random_element<typename chained_curve_type::g1_type::underlying_field_type>());
+        random_element<typename chained_curve_type::g1_type>();
     typename chained_curve_type::g1_type::value_type p2 = 
-        typename chained_curve_type::g1_type::value_type(
-        random_element<typename chained_curve_type::g1_type::underlying_field_type>(),
-        random_element<typename chained_curve_type::g1_type::underlying_field_type>());
+        random_element<typename chained_curve_type::g1_type>();
 
     blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);
 

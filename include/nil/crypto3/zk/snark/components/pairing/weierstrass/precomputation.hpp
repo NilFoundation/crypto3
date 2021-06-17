@@ -63,7 +63,7 @@ namespace nil {
                         using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     public:
-                        std::shared_ptr<g1_variable<CurveType>> P;
+                        std::shared_ptr<element_g1<CurveType>> P;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> PY_twist_squared;
 
                         g1_precomputation() {
@@ -75,7 +75,7 @@ namespace nil {
                             const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P_val) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type P_val_copy =
                                 P_val.to_affine();
-                            P.reset(new g1_variable<CurveType>(bp, P_val_copy));
+                            P.reset(new element_g1<CurveType>(bp, P_val_copy));
                             PY_twist_squared.reset(new typename component_policy::Fqe_variable_type(
                                 bp,
                                 P_val_copy.Y() *
@@ -100,7 +100,7 @@ namespace nil {
                         template<typename FieldType>
                         precompute_G1_component(
                             blueprint<FieldType> &bp,
-                            const g1_variable<CurveType> &P,
+                            const element_g1<CurveType> &P,
                             g1_precomputation<CurveType> &precomp,    // will allocate this inside
                             const typename std::enable_if<fqk_type::arity == 4, typename FieldType::value_type>::type
                                 & = typename FieldType::value_type()) :
@@ -113,7 +113,7 @@ namespace nil {
                             c0.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[0]));
                             c1.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[1]));
 
-                            precomp.P.reset(new g1_variable<CurveType>(P));
+                            precomp.P.reset(new element_g1<CurveType>(P));
                             precomp.PY_twist_squared.reset(new
                                                            typename component_policy::Fqe_variable_type(bp, c0, c1));
                         }
@@ -121,7 +121,7 @@ namespace nil {
                         template<typename FieldType>
                         precompute_G1_component(
                             blueprint<FieldType> &bp,
-                            const g1_variable<CurveType> &P,
+                            const element_g1<CurveType> &P,
                             g1_precomputation<CurveType> &precomp,    // will allocate this inside
                             const typename std::enable_if<fqk_type::arity == 6, typename FieldType::value_type>::type
                                 & = typename FieldType::value_type()) :
@@ -135,7 +135,7 @@ namespace nil {
                             c1.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[1]));
                             c2.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[2]));
 
-                            precomp.P.reset(new g1_variable<CurveType>(P));
+                            precomp.P.reset(new element_g1<CurveType>(P));
                             precomp.PY_twist_squared.reset(
                                 new typename component_policy::Fqe_variable_type(bp, c0, c1, c2));
                         }
@@ -178,7 +178,7 @@ namespace nil {
                             gamma_X.reset(new typename component_policy::Fqe_variable_type(bp));
                         }
 
-                        precompute_G2_component_coeffs(blueprint<FieldType> &bp, const g2_variable<CurveType> &Q) {
+                        precompute_G2_component_coeffs(blueprint<FieldType> &bp, const element_g2<CurveType> &Q) {
                             RX.reset(new typename component_policy::Fqe_variable_type(*(Q.X)));
                             RY.reset(new typename component_policy::Fqe_variable_type(*(Q.Y)));
                             gamma.reset(new typename component_policy::Fqe_variable_type(bp));
@@ -196,7 +196,7 @@ namespace nil {
                     public:
                         typedef typename CurveType::pairing::fp_type FieldType;
 
-                        std::shared_ptr<g2_variable<CurveType>> Q;
+                        std::shared_ptr<element_g2<CurveType>> Q;
 
                         std::vector<std::shared_ptr<precompute_G2_component_coeffs<CurveType>>> coeffs;
 
@@ -205,7 +205,7 @@ namespace nil {
                         g2_precomputation(
                             blueprint<FieldType> &bp,
                             const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q_val) {
-                            Q.reset(new g2_variable<CurveType>(bp, Q_val));
+                            Q.reset(new element_g2<CurveType>(bp, Q_val));
                             const typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp
                                 native_precomp =
                                     affine_ate_precompute_g2<typename CurveType::pairing::pair_curve_type>(Q_val);
@@ -374,7 +374,7 @@ namespace nil {
                         bool invert_Q;
                         precompute_G2_component_coeffs<CurveType> cur;
                         precompute_G2_component_coeffs<CurveType> next;
-                        g2_variable<CurveType> Q;
+                        element_g2<CurveType> Q;
 
                         std::shared_ptr<typename component_policy::Fqe_variable_type> RY_minus_QY;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> RX_minus_QX;
@@ -392,7 +392,7 @@ namespace nil {
                                                               const bool invert_Q,
                                                               const precompute_G2_component_coeffs<CurveType> &cur,
                                                               const precompute_G2_component_coeffs<CurveType> &next,
-                                                              const g2_variable<CurveType> &Q) :
+                                                              const element_g2<CurveType> &Q) :
                             component<FieldType>(bp),
                             invert_Q(invert_Q), cur(cur), next(next), Q(Q) {
                             RY_minus_QY.reset(new typename component_policy::Fqe_variable_type(
@@ -477,11 +477,11 @@ namespace nil {
                         g2_precomputation<CurveType> &precomp;    // important to have a reference here
 
                         precompute_G2_component(blueprint<FieldType> &bp,
-                                                const g2_variable<CurveType> &Q,
+                                                const element_g2<CurveType> &Q,
                                                 g2_precomputation<CurveType> &precomp) :
                             component<FieldType>(bp),
                             precomp(precomp) {
-                            precomp.Q.reset(new g2_variable<CurveType>(Q));
+                            precomp.Q.reset(new element_g2<CurveType>(Q));
 
                             const auto &loop_count = component_policy::pairing_loop_count;
                             std::size_t coeff_count = 1;    // the last RX/RY are unused in Miller loop, but will need

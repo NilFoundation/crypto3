@@ -42,13 +42,13 @@ using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
-void test_g1_variable_precomp() {
+void test_element_g1_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename CurveType::pairing::pair_curve_type::g1_type::value_type g_val =
         algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
         CurveType::pairing::pair_curve_type::g1_type::value_type::one();
 
-    g1_variable<CurveType> g(bp);
+    element_g1<CurveType> g(bp);
     g1_precomputation<CurveType> precomp;
     precompute_G1_component<CurveType> do_precomp(bp, g, precomp);
     do_precomp.generate_r1cs_constraints();
@@ -66,13 +66,13 @@ void test_g1_variable_precomp() {
 }
 
 template<typename CurveType>
-void test_g2_variable_precomp() {
+void test_element_g2_precomp() {
     blueprint<typename CurveType::scalar_field_type> bp;
     typename CurveType::pairing::pair_curve_type::g2_type::value_type g_val =
         algebra::random_element<typename CurveType::pairing::pair_curve_type::scalar_field_type>() *
         CurveType::pairing::pair_curve_type::g2_type::value_type::one();
 
-    g2_variable<CurveType> g(bp);
+    element_g2<CurveType> g(bp);
     g2_precomputation<CurveType> precomp;
     precompute_G2_component<CurveType> do_precomp(bp, g, precomp);
     do_precomp.generate_r1cs_constraints();

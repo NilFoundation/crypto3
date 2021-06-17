@@ -159,7 +159,7 @@ namespace nil {
                         bool invert_Q;
                         g1_precomputation<CurveType> prec_P;
                         precompute_G2_component_coeffs<CurveType> c;
-                        g2_variable<CurveType> Q;
+                        element_g2<CurveType> Q;
                         std::shared_ptr<typename component_policy::Fqk_variable_type>
                             &g_RQ_at_P;    // reference from outside
 
@@ -172,7 +172,7 @@ namespace nil {
                             const bool invert_Q,
                             const g1_precomputation<CurveType> &prec_P,
                             const precompute_G2_component_coeffs<CurveType> &c,
-                            const g2_variable<CurveType> &Q,
+                            const element_g2<CurveType> &Q,
                             std::shared_ptr<typename component_policy::Fqk_variable_type> &g_RQ_at_P) :
                             component<field_type>(bp),
                             invert_Q(invert_Q), prec_P(prec_P), c(c), Q(Q), g_RQ_at_P(g_RQ_at_P) {

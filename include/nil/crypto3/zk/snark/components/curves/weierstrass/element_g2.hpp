@@ -54,7 +54,7 @@ namespace nil {
                      * Component that represents a G2 variable.
                      */
                     template<typename CurveType>
-                    class g2_variable : public component<typename CurveType::scalar_field_type> {
+                    class element_g2 : public component<typename CurveType::scalar_field_type> {
                         using field_type = typename CurveType::pairing::fp_type;
 
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
@@ -68,14 +68,14 @@ namespace nil {
 
                         blueprint_linear_combination_vector<field_type> all_vars;
 
-                        g2_variable(blueprint<field_type> &bp) : component<field_type>(bp) {
+                        element_g2(blueprint<field_type> &bp) : component<field_type>(bp) {
                             X.reset(new typename component_policy::Fqe_variable_type(bp));
                             Y.reset(new typename component_policy::Fqe_variable_type(bp));
 
                             all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
                             all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                         }
-                        g2_variable(blueprint<field_type> &bp,
+                        element_g2(blueprint<field_type> &bp,
                                     const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
                             component<field_type>(bp) {
                             typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy =
@@ -111,7 +111,7 @@ namespace nil {
                      * Component that creates constraints for the validity of a G2 variable.
                      */
                     template<typename CurveType>
-                    class G2_checker_component : public component<typename CurveType::scalar_field_type> {
+                    class element_g2_is_well_formed : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::pairing::fp_type field_type;
                         using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
                         using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
@@ -119,7 +119,7 @@ namespace nil {
                         using component_policy = basic_curve_component_policy<CurveType>;
 
                     public:
-                        g2_variable<CurveType> Q;
+                        element_g2<CurveType> Q;
 
                         std::shared_ptr<typename component_policy::Fqe_variable_type> Xsquared;
                         std::shared_ptr<typename component_policy::Fqe_variable_type> Ysquared;
@@ -130,7 +130,7 @@ namespace nil {
                         std::shared_ptr<typename component_policy::Fqe_sqr_component_type> compute_Ysquared;
                         std::shared_ptr<typename component_policy::Fqe_mul_component_type> curve_equation;
 
-                        G2_checker_component(blueprint<field_type> &bp, const g2_variable<CurveType> &Q) :
+                        element_g2_is_well_formed(blueprint<field_type> &bp, const element_g2<CurveType> &Q) :
                             component<field_type>(bp), Q(Q) {
                             Xsquared.reset(new typename component_policy::Fqe_variable_type(bp));
                             Ysquared.reset(new typename component_policy::Fqe_variable_type(bp));

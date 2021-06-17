@@ -291,8 +291,8 @@ void test_full_pair() {
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
         pairing::CurveType::pairing::pair_curve_type::g2_type::value_type::one();
 
-    g1_variable<CurveType> P(bp);
-    g2_variable<CurveType> Q(bp);
+    element_g1<CurveType> P(bp);
+    element_g2<CurveType> Q(bp);
     g1_precomputation<CurveType> prec_P;
     g2_precomputation<CurveType> prec_Q;
 
@@ -401,14 +401,14 @@ BOOST_AUTO_TEST_CASE(benes_components_test) {
                                   algebra::mnt6_q_limbs>(algebra::mnt6_final_exponent_last_chunk_abs_of_w0);
     test_Frobenius<algebra::mnt6_Fq6, Fp6_2over3_variable>();
 
-    test_G2_checker_component<curves::mnt4>();
-    test_G2_checker_component<curves::mnt6>();
+    test_element_g2_is_well_formed<curves::mnt4>();
+    test_element_g2_is_well_formed<curves::mnt6>();
 
-    test_g1_variable_precomp<curves::mnt4>();
-    test_g1_variable_precomp<curves::mnt6>();
+    test_element_g1_precomp<curves::mnt4>();
+    test_element_g1_precomp<curves::mnt6>();
 
-    test_g2_variable_precomp<curves::mnt4>();
-    test_g2_variable_precomp<curves::mnt6>();
+    test_element_g2_precomp<curves::mnt4>();
+    test_element_g2_precomp<curves::mnt6>();
 
     test_mnt_miller_loop<curves::mnt4>();
     test_mnt_miller_loop<curves::mnt6>();
