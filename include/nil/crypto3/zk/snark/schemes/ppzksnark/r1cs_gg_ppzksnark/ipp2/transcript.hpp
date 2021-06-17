@@ -49,7 +49,7 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::algebra_bincode<curve_type> bincode;
+                    typedef marshalling::curve_bincode<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
 
