@@ -63,7 +63,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/random/hash.hpp>
+#include <nil/crypto3/random/libff_hash_based_algebraic_engine.hpp>
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -170,14 +170,15 @@ namespace nil {
 
                         static void sample_randomness(std::size_t input_len) {
                             const std::size_t num_coefficients = knapsack_dimension<FieldType>::dimension * input_len;
-                            crypto3::random::hash<hashes::sha2<512>, typename FieldType::value_type> rng;
-                            boost::random::uniform_int_distribution<> index_dist(0, FieldType::modulus_bits / CHAR_BIT);
+                            ::nil::crypto3::random::libff_hash_based_algebraic_engine<hashes::sha2<512>,
+                                                                                      typename FieldType::value_type>
+                                rng;
 
                             if (num_coefficients > num_cached_coefficients) {
                                 knapsack_coefficients.resize(num_coefficients);
                                 for (std::size_t i = num_cached_coefficients; i < num_coefficients; ++i) {
                                     rng.seed(i);
-                                    knapsack_coefficients[i] = index_dist(rng);
+                                    knapsack_coefficients[i] = rng();
                                 }
                                 num_cached_coefficients = num_coefficients;
                             }
@@ -219,11 +220,10 @@ namespace nil {
                             output.resize(dimension);
 
                             for (std::size_t i = 0; i < dimension; ++i) {
-                                output[i].assign(
-                                    bp,
-                                    blueprint_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
-                                        output_digest.bits.begin() + i * FieldType::value_bits,
-                                        output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
+                                output[i].assign(bp,
+                                                 blueprint_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
+                                                     output_digest.bits.begin() + i * FieldType::value_bits,
+                                                     output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
                             }
 
                             hasher.reset(new knapsack_crh_with_field_out_component<FieldType>(
