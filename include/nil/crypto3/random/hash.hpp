@@ -116,7 +116,7 @@ namespace nil {
                     return cache;
                 }
 
-                inline void discard(std::size_t n) const {
+                inline void discard(std::size_t n) {
                     if (n > 0 && !cached) {
                         operator()();
                     }
