@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SCALAR_MUL_HPP
 
-#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
@@ -84,9 +84,9 @@ namespace nil {
                     }
 
                     /*template<typename GroupValueType, typename =
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename
+                        typename std::enable_if<algebra::detail::is_curve_group<typename
                     GroupValueType::group_type>::value &&
-                                                !::nil::crypto3::detail::is_field<typename
+                                                !algebra::detail::is_field<typename
                     GroupValueType::group_type>::value>::type> GroupValueType operator*( const GroupValueType &left,
                         const typename GroupValueType::underlying_field_type::modulus_type &right) {
 
@@ -94,9 +94,9 @@ namespace nil {
                     }
 
                     template<typename GroupValueType, typename =
-                        typename std::enable_if<::nil::crypto3::detail::is_curve_group<typename
+                        typename std::enable_if<algebra::detail::is_curve_group<typename
                     GroupValueType::group_type>::value &&
-                                                !::nil::crypto3::detail::is_field<typename
+                                                !algebra::detail::is_field<typename
                     GroupValueType::group_type>::value>::type> GroupValueType operator*( const typename
                     GroupValueType::underlying_field_type::modulus_type &left, const GroupValueType &right) {
 
@@ -105,10 +105,10 @@ namespace nil {
 
                     template<typename GroupValueType, typename FieldValueType>
                     typename std::enable_if<
-                        ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
-                            !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
-                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
-                            !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                        algebra::detail::is_curve_group<typename GroupValueType::group_type>::value &&
+                            !algebra::detail::is_field<typename GroupValueType::group_type>::value &&
+                            algebra::detail::is_field<typename FieldValueType::field_type>::value &&
+                            !algebra::detail::is_extended_field<typename FieldValueType::field_type>::value,
                         GroupValueType>::type
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
@@ -117,10 +117,10 @@ namespace nil {
 
                     template<typename GroupValueType, typename FieldValueType>
                     typename std::enable_if<
-                        ::nil::crypto3::detail::is_curve_group<typename GroupValueType::group_type>::value &&
-                            !::nil::crypto3::detail::is_field<typename GroupValueType::group_type>::value &&
-                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
-                            !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                        algebra::detail::is_curve_group<typename GroupValueType::group_type>::value &&
+                            !algebra::detail::is_field<typename GroupValueType::group_type>::value &&
+                            algebra::detail::is_field<typename FieldValueType::field_type>::value &&
+                            !algebra::detail::is_extended_field<typename FieldValueType::field_type>::value,
                         GroupValueType>::type
                         operator*(const FieldValueType &left, const GroupValueType &right) {
 

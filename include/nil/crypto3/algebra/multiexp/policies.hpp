@@ -32,8 +32,6 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/detail/type_traits.hpp>
-
 #include <nil/crypto3/algebra/wnaf.hpp>
 
 namespace nil {

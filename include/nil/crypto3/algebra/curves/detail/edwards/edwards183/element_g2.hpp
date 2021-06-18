@@ -31,7 +31,6 @@
 #include <nil/crypto3/algebra/curves/detail/edwards/jubjub/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/edwards/babyjubjub/basic_policy.hpp>
 
-#include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {

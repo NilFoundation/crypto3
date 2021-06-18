@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ALGEBRA_RANDOM_ELEMENT_HPP
 #define CRYPTO3_ALGEBRA_RANDOM_ELEMENT_HPP
 
-#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/detail/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/debug_adaptor.hpp>
 #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
@@ -54,8 +54,8 @@ namespace nil {
                 typename FieldType,
                 typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
                 typename GeneratorType = boost::random::mt19937>
-            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value &&
-                                        !(::nil::crypto3::detail::is_extended_field<FieldType>::value),
+            typename std::enable_if<algebra::detail::is_field<FieldType>::value &&
+                                        !(algebra::detail::is_extended_field<FieldType>::value),
                                     typename FieldType::value_type>::type
                 random_element() {
 
@@ -70,8 +70,6 @@ namespace nil {
 
                 typename field_type::value_type value(d(rd));
 
-                // std::cout << value.data << " by modulus " << field_type::modulus << std::endl;
-
                 return value;
             }
 
@@ -79,8 +77,8 @@ namespace nil {
                 typename FieldType,
                 typename DistributionType = boost::random::uniform_int_distribution<typename FieldType::modulus_type>,
                 typename GeneratorType = boost::random::mt19937>
-            typename std::enable_if<::nil::crypto3::detail::is_field<FieldType>::value
-                                        && ::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            typename std::enable_if<algebra::detail::is_field<FieldType>::value
+                                        && algebra::detail::is_extended_field<FieldType>::value,
                                     typename FieldType::value_type>::type
                 random_element() {
 
@@ -103,7 +101,7 @@ namespace nil {
                      typename DistributionType = boost::random::uniform_int_distribution<
                          typename CurveGroupType::underlying_field_type::modulus_type>,
                      typename GeneratorType = boost::random::mt19937>
-            typename std::enable_if<::nil::crypto3::detail::is_curve_group<CurveGroupType>::value,
+            typename std::enable_if<algebra::detail::is_curve_group<CurveGroupType>::value,
                                     typename CurveGroupType::value_type>::type
                 random_element() {
 
