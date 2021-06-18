@@ -63,7 +63,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/random/libff_hash_based_algebraic_engine.hpp>
+#include <nil/crypto3/random/hash.hpp>
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -169,10 +169,10 @@ namespace nil {
                         }
 
                         static void sample_randomness(std::size_t input_len) {
-                            const std::size_t num_coefficients = knapsack_dimension<FieldType>::dimension * input_len;
-                            ::nil::crypto3::random::libff_hash_based_algebraic_engine<hashes::sha2<512>,
-                                                                                      typename FieldType::value_type>
-                                rng;
+                            const std::size_t num_coefficients = 
+                                knapsack_dimension<FieldType>::dimension * input_len;
+                            random::hash<hashes::sha2<512>, 
+                                typename FieldType::value_type> rng;
 
                             if (num_coefficients > num_cached_coefficients) {
                                 knapsack_coefficients.resize(num_coefficients);
