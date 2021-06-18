@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -22,118 +23,140 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_RANDOM_HASH_HPP
-#define BOOST_RANDOM_HASH_HPP
+#ifndef CRYPTO3_RANDOM_HASH_BASED_ALGEBRAIC_ENGINE_HPP
+#define CRYPTO3_RANDOM_HASH_BASED_ALGEBRAIC_ENGINE_HPP
 
-#include <string>
-
-#include <boost/config.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/random/detail/auto_link.hpp>
-#include <boost/tti/has_type.hpp>
-#include <boost/system/config.hpp>    // force autolink to find Boost.System
-
-#include <nil/crypto3/detail/pack.hpp>
-#include <nil/crypto3/detail/pack_numeric.hpp>
+#include <type_traits>
+#include <vector>
+#include <array>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
+#include <nil/crypto3/algebra/marshalling.hpp>
+
+#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/detail/pack.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace random {
-            template<typename Hash, typename ResultType = multiprecision::cpp_int>
-            struct hash : private boost::noncopyable {
+            template<typename Hash, typename ResultType, typename = void>
+            struct hash;
+
+            // TODO: replace pack with marshaling
+            template<typename Hash, typename ResultType>
+            struct hash<
+                Hash,
+                ResultType,
+                typename std::enable_if<
+                    ::nil::crypto3::detail::is_field<typename ResultType::field_type>::value &&
+                    !::nil::crypto3::detail::is_extended_field<typename ResultType::field_type>::value &&
+                    (ResultType::field_type::value_bits <= Hash::digest_bits)>::type> {
                 typedef Hash hash_type;
                 typedef ResultType result_type;
+                typedef std::uint64_t input_type;
 
-                BOOST_STATIC_ASSERT(std::numeric_limits<result_type>::is_specialized ?
-                                        std::numeric_limits<result_type>::digits <= hash_type::digest_bits :
-                                        true);
-
-                BOOST_STATIC_CONSTANT(std::size_t, reseed_interval = 256);
-
-                BOOST_STATIC_CONSTANT(bool, has_fixed_range = false);
-
-                /** Returns the smallest value that the \random_device can produce. */
-                static BOOST_CONSTEXPR std::size_t min BOOST_PREVENT_MACRO_SUBSTITUTION() {
-                    return 0;
-                }
-                /** Returns the largest value that the \random_device can produce. */
-                static BOOST_CONSTEXPR std::size_t max BOOST_PREVENT_MACRO_SUBSTITUTION() {
-                    return std::numeric_limits<result_type>::is_specialized ? std::numeric_limits<result_type>::max :
-                                                                              ~0u;
+                hash() {
+                    seed();
                 }
 
-                /** Constructs a @c random_device, optionally using the default device. */
-                BOOST_RANDOM_DECL hash() {
-                }
-                /**
-                 * Constructs a @c random_device, optionally using the given token as an
-                 * access specification (for example, a URL) to some implementation-defined
-                 * service for monitoring a stochastic process.
-                 */
-                template<typename SeedSinglePassRange>
-                BOOST_RANDOM_DECL explicit hash(const SeedSinglePassRange &token) {
-                }
-
-                BOOST_RANDOM_DECL ~hash() {
-                }
-
-                /** default seeds the underlying generator. */
-                void seed(std::size_t s = 0) {
-                    idx = s;
-                }
-
-                /** Seeds the underlying generator with first and last. */
-                template<typename InputIterator>
-                void seed(InputIterator &first, InputIterator last) {
-                    while (first != last) {
-                        idx ^= *first++;
+                hash(const hash &other) {
+                    seed(other.state);
+                    if (other.cached) {
+                        cache = other.cache;
+                        cached = true;
                     }
                 }
 
-                /**
-                 * Returns: An entropy estimate for the random numbers returned by
-                 * operator(), in the range min() to log2( max()+1). A deterministic
-                 * random number generator (e.g. a pseudo-random number engine)
-                 * has entropy 0.
-                 *
-                 * Throws: Nothing.
-                 */
-                BOOST_RANDOM_DECL double entropy() const {
+                hash(input_type x) {
+                    seed(x);
                 }
-                /** Returns a random value in the range [min, max]. */
-                BOOST_RANDOM_DECL result_type operator()() {
-                    result_type rval;
 
+                inline void seed() {
+                    seed(0);
+                }
+
+                inline void seed(input_type x) {
+                    state = x;
+                    cached = false;
+                }
+
+                inline result_type operator()() {
+                    using bincode = ::nil::marshalling::field_bincode<typename result_type::field_type>;
+
+                    if (cached) {
+                        return cache;
+                    }
+
+                    input_type iter = 0;
+                    std::array<std::uint8_t, 2 * sizeof(input_type)> seed_bytes;
+                    typename hash_type::digest_type res;
+                    typename result_type::field_type::modulus_type result;
                     do {
-                        uint64_t iter = 0;
+                        ::nil::crypto3::detail::pack<stream_endian::little_byte_big_bit,
+                                                     stream_endian::big_byte_big_bit,
+                                                     sizeof(input_type) * 8,
+                                                     8>(
+                            std::vector<input_type> {
+                                state,
+                                iter,
+                            },
+                            seed_bytes);
+                        res = ::nil::crypto3::hash<hash_type>(seed_bytes);
+                        ::nil::crypto3::multiprecision::import_bits(
+                            result, res.begin(), res.begin() + bincode::modulus_chunks, 8, false);
 
-                        std::array<std::size_t, 2> input = {idx, iter};
-                        typename Hash::digest_type hash = crypto3::hash<Hash>(input);
-                        crypto3::detail::pack(hash, rval);
+                        ++iter;
+                    } while (result >= result_type::field_type::modulus);
+                    cache = result;
+                    cached = true;
 
-                        iter++;
-                    } while (rval == result_type());
-
-                    return rval;
+                    return cache;
                 }
 
-                /** Fills a range with random values. */
-                template<class Iter>
-                void generate(Iter begin, Iter end) {
-                    while (begin != end) {
-                        *begin++ = this->operator()();
+                inline void discard(std::size_t n) {
+                    if (n > 0 && !cached) {
+                        operator()();
                     }
                 }
+
+                inline bool operator==(const hash &other) const {
+                    return state == other.state;
+                }
+
+                inline bool operator!=(const hash &other) const {
+                    return !(*this == other);
+                }
+
+                template<typename OS, typename HashT, typename ResultT>
+                friend OS &operator<<(OS &, const hash<HashT, ResultT> &);
+
+                template<typename IS, typename HashT, typename ResultT>
+                friend IS &operator>>(IS &, hash<HashT, ResultT> &);
 
             protected:
-                std::size_t idx;
+                input_type state;
+                result_type cache;
+                bool cached;
             };
+
+            template<typename OS, typename Hash, typename ResultType>
+            OS &operator<<(OS &os, const hash<Hash, ResultType> &e) {
+                os << e.state;
+                return os;
+            }
+
+            template<typename IS, typename HashT, typename ResultT>
+            IS &operator>>(IS &is, hash<HashT, ResultT> &e) {
+                typename hash<HashT, ResultT>::input_type x;
+                is >> x;
+                e.seed(x);
+                return is;
+            }
         }    // namespace random
     }        // namespace crypto3
 }    // namespace nil
 
-#endif /* BOOST_RANDOM_RANDOM_DEVICE_HPP */
+#endif    // CRYPTO3_RANDOM_HASH_BASED_ALGEBRAIC_ENGINE_HPP
