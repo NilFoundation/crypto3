@@ -45,6 +45,7 @@ set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
     "components/hashes/knapsack/knapsack_component"
+    "components/hashes/knapsack/knapsack_component_r1cs_scheme"
     "components/hashes/sha256/sha256_component"
     "components/hashes/sha256/sha256_r1cs_gg_ppzksnark"
 

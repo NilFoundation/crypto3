@@ -268,7 +268,7 @@ namespace nil {
 
                             for (const typename FieldType::value_type &elt : hash_elems) {
                                 std::vector<bool> elt_bits;
-                                detail::pack(elt, elt_bits);
+                                nil::crypto3::detail::pack(elt, elt_bits);
                                 result.insert(result.end(), elt_bits.begin(), elt_bits.end());
                             }
 

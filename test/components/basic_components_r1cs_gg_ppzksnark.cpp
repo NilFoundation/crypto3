@@ -49,34 +49,13 @@
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
-#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
-#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
-#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
-
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
+
+#include "verify_r1cs_scheme.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
-
-template<typename CurveType>
-void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
-    using field_type = typename CurveType::scalar_field_type;
-    using curve_type = CurveType;
-
-    const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
-
-    const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
-
-    const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
-
-    bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
-
-    std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
-    std::cout << "Verification status: " << verified << std::endl;
-
-    BOOST_CHECK(verified);
-}
 
 template<typename CurveType>
 void test_disjunction_component(std::size_t w) {
@@ -108,7 +87,7 @@ void test_disjunction_component(std::size_t w) {
     BOOST_CHECK(bp.val(output) == (w ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.is_satisfied());
 
-    verify_component<curve_type>(bp);
+    BOOST_CHECK(verify_component<curve_type>(bp));
 }
 
 template<typename CurveType>
@@ -143,7 +122,7 @@ void test_conjunction_component(std::size_t w) {
                 (w == (1ul << n) - 1 ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.is_satisfied());
 
-    verify_component<curve_type>(bp);
+    BOOST_CHECK(verify_component<curve_type>(bp));
 }
 
 template<typename CurveType>
@@ -176,7 +155,7 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.is_satisfied());
 
-    verify_component<curve_type>(bp);
+    BOOST_CHECK(verify_component<curve_type>(bp));
 }
 
 BOOST_AUTO_TEST_SUITE(basic_components_test_suite)
