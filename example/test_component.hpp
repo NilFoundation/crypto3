@@ -26,11 +26,11 @@
 #ifndef CRYPTO3_BLUEPRINT_EXAMPLE_TEST_COMPONENT_HPP
 #define CRYPTO3_BLUEPRINT_EXAMPLE_TEST_COMPONENT_HPP
 
-#include <nil/crypto3/zk/snark/component.hpp>
+#include <nil/crypto3/zk/components/component.hpp>
 
-#include <nil/crypto3/zk/snark/blueprint.hpp>
-#include <nil/crypto3/zk/snark/blueprint_variable.hpp>
-#include <nil/crypto3/zk/snark/components/basic_components.hpp>
+#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/components/basic_components.hpp>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 

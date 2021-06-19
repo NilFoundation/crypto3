@@ -44,23 +44,23 @@ endmacro()
 set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
-    "components/hashes/knapsack/knapsack_component"
-    "components/hashes/knapsack/knapsack_component_r1cs_scheme"
-    "components/hashes/sha256/sha256_component"
-    "components/hashes/sha256/sha256_r1cs_gg_ppzksnark"
+    "hashes/knapsack/knapsack_component"
+    "hashes/knapsack/knapsack_component_r1cs_scheme"
+    "hashes/sha256/sha256_component"
+    "hashes/sha256/sha256_r1cs_gg_ppzksnark"
 
-    "components/routing/as_waksman"
-    "components/routing/benes"
+    "routing/as_waksman"
+    "routing/benes"
 
-    "components/pairing/weierstrass_miller_loop"
-#    "components/pairing/weierstrass_precomputation"
+    "pairing/weierstrass_miller_loop"
+#    "pairing/weierstrass_precomputation"
 
-    "components/verifiers/r1cs_ppzksnark"
-    "components/basic_components"
-    "components/basic_components_r1cs_gg_ppzksnark"
-    "components/exponentiation_component"
-    "components/merkle_tree_components"
-    "components/set_commitment_component")
+    "verifiers/r1cs_ppzksnark"
+    "basic_components"
+    "basic_components_r1cs_gg_ppzksnark"
+    "exponentiation_component"
+    "merkle_tree_components"
+    "set_commitment_component")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_blueprint_test(${TEST_NAME})

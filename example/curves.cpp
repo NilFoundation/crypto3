@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include <nil/crypto3/zk/snark/blueprint.hpp>
-
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
@@ -20,9 +18,10 @@
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
-#include <nil/crypto3/zk/snark/components/curves/edwards/element_g1.hpp>
-
 #include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/edwards/element_g1.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>

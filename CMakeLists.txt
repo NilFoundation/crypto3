@@ -52,51 +52,50 @@ if(UNIX AND BUILD_WITH_PROCPS)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+    include/nil/crypto3/zk/components/algebra/curves/edwards/element_g1.hpp
+    include/nil/crypto3/zk/components/algebra/curves/weierstrass/element_g1.hpp
+    include/nil/crypto3/zk/components/algebra/curves/weierstrass/element_g2.hpp
+    include/nil/crypto3/zk/components/algebra/curves/scalar_mul.hpp
 
-     include/nil/crypto3/zk/snark/components/curves/weierstrass/element_g1.hpp
-     include/nil/crypto3/zk/snark/components/curves/weierstrass/element_g2.hpp
+    include/nil/crypto3/zk/components/algebra/fields/exponentiation.hpp
+    include/nil/crypto3/zk/components/algebra/fields/element_fp2.hpp
+    include/nil/crypto3/zk/components/algebra/fields/element_fp3.hpp
+    include/nil/crypto3/zk/components/algebra/fields/element_fp4.hpp
+    include/nil/crypto3/zk/components/algebra/fields/element_fp6.hpp
 
-     include/nil/crypto3/zk/snark/components/fields/exponentiation_component.hpp
-     include/nil/crypto3/zk/snark/components/fields/element_fp2.hpp
-     include/nil/crypto3/zk/snark/components/fields/element_fp3.hpp
-     include/nil/crypto3/zk/snark/components/fields/element_fp4.hpp
-     include/nil/crypto3/zk/snark/components/fields/element_fp6.hpp
+    include/nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/sha256_aux.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/sha256_components.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp
+    include/nil/crypto3/zk/components/hashes/crh_component.hpp
+    include/nil/crypto3/zk/components/hashes/digest_selector_component.hpp
+    include/nil/crypto3/zk/components/hashes/hash_io.hpp
 
-     include/nil/crypto3/zk/snark/components/hashes/knapsack/knapsack_component.hpp
+    include/nil/crypto3/zk/components/merkle_tree/authentication_path.hpp
+    include/nil/crypto3/zk/components/merkle_tree/check_read.hpp
+    include/nil/crypto3/zk/components/merkle_tree/check_update.hpp
 
-     include/nil/crypto3/zk/snark/components/hashes/sha256/sha256_aux.hpp
-     include/nil/crypto3/zk/snark/components/hashes/sha256/sha256_components.hpp
-     include/nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/pairing_checks.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/final_exponentiation.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/miller_loop.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/precomputation.hpp
 
-     include/nil/crypto3/zk/snark/components/hashes/crh_component.hpp
-     include/nil/crypto3/zk/snark/components/hashes/digest_selector_component.hpp
-     include/nil/crypto3/zk/snark/components/hashes/hash_io.hpp
+    include/nil/crypto3/zk/components/routing/as_waksman_routing_component.hpp
+    include/nil/crypto3/zk/components/routing/benes_routing_component.hpp
 
-     include/nil/crypto3/zk/snark/components/merkle_tree/merkle_authentication_path_variable.hpp
-     include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_read_component.hpp
-     include/nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_update_component.hpp
+    include/nil/crypto3/zk/components/schemes/set_commitment/set_commitment_component.hpp
+    include/nil/crypto3/zk/components/schemes/set_commitment/set_membership_proof_variable.hpp
 
-     include/nil/crypto3/zk/snark/components/pairing/detail/mnt4.hpp
-     include/nil/crypto3/zk/snark/components/pairing/detail/mnt6.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass/pairing_checks.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass/final_exponentiation.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass/miller_loop.hpp
-     include/nil/crypto3/zk/snark/components/pairing/weierstrass/precomputation.hpp
+    include/nil/crypto3/zk/components/schemes/snark/r1cs_pp_zksnark/verifier.hpp
+    include/nil/crypto3/zk/components/basic_components.hpp
+    include/nil/crypto3/zk/components/component_from_r1cs.hpp
 
-     include/nil/crypto3/zk/snark/components/routing/as_waksman_routing_component.hpp
-     include/nil/crypto3/zk/snark/components/routing/benes_routing_component.hpp
-
-     include/nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp
-     include/nil/crypto3/zk/snark/components/set_commitment/set_membership_proof_variable.hpp
-
-     include/nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp
-     include/nil/crypto3/zk/snark/components/basic_components.hpp
-     include/nil/crypto3/zk/snark/components/component_from_r1cs.hpp
-
-     include/nil/crypto3/zk/snark/component.hpp
-     include/nil/crypto3/zk/snark/merkle_tree.hpp
-     include/nil/crypto3/zk/snark/blueprint_variable.hpp
-     include/nil/crypto3/zk/snark/blueprint.hpp)
+    include/nil/crypto3/zk/components/component.hpp
+    include/nil/crypto3/zk/components/blueprint_variable.hpp
+    include/nil/crypto3/zk/components/blueprint.hpp
+    include/nil/crypto3/zk/merkle_tree.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
