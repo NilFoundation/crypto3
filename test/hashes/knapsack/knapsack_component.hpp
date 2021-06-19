@@ -39,19 +39,19 @@ using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;
 
 template<typename FieldType>
-blueprint<FieldType> test_knapsack_crh_with_bit_out_component() {
-    blueprint<FieldType> bp;
+components::blueprint<FieldType> test_knapsack_crh_with_bit_out_component() {
+    components::blueprint<FieldType> bp;
     std::cout << "Warning! Blank test is running." << std::endl;
     return bp;
 }
 
 template<typename FieldType>
-blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size_t dimension,
+components::blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size_t dimension,
                                                        const std::vector<bool> &input_bits,
                                                        const std::vector<bool> &digest_bits) {
     BOOST_CHECK(components::knapsack_dimension<FieldType>::dimension == dimension);
     components::knapsack_crh_with_bit_out_component<FieldType>::sample_randomness(input_bits.size());
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
 
     components::block_variable<FieldType> input_block(bp, input_bits.size());
     components::digest_variable<FieldType> output_digest(
@@ -77,7 +77,7 @@ blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size
 // * generate_knapsack_tests.py) and contain hard-to-read constants. */
 //
 // template<>
-// blueprint<typename curves::bn128::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::bn128::scalar_field_type>() {
+// components::blueprint<typename curves::bn128::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::bn128::scalar_field_type>() {
 //    typedef typename curves::bn128::scalar_field_type FieldType;
 //    const std::size_t dimension = components::knapsack_dimension<FieldType>::dimension;
 //    const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -131,7 +131,7 @@ blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size
 // }
 
 template<>
-blueprint<typename curves::edwards<183>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::edwards<183>::scalar_field_type>() {
+components::blueprint<typename curves::edwards<183>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::edwards<183>::scalar_field_type>() {
    typedef typename curves::edwards<183>::scalar_field_type FieldType;
    const std::size_t dimension = components::knapsack_dimension<FieldType>::dimension;
    const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -175,7 +175,7 @@ blueprint<typename curves::edwards<183>::scalar_field_type> test_knapsack_crh_wi
 }
 
 template<>
-blueprint<typename curves::mnt4<298>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::mnt4<298>::scalar_field_type>() {
+components::blueprint<typename curves::mnt4<298>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::mnt4<298>::scalar_field_type>() {
     typedef typename curves::mnt4<298>::scalar_field_type FieldType;
     const std::size_t dimension = components::knapsack_dimension<FieldType>::dimension;
     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -236,7 +236,7 @@ blueprint<typename curves::mnt4<298>::scalar_field_type> test_knapsack_crh_with_
 }
 
 template<>
-blueprint<typename curves::mnt6<298>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::mnt6<298>::scalar_field_type>() {
+components::blueprint<typename curves::mnt6<298>::scalar_field_type> test_knapsack_crh_with_bit_out_component<typename curves::mnt6<298>::scalar_field_type>() {
     typedef typename curves::mnt6<298>::scalar_field_type FieldType;
     const std::size_t dimension = components::knapsack_dimension<FieldType>::dimension;
     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};

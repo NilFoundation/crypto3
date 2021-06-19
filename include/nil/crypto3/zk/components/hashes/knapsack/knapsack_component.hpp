@@ -195,7 +195,7 @@ namespace nil {
                 class knapsack_crh_with_bit_out_component : public component<FieldType> {
                 public:
                     typedef std::vector<bool> hash_value_type;
-                    typedef merkle_authentication_path merkle_authentication_path_type;
+                    typedef snark::merkle_authentication_path merkle_authentication_path_type;
 
                     std::size_t input_len;
                     std::size_t dimension;
