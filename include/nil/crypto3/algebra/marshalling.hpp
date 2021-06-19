@@ -58,7 +58,7 @@ namespace nil {
 
             template<typename InputFieldValueIterator>
             static inline typename std::enable_if<
-                !::nil::crypto3::detail::is_extended_field<field_type>::value &&
+                !crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
                 field_value_type>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
@@ -72,7 +72,7 @@ namespace nil {
 
             template<typename InputFieldValueIterator>
             static inline typename std::enable_if<
-                ::nil::crypto3::detail::is_extended_field<field_type>::value &&
+                crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
                 field_value_type>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
@@ -91,7 +91,7 @@ namespace nil {
 
             template<typename OutputIterator>
             static inline typename std::enable_if<
-                !::nil::crypto3::detail::is_extended_field<field_type>::value &&
+                !crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<OutputIterator>::value_type>::value,
                 std::size_t>::type
                 field_element_to_bytes(const field_value_type &element, OutputIterator out_first,
@@ -106,7 +106,7 @@ namespace nil {
 
             template<typename OutputIterator>
             static inline typename std::enable_if<
-                ::nil::crypto3::detail::is_extended_field<field_type>::value &&
+                crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<OutputIterator>::value_type>::value,
                 std::size_t>::type
                 field_element_to_bytes(const field_value_type &element, OutputIterator out_first,
@@ -189,7 +189,7 @@ namespace nil {
 
             template<typename FieldType, typename InputFieldValueIterator>
             static inline typename std::enable_if<
-                !::nil::crypto3::detail::is_extended_field<FieldType>::value &&
+                !crypto3::algebra::is_extended_field<FieldType>::value &&
                     std::is_same<chunk_type,
                                  typename std::iterator_traits<InputFieldValueIterator>::value_type>::value &&
                     (std::is_same<fp_type, FieldType>::value || std::is_same<fr_type, FieldType>::value),
@@ -200,7 +200,7 @@ namespace nil {
 
             template<typename FieldType, typename InputFieldValueIterator>
             static inline typename std::enable_if<
-                ::nil::crypto3::detail::is_extended_field<FieldType>::value &&
+                crypto3::algebra::is_extended_field<FieldType>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
                 typename FieldType::value_type>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
@@ -243,7 +243,7 @@ namespace nil {
 
             template<typename FieldType, typename OutputIterator>
             static inline typename std::enable_if<
-                !::nil::crypto3::detail::is_extended_field<FieldType>::value &&
+                !crypto3::algebra::is_extended_field<FieldType>::value &&
                     (std::is_same<fp_type, FieldType>::value || std::is_same<fr_type, FieldType>::value) &&
                     std::is_same<chunk_type, typename std::iterator_traits<OutputIterator>::value_type>::value,
                 std::size_t>::type
@@ -254,7 +254,7 @@ namespace nil {
 
             template<typename FieldType, typename OutputIterator>
             static inline typename std::enable_if<
-                ::nil::crypto3::detail::is_extended_field<FieldType>::value &&
+                crypto3::algebra::is_extended_field<FieldType>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<OutputIterator>::value_type>::value,
                 std::size_t>::type
                 field_element_to_bytes(const typename FieldType::value_type &element, OutputIterator out_first,

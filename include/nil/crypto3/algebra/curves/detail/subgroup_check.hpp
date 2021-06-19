@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ALGEBRA_CURVES_SUBGROUP_CHECK_HPP
 #define CRYPTO3_ALGEBRA_CURVES_SUBGROUP_CHECK_HPP
 
-#include <nil/crypto3/algebra/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,8 +37,8 @@ namespace nil {
                     //  Should be implemented as class method
                     template<typename GroupValueType,
                              typename = typename std::enable_if<
-                                 algebra::detail::is_curve_group<typename GroupValueType::group_type>::value &&
-                                 !algebra::detail::is_field<typename GroupValueType::group_type>::value>::type>
+                                 is_curve_group<typename GroupValueType::group_type>::value &&
+                                 !is_field<typename GroupValueType::group_type>::value>::type>
                     bool subgroup_check(const GroupValueType &p) {
                         return (p * GroupValueType::group_type::curve_type::q).is_zero();
                     }
