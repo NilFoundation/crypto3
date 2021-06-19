@@ -67,8 +67,8 @@ void test_exponentiation_component(const typename FpkT::modulus_type &power) {
         x.generate_r1cs_witness(x_val);
         exp_component.generate_r1cs_witness();
         const typename FpkT::value_type res = x_to_power.get_element();
-        assert(bp.is_satisfied());
-        assert(res == (x_val.pow(power)));
+        BOOST_CHECK(bp.is_satisfied());
+        BOOST_CHECK(res == (x_val.pow(power)));
     }
     std::cout << "Number of constraints: " << bp.num_constraints() << std::endl;
     std::cout << "Power: " << power << std::endl;

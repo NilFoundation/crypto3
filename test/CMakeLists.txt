@@ -54,8 +54,8 @@ macro(define_blueprint_test test)
 endmacro()
 
 set(TESTS_NAMES
+    "algebra/fields/element_fp2"
     "routing_algorithms/routing_algorithms"
-
     "hashes/knapsack"
     "hashes/knapsack_verification"
     "hashes/sha256"

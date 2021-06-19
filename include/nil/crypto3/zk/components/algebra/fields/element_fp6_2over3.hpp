@@ -198,11 +198,7 @@ namespace nil {
                         compute_v1.reset(new element_fp3_mul<underlying_field_type>(bp, A.data[1], B.data[1], *v1));
 
                         v0_c0.assign(bp, result.data[0].data[0] -
-                                             field_type::value_type::one().non_residue * v1->data[2]);
-                        // while constepr is not ready
-                        // must be:
-                        // v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue *
-                        // v1->data[2]);
+                                             field_type::value_type::non_residue * v1->data[2]);
 
                         v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                         v0_c2.assign(bp, result.data[0].data[2] - v1->data[1]);

@@ -26,7 +26,6 @@
 #define BOOST_TEST_MODULE knapsack_component_test
 
 #include <chrono>
-
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>

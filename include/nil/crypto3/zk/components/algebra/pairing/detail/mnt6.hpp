@@ -88,7 +88,7 @@ namespace nil {
                         constexpr static const typename curve_type::g2_type::underlying_field_type::value_type
                             g2_coeff_b = typename curve_type::g2_type::underlying_field_type::value_type(
                                 g1_coeff_b *
-                                    typename curve_type::g2_type::underlying_field_type::value_type().non_residue,
+                                    typename curve_type::g2_type::underlying_field_type::value_type::non_residue,
                                 curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero(),
                                 curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero());
                     };
