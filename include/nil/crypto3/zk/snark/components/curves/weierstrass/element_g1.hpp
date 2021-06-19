@@ -32,6 +32,7 @@
 #define CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp.hpp>
 
 #include <nil/crypto3/zk/snark/blueprint_variable.hpp>
 
@@ -46,30 +47,31 @@ namespace nil {
                      */
                     template<typename CurveType>
                     class element_g1 : public component<typename CurveType::scalar_field_type> {
-                        typedef typename CurveType::scalar_field_type FieldType;
+                        typedef typename CurveType::scalar_field_type scalar_field_type;
 
+                        using underlying_element_type = element_fp<scalar_field_type>;
                     public:
-                        blueprint_linear_combination<FieldType> X;
-                        blueprint_linear_combination<FieldType> Y;
+                        scalar_field_type X;
+                        scalar_field_type Y;
 
-                        blueprint_linear_combination_vector<FieldType> all_vars;
+                        blueprint_linear_combination_vector<scalar_field_type> all_vars;
 
-                        element_g1(blueprint<FieldType> &bp) : component<FieldType>(bp) {
-                            blueprint_variable<FieldType> X_var, Y_var;
+                        element_g1(blueprint<scalar_field_type> &bp) : component<scalar_field_type>(bp) {
+                            blueprint_variable<scalar_field_type> X_var, Y_var;
 
                             X_var.allocate(bp);
                             Y_var.allocate(bp);
 
-                            X = blueprint_linear_combination<FieldType>(X_var);
-                            Y = blueprint_linear_combination<FieldType>(Y_var);
+                            X = scalar_field_type(X_var);
+                            Y = scalar_field_type(Y_var);
 
                             all_vars.emplace_back(X);
                             all_vars.emplace_back(Y);
                         }
 
-                        element_g1(blueprint<FieldType> &bp,
+                        element_g1(blueprint<scalar_field_type> &bp,
                                     const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P) :
-                            component<FieldType>(bp) {
+                            component<scalar_field_type>(bp) {
                             typename CurveType::pairing::pair_curve_type::g1_type::value_type Pcopy =
                                 P.to_affine();
 
@@ -93,7 +95,7 @@ namespace nil {
                         // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                         // we mark this function noinline.) TODO: remove later
                         static std::size_t __attribute__((noinline)) size_in_bits() {
-                            return 2 * FieldType::modulus_bits;
+                            return 2 * scalar_field_type::modulus_bits;
                         }
                         static std::size_t num_variables() {
                             return 2;

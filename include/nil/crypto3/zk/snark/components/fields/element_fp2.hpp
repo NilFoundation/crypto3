@@ -34,6 +34,7 @@
 #include <memory>
 
 #include <nil/crypto3/zk/snark/component.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp.hpp>
 
 #include <nil/crypto3/zk/snark/blueprint_variable.hpp>
 
@@ -43,32 +44,38 @@ namespace nil {
             namespace snark {
                 namespace components {
 
-                    /******************************** Fp2_variable ************************************/
+                    /******************************** element_fp2 ************************************/
 
                     /**
-                     * Component that represents an Fp2 variable.
+                     * Component that represents an element Fp2 component.
                      */
                     template<typename Fp2T>
-                    struct Fp2_variable : public component<typename Fp2T::underlying_field_type> {
-                        using base_field_type = typename Fp2T::base_field_type;
+                    struct element_fp2 : public component<typename Fp2T::underlying_field_type> {
+                        
+                        using field_type = Fp2T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
+
+                        using underlying_element_type = element_fp<underlying_field_type>;
+
                         using base_field_value_type = typename base_field_type::value_type;
 
-                        using underlying_type = blueprint_linear_combination<base_field_type>;
-
-                        using data_type = std::array<underlying_type, Fp2T::arity / Fp2T::underlying_field_type::arity>;
+                        using data_type = std::array<
+                            underlying_element_type, 
+                            field_type::arity / underlying_field_type::arity>;
 
                         data_type data;
 
                         blueprint_linear_combination_vector<base_field_type> all_vars;
 
-                        Fp2_variable(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {
+                        element_fp2(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {
                             blueprint_variable<base_field_type> c0_var, c1_var;
 
                             c0_var.allocate(bp);
                             c1_var.allocate(bp);
 
-                            // c0 = blueprint_linear_combination<base_field_type>(c0_var);
-                            // c1 = blueprint_linear_combination<base_field_type>(c1_var);
+                            // c0 = underlying_type<base_field_type>(c0_var);
+                            // c1 = underlying_type<base_field_type>(c1_var);
 
                             data = data_type({underlying_type(c0_var), underlying_type(c1_var)});
 
@@ -76,10 +83,10 @@ namespace nil {
                             all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<base_field_type> &bp, const typename Fp2T::value_type &el) :
+                        element_fp2(blueprint<base_field_type> &bp, const typename Fp2T::value_type &el) :
                             component<base_field_type>(bp) {
-                            blueprint_linear_combination<base_field_type> c0_lc;
-                            blueprint_linear_combination<base_field_type> c1_lc;
+                            underlying_type<base_field_type> c0_lc;
+                            underlying_type<base_field_type> c1_lc;
 
                             c0_lc.assign(bp, el.data[0]);
                             c1_lc.assign(bp, el.data[1]);
@@ -93,13 +100,13 @@ namespace nil {
                             all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<base_field_type> &bp,
+                        element_fp2(blueprint<base_field_type> &bp,
                                      const typename Fp2T::value_type &el,
                                      const blueprint_linear_combination<base_field_type> &coeff) :
                             component<base_field_type>(bp) {
 
-                            blueprint_linear_combination<base_field_type> c0_lc;
-                            blueprint_linear_combination<base_field_type> c1_lc;
+                            underlying_type<base_field_type> c0_lc;
+                            underlying_type<base_field_type> c1_lc;
 
                             c0_lc.assign(bp, el.data[0] * coeff);
                             c1_lc.assign(bp, el.data[1] * coeff);
@@ -110,9 +117,9 @@ namespace nil {
                             all_vars.emplace_back(data[1]);
                         }
 
-                        Fp2_variable(blueprint<base_field_type> &bp,
-                                     const blueprint_linear_combination<base_field_type> &c0_lc,
-                                     const blueprint_linear_combination<base_field_type> &c1_lc) :
+                        element_fp2(blueprint<base_field_type> &bp,
+                                     const underlying_type<base_field_type> &c0_lc,
+                                     const underlying_type<base_field_type> &c1_lc) :
                             component<base_field_type>(bp) {
 
                             data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
@@ -138,33 +145,33 @@ namespace nil {
                             return el;
                         }
 
-                        Fp2_variable operator*(const base_field_value_type &coeff) const {
-                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                        element_fp2 operator*(const base_field_value_type &coeff) const {
+                            underlying_type<base_field_type> new_c0, new_c1;
                             new_c0.assign(this->bp, this->data[0] * coeff);
                             new_c1.assign(this->bp, this->data[1] * coeff);
-                            return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
+                            return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
-                        Fp2_variable operator+(const Fp2_variable &other) const {
-                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                        element_fp2 operator+(const element_fp2 &other) const {
+                            underlying_type<base_field_type> new_c0, new_c1;
                             new_c0.assign(this->bp, this->data[0] + other.data[0]);
                             new_c1.assign(this->bp, this->data[1] + other.data[1]);
-                            return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
+                            return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
-                        Fp2_variable operator+(const typename Fp2T::value_type &other) const {
-                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                        element_fp2 operator+(const typename Fp2T::value_type &other) const {
+                            underlying_type<base_field_type> new_c0, new_c1;
                             new_c0.assign(this->bp, this->data[0] + other.data[0]);
                             new_c1.assign(this->bp, this->data[1] + other.data[1]);
-                            return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
+                            return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
-                        Fp2_variable mul_by_X() const {
-                            blueprint_linear_combination<base_field_type> new_c0, new_c1;
+                        element_fp2 mul_by_X() const {
+                            underlying_type<base_field_type> new_c0, new_c1;
                             new_c0.assign(this->bp, this->data[1] * Fp2T::value_type::non_residue);
 
                             new_c1.assign(this->bp, this->data[0]);
-                            return Fp2_variable<Fp2T>(this->bp, new_c0, new_c1);
+                            return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                         }
 
                         void evaluate() const {
@@ -195,16 +202,16 @@ namespace nil {
                         using base_field_type = typename Fp2T::underlying_field_type;
                         using base_field_value_type = typename base_field_type::value_type;
 
-                        Fp2_variable<Fp2T> A;
-                        Fp2_variable<Fp2T> B;
-                        Fp2_variable<Fp2T> result;
+                        element_fp2<Fp2T> A;
+                        element_fp2<Fp2T> B;
+                        element_fp2<Fp2T> result;
 
                         blueprint_variable<base_field_type> v1;
 
                         Fp2_mul_component(blueprint<base_field_type> &bp,
-                                          const Fp2_variable<Fp2T> &A,
-                                          const Fp2_variable<Fp2T> &B,
-                                          const Fp2_variable<Fp2T> &result) :
+                                          const element_fp2<Fp2T> &A,
+                                          const element_fp2<Fp2T> &B,
+                                          const element_fp2<Fp2T> &result) :
                             component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             v1.allocate(bp);
@@ -260,14 +267,14 @@ namespace nil {
                     struct Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
                         using base_field_type = typename Fp2T::underlying_field_type;
 
-                        Fp2_variable<Fp2T> A;
+                        element_fp2<Fp2T> A;
                         blueprint_linear_combination<base_field_type> lc;
-                        Fp2_variable<Fp2T> result;
+                        element_fp2<Fp2T> result;
 
                         Fp2_mul_by_lc_component(blueprint<base_field_type> &bp,
-                                                const Fp2_variable<Fp2T> &A,
+                                                const element_fp2<Fp2T> &A,
                                                 const blueprint_linear_combination<base_field_type> &lc,
-                                                const Fp2_variable<Fp2T> &result) :
+                                                const element_fp2<Fp2T> &result) :
                             component<base_field_type>(bp),
                             A(A), lc(lc), result(result) {
                         }
@@ -294,14 +301,14 @@ namespace nil {
                     struct Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
                         using base_field_type = typename Fp2T::base_field_type;
 
-                        Fp2_variable<Fp2T> A;
-                        Fp2_variable<Fp2T> result;
+                        element_fp2<Fp2T> A;
+                        element_fp2<Fp2T> result;
 
                         using base_field_value_type = typename base_field_type::value_type;
 
                         Fp2_sqr_component(blueprint<base_field_type> &bp,
-                                          const Fp2_variable<Fp2T> &A,
-                                          const Fp2_variable<Fp2T> &result) :
+                                          const element_fp2<Fp2T> &A,
+                                          const element_fp2<Fp2T> &result) :
                             component<base_field_type>(bp),
                             A(A), result(result) {
                         }

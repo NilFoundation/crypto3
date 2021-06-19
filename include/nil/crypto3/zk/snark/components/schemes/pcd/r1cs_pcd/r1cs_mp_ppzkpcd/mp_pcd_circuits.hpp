@@ -46,7 +46,8 @@
 #include <nil/crypto3/zk/snark/components/hashes/crh_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp>
 #include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
-#include <nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
+
+#include <nil/crypto3/zk/snark/components/schemes/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
     namespace crypto3 {

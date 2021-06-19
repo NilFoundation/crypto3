@@ -33,6 +33,7 @@
 #define CRYPTO3_ZK_TWISTED_EDWARDS_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
+#include <nil/crypto3/zk/snark/components/fields/element_fp.hpp>
 
 #include <nil/crypto3/zk/snark/blueprint_variable.hpp>
 
@@ -51,9 +52,10 @@ namespace nil {
                     class element_g1 : public component<typename CurveType::scalar_field_type> {
                         typedef typename CurveType::scalar_field_type scalar_field_type;
 
+                        using underlying_element_type = element_fp<scalar_field_type>;
                     public:
-                        blueprint_linear_combination<scalar_field_type> X;
-                        blueprint_linear_combination<scalar_field_type> Y;
+                        underlying_element_type X;
+                        underlying_element_type Y;
 
                         blueprint_linear_combination_vector<scalar_field_type> all_vars;
 
@@ -63,8 +65,8 @@ namespace nil {
                             X_var.allocate(bp);
                             Y_var.allocate(bp);
 
-                            X = blueprint_linear_combination<scalar_field_type>(X_var);
-                            Y = blueprint_linear_combination<scalar_field_type>(Y_var);
+                            X = underlying_element_type(X_var);
+                            Y = underlying_element_type(Y_var);
 
                             all_vars.emplace_back(X);
                             all_vars.emplace_back(Y);

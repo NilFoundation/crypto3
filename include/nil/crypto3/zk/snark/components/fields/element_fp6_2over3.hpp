@@ -43,35 +43,37 @@ namespace nil {
             namespace snark {
                 namespace components {
 
-                    /******************************** Fp6_2over3_variable ************************************/
+                    /******************************** element_fp6_2over3 ************************************/
 
                     /**
                      * Component that represents an Fp6 variable.
                      */
                     template<typename Fp6_2over3T>    // Fp6_2over3T
-                    struct Fp6_2over3_variable : public component<typename Fp6_2over3T::base_field_type> {
-                        using base_field_type = typename Fp6_2over3T::base_field_type;
+                    struct element_fp6_2over3 : public component<typename Fp6_2over3T::base_field_type> {
+                        
+                        using field_type = Fp6_2over3T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
 
-                        typedef typename Fp6_2over3T::underlying_field_type Fp3T;
+                        using underlying_element_type = element_fp3<underlying_field_type>;
 
-                        using underlying_type = Fp3_variable<Fp3T>;
-
-                        using data_type =
-                            std::array<underlying_type, Fp6_2over3T::arity / Fp6_2over3T::underlying_field_type::arity>;
+                        using data_type = std::array<
+                            underlying_element_type, 
+                            field_type::arity / underlying_field_type::arity>;
 
                         data_type data;
 
-                        Fp6_2over3_variable(blueprint<base_field_type> &bp) :
+                        element_fp6_2over3(blueprint<base_field_type> &bp) :
                             component<base_field_type>(bp), data({underlying_type(bp), underlying_type(bp)}) {
                         }
 
-                        Fp6_2over3_variable(blueprint<base_field_type> &bp,
+                        element_fp6_2over3(blueprint<base_field_type> &bp,
                                             const typename Fp6_2over3T::value_type &el) :
                             component<base_field_type>(bp),
                             data({underlying_type(bp, el.data[0]), underlying_type(bp, el.data[1])}) {
                         }
 
-                        Fp6_2over3_variable(blueprint<base_field_type> &bp, const Fp3_variable<Fp3T> &in_data0,
+                        element_fp6_2over3(blueprint<base_field_type> &bp, const Fp3_variable<Fp3T> &in_data0,
                                             const Fp3_variable<Fp3T> &in_data1) :
                             component<base_field_type>(bp),
                             data({underlying_type(in_data0), underlying_type(in_data1)}) {
@@ -94,7 +96,7 @@ namespace nil {
                             return el;
                         }
 
-                        Fp6_2over3_variable<Fp6_2over3T> Frobenius_map(const std::size_t power) const {
+                        element_fp6_2over3<Fp6_2over3T> Frobenius_map(const std::size_t power) const {
                             blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c0c2, new_c1c0,
                                 new_c1c1, new_c1c2;
                             new_c0c0.assign(this->bp, data[0].data[0]);
@@ -111,7 +113,7 @@ namespace nil {
                                             data[1].data[2] * (Fp6_2over3T::value_type::Frobenius_coeffs_c1[power % 6] *
                                                                Fp3T::value_type::Frobenius_coeffs_c2[power % 3]));
 
-                            return Fp6_2over3_variable<Fp6_2over3T>(
+                            return element_fp6_2over3<Fp6_2over3T>(
                                 this->bp,
                                 Fp3_variable<Fp3T>(this->bp, new_c0c0, new_c0c1, new_c0c2),
                                 Fp3_variable<Fp3T>(this->bp, new_c1c0, new_c1c1, new_c1c2));
@@ -133,9 +135,9 @@ namespace nil {
                         using base_field_type = typename Fp6_2over3T::base_field_type;
                         typedef typename Fp6_2over3T::underlying_field_type Fp3T;
 
-                        Fp6_2over3_variable<Fp6_2over3T> A;
-                        Fp6_2over3_variable<Fp6_2over3T> B;
-                        Fp6_2over3_variable<Fp6_2over3T> result;
+                        element_fp6_2over3<Fp6_2over3T> A;
+                        element_fp6_2over3<Fp6_2over3T> B;
+                        element_fp6_2over3<Fp6_2over3T> result;
 
                         blueprint_linear_combination<base_field_type> v0_c0;
                         blueprint_linear_combination<base_field_type> v0_c1;
@@ -164,9 +166,9 @@ namespace nil {
                         std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
                         Fp6_2over3_mul_component(blueprint<base_field_type> &bp,
-                                                 const Fp6_2over3_variable<Fp6_2over3T> &A,
-                                                 const Fp6_2over3_variable<Fp6_2over3T> &B,
-                                                 const Fp6_2over3_variable<Fp6_2over3T> &result) :
+                                                 const element_fp6_2over3<Fp6_2over3T> &A,
+                                                 const element_fp6_2over3<Fp6_2over3T> &B,
+                                                 const element_fp6_2over3<Fp6_2over3T> &result) :
                             component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
@@ -273,9 +275,9 @@ namespace nil {
                         using base_field_type = typename Fp6_2over3T::base_field_type;
                         typedef typename Fp6_2over3T::underlying_field_type Fp3T;
 
-                        Fp6_2over3_variable<Fp6_2over3T> A;
-                        Fp6_2over3_variable<Fp6_2over3T> B;
-                        Fp6_2over3_variable<Fp6_2over3T> result;
+                        element_fp6_2over3<Fp6_2over3T> A;
+                        element_fp6_2over3<Fp6_2over3T> B;
+                        element_fp6_2over3<Fp6_2over3T> result;
 
                         blueprint_linear_combination<base_field_type> v0_c0;
                         blueprint_linear_combination<base_field_type> v0_c1;
@@ -303,9 +305,9 @@ namespace nil {
                         std::shared_ptr<Fp3_mul_component<Fp3T>> compute_result_c1;
 
                         Fp6_2over3_mul_by_2345_component(blueprint<base_field_type> &bp,
-                                                         const Fp6_2over3_variable<Fp6_2over3T> &A,
-                                                         const Fp6_2over3_variable<Fp6_2over3T> &B,
-                                                         const Fp6_2over3_variable<Fp6_2over3T> &result) :
+                                                         const element_fp6_2over3<Fp6_2over3T> &A,
+                                                         const element_fp6_2over3<Fp6_2over3T> &B,
+                                                         const element_fp6_2over3<Fp6_2over3T> &result) :
                             component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
@@ -423,14 +425,14 @@ namespace nil {
                     struct Fp6_2over3_sqr_component : public component<typename Fp6_2over3T::base_field_type> {
                         using base_field_type = typename Fp6_2over3T::base_field_type;
 
-                        Fp6_2over3_variable<Fp6_2over3T> A;
-                        Fp6_2over3_variable<Fp6_2over3T> result;
+                        element_fp6_2over3<Fp6_2over3T> A;
+                        element_fp6_2over3<Fp6_2over3T> result;
 
                         std::shared_ptr<Fp6_2over3_mul_component<Fp6_2over3T>> mul;
 
                         Fp6_2over3_sqr_component(blueprint<base_field_type> &bp,
-                                                 const Fp6_2over3_variable<Fp6_2over3T> &A,
-                                                 const Fp6_2over3_variable<Fp6_2over3T> &result) :
+                                                 const element_fp6_2over3<Fp6_2over3T> &A,
+                                                 const element_fp6_2over3<Fp6_2over3T> &result) :
                             component<base_field_type>(bp),
                             A(A), result(result) {
                             mul.reset(new Fp6_2over3_mul_component<Fp6_2over3T>(bp, A, A, result));
@@ -457,12 +459,12 @@ namespace nil {
                         typedef typename Fp6_2over3T::base_field_type base_field_type;
                         typedef typename Fp6_2over3T::underlying_field_type Fp2T;
 
-                        Fp6_2over3_variable<Fp6_2over3T> A;
-                        Fp6_2over3_variable<Fp6_2over3T> result;
+                        element_fp6_2over3<Fp6_2over3T> A;
+                        element_fp6_2over3<Fp6_2over3T> result;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> a;
-                        std::shared_ptr<Fp2_variable<Fp2T>> b;
-                        std::shared_ptr<Fp2_variable<Fp2T>> c;
+                        std::shared_ptr<element_fp2<Fp2T>> a;
+                        std::shared_ptr<element_fp2<Fp2T>> b;
+                        std::shared_ptr<element_fp2<Fp2T>> c;
 
                         blueprint_linear_combination<base_field_type> asq_c0;
                         blueprint_linear_combination<base_field_type> asq_c1;
@@ -473,17 +475,17 @@ namespace nil {
                         blueprint_linear_combination<base_field_type> csq_c0;
                         blueprint_linear_combination<base_field_type> csq_c1;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> asq;
-                        std::shared_ptr<Fp2_variable<Fp2T>> bsq;
-                        std::shared_ptr<Fp2_variable<Fp2T>> csq;
+                        std::shared_ptr<element_fp2<Fp2T>> asq;
+                        std::shared_ptr<element_fp2<Fp2T>> bsq;
+                        std::shared_ptr<element_fp2<Fp2T>> csq;
 
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_asq;
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_bsq;
                         std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_csq;
 
                         Fp6_2over3_cyclotomic_sqr_component(blueprint<base_field_type> &bp,
-                                                            const Fp6_2over3_variable<Fp6_2over3T> &A,
-                                                            const Fp6_2over3_variable<Fp6_2over3T> &result) :
+                                                            const element_fp6_2over3<Fp6_2over3T> &A,
+                                                            const element_fp6_2over3<Fp6_2over3T> &result) :
                             component<base_field_type>(bp),
                             A(A), result(result) {
                             /*
@@ -507,9 +509,9 @@ namespace nil {
                                 return Fp6_2over3_model<n, mbodulus>(my_Fp3(A_a, C_a, B_b),
                                                                      my_Fp3(B_a, A_b, C_b))
                             */
-                            a.reset(new Fp2_variable<Fp2T>(bp, A.data[0].data[0], A.data[1].data[1]));
-                            b.reset(new Fp2_variable<Fp2T>(bp, A.data[1].data[0], A.data[0].data[2]));
-                            c.reset(new Fp2_variable<Fp2T>(bp, A.data[0].data[1], A.data[1].data[2]));
+                            a.reset(new element_fp2<Fp2T>(bp, A.data[0].data[0], A.data[1].data[1]));
+                            b.reset(new element_fp2<Fp2T>(bp, A.data[1].data[0], A.data[0].data[2]));
+                            c.reset(new element_fp2<Fp2T>(bp, A.data[0].data[1], A.data[1].data[2]));
 
                             asq_c0.assign(bp, (result.data[0].data[0] + 2 * a->data[0]) *
                                                   typename base_field_type::value_type(3).inversed());
@@ -528,9 +530,9 @@ namespace nil {
                                               (typename base_field_type::value_type(3) * Fp2T::value_type::non_residue)
                                                   .inversed());
 
-                            asq.reset(new Fp2_variable<Fp2T>(bp, asq_c0, asq_c1));
-                            bsq.reset(new Fp2_variable<Fp2T>(bp, bsq_c0, bsq_c1));
-                            csq.reset(new Fp2_variable<Fp2T>(bp, csq_c0, csq_c1));
+                            asq.reset(new element_fp2<Fp2T>(bp, asq_c0, asq_c1));
+                            bsq.reset(new element_fp2<Fp2T>(bp, bsq_c0, bsq_c1));
+                            csq.reset(new element_fp2<Fp2T>(bp, csq_c0, csq_c1));
 
                             compute_asq.reset(new Fp2_sqr_component<Fp2T>(bp, *a, *asq));
                             compute_bsq.reset(new Fp2_sqr_component<Fp2T>(bp, *b, *bsq));

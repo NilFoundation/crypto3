@@ -42,66 +42,71 @@ namespace nil {
             namespace snark {
                 namespace components {
 
-                    /******************************** Fp4_variable ************************************/
+                    /******************************** element_fp4 ************************************/
 
                     /**
                      * Component that represents an Fp4 variable.
                      */
                     template<typename Fp4T>
-                    struct Fp4_variable : public component<typename Fp4T::base_field_type> {
-                        typedef typename Fp4T::base_field_type base_field_type;
-                        typedef typename Fp4T::underlying_field_type Fp2T;
+                    struct element_fp4 : public component<typename Fp4T::base_field_type> {
 
-                        using underlying_type = Fp2_variable<Fp2T>;
+                        using field_type = Fp4T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
 
-                        using data_type = std::array<underlying_type, Fp4T::arity / Fp4T::underlying_field_type::arity>;
+                        using underlying_element_type = element_fp2<underlying_field_type>;
+
+                        using data_type = std::array<
+                            underlying_element_type, 
+                            field_type::arity / underlying_field_type::arity>;
 
                         data_type data;
 
-                        Fp4_variable(blueprint<base_field_type> &bp) :
-                            component<base_field_type>(bp), data({underlying_type(bp), underlying_type(bp)}) {
+                        element_fp4(blueprint<base_field_type> &bp) :
+                            component<base_field_type>(bp), data({underlying_element_type(bp), underlying_element_type(bp)}) {
                         }
 
-                        Fp4_variable(blueprint<base_field_type> &bp, const typename Fp4T::value_type &el) :
+                        element_fp4(blueprint<base_field_type> &bp, 
+                            const typename field_type::value_type &el) :
                             component<base_field_type>(bp),
-                            data({underlying_type(bp, el.data[0]), underlying_type(bp, el.data[1])}) {
+                            data({underlying_element_type(bp, el.data[0]), underlying_element_type(bp, el.data[1])}) {
                         }
 
-                        Fp4_variable(blueprint<base_field_type> &bp, const Fp2_variable<Fp2T> &in_data0,
-                                     const Fp2_variable<Fp2T> &in_data1) :
+                        element_fp4(blueprint<base_field_type> &bp, const underlying_element_type &in_data0,
+                                     const underlying_element_type &in_data1) :
                             component<base_field_type>(bp),
-                            data({underlying_type(in_data0), underlying_type(in_data1)}) {
+                            data({underlying_element_type(in_data0), underlying_element_type(in_data1)}) {
                         }
 
-                        void generate_r1cs_equals_const_constraints(const typename Fp4T::value_type &el) {
+                        void generate_r1cs_equals_const_constraints(const typename field_type::value_type &el) {
                             data[0].generate_r1cs_equals_const_constraints(el.data[0]);
                             data[1].generate_r1cs_equals_const_constraints(el.data[1]);
                         }
 
-                        void generate_r1cs_witness(const typename Fp4T::value_type &el) {
+                        void generate_r1cs_witness(const typename field_type::value_type &el) {
                             data[0].generate_r1cs_witness(el.data[0]);
                             data[1].generate_r1cs_witness(el.data[1]);
                         }
 
-                        typename Fp4T::value_type get_element() {
-                            typename Fp4T::value_type el;
+                        typename field_type::value_type get_element() {
+                            typename field_type::value_type el;
                             el.data[0] = data[0].get_element();
                             el.data[1] = data[1].get_element();
                             return el;
                         }
 
-                        Fp4_variable<Fp4T> Frobenius_map(const std::size_t power) const {
+                        element_fp4<field_type> Frobenius_map(const std::size_t power) const {
                             blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
                             new_c0c0.assign(this->bp, data[0].data[0]);
-                            new_c0c1.assign(this->bp, data[0].data[1] * Fp2T::Frobenius_coeffs_c1[power % 2]);
-                            new_c1c0.assign(this->bp, data[1].data[0] * Fp4T::Frobenius_coeffs_c1[power % 4]);
+                            new_c0c1.assign(this->bp, data[0].data[1] * underlying_field_type::Frobenius_coeffs_c1[power % 2]);
+                            new_c1c0.assign(this->bp, data[1].data[0] * field_type::Frobenius_coeffs_c1[power % 4]);
                             new_c1c1.assign(this->bp,
-                                            data[1].data[1] * Fp4T::Frobenius_coeffs_c1[power % 4] *
-                                                Fp2T::Frobenius_coeffs_c1[power % 2]);
+                                            data[1].data[1] * field_type::Frobenius_coeffs_c1[power % 4] *
+                                                underlying_field_type::Frobenius_coeffs_c1[power % 2]);
 
-                            return Fp4_variable<Fp4T>(this->bp,
-                                                      Fp2_variable<Fp2T>(this->bp, new_c0c0, new_c0c1),
-                                                      Fp2_variable<Fp2T>(this->bp, new_c1c0, new_c1c1));
+                            return element_fp4<field_type>(this->bp,
+                                                      underlying_element_type(this->bp, new_c0c0, new_c0c1),
+                                                      underlying_element_type(this->bp, new_c1c0, new_c1c1));
                         }
 
                         void evaluate() const {
@@ -118,40 +123,43 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_tower_mul_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type base_field_type;
-                        typedef typename Fp4T::underlying_field_type Fp2T;
+                        using field_type = Fp4T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
 
-                        Fp4_variable<Fp4T> A;
-                        Fp4_variable<Fp4T> B;
-                        Fp4_variable<Fp4T> result;
+                        using underlying_element_type = element_fp2<underlying_field_type>;
+
+                        element_fp4<field_type> A;
+                        element_fp4<field_type> B;
+                        element_fp4<field_type> result;
 
                         blueprint_linear_combination<base_field_type> v0_c0;
                         blueprint_linear_combination<base_field_type> v0_c1;
 
                         blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
                         blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
+                        std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> v0;
-                        std::shared_ptr<Fp2_variable<Fp2T>> v1;
+                        std::shared_ptr<underlying_element_type> v0;
+                        std::shared_ptr<underlying_element_type> v1;
 
                         blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
                         blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> Bc0_plus_Bc1;
+                        std::shared_ptr<underlying_element_type> Bc0_plus_Bc1;
 
                         blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
                         blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
+                        std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
-                        std::shared_ptr<Fp2_mul_component<Fp2T>> compute_v0;
-                        std::shared_ptr<Fp2_mul_component<Fp2T>> compute_v1;
-                        std::shared_ptr<Fp2_mul_component<Fp2T>> compute_result_c1;
+                        std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_v0;
+                        std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_v1;
+                        std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_result_c1;
 
                         Fp4_tower_mul_component(blueprint<base_field_type> &bp,
-                                                const Fp4_variable<Fp4T> &A,
-                                                const Fp4_variable<Fp4T> &B,
-                                                const Fp4_variable<Fp4T> &result) :
+                                                const element_fp4<field_type> &A,
+                                                const element_fp4<field_type> &B,
+                                                const element_fp4<field_type> &result) :
                             component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
@@ -171,31 +179,31 @@ namespace nil {
                               "Multiplication and Squaring on Pairing-Friendly Fields"
                               Devegili, OhEigeartaigh, Scott, Dahab
                             */
-                            v1.reset(new Fp2_variable<Fp2T>(bp));
+                            v1.reset(new underlying_element_type(bp));
 
-                            compute_v1.reset(new Fp2_mul_component<Fp2T>(bp, A.data[1], B.data[1], *v1));
+                            compute_v1.reset(new Fp2_mul_component<underlying_field_type>(bp, A.data[1], B.data[1], *v1));
 
-                            v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::non_residue * v1->data[1]);
+                            v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue * v1->data[1]);
 
                             v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
-                            v0.reset(new Fp2_variable<Fp2T>(bp, v0_c0, v0_c1));
+                            v0.reset(new underlying_element_type(bp, v0_c0, v0_c1));
 
-                            compute_v0.reset(new Fp2_mul_component<Fp2T>(bp, A.data[0], B.data[0], *v0));
+                            compute_v0.reset(new Fp2_mul_component<underlying_field_type>(bp, A.data[0], B.data[0], *v0));
 
                             Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                             Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
-                            Ac0_plus_Ac1.reset(new Fp2_variable<Fp2T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
+                            Ac0_plus_Ac1.reset(new underlying_element_type(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
 
                             Bc0_plus_Bc1_c0.assign(bp, B.data[0].data[0] + B.data[1].data[0]);
                             Bc0_plus_Bc1_c1.assign(bp, B.data[0].data[1] + B.data[1].data[1]);
-                            Bc0_plus_Bc1.reset(new Fp2_variable<Fp2T>(bp, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1));
+                            Bc0_plus_Bc1.reset(new underlying_element_type(bp, Bc0_plus_Bc1_c0, Bc0_plus_Bc1_c1));
 
                             result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
                             result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                             result_c1_plus_v0_plus_v1.reset(
-                                new Fp2_variable<Fp2T>(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
+                                new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
-                            compute_result_c1.reset(new Fp2_mul_component<Fp2T>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
+                            compute_result_c1.reset(new Fp2_mul_component<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
                                                                                 *result_c1_plus_v0_plus_v1));
                         }
 
@@ -217,9 +225,9 @@ namespace nil {
 
                             compute_result_c1->generate_r1cs_witness();
 
-                            const typename Fp4T::value_type Aval = A.get_element();
-                            const typename Fp4T::value_type Bval = B.get_element();
-                            const typename Fp4T::value_type Rval = Aval * Bval;
+                            const typename field_type::value_type Aval = A.get_element();
+                            const typename field_type::value_type Bval = B.get_element();
+                            const typename field_type::value_type Rval = Aval * Bval;
 
                             result.generate_r1cs_witness(Rval);
                         }
@@ -233,23 +241,26 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_direct_mul_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type base_field_type;
-                        typedef typename Fp4T::underlying_field_type Fp2T;
+                        using field_type = Fp4T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
+
+                        using underlying_element_type = element_fp2<underlying_field_type>;
 
                         using base_field_value_type = typename base_field_type::value_type;
 
-                        Fp4_variable<Fp4T> A;
-                        Fp4_variable<Fp4T> B;
-                        Fp4_variable<Fp4T> result;
+                        element_fp4<field_type> A;
+                        element_fp4<field_type> B;
+                        element_fp4<field_type> result;
 
                         blueprint_variable<base_field_type> v1;
                         blueprint_variable<base_field_type> v2;
                         blueprint_variable<base_field_type> v6;
 
                         Fp4_direct_mul_component(blueprint<base_field_type> &bp,
-                                                 const Fp4_variable<Fp4T> &A,
-                                                 const Fp4_variable<Fp4T> &B,
-                                                 const Fp4_variable<Fp4T> &result) :
+                                                 const element_fp4<field_type> &A,
+                                                 const element_fp4<field_type> &B,
+                                                 const element_fp4<field_type> &result) :
                             component<base_field_type>(bp),
                             A(A), B(B), result(result) {
                             /*
@@ -315,7 +326,7 @@ namespace nil {
                         }
 
                         void generate_r1cs_constraints() {
-                            const base_field_value_type beta = Fp4T::value_type::non_residue;
+                            const base_field_value_type beta = field_type::value_type::non_residue;
 
                             const base_field_value_type u = (base_field_value_type::one() - beta).inversed();
 
@@ -404,9 +415,9 @@ namespace nil {
                                                  this->bp.lc_val(b3)));
                             this->bp.val(v6) = this->bp.lc_val(a3) * this->bp.lc_val(b3);
 
-                            const typename Fp4T::value_type Aval = A.get_element();
-                            const typename Fp4T::value_type Bval = B.get_element();
-                            const typename Fp4T::value_type Rval = Aval * Bval;
+                            const typename field_type::value_type Aval = A.get_element();
+                            const typename field_type::value_type Bval = B.get_element();
+                            const typename field_type::value_type Rval = Aval * Bval;
 
                             result.generate_r1cs_witness(Rval);
                         }
@@ -426,35 +437,38 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_sqr_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        typedef typename Fp4T::base_field_type base_field_type;
-                        typedef typename Fp4T::underlying_field_type Fp2T;
+                        using field_type = Fp4T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
 
-                        Fp4_variable<Fp4T> A;
-                        Fp4_variable<Fp4T> result;
+                        using underlying_element_type = element_fp2<underlying_field_type>;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> v1;
+                        element_fp4<field_type> A;
+                        element_fp4<field_type> result;
+
+                        std::shared_ptr<underlying_element_type> v1;
 
                         blueprint_linear_combination<base_field_type> v0_c0;
                         blueprint_linear_combination<base_field_type> v0_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> v0;
+                        std::shared_ptr<underlying_element_type> v0;
 
-                        std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v0;
-                        std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_v1;
+                        std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_v0;
+                        std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_v1;
 
                         blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
                         blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> Ac0_plus_Ac1;
+                        std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
                         blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
                         blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
-                        std::shared_ptr<Fp2_variable<Fp2T>> result_c1_plus_v0_plus_v1;
+                        std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
-                        std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_result_c1;
+                        std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_result_c1;
 
                         Fp4_sqr_component(blueprint<base_field_type> &bp,
-                                          const Fp4_variable<Fp4T> &A,
-                                          const Fp4_variable<Fp4T> &result) :
+                                          const element_fp4<field_type> &A,
+                                          const element_fp4<field_type> &result) :
                             component<base_field_type>(bp),
                             A(A), result(result) {
                             /*
@@ -475,27 +489,27 @@ namespace nil {
                               Devegili, OhEigeartaigh, Scott, Dahab
                             */
 
-                            v1.reset(new Fp2_variable<Fp2T>(bp));
-                            compute_v1.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[1], *v1));
+                            v1.reset(new underlying_element_type(bp));
+                            compute_v1.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[1], *v1));
 
-                            v0_c0.assign(bp, result.data[0].data[0] - Fp4T::value_type::non_residue * v1->data[1]);
+                            v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue * v1->data[1]);
 
                             v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
-                            v0.reset(new Fp2_variable<Fp2T>(bp, v0_c0, v0_c1));
+                            v0.reset(new underlying_element_type(bp, v0_c0, v0_c1));
 
-                            compute_v0.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[0], *v0));
+                            compute_v0.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[0], *v0));
 
                             Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                             Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
-                            Ac0_plus_Ac1.reset(new Fp2_variable<Fp2T>(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
+                            Ac0_plus_Ac1.reset(new underlying_element_type(bp, Ac0_plus_Ac1_c0, Ac0_plus_Ac1_c1));
 
                             result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
                             result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                             result_c1_plus_v0_plus_v1.reset(
-                                new Fp2_variable<Fp2T>(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
+                                new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
                             compute_result_c1.reset(
-                                new Fp2_sqr_component<Fp2T>(bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
+                                new Fp2_sqr_component<underlying_field_type>(bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
                         }
 
                         void generate_r1cs_constraints() {
@@ -515,8 +529,8 @@ namespace nil {
                             Ac0_plus_Ac1_c1.evaluate(this->bp);
                             compute_result_c1->generate_r1cs_witness();
 
-                            const typename Fp4T::value_type Aval = A.get_element();
-                            const typename Fp4T::value_type Rval = Aval.squared();
+                            const typename field_type::value_type Aval = A.get_element();
+                            const typename field_type::value_type Rval = Aval.squared();
                             result.generate_r1cs_witness(Rval);
                         }
                     };
@@ -529,33 +543,34 @@ namespace nil {
                     template<typename Fp4T>
                     class Fp4_cyclotomic_sqr_component : public component<typename Fp4T::base_field_type> {
                     public:
-                        /*
-                         */
-                        typedef typename Fp4T::base_field_type base_field_type;
-                        typedef typename Fp4T::underlying_field_type Fp2T;
+                        using field_type = Fp4T;
+                        using base_field_type = typename field_type::base_field_type;
+                        using underlying_field_type = typename field_type::underlying_field_type;
+
+                        using underlying_element_type = element_fp2<underlying_field_type>;
 
                         using base_field_value_type = typename base_field_type::value_type;
 
-                        Fp4_variable<Fp4T> A;
-                        Fp4_variable<Fp4T> result;
+                        element_fp4<field_type> A;
+                        element_fp4<field_type> result;
 
                         blueprint_linear_combination<base_field_type> c0_expr_c0;
                         blueprint_linear_combination<base_field_type> c0_expr_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> c0_expr;
-                        std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c0_expr;
+                        std::shared_ptr<underlying_element_type> c0_expr;
+                        std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_c0_expr;
 
                         blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c0;
                         blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> A_c0_plus_A_c1;
+                        std::shared_ptr<underlying_element_type> A_c0_plus_A_c1;
 
                         blueprint_linear_combination<base_field_type> c1_expr_c0;
                         blueprint_linear_combination<base_field_type> c1_expr_c1;
-                        std::shared_ptr<Fp2_variable<Fp2T>> c1_expr;
-                        std::shared_ptr<Fp2_sqr_component<Fp2T>> compute_c1_expr;
+                        std::shared_ptr<underlying_element_type> c1_expr;
+                        std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_c1_expr;
 
                         Fp4_cyclotomic_sqr_component(blueprint<base_field_type> &bp,
-                                                     const Fp4_variable<Fp4T> &A,
-                                                     const Fp4_variable<Fp4T> &result) :
+                                                     const element_fp4<field_type> &A,
+                                                     const element_fp4<field_type> &result) :
                             component<base_field_type>(bp),
                             A(A), result(result) {
                             /*
@@ -583,14 +598,14 @@ namespace nil {
                             c0_expr_c1.assign(
                                 bp,
                                 (result.data[0].data[0] - base_field_value_type(0x01)) *
-                                    (base_field_value_type(0x02) * Fp4T::value_type::non_residue).inversed());
+                                    (base_field_value_type(0x02) * field_type::value_type::non_residue).inversed());
 
-                            c0_expr.reset(new Fp2_variable<Fp2T>(bp, c0_expr_c0, c0_expr_c1));
-                            compute_c0_expr.reset(new Fp2_sqr_component<Fp2T>(bp, A.data[1], *c0_expr));
+                            c0_expr.reset(new underlying_element_type(bp, c0_expr_c0, c0_expr_c1));
+                            compute_c0_expr.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[1], *c0_expr));
 
                             A_c0_plus_A_c1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                             A_c0_plus_A_c1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
-                            A_c0_plus_A_c1.reset(new Fp2_variable<Fp2T>(bp, A_c0_plus_A_c1_c0, A_c0_plus_A_c1_c1));
+                            A_c0_plus_A_c1.reset(new underlying_element_type(bp, A_c0_plus_A_c1_c0, A_c0_plus_A_c1_c1));
 
                             c1_expr_c0.assign(
                                 bp,
@@ -600,13 +615,13 @@ namespace nil {
                             c1_expr_c1.assign(
                                 bp,
                                 (result.data[0].data[0] - base_field_value_type(0x01)) *
-                                        (base_field_value_type(0x02) * Fp4T::value_type::non_residue).inversed() +
+                                        (base_field_value_type(0x02) * field_type::value_type::non_residue).inversed() +
                                     result.data[1].data[1] +
                                     result.data[0].data[1] * base_field_value_type(0x02).inversed());
 
-                            c1_expr.reset(new Fp2_variable<Fp2T>(bp, c1_expr_c0, c1_expr_c1));
+                            c1_expr.reset(new underlying_element_type(bp, c1_expr_c0, c1_expr_c1));
 
-                            compute_c1_expr.reset(new Fp2_sqr_component<Fp2T>(bp, *A_c0_plus_A_c1, *c1_expr));
+                            compute_c1_expr.reset(new Fp2_sqr_component<underlying_field_type>(bp, *A_c0_plus_A_c1, *c1_expr));
                         }
 
                         void generate_r1cs_constraints() {
@@ -621,8 +636,8 @@ namespace nil {
                             A_c0_plus_A_c1_c1.evaluate(this->bp);
                             compute_c1_expr->generate_r1cs_witness();
 
-                            const typename Fp4T::value_type Aval = A.get_element();
-                            const typename Fp4T::value_type Rval = Aval.squared();
+                            const typename field_type::value_type Aval = A.get_element();
+                            const typename field_type::value_type Rval = Aval.squared();
                             result.generate_r1cs_witness(Rval);
                         }
                     };

@@ -62,12 +62,12 @@ namespace nil {
                         typedef typename curve_type::pairing::fp_type field_type;
 
                     public:
-                        typedef Fp3_variable<fqe_type> Fqe_variable_type;
+                        typedef element_fp3<fqe_type> Fqe_variable_type;
                         typedef Fp3_mul_component<fqe_type> Fqe_mul_component_type;
                         typedef Fp3_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
                         typedef Fp3_sqr_component<fqe_type> Fqe_sqr_component_type;
 
-                        typedef Fp6_2over3_variable<fqk_type> Fqk_variable_type;
+                        typedef element_fp6_2over3<fqk_type> Fqk_variable_type;
                         typedef Fp6_2over3_mul_component<fqk_type> Fqk_mul_component_type;
                         typedef Fp6_2over3_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
                         typedef Fp6_2over3_sqr_component<fqk_type> Fqk_sqr_component_type;

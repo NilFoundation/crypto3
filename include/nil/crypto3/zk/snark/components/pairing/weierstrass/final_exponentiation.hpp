@@ -89,14 +89,14 @@ namespace nil {
 
                         using exponentiation_component_type = exponentiation_component<
                                         typename curve_type::pairing::fqk_type,
-                                        Fp6_2over3_variable,
+                                        element_fp6_2over3,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component>;
 
                         std::shared_ptr<exponentiation_component_type> compute_w1;
                         std::shared_ptr<exponentiation_component<
                                         typename curve_type::pairing::fqk_type,
-                                        Fp6_2over3_variable,
+                                        element_fp6_2over3,
                                         Fp6_2over3_mul_component,
                                         Fp6_2over3_cyclotomic_sqr_component> > compute_w0;
                         std::shared_ptr<Fqk_mul_component_type> compute_result;
@@ -135,14 +135,14 @@ namespace nil {
                                 new Fqk_mul_component_type(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
                             compute_w1.reset(new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                             Fp6_2over3_variable,
+                                             element_fp6_2over3,
                                              Fp6_2over3_mul_component,
                                              Fp6_2over3_cyclotomic_sqr_component>
                                                  (bp, *beta_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
 
                             compute_w0.reset(
                                 new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                Fp6_2over3_variable,
+                                element_fp6_2over3,
                                 Fp6_2over3_mul_component,
                                 Fp6_2over3_cyclotomic_sqr_component>
                                     (bp,
@@ -237,11 +237,11 @@ namespace nil {
                         std::shared_ptr<Fqk_mul_component_type> compute_el_inv_q_2_minus_1;
 
                         std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
-                                        Fp4_variable,
+                                        element_fp4,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component> > compute_w1;
                         std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
-                                        Fp4_variable,
+                                        element_fp4,
                                         Fp4_mul_component,
                                         Fp4_cyclotomic_sqr_component> > compute_w0;
                         std::shared_ptr<Fqk_mul_component_type> compute_result;
@@ -272,13 +272,13 @@ namespace nil {
 
                             compute_w1.reset(
                                 new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                Fp4_variable,
+                                element_fp4,
                                 Fp4_mul_component,
                                 Fp4_cyclotomic_sqr_component> >
                                     (bp, *el_q_3_minus_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
                             compute_w0.reset(
                                 new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                Fp4_variable,
+                                element_fp4,
                                 Fp4_mul_component,
                                 Fp4_cyclotomic_sqr_component> >
                                     (bp,

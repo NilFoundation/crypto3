@@ -379,57 +379,86 @@ void test_full_precomputed_pair() {
 
 BOOST_AUTO_TEST_SUITE(benes_components_test_suite)
 
-BOOST_AUTO_TEST_CASE(benes_components_test) {
+BOOST_AUTO_TEST_CASE(benes_components_mnt4_test) {
 
-    test_mul<algebra::mnt4_Fq2, Fp2_variable, Fp2_mul_component>();
-    test_sqr<algebra::mnt4_Fq2, Fp2_variable, Fp2_sqr_component>();
+    std::cout << "Benes components test for mnt4-298 started" << std::endl;
+    using curve_type = typename algebra::curves::mnt4<298>;
+    using fq2_type = typename curve_type::g2_type::underlying_field_type;
+    using fq4_type = typename curve_type::gt_type;
 
-    test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component>();
-    test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_component>();
-    test_cyclotomic_sqr<curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>();
-    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component,
-                                  algebra::mnt4_q_limbs>(algebra::mnt4_final_exponent_last_chunk_abs_of_w0);
-    test_Frobenius<algebra::mnt4_Fq4, Fp4_variable>();
+    test_mul<fq2_type, element_fp2, Fp2_mul_component>();
+    test_sqr<fq2_type, element_fp2, Fp2_sqr_component>();
 
-    test_mul<algebra::mnt6_Fq3, Fp3_variable, Fp3_mul_component>();
-    test_sqr<algebra::mnt6_Fq3, Fp3_variable, Fp3_sqr_component>();
+    test_mul<fq4_type, element_fp4, Fp4_mul_component>();
+    test_sqr<fq4_type, element_fp4, Fp4_sqr_component>();
+    test_cyclotomic_sqr<curve_type, element_fp4, 
+        Fp4_cyclotomic_sqr_component>();
+    test_exponentiation_component<fq4_type, element_fp4, Fp4_mul_component, Fp4_sqr_component,
+                                  algebra::mnt4_q_limbs>(curve_type::pairing::final_exponent_last_chunk_abs_of_w0);
+    test_Frobenius<fq4_type, element_fp4>();
 
-    test_mul<algebra::mnt6_Fq6, Fp6_2over3_variable, Fp6_2over3_mul_component>();
-    test_sqr<algebra::mnt6_Fq6, Fp6_2over3_variable, Fp6_2over3_sqr_component>();
-    test_cyclotomic_sqr<curves::mnt6, Fp6_2over3_variable, Fp6_2over3_cyclotomic_sqr_component>();
-    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_2over3_variable, Fp6_2over3_mul_component, Fp6_2over3_sqr_component,
-                                  algebra::mnt6_q_limbs>(algebra::mnt6_final_exponent_last_chunk_abs_of_w0);
-    test_Frobenius<algebra::mnt6_Fq6, Fp6_2over3_variable>();
+    test_element_g2_is_well_formed<curve_type>();
+    
+    test_element_g1_precomp<curve_type>();
+    
+    test_element_g2_precomp<curve_type>();
+    
+    test_mnt_miller_loop<curve_type>();
+    
+    test_mnt_e_over_e_miller_loop<curve_type>();
+    
+    test_mnt_e_times_e_over_e_miller_loop<curve_type>();
+    
+    test_full_pairing<curve_type>();
+    
+    test_full_precomputed_pairing<curve_type>();
+    
+    test_verifier<curve_type, 
+        typename curve_type::pairing::pair_curve_type>();
+    
+    test_hardcoded_verifier<curve_type, 
+        typename curve_type::pairing::pair_curve_type>();
+}
 
-    test_element_g2_is_well_formed<curves::mnt4>();
-    test_element_g2_is_well_formed<curves::mnt6>();
+BOOST_AUTO_TEST_CASE(benes_components_mnt6_test) {
 
-    test_element_g1_precomp<curves::mnt4>();
-    test_element_g1_precomp<curves::mnt6>();
+    std::cout << "Benes components test for mnt6-298 started" << std::endl;
 
-    test_element_g2_precomp<curves::mnt4>();
-    test_element_g2_precomp<curves::mnt6>();
+    using curve_type = typename algebra::curves::mnt6<298>;
+    using fq3_type = typename curve_type::g2_type::underlying_field_type;
+    using fq6_2over3_type = typename curve_type::gt_type;
 
-    test_mnt_miller_loop<curves::mnt4>();
-    test_mnt_miller_loop<curves::mnt6>();
+    test_mul<fq3_type, Fp3_variable, Fp3_mul_component>();
+    test_sqr<fq3_type, Fp3_variable, Fp3_sqr_component>();
 
-    test_mnt_e_over_e_miller_loop<curves::mnt4>();
-    test_mnt_e_over_e_miller_loop<curves::mnt6>();
+    test_mul<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_mul_component>();
+    test_sqr<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_sqr_component>();
+    test_cyclotomic_sqr<curve_type, components::element_fp6_2over3, Fp6_2over3_cyclotomic_sqr_component>();
+    test_exponentiation_component<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_mul_component, Fp6_2over3_sqr_component,
+                                  algebra::mnt6_q_limbs>(curve_type::pairing::final_exponent_last_chunk_abs_of_w0);
+    test_Frobenius<fq6_2over3_type, components::element_fp6_2over3>();
 
-    test_mnt_e_times_e_over_e_miller_loop<curves::mnt4>();
-    test_mnt_e_times_e_over_e_miller_loop<curves::mnt6>();
+    test_element_g2_is_well_formed<curve_type>();
 
-    test_full_pairing<curves::mnt4>();
-    test_full_pairing<curves::mnt6>();
+    test_element_g1_precomp<curve_type>();
 
-    test_full_precomputed_pairing<curves::mnt4>();
-    test_full_precomputed_pairing<curves::mnt6>();
+    test_element_g2_precomp<curve_type>();
 
-    test_verifier<curves::mnt4, curves::mnt6>();
-    test_verifier<curves::mnt6, curves::mnt4>();
+    test_mnt_miller_loop<curve_type>();
 
-    test_hardcoded_verifier<curves::mnt4, curves::mnt6>();
-    test_hardcoded_verifier<curves::mnt6, curves::mnt4>();
+    test_mnt_e_over_e_miller_loop<curve_type>();
+
+    test_mnt_e_times_e_over_e_miller_loop<curve_type>();
+
+    test_full_pairing<curve_type>();
+
+    test_full_precomputed_pairing<curve_type>();
+
+    test_verifier<curve_type, 
+        typename curve_type::pairing::pair_curve_type>();
+
+    test_hardcoded_verifier<curve_type, 
+        typename curve_type::pairing::pair_curve_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
