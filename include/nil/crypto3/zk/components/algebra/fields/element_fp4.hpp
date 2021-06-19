@@ -114,13 +114,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp4_tower_mul_component ************************************/
+                /******************************** element_fp4_tower_mul ************************************/
 
                 /**
                  * Component that creates constraints for Fp4 multiplication (towering formulas).
                  */
                 template<typename Fp4T>
-                class Fp4_tower_mul_component : public component<typename Fp4T::base_field_type> {
+                class element_fp4_tower_mul : public component<typename Fp4T::base_field_type> {
                 public:
                     using field_type = Fp4T;
                     using base_field_type = typename field_type::base_field_type;
@@ -151,11 +151,11 @@ namespace nil {
 
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
-                    std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_v0;
-                    std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_v1;
-                    std::shared_ptr<Fp2_mul_component<underlying_field_type>> compute_result_c1;
+                    std::shared_ptr<element_fp2_mul<underlying_field_type>> compute_v0;
+                    std::shared_ptr<element_fp2_mul<underlying_field_type>> compute_v1;
+                    std::shared_ptr<element_fp2_mul<underlying_field_type>> compute_result_c1;
 
-                    Fp4_tower_mul_component(blueprint<base_field_type> &bp,
+                    element_fp4_tower_mul(blueprint<base_field_type> &bp,
                                             const element_fp4<field_type> &A,
                                             const element_fp4<field_type> &B,
                                             const element_fp4<field_type> &result) :
@@ -169,7 +169,7 @@ namespace nil {
                           result.data[1] = (A.data[0] + A.data[1]) * (B.data[0] + B.data[1]) - v0 - v1
                           where "non_residue * elem" := (non_residue * elt.data[1], elt.data[0])
 
-                          Enforced with 3 Fp2_mul_component's that ensure that:
+                          Enforced with 3 element_fp2_mul's that ensure that:
                           A.data[1] * B.data[1] = v1
                           A.data[0] * B.data[0] = v0
                           (A.data[0]+A.data[1])*(B.data[0]+B.data[1]) = result.data[1] + v0 + v1
@@ -180,14 +180,14 @@ namespace nil {
                         */
                         v1.reset(new underlying_element_type(bp));
 
-                        compute_v1.reset(new Fp2_mul_component<underlying_field_type>(bp, A.data[1], B.data[1], *v1));
+                        compute_v1.reset(new element_fp2_mul<underlying_field_type>(bp, A.data[1], B.data[1], *v1));
 
                         v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue * v1->data[1]);
 
                         v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                         v0.reset(new underlying_element_type(bp, v0_c0, v0_c1));
 
-                        compute_v0.reset(new Fp2_mul_component<underlying_field_type>(bp, A.data[0], B.data[0], *v0));
+                        compute_v0.reset(new element_fp2_mul<underlying_field_type>(bp, A.data[0], B.data[0], *v0));
 
                         Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                         Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
@@ -202,7 +202,7 @@ namespace nil {
                         result_c1_plus_v0_plus_v1.reset(
                             new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
-                        compute_result_c1.reset(new Fp2_mul_component<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
+                        compute_result_c1.reset(new element_fp2_mul<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
                                                                             *result_c1_plus_v0_plus_v1));
                     }
 
@@ -232,13 +232,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp4_direct_mul_component ************************************/
+                /******************************** element_fp4_direct_mul ************************************/
 
                 /**
                  * Component that creates constraints for Fp4 multiplication (direct formulas).
                  */
                 template<typename Fp4T>
-                class Fp4_direct_mul_component : public component<typename Fp4T::base_field_type> {
+                class element_fp4_direct_mul : public component<typename Fp4T::base_field_type> {
                 public:
                     using field_type = Fp4T;
                     using base_field_type = typename field_type::base_field_type;
@@ -256,7 +256,7 @@ namespace nil {
                     blueprint_variable<base_field_type> v2;
                     blueprint_variable<base_field_type> v6;
 
-                    Fp4_direct_mul_component(blueprint<base_field_type> &bp,
+                    element_fp4_direct_mul(blueprint<base_field_type> &bp,
                                              const element_fp4<field_type> &A,
                                              const element_fp4<field_type> &B,
                                              const element_fp4<field_type> &result) :
@@ -426,15 +426,15 @@ namespace nil {
                  * Alias default multiplication component
                  */
                 template<typename Fp4T>
-                using Fp4_mul_component = Fp4_direct_mul_component<Fp4T>;
+                using element_fp4_mul = element_fp4_direct_mul<Fp4T>;
 
-                /******************************** Fp4_sqr_component ************************************/
+                /******************************** element_fp4_squared ************************************/
 
                 /**
                  * Component that creates constraints for Fp4 squaring.
                  */
                 template<typename Fp4T>
-                class Fp4_sqr_component : public component<typename Fp4T::base_field_type> {
+                class element_fp4_squared : public component<typename Fp4T::base_field_type> {
                 public:
                     using field_type = Fp4T;
                     using base_field_type = typename field_type::base_field_type;
@@ -451,8 +451,8 @@ namespace nil {
                     blueprint_linear_combination<base_field_type> v0_c1;
                     std::shared_ptr<underlying_element_type> v0;
 
-                    std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_v0;
-                    std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_v1;
+                    std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_v0;
+                    std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_v1;
 
                     blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
                     blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
@@ -463,9 +463,9 @@ namespace nil {
 
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
-                    std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_result_c1;
+                    std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_result_c1;
 
-                    Fp4_sqr_component(blueprint<base_field_type> &bp,
+                    element_fp4_squared(blueprint<base_field_type> &bp,
                                       const element_fp4<field_type> &A,
                                       const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
@@ -478,7 +478,7 @@ namespace nil {
                           result.data[1] = (A.data[0] + A.data[1])^2 - v0 - v1
                           where "non_residue * elem" := (non_residue * elt.data[1], elt.data[0])
 
-                          Enforced with 3 Fp2_sqr_component's that ensure that:
+                          Enforced with 3 element_fp2_squared's that ensure that:
                           A.data[1]^2 = v1
                           A.data[0]^2 = v0
                           (A.data[0]+A.data[1])^2 = result.data[1] + v0 + v1
@@ -489,14 +489,14 @@ namespace nil {
                         */
 
                         v1.reset(new underlying_element_type(bp));
-                        compute_v1.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[1], *v1));
+                        compute_v1.reset(new element_fp2_squared<underlying_field_type>(bp, A.data[1], *v1));
 
                         v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue * v1->data[1]);
 
                         v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                         v0.reset(new underlying_element_type(bp, v0_c0, v0_c1));
 
-                        compute_v0.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[0], *v0));
+                        compute_v0.reset(new element_fp2_squared<underlying_field_type>(bp, A.data[0], *v0));
 
                         Ac0_plus_Ac1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                         Ac0_plus_Ac1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
@@ -508,7 +508,7 @@ namespace nil {
                             new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
 
                         compute_result_c1.reset(
-                            new Fp2_sqr_component<underlying_field_type>(bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
+                            new element_fp2_squared<underlying_field_type>(bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -534,13 +534,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp4_cyclotomic_sqr_component ************************************/
+                /******************************** element_fp4_cyclotomic_squared ************************************/
 
                 /**
                  * Component that creates constraints for Fp4 cyclotomic squaring
                  */
                 template<typename Fp4T>
-                class Fp4_cyclotomic_sqr_component : public component<typename Fp4T::base_field_type> {
+                class element_fp4_cyclotomic_squared : public component<typename Fp4T::base_field_type> {
                 public:
                     using field_type = Fp4T;
                     using base_field_type = typename field_type::base_field_type;
@@ -556,7 +556,7 @@ namespace nil {
                     blueprint_linear_combination<base_field_type> c0_expr_c0;
                     blueprint_linear_combination<base_field_type> c0_expr_c1;
                     std::shared_ptr<underlying_element_type> c0_expr;
-                    std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_c0_expr;
+                    std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_c0_expr;
 
                     blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c0;
                     blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c1;
@@ -565,9 +565,9 @@ namespace nil {
                     blueprint_linear_combination<base_field_type> c1_expr_c0;
                     blueprint_linear_combination<base_field_type> c1_expr_c1;
                     std::shared_ptr<underlying_element_type> c1_expr;
-                    std::shared_ptr<Fp2_sqr_component<underlying_field_type>> compute_c1_expr;
+                    std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_c1_expr;
 
-                    Fp4_cyclotomic_sqr_component(blueprint<base_field_type> &bp,
+                    element_fp4_cyclotomic_squared(blueprint<base_field_type> &bp,
                                                  const element_fp4<field_type> &A,
                                                  const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
@@ -583,7 +583,7 @@ namespace nil {
 
                           return Fp4(F, G);
 
-                          Enforced with 2 Fp2_sqr_component's that ensure that:
+                          Enforced with 2 element_fp2_squared's that ensure that:
 
                           elt.data[1] ^ 2 = Fp2(result.data[0].data[1] / 2, (result.data[0].data[0] - 1) / (2 *
                           non_residue)) = A (elt.data[1] + elt.data[0]) ^ 2 = A + result.data[1] + Fp2(A.data[1] *
@@ -600,7 +600,7 @@ namespace nil {
                                 (base_field_value_type(0x02) * field_type::value_type::non_residue).inversed());
 
                         c0_expr.reset(new underlying_element_type(bp, c0_expr_c0, c0_expr_c1));
-                        compute_c0_expr.reset(new Fp2_sqr_component<underlying_field_type>(bp, A.data[1], *c0_expr));
+                        compute_c0_expr.reset(new element_fp2_squared<underlying_field_type>(bp, A.data[1], *c0_expr));
 
                         A_c0_plus_A_c1_c0.assign(bp, A.data[0].data[0] + A.data[1].data[0]);
                         A_c0_plus_A_c1_c1.assign(bp, A.data[0].data[1] + A.data[1].data[1]);
@@ -620,7 +620,7 @@ namespace nil {
 
                         c1_expr.reset(new underlying_element_type(bp, c1_expr_c0, c1_expr_c1));
 
-                        compute_c1_expr.reset(new Fp2_sqr_component<underlying_field_type>(bp, *A_c0_plus_A_c1, *c1_expr));
+                        compute_c1_expr.reset(new element_fp2_squared<underlying_field_type>(bp, *A_c0_plus_A_c1, *c1_expr));
                     }
 
                     void generate_r1cs_constraints() {

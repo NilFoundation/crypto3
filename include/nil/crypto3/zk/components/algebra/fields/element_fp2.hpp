@@ -73,10 +73,10 @@ namespace nil {
                         c0_var.allocate(bp);
                         c1_var.allocate(bp);
 
-                        // c0 = underlying_type<base_field_type>(c0_var);
-                        // c1 = underlying_type<base_field_type>(c1_var);
+                        // c0 = underlying_element_type(c0_var);
+                        // c1 = underlying_element_type(c1_var);
 
-                        data = data_type({underlying_type(c0_var), underlying_type(c1_var)});
+                        data = data_type({underlying_element_type(c0_var), underlying_element_type(c1_var)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -84,8 +84,8 @@ namespace nil {
 
                     element_fp2(blueprint<base_field_type> &bp, const typename Fp2T::value_type &el) :
                         component<base_field_type>(bp) {
-                        underlying_type<base_field_type> c0_lc;
-                        underlying_type<base_field_type> c1_lc;
+                        underlying_element_type c0_lc;
+                        underlying_element_type c1_lc;
 
                         c0_lc.assign(bp, el.data[0]);
                         c1_lc.assign(bp, el.data[1]);
@@ -93,7 +93,7 @@ namespace nil {
                         c0_lc.evaluate(bp);
                         c1_lc.evaluate(bp);
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -104,24 +104,24 @@ namespace nil {
                                  const blueprint_linear_combination<base_field_type> &coeff) :
                         component<base_field_type>(bp) {
 
-                        underlying_type<base_field_type> c0_lc;
-                        underlying_type<base_field_type> c1_lc;
+                        underlying_element_type c0_lc;
+                        underlying_element_type c1_lc;
 
                         c0_lc.assign(bp, el.data[0] * coeff);
                         c1_lc.assign(bp, el.data[1] * coeff);
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
                     }
 
                     element_fp2(blueprint<base_field_type> &bp,
-                                 const underlying_type<base_field_type> &c0_lc,
-                                 const underlying_type<base_field_type> &c1_lc) :
+                                 const underlying_element_type &c0_lc,
+                                 const underlying_element_type &c1_lc) :
                         component<base_field_type>(bp) {
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -145,28 +145,28 @@ namespace nil {
                     }
 
                     element_fp2 operator*(const base_field_value_type &coeff) const {
-                        underlying_type<base_field_type> new_c0, new_c1;
+                        underlying_element_type new_c0, new_c1;
                         new_c0.assign(this->bp, this->data[0] * coeff);
                         new_c1.assign(this->bp, this->data[1] * coeff);
                         return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                     }
 
                     element_fp2 operator+(const element_fp2 &other) const {
-                        underlying_type<base_field_type> new_c0, new_c1;
+                        underlying_element_type new_c0, new_c1;
                         new_c0.assign(this->bp, this->data[0] + other.data[0]);
                         new_c1.assign(this->bp, this->data[1] + other.data[1]);
                         return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                     }
 
                     element_fp2 operator+(const typename Fp2T::value_type &other) const {
-                        underlying_type<base_field_type> new_c0, new_c1;
+                        underlying_element_type new_c0, new_c1;
                         new_c0.assign(this->bp, this->data[0] + other.data[0]);
                         new_c1.assign(this->bp, this->data[1] + other.data[1]);
                         return element_fp2<Fp2T>(this->bp, new_c0, new_c1);
                     }
 
                     element_fp2 mul_by_X() const {
-                        underlying_type<base_field_type> new_c0, new_c1;
+                        underlying_element_type new_c0, new_c1;
                         new_c0.assign(this->bp, this->data[1] * Fp2T::value_type::non_residue);
 
                         new_c1.assign(this->bp, this->data[0]);
@@ -191,13 +191,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp2_mul_component ************************************/
+                /******************************** element_fp2_mul ************************************/
 
                 /**
                  * Component that creates constraints for Fp2 by Fp2 multiplication.
                  */
                 template<typename Fp2T>
-                struct Fp2_mul_component : public component<typename Fp2T::underlying_field_type> {
+                struct element_fp2_mul : public component<typename Fp2T::underlying_field_type> {
                     using base_field_type = typename Fp2T::underlying_field_type;
                     using base_field_value_type = typename base_field_type::value_type;
 
@@ -207,7 +207,7 @@ namespace nil {
 
                     blueprint_variable<base_field_type> v1;
 
-                    Fp2_mul_component(blueprint<base_field_type> &bp,
+                    element_fp2_mul(blueprint<base_field_type> &bp,
                                       const element_fp2<Fp2T> &A,
                                       const element_fp2<Fp2T> &B,
                                       const element_fp2<Fp2T> &result) :
@@ -257,20 +257,20 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp2_mul_by_lc_component ************************************/
+                /******************************** element_fp2_mul_by_lc ************************************/
 
                 /**
                  * Component that creates constraints for Fp2 multiplication by a linear combination.
                  */
                 template<typename Fp2T>
-                struct Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
+                struct element_fp2_mul_by_lc : public component<typename Fp2T::underlying_field_type> {
                     using base_field_type = typename Fp2T::underlying_field_type;
 
                     element_fp2<Fp2T> A;
                     blueprint_linear_combination<base_field_type> lc;
                     element_fp2<Fp2T> result;
 
-                    Fp2_mul_by_lc_component(blueprint<base_field_type> &bp,
+                    element_fp2_mul_by_lc(blueprint<base_field_type> &bp,
                                             const element_fp2<Fp2T> &A,
                                             const blueprint_linear_combination<base_field_type> &lc,
                                             const element_fp2<Fp2T> &result) :
@@ -291,13 +291,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp2_sqr_component ************************************/
+                /******************************** element_fp2_squared ************************************/
 
                 /**
                  * Component that creates constraints for Fp2 squaring.
                  */
                 template<typename Fp2T>
-                struct Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
+                struct element_fp2_squared : public component<typename Fp2T::underlying_field_type> {
                     using base_field_type = typename Fp2T::base_field_type;
 
                     element_fp2<Fp2T> A;
@@ -305,7 +305,7 @@ namespace nil {
 
                     using base_field_value_type = typename base_field_type::value_type;
 
-                    Fp2_sqr_component(blueprint<base_field_type> &bp,
+                    element_fp2_squared(blueprint<base_field_type> &bp,
                                       const element_fp2<Fp2T> &A,
                                       const element_fp2<Fp2T> &result) :
                         component<base_field_type>(bp),

@@ -46,31 +46,32 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g1 : public component<typename CurveType::scalar_field_type> {
-                    typedef typename CurveType::scalar_field_type scalar_field_type;
-
-                    using underlying_element_type = element_fp<scalar_field_type>;
+                    
+                    using underlying_field_type = typename CurveType::scalar_field_type;
+                    using underlying_element_type = element_fp<underlying_field_type>;
                 public:
-                    scalar_field_type X;
-                    scalar_field_type Y;
+                    underlying_element_type X;
+                    underlying_element_type Y;
 
-                    blueprint_linear_combination_vector<scalar_field_type> all_vars;
+                    blueprint_linear_combination_vector<underlying_field_type> all_vars;
 
-                    element_g1(blueprint<scalar_field_type> &bp) : component<scalar_field_type>(bp) {
-                        blueprint_variable<scalar_field_type> X_var, Y_var;
+                    element_g1(blueprint<underlying_field_type> &bp) : component<underlying_field_type>(bp) {
+
+                        blueprint_variable<underlying_field_type> X_var, Y_var;
 
                         X_var.allocate(bp);
                         Y_var.allocate(bp);
 
-                        X = scalar_field_type(X_var);
-                        Y = scalar_field_type(Y_var);
+                        X = underlying_element_type(X_var);
+                        Y = underlying_element_type(Y_var);
 
                         all_vars.emplace_back(X);
                         all_vars.emplace_back(Y);
                     }
 
-                    element_g1(blueprint<scalar_field_type> &bp,
+                    element_g1(blueprint<underlying_field_type> &bp,
                                 const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P) :
-                        component<scalar_field_type>(bp) {
+                        component<underlying_field_type>(bp) {
                         typename CurveType::pairing::pair_curve_type::g1_type::value_type Pcopy =
                             P.to_affine();
 
@@ -94,7 +95,7 @@ namespace nil {
                     // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                     // we mark this function noinline.) TODO: remove later
                     static std::size_t __attribute__((noinline)) size_in_bits() {
-                        return 2 * scalar_field_type::modulus_bits;
+                        return 2 * underlying_field_type::modulus_bits;
                     }
                     static std::size_t num_variables() {
                         return 2;
@@ -106,27 +107,28 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g1_is_well_formed : public component<typename CurveType::scalar_field_type> {
-                    typedef typename CurveType::scalar_field_type FieldType;
+                    
+                    using underlying_field_type = typename CurveType::scalar_field_type;
 
                 public:
                     element_g1<CurveType> P;
-                    blueprint_variable<FieldType> P_X_squared;
-                    blueprint_variable<FieldType> P_Y_squared;
+                    blueprint_variable<underlying_field_type> P_X_squared;
+                    blueprint_variable<underlying_field_type> P_Y_squared;
 
-                    element_g1_is_well_formed(blueprint<FieldType> &bp, const element_g1<CurveType> &P) :
-                        component<FieldType>(bp), P(P) {
+                    element_g1_is_well_formed(blueprint<underlying_field_type> &bp, const element_g1<CurveType> &P) :
+                        component<underlying_field_type>(bp), P(P) {
                         P_X_squared.allocate(bp);
                         P_Y_squared.allocate(bp);
                     }
                     void generate_r1cs_constraints() {
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>({P.X}, {P.X}, {P_X_squared}));
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>({P.X}, {P.X}, {P_X_squared}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>({P.Y}, {P.Y}, {P_Y_squared}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>(
                             {P.X},
                             {P_X_squared,
-                             blueprint_variable<FieldType>(0) * CurveType::pairing::pair_curve_type::a},
+                             blueprint_variable<underlying_field_type>(0) * CurveType::pairing::pair_curve_type::a},
                             {P_Y_squared,
-                             blueprint_variable<FieldType>(0) * (-CurveType::pairing::pair_curve_type::b)}));
+                             blueprint_variable<underlying_field_type>(0) * (-CurveType::pairing::pair_curve_type::b)}));
                     }
                     void generate_r1cs_witness() {
                         this->bp.val(P_X_squared) = this->bp.lc_val(P.X).squared();
@@ -139,21 +141,22 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g1_add : public component<typename CurveType::scalar_field_type> {
-                    typedef typename CurveType::scalar_field_type FieldType;
+                    
+                    using underlying_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    blueprint_variable<FieldType> lambda;
-                    blueprint_variable<FieldType> inv;
+                    blueprint_variable<underlying_field_type> lambda;
+                    blueprint_variable<underlying_field_type> inv;
 
                     element_g1<CurveType> A;
                     element_g1<CurveType> B;
                     element_g1<CurveType> C;
 
-                    element_g1_add(blueprint<FieldType> &bp,
+                    element_g1_add(blueprint<underlying_field_type> &bp,
                                      const element_g1<CurveType> &A,
                                      const element_g1<CurveType> &B,
                                      const element_g1<CurveType> &C) :
-                        component<FieldType>(bp),
+                        component<underlying_field_type>(bp),
                         A(A), B(B), C(C) {
                         /*
                           lambda = (B.y - A.y)/(B.x - A.x)
@@ -177,16 +180,16 @@ namespace nil {
                     }
                     void generate_r1cs_constraints() {
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda}, {B.X, A.X * (-1)}, {B.Y, A.Y * (-1)}));
+                            snark::r1cs_constraint<underlying_field_type>({lambda}, {B.X, A.X * (-1)}, {B.Y, A.Y * (-1)}));
 
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda}, {lambda}, {C.X, A.X, B.X}));
+                            snark::r1cs_constraint<underlying_field_type>({lambda}, {lambda}, {C.X, A.X, B.X}));
 
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
+                            snark::r1cs_constraint<underlying_field_type>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
 
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
-                            {inv}, {B.X, A.X * (-1)}, {blueprint_variable<FieldType>(0)}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>(
+                            {inv}, {B.X, A.X * (-1)}, {blueprint_variable<underlying_field_type>(0)}));
                     }
                     void generate_r1cs_witness() {
                         this->bp.val(inv) = (this->bp.lc_val(B.X) - this->bp.lc_val(A.X)).inversed();
@@ -204,46 +207,47 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g1_doubled : public component<typename CurveType::scalar_field_type> {
-                    typedef typename CurveType::scalar_field_type FieldType;
+                    
+                    using underlying_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    blueprint_variable<FieldType> Xsquared;
-                    blueprint_variable<FieldType> lambda;
+                    blueprint_variable<underlying_field_type> Xsquared;
+                    blueprint_variable<underlying_field_type> lambda;
 
                     element_g1<CurveType> A;
                     element_g1<CurveType> B;
 
-                    element_g1_doubled(blueprint<FieldType> &bp,
+                    element_g1_doubled(blueprint<underlying_field_type> &bp,
                                      const element_g1<CurveType> &A,
                                      const element_g1<CurveType> &B) :
-                        component<FieldType>(bp),
+                        component<underlying_field_type>(bp),
                         A(A), B(B) {
                         Xsquared.allocate(bp);
                         lambda.allocate(bp);
                     }
                     void generate_r1cs_constraints() {
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>({A.X}, {A.X}, {Xsquared}));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>({A.X}, {A.X}, {Xsquared}));
 
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda * 2},
+                            snark::r1cs_constraint<underlying_field_type>({lambda * 2},
                                                        {A.Y},
-                                                       {Xsquared * 3, blueprint_variable<FieldType>(0x00) *
+                                                       {Xsquared * 3, blueprint_variable<underlying_field_type>(0x00) *
                                                                           CurveType::pairing::pair_curve_type::a}));
 
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
+                            snark::r1cs_constraint<underlying_field_type>({lambda}, {lambda}, {B.X, A.X * 2}));
 
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
+                            snark::r1cs_constraint<underlying_field_type>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
                     }
                     void generate_r1cs_witness() {
                         this->bp.val(Xsquared) = this->bp.lc_val(A.X).squared();
                         this->bp.val(lambda) =
-                            (typename FieldType::value_type(0x03) * this->bp.val(Xsquared) +
+                            (typename underlying_field_type::value_type(0x03) * this->bp.val(Xsquared) +
                              CurveType::pairing::pair_curve_type::a) *
-                            (typename FieldType::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
+                            (typename underlying_field_type::value_type(0x02) * this->bp.lc_val(A.Y)).inversed();
                         this->bp.lc_val(B.X) = this->bp.val(lambda).squared() -
-                                               typename FieldType::value_type(0x02) * this->bp.lc_val(A.X);
+                                               typename underlying_field_type::value_type(0x02) * this->bp.lc_val(A.X);
                         this->bp.lc_val(B.Y) =
                             this->bp.val(lambda) * (this->bp.lc_val(A.X) - this->bp.lc_val(B.X)) -
                             this->bp.lc_val(A.Y);

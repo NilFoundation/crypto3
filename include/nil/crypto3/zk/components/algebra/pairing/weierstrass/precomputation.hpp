@@ -251,7 +251,7 @@ namespace nil {
 
                 public:
                     typedef typename CurveType::pairing::fp_type FieldType;
-                    using fqe_type = typename CurveType::pairing::pair_curve_type::fqe_type;
+                    using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
 
                     precompute_G2_component_coeffs<CurveType> cur;
                     precompute_G2_component_coeffs<CurveType> next;
@@ -482,14 +482,15 @@ namespace nil {
                         precomp(precomp) {
                         precomp.Q.reset(new element_g2<CurveType>(Q));
 
-                        const auto &loop_count = component_policy::pairing_loop_count;
                         std::size_t coeff_count = 1;    // the last RX/RY are unused in Miller loop, but will need
                                                         // to get allocated somehow
                         this->add_count = 0;
                         this->dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -559,13 +560,13 @@ namespace nil {
                         precomp.coeffs[0]->RX->generate_r1cs_witness(precomp.Q->X->get_element());
                         precomp.coeffs[0]->RY->generate_r1cs_witness(precomp.Q->Y->get_element());
 
-                        const auto &loop_count = component_policy::pairing_loop_count;
-
                         std::size_t add_id = 0;
                         std::size_t dbl_id = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+                        
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */

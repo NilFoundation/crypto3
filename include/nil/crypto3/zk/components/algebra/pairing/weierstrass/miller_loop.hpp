@@ -38,7 +38,7 @@
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/algebra/pairing/precomputations.hpp>
+#include <nil/crypto3/zk/components/algebra/pairing/weierstrass/precomputation.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -266,12 +266,11 @@ namespace nil {
                                               const typename component_policy::Fqk_variable_type &result) :
                         component<field_type>(bp),
                         prec_P(prec_P), prec_Q(prec_Q), result(result) {
-                        const auto &loop_count = component_policy::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -361,10 +360,8 @@ namespace nil {
                         std::size_t add_id = 0;
                         std::size_t dbl_id = 0;
 
-                        const auto &loop_count = component_policy::pairing_loop_count;
-
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -438,12 +435,13 @@ namespace nil {
                                                        const typename component_policy::Fqk_variable_type &result) :
                         component<field_type>(bp),
                         prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), result(result) {
-                        const auto &loop_count = component_policy::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -557,10 +555,10 @@ namespace nil {
                         std::size_t dbl_id = 0;
                         std::size_t f_id = 0;
 
-                        const auto &loop_count = component_policy::pairing_loop_count;
-
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -664,12 +662,13 @@ namespace nil {
                         component<field_type>(bp),
                         prec_P1(prec_P1), prec_Q1(prec_Q1), prec_P2(prec_P2), prec_Q2(prec_Q2), prec_P3(prec_P3),
                         prec_Q3(prec_Q3), result(result) {
-                        const auto &loop_count = component_policy::pairing_loop_count;
 
                         f_count = add_count = dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -805,10 +804,10 @@ namespace nil {
                         std::size_t dbl_id = 0;
                         std::size_t f_id = 0;
 
-                        const auto &loop_count = component_policy::pairing_loop_count;
-
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, loop_count);
+                        std::vector<long> NAF = find_wnaf(1, 
+                            CurveType::pairing::pairing_loop_count);
+                        
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */

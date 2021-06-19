@@ -49,8 +49,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g1 : public component<typename CurveType::scalar_field_type> {
-                    typedef typename CurveType::scalar_field_type scalar_field_type;
-
+                    using underlying_field_type = typename CurveType::scalar_field_type;
                     using underlying_element_type = element_fp<scalar_field_type>;
                 public:
                     underlying_element_type X;

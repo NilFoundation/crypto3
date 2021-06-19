@@ -50,10 +50,14 @@ namespace nil {
                  */
                 template<typename Fp3T>
                 struct element_fp3 : public component<typename Fp3T::underlying_field_type> {
-                    using base_field_type = typename Fp3T::base_field_type;
-                    using base_field_value_type = typename base_field_type::value_type;
+                    
+                    using field_type = Fp3T;
+                    using base_field_type = typename field_type::base_field_type;
+                    using underlying_field_type = typename field_type::underlying_field_type;
 
-                    using underlying_type = element_fp<base_field_type>;
+                    using underlying_element_type = element_fp<underlying_field_type>;
+
+                    using base_field_value_type = typename base_field_type::value_type;
 
                     using data_type = std::array<
                         underlying_element_type, 
@@ -71,7 +75,7 @@ namespace nil {
                         c2_var.allocate(bp);
 
                         data =
-                            data_type({underlying_type(c0_var), underlying_type(c1_var), underlying_type(c2_var)});
+                            data_type({underlying_element_type(c0_var), underlying_element_type(c1_var), underlying_element_type(c2_var)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -80,9 +84,9 @@ namespace nil {
 
                     element_fp3(blueprint<base_field_type> &bp, const typename Fp3T::value_type &el) :
                         component<base_field_type>(bp) {
-                        underlying_type c0_lc;
-                        underlying_type c1_lc;
-                        underlying_type c2_lc;
+                        underlying_element_type c0_lc;
+                        underlying_element_type c1_lc;
+                        underlying_element_type c2_lc;
 
                         c0_lc.assign(bp, el.data[0]);
                         c1_lc.assign(bp, el.data[1]);
@@ -92,7 +96,7 @@ namespace nil {
                         c1_lc.evaluate(bp);
                         c2_lc.evaluate(bp);
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc), underlying_type(c2_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc), underlying_element_type(c2_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -104,15 +108,15 @@ namespace nil {
                                  const blueprint_linear_combination<base_field_type> &coeff) :
                         component<base_field_type>(bp) {
 
-                        underlying_type c0_lc;
-                        underlying_type c1_lc;
-                        underlying_type c2_lc;
+                        underlying_element_type c0_lc;
+                        underlying_element_type c1_lc;
+                        underlying_element_type c2_lc;
 
                         c0_lc.assign(bp, el.data[0] * coeff);
                         c1_lc.assign(bp, el.data[1] * coeff);
                         c2_lc.assign(bp, el.data[2] * coeff);
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc), underlying_type(c2_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc), underlying_element_type(c2_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -120,12 +124,12 @@ namespace nil {
                     }
 
                     element_fp3(blueprint<base_field_type> &bp,
-                                 const underlying_type &c0_lc,
-                                 const underlying_type &c1_lc,
-                                 const underlying_type &c2_lc) :
+                                 const underlying_element_type &c0_lc,
+                                 const underlying_element_type &c1_lc,
+                                 const underlying_element_type &c2_lc) :
                         component<base_field_type>(bp) {
 
-                        data = data_type({underlying_type(c0_lc), underlying_type(c1_lc), underlying_type(c2_lc)});
+                        data = data_type({underlying_element_type(c0_lc), underlying_element_type(c1_lc), underlying_element_type(c2_lc)});
 
                         all_vars.emplace_back(data[0]);
                         all_vars.emplace_back(data[1]);
@@ -153,7 +157,7 @@ namespace nil {
                     }
 
                     element_fp3<Fp3T> operator*(const typename base_field_type::value_type &coeff) const {
-                        underlying_type new_c0, new_c1, new_c2;
+                        underlying_element_type new_c0, new_c1, new_c2;
                         new_c0.assign(this->bp, this->data[0] * coeff);
                         new_c1.assign(this->bp, this->data[1] * coeff);
                         new_c2.assign(this->bp, this->data[2] * coeff);
@@ -161,7 +165,7 @@ namespace nil {
                     }
 
                     element_fp3<Fp3T> operator+(const element_fp3<Fp3T> &other) const {
-                        underlying_type new_c0, new_c1, new_c2;
+                        underlying_element_type new_c0, new_c1, new_c2;
                         new_c0.assign(this->bp, this->data[0] + other.data[0]);
                         new_c1.assign(this->bp, this->data[1] + other.data[1]);
                         new_c2.assign(this->bp, this->data[2] + other.data[2]);
@@ -169,7 +173,7 @@ namespace nil {
                     }
 
                     element_fp3<Fp3T> operator+(const typename Fp3T::value_type &other) const {
-                        underlying_type new_c0, new_c1, new_c2;
+                        underlying_element_type new_c0, new_c1, new_c2;
                         new_c0.assign(this->bp, this->data[0] + other.data[0]);
                         new_c1.assign(this->bp, this->data[1] + other.data[1]);
                         new_c2.assign(this->bp, this->data[2] + other.data[2]);
@@ -177,7 +181,7 @@ namespace nil {
                     }
 
                     element_fp3<Fp3T> mul_by_X() const {
-                        underlying_type new_c0, new_c1, new_c2;
+                        underlying_element_type new_c0, new_c1, new_c2;
                         new_c0.assign(this->bp, this->data[2] * Fp3T::value_type::non_residue);
 
                         new_c1.assign(this->bp, this->data[0]);
@@ -204,13 +208,13 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp3_mul_component ************************************/
+                /******************************** element_fp3_mul ************************************/
 
                 /**
                  * Component that creates constraints for Fp3 by Fp3 multiplication.
                  */
                 template<typename Fp3T>
-                struct Fp3_mul_component : public component<typename Fp3T::base_field_type> {
+                struct element_fp3_mul : public component<typename Fp3T::base_field_type> {
                     using base_field_type = typename Fp3T::base_field_type;
 
                     element_fp3<Fp3T> A;
@@ -220,7 +224,7 @@ namespace nil {
                     blueprint_variable<base_field_type> v0;
                     blueprint_variable<base_field_type> v4;
 
-                    Fp3_mul_component(blueprint<base_field_type> &bp,
+                    element_fp3_mul(blueprint<base_field_type> &bp,
                                       const element_fp3<Fp3T> &A,
                                       const element_fp3<Fp3T> &B,
                                       const element_fp3<Fp3T> &result) :
@@ -306,20 +310,20 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp3_mul_by_lc_component ************************************/
+                /******************************** element_fp3_mul_by_lc ************************************/
 
                 /**
                  * Component that creates constraints for Fp3 multiplication by a linear combination.
                  */
                 template<typename Fp3T>
-                struct Fp3_mul_by_lc_component : public component<typename Fp3T::underlying_field_type> {
+                struct element_fp3_mul_by_lc : public component<typename Fp3T::underlying_field_type> {
                     using base_field_type = typename Fp3T::underlying_field_type;
 
                     element_fp3<Fp3T> A;
                     blueprint_linear_combination<base_field_type> lc;
                     element_fp3<Fp3T> result;
 
-                    Fp3_mul_by_lc_component(blueprint<base_field_type> &bp,
+                    element_fp3_mul_by_lc(blueprint<base_field_type> &bp,
                                             const element_fp3<Fp3T> &A,
                                             const blueprint_linear_combination<base_field_type> &lc,
                                             const element_fp3<Fp3T> &result) :
@@ -343,26 +347,26 @@ namespace nil {
                     }
                 };
 
-                /******************************** Fp3_sqr_component ************************************/
+                /******************************** element_fp3_squared ************************************/
 
                 /**
                  * Component that creates constraints for Fp3 squaring.
                  */
                 template<typename Fp3T>
-                struct Fp3_sqr_component : public component<typename Fp3T::underlying_field_type> {
+                struct element_fp3_squared : public component<typename Fp3T::underlying_field_type> {
                     using base_field_type = typename Fp3T::underlying_field_type;
 
                     element_fp3<Fp3T> A;
                     element_fp3<Fp3T> result;
 
-                    std::shared_ptr<Fp3_mul_component<Fp3T>> mul;
+                    std::shared_ptr<element_fp3_mul<Fp3T>> mul;
 
-                    Fp3_sqr_component(blueprint<base_field_type> &bp,
+                    element_fp3_squared(blueprint<base_field_type> &bp,
                                       const element_fp3<Fp3T> &A,
                                       const element_fp3<Fp3T> &result) :
                         component<base_field_type>(bp),
                         A(A), result(result) {
-                        mul.reset(new Fp3_mul_component<Fp3T>(bp, A, A, result));
+                        mul.reset(new element_fp3_mul<Fp3T>(bp, A, A, result));
                     }
 
                     void generate_r1cs_constraints() {

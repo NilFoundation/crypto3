@@ -387,14 +387,14 @@ BOOST_AUTO_TEST_CASE(benes_components_mnt4_test) {
     using fq2_type = typename curve_type::g2_type::underlying_field_type;
     using fq4_type = typename curve_type::gt_type;
 
-    test_mul<fq2_type, element_fp2, Fp2_mul_component>();
-    test_sqr<fq2_type, element_fp2, Fp2_sqr_component>();
+    test_mul<fq2_type, element_fp2, element_fp2_mul>();
+    test_sqr<fq2_type, element_fp2, element_fp2_squared>();
 
-    test_mul<fq4_type, element_fp4, Fp4_mul_component>();
-    test_sqr<fq4_type, element_fp4, Fp4_sqr_component>();
+    test_mul<fq4_type, element_fp4, element_fp4_mul>();
+    test_sqr<fq4_type, element_fp4, element_fp4_squared>();
     test_cyclotomic_sqr<curve_type, element_fp4, 
-        Fp4_cyclotomic_sqr_component>();
-    test_exponentiation_component<fq4_type, element_fp4, Fp4_mul_component, Fp4_sqr_component,
+        element_fp4_cyclotomic_squared>();
+    test_exponentiation_component<fq4_type, element_fp4, element_fp4_mul, element_fp4_squared,
                                   algebra::mnt4_q_limbs>(curve_type::pairing::final_exponent_last_chunk_abs_of_w0);
     test_Frobenius<fq4_type, element_fp4>();
 
@@ -429,13 +429,13 @@ BOOST_AUTO_TEST_CASE(benes_components_mnt6_test) {
     using fq3_type = typename curve_type::g2_type::underlying_field_type;
     using fq6_2over3_type = typename curve_type::gt_type;
 
-    test_mul<fq3_type, Fp3_variable, Fp3_mul_component>();
-    test_sqr<fq3_type, Fp3_variable, Fp3_sqr_component>();
+    test_mul<fq3_type, element_fp3, element_fp3_mul>();
+    test_sqr<fq3_type, element_fp3, element_fp3_squared>();
 
-    test_mul<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_mul_component>();
-    test_sqr<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_sqr_component>();
-    test_cyclotomic_sqr<curve_type, components::element_fp6_2over3, Fp6_2over3_cyclotomic_sqr_component>();
-    test_exponentiation_component<fq6_2over3_type, components::element_fp6_2over3, Fp6_2over3_mul_component, Fp6_2over3_sqr_component,
+    test_mul<fq6_2over3_type, components::element_fp6_2over3, element_fp6_2over3_mul>();
+    test_sqr<fq6_2over3_type, components::element_fp6_2over3, element_fp6_2over3_squared>();
+    test_cyclotomic_sqr<curve_type, components::element_fp6_2over3, element_fp6_2over3_cyclotomic_squared>();
+    test_exponentiation_component<fq6_2over3_type, components::element_fp6_2over3, element_fp6_2over3_mul, element_fp6_2over3_squared,
                                   algebra::mnt6_q_limbs>(curve_type::pairing::final_exponent_last_chunk_abs_of_w0);
     test_Frobenius<fq6_2over3_type, components::element_fp6_2over3>();
 

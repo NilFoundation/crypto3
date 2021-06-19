@@ -41,7 +41,7 @@ void test_mnt_miller_loop() {
 
     using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
-    blueprint<typename curve_type::scalar_field_type> bp;
+    components::blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g1_type::value_type::one();
     typename pair_curve_type::g2_type::value_type Q_val =
@@ -93,7 +93,7 @@ void test_mnt_e_over_e_miller_loop() {
 
     using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
-    blueprint<typename curve_type::scalar_field_type> bp;
+    components::blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P1_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g1_type::value_type::one();
     typename pair_curve_type::g2_type::value_type Q1_val =
@@ -166,7 +166,7 @@ void test_mnt_e_times_e_over_e_miller_loop() {
 
     using component_policy = components::detail::basic_pairing_component_policy<CurveType>;
 
-    blueprint<typename curve_type::scalar_field_type> bp;
+    components::blueprint<typename curve_type::scalar_field_type> bp;
     typename pair_curve_type::g1_type::value_type P1_val =
         random_element<typename pair_curve_type::scalar_field_type>() * pair_curve_type::g1_type::value_type::one();
     typename pair_curve_type::g2_type::value_type Q1_val =

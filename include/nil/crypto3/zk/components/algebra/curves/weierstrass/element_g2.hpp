@@ -53,6 +53,9 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g2 : public component<typename CurveType::scalar_field_type> {
+                    
+                    using underlying_field_type = typename CurveType::scalar_field_type;
+
                     using field_type = typename CurveType::pairing::fp_type;
 
                     using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
