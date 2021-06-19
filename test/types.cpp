@@ -56,7 +56,7 @@
 #include <nil/marshalling/msg_factory.hpp>
 #include <nil/marshalling/generic_message.hpp>
 
-#include <nil/marshalling/algorithms/marshal.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
 
 using namespace nil::marshalling;
 

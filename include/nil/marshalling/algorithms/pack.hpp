@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_DESERIALIZE_HPP
-#define MARSHALLING_DESERIALIZE_HPP
+#ifndef MARSHALLING_PACK_HPP
+#define MARSHALLING_PACK_HPP
 
 #include <nil/marshalling/marshalling_state.hpp>
 #include <nil/marshalling/accumulators/marshalling.hpp>
@@ -45,9 +45,10 @@ namespace nil {
          * @brief Algorithms are meant to provide marshalling interface similar to STL algorithms' one.
          */
 
-        /*************************
+        /*
          * Marshalling with both input and output types, which are marshalling types, not a std
-         * iterator of elements with a marshalling type ***********************************/
+         * iterator of elements with a marshalling type
+         */
 
         /*!
          * @brief
@@ -66,7 +67,7 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
-            marshal(MarshallingInputType input_field, status_type expectedStatus = status_type::success) {
+            pack(MarshallingInputType input_field, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -98,8 +99,8 @@ namespace nil {
                                     && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
-            marshal(MarshallingInputType input_field, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(MarshallingInputType input_field, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -111,10 +112,10 @@ namespace nil {
             return result;
         }
 
-        /*************************
+        /*
          * Marshalling with input type, which is not a marshalling type and output type, which
          * is a marshalling type, not a std iterator of elements with a marshalling type
-         * ***********************************/
+         */
 
         /*!
          * @brief
@@ -134,7 +135,7 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
-            marshal(InputIterator first, InputIterator last, status_type expectedStatus = status_type::success) {
+            pack(InputIterator first, InputIterator last, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -168,8 +169,8 @@ namespace nil {
                                     && marshalling::detail::is_iterator<InputIterator>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
-            marshal(InputIterator first, InputIterator last, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(InputIterator first, InputIterator last, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
 
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -199,7 +200,7 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
-            marshal(const SinglePassRange &rng, status_type expectedStatus = status_type::success) {
+            pack(const SinglePassRange &rng, status_type expectedStatus = status_type::success) {
 
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
@@ -232,8 +233,8 @@ namespace nil {
                                     && marshalling::detail::is_range<SinglePassRange>::value
                                     && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type &
-            marshal(const SinglePassRange &rng, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(const SinglePassRange &rng, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
             typedef MarshallingOutputTypeAccumulator accumulator_set_type;
             typedef typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
@@ -242,9 +243,10 @@ namespace nil {
             return boost::accumulators::extract_result<accumulator_type>(acc);
         }
 
-        /*************************
+        /*
          * Marshalling with input type, which is a marshalling type and output type, which is a
-         * std iterators of elements with a marshalling type ***********************************/
+         * std iterators of elements with a marshalling type
+         */
 
         /*!
          * @brief
@@ -264,8 +266,8 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(MarshallingInputType input_field, OutputIterator out,
-                    status_type expectedStatus = status_type::success) {
+            pack(MarshallingInputType input_field, OutputIterator out,
+                 status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
@@ -311,8 +313,8 @@ namespace nil {
                                     && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(MarshallingInputType input_field, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(MarshallingInputType input_field, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
@@ -337,9 +339,10 @@ namespace nil {
             return out;
         }
 
-        /*************************
+        /*
          * Marshalling with both input and output type, which are std iterators of elements
-         * with a marshalling type ***********************************/
+         * with a marshalling type
+         */
 
         /*!
          * @brief
@@ -360,8 +363,8 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(InputIterator first, InputIterator last, OutputIterator out,
-                    status_type expectedStatus = status_type::success) {
+            pack(InputIterator first, InputIterator last, OutputIterator out,
+                 status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
@@ -409,8 +412,8 @@ namespace nil {
                                     && marshalling::detail::is_iterator<InputIterator>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(InputIterator first, InputIterator last, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(InputIterator first, InputIterator last, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
@@ -452,7 +455,7 @@ namespace nil {
         typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(const SinglePassRange &rng, OutputIterator out, status_type expectedStatus = status_type::success) {
+            pack(const SinglePassRange &rng, OutputIterator out, status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
@@ -497,8 +500,8 @@ namespace nil {
                                     && marshalling::detail::is_range<SinglePassRange>::value
                                     && marshalling::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
-            marshal(const SinglePassRange &rng, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
-                    status_type expectedStatus = status_type::success) {
+            pack(const SinglePassRange &rng, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
+                 status_type expectedStatus = status_type::success) {
 
             using type_to_process = typename std::iterator_traits<OutputIterator>::value_type;
 
