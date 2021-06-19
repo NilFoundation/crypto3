@@ -37,6 +37,7 @@
 #include <nil/crypto3/algebra/marshalling.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/detail/pack.hpp>
 
 namespace nil {
@@ -51,8 +52,8 @@ namespace nil {
                 Hash,
                 ResultType,
                 typename std::enable_if<
-                    ::nil::crypto3::detail::is_field<typename ResultType::field_type>::value &&
-                    !::nil::crypto3::detail::is_extended_field<typename ResultType::field_type>::value &&
+                    algebra::is_field<typename ResultType::field_type>::value &&
+                    !algebra::is_extended_field<typename ResultType::field_type>::value &&
                     (ResultType::field_type::value_bits <= Hash::digest_bits)>::type> {
                 typedef Hash hash_type;
                 typedef ResultType result_type;
