@@ -34,8 +34,8 @@
 #include <cstdio>
 
 #include "../../r1cs_examples.hpp"
-#include "sha256_component.hpp"
-#include "sha256_r1cs_gg_ppzksnark.hpp"
+#include "component.hpp"
+#include "component_verify.hpp"
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>

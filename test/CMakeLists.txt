@@ -23,38 +23,47 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
 macro(define_blueprint_test test)
     get_filename_component(name ${test} NAME)
-    cm_test(NAME blueprint_${name}_test SOURCES ${test}.cpp)
+    get_filename_component(path ${test} DIRECTORY)
 
-    target_include_directories(blueprint_${name}_test PRIVATE
+    get_filename_component(dir ${test} NAME)
+
+    set (full_test_name blueprint_${name}_test)
+
+    if (NOT ${path}  STREQUAL "")
+        get_filename_component(dir ${path} NAME)
+        
+        set (full_test_name blueprint_${dir}_${name}_test)
+    endif()
+
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
+
+    target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(blueprint_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 14)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(blueprint_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(${full_test_name} PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
 endmacro()
 
 set(TESTS_NAMES
-    "routing_algorithms/test_routing_algorithms"
+    "routing_algorithms/routing_algorithms"
 
-    "hashes/knapsack/knapsack_component"
-    "hashes/knapsack/knapsack_component_r1cs_scheme"
-    "hashes/sha256/sha256_component"
-    "hashes/sha256/sha256_r1cs_gg_ppzksnark"
-
+    "hashes/knapsack/component"
+    "hashes/knapsack/verification"
+    "hashes/sha256/component"
+    "hashes/sha256/verification"
     "routing/as_waksman"
     "routing/benes"
-
     "pairing/weierstrass_miller_loop"
 #    "pairing/weierstrass_precomputation"
-
     "verifiers/r1cs_ppzksnark"
     "basic_components"
     "basic_components_r1cs_gg_ppzksnark"
