@@ -56,10 +56,10 @@ endmacro()
 set(TESTS_NAMES
     "routing_algorithms/routing_algorithms"
 
-    "hashes/knapsack/component"
-    "hashes/knapsack/verification"
-    "hashes/sha256/component"
-    "hashes/sha256/verification"
+    "hashes/knapsack"
+    "hashes/knapsack_verification"
+    "hashes/sha256"
+    "hashes/sha256_verification"
     "routing/as_waksman"
     "routing/benes"
     "pairing/weierstrass_miller_loop"

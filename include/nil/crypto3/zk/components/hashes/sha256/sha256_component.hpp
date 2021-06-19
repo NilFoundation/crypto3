@@ -196,7 +196,7 @@ namespace nil {
                 class sha256_two_to_one_hash_component : public component<FieldType> {
                 public:
                     typedef std::vector<bool> hash_value_type;
-                    typedef merkle_authentication_path merkle_authentication_path_type;
+                    typedef snark::merkle_authentication_path merkle_authentication_path_type;
 
                     std::shared_ptr<sha256_compression_function_component<FieldType>> f;
 
@@ -272,7 +272,7 @@ namespace nil {
                 class sha256_hash_component: component<FieldType> {
                 public:
                     typedef std::vector<bool> hash_value_type;
-                    typedef merkle_authentication_path merkle_authentication_path_type;
+                    typedef snark::merkle_authentication_path merkle_authentication_path_type;
 
                     std::vector<std::shared_ptr<sha256_compression_function_component<FieldType>>> blocks_components;
                     std::vector<blueprint_variable_vector<FieldType>> blocks_bits;
