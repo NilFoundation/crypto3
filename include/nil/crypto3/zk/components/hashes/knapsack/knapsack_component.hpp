@@ -56,8 +56,8 @@
 // ECCC TR95-042
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP
-#define CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
 
 #include <boost/random/uniform_int_distribution.hpp>
 
@@ -297,4 +297,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_KNAPSACK_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP

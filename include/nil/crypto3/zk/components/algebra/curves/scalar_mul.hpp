@@ -28,8 +28,8 @@
 // is an elliptic curve over F in short Weierstrass form.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
-#define CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G1_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/component.hpp>
 
@@ -165,4 +165,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_WEIERSTRASS_G1_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G1_COMPONENT_HPP

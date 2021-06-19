@@ -26,8 +26,8 @@
 // prover, then verifier) on a synthetic R1CS instance.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
-#define CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#define CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/component.hpp>
@@ -91,4 +91,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP

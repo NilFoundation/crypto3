@@ -28,8 +28,8 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MNT4_BASIC_PAIRING_HPP
-#define CRYPTO3_ZK_MNT4_BASIC_PAIRING_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_PAIRING_HPP
+#define CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_PAIRING_HPP
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/detail/mnt4.hpp>
@@ -94,4 +94,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MNT4_BASIC_PAIRING_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_PAIRING_HPP

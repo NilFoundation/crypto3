@@ -28,8 +28,8 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
-#define CRYPTO3_ZK_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#define CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 
@@ -76,4 +76,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP

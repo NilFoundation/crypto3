@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SHA256_AUX_HPP
-#define CRYPTO3_ZK_SHA256_AUX_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
+#define CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
 
 #include <nil/crypto3/zk/components/basic_components.hpp>
 
@@ -343,4 +343,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SHA256_AUX_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP

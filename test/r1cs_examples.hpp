@@ -26,8 +26,8 @@
 // R1CS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP
-#define CRYPTO3_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP
+#define CRYPTO3_ZK_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
@@ -213,4 +213,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_R1CS_EXAMPLES_TEST_HPP

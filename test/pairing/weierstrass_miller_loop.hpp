@@ -11,8 +11,8 @@
  * @copyright  MIT license (see LICENSE file)
  *****************************************************************************/
 
-#ifndef CRYPTO3_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP
-#define CRYPTO3_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP
+#define CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -252,4 +252,4 @@ void test_mnt_e_times_e_over_e_miller_loop() {
     std::cout << "number of constraints for e times e over e Miller loop " << bp.num_constraints() << std::endl;
 }
 
-#endif    // CRYPTO3_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_TEST_HPP

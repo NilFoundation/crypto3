@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP
-#define CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP
 
 #include <vector>
 
@@ -86,4 +86,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_DIGEST_SELECTOR_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP

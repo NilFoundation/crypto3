@@ -29,8 +29,8 @@
 // - the component "check_e_equals_ee_component" checks the equation "e(P1,Q1)=e(P2,Q2)*e(P3,Q3)".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PAIRING_CHECKS_HPP
-#define CRYPTO3_ZK_PAIRING_CHECKS_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PAIRING_CHECKS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PAIRING_CHECKS_HPP
 
 #include <memory>
 
@@ -148,4 +148,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PAIRING_CHECKS_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PAIRING_CHECKS_HPP

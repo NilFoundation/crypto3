@@ -25,8 +25,8 @@
 // @file Declaration of interfaces for top-level SHA256 components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SHA256_COMPONENT_HPP
-#define CRYPTO3_ZK_SHA256_COMPONENT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_SHA256_COMPONENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_SHA256_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/basic_components.hpp>
@@ -368,4 +368,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SHA256_COMPONENT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_SHA256_COMPONENT_HPP

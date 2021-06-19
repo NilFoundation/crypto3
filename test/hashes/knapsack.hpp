@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
-#define CRYPTO3_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
+#define CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -296,4 +296,4 @@ components::blueprint<typename curves::mnt6<298>::scalar_field_type> test_knapsa
     return test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
 }
 
-#endif    // CRYPTO3_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP

@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BASIC_COMPONENTS_HPP
-#define CRYPTO3_ZK_BASIC_COMPONENTS_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_BASIC_COMPONENTS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_BASIC_COMPONENTS_HPP
 
 #include <cassert>
 #include <memory>
@@ -679,4 +679,4 @@ namespace nil {
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BASIC_COMPONENTS_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_BASIC_COMPONENTS_HPP

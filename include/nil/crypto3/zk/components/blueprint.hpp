@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -155,4 +155,4 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_HPP
