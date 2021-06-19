@@ -36,18 +36,16 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    /******************************** element_fp ************************************/
+                /******************************** element_fp ************************************/
 
-                    /**
-                     * Component that represents an element_fp.
-                     */
-                    template<typename FieldType>
-                    using element_fp = blueprint_linear_combination<FieldType>;
-                }    // namespace components
-            }        // namespace snark
+                /**
+                 * Component that represents an element_fp.
+                 */
+                template<typename FieldType>
+                using element_fp = blueprint_linear_combination<FieldType>;
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

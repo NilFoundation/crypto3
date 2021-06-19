@@ -31,21 +31,19 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    template<typename FieldType>
-                    class component {
-                    protected:
-                        blueprint<FieldType> &bp;
+                template<typename FieldType>
+                class component {
+                protected:
+                    blueprint<FieldType> &bp;
 
-                    public:
-                        component(blueprint<FieldType> &bp) : bp(bp) {
-                        }
-                    };
+                public:
+                    component(blueprint<FieldType> &bp) : bp(bp) {
+                    }
+                };
 
-                }    // namespace components    
-            }    // namespace snark
+            }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

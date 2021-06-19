@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
@@ -43,17 +43,17 @@ void print_fp_curve_group_element(FpCurveGroupElement e) {
 }
 
 template<typename CurveType>
-void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
+void verify_component(components::blueprint<typename CurveType::scalar_field_type> bp){
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
 
-    const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
+    const snark::r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-    const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
 
-    const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
 
-    bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
+    bool verified = snark::verify<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
 
     std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
     std::cout << "Verification status: " << verified << std::endl;
@@ -62,7 +62,7 @@ void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
 }
 
 template <typename CurveType>
-blueprint<typename CurveType::scalar_field_type> addition_example(
+components::blueprint<typename CurveType::scalar_field_type> addition_example(
     typename CurveType::pairing::chained_curve_type::g1_type::value_type p1,
     typename CurveType::pairing::chained_curve_type::g1_type::value_type p2){
 
@@ -70,12 +70,12 @@ blueprint<typename CurveType::scalar_field_type> addition_example(
     using chained_curve_type = typename CurveType::pairing::chained_curve_type;
     using scalar_field_type = typename CurveType::scalar_field_type;
 
-    // Create blueprint
+    // Create components::blueprint
 
-    blueprint<scalar_field_type> bp;
+    components::blueprint<scalar_field_type> bp;
 
-    blueprint_variable<scalar_field_type> a;
-    blueprint_variable<scalar_field_type> d;
+    components::blueprint_variable<scalar_field_type> a;
+    components::blueprint_variable<scalar_field_type> d;
 
     a.allocate(bp);
     d.allocate(bp);
@@ -133,7 +133,7 @@ int main(){
     typename chained_curve_type::g1_type::value_type p2 = 
         random_element<typename chained_curve_type::g1_type>();
 
-    blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);
+    components::blueprint<scalar_field_type> bp = addition_example<main_curve_type>(p1, p2);
 
     assert(bp.is_satisfied());
 

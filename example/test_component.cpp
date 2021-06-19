@@ -20,7 +20,7 @@
 
 #include "test_component.hpp"
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 int main(){
@@ -30,9 +30,9 @@ int main(){
         
     // Create blueprint
 
-    blueprint<field_type> bp;
-    blueprint_variable<field_type> out;
-    blueprint_variable<field_type> x;
+    components::blueprint<field_type> bp;
+    components::blueprint_variable<field_type> out;
+    components::blueprint_variable<field_type> x;
 
     // Allocate variables
 
@@ -59,18 +59,18 @@ int main(){
     
     assert(bp.is_satisfied());
 
-    const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
+    const snark::r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-    const typename r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = generate<r1cs_gg_ppzksnark<curve_type>>(constraint_system);
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
 
-    const typename r1cs_gg_ppzksnark<curve_type>::proof_type proof = prove<r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
 
-    bool verified = verify<r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
+    bool verified = snark::verify<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
 
     std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
     std::cout << "Verification status: " << verified << std::endl;
 
-    const typename r1cs_gg_ppzksnark<curve_type>::verification_key_type vk = keypair.second;
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::verification_key_type vk = keypair.second;
 
     return 0;
 }

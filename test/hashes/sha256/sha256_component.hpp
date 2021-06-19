@@ -35,7 +35,7 @@
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 
 template<typename FieldType>
 blueprint<FieldType> sha2_two_to_one_bp() {

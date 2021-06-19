@@ -439,7 +439,7 @@ namespace nil {
                         blueprint_variable_vector<FieldType> input;
                         std::size_t elt_size;
                         r1cs_ppzksnark_proof_variable<CurveType> proof;
-                        variable<FieldType> result;
+                        blueprint_variable<FieldType> result;
                         const std::size_t input_len;
 
                         std::shared_ptr<element_g1<CurveType>> acc;
@@ -480,11 +480,11 @@ namespace nil {
                         std::shared_ptr<check_e_equals_ee_component<CurveType>> check_QAP_valid;
                         std::shared_ptr<check_e_equals_ee_component<CurveType>> check_CC_valid;
 
-                        variable<FieldType> kc_A_valid;
-                        variable<FieldType> kc_B_valid;
-                        variable<FieldType> kc_C_valid;
-                        variable<FieldType> QAP_valid;
-                        variable<FieldType> CC_valid;
+                        blueprint_variable<FieldType> kc_A_valid;
+                        blueprint_variable<FieldType> kc_B_valid;
+                        blueprint_variable<FieldType> kc_C_valid;
+                        blueprint_variable<FieldType> QAP_valid;
+                        blueprint_variable<FieldType> CC_valid;
 
                         blueprint_variable_vector<FieldType> all_test_results;
                         std::shared_ptr<conjunction_component<FieldType>> all_tests_pass;
@@ -495,7 +495,7 @@ namespace nil {
                             const blueprint_variable_vector<FieldType> &input,
                             const std::size_t elt_size,
                             const r1cs_ppzksnark_proof_variable<CurveType> &proof,
-                            const variable<FieldType> &result) :
+                            const blueprint_variable<FieldType> &result) :
                             component<FieldType>(bp),
                             pvk(pvk), input(input), elt_size(elt_size), proof(proof), result(result),
                             input_len(input.size()) {
@@ -686,7 +686,7 @@ namespace nil {
                                                           const blueprint_variable_vector<FieldType> &input,
                                                           const std::size_t elt_size,
                                                           const r1cs_ppzksnark_proof_variable<CurveType> &proof,
-                                                          const variable<FieldType> &result) :
+                                                          const blueprint_variable<FieldType> &result) :
                             component<FieldType>(bp) {
                             pvk.reset(
                                 new r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>());

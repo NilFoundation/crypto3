@@ -34,22 +34,22 @@
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 class test_component : public components::component<FieldType> {
     using field_type = FieldType;
-    blueprint_variable<field_type> sym_1;
-    blueprint_variable<field_type> y;
-    blueprint_variable<field_type> sym_2;
+    components::blueprint_variable<field_type> sym_1;
+    components::blueprint_variable<field_type> y;
+    components::blueprint_variable<field_type> sym_2;
 public:
-    const blueprint_variable<field_type> out;
-    const blueprint_variable<field_type> x;
+    const components::blueprint_variable<field_type> out;
+    const components::blueprint_variable<field_type> x;
 
     test_component(blueprint<field_type> &bp,
-                const blueprint_variable<field_type> &out,
-                const blueprint_variable<field_type> &x) : 
+                const components::blueprint_variable<field_type> &out,
+                const components::blueprint_variable<field_type> &x) : 
       components::component<field_type>(bp), out(out), x(x) {
 
       // Allocate variables to blueprint
@@ -61,16 +61,16 @@ public:
 
     void generate_r1cs_constraints() {
       // x*x = sym_1
-      this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(x, x, sym_1));
+      this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(x, x, sym_1));
 
       // sym_1 * x = y
-      this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(sym_1, x, y));
+      this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(sym_1, x, y));
 
       // y + x = sym_2
-      this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(y + x, 1, sym_2));
+      this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(y + x, 1, sym_2));
 
       // sym_2 + 5 = ~out
-      this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(sym_2 + 5, 1, out));
+      this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(sym_2 + 5, 1, out));
     }
 
     void generate_r1cs_witness() {

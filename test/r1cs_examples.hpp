@@ -45,20 +45,20 @@ namespace nil {
                  */
                 template<typename FieldType>
                 struct r1cs_example {
-                    r1cs_constraint_system<FieldType> constraint_system;
-                    r1cs_primary_input<FieldType> primary_input;
-                    r1cs_auxiliary_input<FieldType> auxiliary_input;
+                    snark::r1cs_constraint_system<FieldType> constraint_system;
+                    snark::r1cs_primary_input<FieldType> primary_input;
+                    snark::r1cs_auxiliary_input<FieldType> auxiliary_input;
 
                     r1cs_example<FieldType>() = default;
                     r1cs_example<FieldType>(const r1cs_example<FieldType> &other) = default;
-                    r1cs_example<FieldType>(const r1cs_constraint_system<FieldType> &constraint_system,
-                                            const r1cs_primary_input<FieldType> &primary_input,
-                                            const r1cs_auxiliary_input<FieldType> &auxiliary_input) :
+                    r1cs_example<FieldType>(const snark::r1cs_constraint_system<FieldType> &constraint_system,
+                                            const snark::r1cs_primary_input<FieldType> &primary_input,
+                                            const snark::r1cs_auxiliary_input<FieldType> &auxiliary_input) :
                         constraint_system(constraint_system),
                         primary_input(primary_input), auxiliary_input(auxiliary_input) {};
-                    r1cs_example<FieldType>(r1cs_constraint_system<FieldType> &&constraint_system,
-                                            r1cs_primary_input<FieldType> &&primary_input,
-                                            r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
+                    r1cs_example<FieldType>(snark::r1cs_constraint_system<FieldType> &&constraint_system,
+                                            snark::r1cs_primary_input<FieldType> &&primary_input,
+                                            snark::r1cs_auxiliary_input<FieldType> &&auxiliary_input) :
                         constraint_system(std::move(constraint_system)),
                         primary_input(std::move(primary_input)), auxiliary_input(std::move(auxiliary_input)) {};
                 };
@@ -77,11 +77,11 @@ namespace nil {
 
                     BOOST_CHECK(num_inputs <= num_constraints + 2);
 
-                    r1cs_constraint_system<FieldType> cs;
+                    snark::r1cs_constraint_system<FieldType> cs;
                     cs.primary_input_size = num_inputs;
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
-                    r1cs_variable_assignment<FieldType> full_variable_assignment;
+                    snark::r1cs_variable_assignment<FieldType> full_variable_assignment;
                     typename FieldType::value_type a = algebra::random_element<FieldType>();
                     typename FieldType::value_type b = algebra::random_element<FieldType>();
                     full_variable_assignment.push_back(a);
@@ -111,7 +111,7 @@ namespace nil {
                             b = tmp;
                         }
 
-                        cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
+                        cs.add_constraint(snark::r1cs_constraint<FieldType>(A, B, C));
                     }
 
                     linear_combination<FieldType> A, B, C;
@@ -122,13 +122,13 @@ namespace nil {
                         fin = fin + full_variable_assignment[i - 1];
                     }
                     C.add_term(cs.num_variables(), 1);
-                    cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
+                    cs.add_constraint(snark::r1cs_constraint<FieldType>(A, B, C));
                     full_variable_assignment.push_back(fin.squared());
 
                     /* split variable assignment */
-                    r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
+                    snark::r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
                                                                 full_variable_assignment.begin() + num_inputs);
-                    r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
+                    snark::r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
                                                                   full_variable_assignment.end());
 
                     /* sanity checks */
@@ -155,11 +155,11 @@ namespace nil {
                                                                                 std::size_t num_inputs) {
                     BOOST_CHECK(num_inputs >= 1);
 
-                    r1cs_constraint_system<FieldType> cs;
+                    snark::r1cs_constraint_system<FieldType> cs;
                     cs.primary_input_size = num_inputs;
                     cs.auxiliary_input_size = num_constraints; /* we will add one auxiliary variable per constraint */
 
-                    r1cs_variable_assignment<FieldType> full_variable_assignment;
+                    snark::r1cs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_inputs; ++i) {
                         full_variable_assignment.push_back(typename FieldType::value_type(std::rand() % 2));
                     }
@@ -185,16 +185,16 @@ namespace nil {
                         }
                         C.add_term(lastvar + 1, -FieldType::value_type::one());
 
-                        cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
+                        cs.add_constraint(snark::r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -
                                                            full_variable_assignment[u] * full_variable_assignment[v] -
                                                            full_variable_assignment[u] * full_variable_assignment[v]);
                     }
 
                     /* split variable assignment */
-                    r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
+                    snark::r1cs_primary_input<FieldType> primary_input(full_variable_assignment.begin(),
                                                                 full_variable_assignment.begin() + num_inputs);
-                    r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
+                    snark::r1cs_primary_input<FieldType> auxiliary_input(full_variable_assignment.begin() + num_inputs,
                                                                   full_variable_assignment.end());
 
                     /* sanity checks */

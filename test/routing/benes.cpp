@@ -35,7 +35,7 @@
 #include <nil/crypto3/zk/snark/components/routing/benes_components.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
@@ -43,7 +43,7 @@ void test_benes_routing_component(const std::size_t num_packets, const std::size
     const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
     assert(num_packets == 1ul << dimension);
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     integer_permutation permutation(num_packets);
     permutation.random_shuffle();
 
@@ -70,7 +70,7 @@ void test_benes_routing_component(const std::size_t num_packets, const std::size
         }
     }
 
-    bp.val(variable<FieldType>(10)) = typename FieldType::value_type(12345);
+    bp.val(blueprint_variable<FieldType>(10)) = typename FieldType::value_type(12345);
     assert(!bp.is_satisfied());
 }
 

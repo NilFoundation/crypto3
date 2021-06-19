@@ -34,7 +34,7 @@
 #include <nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldT, typename HashT>
@@ -55,8 +55,8 @@ void test_set_commitment_component(){
         BOOST_CHECK(accumulator.is_in_set(elem));
     }
 
-    blueprint<FieldT> bp;
-    bp_variable_array<FieldT> element_bits;
+    components::blueprint<FieldT> bp;
+    components::blueprint_variable_array<FieldT> element_bits;
     element_bits.allocate(bp, value_size);
     set_commitment_variable<FieldT, HashT> root_digest(bp, digest_len);
 
@@ -100,9 +100,15 @@ void test_set_commitment_component(){
 
 template<typename CurveType>
 void test_all_set_commitment_components() {
-    typedef typename CurveType::scalar_field_type FieldType;
-    test_set_commitment_component<FieldType, crh_with_bit_out_component<FieldType>>();
-    test_set_commitment_component<FieldType, sha256_two_to_one_hash_component<FieldType>>();
+    typedef typename CurveType::scalar_field_type scalar_field_type;
+
+    // for now all CRH components are knapsack CRH's; can be easily extended
+    // later to more expressive selector types.
+    using crh_with_field_out_component = knapsack_crh_with_field_out_component<scalar_field_type>;
+    using crh_with_bit_out_component = knapsack_crh_with_bit_out_component<scalar_field_type>;
+
+    test_set_commitment_component<scalar_field_type, crh_with_bit_out_component>();
+    test_set_commitment_component<scalar_field_type, sha256_two_to_one_hash_component<scalar_field_type>>();
 }
 
 int main(void) {

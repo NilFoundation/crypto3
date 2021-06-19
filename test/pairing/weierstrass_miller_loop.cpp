@@ -32,7 +32,7 @@
 
 #include "weierstrass_miller_loop.hpp"
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(weierstrass_miller_loop_components_test_suite)

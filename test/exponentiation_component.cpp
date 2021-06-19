@@ -46,7 +46,7 @@
 #include <nil/crypto3/zk/components/algebra/fields/element_fp4.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/element_fp6_2over3.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FpkT, template<class> class Fpk_variableT, template<class> class Fpk_mul_componentT,
@@ -54,7 +54,7 @@ template<typename FpkT, template<class> class Fpk_variableT, template<class> cla
 void test_exponentiation_component(const typename FpkT::modulus_type &power) {
     typedef typename FpkT::base_field_type FieldType;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     Fpk_variableT<FpkT> x(bp);
     Fpk_variableT<FpkT> x_to_power(bp);
     components::exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,

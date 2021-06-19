@@ -122,14 +122,14 @@ namespace nil {
                         const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value);
 
                     r1cs_pcd_compliance_predicate<FieldType> get_compliance_predicate() const;
-                    r1cs_variable_assignment<FieldType> get_full_variable_assignment() const;
+                    snark::r1cs_variable_assignment<FieldType> get_full_variable_assignment() const;
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_outgoing_message() const;
                     std::size_t get_arity() const;
                     std::shared_ptr<r1cs_pcd_message<FieldType>>
                         get_incoming_message(const std::size_t message_idx) const;
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> get_local_data() const;
-                    r1cs_variable_assignment<FieldType> get_witness() const;
+                    snark::r1cs_variable_assignment<FieldType> get_witness() const;
                 };
 
                 template<typename FieldType>
@@ -233,7 +233,7 @@ namespace nil {
                          local_data_length);
                     const std::size_t witness_length = bp.num_variables() - all_but_witness_length;
 
-                    r1cs_constraint_system<FieldType> constraint_system = bp.get_constraint_system();
+                    snark::r1cs_constraint_system<FieldType> constraint_system = bp.get_constraint_system();
                     constraint_system.primary_input_size = 1 + outgoing_message_payload_length;
                     constraint_system.auxiliary_input_size = bp.num_variables() - constraint_system.primary_input_size;
 
@@ -250,7 +250,7 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename BlueprintType>
-                r1cs_variable_assignment<FieldType>
+                snark::r1cs_variable_assignment<FieldType>
                     compliance_predicate_handler<FieldType, BlueprintType>::get_full_variable_assignment() const {
                     return bp.full_variable_assignment();
                 }
@@ -283,7 +283,7 @@ namespace nil {
                 template<typename FieldType, typename BlueprintType>
                 r1cs_pcd_witness<FieldType>
                     compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
-                    const r1cs_variable_assignment<FieldType> va = bp.full_variable_assignment();
+                    const snark::r1cs_variable_assignment<FieldType> va = bp.full_variable_assignment();
                     // outgoing_message + arity + incoming_messages + local_data
                     const std::size_t witness_pos =
                         (outgoing_message->all_vars.size() + 1 +
@@ -294,7 +294,7 @@ namespace nil {
                              }) +
                          local_data->all_vars.size());
 
-                    return r1cs_variable_assignment<FieldType>(va.begin() + witness_pos, va.end());
+                    return snark::r1cs_variable_assignment<FieldType>(va.begin() + witness_pos, va.end());
                 }
             }    // namespace snark
         }        // namespace zk

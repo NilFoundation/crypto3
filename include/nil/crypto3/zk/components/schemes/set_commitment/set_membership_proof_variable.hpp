@@ -88,7 +88,7 @@ namespace nil {
                             return result;
                         }
 
-                        static r1cs_variable_assignment<FieldType>
+                        static snark::r1cs_variable_assignment<FieldType>
                             as_r1cs_variable_assignment(const set_membership_proof &proof) {
 
                             blueprint<FieldType> bp;

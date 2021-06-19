@@ -54,7 +54,7 @@
 #include "verify_r1cs_scheme.hpp"
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
@@ -66,13 +66,13 @@ void test_disjunction_component(std::size_t w) {
     std::size_t n = std::log2(w) + 
         ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
 
-    blueprint<field_type> bp;
-    blueprint_variable<field_type> output;
+    components::blueprint<field_type> bp;
+    components::blueprint_variable<field_type> output;
     output.allocate(bp);
 
     bp.set_input_sizes(1);
 
-    blueprint_variable_vector<field_type> inputs;
+    components::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
     components::disjunction_component<field_type> d(bp, inputs, output);
@@ -99,14 +99,14 @@ void test_conjunction_component(std::size_t w) {
     std::size_t n = std::log2(w) + 
         ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
 
-    blueprint<field_type> bp;
+    components::blueprint<field_type> bp;
 
-    blueprint_variable<field_type> output;
+    components::blueprint_variable<field_type> output;
     output.allocate(bp);
 
     bp.set_input_sizes(1);
 
-    blueprint_variable_vector<field_type> inputs;
+    components::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
     components::conjunction_component<field_type> c(bp, inputs, output);
@@ -131,9 +131,9 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
 
-    blueprint<field_type> bp;
+    components::blueprint<field_type> bp;
 
-    blueprint_variable<field_type> A, B, less, less_or_eq;
+    components::blueprint_variable<field_type> A, B, less, less_or_eq;
     A.allocate(bp);
     B.allocate(bp);
     less.allocate(bp);

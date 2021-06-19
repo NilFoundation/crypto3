@@ -43,292 +43,290 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    /**
-                     * Component for final exponentiation with embedding degree 4.
-                     */
-                    template<typename CurveType>
-                    struct final_exp_component;
+                /**
+                 * Component for final exponentiation with embedding degree 4.
+                 */
+                template<typename CurveType>
+                struct final_exp_component;
 
-                    template<std::size_t Version>
-                    class final_exp_component<curves::mnt4<Version>>
-                        : public component<typename curves::mnt4<Version>::scalar_field_type> {
+                template<std::size_t Version>
+                class final_exp_component<curves::mnt4<Version>>
+                    : public component<typename curves::mnt4<Version>::scalar_field_type> {
 
-                        using curve_type = curves::mnt4<Version>;
+                    using curve_type = curves::mnt4<Version>;
 
-                        using Fqk_variable_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_variable_type;
-                        using Fqk_mul_component_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_mul_component_type;
+                    using Fqk_variable_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_variable_type;
+                    using Fqk_mul_component_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_mul_component_type;
 
-                    public:
-                        typedef typename curve_type::scalar_field_type field_type;
+                public:
+                    typedef typename curve_type::scalar_field_type field_type;
 
-                        Fqk_variable_type el;
-                        std::shared_ptr<Fqk_variable_type> one;
-                        std::shared_ptr<Fqk_variable_type> el_inv;
-                        std::shared_ptr<Fqk_variable_type> el_q_3;
-                        std::shared_ptr<Fqk_variable_type> el_q_3_minus_1;
-                        std::shared_ptr<Fqk_variable_type> alpha;
-                        std::shared_ptr<Fqk_variable_type> beta;
-                        std::shared_ptr<Fqk_variable_type> beta_q;
-                        std::shared_ptr<Fqk_variable_type> el_inv_q_3;
-                        std::shared_ptr<Fqk_variable_type> el_inv_q_3_minus_1;
-                        std::shared_ptr<Fqk_variable_type> inv_alpha;
-                        std::shared_ptr<Fqk_variable_type> inv_beta;
-                        std::shared_ptr<Fqk_variable_type> w1;
-                        std::shared_ptr<Fqk_variable_type> w0;
-                        std::shared_ptr<Fqk_variable_type> result;
+                    Fqk_variable_type el;
+                    std::shared_ptr<Fqk_variable_type> one;
+                    std::shared_ptr<Fqk_variable_type> el_inv;
+                    std::shared_ptr<Fqk_variable_type> el_q_3;
+                    std::shared_ptr<Fqk_variable_type> el_q_3_minus_1;
+                    std::shared_ptr<Fqk_variable_type> alpha;
+                    std::shared_ptr<Fqk_variable_type> beta;
+                    std::shared_ptr<Fqk_variable_type> beta_q;
+                    std::shared_ptr<Fqk_variable_type> el_inv_q_3;
+                    std::shared_ptr<Fqk_variable_type> el_inv_q_3_minus_1;
+                    std::shared_ptr<Fqk_variable_type> inv_alpha;
+                    std::shared_ptr<Fqk_variable_type> inv_beta;
+                    std::shared_ptr<Fqk_variable_type> w1;
+                    std::shared_ptr<Fqk_variable_type> w0;
+                    std::shared_ptr<Fqk_variable_type> result;
 
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_inv;
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_q_3_minus_1;
-                        std::shared_ptr<Fqk_mul_component_type> compute_beta;
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_inv_q_3_minus_1;
-                        std::shared_ptr<Fqk_mul_component_type> compute_inv_beta;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_inv;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_q_3_minus_1;
+                    std::shared_ptr<Fqk_mul_component_type> compute_beta;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_inv_q_3_minus_1;
+                    std::shared_ptr<Fqk_mul_component_type> compute_inv_beta;
 
-                        using exponentiation_component_type = exponentiation_component<
-                                        typename curve_type::pairing::fqk_type,
-                                        element_fp6_2over3,
-                                        Fp6_2over3_mul_component,
-                                        Fp6_2over3_cyclotomic_sqr_component>;
+                    using exponentiation_component_type = exponentiation_component<
+                                    typename curve_type::pairing::fqk_type,
+                                    element_fp6_2over3,
+                                    Fp6_2over3_mul_component,
+                                    Fp6_2over3_cyclotomic_sqr_component>;
 
-                        std::shared_ptr<exponentiation_component_type> compute_w1;
-                        std::shared_ptr<exponentiation_component<
-                                        typename curve_type::pairing::fqk_type,
-                                        element_fp6_2over3,
-                                        Fp6_2over3_mul_component,
-                                        Fp6_2over3_cyclotomic_sqr_component> > compute_w0;
-                        std::shared_ptr<Fqk_mul_component_type> compute_result;
+                    std::shared_ptr<exponentiation_component_type> compute_w1;
+                    std::shared_ptr<exponentiation_component<
+                                    typename curve_type::pairing::fqk_type,
+                                    element_fp6_2over3,
+                                    Fp6_2over3_mul_component,
+                                    Fp6_2over3_cyclotomic_sqr_component> > compute_w0;
+                    std::shared_ptr<Fqk_mul_component_type> compute_result;
 
-                        variable<field_type> result_is_one;
+                    blueprint_variable<field_type> result_is_one;
 
-                        final_exp_component(blueprint<field_type> &bp,
-                                                 const Fqk_variable_type &el,
-                                                 const variable<field_type> &result_is_one) :
-                            component<field_type>(bp),
-                            el(el), result_is_one(result_is_one) {
-                            one.reset(new Fqk_variable_type(bp));
-                            el_inv.reset(new Fqk_variable_type(bp));
-                            el_q_3.reset(new Fqk_variable_type(el.Frobenius_map(3)));
-                            el_q_3_minus_1.reset(new Fqk_variable_type(bp));
-                            alpha.reset(new Fqk_variable_type(el_q_3_minus_1->Frobenius_map(1)));
-                            beta.reset(new Fqk_variable_type(bp));
-                            beta_q.reset(new Fqk_variable_type(beta->Frobenius_map(1)));
+                    final_exp_component(blueprint<field_type> &bp,
+                                             const Fqk_variable_type &el,
+                                             const blueprint_variable<field_type> &result_is_one) :
+                        component<field_type>(bp),
+                        el(el), result_is_one(result_is_one) {
+                        one.reset(new Fqk_variable_type(bp));
+                        el_inv.reset(new Fqk_variable_type(bp));
+                        el_q_3.reset(new Fqk_variable_type(el.Frobenius_map(3)));
+                        el_q_3_minus_1.reset(new Fqk_variable_type(bp));
+                        alpha.reset(new Fqk_variable_type(el_q_3_minus_1->Frobenius_map(1)));
+                        beta.reset(new Fqk_variable_type(bp));
+                        beta_q.reset(new Fqk_variable_type(beta->Frobenius_map(1)));
 
-                            el_inv_q_3.reset(new Fqk_variable_type(el_inv->Frobenius_map(3)));
-                            el_inv_q_3_minus_1.reset(new Fqk_variable_type(bp));
-                            inv_alpha.reset(new Fqk_variable_type(el_inv_q_3_minus_1->Frobenius_map(1)));
-                            inv_beta.reset(new Fqk_variable_type(bp));
-                            w1.reset(new Fqk_variable_type(bp));
-                            w0.reset(new Fqk_variable_type(bp));
-                            result.reset(new Fqk_variable_type(bp));
+                        el_inv_q_3.reset(new Fqk_variable_type(el_inv->Frobenius_map(3)));
+                        el_inv_q_3_minus_1.reset(new Fqk_variable_type(bp));
+                        inv_alpha.reset(new Fqk_variable_type(el_inv_q_3_minus_1->Frobenius_map(1)));
+                        inv_beta.reset(new Fqk_variable_type(bp));
+                        w1.reset(new Fqk_variable_type(bp));
+                        w0.reset(new Fqk_variable_type(bp));
+                        result.reset(new Fqk_variable_type(bp));
 
-                            compute_el_inv.reset(new Fqk_mul_component_type(bp, el, *el_inv, *one));
-                            compute_el_q_3_minus_1.reset(
-                                new Fqk_mul_component_type(bp, *el_q_3, *el_inv, *el_q_3_minus_1));
-                            compute_beta.reset(new Fqk_mul_component_type(bp, *alpha, *el_q_3_minus_1, *beta));
+                        compute_el_inv.reset(new Fqk_mul_component_type(bp, el, *el_inv, *one));
+                        compute_el_q_3_minus_1.reset(
+                            new Fqk_mul_component_type(bp, *el_q_3, *el_inv, *el_q_3_minus_1));
+                        compute_beta.reset(new Fqk_mul_component_type(bp, *alpha, *el_q_3_minus_1, *beta));
 
-                            compute_el_inv_q_3_minus_1.reset(
-                                new Fqk_mul_component_type(bp, *el_inv_q_3, el, *el_inv_q_3_minus_1));
-                            compute_inv_beta.reset(
-                                new Fqk_mul_component_type(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
+                        compute_el_inv_q_3_minus_1.reset(
+                            new Fqk_mul_component_type(bp, *el_inv_q_3, el, *el_inv_q_3_minus_1));
+                        compute_inv_beta.reset(
+                            new Fqk_mul_component_type(bp, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
-                            compute_w1.reset(new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                             element_fp6_2over3,
-                                             Fp6_2over3_mul_component,
-                                             Fp6_2over3_cyclotomic_sqr_component>
-                                                 (bp, *beta_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
+                        compute_w1.reset(new exponentiation_component<typename curve_type::pairing::fqk_type,
+                                         element_fp6_2over3,
+                                         Fp6_2over3_mul_component,
+                                         Fp6_2over3_cyclotomic_sqr_component>
+                                             (bp, *beta_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
 
-                            compute_w0.reset(
-                                new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                element_fp6_2over3,
-                                Fp6_2over3_mul_component,
-                                Fp6_2over3_cyclotomic_sqr_component>
-                                    (bp,
-                                     (curve_type::pairing::final_exponent_last_chunk_is_w0_neg ? *inv_beta : *beta),
-                                     curve_type::pairing::final_exponent_last_chunk_abs_of_w0,
-                                     *w0));
+                        compute_w0.reset(
+                            new exponentiation_component<typename curve_type::pairing::fqk_type,
+                            element_fp6_2over3,
+                            Fp6_2over3_mul_component,
+                            Fp6_2over3_cyclotomic_sqr_component>
+                                (bp,
+                                 (curve_type::pairing::final_exponent_last_chunk_is_w0_neg ? *inv_beta : *beta),
+                                 curve_type::pairing::final_exponent_last_chunk_abs_of_w0,
+                                 *w0));
 
-                            compute_result.reset(new Fqk_mul_component_type(bp, *w1, *w0, *result));
-                        }
+                        compute_result.reset(new Fqk_mul_component_type(bp, *w1, *w0, *result));
+                    }
 
-                        void generate_r1cs_constraints() {
-                            one->generate_r1cs_equals_const_constraints(
-                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
+                    void generate_r1cs_constraints() {
+                        one->generate_r1cs_equals_const_constraints(
+                            curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
 
-                            compute_el_inv->generate_r1cs_constraints();
-                            compute_el_q_3_minus_1->generate_r1cs_constraints();
-                            compute_beta->generate_r1cs_constraints();
+                        compute_el_inv->generate_r1cs_constraints();
+                        compute_el_q_3_minus_1->generate_r1cs_constraints();
+                        compute_beta->generate_r1cs_constraints();
 
-                            compute_el_inv_q_3_minus_1->generate_r1cs_constraints();
-                            compute_inv_beta->generate_r1cs_constraints();
+                        compute_el_inv_q_3_minus_1->generate_r1cs_constraints();
+                        compute_inv_beta->generate_r1cs_constraints();
 
-                            compute_w0->generate_r1cs_constraints();
-                            compute_w1->generate_r1cs_constraints();
-                            compute_result->generate_r1cs_constraints();
+                        compute_w0->generate_r1cs_constraints();
+                        compute_w1->generate_r1cs_constraints();
+                        compute_result->generate_r1cs_constraints();
 
-                            generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
-                            this->bp.add_r1cs_constraint(
-                                r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c2, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c2, 0));
-                        }
+                        generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c0.c2, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c1.c2, 0));
+                    }
 
-                        void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(
-                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
-                            el_inv->generate_r1cs_witness(el.get_element().inversed());
+                    void generate_r1cs_witness() {
+                        one->generate_r1cs_witness(
+                            curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
+                        el_inv->generate_r1cs_witness(el.get_element().inversed());
 
-                            compute_el_inv->generate_r1cs_witness();
-                            el_q_3->evaluate();
-                            compute_el_q_3_minus_1->generate_r1cs_witness();
-                            alpha->evaluate();
-                            compute_beta->generate_r1cs_witness();
-                            beta_q->evaluate();
+                        compute_el_inv->generate_r1cs_witness();
+                        el_q_3->evaluate();
+                        compute_el_q_3_minus_1->generate_r1cs_witness();
+                        alpha->evaluate();
+                        compute_beta->generate_r1cs_witness();
+                        beta_q->evaluate();
 
-                            el_inv_q_3->evaluate();
-                            compute_el_inv_q_3_minus_1->generate_r1cs_witness();
-                            inv_alpha->evaluate();
-                            compute_inv_beta->generate_r1cs_witness();
+                        el_inv_q_3->evaluate();
+                        compute_el_inv_q_3_minus_1->generate_r1cs_witness();
+                        inv_alpha->evaluate();
+                        compute_inv_beta->generate_r1cs_witness();
 
-                            compute_w0->generate_r1cs_witness();
-                            compute_w1->generate_r1cs_witness();
-                            compute_result->generate_r1cs_witness();
+                        compute_w0->generate_r1cs_witness();
+                        compute_w1->generate_r1cs_witness();
+                        compute_result->generate_r1cs_witness();
 
-                            this->bp.val(result_is_one) =
-                                (result->get_element() == one->get_element() ? field_type::value_type::one() :
-                                                                               field_type::value_type::zero());
-                        }
-                    };
+                        this->bp.val(result_is_one) =
+                            (result->get_element() == one->get_element() ? field_type::value_type::one() :
+                                                                           field_type::value_type::zero());
+                    }
+                };
 
-                    /**
-                     * Component for final exponentiation with embedding degree 6.
-                     */
-                    template<std::size_t Version>
-                    class final_exp_component<curves::mnt6<Version>>
-                        : public component<typename curves::mnt6<Version>::scalar_field_type> {
+                /**
+                 * Component for final exponentiation with embedding degree 6.
+                 */
+                template<std::size_t Version>
+                class final_exp_component<curves::mnt6<Version>>
+                    : public component<typename curves::mnt6<Version>::scalar_field_type> {
 
-                        using curve_type = curves::mnt6<Version>;
+                    using curve_type = curves::mnt6<Version>;
 
-                        using Fqk_variable_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_variable_type;
-                        using Fqk_mul_component_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_mul_component_type;
+                    using Fqk_variable_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_variable_type;
+                    using Fqk_mul_component_type = typename detail::basic_pairing_component_policy<curve_type>::Fqk_mul_component_type;
 
-                    public:
-                        typedef typename curve_type::scalar_field_type field_type;
+                public:
+                    typedef typename curve_type::scalar_field_type field_type;
 
-                        Fqk_variable_type el;
-                        std::shared_ptr<Fqk_variable_type> one;
-                        std::shared_ptr<Fqk_variable_type> el_inv;
-                        std::shared_ptr<Fqk_variable_type> el_q_2;
-                        std::shared_ptr<Fqk_variable_type> el_q_2_minus_1;
-                        std::shared_ptr<Fqk_variable_type> el_q_3_minus_q;
-                        std::shared_ptr<Fqk_variable_type> el_inv_q_2;
-                        std::shared_ptr<Fqk_variable_type> el_inv_q_2_minus_1;
-                        std::shared_ptr<Fqk_variable_type> w1;
-                        std::shared_ptr<Fqk_variable_type> w0;
-                        std::shared_ptr<Fqk_variable_type> result;
+                    Fqk_variable_type el;
+                    std::shared_ptr<Fqk_variable_type> one;
+                    std::shared_ptr<Fqk_variable_type> el_inv;
+                    std::shared_ptr<Fqk_variable_type> el_q_2;
+                    std::shared_ptr<Fqk_variable_type> el_q_2_minus_1;
+                    std::shared_ptr<Fqk_variable_type> el_q_3_minus_q;
+                    std::shared_ptr<Fqk_variable_type> el_inv_q_2;
+                    std::shared_ptr<Fqk_variable_type> el_inv_q_2_minus_1;
+                    std::shared_ptr<Fqk_variable_type> w1;
+                    std::shared_ptr<Fqk_variable_type> w0;
+                    std::shared_ptr<Fqk_variable_type> result;
 
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_inv;
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_q_2_minus_1;
-                        std::shared_ptr<Fqk_mul_component_type> compute_el_inv_q_2_minus_1;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_inv;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_q_2_minus_1;
+                    std::shared_ptr<Fqk_mul_component_type> compute_el_inv_q_2_minus_1;
 
-                        std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
-                                        element_fp4,
-                                        Fp4_mul_component,
-                                        Fp4_cyclotomic_sqr_component> > compute_w1;
-                        std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
-                                        element_fp4,
-                                        Fp4_mul_component,
-                                        Fp4_cyclotomic_sqr_component> > compute_w0;
-                        std::shared_ptr<Fqk_mul_component_type> compute_result;
+                    std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
+                                    element_fp4,
+                                    Fp4_mul_component,
+                                    Fp4_cyclotomic_sqr_component> > compute_w1;
+                    std::shared_ptr<exponentiation_component<typename curve_type::pairing::fqk_type,
+                                    element_fp4,
+                                    Fp4_mul_component,
+                                    Fp4_cyclotomic_sqr_component> > compute_w0;
+                    std::shared_ptr<Fqk_mul_component_type> compute_result;
 
-                        variable<field_type> result_is_one;
+                    blueprint_variable<field_type> result_is_one;
 
-                        final_exp_component(blueprint<field_type> &bp,
-                                                 const Fqk_variable_type &el,
-                                                 const variable<field_type> &result_is_one) :
-                            component<field_type>(bp),
-                            el(el), result_is_one(result_is_one) {
-                            one.reset(new Fqk_variable_type(bp));
-                            el_inv.reset(new Fqk_variable_type(bp));
-                            el_q_2.reset(new Fqk_variable_type(el.Frobenius_map(2)));
-                            el_q_2_minus_1.reset(new Fqk_variable_type(bp));
-                            el_q_3_minus_q.reset(new Fqk_variable_type(el_q_2_minus_1->Frobenius_map(1)));
-                            el_inv_q_2.reset(new Fqk_variable_type(el_inv->Frobenius_map(2)));
-                            el_inv_q_2_minus_1.reset(new Fqk_variable_type(bp));
-                            w1.reset(new Fqk_variable_type(bp));
-                            w0.reset(new Fqk_variable_type(bp));
-                            result.reset(new Fqk_variable_type(bp));
+                    final_exp_component(blueprint<field_type> &bp,
+                                             const Fqk_variable_type &el,
+                                             const blueprint_variable<field_type> &result_is_one) :
+                        component<field_type>(bp),
+                        el(el), result_is_one(result_is_one) {
+                        one.reset(new Fqk_variable_type(bp));
+                        el_inv.reset(new Fqk_variable_type(bp));
+                        el_q_2.reset(new Fqk_variable_type(el.Frobenius_map(2)));
+                        el_q_2_minus_1.reset(new Fqk_variable_type(bp));
+                        el_q_3_minus_q.reset(new Fqk_variable_type(el_q_2_minus_1->Frobenius_map(1)));
+                        el_inv_q_2.reset(new Fqk_variable_type(el_inv->Frobenius_map(2)));
+                        el_inv_q_2_minus_1.reset(new Fqk_variable_type(bp));
+                        w1.reset(new Fqk_variable_type(bp));
+                        w0.reset(new Fqk_variable_type(bp));
+                        result.reset(new Fqk_variable_type(bp));
 
-                            compute_el_inv.reset(new Fqk_mul_component_type(bp, el, *el_inv, *one));
-                            compute_el_q_2_minus_1.reset(
-                                new Fqk_mul_component_type(bp, *el_q_2, *el_inv, *el_q_2_minus_1));
-                            compute_el_inv_q_2_minus_1.reset(
-                                new Fqk_mul_component_type(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
+                        compute_el_inv.reset(new Fqk_mul_component_type(bp, el, *el_inv, *one));
+                        compute_el_q_2_minus_1.reset(
+                            new Fqk_mul_component_type(bp, *el_q_2, *el_inv, *el_q_2_minus_1));
+                        compute_el_inv_q_2_minus_1.reset(
+                            new Fqk_mul_component_type(bp, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
-                            compute_w1.reset(
-                                new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                element_fp4,
-                                Fp4_mul_component,
-                                Fp4_cyclotomic_sqr_component> >
-                                    (bp, *el_q_3_minus_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
-                            compute_w0.reset(
-                                new exponentiation_component<typename curve_type::pairing::fqk_type,
-                                element_fp4,
-                                Fp4_mul_component,
-                                Fp4_cyclotomic_sqr_component> >
-                                    (bp,
-                                     (curve_type::pairing::final_exponent_last_chunk_is_w0_neg ? *el_inv_q_2_minus_1 :
-                                                                                          *el_q_2_minus_1),
-                                     curve_type::pairing::final_exponent_last_chunk_abs_of_w0,
-                                     *w0));
-                            compute_result.reset(new Fqk_mul_component_type(bp, *w1, *w0, *result));
-                        }
+                        compute_w1.reset(
+                            new exponentiation_component<typename curve_type::pairing::fqk_type,
+                            element_fp4,
+                            Fp4_mul_component,
+                            Fp4_cyclotomic_sqr_component> >
+                                (bp, *el_q_3_minus_q, curve_type::pairing::final_exponent_last_chunk_w1, *w1));
+                        compute_w0.reset(
+                            new exponentiation_component<typename curve_type::pairing::fqk_type,
+                            element_fp4,
+                            Fp4_mul_component,
+                            Fp4_cyclotomic_sqr_component> >
+                                (bp,
+                                 (curve_type::pairing::final_exponent_last_chunk_is_w0_neg ? *el_inv_q_2_minus_1 :
+                                                                                      *el_q_2_minus_1),
+                                 curve_type::pairing::final_exponent_last_chunk_abs_of_w0,
+                                 *w0));
+                        compute_result.reset(new Fqk_mul_component_type(bp, *w1, *w0, *result));
+                    }
 
-                        void generate_r1cs_constraints() {
-                            one->generate_r1cs_equals_const_constraints(
-                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
+                    void generate_r1cs_constraints() {
+                        one->generate_r1cs_equals_const_constraints(
+                            curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
 
-                            compute_el_inv->generate_r1cs_constraints();
-                            compute_el_q_2_minus_1->generate_r1cs_constraints();
-                            compute_el_inv_q_2_minus_1->generate_r1cs_constraints();
-                            compute_w1->generate_r1cs_constraints();
-                            compute_w0->generate_r1cs_constraints();
-                            compute_result->generate_r1cs_constraints();
+                        compute_el_inv->generate_r1cs_constraints();
+                        compute_el_q_2_minus_1->generate_r1cs_constraints();
+                        compute_el_inv_q_2_minus_1->generate_r1cs_constraints();
+                        compute_w1->generate_r1cs_constraints();
+                        compute_w0->generate_r1cs_constraints();
+                        compute_result->generate_r1cs_constraints();
 
-                            generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
-                            this->bp.add_r1cs_constraint(
-                                r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
-                            this->bp.add_r1cs_constraint(r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
-                        }
+                        generate_boolean_r1cs_constraint<field_type>(this->bp, result_is_one);
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<field_type>(result_is_one, 1 - result->c0.c0, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c0.c1, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c1.c0, 0));
+                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(result_is_one, result->c1.c1, 0));
+                    }
 
-                        void generate_r1cs_witness() {
-                            one->generate_r1cs_witness(
-                                curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
-                            el_inv->generate_r1cs_witness(el.get_element().inversed());
+                    void generate_r1cs_witness() {
+                        one->generate_r1cs_witness(
+                            curve_type::pairing::pair_curve_type::pairing::fqk_type::value_type::one());
+                        el_inv->generate_r1cs_witness(el.get_element().inversed());
 
-                            compute_el_inv->generate_r1cs_witness();
-                            el_q_2->evaluate();
-                            compute_el_q_2_minus_1->generate_r1cs_witness();
-                            el_q_3_minus_q->evaluate();
-                            el_inv_q_2->evaluate();
-                            compute_el_inv_q_2_minus_1->generate_r1cs_witness();
-                            compute_w1->generate_r1cs_witness();
-                            compute_w0->generate_r1cs_witness();
-                            compute_result->generate_r1cs_witness();
+                        compute_el_inv->generate_r1cs_witness();
+                        el_q_2->evaluate();
+                        compute_el_q_2_minus_1->generate_r1cs_witness();
+                        el_q_3_minus_q->evaluate();
+                        el_inv_q_2->evaluate();
+                        compute_el_inv_q_2_minus_1->generate_r1cs_witness();
+                        compute_w1->generate_r1cs_witness();
+                        compute_w0->generate_r1cs_witness();
+                        compute_result->generate_r1cs_witness();
 
-                            this->bp.val(result_is_one) =
-                                (result->get_element() == one->get_element() ? field_type::value_type::one() :
-                                                                               field_type::value_type::zero());
-                        }
-                    };
-                }    // namespace components
-            }        // namespace snark
+                        this->bp.val(result_is_one) =
+                            (result->get_element() == one->get_element() ? field_type::value_type::one() :
+                                                                           field_type::value_type::zero());
+                    }
+                };
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

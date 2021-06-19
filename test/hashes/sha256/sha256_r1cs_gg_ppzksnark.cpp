@@ -44,9 +44,9 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt4.hpp>
 
-//#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/components/blueprint.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
@@ -55,7 +55,7 @@ void run_r1cs_gg_ppzksnark_sha256_test() {
 
     std::cout << "SHA2-256 blueprint generation started." << std::endl;
 
-    blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
+    components::blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
 
     std::cout << "SHA2-256 blueprint generation finished." << std::endl;
 

@@ -37,61 +37,59 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
-                    namespace detail {
+            namespace components {
+                namespace detail {
 
-                        using namespace nil::crypto3::algebra;
+                    using namespace nil::crypto3::algebra;
 
-                        template<typename CurveType>
-                        class basic_pairing_component_policy;
+                    template<typename CurveType>
+                    class basic_pairing_component_policy;
 
-                        /**
-                         * Specialization for MNT4.
-                         */
-                        template<std::size_t Version>
-                        class basic_pairing_component_policy<curves::mnt4<Version>> {
-                            using curve_type = typename curves::mnt4<Version>;
+                    /**
+                     * Specialization for MNT4.
+                     */
+                    template<std::size_t Version>
+                    class basic_pairing_component_policy<curves::mnt4<Version>> {
+                        using curve_type = typename curves::mnt4<Version>;
 
-                        public:
-                            using Fqe_variable_type = typename basic_curve_component_policy<curve_type>::Fqe_variable_type;
-                            using Fqe_mul_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqe_mul_component_type;
-                            using Fqe_mul_by_lc_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqe_mul_by_lc_component_type;
-                            using Fqe_sqr_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqe_sqr_component_type;
+                    public:
+                        using Fqe_variable_type = typename basic_curve_component_policy<curve_type>::Fqe_variable_type;
+                        using Fqe_mul_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqe_mul_component_type;
+                        using Fqe_mul_by_lc_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqe_mul_by_lc_component_type;
+                        using Fqe_sqr_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqe_sqr_component_type;
 
-                            using Fqk_variable_type = typename basic_curve_component_policy<curve_type>::Fqk_variable_type;
-                            using Fqk_mul_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqk_mul_component_type;
-                            using Fqk_special_mul_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqk_special_mul_component_type;
-                            using Fqk_sqr_component_type =
-                                typename basic_curve_component_policy<curve_type>::Fqk_sqr_component_type;
+                        using Fqk_variable_type = typename basic_curve_component_policy<curve_type>::Fqk_variable_type;
+                        using Fqk_mul_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqk_mul_component_type;
+                        using Fqk_special_mul_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqk_special_mul_component_type;
+                        using Fqk_sqr_component_type =
+                            typename basic_curve_component_policy<curve_type>::Fqk_sqr_component_type;
 
-                            constexpr static const typename curve_type::pairing::number_type pairing_loop_count =
-                                curve_type::pairing::pairing_loop_count;
+                        constexpr static const typename curve_type::pairing::number_type pairing_loop_count =
+                            curve_type::pairing::pairing_loop_count;
 
-                            constexpr static const typename curve_type::g1_type::underlying_field_type::value_type
-                                g1_coeff_a = curve_type::a;
+                        constexpr static const typename curve_type::g1_type::underlying_field_type::value_type
+                            g1_coeff_a = curve_type::a;
 
-                            constexpr static const typename curve_type::g1_type::underlying_field_type::value_type
-                                g1_coeff_b = curve_type::b;
+                        constexpr static const typename curve_type::g1_type::underlying_field_type::value_type
+                            g1_coeff_b = curve_type::b;
 
-                            constexpr static const typename curve_type::g2_type::underlying_field_type::value_type
-                                g2_coeff_a = typename curve_type::g2_type::underlying_field_type::value_type(
-                                    g1_coeff_a * curve_type::g2_type::underlying_field_type::value_type::non_residue,
-                                    curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero());
+                        constexpr static const typename curve_type::g2_type::underlying_field_type::value_type
+                            g2_coeff_a = typename curve_type::g2_type::underlying_field_type::value_type(
+                                g1_coeff_a * curve_type::g2_type::underlying_field_type::value_type::non_residue,
+                                curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero());
 
-                            constexpr static const typename curve_type::g2_type::underlying_field_type::value_type
-                                g2_coeff_b = typename curve_type::g2_type::underlying_field_type::value_type(
-                                    curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero(),
-                                    g1_coeff_b *curve_type::g2_type::underlying_field_type::value_type::non_residue);
-                        };
-                    }    // namespace detail
-                }    // namespace components
-            }        // namespace snark
+                        constexpr static const typename curve_type::g2_type::underlying_field_type::value_type
+                            g2_coeff_b = typename curve_type::g2_type::underlying_field_type::value_type(
+                                curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero(),
+                                g1_coeff_b *curve_type::g2_type::underlying_field_type::value_type::non_residue);
+                    };
+                }    // namespace detail
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

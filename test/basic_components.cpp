@@ -34,16 +34,16 @@
 #include <nil/crypto3/zk/components/basic_components.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_disjunction_component(size_t n) {
-    blueprint<FieldType> bp;
-    blueprint_variable_vector<FieldType> inputs;
+    components::blueprint<FieldType> bp;
+    components::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    blueprint_variable<FieldType> output;
+    components::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
     components::disjunction_component<FieldType> d(bp, inputs, output);
@@ -66,11 +66,11 @@ void test_disjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_conjunction_component(size_t n) {
-    blueprint<FieldType> bp;
-    blueprint_variable_vector<FieldType> inputs;
+    components::blueprint<FieldType> bp;
+    components::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    blueprint_variable<FieldType> output;
+    components::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
     components::conjunction_component<FieldType> c(bp, inputs, output);
@@ -94,9 +94,9 @@ void test_conjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_comparison_component(size_t n) {
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
 
-    blueprint_variable<FieldType> A, B, less, less_or_eq;
+    components::blueprint_variable<FieldType> A, B, less, less_or_eq;
     A.allocate(bp);
     B.allocate(bp);
     less.allocate(bp);
@@ -121,13 +121,13 @@ void test_comparison_component(size_t n) {
 
 template<typename FieldType>
 void test_inner_product_component(size_t n) {
-    blueprint<FieldType> bp;
-    blueprint_variable_vector<FieldType> A;
+    components::blueprint<FieldType> bp;
+    components::blueprint_variable_vector<FieldType> A;
     A.allocate(bp, n);
-    blueprint_variable_vector<FieldType> B;
+    components::blueprint_variable_vector<FieldType> B;
     B.allocate(bp, n);
 
-    blueprint_variable<FieldType> result;
+    components::blueprint_variable<FieldType> result;
     result.allocate(bp);
 
     components::inner_product_component<FieldType> g(bp, A, B, result);
@@ -155,11 +155,11 @@ void test_inner_product_component(size_t n) {
 
 template<typename FieldType>
 void test_loose_multiplexing_component(size_t n) {
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
 
-    blueprint_variable_vector<FieldType> arr;
+    components::blueprint_variable_vector<FieldType> arr;
     arr.allocate(bp, 1ul << n);
-    blueprint_variable<FieldType> index, result, success_flag;
+    components::blueprint_variable<FieldType> index, result, success_flag;
     index.allocate(bp);
     result.allocate(bp);
     success_flag.allocate(bp);

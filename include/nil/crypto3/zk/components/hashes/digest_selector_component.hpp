@@ -34,56 +34,54 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    template<typename FieldType>
-                    class digest_selector_component : public component<FieldType> {
-                    public:
-                        std::size_t digest_size;
-                        digest_variable<FieldType> input;
-                        blueprint_linear_combination<FieldType> is_right;
-                        digest_variable<FieldType> left;
-                        digest_variable<FieldType> right;
+                template<typename FieldType>
+                class digest_selector_component : public component<FieldType> {
+                public:
+                    std::size_t digest_size;
+                    digest_variable<FieldType> input;
+                    blueprint_linear_combination<FieldType> is_right;
+                    digest_variable<FieldType> left;
+                    digest_variable<FieldType> right;
 
-                        digest_selector_component(blueprint<FieldType> &bp,
-                                                  const std::size_t digest_size,
-                                                  const digest_variable<FieldType> &input,
-                                                  const blueprint_linear_combination<FieldType> &is_right,
-                                                  const digest_variable<FieldType> &left,
-                                                  const digest_variable<FieldType> &right) :
-                            component<FieldType>(bp),
-                            digest_size(digest_size), input(input), is_right(is_right), left(left), right(right) {
+                    digest_selector_component(blueprint<FieldType> &bp,
+                                              const std::size_t digest_size,
+                                              const digest_variable<FieldType> &input,
+                                              const blueprint_linear_combination<FieldType> &is_right,
+                                              const digest_variable<FieldType> &left,
+                                              const digest_variable<FieldType> &right) :
+                        component<FieldType>(bp),
+                        digest_size(digest_size), input(input), is_right(is_right), left(left), right(right) {
+                    }
+
+                    void generate_r1cs_constraints() {
+                        for (std::size_t i = 0; i < digest_size; ++i) {
+                            /*
+                              input = is_right * right + (1-is_right) * left
+                              input - left = is_right(right - left)
+                            */
+                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
+                                is_right, right.bits[i] - left.bits[i], input.bits[i] - left.bits[i]));
                         }
+                    }
+                    void generate_r1cs_witness() {
+                        is_right.evaluate(this->bp);
 
-                        void generate_r1cs_constraints() {
+                        assert(this->bp.lc_val(is_right) == FieldType::value_type::zero() ||
+                               this->bp.lc_val(is_right) == FieldType::value_type::zero());
+                        if (this->bp.lc_val(is_right) == FieldType::value_type::zero()) {
                             for (std::size_t i = 0; i < digest_size; ++i) {
-                                /*
-                                  input = is_right * right + (1-is_right) * left
-                                  input - left = is_right(right - left)
-                                */
-                                this->bp.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                                    is_right, right.bits[i] - left.bits[i], input.bits[i] - left.bits[i]));
+                                this->bp.val(right.bits[i]) = this->bp.val(input.bits[i]);
+                            }
+                        } else {
+                            for (std::size_t i = 0; i < digest_size; ++i) {
+                                this->bp.val(left.bits[i]) = this->bp.val(input.bits[i]);
                             }
                         }
-                        void generate_r1cs_witness() {
-                            is_right.evaluate(this->bp);
-
-                            assert(this->bp.lc_val(is_right) == FieldType::value_type::zero() ||
-                                   this->bp.lc_val(is_right) == FieldType::value_type::zero());
-                            if (this->bp.lc_val(is_right) == FieldType::value_type::zero()) {
-                                for (std::size_t i = 0; i < digest_size; ++i) {
-                                    this->bp.val(right.bits[i]) = this->bp.val(input.bits[i]);
-                                }
-                            } else {
-                                for (std::size_t i = 0; i < digest_size; ++i) {
-                                    this->bp.val(left.bits[i]) = this->bp.val(input.bits[i]);
-                                }
-                            }
-                        }
-                    };
-                }    // namespace components
-            }        // namespace snark
+                    }
+                };
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

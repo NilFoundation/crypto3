@@ -34,7 +34,7 @@
 #include <nil/crypto3/zk/snark/routing/as_waksman.hpp>
 #include <nil/crypto3/zk/snark/routing/benes.hpp>
 
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 
 /**
  * Test Benes network routing for all permutations on 2^static_cast<std::size_t>(std::ceil(std::log2(N))) elements.

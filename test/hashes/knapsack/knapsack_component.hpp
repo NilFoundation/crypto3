@@ -36,7 +36,7 @@
 #include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 
 template<typename FieldType>
 blueprint<FieldType> test_knapsack_crh_with_bit_out_component() {

@@ -35,16 +35,16 @@
 #include <nil/crypto3/zk/snark/components/routing/as_waksman_components.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     integer_permutation permutation(num_packets);
     permutation.random_shuffle();
 
-    std::vector<blueprint_variable_vector<FieldType>> randbits(num_packets), outbits(num_packets);
+    std::vector<components::blueprint_variable_vector<FieldType>> randbits(num_packets), outbits(num_packets);
     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
         randbits[packet_idx].allocate(bp, packet_size);
         outbits[packet_idx].allocate(bp, packet_size);
@@ -66,7 +66,7 @@ void test_as_waksman_routing_component(const std::size_t num_packets, const std:
         }
     }
 
-    bp.val(variable<FieldType>(10)) = typename FieldType::value_type(12345);
+    bp.val(components::blueprint_variable<FieldType>(10)) = typename FieldType::value_type(12345);
     BOOST_CHECK(!bp.is_satisfied());
 }
 

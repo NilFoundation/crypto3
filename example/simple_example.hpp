@@ -33,7 +33,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace components {
 
                 template<typename FieldType>
                 r1cs_example<FieldType> gen_r1cs_example_from_blueprint(const std::size_t num_constraints,
@@ -50,7 +50,7 @@ namespace nil {
                     blueprint<FieldType> bp;
                     blueprint_variable_vector<FieldType> A;
                     blueprint_variable_vector<FieldType> B;
-                    variable<FieldType> res;
+                    blueprint_variable<FieldType> res;
 
                     // the variables on the blueprint are (ONE (constant 1 term), res, A[0], ..., A[num_constraints-1],
                     // B[0], ..., B[num_constraints-1])
@@ -72,7 +72,7 @@ namespace nil {
                         bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
                 }
 
-            }    // namespace snark
+            }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

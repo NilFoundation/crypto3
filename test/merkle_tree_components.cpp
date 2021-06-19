@@ -36,7 +36,7 @@
 #include <nil/crypto3/zk/components/merkle_tree/merkle_tree_check_update_components.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldType, typename Hash>
@@ -83,8 +83,8 @@ void test_merkle_tree_check_update_component() {
     std::vector<bool> store_root = prev_store_hash;
 
     /* execute the test */
-    blueprint<FieldType> bp;
-    blueprint_variable_vector<FieldType> address_bits_va;
+    components::blueprint<FieldType> bp;
+    components::blueprint_variable_vector<FieldType> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     digest_variable<FieldType> prev_leaf_digest(bp, digest_len);
     digest_variable<FieldType> prev_root_digest(bp, digest_len);
@@ -94,7 +94,7 @@ void test_merkle_tree_check_update_component() {
     merkle_authentication_path_variable<FieldType, Hash> next_path_var(bp, tree_depth);
     merkle_tree_check_update_components<FieldType, Hash> mls(bp, tree_depth, address_bits_va, prev_leaf_digest,
                                                              prev_root_digest, prev_path_var, next_leaf_digest,
-                                                             next_root_digest, next_path_var, variable<FieldType>(0));
+                                                             next_root_digest, next_path_var, components::blueprint_variable<FieldType>(0));
 
     prev_path_var.generate_r1cs_constraints();
     mls.generate_r1cs_constraints();
@@ -153,14 +153,14 @@ void test_merkle_tree_check_read_component() {
     std::vector<bool> root = prev_hash;
 
     /* execute test */
-    blueprint<FieldType> bp;
-    blueprint_variable_vector<FieldType> address_bits_va;
+    components::blueprint<FieldType> bp;
+    components::blueprint_variable_vector<FieldType> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     digest_variable<FieldType> leaf_digest(bp, digest_len);
     digest_variable<FieldType> root_digest(bp, digest_len);
     merkle_authentication_path_variable<FieldType, Hash> path_var(bp, tree_depth);
     merkle_tree_check_read_component<FieldType, Hash> ml(bp, tree_depth, address_bits_va, leaf_digest, root_digest,
-                                                         path_var, variable<FieldType>(0));
+                                                         path_var, components::blueprint_variable<FieldType>(0));
 
     path_var.generate_r1cs_constraints();
     ml.generate_r1cs_constraints();
@@ -185,21 +185,38 @@ void test_merkle_tree_check_read_component() {
 
 template<typename CurveType>
 void test_all_merkle_tree_components() {
-    typedef typename CurveType::scalar_field_type FieldType;
-    test_merkle_tree_check_read_component<FieldType, crh_with_bit_out_component<FieldType>>();
-    test_merkle_tree_check_read_component<FieldType, sha256_two_to_one_hash_component<FieldType>>();
+    typedef typename CurveType::scalar_field_type scalar_field_type;
 
-    test_merkle_tree_check_update_component<FieldType, crh_with_bit_out_component<FieldType>>();
-    test_merkle_tree_check_update_component<FieldType, sha256_two_to_one_hash_component<FieldType>>();
+    // for now all CRH components are knapsack CRH's; can be easily extended
+    // later to more expressive selector types.
+    using crh_with_field_out_component = knapsack_crh_with_field_out_component<scalar_field_type>;
+    using crh_with_bit_out_component = knapsack_crh_with_bit_out_component<scalar_field_type>;
+
+    test_merkle_tree_check_read_component<scalar_field_type, crh_with_bit_out_component>();
+    test_merkle_tree_check_read_component<scalar_field_type, sha256_two_to_one_hash_component<scalar_field_type>>();
+
+    test_merkle_tree_check_update_component<scalar_field_type, crh_with_bit_out_component>();
+    test_merkle_tree_check_update_component<scalar_field_type, sha256_two_to_one_hash_component<scalar_field_type>>();
 }
 
 BOOST_AUTO_TEST_SUITE(merkle_tree_components_test_suite)
 
-BOOST_AUTO_TEST_CASE(merkle_tree_components_test) {
+BOOST_AUTO_TEST_CASE(merkle_tree_components_bls12_381_test) {
 
     test_all_merkle_tree_components<curves::bls12<381>>();
+
+}
+
+BOOST_AUTO_TEST_CASE(merkle_tree_components_mnt4_test) {
+
     test_all_merkle_tree_components<curves::mnt4<398>>();
+
+}
+
+BOOST_AUTO_TEST_CASE(merkle_tree_components_mnt6_test) {
+
     test_all_merkle_tree_components<curves::mnt6<298>>();
+    
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -38,14 +38,14 @@
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 
 BOOST_AUTO_TEST_SUITE(sha2_256_component_test_suite)
 
 BOOST_AUTO_TEST_CASE(sha2_256_component_test_case) {
     using field_type = typename curves::mnt4<298>::scalar_field_type;
 
-    blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
+    components::blueprint<field_type> bp = sha2_two_to_one_bp<field_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

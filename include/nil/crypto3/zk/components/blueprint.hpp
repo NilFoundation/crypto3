@@ -33,23 +33,24 @@
 #include <vector>
 
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace components {
 
                 template<typename FieldType>
                 class blueprint {
-                    r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
+                    snark::r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
                                                                 variable of the blueprint, *NOT* constant 1 */
                     typename FieldType::value_type constant_term;
 
-                    var_index_t next_free_var;
+                    typename snark::var_index_t next_free_var;
                     lc_index_t next_free_lc;
                     std::vector<typename FieldType::value_type> lc_values;
-                    r1cs_constraint_system<FieldType> constraint_system;
+                    snark::r1cs_constraint_system<FieldType> constraint_system;
 
                 public:
                     typedef FieldType field_type;
@@ -93,7 +94,7 @@ namespace nil {
                         }
                     }
 
-                    void add_r1cs_constraint(const r1cs_constraint<FieldType> &constr) {
+                    void add_r1cs_constraint(const snark::r1cs_constraint<FieldType> &constr) {
                         constraint_system.constraints.emplace_back(constr);
                     }
 
@@ -119,19 +120,19 @@ namespace nil {
                         constraint_system.auxiliary_input_size = num_variables() - primary_input_size;
                     }
 
-                    r1cs_variable_assignment<FieldType> full_variable_assignment() const {
+                    snark::r1cs_variable_assignment<FieldType> full_variable_assignment() const {
                         return values;
                     }
 
-                    r1cs_primary_input<FieldType> primary_input() const {
-                        return r1cs_primary_input<FieldType>(values.begin(), values.begin() + num_inputs());
+                    snark::r1cs_primary_input<FieldType> primary_input() const {
+                        return snark::r1cs_primary_input<FieldType>(values.begin(), values.begin() + num_inputs());
                     }
 
-                    r1cs_auxiliary_input<FieldType> auxiliary_input() const {
-                        return r1cs_auxiliary_input<FieldType>(values.begin() + num_inputs(), values.end());
+                    snark::r1cs_auxiliary_input<FieldType> auxiliary_input() const {
+                        return snark::r1cs_auxiliary_input<FieldType>(values.begin() + num_inputs(), values.end());
                     }
 
-                    r1cs_constraint_system<FieldType> get_constraint_system() const {
+                    snark::r1cs_constraint_system<FieldType> get_constraint_system() const {
                         return constraint_system;
                     }
 
@@ -139,7 +140,7 @@ namespace nil {
                     friend class blueprint_linear_combination<FieldType>;
 
                 private:
-                    var_index_t allocate_var_index() {
+                    typename snark::var_index_t allocate_var_index() {
                         ++constraint_system.auxiliary_input_size;
                         values.emplace_back(FieldType::value_type::zero());
                         return next_free_var++;
@@ -150,7 +151,7 @@ namespace nil {
                         return next_free_lc++;
                     }
                 };
-            }    // namespace snark
+            }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

@@ -44,124 +44,122 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    using namespace nil::crypto3::algebra::pairing;
+                using namespace nil::crypto3::algebra::pairing;
 
-                    /**
-                     * Component that represents a G2 variable.
-                     */
-                    template<typename CurveType>
-                    class element_g2 : public component<typename CurveType::scalar_field_type> {
-                        using field_type = typename CurveType::pairing::fp_type;
+                /**
+                 * Component that represents a G2 element.
+                 */
+                template<typename CurveType>
+                class element_g2 : public component<typename CurveType::scalar_field_type> {
+                    using field_type = typename CurveType::pairing::fp_type;
 
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
+                    using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                    using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
-                        using component_policy = basic_curve_component_policy<CurveType>;
+                    using component_policy = basic_curve_component_policy<CurveType>;
 
-                    public:
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> X;
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> Y;
+                public:
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> X;
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> Y;
 
-                        blueprint_linear_combination_vector<field_type> all_vars;
+                    blueprint_linear_combination_vector<field_type> all_vars;
 
-                        element_g2(blueprint<field_type> &bp) : component<field_type>(bp) {
-                            X.reset(new typename component_policy::Fqe_variable_type(bp));
-                            Y.reset(new typename component_policy::Fqe_variable_type(bp));
+                    element_g2(blueprint<field_type> &bp) : component<field_type>(bp) {
+                        X.reset(new typename component_policy::Fqe_variable_type(bp));
+                        Y.reset(new typename component_policy::Fqe_variable_type(bp));
 
-                            all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
-                            all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
-                        }
-                        element_g2(blueprint<field_type> &bp,
-                                    const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
-                            component<field_type>(bp) {
-                            typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy =
-                                Q.to_affine();
+                        all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
+                        all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
+                    }
+                    element_g2(blueprint<field_type> &bp,
+                                const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
+                        component<field_type>(bp) {
+                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy =
+                            Q.to_affine();
 
-                            X.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.X));
-                            Y.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.Y));
+                        X.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.X));
+                        Y.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.Y));
 
-                            all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
-                            all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
-                        }
+                        all_vars.insert(all_vars.end(), X->all_vars.begin(), X->all_vars.end());
+                        all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
+                    }
 
-                        void generate_r1cs_witness(
-                            const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) {
-                            typename CurveType::pairing::pair_curve_type::g2_type::value_type Qcopy =
-                                Q.to_affine();
+                    void generate_r1cs_witness(
+                        const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) {
+                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Qcopy =
+                            Q.to_affine();
 
-                            X->generate_r1cs_witness(Qcopy.X);
-                            Y->generate_r1cs_witness(Qcopy.Y);
-                        }
+                        X->generate_r1cs_witness(Qcopy.X);
+                        Y->generate_r1cs_witness(Qcopy.Y);
+                    }
 
-                        // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
-                        // we mark this function noinline.) TODO: remove later
-                        static std::size_t __attribute__((noinline)) size_in_bits() {
-                            return 2 * typename component_policy::Fqe_variable_type::size_in_bits();
-                        }
-                        static std::size_t num_variables() {
-                            return 2 * typename component_policy::Fqe_variable_type::num_variables();
-                        }
-                    };
+                    // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
+                    // we mark this function noinline.) TODO: remove later
+                    static std::size_t __attribute__((noinline)) size_in_bits() {
+                        return 2 * typename component_policy::Fqe_variable_type::size_in_bits();
+                    }
+                    static std::size_t num_variables() {
+                        return 2 * typename component_policy::Fqe_variable_type::num_variables();
+                    }
+                };
 
-                    /**
-                     * Component that creates constraints for the validity of a G2 variable.
-                     */
-                    template<typename CurveType>
-                    class element_g2_is_well_formed : public component<typename CurveType::scalar_field_type> {
-                        typedef typename CurveType::pairing::fp_type field_type;
-                        using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
-                        using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
+                /**
+                 * Component that creates constraints for the validity of a G2 element.
+                 */
+                template<typename CurveType>
+                class element_g2_is_well_formed : public component<typename CurveType::scalar_field_type> {
+                    typedef typename CurveType::pairing::fp_type field_type;
+                    using fqe_type = typename CurveType::pairing::pair_curve_type::pairing::fqe_type;
+                    using fqk_type = typename CurveType::pairing::pair_curve_type::pairing::fqk_type;
 
-                        using component_policy = basic_curve_component_policy<CurveType>;
+                    using component_policy = basic_curve_component_policy<CurveType>;
 
-                    public:
-                        element_g2<CurveType> Q;
+                public:
+                    element_g2<CurveType> Q;
 
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> Xsquared;
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> Ysquared;
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> Xsquared_plus_a;
-                        std::shared_ptr<typename component_policy::Fqe_variable_type> Ysquared_minus_b;
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> Xsquared;
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> Ysquared;
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> Xsquared_plus_a;
+                    std::shared_ptr<typename component_policy::Fqe_variable_type> Ysquared_minus_b;
 
-                        std::shared_ptr<typename component_policy::Fqe_sqr_component_type> compute_Xsquared;
-                        std::shared_ptr<typename component_policy::Fqe_sqr_component_type> compute_Ysquared;
-                        std::shared_ptr<typename component_policy::Fqe_mul_component_type> curve_equation;
+                    std::shared_ptr<typename component_policy::Fqe_sqr_component_type> compute_Xsquared;
+                    std::shared_ptr<typename component_policy::Fqe_sqr_component_type> compute_Ysquared;
+                    std::shared_ptr<typename component_policy::Fqe_mul_component_type> curve_equation;
 
-                        element_g2_is_well_formed(blueprint<field_type> &bp, const element_g2<CurveType> &Q) :
-                            component<field_type>(bp), Q(Q) {
-                            Xsquared.reset(new typename component_policy::Fqe_variable_type(bp));
-                            Ysquared.reset(new typename component_policy::Fqe_variable_type(bp));
+                    element_g2_is_well_formed(blueprint<field_type> &bp, const element_g2<CurveType> &Q) :
+                        component<field_type>(bp), Q(Q) {
+                        Xsquared.reset(new typename component_policy::Fqe_variable_type(bp));
+                        Ysquared.reset(new typename component_policy::Fqe_variable_type(bp));
 
-                            compute_Xsquared.reset(
-                                new typename component_policy::Fqe_sqr_component_type(bp, *(Q.X), *Xsquared));
-                            compute_Ysquared.reset(
-                                new typename component_policy::Fqe_sqr_component_type(bp, *(Q.Y), *Ysquared));
+                        compute_Xsquared.reset(
+                            new typename component_policy::Fqe_sqr_component_type(bp, *(Q.X), *Xsquared));
+                        compute_Ysquared.reset(
+                            new typename component_policy::Fqe_sqr_component_type(bp, *(Q.Y), *Ysquared));
 
-                            Xsquared_plus_a.reset(new typename component_policy::Fqe_variable_type(
-                                (*Xsquared) + CurveType::pairing::pair_curve_type::a));
-                            Ysquared_minus_b.reset(new typename component_policy::Fqe_variable_type(
-                                (*Ysquared) + (-CurveType::pairing::pair_curve_type::b)));
+                        Xsquared_plus_a.reset(new typename component_policy::Fqe_variable_type(
+                            (*Xsquared) + CurveType::pairing::pair_curve_type::a));
+                        Ysquared_minus_b.reset(new typename component_policy::Fqe_variable_type(
+                            (*Ysquared) + (-CurveType::pairing::pair_curve_type::b)));
 
-                            curve_equation.reset(new typename component_policy::Fqe_mul_component_type(
-                                bp, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
-                        }
+                        curve_equation.reset(new typename component_policy::Fqe_mul_component_type(
+                            bp, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
+                    }
 
-                        void generate_r1cs_constraints() {
-                            compute_Xsquared->generate_r1cs_constraints();
-                            compute_Ysquared->generate_r1cs_constraints();
-                            curve_equation->generate_r1cs_constraints();
-                        }
-                        void generate_r1cs_witness() {
-                            compute_Xsquared->generate_r1cs_witness();
-                            compute_Ysquared->generate_r1cs_witness();
-                            Xsquared_plus_a->evaluate();
-                            curve_equation->generate_r1cs_witness();
-                        }
-                    };
-                }    // namespace components
-            }        // namespace snark
+                    void generate_r1cs_constraints() {
+                        compute_Xsquared->generate_r1cs_constraints();
+                        compute_Ysquared->generate_r1cs_constraints();
+                        curve_equation->generate_r1cs_constraints();
+                    }
+                    void generate_r1cs_witness() {
+                        compute_Xsquared->generate_r1cs_witness();
+                        compute_Ysquared->generate_r1cs_witness();
+                        Xsquared_plus_a->evaluate();
+                        curve_equation->generate_r1cs_witness();
+                    }
+                };
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

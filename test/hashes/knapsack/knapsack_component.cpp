@@ -37,7 +37,7 @@
 #include "knapsack_component.hpp"
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk;
 
 BOOST_AUTO_TEST_SUITE(knapsack_component_test_suite)
 

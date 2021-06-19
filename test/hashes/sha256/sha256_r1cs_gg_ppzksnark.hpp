@@ -49,11 +49,11 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
+                    test_affine_verifier(const typename snark::r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename snark::r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename snark::r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
-                    using basic_proof_system = r1cs_gg_ppzksnark<CurveType,
+                    using basic_proof_system = snark::r1cs_gg_ppzksnark<CurveType,
                                           r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<
                                               CurveType>>;
 
@@ -63,9 +63,9 @@ namespace nil {
 
                 template<typename CurveType>
                 typename std::enable_if<!CurveType::has_affine_pairing, void>::type
-                    test_affine_verifier(const typename r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
-                                         const typename r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
+                    test_affine_verifier(const typename snark::r1cs_gg_ppzksnark<CurveType>::verification_key_type &vk,
+                                         const typename snark::r1cs_gg_ppzksnark<CurveType>::primary_input_type &primary_input,
+                                         const typename snark::r1cs_gg_ppzksnark<CurveType>::proof_type &proof,
                                          const bool expected_answer) {
                     BOOST_ATTRIBUTE_UNUSED(vk, primary_input, proof, expected_answer);
                 }
@@ -85,24 +85,24 @@ namespace nil {
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
 
-                    using basic_proof_system = r1cs_gg_ppzksnark<CurveType>;
+                    using basic_proof_system = snark::r1cs_gg_ppzksnark<CurveType>;
 
                     std::cout << "Starting generator" << std::endl;
-                    typename r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
+                    typename snark::r1cs_gg_ppzksnark<CurveType>::keypair_type keypair =
                         generate<basic_proof_system>(example.constraint_system);
 
                     std::cout << "Starting verification key processing" << std::endl;
 
-                    typename r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
-                        r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
+                    typename snark::r1cs_gg_ppzksnark<CurveType>::processed_verification_key_type pvk =
+                        snark::r1cs_gg_ppzksnark_process_verification_key<CurveType>::process(keypair.second);
 
                     std::cout << "Starting prover" << std::endl;
 
-                    typename r1cs_gg_ppzksnark<CurveType>::proof_type proof = prove<basic_proof_system>(
+                    typename snark::r1cs_gg_ppzksnark<CurveType>::proof_type proof = prove<basic_proof_system>(
                         keypair.first, example.primary_input, example.auxiliary_input);
 
                     /*const bool ans =
-                        r1cs_gg_ppzksnark<CurveType,
+                        snark::r1cs_gg_ppzksnark<CurveType,
                        policies::r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>>::verifier(keypair.second,
                        example.primary_input, proof);*/
 
@@ -122,7 +122,7 @@ namespace nil {
 
                     std::cout << "Starting weak verifier" << std::endl;
 
-                    using weak_proof_system = r1cs_gg_ppzksnark<
+                    using weak_proof_system = snark::r1cs_gg_ppzksnark<
                         CurveType,
                         r1cs_gg_ppzksnark_generator<CurveType>,
                         r1cs_gg_ppzksnark_prover<CurveType>,

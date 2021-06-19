@@ -58,6 +58,7 @@
 #include "../pairing/weierstrass_miller_loop.hpp"
 #include "../r1cs_examples.hpp"
 
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::algebra;
 
@@ -85,18 +86,18 @@ void test_verifier() {
     const std::size_t vk_size_in_bits =
         r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
-    blueprint<FieldT_B> bp;
-    blueprint_variable_vector<FieldT_B> vk_bits;
+    components::blueprint<FieldT_B> bp;
+    components::blueprint_variable_vector<FieldT_B> vk_bits;
     vk_bits.allocate(bp, vk_size_in_bits);
 
-    blueprint_variable_vector<FieldT_B> primary_input_bits;
+    components::blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(bp, primary_input_size_in_bits);
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(bp);
 
     r1cs_ppzksnark_verification_key_variable<ppT_B> vk(bp, vk_bits, primary_input_size);
 
-    variable<FieldT_B> result;
+    components::blueprint_variable<FieldT_B> result;
     result.allocate(bp);
 
     r1cs_ppzksnark_verifier_component<ppT_B> verifier(bp, vk, primary_input_bits, elt_size, proof, result);
@@ -151,14 +152,14 @@ void test_hardcoded_verifier() {
     const std::size_t elt_size = FieldT_A::size_in_bits();
     const std::size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
-    blueprint<FieldT_B> bp;
+    components::blueprint<FieldT_B> bp;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(bp, keypair.second);
-    blueprint_variable_vector<FieldT_B> primary_input_bits;
+    components::blueprint_variable_vector<FieldT_B> primary_input_bits;
     primary_input_bits.allocate(bp, primary_input_size_in_bits);
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(bp);
 
-    variable<FieldT_B> result;
+    components::blueprint_variable<FieldT_B> result;
     result.allocate(bp);
 
     r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(bp, hardcoded_vk, primary_input_bits, elt_size,
@@ -195,7 +196,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class MulT
 void test_mul() {
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> y(bp);
     VarT<FpExtT> xy(bp);
@@ -219,7 +220,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class SqrT
 void test_sqr() {
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     SqrT<FpExtT> sqr(bp, x, xsq);
@@ -241,7 +242,7 @@ void test_cyclotomic_sqr() {
     typedef algebra::Fqk<CurveType> FpExtT;
     typedef typename FpExtT::my_Fp FieldType;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     CycloSqrT<FpExtT> sqr(bp, x, xsq);
@@ -265,7 +266,7 @@ void test_Frobenius() {
     typedef typename FpExtT::my_Fp FieldType;
 
     for (size_t i = 0; i < 100; ++i) {
-        blueprint<FieldType> bp;
+        components::blueprint<FieldType> bp;
         VarT<FpExtT> x(bp);
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
@@ -283,7 +284,7 @@ void test_full_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
         pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
@@ -301,7 +302,7 @@ void test_full_pair() {
 
     Fqk_variable<CurveType> miller_result(bp);
     mnt_miller_loop_component<CurveType> miller(bp, prec_P, prec_Q, miller_result);
-    variable<FieldType> result_is_one;
+    components::blueprint_variable<FieldType> result_is_one;
     result_is_one.allocate(bp);
     final_exp_component<CurveType> finexp(bp, miller_result, result_is_one);
 
@@ -338,7 +339,7 @@ void test_full_precomputed_pair() {
     typedef typename CurveType::scalar_field_type FieldType;
     typedef typename pairing::CurveType::pairing::pair_curve_type::pairing pairing_policy;
 
-    blueprint<FieldType> bp;
+    components::blueprint<FieldType> bp;
     pairing::CurveType::pairing::pair_curve_type::g1_type::value_type P_val =
         algebra::random_element<pairing::CurveType::pairing::pair_curve_type::scalar_field_type>() *
         pairing::CurveType::pairing::pair_curve_type::g1_type::value_type::one();
@@ -351,7 +352,7 @@ void test_full_precomputed_pair() {
 
     Fqk_variable<CurveType> miller_result(bp);
     mnt_miller_loop_component<CurveType> miller(bp, prec_P, prec_Q, miller_result);
-    variable<FieldType> result_is_one;
+    components::blueprint_variable<FieldType> result_is_one;
     result_is_one.allocate(bp);
     final_exp_component<CurveType> finexp(bp, miller_result, result_is_one);
 

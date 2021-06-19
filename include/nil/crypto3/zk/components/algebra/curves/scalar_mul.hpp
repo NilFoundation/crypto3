@@ -38,131 +38,129 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                namespace components {
+            namespace components {
 
-                    template<typename CurveType>
-                    class element_g1;
+                template<typename CurveType>
+                class element_g1;
 
-                    template<typename CurveType>
-                    class element_g1_add;
+                template<typename CurveType>
+                class element_g1_add;
 
-                    template<typename CurveType>
-                    class element_g1_doubled;
+                template<typename CurveType>
+                class element_g1_doubled;
 
-                    /**
-                     * Component that creates constraints for G1 multi-scalar multiplication.
-                     */
-                    template<typename CurveType>
-                    class scalar_mul : public component<typename CurveType::scalar_field_type> {
-                        typedef typename CurveType::scalar_field_type FieldType;
+                /**
+                 * Component that creates constraints for G1 multi-scalar multiplication.
+                 */
+                template<typename CurveType>
+                class scalar_mul : public component<typename CurveType::scalar_field_type> {
+                    typedef typename CurveType::scalar_field_type FieldType;
 
-                    public:
-                        std::vector<element_g1<CurveType>> computed_results;
-                        std::vector<element_g1<CurveType>> chosen_results;
-                        std::vector<element_g1_add<CurveType>> adders;
-                        std::vector<element_g1_doubled<CurveType>> doublers;
+                public:
+                    std::vector<element_g1<CurveType>> computed_results;
+                    std::vector<element_g1<CurveType>> chosen_results;
+                    std::vector<element_g1_add<CurveType>> adders;
+                    std::vector<element_g1_doubled<CurveType>> doublers;
 
-                        element_g1<CurveType> base;
-                        blueprint_variable_vector<FieldType> scalars;
-                        std::vector<element_g1<CurveType>> points;
-                        std::vector<element_g1<CurveType>> points_and_powers;
-                        element_g1<CurveType> result;
+                    element_g1<CurveType> base;
+                    blueprint_variable_vector<FieldType> scalars;
+                    std::vector<element_g1<CurveType>> points;
+                    std::vector<element_g1<CurveType>> points_and_powers;
+                    element_g1<CurveType> result;
 
-                        const std::size_t elt_size;
-                        const std::size_t num_points;
-                        const std::size_t scalar_size;
+                    const std::size_t elt_size;
+                    const std::size_t num_points;
+                    const std::size_t scalar_size;
 
-                        scalar_mul(blueprint<FieldType> &bp,
-                                                     const element_g1<CurveType> &base,
-                                                     const blueprint_variable_vector<FieldType> &scalars,
-                                                     const std::size_t elt_size,
-                                                     const std::vector<element_g1<CurveType>> &points,
-                                                     const element_g1<CurveType> &result) :
-                            component<FieldType>(bp),
-                            base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
-                            num_points(points.size()), scalar_size(scalars.size()) {
+                    scalar_mul(blueprint<FieldType> &bp,
+                                                 const element_g1<CurveType> &base,
+                                                 const blueprint_variable_vector<FieldType> &scalars,
+                                                 const std::size_t elt_size,
+                                                 const std::vector<element_g1<CurveType>> &points,
+                                                 const element_g1<CurveType> &result) :
+                        component<FieldType>(bp),
+                        base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
+                        num_points(points.size()), scalar_size(scalars.size()) {
 
-                            assert(num_points >= 1);
-                            assert(num_points * elt_size == scalar_size);
+                        assert(num_points >= 1);
+                        assert(num_points * elt_size == scalar_size);
 
-                            for (std::size_t i = 0; i < num_points; ++i) {
-                                points_and_powers.emplace_back(points[i]);
-                                for (std::size_t j = 0; j < elt_size - 1; ++j) {
-                                    points_and_powers.emplace_back(element_g1<CurveType>(bp));
-                                    doublers.emplace_back(
-                                        element_g1_doubled<CurveType>(bp,
-                                                                    points_and_powers[i * elt_size + j],
-                                                                    points_and_powers[i * elt_size + j + 1]));
-                                }
-                            }
-
-                            chosen_results.emplace_back(base);
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                computed_results.emplace_back(element_g1<CurveType>(bp));
-                                if (i < scalar_size - 1) {
-                                    chosen_results.emplace_back(element_g1<CurveType>(bp));
-                                } else {
-                                    chosen_results.emplace_back(result);
-                                }
-
-                                adders.emplace_back(element_g1_add<CurveType>(
-                                    bp, chosen_results[i], points_and_powers[i], computed_results[i]));
+                        for (std::size_t i = 0; i < num_points; ++i) {
+                            points_and_powers.emplace_back(points[i]);
+                            for (std::size_t j = 0; j < elt_size - 1; ++j) {
+                                points_and_powers.emplace_back(element_g1<CurveType>(bp));
+                                doublers.emplace_back(
+                                    element_g1_doubled<CurveType>(bp,
+                                                                points_and_powers[i * elt_size + j],
+                                                                points_and_powers[i * elt_size + j + 1]));
                             }
                         }
 
-                        void generate_r1cs_constraints() {
-                            const std::size_t num_constraints_before = this->bp.num_constraints();
-
-                            for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                                doublers[i].generate_r1cs_constraints();
+                        chosen_results.emplace_back(base);
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            computed_results.emplace_back(element_g1<CurveType>(bp));
+                            if (i < scalar_size - 1) {
+                                chosen_results.emplace_back(element_g1<CurveType>(bp));
+                            } else {
+                                chosen_results.emplace_back(result);
                             }
 
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                adders[i].generate_r1cs_constraints();
+                            adders.emplace_back(element_g1_add<CurveType>(
+                                bp, chosen_results[i], points_and_powers[i], computed_results[i]));
+                        }
+                    }
 
-                                /*
-                                  chosen_results[i+1].X = scalars[i] * computed_results[i].X + (1-scalars[i]) *
-                                  chosen_results[i].X chosen_results[i+1].X - chosen_results[i].X = scalars[i] *
-                                  (computed_results[i].X - chosen_results[i].X)
-                                */
-                                this->bp.add_r1cs_constraint(
-                                    r1cs_constraint<FieldType>(scalars[i],
-                                                               computed_results[i].X - chosen_results[i].X,
-                                                               chosen_results[i + 1].X - chosen_results[i].X));
-                                this->bp.add_r1cs_constraint(
-                                    r1cs_constraint<FieldType>(scalars[i],
-                                                               computed_results[i].Y - chosen_results[i].Y,
-                                                               chosen_results[i + 1].Y - chosen_results[i].Y));
-                            }
+                    void generate_r1cs_constraints() {
+                        const std::size_t num_constraints_before = this->bp.num_constraints();
 
-                            const std::size_t num_constraints_after = this->bp.num_constraints();
-                            assert(num_constraints_after - num_constraints_before ==
-                                   4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
+                        for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
+                            doublers[i].generate_r1cs_constraints();
                         }
 
-                        void generate_r1cs_witness() {
-                            for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                                doublers[i].generate_r1cs_witness();
-                            }
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            adders[i].generate_r1cs_constraints();
 
-                            for (std::size_t i = 0; i < scalar_size; ++i) {
-                                adders[i].generate_r1cs_witness();
-                                this->bp.lc_val(chosen_results[i + 1].X) =
-                                    (this->bp.val(scalars[i]) ==
-                                             typename CurveType::scalar_field_type::value_type::zero() ?
-                                         this->bp.lc_val(chosen_results[i].X) :
-                                         this->bp.lc_val(computed_results[i].X));
-                                this->bp.lc_val(chosen_results[i + 1].Y) =
-                                    (this->bp.val(scalars[i]) ==
-                                             typename CurveType::scalar_field_type::value_type::zero() ?
-                                         this->bp.lc_val(chosen_results[i].Y) :
-                                         this->bp.lc_val(computed_results[i].Y));
-                            }
+                            /*
+                              chosen_results[i+1].X = scalars[i] * computed_results[i].X + (1-scalars[i]) *
+                              chosen_results[i].X chosen_results[i+1].X - chosen_results[i].X = scalars[i] *
+                              (computed_results[i].X - chosen_results[i].X)
+                            */
+                            this->bp.add_r1cs_constraint(
+                                snark::r1cs_constraint<FieldType>(scalars[i],
+                                                           computed_results[i].X - chosen_results[i].X,
+                                                           chosen_results[i + 1].X - chosen_results[i].X));
+                            this->bp.add_r1cs_constraint(
+                                snark::r1cs_constraint<FieldType>(scalars[i],
+                                                           computed_results[i].Y - chosen_results[i].Y,
+                                                           chosen_results[i + 1].Y - chosen_results[i].Y));
                         }
-                    };
-                }    // namespace components
-            }        // namespace snark
+
+                        const std::size_t num_constraints_after = this->bp.num_constraints();
+                        assert(num_constraints_after - num_constraints_before ==
+                               4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
+                    }
+
+                    void generate_r1cs_witness() {
+                        for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
+                            doublers[i].generate_r1cs_witness();
+                        }
+
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            adders[i].generate_r1cs_witness();
+                            this->bp.lc_val(chosen_results[i + 1].X) =
+                                (this->bp.val(scalars[i]) ==
+                                         typename CurveType::scalar_field_type::value_type::zero() ?
+                                     this->bp.lc_val(chosen_results[i].X) :
+                                     this->bp.lc_val(computed_results[i].X));
+                            this->bp.lc_val(chosen_results[i + 1].Y) =
+                                (this->bp.val(scalars[i]) ==
+                                         typename CurveType::scalar_field_type::value_type::zero() ?
+                                     this->bp.lc_val(chosen_results[i].Y) :
+                                     this->bp.lc_val(computed_results[i].Y));
+                        }
+                    }
+                };
+            }    // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil
