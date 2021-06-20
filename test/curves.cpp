@@ -232,11 +232,6 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
-    typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
-    BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
-    typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
-    BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
     BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
     BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
                           (points[p2] * static_cast<cpp_int>(constants[C2])),
@@ -244,29 +239,34 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
                           (points[p2] * static_cast<cpp_int>(constants[C2])),
                       points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
+    typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
+    BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
+    typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
+    BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 }
 
 // temporary separated test for JubJub and BabyJubJub
 template<typename CurveGroup>
 void check_curve_operations_twisted_edwards(const std::vector<typename CurveGroup::value_type> &points,
-                            const std::vector<std::size_t> &constants) {
+                            const std::vector<typename CurveGroup::curve_type::number_type> &constants) {
     using nil::crypto3::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
-    // BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      points[p2_mul_C1_plus_p2_mul_C2]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
+                          (points[p2] * static_cast<cpp_int>(constants[C2])),
+                      points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));    
     // BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
     // typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
     // BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
     // typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
     // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
-    // BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
-    // BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
-                          // (points[p2] * static_cast<cpp_int>(constants[C2])),
-                      // points[p2_mul_C1_plus_p2_mul_C2]);
-    // BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
-                          // (points[p2] * static_cast<cpp_int>(constants[C2])),
-                      // points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>
@@ -286,6 +286,26 @@ void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
 
     for (auto &constant : test_set.second.get_child("constants")) {
         constants.emplace_back(std::stoul(constant.second.data()));
+    }
+}
+
+template<typename FpCurveGroup, typename TestSet>
+void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value_type> &points,
+                        std::vector<typename FpCurveGroup::curve_type::number_type> &constants,
+                        const TestSet &test_set) {
+    typedef typename FpCurveGroup::underlying_field_type::value_type field_value_type;
+    std::array<field_value_type, 3> coordinates;
+
+    for (auto &point : test_set.second.get_child("point_coordinates")) {
+        auto i = 0;
+        for (auto &coordinate : point.second) {
+            coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
+        }
+        points.emplace_back(typename FpCurveGroup::value_type(coordinates[0], coordinates[1]));
+    }
+
+    for (auto &constant : test_set.second.get_child("constants")) {
+        constants.emplace_back(typename FpCurveGroup::curve_type::number_type(constant.second.data()));
     }
 }
 
@@ -358,11 +378,11 @@ void curve_operation_test(const TestSet &test_set,
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test_twisted_edwards(const TestSet &test_set,
                           void (&test_init)(std::vector<typename CurveGroup::value_type> &,
-                                            std::vector<std::size_t> &,
+                                            std::vector<typename CurveGroup::curve_type::number_type> &,
                                             const TestSet &)) {
 
     std::vector<typename CurveGroup::value_type> points;
-    std::vector<std::size_t> constants;
+    std::vector<typename CurveGroup::curve_type::number_type> constants;
 
     test_init(points, constants, test_set);
 
@@ -371,7 +391,7 @@ void curve_operation_test_twisted_edwards(const TestSet &test_set,
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_jubjub_g1"), data_set) {
     using policy_type = curves::jubjub::g1_type;
 
     typename policy_type::value_type P1(typename policy_type::underlying_field_type::value_type(0x07573f2e83f6b00594e8b165d078db94eb5d9d36058707a629dc0cd723dc3d13_cppui255),
@@ -424,7 +444,7 @@ BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operatio
 
     BOOST_CHECK((P2 * C1) + (P2 * C2) == P2mulC1plusP2mulC2);
     BOOST_CHECK(P2mulC1plusP2mulC2.is_well_formed());
-    // curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_test_init<policy_type>);
+    curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_twisted_edwards_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
