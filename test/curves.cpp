@@ -394,56 +394,6 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 BOOST_DATA_TEST_CASE(curve_operation_test_jubjub_g1, string_data("curve_operation_test_jubjub_g1"), data_set) {
     using policy_type = curves::jubjub::g1_type;
 
-    typename policy_type::value_type P1(typename policy_type::underlying_field_type::value_type(0x07573f2e83f6b00594e8b165d078db94eb5d9d36058707a629dc0cd723dc3d13_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x675e75c4f99ebf2650116c5aac9c5b4854befafd32058921b16a2ab03b09bb87_cppui255)), 
-                       P2(typename policy_type::underlying_field_type::value_type(0x51ea3efbd880edab46bcd6d4f25a3e51183edc9747d68639d90f2a56b2400cdd_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x24851474b035954123775ebb90e4a686b675c2441f129cad31fc74ba3195c09c_cppui255)),
-                       P1pP2(typename policy_type::underlying_field_type::value_type(0x48aca52483a763779bc66e971ba5544aaef229428c1564f238fef37ec9304124_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x0e0f60baa5175659ab7b7475c733b3799a728e139bde7fc6dbaa0fc5582c6c8e_cppui255)),
-                       P1mP2(typename policy_type::underlying_field_type::value_type(0x01397f5c1cb8b01d50f2de0ea7b4313c3cde9092ce7be8b296e161b8acd11ca5_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x12817dc216db8b3f2912895ea74503c5898bb6ad2031551d3b6dd85bd31949fe_cppui255)),
-                       P1mulC1(typename policy_type::underlying_field_type::value_type(0x54159bc9b43c36f888bcc71d1d6872c5066cb696d50ea8e474dafee60a32c765_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x0903cbf05cbb1c940c7ef202006cff0ac85d5930acf8a5a1ec0ac1bc7c3588b7_cppui255)),
-                       P2mulC1plusP2mulC2(typename policy_type::underlying_field_type::value_type(0x68b2b1f0c4b6a7b459ab849f7e5f18bc5ad096af5352213c5d9caf97b00dd224_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x336631c01b140040bbed152255f98540d9d40a75dc4fdf69699c3ac489027e3f_cppui255));
-
-    typename policy_type::value_type one_point = policy_type::value_type::one();
-    typename policy_type::value_type random_point = random_element<policy_type>();
-
-    BOOST_CHECK(one_point.is_well_formed());
-    BOOST_CHECK((one_point * curves::jubjub::number_type(5)).is_well_formed());
-    BOOST_CHECK((one_point.doubled()).is_well_formed());
-    BOOST_CHECK(random_point.is_well_formed());
-
-    // std::cout << std::endl;
-    // std::cout << "P1mP2:" << std::endl;
-    // print_fp_curve_group_element(std::cout, P1mP2);
-
-    BOOST_CHECK(P1 + P2 == P1pP2);
-
-    BOOST_CHECK(P1 - P2 == P1mP2);
-
-    BOOST_CHECK(P1.is_well_formed());
-    BOOST_CHECK(P2.is_well_formed());
-    BOOST_CHECK(P1pP2.is_well_formed());
-    BOOST_CHECK(P1mP2.is_well_formed());
-
-    typename policy_type::value_type 
-                       P1dbl(typename policy_type::underlying_field_type::value_type(0x2bfd313640c85b796710432b3d38ac694f77d136d39be1e4065c809206bfcd47_cppui255),
-                          typename policy_type::underlying_field_type::value_type(0x46d3a20408233f9bb5772f27ab2fc0653c8eac3d01b56e01b87cb6f9c084ab29_cppui255));
-
-    BOOST_CHECK(P1.doubled() == P1dbl);
-    BOOST_CHECK(P1dbl.is_well_formed());
-
-    typename curves::jubjub::scalar_field_type::value_type C1 = typename curves::jubjub::scalar_field_type::value_type(0x0aa7d8962e0c9834889e553aaae3f7ac694ca24069b111291cd0150e786038dc_cppui252);
-    typename curves::jubjub::scalar_field_type::value_type C2 = typename curves::jubjub::scalar_field_type::value_type(0x0635ed2fa92d60296d9585a8927947ebf6bd9233cd116320abff907354205e88_cppui252);
-
-    // print_fp_curve_group_element(std::cout, P1 * C1);
-    BOOST_CHECK(P1 * C1 == P1mulC1);
-    BOOST_CHECK(P1mulC1.is_well_formed());
-
-    BOOST_CHECK((P2 * C1) + (P2 * C2) == P2mulC1plusP2mulC2);
-    BOOST_CHECK(P2mulC1plusP2mulC2.is_well_formed());
     curve_operation_test_twisted_edwards<policy_type>(data_set, fp_curve_twisted_edwards_test_init<policy_type>);
 }
 
