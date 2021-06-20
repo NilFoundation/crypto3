@@ -55,9 +55,13 @@ endmacro()
 
 set(FIELDS_TESTS_FILES
     "algebra/fields/fp2"
+    "algebra/fields/fp2_verification"
     "algebra/fields/fp3"
+    "algebra/fields/fp3_verification"
     "algebra/fields/fp4"
+    "algebra/fields/fp4_verification"
     "algebra/fields/fp6_2over3"
+    "algebra/fields/fp6_2over3_verification"
     #"algebra/fields/exponentiation"
     )
 

@@ -51,7 +51,6 @@ bool verify_component(components::blueprint<typename CurveType::scalar_field_typ
     }
 
     using field_type = typename CurveType::scalar_field_type;
-    using curve_type = CurveType;
     using scheme_type = SchemeType;
 
     const snark::r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
