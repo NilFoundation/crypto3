@@ -28,15 +28,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/edwards.hpp>
-
-#include <nil/crypto3/zk/components/algebra/fields/element_fp2.hpp>
-
 using namespace nil::crypto3::zk;
 
 template <typename FieldType, template<class> class Fpk_variableT, 
           template<class> class Fpk_mul_componentT>
-components::blueprint<typename FieldType::base_field_type> test_element_field_mul(typename FieldType::value_type a_value, 
+components::blueprint<typename FieldType::base_field_type> test_field_element_mul(typename FieldType::value_type a_value, 
                                                       typename FieldType::value_type b_value){
     using field_type = FieldType;
     using element_component = Fpk_variableT<field_type>;

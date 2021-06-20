@@ -23,20 +23,20 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE element_fp_test
+#define BOOST_TEST_MODULE element_fp3_test
 
 #include <chrono>
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/element_fp2.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/element_fp3.hpp>
 
-#include "element_fp2.hpp"
+#include "arithmetic.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -44,28 +44,52 @@ using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(field_element_arithmetic_component_test_suite)
 
-BOOST_AUTO_TEST_CASE(field_element_arithmetic_component_test_mnt4_case) {
-    using curve_type = typename curves::mnt4<298>;
+BOOST_AUTO_TEST_CASE(field_element_arithmetic_component_test_mnt6_case) {
+    using curve_type = typename curves::mnt6<298>;
     using field_type = typename curve_type::g2_type::underlying_field_type;
     using base_field_type = typename curve_type::base_field_type;
 
     std::size_t tries_quantity = 500;
-    std::cout << "Starting element Fp2 component test for MNT4-298 " << tries_quantity << " times ..." << std::endl;
+    std::cout << "Starting element Fp3 component test for MNT6-298 " << tries_quantity << " times ..." << std::endl;
     auto begin = std::chrono::high_resolution_clock::now();
 
     for (std::size_t i = 0; i < tries_quantity; i++){
         typename field_type::value_type a_value = random_element<field_type>();
         typename field_type::value_type b_value = random_element<field_type>();
 
-        components::blueprint<base_field_type> bp = test_element_field_mul<field_type, 
-            components::element_fp2, 
-            components::element_fp2_mul>(a_value, b_value);
+        components::blueprint<base_field_type> bp = test_field_element_mul<field_type, 
+            components::element_fp3, 
+            components::element_fp3_mul>(a_value, b_value);
 
         BOOST_CHECK(bp.is_satisfied());
     }
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    std::cout << "Element Fp2 component test for MNT4-298 finished, average time: " << elapsed.count() * 1e-9 / tries_quantity << std::endl;
+    std::cout << "Element Fp3 component test for MNT6-298 finished, average time: " << elapsed.count() * 1e-9 / tries_quantity << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(field_element_arithmetic_component_test_edwards_183_case) {
+    using curve_type = typename curves::edwards<183>;
+    using field_type = typename curve_type::g2_type::underlying_field_type;
+    using base_field_type = typename curve_type::base_field_type;
+
+    std::size_t tries_quantity = 500;
+    std::cout << "Starting element Fp3 component test for Edwards-183 " << tries_quantity << " times ..." << std::endl;
+    auto begin = std::chrono::high_resolution_clock::now();
+
+    for (std::size_t i = 0; i < tries_quantity; i++){
+        typename field_type::value_type a_value = random_element<field_type>();
+        typename field_type::value_type b_value = random_element<field_type>();
+
+        components::blueprint<base_field_type> bp = test_field_element_mul<field_type, 
+            components::element_fp3, 
+            components::element_fp3_mul>(a_value, b_value);
+
+        BOOST_CHECK(bp.is_satisfied());
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    std::cout << "Element Fp3 component test for Edwards-183 finished, average time: " << elapsed.count() * 1e-9 / tries_quantity << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

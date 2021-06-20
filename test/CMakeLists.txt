@@ -53,24 +53,51 @@ macro(define_blueprint_test test)
     endif()
 endmacro()
 
-set(TESTS_NAMES
-    "algebra/fields/element_fp2"
-    "routing_algorithms/routing_algorithms"
+set(FIELDS_TESTS_FILES
+    "algebra/fields/fp2"
+    "algebra/fields/fp3"
+    "algebra/fields/fp4"
+    #"algebra/fields/exponentiation"
+    )
+
+set(HASHES_TESTS_FILES
     "hashes/knapsack"
     "hashes/knapsack_verification"
     "hashes/sha256"
-    "hashes/sha256_verification"
+    "hashes/sha256_verification")
+
+set(PAIRING_TESTS_FILES
+    "algebra/pairing/weierstrass/miller_loop"
+    "algebra/pairing/weierstrass/precomputation")
+
+set(ROUTING_TESTS_FILES
+    "routing_algorithms/routing_algorithms"
     "routing/as_waksman"
-    "routing/benes"
-    "pairing/weierstrass_miller_loop"
-#    "pairing/weierstrass_precomputation"
+    "routing/benes")
+
+set(SCHEMES_TESTS_FILES
     "verifiers/r1cs_ppzksnark"
-    "basic_components"
-    "basic_components_r1cs_gg_ppzksnark"
-    "exponentiation_component"
-    "merkle_tree_components"
     "set_commitment_component")
 
-foreach(TEST_NAME ${TESTS_NAMES})
-    define_blueprint_test(${TEST_NAME})
+set(MERKLE_TREE_TESTS_FILES
+    "merkle_tree_components")
+
+set(BASIC_COMPONENTS_TESTS_FILES
+    "basic_components"
+    "basic_components_r1cs_gg_ppzksnark")
+
+SET(ALGEBRA_TESTS_FILES 
+    ${FIELDS_TESTS_FILES}
+    ${PAIRING_TESTS_FILES})
+
+SET(ALL_TESTS_FILES 
+    ${ALGEBRA_TESTS_FILES}
+    ${HASHES_TESTS_FILES}
+    ${ROUTING_TESTS_FILES}
+    ${SCHEMES_TESTS_FILES}
+    ${MERKLE_TREE_TESTS_FILES}
+    ${BASIC_COMPONENTS_TESTS_FILES})
+
+foreach(TEST_FILE ${ALL_TESTS_FILES})
+    define_blueprint_test(${TEST_FILE})
 endforeach()
