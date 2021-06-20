@@ -57,4 +57,29 @@ components::blueprint<typename FieldType::base_field_type> test_field_element_mu
     return bp;
 }
 
+template <typename FieldType, template<class> class Fpk_variableT, 
+          template<class> class Fpk_squared_componentT>
+components::blueprint<typename FieldType::base_field_type> test_field_element_squared(typename FieldType::value_type a_value){
+    using field_type = FieldType;
+    using element_component = Fpk_variableT<field_type>;
+    using element_squared_component = Fpk_squared_componentT<field_type>;
+    using base_field_type = typename field_type::base_field_type;
+
+    components::blueprint<base_field_type> bp;
+
+    element_component A(bp, a_value);
+    element_component result(bp);
+
+    element_squared_component el_squared_instance(bp, A, result);
+    el_squared_instance.generate_r1cs_constraints();
+    el_squared_instance.generate_r1cs_witness();
+
+    const typename field_type::value_type res = result.get_element();
+
+    BOOST_CHECK(bp.is_satisfied());
+    BOOST_CHECK(res == (a_value.squared()));
+
+    return bp;
+}
+
 #endif    // CRYPTO3_ZK_BLUEPRINT_ELEMENT_FP2_COMPONENT_TEST_HPP
