@@ -89,12 +89,18 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
     include/nil/crypto3/zk/components/schemes/set_commitment/set_membership_proof_variable.hpp
 
     include/nil/crypto3/zk/components/schemes/snark/r1cs_pp_zksnark/verifier.hpp
-    include/nil/crypto3/zk/components/basic_components.hpp
+    include/nil/crypto3/zk/components/packing.hpp
+    include/nil/crypto3/zk/components/comparison.hpp
+    include/nil/crypto3/zk/components/conjunction.hpp
+    include/nil/crypto3/zk/components/disjunction.hpp
+    include/nil/crypto3/zk/components/inner_product.hpp
+    include/nil/crypto3/zk/components/loose_multiplexing.hpp
     include/nil/crypto3/zk/components/component_from_r1cs.hpp
-
     include/nil/crypto3/zk/components/component.hpp
     include/nil/crypto3/zk/components/blueprint_variable.hpp
+    include/nil/crypto3/zk/components/blueprint_linear_combination.hpp
     include/nil/crypto3/zk/components/blueprint.hpp
+    
     include/nil/crypto3/zk/merkle_tree.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)

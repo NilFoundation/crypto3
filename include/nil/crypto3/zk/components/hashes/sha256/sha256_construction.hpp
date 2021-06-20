@@ -30,7 +30,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
+#include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/sha256_aux.hpp>
 

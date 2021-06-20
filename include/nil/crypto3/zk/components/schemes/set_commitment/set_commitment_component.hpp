@@ -27,7 +27,6 @@
 #define CRYPTO3_ZK_BLUEPRINT_SET_COMMITMENT_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/basic_components.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/components/merkle_tree/merkle_tree_check_read_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_membership_proof_variable.hpp>

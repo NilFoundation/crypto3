@@ -59,14 +59,13 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
 
-#include <boost/random/uniform_int_distribution.hpp>
-
 #include <nil/crypto3/hash/sha2.hpp>
 
 #include <nil/crypto3/random/hash.hpp>
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
-#include <nil/crypto3/zk/components/basic_components.hpp>
+
+#include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
 namespace nil {

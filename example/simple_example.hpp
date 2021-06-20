@@ -58,7 +58,7 @@ namespace nil {
                     A.allocate(bp, new_num_constraints);
                     B.allocate(bp, new_num_constraints);
 
-                    inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
+                    inner_product<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
                     compute_inner_product.generate_r1cs_constraints();
 
                     /* fill in random example */

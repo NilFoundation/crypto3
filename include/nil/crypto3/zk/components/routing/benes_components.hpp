@@ -32,7 +32,8 @@
 #define CRYPTO3_ZK_BLUEPRINT_BENES_ROUTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
-#include <nil/crypto3/zk/components/basic_components.hpp>
+
+#include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
 namespace nil {

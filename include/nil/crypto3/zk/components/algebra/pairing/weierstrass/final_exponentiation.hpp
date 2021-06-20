@@ -35,8 +35,8 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
+#include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/exponentiation.hpp>
-
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp>
 

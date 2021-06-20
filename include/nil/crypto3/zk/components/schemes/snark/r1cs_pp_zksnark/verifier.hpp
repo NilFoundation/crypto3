@@ -38,7 +38,8 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
+#include <nil/crypto3/zk/components/packing.hpp>
+#include <nil/crypto3/zk/components/conjunction.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g1.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g2.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/pairing_checks.hpp>
@@ -487,7 +488,7 @@ namespace nil {
                         blueprint_variable<FieldType> CC_valid;
 
                         blueprint_variable_vector<FieldType> all_test_results;
-                        std::shared_ptr<conjunction_component<FieldType>> all_tests_pass;
+                        std::shared_ptr<conjunction<FieldType>> all_tests_pass;
 
                         r1cs_ppzksnark_online_verifier_component(
                             blueprint<FieldType> &bp,
@@ -613,7 +614,7 @@ namespace nil {
                             all_test_results.emplace_back(QAP_valid);
                             all_test_results.emplace_back(CC_valid);
 
-                            all_tests_pass.reset(new conjunction_component<FieldType>(bp, all_test_results, result));
+                            all_tests_pass.reset(new conjunction<FieldType>(bp, all_test_results, result));
                         }
 
                         void generate_r1cs_constraints() {

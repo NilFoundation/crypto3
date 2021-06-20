@@ -29,8 +29,8 @@
 #include <cstddef>
 #include <vector>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
-
+#include <nil/crypto3/zk/components/packing.hpp>
+#include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/blueprint.hpp>
 #include <nil/crypto3/zk/components/blueprint_variable.hpp>
 

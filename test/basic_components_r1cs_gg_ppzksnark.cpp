@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE basic_components_test
+#define BOOST_TEST_MODULE basic_components_verification_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -47,7 +47,11 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
+#include <nil/crypto3/zk/components/disjunction.hpp>
+#include <nil/crypto3/zk/components/conjunction.hpp>
+#include <nil/crypto3/zk/components/comparison.hpp>
+#include <nil/crypto3/zk/components/inner_product.hpp>
+#include <nil/crypto3/zk/components/loose_multiplexing.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
@@ -75,7 +79,7 @@ void test_disjunction_component(std::size_t w) {
     components::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
-    components::disjunction_component<field_type> d(bp, inputs, output);
+    components::disjunction<field_type> d(bp, inputs, output);
     d.generate_r1cs_constraints();
 
     for (std::size_t j = 0; j < n; ++j) {
@@ -109,7 +113,7 @@ void test_conjunction_component(std::size_t w) {
     components::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
-    components::conjunction_component<field_type> c(bp, inputs, output);
+    components::conjunction<field_type> c(bp, inputs, output);
     c.generate_r1cs_constraints();
 
     for (std::size_t j = 0; j < n; ++j) {
@@ -143,7 +147,7 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     std::size_t n = std::log2(std::max(a, b)) + 
         ((std::max(a, b) > (1ul << std::size_t(std::log2(std::max(a, b)))))? 1 : 0);
 
-    components::comparison_component<field_type> cmp(bp, n, A, B, less, less_or_eq);
+    components::comparison<field_type> cmp(bp, n, A, B, less, less_or_eq);
     cmp.generate_r1cs_constraints();
     
     bp.val(A) = typename field_type::value_type(a);

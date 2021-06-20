@@ -42,8 +42,6 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-
-#include <nil/crypto3/zk/components/basic_components.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp>
 //#include <nil/crypto3/zk/components/algebra/pairing/pairing_params.hpp>

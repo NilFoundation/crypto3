@@ -29,7 +29,6 @@
 #define CRYPTO3_ZK_BLUEPRINT_SHA256_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
-#include <nil/crypto3/zk/components/basic_components.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/sha256_construction.hpp>
 

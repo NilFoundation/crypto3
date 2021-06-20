@@ -31,7 +31,11 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
+#include <nil/crypto3/zk/components/disjunction.hpp>
+#include <nil/crypto3/zk/components/conjunction.hpp>
+#include <nil/crypto3/zk/components/comparison.hpp>
+#include <nil/crypto3/zk/components/inner_product.hpp>
+#include <nil/crypto3/zk/components/loose_multiplexing.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -46,7 +50,7 @@ void test_disjunction_component(size_t n) {
     components::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
-    components::disjunction_component<FieldType> d(bp, inputs, output);
+    components::disjunction<FieldType> d(bp, inputs, output);
     d.generate_r1cs_constraints();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -73,7 +77,7 @@ void test_conjunction_component(size_t n) {
     components::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
-    components::conjunction_component<FieldType> c(bp, inputs, output);
+    components::conjunction<FieldType> c(bp, inputs, output);
     c.generate_r1cs_constraints();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -102,7 +106,7 @@ void test_comparison_component(size_t n) {
     less.allocate(bp);
     less_or_eq.allocate(bp);
 
-    components::comparison_component<FieldType> cmp(bp, n, A, B, less, less_or_eq);
+    components::comparison<FieldType> cmp(bp, n, A, B, less, less_or_eq);
     cmp.generate_r1cs_constraints();
 
     for (std::size_t a = 0; a < 1ul << n; ++a) {
@@ -130,7 +134,7 @@ void test_inner_product_component(size_t n) {
     components::blueprint_variable<FieldType> result;
     result.allocate(bp);
 
-    components::inner_product_component<FieldType> g(bp, A, B, result);
+    components::inner_product<FieldType> g(bp, A, B, result);
     g.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {
@@ -164,7 +168,7 @@ void test_loose_multiplexing_component(size_t n) {
     result.allocate(bp);
     success_flag.allocate(bp);
 
-    components::loose_multiplexing_component<FieldType> g(bp, arr, index, result, success_flag);
+    components::loose_multiplexing<FieldType> g(bp, arr, index, result, success_flag);
     g.generate_r1cs_constraints();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {

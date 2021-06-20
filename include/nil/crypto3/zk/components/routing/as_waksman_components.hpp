@@ -33,7 +33,8 @@
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
 #include <nil/crypto3/zk/snark/routing/as_waksman.hpp>
-#include <nil/crypto3/zk/components/basic_components.hpp>
+
+#include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/blueprint.hpp>
 
 namespace nil {

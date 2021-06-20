@@ -28,8 +28,6 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
-
 #include "weierstrass_miller_loop.hpp"
 
 using namespace nil::crypto3::zk;

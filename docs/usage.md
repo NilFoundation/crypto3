@@ -52,12 +52,12 @@ constructor allocates intermediate variables, so the developer is responsible fo
 allocation only primary and auxiliary variables. Any Component has to implement 
 at least two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
 
-Now we initialize the simple component `inner_product_component`. The function `generate_r1cs_constraints()` 
+Now we initialize the simple component `inner_product`. The function `generate_r1cs_constraints()` 
 adds R1CS constraints to the blueprint corresponding to the circuit. 
 
 
 ```c++
-inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
+inner_product<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
 compute_inner_product.generate_r1cs_constraints();
 ```
 

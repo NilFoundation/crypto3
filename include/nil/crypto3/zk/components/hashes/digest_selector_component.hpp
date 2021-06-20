@@ -28,7 +28,6 @@
 
 #include <vector>
 
-#include <nil/crypto3/zk/components/basic_components.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
 namespace nil {
