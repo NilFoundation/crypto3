@@ -104,7 +104,7 @@ namespace nil {
                 modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
-            static inline typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
@@ -121,7 +121,7 @@ namespace nil {
             }
 
             template<typename FieldType>
-            static inline typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
@@ -320,7 +320,7 @@ namespace nil {
             template<typename FieldType>
 
             static inline
-                typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -333,7 +333,7 @@ namespace nil {
 
             template<typename FieldType>
             static inline
-                typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -513,7 +513,7 @@ namespace nil {
                 (CurveType::scalar_field_type::modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
-            static inline typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
                                    typename std::vector<chunk_type>::const_iterator read_iter_end) {
@@ -533,7 +533,7 @@ namespace nil {
             }
 
             template<typename FieldType>
-            static inline typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
                                    typename std::vector<chunk_type>::const_iterator read_iter_end) {
@@ -754,7 +754,7 @@ namespace nil {
             template<typename FieldType>
 
             static inline
-                typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -772,7 +772,7 @@ namespace nil {
 
             template<typename FieldType>
             static inline
-                typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
