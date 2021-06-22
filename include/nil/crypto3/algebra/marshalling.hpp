@@ -60,33 +60,37 @@ namespace nil {
             static inline typename std::enable_if<
                 !crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
-                field_value_type>::type
+                std::pair<bool, field_value_type>>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 BOOST_ASSERT(field_octets_num == std::distance(first, last));
 
                 typename FieldType::modulus_type result;
                 ::nil::crypto3::multiprecision::import_bits(result, first, last, chunk_size, false);
 
-                return field_value_type(result);
+                return std::make_pair(result < FieldType::modulus, field_value_type(result));
             }
 
             template<typename InputFieldValueIterator>
             static inline typename std::enable_if<
                 crypto3::algebra::is_extended_field<field_type>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
-                field_value_type>::type
+                std::pair<bool, field_value_type>>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 constexpr std::size_t data_dimension = field_type::arity / field_type::underlying_field_type::arity;
                 BOOST_ASSERT(field_octets_num == std::distance(first, last));
 
                 typename field_value_type::data_type data;
+                bool bres = true;
                 for (std::size_t n = 0; n < data_dimension; ++n) {
-                    data[n] = field_bincode<typename field_type::underlying_field_type>::field_element_from_bytes(
-                        first + n * field_type::underlying_field_type::arity * modulus_chunks,
-                        first + (n + 1) * field_type::underlying_field_type::arity * modulus_chunks);
+                    std::pair<bool, typename field_type::underlying_field_type::value_type> valid_coord =
+                        field_bincode<typename field_type::underlying_field_type>::field_element_from_bytes(
+                            first + n * field_type::underlying_field_type::arity * modulus_chunks,
+                            first + (n + 1) * field_type::underlying_field_type::arity * modulus_chunks);
+                    bres = bres && valid_coord.first;
+                    data[n] = valid_coord.second;
                 }
 
-                return field_value_type(data);
+                return std::make_pair(bres, field_value_type(data));
             }
 
             template<typename OutputIterator>
@@ -193,7 +197,7 @@ namespace nil {
                     std::is_same<chunk_type,
                                  typename std::iterator_traits<InputFieldValueIterator>::value_type>::value &&
                     (std::is_same<fp_type, FieldType>::value || std::is_same<fr_type, FieldType>::value),
-                typename FieldType::value_type>::type
+                std::pair<bool, typename FieldType::value_type>>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 return field_bincode<FieldType>::field_element_from_bytes(first, last);
             }
@@ -202,7 +206,7 @@ namespace nil {
             static inline typename std::enable_if<
                 crypto3::algebra::is_extended_field<FieldType>::value &&
                     std::is_same<chunk_type, typename std::iterator_traits<InputFieldValueIterator>::value_type>::value,
-                typename FieldType::value_type>::type
+                std::pair<bool, typename FieldType::value_type>>::type
                 field_element_from_bytes(InputFieldValueIterator first, InputFieldValueIterator last) {
                 return field_bincode<FieldType>::field_element_from_bytes(first, last);
             }
