@@ -126,15 +126,16 @@ namespace nil {
 
                             state.insert(state.end(), counter_nonce_bytes.begin(), counter_nonce_bytes.end());
                             typename hash_type::digest_type res = hash<hash_type>(state);
-                            typename curve_type::scalar_field_type::value_type res_deser =
+                            std::pair<bool, typename curve_type::scalar_field_type::value_type> res_deser =
                                 bincode::template field_element_from_bytes<typename curve_type::scalar_field_type>(
                                     res.begin(), res.end());
 
-                            if (res_deser == curve_type::scalar_field_type::value_type::zero() ||
-                                res_deser == curve_type::scalar_field_type::value_type::one()) {
+                            if (!res_deser.first ||
+                                res_deser.second == curve_type::scalar_field_type::value_type::zero() ||
+                                res_deser.second == curve_type::scalar_field_type::value_type::one()) {
                                 continue;
                             }
-                            return res_deser;
+                            return res_deser.second;
                         }
                     }
                 };
