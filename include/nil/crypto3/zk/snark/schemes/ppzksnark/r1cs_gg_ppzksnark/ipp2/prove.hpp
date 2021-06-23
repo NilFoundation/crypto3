@@ -587,6 +587,8 @@ namespace nil {
                     typename CurveType::g1_type::value_type agg_c =
                         algebra::multiexp<algebra::policies::multiexp_method_bos_coster>(c.begin(), c.end(),
                                                                                          r_vec.begin(), r_vec.end(), 1);
+                    tr.template write<typename CurveType::gt_type>(ip_ab);
+                    tr.template write<typename CurveType::g1_type>(agg_c);
 
                     // w^{r^{-1}}
                     r1cs_gg_ppzksnark_ipp2_commitment_key<typename CurveType::g1_type> wkey_r_inv =
