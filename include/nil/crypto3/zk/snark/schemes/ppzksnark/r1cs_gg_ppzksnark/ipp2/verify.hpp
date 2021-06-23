@@ -323,11 +323,11 @@ namespace nil {
                     gipa_verify_tipp_mipp(transcript<CurveType, Hash> &tr,
                                           const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                           const typename CurveType::scalar_field_type::value_type &r_shift) {
-                    constexpr std::array<std::uint8_t, 4> domain_separator = {'g', 'i', 'p', 'a'};
-                    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
-
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges_inv;
+
+                    constexpr std::array<std::uint8_t, 4> domain_separator = {'g', 'i', 'p', 'a'};
+                    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
 
                     // We first generate all challenges as this is the only consecutive process
                     // that can not be parallelized then we scale the commitments in a
@@ -560,14 +560,13 @@ namespace nil {
                         std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value,
                     bool>::type
                     verify_aggregate_proof(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &ip_verifier_srs,
-                                           const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                                           const r1cs_gg_ppzksnark_verification_key<CurveType> &pvk,
                                            const InputRangesRange &public_inputs,
                                            const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                            InputIterator transcript_include_first,
                                            InputIterator transcript_include_last) {
                     for (const auto &public_input : public_inputs) {
-                        // TODO: without +1
-                        BOOST_ASSERT((public_input.size() + 1) == vk.gamma_ABC_g1.size());
+                        BOOST_ASSERT((public_input.size()) == pvk.gamma_ABC_g1.size());
                     }
 
                     // Random linear combination of proofs
@@ -587,6 +586,7 @@ namespace nil {
 
                     pairing_check<CurveType, DistributionType, GeneratorType> pc;
 
+                    // TODO: parallel
                     // 1.Check TIPA proof ab
                     // 2.Check TIPA proof c
                     verify_tipp_mipp<CurveType, DistributionType, GeneratorType, Hash>(
@@ -613,22 +613,35 @@ namespace nil {
                     // randomized already. When merging all pairing checks together, this will be the only one
                     // non-randomized.
                     //
-                    std::vector<typename CurveType::scalar_field_type::value_type> r_vec =
+                    // now we do the multi exponentiation
+                    std::vector<typename CurveType::scalar_field_type::value_type> powers =
                         structured_scalar_power<typename CurveType::scalar_field_type>(public_inputs.size(), r);
                     std::vector<typename CurveType::scalar_field_type::value_type> multi_r_vec;
                     // i denotes the column of the public input, and j denotes which public input
                     for (std::size_t i = 0; i < public_inputs[0].size(); ++i) {
                         typename CurveType::scalar_field_type::value_type c = public_inputs[0][i];
                         for (std::size_t j = 1; j < public_inputs.size(); ++j) {
-                            c = c + public_inputs[j][i] * r_vec[j];
+                            c = c + public_inputs[j][i] * powers[j];
                         }
+                        multi_r_vec.emplace_back(c);
                     }
 
                     // 3. Compute left part of the final pairing equation
-                    typename CurveType::gt_type::value_type left = vk.alpha_g1_beta_g2.pow(r_sum.data);
+                    // TODO: add fields alpha_g1 and beta_g2 in vk then fix
+                    using curve_type = CurveType;
+                    using g2_type = typename curve_type::g2_type;
+                    using G2_value_type = typename g2_type::value_type;
+                    using fq2_type = typename G2_value_type::underlying_field_type;
+                    using fq2_value_type = typename fq2_type::value_type;
+                    using fq12_type = typename curve_type::gt_type;
+                    using fq12_value_type = typename fq12_type::value_type;
+                    using fq6_value_type = typename fq12_value_type::underlying_type;
+                    typename CurveType::gt_type::value_type left = fq12_value_type(fq6_value_type(fq2_value_type(0x194295c7c6906869e05e0a03fd6c74136fe849099343e413425ef5aa1a1aba1b9227b43c491cdeffb4501be3de7da032_cppui381, 0x07e780996d0e6eccc00bf6ea16925d5939784e7fa73e4dc12c0acecb8b1a5eb6164fc395055b6db40c84db335dcf3e11_cppui381), fq2_value_type(0x15369ecc34a321ba1f3312641e87b7bf4ed26e80720bb9ba73eb0c3758b67fecadd82fff14fdd563ec4742db7f532420_cppui381, 0x1034d456a34bbcc06d26b038bcc9273d1cd651669b43acde52163f6937e2bf78de24a81f313947ffaa65ee6e86f1e8bd_cppui381), fq2_value_type(0x19157664e8672790722d621ed5ee66ada8519d30c3d81a8e7cc4397a7ca728b779dc75d3840f67a0f4f474a21209ee6e_cppui381, 0x0b071490bc0a0f686d94d5d2a4c67af781238b55927761891d3a35e208f748a13d8adbf83932c0b53bdc7b109e625c59_cppui381)), fq6_value_type(fq2_value_type(0x0c9c46341648acf8f4f9f5d3b55abad1d2e5cceb50aa0391899b582264b1cf39d8e32364b4489d79b66c32d7c4248483_cppui381, 0x03b5e9c9d7531374b794ceb69d650c7a5954ecf93fe7699047c9a088d60c4b8f7dc73dad95241905a04f5be104e0af4c_cppui381), fq2_value_type(0x0d8eea852dd77b7bdb9f327f6de82d2606e4000e597ce7fd430363a236713ff1bf841acf4befd2b869c9b9259049bff3_cppui381, 0x165afc876579d10c16e535885c6d3d86b0a1736caa6d4778ae3357385849a345b016b1d80420d00cea8e8af32dc375c7_cppui381), fq2_value_type(0x191520f2b8e9f7551b2cef314937d5b7e85a5aa8b1b23d0edfecafde290863b75e8fc103127e08d4be26cd1e74fb6a5e_cppui381, 0x133c7549dc9ec98b3b2db1543b8d2822477b66592e3ad3f72229c845b4d043656d6ff4dde58ff80f3c1392aa5c280327_cppui381)));
+                    // typename CurveType::gt_type::value_type left = pvk.alpha_g1_beta_g2.pow(r_sum.data);
+                    // typename CurveType::gt_type::value_type left = algebra::pair<CurveType>(pvk.alpha_g1 * r_sum, pvk.beta_g2);
 
                     // 4. Compute right part of the final pairing equation
-                    typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, vk.delta_g2);
+                    typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, pvk.delta_g2);
 
                     // 5. compute the middle part of the final pairing equation, the one
                     //    with the public inputs
@@ -639,16 +652,16 @@ namespace nil {
                     // input element
                     // We incrementally build the r vector and the table
                     // NOTE: in this version it's not r^2j but simply r^j
-                    // TODO: how to get element of accumulation vector
-                    typename CurveType::g1_type::value_type g_ic = vk.gamma_ABC_g1.first * r_sum;
-                    // TODO: it seems to be incorrect
+                    typename CurveType::g1_type::value_type g_ic = pvk.gamma_ABC_g1.first * r_sum;
+                    // TODO: do without using of accumulation_vector
                     typename CurveType::g1_type::value_type totsi =
-                        vk.gamma_ABC_g1.template accumulate_chunk(r_vec.begin(), r_vec.end(), 1).first;
+                        pvk.gamma_ABC_g1.accumulate_chunk(multi_r_vec.begin(), multi_r_vec.end(), 0).first -
+                        pvk.gamma_ABC_g1.first;
                     g_ic = g_ic + totsi;
-                    typename CurveType::gt_type::value_type ml = algebra::pair<CurveType>(g_ic, vk.gamma_g2);
+                    typename CurveType::gt_type::value_type middle = algebra::pair<CurveType>(g_ic, pvk.gamma_g2);
 
-                    std::vector<typename CurveType::scalar_field_type::value_type> a_input {left, middle, right};
-                    pc.template merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
+                    std::vector<typename CurveType::gt_type::value_type> a_input {left, middle, right};
+                    pc.merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
                     return pc.verify();
                 }
             }    // namespace snark
