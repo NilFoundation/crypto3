@@ -137,7 +137,7 @@ namespace nil {
                 }
 
                 virtual ~block_stream_processor() {
-                    if (!cache.empty()) {
+                    if (cache_seen > 0) {
                         process_block(cache_seen * value_bits);
                         cache_seen = 0;
                     }
