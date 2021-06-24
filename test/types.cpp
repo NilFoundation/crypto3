@@ -112,7 +112,7 @@ struct types_fixture {
                           status_type expectedStatus = status_type::success){
 
         std::vector<char> outDataBuf(size);
-        marshal<TField>(field, outDataBuf.begin(), expectedStatus);
+        pack<TField>(field, outDataBuf.begin(), expectedStatus);
 
         bool bufAsExpected = std::equal(expectedBuf, expectedBuf + size, outDataBuf.begin());
         if (!bufAsExpected) {
@@ -124,7 +124,7 @@ struct types_fixture {
         }
         BOOST_CHECK(bufAsExpected);
 
-        TField newField = marshal<TField>(outDataBuf.begin(), outDataBuf.begin() + size, expectedStatus);
+        TField newField = pack<TField>(outDataBuf.begin(), outDataBuf.begin() + size, expectedStatus);
         BOOST_CHECK(field == newField);
         BOOST_CHECK(field.value() == newField.value());
     }
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test_minus1) {
                                0x09, 0x0a, 0x0b, 0x0c, 
                                0x0d, 0x0e, 0x0f, 0x10};
 
-    big_endian_array_type be_array = marshal<big_endian_array_type>(Buf.begin(), Buf.end());
+    big_endian_array_type be_array = pack<big_endian_array_type>(Buf.begin(), Buf.end());
 
     std::vector<std::uint32_t> v = be_array.value();
 
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test_minus2) {
                                0x09, 0x0a, 0x0b, 0x0c, 
                                0x0d, 0x0e, 0x0f, 0x10};
 
-    little_endian_array_type le_array = marshal<little_endian_array_type>(Buf.begin(), Buf.end());
+    little_endian_array_type le_array = pack<little_endian_array_type>(Buf.begin(), Buf.end());
 
     std::vector<std::uint32_t> v = le_array.value();
 
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test_minus3) {
                                0x19, 0x1a, 0x1b, 0x1c, 
                                0x1d, 0x1e, 0x1f, 0x20};
 
-    big_endian_array_type be_array = marshal<big_endian_array_type>(Buf.begin(), Buf.end());
+    big_endian_array_type be_array = pack<big_endian_array_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK_EQUAL((be_array.value())[0].value(), 0x01020304);
     BOOST_CHECK_EQUAL((be_array.value())[1].value(), 0x05060708);
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test1) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04};
 
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::uint32_t));
     BOOST_CHECK_EQUAL(field.value(), 0x01020304);
     BOOST_CHECK(field.valid());
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test2) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), 3);
     BOOST_CHECK_EQUAL(field.value(), 0x010203);
     BOOST_CHECK(field.valid());
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test3) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::int16_t>(0x0102));
     BOOST_CHECK(field.valid());
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test4) {
                                                std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, (char)0xff};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), -1);
     BOOST_CHECK(field.valid());
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test5) {
         std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {0x0, (char)0x80};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
     BOOST_CHECK_EQUAL(field.value(), std::numeric_limits<std::int16_t>::min());
     BOOST_CHECK(field.valid());
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test6) {
         testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, 0x00};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), 1);
     BOOST_CHECK_EQUAL(field.value(), -1);
     BOOST_CHECK(field.valid());
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test7) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<char> Buf = {13};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == 2013);
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test8) {
 
     static const std::vector<char> Buf = {0x01, 0x02, 0x03, 0x04};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end(), acc);
+    field = pack<testing_type>(Buf.begin(), Buf.end(), acc);
     BOOST_CHECK(field.length() == 3);
     BOOST_CHECK(field.value() == 0x010203);
     BOOST_CHECK(!field.valid());
@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test9) {
 
     static const std::vector<char> Buf = {0x05, 0x02};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end(), acc);
+    field = pack<testing_type>(Buf.begin(), Buf.end(), acc);
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == 0x05);
     BOOST_CHECK(field.valid());
@@ -397,7 +397,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test10) {
         (char)0xad,
     };
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == 0xdead);
     BOOST_CHECK(field.get_bit_value(0U) == true);
@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test11) {
 
     static const std::vector<char> Buf = {(char)0xde, (char)0xad, (char)0x00, (char)0xff};
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 3);
     BOOST_CHECK(field.value() == 0xadde);
     BOOST_CHECK(field.valid());
@@ -498,7 +498,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test12) {
 
     static const std::vector<char> Buf = {(char)Enum1_Value1, (char)0x3f};
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 1);
     BOOST_CHECK(field.value() == Enum1_Value1);
     BOOST_CHECK(field.valid());
@@ -525,7 +525,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test13) {
     BOOST_CHECK(field.value() == Enum2::NumOfValues);
 
     static const std::vector<char> Buf = {0x0, (char)Enum2::Value4, (char)0x3f};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 2);
 
     BOOST_CHECK(field.value() == Enum2::Value4);
@@ -551,7 +551,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test14) {
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(!field.refresh());
@@ -570,12 +570,12 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test15) {
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf2 = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc};
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end());
+    field = pack<testing_type>(Buf2.begin(), Buf2.end());
     BOOST_CHECK(field.length() == Buf2.size());
     BOOST_CHECK(field.valid());
 }
@@ -611,12 +611,12 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test16) {
 
     static const std::vector<char> Buf = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(field.valid());
 
-    staticStorageField = marshal<StaticStorageField>(Buf.begin(), Buf.end());
+    staticStorageField = pack<StaticStorageField>(Buf.begin(), Buf.end());
     BOOST_CHECK(staticStorageField.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(staticStorageField.length() == staticStorageField.value().size() + 1U);
     BOOST_CHECK(staticStorageField.valid());
@@ -658,13 +658,13 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test17) {
 
     static const std::vector<char> Buf = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.value() == "hello");
 
-    staticStorageField = marshal<StaticStorageField>(Buf.begin(), Buf.end());
+    staticStorageField = pack<StaticStorageField>(Buf.begin(), Buf.end());
     BOOST_CHECK(staticStorageField.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(staticStorageField.length() == field.value().size() + 1U);
     BOOST_CHECK(!staticStorageField.valid());
@@ -778,7 +778,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test20) {
 
     static const std::vector<char> Buf = {(char)0x81, 0x01};
     
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), 2U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint16_t>(0x81));
     BOOST_CHECK(field.valid());
@@ -799,7 +799,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test21) {
 
     static const std::vector<char> Buf = {(char)0x83, 0x0f};
     
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK_EQUAL(field.length(), 2U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint32_t>(0x18f));
     BOOST_CHECK(field.valid());
@@ -816,7 +816,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test21) {
     write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
     static const std::vector<char> Buf2 = {(char)0x91, (char)0xc2, (char)0x3f, (char)0xff};
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end());
+    field = pack<testing_type>(Buf2.begin(), Buf2.end());
     BOOST_CHECK_EQUAL(field.length(), 3U);
     BOOST_CHECK_EQUAL(field.value(), static_cast<std::uint32_t>(0x4613f));
     BOOST_CHECK(field.valid());
@@ -830,7 +830,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test22) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<char> Buf = {(char)0x83, (char)0x8f, (char)0x8c, (char)0x3f, (char)0xff};
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end(), status_type::protocol_error);
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end(), status_type::protocol_error);
     static_cast<void>(field);
 }
 
@@ -866,7 +866,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test24) {
 
     static const std::vector<char> Buf = {0x00, 0x02};
 
-    testing_type field = marshal<testing_type>(Buf.begin(), Buf.end());
+    testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == 0x0);
     BOOST_CHECK(field.valid());
@@ -897,7 +897,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test25) {
 
     static const std::vector<char> Buf = {(char)0x41, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -926,7 +926,7 @@ BOOST_AUTO_TEST_CASE(test26) {
 
     static const std::vector<char> Buf = {(char)0x09, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -966,7 +966,7 @@ BOOST_AUTO_TEST_CASE(test27) {
 
     static const std::vector<char> Buf = {(char)0x4f, (char)0xa1, (char)0xaa};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &mem1 = field.field_mem1();
     BOOST_CHECK(mem1.value() == 0x1);
 
@@ -995,7 +995,7 @@ BOOST_AUTO_TEST_CASE(test28) {
     BOOST_CHECK(field.value().size() == 0U);
 
     static const std::vector<char> Buf = {0x0, 0xa, 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.value().size() == 10U);
@@ -1021,14 +1021,14 @@ BOOST_AUTO_TEST_CASE(test29) {
     BOOST_CHECK(field.value() == Enum1_Value2);
 
     static const std::vector<char> Buf = {0x0, (char)Enum1_Value1, (char)0x3f};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 2);
     BOOST_CHECK(field.value() == Enum1_Value1);
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf2 = {0x0, (char)Enum1_NumOfValues, (char)0x3f};
     
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end(), status_type::protocol_error);
+    field = pack<testing_type>(Buf2.begin(), Buf2.end(), status_type::protocol_error);
 
     field.value() = Enum1_Value3;
     BOOST_CHECK(field.valid());
@@ -1051,14 +1051,14 @@ BOOST_AUTO_TEST_CASE(test30) {
 
     static const std::vector<char> Buf = {0x0f};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.value() == 0x2);
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf2 = {0x00, 0x02, (char)0xff};
 
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end());
+    field = pack<testing_type>(Buf2.begin(), Buf2.end());
 
     BOOST_CHECK(field.value() == 0x2);
     BOOST_CHECK(field.valid());
@@ -1082,7 +1082,7 @@ BOOST_AUTO_TEST_CASE(test31) {
 
     static const std::vector<char> Buf = {0x0f, (char)0xf0};
     
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.field().value() == 0xff0);
     BOOST_CHECK(!field.valid());
@@ -1131,7 +1131,7 @@ BOOST_AUTO_TEST_CASE(test32) {
 
     static const std::vector<char> Buf = {0x00, 0x3, Enum1_Value3, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.valid());
@@ -1201,7 +1201,7 @@ BOOST_AUTO_TEST_CASE(test33) {
 
     static const std::vector<char> Buf = {0x05, 'h', 'e', 'l', 'l', 'o', 0x03, 'b', 'l', 'a'};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
@@ -1228,7 +1228,7 @@ BOOST_AUTO_TEST_CASE(test34) {
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end(), acc);
+    field = pack<testing_type>(Buf.begin(), Buf.end(), acc);
 
     BOOST_CHECK(field.length() == MaxCount);
     BOOST_CHECK(field.valid());
@@ -1255,7 +1255,7 @@ BOOST_AUTO_TEST_CASE(test35) {
     BOOST_CHECK(fpEquals(field.value(), 0.0f));
 
     const auto *readIter = &buf[0];
-    field = marshal<testing_type>(buf.begin(), buf.end());
+    field = pack<testing_type>(buf.begin(), buf.end());
     
     BOOST_CHECK(fpEquals(field.value(), 1.23f));
 }
@@ -1277,7 +1277,7 @@ BOOST_AUTO_TEST_CASE(test36) {
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == Buf.size());
@@ -1301,7 +1301,7 @@ BOOST_AUTO_TEST_CASE(test37) {
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 6U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 3U);
@@ -1345,7 +1345,7 @@ BOOST_AUTO_TEST_CASE(test38) {
     static const std::vector<char> ExpectedBuf2 = {'f', 'o', 'o', 0x0, 0x0, 0x0};
     write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
-    field = marshal<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
+    field = pack<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -1383,7 +1383,7 @@ BOOST_AUTO_TEST_CASE(test40) {
 
     static const std::vector<char> Buf = {115};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.value() == 115);
     BOOST_CHECK(fpEquals(field.scale_as<float>(), 1.15f));
 }
@@ -1413,7 +1413,7 @@ BOOST_AUTO_TEST_CASE(test41) {
 
     static const std::vector<char> InputBuf = {'f', 'o', 'o', 0x0, 'b', 'l', 'a'};
 
-    field = marshal<testing_type>(InputBuf.begin(), InputBuf.end());
+    field = pack<testing_type>(InputBuf.begin(), InputBuf.end());
 
     BOOST_CHECK(field.value() == "foo");
     BOOST_CHECK(field.value().size() == 3U);
@@ -1682,7 +1682,7 @@ BOOST_AUTO_TEST_CASE(test49) {
 
     static const std::vector<char> Buf = {0x00, 0x10, 0x20, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(mem1.value() == 0U);
     BOOST_CHECK(mem2.field().value() == 0x1020);
@@ -1692,7 +1692,7 @@ BOOST_AUTO_TEST_CASE(test49) {
 
     static const std::vector<char> Buf2 = {0x01, 0x10, 0x20, (char)0xff};
 
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end(), acc);
+    field = pack<testing_type>(Buf2.begin(), Buf2.end(), acc);
     BOOST_CHECK(field.length() == 1U);
     BOOST_CHECK(mem1.value() == 1U);
     BOOST_CHECK(mem2.get_mode() == types::optional_mode::missing);
@@ -1774,7 +1774,7 @@ BOOST_AUTO_TEST_CASE(test51) {
 
     static const std::vector<char> Buf = {(char)0x41, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &mem1 = field.field_name1();
     BOOST_CHECK(mem1.value() == 0x1);
 
@@ -1801,7 +1801,7 @@ BOOST_AUTO_TEST_CASE(test52) {
 
     static const std::vector<char> Buf = {(char)0xff, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 255);
@@ -1895,7 +1895,7 @@ BOOST_AUTO_TEST_CASE(test56) {
     static const std::vector<char> ExpectedBuf2 = {'f', 'o', 'o', 0x0, 0x0, 0x0};
     write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
-    field = marshal<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
+    field = pack<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
 
     BOOST_CHECK(field.value() == "foo");
 }
@@ -2575,7 +2575,7 @@ BOOST_AUTO_TEST_CASE(test69) {
     write_read_field(field, ExpectedBuf.begin(), ExpectedBuf.size());
 
     static const std::vector<char> Buf = {0x8, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]) / 2U);
     BOOST_CHECK(field.length() == (field.value().size() * 2) + 1U);
@@ -2586,10 +2586,10 @@ BOOST_AUTO_TEST_CASE(test69) {
 
     static const std::vector<char> Buf2 = {0x7, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
 
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end(), status_type::invalid_msg_data);
+    field = pack<testing_type>(Buf2.begin(), Buf2.end(), status_type::invalid_msg_data);
 
     static const std::vector<char> Buf3 = {0x4, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-    field = marshal<testing_type>(Buf3.begin(), Buf3.end());
+    field = pack<testing_type>(Buf3.begin(), Buf3.end());
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf3[0]) / 2U);
     BOOST_CHECK(field.length() == (field.value().size() * 2) + 1U);
     BOOST_CHECK(field.value()[0].value() == 0x0a0b);
@@ -2671,19 +2671,19 @@ BOOST_AUTO_TEST_CASE(test70) {
     BOOST_CHECK(field.current_field() == std::tuple_size<testing_type::members_type>::value);
 
     static const std::vector<char> Buf = {0x1, 0x2, 0x3};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.current_field() == 0U);
 
     static const std::vector<char> Buf2 = {0x2, 0x3, 0x4};
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end(), status_type::not_enough_data);
+    field = pack<testing_type>(Buf2.begin(), Buf2.end(), status_type::not_enough_data);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.length() == 0U);
     BOOST_CHECK(field.current_field() == std::tuple_size<testing_type::members_type>::value);
 
     static const std::vector<char> Buf3 = {0x2, 0x3, 0x4, 0x5, 0x6};
-    field = marshal<testing_type>(Buf3.begin(), Buf3.end());
+    field = pack<testing_type>(Buf3.begin(), Buf3.end());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.length() == 5U);
     BOOST_CHECK(field.current_field() == 1U);
@@ -2789,13 +2789,13 @@ BOOST_AUTO_TEST_CASE(test71) {
 
     static const std::vector<char> Buf = {0, 0, 0};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 1U);
     BOOST_CHECK(field.field_val().is_missing());
 
     static const std::vector<char> Buf2 = {1, 5, 0};
 
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end());
+    field = pack<testing_type>(Buf2.begin(), Buf2.end());
     BOOST_CHECK(field.length() == 2U);
     BOOST_CHECK(field.field_val().does_exist());
     BOOST_CHECK(field.field_val().field().value() == (unsigned)Buf2[1]);
@@ -2822,7 +2822,7 @@ BOOST_AUTO_TEST_CASE(test72) {
     BOOST_CHECK(field.value().empty());
 
     static const std::vector<char> Buf = {0x5, 'h', 'e', 'l', 'l', 'o', 'g', 'a', 'r'};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.value().size() == static_cast<std::size_t>(Buf[0]));
     BOOST_CHECK(field.length() == field.value().size() + 1U);
     BOOST_CHECK(field.valid());
@@ -2866,7 +2866,7 @@ BOOST_AUTO_TEST_CASE(test73) {
 
     static const std::vector<char> InputBuf = {'f', 'o', 'o', 0x0, 'b', 'l', 'a'};
 
-    field = marshal<testing_type>(InputBuf.begin(), InputBuf.end());
+    field = pack<testing_type>(InputBuf.begin(), InputBuf.end());
     
     BOOST_CHECK(field.value() == "foo");
     BOOST_CHECK(field.value().size() == 3U);
@@ -2912,7 +2912,7 @@ BOOST_AUTO_TEST_CASE(test74) {
     static const std::vector<char> ExpectedBuf2 = {'f', 'o', 'o', 0x0, 0x0, 0x0};
     write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
-    field = marshal<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
+    field = pack<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -2932,7 +2932,7 @@ BOOST_AUTO_TEST_CASE(test75) {
     BOOST_CHECK(field.value().empty());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
 
@@ -2959,7 +2959,7 @@ BOOST_AUTO_TEST_CASE(test76) {
     BOOST_CHECK(field.value().empty());
 
     static const std::vector<char> Buf = {0x0, 0xa, 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xf, 0xf};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 12);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 10U);
@@ -2988,7 +2988,7 @@ BOOST_AUTO_TEST_CASE(test77) {
     BOOST_CHECK(field.value().empty());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 6U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 6U);
@@ -3006,7 +3006,7 @@ BOOST_AUTO_TEST_CASE(test77) {
     static const std::vector<char> ExpectedBuf = {0x3, 0x4, 0x5, 0x0, 0x0, 0x0};
 
     std::vector<char> outDataBuf(ExpectedBuf.size());
-    marshal<testing_type>(field, outDataBuf.begin());
+    pack<testing_type>(field, outDataBuf.begin());
 
     bool bufAsExpected = std::equal(ExpectedBuf.begin(), ExpectedBuf.end(), outDataBuf.begin());
     BOOST_CHECK(bufAsExpected);
@@ -3054,7 +3054,7 @@ BOOST_AUTO_TEST_CASE(test79) {
 
     static const std::vector<char> Buf = {0x1, 0x0, 0x2, 0x0, 0x3, 0x0, 0x4, 0x0, 0x5, 0x0, 0x6, 0x0, 0x7, 0x0, 0x8, 0x0};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     
     BOOST_CHECK(field.length() == 6U);
     BOOST_CHECK(field.value().size() == 3U);
@@ -3113,7 +3113,7 @@ BOOST_AUTO_TEST_CASE(test80) {
 
     static const std::vector<char> Buf = {0x00, 0x3, Enum1_Value3, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 3U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(intValField.value() == 3U);
@@ -3173,7 +3173,7 @@ BOOST_AUTO_TEST_CASE(test82) {
     BOOST_CHECK(field.valid());
     static const std::vector<char> Buf = {0x00, 0x3, (char)0xff};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == 2U);
     BOOST_CHECK(field.valid());
     BOOST_CHECK(intValField.value() == 3U);
@@ -3210,7 +3210,7 @@ BOOST_AUTO_TEST_CASE(test83) {
     BOOST_CHECK(testing_type::max_length() == 5U);
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == Buf.size());
@@ -3247,7 +3247,7 @@ BOOST_AUTO_TEST_CASE(test84) {
     static const std::vector<char> ExpectedBuf2 = {'f', 'o', 'o', 0x0, 0x0};
     write_read_field(field, ExpectedBuf2.begin(), ExpectedBuf2.size());
 
-    field = marshal<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
+    field = pack<testing_type>(ExpectedBuf2.begin(), ExpectedBuf2.end());
     BOOST_CHECK(field.value() == "foo");
 }
 
@@ -3313,7 +3313,7 @@ BOOST_AUTO_TEST_CASE(test87) {
     BOOST_CHECK(field.value().size() == 0U);
 
     static const std::vector<char> Buf = {0x0, 0x4, 0x1, 0x0, 0x1, 0x1, 0x1, 0x2, 0x1, 0x3};
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
     BOOST_CHECK(field.value().size() == 4U);
@@ -3325,7 +3325,7 @@ BOOST_AUTO_TEST_CASE(test87) {
 
     static const std::vector<char> Buf2 = {0x0, 0x4, 0x2, 0x0, 0x1, 0x2, 0x3, 0x4, 0x2, 0x5, 0x6, 0x2, 0x7, 0x8};
     
-    field = marshal<testing_type>(Buf2.begin(), Buf2.end());
+    field = pack<testing_type>(Buf2.begin(), Buf2.end());
     
     BOOST_CHECK(field.length() == Buf2.size() - 4U);
     BOOST_CHECK(!field.valid());
@@ -3363,7 +3363,7 @@ BOOST_AUTO_TEST_CASE(test88) {
     static const std::vector<char> Buf
         = {0x2, 0x9, 0x1, 0x5, 'h', 'e', 'l', 'l', 'o', 0xa, 0xb, 0x7, 0x2, 0x3, 'b', 'l', 'a', 0xc, 0xd};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &vec = field.value();
     BOOST_CHECK(vec.size() == 2U);
     auto &bundle0 = vec[0];
@@ -3426,7 +3426,7 @@ BOOST_AUTO_TEST_CASE(test89) {
     static const std::vector<char> Buf
         = {18, 0x9, 0x1, 0x5, 'h', 'e', 'l', 'l', 'o', 0xa, 0xb, 0x7, 0x2, 0x3, 'b', 'l', 'a', 0xc, 0xd};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &vec = field.value();
     BOOST_CHECK(vec.size() == 2U);
     auto &bundle0 = vec[0];
@@ -3491,7 +3491,7 @@ BOOST_AUTO_TEST_CASE(test90) {
 
     static const std::vector<char> Buf = {0x2, 0x4, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &vec = field.value();
     BOOST_CHECK(vec.size() == 2U);
     auto &bundle0 = vec[0];
@@ -3533,7 +3533,7 @@ BOOST_AUTO_TEST_CASE(test91) {
 
     static const std::vector<char> Buf = {0x4, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &vec = field.value();
     BOOST_CHECK(vec.size() == 2U);
     auto &bundle0 = vec[0];
@@ -3567,7 +3567,7 @@ BOOST_AUTO_TEST_CASE(test92) {
 
     static const std::vector<char> Buf = {(char)0x1, (char)0x2, (char)0x3};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
     auto &members = field.value();
     auto &mem1 = std::get<0>(members);
     BOOST_CHECK(mem1.value() == 0x1);
@@ -3701,7 +3701,7 @@ BOOST_AUTO_TEST_CASE(test97) {
 
         static const std::vector<char> Buf1 = {(char)0x01, (char)0x02};
 
-        field = marshal<testing_type>(Buf1.begin(), Buf1.end(), acc);
+        field = pack<testing_type>(Buf1.begin(), Buf1.end(), acc);
         BOOST_CHECK(field.value().size() == 1U);
         auto &members = field.value()[0].value();
         auto &mem1 = std::get<0>(members);
@@ -3719,7 +3719,7 @@ BOOST_AUTO_TEST_CASE(test97) {
 
         static const std::vector<char> Buf2 = {(char)0x03, (char)0x04, (char)0x05, (char)0x06};
         
-        field = marshal<testing_type>(Buf2.begin(), Buf2.end(), acc);
+        field = pack<testing_type>(Buf2.begin(), Buf2.end(), acc);
         BOOST_CHECK(field.value().size() == 1U);
         auto &members = field.value()[0].value();
         auto &mem1 = std::get<0>(members);
@@ -3769,7 +3769,7 @@ BOOST_AUTO_TEST_CASE(test99) {
 
     accumulator_set<Field1> acc1 = accumulator_set<Field1>(field1);
 
-    field1 = marshal<Field1>(Buf.begin(), Buf.end(), acc1);
+    field1 = pack<Field1>(Buf.begin(), Buf.end(), acc1);
     BOOST_CHECK(field1.value().size() == 4U);
     BOOST_CHECK(field1.length() == 4U);
     BOOST_CHECK(field1.valid());
@@ -3790,7 +3790,7 @@ BOOST_AUTO_TEST_CASE(test99) {
 
     accumulator_set<Field2> acc2 = accumulator_set<Field2>(field2);
 
-    field2 = marshal<Field2>(Buf2.begin(), Buf2.end(), acc2);
+    field2 = pack<Field2>(Buf2.begin(), Buf2.end(), acc2);
     BOOST_CHECK(field2.value() == "hello");
     BOOST_CHECK(field2.valid());
     field2.clear_read_length_forcing();
@@ -3807,7 +3807,7 @@ BOOST_AUTO_TEST_CASE(test100) {
 
     static const std::vector<char> Buf = {(char)0x87, (char)0x54, (char)0xa2, (char)0x03, (char)0xb9};
 
-    field = marshal<testing_type>(Buf.begin(), Buf.end());
+    field = pack<testing_type>(Buf.begin(), Buf.end());
 
     BOOST_CHECK(std::abs(field.get_scaled<double>() - 2.67) < 0.1);
 }
