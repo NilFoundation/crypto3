@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -62,6 +63,8 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/keypair.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -111,12 +114,29 @@ namespace nil {
                         typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type>
                             processed_verification_key_type;
 
+                        /************************ Aggregation verification key *************************/
+
+                        /**
+                         * A verification key for the R1CS GG-ppzkSNARK aggregation scheme.
+                         */
+                        typedef r1cs_gg_ppzksnark_aggregate_verification_key<curve_type>
+                            aggregate_verification_key_type;
+
                         /********************************** Key pair *********************************/
 
                         /**
                          * A key pair for the R1CS GG-ppzkSNARK, which consists of a proving key and a verification key.
                          */
                         typedef r1cs_gg_ppzksnark_keypair<proving_key_type, verification_key_type> keypair_type;
+
+                        /********************************** Aggregation key pair *********************************/
+
+                        /**
+                         * A key pair for the R1CS GG-ppzkSNARK aggregation scheme, which consists of a proving key and
+                         * a verification key.
+                         */
+                        typedef r1cs_gg_ppzksnark_keypair<proving_key_type, aggregate_verification_key_type>
+                            aggregate_keypair_type;
 
                         /*********************************** Proof ***********************************/
 
@@ -128,6 +148,17 @@ namespace nil {
                          * about the structure for statistics purposes.
                          */
                         typedef r1cs_gg_ppzksnark_proof<CurveType> proof_type;
+
+                        /*********************************** Aggregated proof ***********************************/
+
+                        /**
+                         * A proof for the R1CS GG-ppzkSNARK aggregation scheme.
+                         *
+                         * While the proof has a structure, externally one merely opaquely produces,
+                         * serializes/deserializes, and verifies proofs. We only expose some information
+                         * about the structure for statistics purposes.
+                         */
+                        typedef r1cs_gg_ppzksnark_aggregate_proof<CurveType> aggregate_proof_type;
                     };
                 }    // namespace detail
             }        // namespace snark

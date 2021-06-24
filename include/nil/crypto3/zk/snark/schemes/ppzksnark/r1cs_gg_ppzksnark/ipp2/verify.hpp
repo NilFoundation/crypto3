@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -560,7 +560,7 @@ namespace nil {
                         std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value,
                     bool>::type
                     verify_aggregate_proof(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &ip_verifier_srs,
-                                           const r1cs_gg_ppzksnark_verification_key<CurveType> &pvk,
+                                           const r1cs_gg_ppzksnark_aggregate_verification_key<CurveType> &pvk,
                                            const InputRangesRange &public_inputs,
                                            const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                            InputIterator transcript_include_first,
@@ -627,18 +627,8 @@ namespace nil {
                     }
 
                     // 3. Compute left part of the final pairing equation
-                    // TODO: add fields alpha_g1 and beta_g2 in vk then fix
-                    using curve_type = CurveType;
-                    using g2_type = typename curve_type::g2_type;
-                    using G2_value_type = typename g2_type::value_type;
-                    using fq2_type = typename G2_value_type::underlying_field_type;
-                    using fq2_value_type = typename fq2_type::value_type;
-                    using fq12_type = typename curve_type::gt_type;
-                    using fq12_value_type = typename fq12_type::value_type;
-                    using fq6_value_type = typename fq12_value_type::underlying_type;
-                    typename CurveType::gt_type::value_type left = fq12_value_type(fq6_value_type(fq2_value_type(0x194295c7c6906869e05e0a03fd6c74136fe849099343e413425ef5aa1a1aba1b9227b43c491cdeffb4501be3de7da032_cppui381, 0x07e780996d0e6eccc00bf6ea16925d5939784e7fa73e4dc12c0acecb8b1a5eb6164fc395055b6db40c84db335dcf3e11_cppui381), fq2_value_type(0x15369ecc34a321ba1f3312641e87b7bf4ed26e80720bb9ba73eb0c3758b67fecadd82fff14fdd563ec4742db7f532420_cppui381, 0x1034d456a34bbcc06d26b038bcc9273d1cd651669b43acde52163f6937e2bf78de24a81f313947ffaa65ee6e86f1e8bd_cppui381), fq2_value_type(0x19157664e8672790722d621ed5ee66ada8519d30c3d81a8e7cc4397a7ca728b779dc75d3840f67a0f4f474a21209ee6e_cppui381, 0x0b071490bc0a0f686d94d5d2a4c67af781238b55927761891d3a35e208f748a13d8adbf83932c0b53bdc7b109e625c59_cppui381)), fq6_value_type(fq2_value_type(0x0c9c46341648acf8f4f9f5d3b55abad1d2e5cceb50aa0391899b582264b1cf39d8e32364b4489d79b66c32d7c4248483_cppui381, 0x03b5e9c9d7531374b794ceb69d650c7a5954ecf93fe7699047c9a088d60c4b8f7dc73dad95241905a04f5be104e0af4c_cppui381), fq2_value_type(0x0d8eea852dd77b7bdb9f327f6de82d2606e4000e597ce7fd430363a236713ff1bf841acf4befd2b869c9b9259049bff3_cppui381, 0x165afc876579d10c16e535885c6d3d86b0a1736caa6d4778ae3357385849a345b016b1d80420d00cea8e8af32dc375c7_cppui381), fq2_value_type(0x191520f2b8e9f7551b2cef314937d5b7e85a5aa8b1b23d0edfecafde290863b75e8fc103127e08d4be26cd1e74fb6a5e_cppui381, 0x133c7549dc9ec98b3b2db1543b8d2822477b66592e3ad3f72229c845b4d043656d6ff4dde58ff80f3c1392aa5c280327_cppui381)));
-                    // typename CurveType::gt_type::value_type left = pvk.alpha_g1_beta_g2.pow(r_sum.data);
-                    // typename CurveType::gt_type::value_type left = algebra::pair<CurveType>(pvk.alpha_g1 * r_sum, pvk.beta_g2);
+                    typename CurveType::gt_type::value_type left =
+                        algebra::pair<CurveType>(pvk.alpha_g1 * r_sum, pvk.beta_g2);
 
                     // 4. Compute right part of the final pairing equation
                     typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, pvk.delta_g2);

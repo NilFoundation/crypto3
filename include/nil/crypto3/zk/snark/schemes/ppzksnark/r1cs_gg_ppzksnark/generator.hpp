@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -82,7 +83,7 @@ namespace nil {
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline keypair_type process(const constraint_system_type &constraint_system) {
+                    static inline auto basic_process(const constraint_system_type &constraint_system) {
 
                         /* Make the B_query "lighter" if possible */
                         constraint_system_type r1cs_copy(constraint_system);
@@ -224,6 +225,19 @@ namespace nil {
 
                         accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                   std::move(gamma_ABC_g1_values));
+
+                        return std::make_tuple(alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query,
+                                               B_query, H_query, L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1);
+                    }
+
+                    template<typename DistributionType =
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline keypair_type process(const constraint_system_type &constraint_system) {
+
+                        auto [alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query, B_query, H_query,
+                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1] =
+                            std::move(basic_process(constraint_system));
 
                         verification_key_type vk =
                             verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
