@@ -755,6 +755,40 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     BOOST_CHECK(agg_proof.tmipp.wkey_opening == tmipp_wkey_opening);
 
     BOOST_CHECK(verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+
+    // Invalid transcript inclusion
+    std::vector<std::uint8_t> wrong_tr_include = {4, 5, 6};
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, wrong_tr_include.begin(), wrong_tr_include.end()));
+
+    // 3. aggregate invalid proof content (random A, B, and C)
+    proofs[0].g_A = random_element<g1_type>();
+    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_a =
+        aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_a, tr_include.begin(), tr_include.end()));
+    proofs[0].g_A = proof0.g_A;
+
+    proofs[0].g_B = random_element<g2_type>();
+    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_b =
+        aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_b, tr_include.begin(), tr_include.end()));
+    proofs[0].g_B = proof0.g_B;
+
+    proofs[0].g_C = random_element<g1_type>();
+    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_c =
+        aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_c, tr_include.begin(), tr_include.end()));
+    proofs[0].g_C = proof0.g_C;
+
+    // 4. verify with invalid aggregate proof
+    // first invalid commitment
+    agg_proof.agg_c = random_element<g1_type>();
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    agg_proof.agg_c = agg_c;
+
+    // 5. invalid gipa element
+    agg_proof.tmipp.gipa.final_a = random_element<g1_type>();
+    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    agg_proof.tmipp.gipa.final_a = gp_final_a;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
