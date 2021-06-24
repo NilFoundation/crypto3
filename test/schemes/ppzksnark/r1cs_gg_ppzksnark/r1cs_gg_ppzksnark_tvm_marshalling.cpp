@@ -62,7 +62,7 @@ void run_r1cs_gg_ppzksnark_tvm_marshalling_basic_test(std::size_t num_constraint
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_marshalling_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_marshalling_basic_test) {
-    run_r1cs_gg_ppzksnark_tvm_marshalling_basic_test<curves::bls12<381>>(100, 10);
+    run_r1cs_gg_ppzksnark_tvm_marshalling_basic_test<curves::bls12<381>>(20, 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
