@@ -13,7 +13,8 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
-cm_test_link_libraries(${CURRENT_PROJECT_NAME} ${Boost_LIBRARIES})
+cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+                                            ${Boost_LIBRARIES})
 
 macro(define_marshalling_test name)
     cm_test(NAME marshalling_${name}_test SOURCES ${name}.cpp)
