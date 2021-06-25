@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 
+#include <nil/marshalling/status_type.hpp>
 #include "../r1cs_examples.hpp"
 
 namespace nil {
@@ -161,7 +162,19 @@ namespace nil {
 
                     std::cout << "Verifier with plain input finished, result: " << ans << std::endl;
 
-                    auto tup = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::verifier_input_process(byteblob.cbegin(), byteblob.cend());
+                    marshalling::status_type processingStatus = marshalling::status_type::success;
+                    
+                    auto tup = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::verifier_input_process(byteblob.cbegin(), 
+                            byteblob.cend(),
+                            processingStatus);
+
+                    if (processingStatus != marshalling::status_type::success){
+                        std::cout << "Incorrect datablob!" << std::endl;
+
+                        return false;
+                    }
+
+                    BOOST_CHECK(processingStatus == marshalling::status_type::success);
 
                     typename scheme_type::proof_type de_prf = std::get<2>(tup);
                     typename scheme_type::primary_input_type de_pi = std::get<1>(tup);
