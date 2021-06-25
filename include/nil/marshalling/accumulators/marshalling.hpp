@@ -37,8 +37,13 @@
 
 #include <boost/container/static_vector.hpp>
 
+#include <nil/marshalling/field_type.hpp>
+
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
 #include <nil/marshalling/accumulators/parameters/expected_status.hpp>
+
+#include <nil/marshalling/types/array_list.hpp>
+
 #include <nil/marshalling/detail/type_traits.hpp>
 
 namespace nil {
@@ -111,9 +116,8 @@ namespace nil {
                         // define type of the container using array_list and process it not by iterator, but by
                         // processing it as marshaling type (at the moment it is the resolve_type function under
                         // this one).
-                        using marhsalling_array_type
-                            = types::array_list<marshalling::field_type<nil::marshalling::option::little_endian>,
-                                                type_to_process>;
+                        using marhsalling_array_type = marshalling::types::
+                            array_list<marshalling::field_type<marshalling::option::little_endian>, type_to_process>;
 
                         typename marhsalling_array_type::value_type sequential_container;
 
