@@ -44,9 +44,14 @@
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/commitment.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verify.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verifier.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
+
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
+
+#include <nil/crypto3/zk/snark/algorithms/prove.hpp>
+#include <nil/crypto3/zk/snark/algorithms/verify.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk::snark;
@@ -149,7 +154,14 @@ namespace boost {
 }    // namespace boost
 
 using curve_type = curves::bls12_381;
-using scheme_type = r1cs_gg_ppzksnark<curve_type>;
+using scheme_type = r1cs_gg_ppzksnark<
+    curve_type,
+    r1cs_gg_ppzksnark_aggregate_generator<curve_type>,
+    r1cs_gg_ppzksnark_aggregate_prover<curve_type,
+                                       r1cs_gg_ppzksnark_prover<curve_type>>,
+    r1cs_gg_ppzksnark_aggregate_verifier<curve_type,
+                                         r1cs_gg_ppzksnark_verifier_strong_input_consistency<curve_type>>,
+    ProvingMode::Aggregate>;
 
 using g1_type = typename curve_type::g1_type;
 using g2_type = typename curve_type::g2_type;
@@ -175,6 +187,10 @@ using scalar_modular_type = typename scalar_field_type::number_type;
 using base_modular_type = typename curve_type::base_field_type::number_type;
 
 using hash_type = hashes::sha2<256>;
+
+using DistributionType = boost::random::uniform_int_distribution<
+    typename scalar_field_type::modulus_type>;
+using GeneratorType = boost::random::mt19937;
 
 BOOST_AUTO_TEST_SUITE(aggregation_functions_conformity_test)
 
@@ -292,11 +308,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_commitment_test) {
             fq_value_type::one()));
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_srs<curve_type> srs;
-    srs.g_alpha_powers = structured_generators_scalar_power<g1_type>(2 * n, alpha);
-    srs.g_beta_powers = structured_generators_scalar_power<g1_type>(2 * n, beta);
-    srs.h_alpha_powers = structured_generators_scalar_power<g2_type>(2 * n, alpha);
-    srs.h_beta_powers = structured_generators_scalar_power<g2_type>(2 * n, beta);
+    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     kzg_opening<g2_type> comm_v = prove_commitment_v<curve_type>(pk.h_alpha_powers.begin(),
@@ -549,11 +561,7 @@ BOOST_AUTO_TEST_CASE(bls381_prove_tipp_mipp_test) {
         0x66d3bcd37b8ce4dbc7efc5bcbb6111f5593c2a173f60a2935bf958efcc099c88_cppui255;
     constexpr scalar_field_value_type beta =
         0x01f39625fe789118b73750642f16a60224a2a86a4d0487a0df75795c3269e3fd_cppui255;
-    r1cs_gg_pp_zksnark_srs<curve_type> srs;
-    srs.g_alpha_powers = structured_generators_scalar_power<g1_type>(2 * n, alpha);
-    srs.g_beta_powers = structured_generators_scalar_power<g1_type>(2 * n, beta);
-    srs.h_alpha_powers = structured_generators_scalar_power<g2_type>(2 * n, alpha);
-    srs.h_beta_powers = structured_generators_scalar_power<g2_type>(2 * n, beta);
+    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     tipp_mipp_proof<curve_type> tmp =
@@ -598,11 +606,7 @@ BOOST_AUTO_TEST_CASE(bls381_aggregate_proofs) {
         0x57aa5df37b9bd97a5e5f84f4797eac33e5ebe0c6e2ca2fbca1b3b3d7052ce35d_cppui255;
     constexpr scalar_field_value_type beta =
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
-    r1cs_gg_pp_zksnark_srs<curve_type> srs;
-    srs.g_alpha_powers = structured_generators_scalar_power<g1_type>(2 * n, alpha);
-    srs.g_beta_powers = structured_generators_scalar_power<g1_type>(2 * n, beta);
-    srs.h_alpha_powers = structured_generators_scalar_power<g2_type>(2 * n, alpha);
-    srs.h_beta_powers = structured_generators_scalar_power<g2_type>(2 * n, beta);
+    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     r1cs_gg_ppzksnark_proof<curve_type> proof0 { G1_value_type(0x0ad9ab904d539e688d51dfd985c3ae5b48fe28b95503191282d47d6b366e2a53e21ae890306f52749d21666b98371708_cppui381, 0x1345e24d804d6be02cf1b3a941b916446d137b97c1a92fd36d3ea125d2faf000dcf622e3f602f558524c87546bc11483_cppui381, fq_value_type::one()),G2_value_type(fq2_value_type(0x026aeb313ea0d77bcfb724fd0898bb830365001a6b17c10e6926511c59af9c36dee091f5c5a8ef1dcaa2c242ca013159_cppui381, 0x1954c22621c04f4e80283616ca8e024a86c58062aed69c053849584a17ea39baefe2e3a6d9a81d771cf5240bf277bfc7_cppui381), fq2_value_type(0x00c2b1a57ca24010cd4b5eb1b7a3765bba0e16bba8e79bd137b5f3ee7b93c72f2a6f19aa74b30c05de75314c6027af8d_cppui381, 0x01334537a911f0f56d111198f3d1fa4f6d229e67acc36239e3880cbc298b2b400d75d2a35b9b190c31223e8dc77df6df_cppui381), fq2_value_type::one()),G1_value_type(0x01fa9d8671ec6696ae5766c83d7bfa9508ad0d94b36df00ada865979bfd005c60113655fcd19f37992eb842bb4bcae66_cppui381, 0x17df4c2aa0d841a72cc3187eb82ad56f83dcd1a392bfa175ef7da90a26963ab3f1cf3b364a0f1a9c8f1e74902451a96d_cppui381, fq_value_type::one()) };
@@ -618,8 +622,10 @@ BOOST_AUTO_TEST_CASE(bls381_aggregate_proofs) {
 
     std::array<std::uint8_t, 3> tr_inc {1, 2, 3};
 
-    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
-        aggregate_proofs<curve_type>(pk, tr_inc.begin(), tr_inc.end(), proofs_vec.begin(), proofs_vec.end());
+    // r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
+    //     aggregate_proofs<curve_type>(pk, tr_inc.begin(), tr_inc.end(), proofs_vec.begin(), proofs_vec.end());
+    auto agg_proof =
+        prove<scheme_type, hashes::sha2<256>>(pk, tr_inc.begin(), tr_inc.end(), proofs_vec.begin(), proofs_vec.end());
 
     std::size_t prf_gp_n = 8;
     fq12_value_type prf_ip_ab = fq12_value_type(fq6_value_type(fq2_value_type(0x06e382f2b5821951b0194812b08f3d6e7515e204ef39b8d4abedb85c6e8533ccea8cda1ff55a1d5bc46611fc81aa5224_cppui381, 0x17073262593261ee2ee5b05dff3cb7b2c775e4d8d6b67ee8a6ec86d38a461915f749646165fc7906e0f63a4a68f11379_cppui381), fq2_value_type(0x0ae1f55007b1d9eec7a4269f5532b2b26c3c618d8e0b18b54aa9cc9c8968f0fa55e3bc0664737734eab9b6280592659b_cppui381, 0x18ef647c9a850f7c069c6e699e09879a8fc078ff57eb2a70652c7f6c481d9a8db047871749c3fd7ab90bcc222c21af12_cppui381), fq2_value_type(0x17610a19b1994fcb5707d40c1f0af1d56084c28a8ba209dd241c694e9651776c60d2e6bf5ee947a1475b3d95b2138b0d_cppui381, 0x0ff40ac478ebaac8888ac0607f40362c4b7321e30c7ad2ed8fffce36675fb44811e27de762c9cfff7bf80bba56b03c8c_cppui381)), fq6_value_type(fq2_value_type(0x17cba7860f256536081c131b2b19ef98d1916fa60b08d7a87bcd821110cf9fea46c85202a3f296b420f290168215b750_cppui381, 0x131fdd3ee9f2510fbd5b42612ac9086edb31ce97cb1eba625f484ebde4c77b19cbb57e620af065466d892cfa8c29822f_cppui381), fq2_value_type(0x04ad75d70807cc5521beea75a4ddb5bf4b64b45b3fff6bb38f400c537a8b5f7f756f230f6332fb7cc119627f5f59b84e_cppui381, 0x12ed6b1a90b2c014ad27da31d9e117b09ea79e0361a90eb093bf2e0791539e122e8080d00dbca76a62a3ade0df571429_cppui381), fq2_value_type(0x02b2df29004ca3853fdc12342f145dca4b6ab977fbe3e5dc8b1a2280d95ea79d8ebe4d87ac75d7f05f4b5dcc546bd87b_cppui381, 0x05711b1370bf0584b4e2332c1705b98fff292fabfd3647753c856d0a815fc126e5e72813d342df67223879ec6794376a_cppui381)));
@@ -666,11 +672,7 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
         0x43131d0617d95a6fbd46c1f9055f60e8028acaae2e6e7e500a471ed47553ecfe_cppui255;
 
     // setup_fake_srs
-    r1cs_gg_pp_zksnark_srs<curve_type> srs;
-    srs.g_alpha_powers = structured_generators_scalar_power<g1_type>(2 * n, alpha);
-    srs.g_beta_powers = structured_generators_scalar_power<g1_type>(2 * n, beta);
-    srs.h_alpha_powers = structured_generators_scalar_power<g2_type>(2 * n, alpha);
-    srs.h_beta_powers = structured_generators_scalar_power<g2_type>(2 * n, beta);
+    r1cs_gg_pp_zksnark_aggregate_srs<curve_type> srs(n, alpha, beta);
     auto [pk, vk] = srs.specialize(n);
 
     std::vector<G2_value_type> pk_vkey_a = {G2_value_type(fq2_value_type(0x024aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb8_cppui381, 0x13e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e_cppui381), fq2_value_type(0x0ce5d527727d6e118cc9cdc6da2e351aadfd9baa8cbdd3a76d429a695160d12c923ac9cc3baca289e193548608b82801_cppui381, 0x0606c4a02ea734cc32acd2b02bc28b99cb3e287e85a763af267492ab572e99ab3f370d275cec1da1aaa9075ff05f79be_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x13e5257ffce3eed808841bcaba1a63f907e51c5452ed1d712d2a80ad5b25054a85b921708f89c7192344e81ef4c2d18e_cppui381, 0x09843c0db7c3e6376559357d41d1d17049e22557e678eca1eeb8d46edb02049159a2a16f3a74aa49fb2b1aabe13e882f_cppui381), fq2_value_type(0x08f60d805b4372d432b2083614477fc24ba9bfcd450f86d05e4634139ad11307fb8a39679f837db216620320c40dd10d_cppui381, 0x0059498ec17559ff4e7f19c9601a8fc6d1100680acdad1b332575bdef424daed6b989e18ad96e7f15858a336730d23a0_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x07cc3cecf1bf7b4302b549e6094806c3e92c83ab71885ea649d7bea56722a79cd5001ecc8bd7719f5dac452fde2dc27d_cppui381, 0x155ba4651c0c2b45d4791035947c0416579d9dfe604c94e26f15acfe1c6a4bb3ba5193ef7ef31dbf458571704f8beee5_cppui381), fq2_value_type(0x14f94da9ed09785f1041a7b998cabd45f472f3f499f9f48d6aac1660809c8a6d0dfb4f16a4ddca70125b61369d4e96b0_cppui381, 0x04272ed3d067c55f4c3e140e8333ae3711e6b82db32fc5a1f7f7da144499b8a7af62f7fcbf49b53f1b0f068be7eccfd0_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x09825619542ee8320ff4f5ba380fd3282ec16026beff6651648162cce26452e187c30be5fbd5f929f3f32c0c02860ca1_cppui381, 0x0cc2ee914ca20bf39af2e0f3c0193ae301a2a3b978f55df8f87d2c7b9512ec0d83185450ce7b83e4da4a5276bf1de448_cppui381), fq2_value_type(0x135a5110ab1d4581f1d213909b0e36efa8e0009de0065a6bd68374429ea80a9767172f12420ad616d4edd7346942cb6e_cppui381, 0x0317f9c89ca98f293f8c52b8350938fdd1cd9de5d0e7fd67db5ee0daaf60dedd7504741a7dd2548520eab87a082739c8_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x02e1b72552a6bb211c01ca8701d58a62d9e43110853bd12bac43b76244b41ed90a112585169938ce675106e205b9f984_cppui381, 0x017a3560faca0a1a19017debea64721060a4299ab0e9839a7cbc436d47ad8551652fdb9b34814d8fd4d56d191f7f965a_cppui381), fq2_value_type(0x0e14db737c6803325d53f89823090a4310ab2deaa428cfb07dbc8563ff3dee66d67c5872923c863c03a44f7e73fadcbc_cppui381, 0x04893331cc41c22fc44daadfbaa8ee50757ca1ae5753fb8ff92323fd1da33459974bb3eb433b54076e52a2ec85ab0ba8_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x01ff99b80855d463be989bf8afe767a8dd3d99ba24e26d337c5ed0c8cb52aed049354122e55a58215783a539ff6f14e7_cppui381, 0x082ca3714156b517d6554fe1ff1a68a8684e988c0bf359bc5373cbd63724da39197f1590f83efd437d81e5dc66dfc05f_cppui381), fq2_value_type(0x06b7875ef9235e62a37801738d05502341ee0a0a407ba1a85918f5cc3c31f0c62b6ba63169c1fb03230995527eda1b32_cppui381, 0x0ba03538196408591e4ac5335ecd09d104a18944d81d0fd174f9d2beaafe4b65efedb88b514589ae615f0549cadca6a8_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x05cb7cb2ff51aa91b53e62decb5170e2bd6646aec10c729aae308b9601d961b2f2a8d360e247ed6b8e32dbfbc186ecfc_cppui381, 0x13c560f1b44a70ab6cb5543bbe006e729c6d47f6ebf264561aad33aa057be5cd63152d0fb309be094ce5a4a64eb8a74a_cppui381), fq2_value_type(0x170c77d828c1a5a7c8b26646a3efdc37090f0462a4c16018a0b87767e1267ba474c7b0209651b9fedd4529a1eabb3be1_cppui381, 0x0950f2624a4f3a5005c5af43de19cd884629310e9cf62c1f837e2817909facd930ff58736b852fbcdda8a3f67be12cc5_cppui381), fq2_value_type::one()), G2_value_type(fq2_value_type(0x1292443c76f4a68cf038d74fb109f8d53b9f0e3b3be75212eea3e25c5386f89fb68ab9d4561c1a534a02adf161fe2cc8_cppui381, 0x03b936274a14066ee633a18d73cf519dbaa84e92053d589d86387ff6a8cf97d3737be7bb903392a2d8510fa2f5983ca4_cppui381), fq2_value_type(0x03b395cd1c619f2802fae59fd092f65ee7aaede32a92c7d7748ea6676e9348c817144a08e768f7efe5c6b2d13cb54303_cppui381, 0x198d3968741b6c662dce9942866b4fff9522b8184f1e7456da72e89c5721916416a981e2413499b942713cf09fcdf99d_cppui381), fq2_value_type::one()), };
@@ -717,8 +719,10 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     };
     std::vector<std::uint8_t> tr_include {1, 2, 3};
 
-    r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
-        aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
+    // r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof =
+    //     aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
+    auto agg_proof =
+        prove<scheme_type, hashes::sha2<256>>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
 
     fq12_value_type ip_ab = fq12_value_type(fq6_value_type(fq2_value_type(0x15252e258c8a254162aa0713bb76b78dceb590bd54a222c5cad3d0a13adf93d45be071beae8f4caa66e27bb7343e2c00_cppui381, 0x0d56df5892c84ad3ed483859d6afcf28338975350084beee6d20256ab57d492b8abad9b73d2ae776995589c6646f0b00_cppui381), fq2_value_type(0x18370c4988d1f03c331c0186eb562f3d21bd3c60a06aba6e7129ca07cf0ceb586ebc949aa2f4653e3407e0017b0d93f2_cppui381, 0x08d3f06b80b77a84ca89f28901a46f533012d6ceab10a312a907d251c60cb62bfe8c62bbff5beeab08d706952e80e315_cppui381), fq2_value_type(0x0fa1557f82f9759e5d09122f5397f04f84923bfae26c553de3d597aeba214588ffc209f2105868a91beaeadf5a139ae7_cppui381, 0x00d441c1b438714a40c0ef990976ffbdd35041b4f5f1b19b71ef1b27655fc6ee2d2308ea954e6d5fc52e3658da1b4b57_cppui381)), fq6_value_type(fq2_value_type(0x0bb9debb1f46a12857b5ee200dee7fb1407dc46f0b6f2033003471ec5a374a70c2b829d37967fe64016ae52c40e29f6a_cppui381, 0x1120eafcbc20a2197ba3a72c1e45fbf439b388b589a14df2e72e396ac7dd587ea6c7ca5e0c92823be3c6a9ef07d25bf2_cppui381), fq2_value_type(0x0d0351b20e3e456163078dc71d00871c03e8a1f8aaeae4ca9e5a84892654253178619a9117d27e8f4489ce50c8006fc8_cppui381, 0x01645839c061ab603b6f2986dabc01f34703c51d7665dc049de32cb9edc3d19c4c6bba61f5bd9e547338314f48d23771_cppui381), fq2_value_type(0x1790f2b2540fee819d211e539d7680e7aeab3a9cf83a562f496fa951ed8e2d5bfb597c7e952cd5d549b2b768e3785f1d_cppui381, 0x14f7b9db7a10270ce2462e8b44f4b1688ff2cdee66c35b4013746a87a15a41945fc0ed72c2e0b886d05f93c8e04b97f2_cppui381)));
     G1_value_type agg_c = G1_value_type(0x04dcf2ded167d1b951bc10d1c4a15aa6f9b0cf228e44e197a9f0a588703241175006b04680d99d271c09c14d754ff5fb_cppui381, 0x010185ed049608e00f66fe27230967cab64aad05e7488cd5a46bc581b159488af6c711d4b9ce85f7ddc1a9b43cc611a6_cppui381, fq_value_type::one());
@@ -754,40 +758,61 @@ BOOST_AUTO_TEST_CASE(bls381_verification) {
     BOOST_CHECK(agg_proof.tmipp.vkey_opening == tmipp_vkey_opening);
     BOOST_CHECK(agg_proof.tmipp.wkey_opening == tmipp_wkey_opening);
 
-    BOOST_CHECK(verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    bool verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(verify_res);
 
     // Invalid transcript inclusion
     std::vector<std::uint8_t> wrong_tr_include = {4, 5, 6};
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, wrong_tr_include.begin(), wrong_tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, wrong_tr_include.begin(), wrong_tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof, wrong_tr_include.begin(), wrong_tr_include.end());
+    BOOST_CHECK(!verify_res);
 
     // 3. aggregate invalid proof content (random A, B, and C)
     proofs[0].g_A = random_element<g1_type>();
     r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_a =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_a, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_a, tr_include.begin(), tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof_rand_a, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(!verify_res);
     proofs[0].g_A = proof0.g_A;
 
     proofs[0].g_B = random_element<g2_type>();
     r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_b =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_b, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_b, tr_include.begin(), tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof_rand_b, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(!verify_res);
     proofs[0].g_B = proof0.g_B;
 
     proofs[0].g_C = random_element<g1_type>();
     r1cs_gg_ppzksnark_aggregate_proof<curve_type> agg_proof_rand_c =
         aggregate_proofs<curve_type>(pk, tr_include.begin(), tr_include.end(), proofs.begin(), proofs.end());
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_c, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof_rand_c, tr_include.begin(), tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof_rand_c, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(!verify_res);
     proofs[0].g_C = proof0.g_C;
 
     // 4. verify with invalid aggregate proof
     // first invalid commitment
     agg_proof.agg_c = random_element<g1_type>();
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(!verify_res);
     agg_proof.agg_c = agg_c;
 
     // 5. invalid gipa element
     agg_proof.tmipp.gipa.final_a = random_element<g1_type>();
-    BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    // BOOST_CHECK(!verify_aggregate_proof<curve_type>(vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end()));
+    verify_res = verify<scheme_type, DistributionType, GeneratorType, hashes::sha2<256>>(
+        vk, pvk, statements, agg_proof, tr_include.begin(), tr_include.end());
+    BOOST_CHECK(!verify_res);
     agg_proof.tmipp.gipa.final_a = gp_final_a;
 }
 

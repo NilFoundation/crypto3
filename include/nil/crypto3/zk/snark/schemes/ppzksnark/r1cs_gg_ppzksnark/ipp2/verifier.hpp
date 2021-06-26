@@ -27,8 +27,10 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -206,7 +208,7 @@ namespace nil {
                 inline typename std::enable_if<
                     std::is_same<typename CurveType::scalar_field_type::value_type,
                                  typename std::iterator_traits<InputScalarIterator>::value_type>::value>::type
-                    verify_kzg_v(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                    verify_kzg_v(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::g2_type::value_type,
                                                  typename CurveType::g2_type::value_type> &final_vkey,
                                  const kzg_opening<typename CurveType::g2_type> &vkey_opening,
@@ -262,7 +264,7 @@ namespace nil {
                 inline typename std::enable_if<
                     std::is_same<typename CurveType::scalar_field_type::value_type,
                                  typename std::iterator_traits<InputScalarIterator>::value_type>::value>::type
-                    verify_kzg_w(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                    verify_kzg_w(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::g1_type::value_type,
                                                  typename CurveType::g1_type::value_type> &final_wkey,
                                  const kzg_opening<typename CurveType::g1_type> &wkey_opening,
@@ -456,7 +458,7 @@ namespace nil {
                 template<typename CurveType, typename DistributionType, typename GeneratorType,
                          typename Hash = hashes::sha2<256>>
                 inline void verify_tipp_mipp(transcript<CurveType, Hash> &tr,
-                                             const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                                             const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                              const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                              const typename CurveType::scalar_field_type::value_type &r_shift,
                                              pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
@@ -559,12 +561,13 @@ namespace nil {
                                      typename InputRangesRange::iterator>::value_type::iterator>::value_type>::value &&
                         std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value,
                     bool>::type
-                    verify_aggregate_proof(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &ip_verifier_srs,
-                                           const r1cs_gg_ppzksnark_aggregate_verification_key<CurveType> &pvk,
-                                           const InputRangesRange &public_inputs,
-                                           const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
-                                           InputIterator transcript_include_first,
-                                           InputIterator transcript_include_last) {
+                    verify_aggregate_proof(
+                        const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &ip_verifier_srs,
+                        const r1cs_gg_ppzksnark_aggregate_verification_key<CurveType> &pvk,
+                        const InputRangesRange &public_inputs,
+                        const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
+                        InputIterator transcript_include_first,
+                        InputIterator transcript_include_last) {
                     for (const auto &public_input : public_inputs) {
                         BOOST_ASSERT((public_input.size()) == pvk.gamma_ABC_g1.size());
                     }
@@ -654,6 +657,69 @@ namespace nil {
                     pc.merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
                     return pc.verify();
                 }
+
+                template<typename CurveType, typename BasicVerifier>
+                class r1cs_gg_ppzksnark_aggregate_verifier {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+
+                    typedef typename CurveType::pairing pairing_policy;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::g1_type g1_type;
+                    typedef typename CurveType::gt_type gt_type;
+                    typedef typename pairing_policy::g1_precomp g1_precomp;
+                    typedef typename pairing_policy::g2_precomp g2_precomp;
+                    typedef typename pairing_policy::fqk_type fqk_type;
+
+                public:
+                    typedef BasicVerifier basic_verifier;
+
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+                    typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
+
+                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
+                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
+                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
+                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+
+                    typedef typename policy_type::proof_type proof_type;
+                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
+
+                    // Aggregate verify
+                    template<typename DistributionType, typename GeneratorType, typename Hash,
+                             typename InputPrimaryInputRange, typename InputIterator>
+                    static inline typename std::enable_if<
+                        std::is_same<primary_input_type,
+                                     typename std::iterator_traits<
+                                         typename InputPrimaryInputRange::iterator>::value_type>::value,
+                        bool>::type
+                        process(const aggregate_verification_srs_type &ip_verifier_srs,
+                                const aggregate_verification_key_type &pvk,
+                                const InputPrimaryInputRange &public_inputs,
+                                const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
+                                InputIterator transcript_include_first,
+                                InputIterator transcript_include_last) {
+                        return verify_aggregate_proof<CurveType, DistributionType, GeneratorType, Hash>(
+                            ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first,
+                            transcript_include_last);
+                    }
+
+                    // Basic verify
+                    template<typename VerificationKey>
+                    static inline bool verify(const VerificationKey &vk,
+                                              const primary_input_type &primary_input,
+                                              const proof_type &proof) {
+                        return BasicVerifier::process(vk, primary_input, proof);
+                    }
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

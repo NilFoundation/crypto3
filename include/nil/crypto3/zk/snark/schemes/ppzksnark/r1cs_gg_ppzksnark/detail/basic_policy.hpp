@@ -65,6 +65,7 @@
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/proof.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -114,7 +115,7 @@ namespace nil {
                         typedef r1cs_gg_ppzksnark_processed_verification_key<curve_type>
                             processed_verification_key_type;
 
-                        /************************ Aggregation verification key *************************/
+                        /******************************* Aggregate verification key ****************************/
 
                         /**
                          * A verification key for the R1CS GG-ppzkSNARK aggregation scheme.
@@ -132,11 +133,42 @@ namespace nil {
                         /********************************** Aggregation key pair *********************************/
 
                         /**
-                         * A key pair for the R1CS GG-ppzkSNARK aggregation scheme, which consists of a proving key and
-                         * a verification key.
+                         * A key pair for the R1CS GG-ppzkSNARK aggregation scheme consisting of a proving key and
+                         * a verification key. The last one includes additional fields in comparison with basic
+                         * verification key.
                          */
                         typedef r1cs_gg_ppzksnark_keypair<proving_key_type, aggregate_verification_key_type>
                             aggregate_keypair_type;
+
+                        /********************************** Aggregation SRS *********************************/
+
+                        /**
+                         * A SRS (Structured Reference String) for the R1CS GG-ppzkSNARK aggregation scheme.
+                         */
+                        typedef r1cs_gg_pp_zksnark_aggregate_srs<CurveType> aggregate_srs_type;
+
+                        /******************************** Proving aggregation SRS ********************************/
+
+                        /**
+                         * A proving SRS for the R1CS GG-ppzkSNARK aggregation scheme.
+                         */
+                        typedef r1cs_gg_ppzksnark_aggregate_proving_srs<curve_type> aggregate_proving_srs_type;
+
+                        /******************************** Verification aggregation SRS ********************************/
+
+                        /**
+                         * A verification SRS for the R1CS GG-ppzkSNARK aggregation scheme.
+                         */
+                        typedef r1cs_gg_ppzksnark_aggregate_verification_srs<curve_type>
+                            aggregate_verification_srs_type;
+
+                        /********************************** Aggregation SRS pair *********************************/
+
+                        /**
+                         * A SRS pair for the R1CS GG-ppzkSNARK aggregation scheme consisting of a proving SRS and
+                         * a verification SRS.
+                         */
+                        typedef typename aggregate_srs_type::srs_pair_type aggregate_srs_pair_type;
 
                         /*********************************** Proof ***********************************/
 

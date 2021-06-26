@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -58,6 +60,11 @@ namespace nil {
                         return (this->alpha_g1 == other.alpha_g1 && this->beta_g2 == other.beta_g2 &&
                                 this->gamma_g2 == other.gamma_g2 && this->delta_g2 == other.delta_g2 &&
                                 this->gamma_ABC_g1 == other.gamma_ABC_g1);
+                    }
+
+                    operator r1cs_gg_ppzksnark_verification_key<curve_type>() const {
+                        return r1cs_gg_ppzksnark_verification_key<curve_type>(
+                            algebra::pair_reduced<curve_type>(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1));
                     }
                 };
             }    // namespace snark

@@ -27,6 +27,7 @@
 #define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_IPP2_GENERATOR_HPP
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,8 +53,14 @@ namespace nil {
                     typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
                     typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
 
+                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
+                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
+                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+
                     typedef typename policy_type::keypair_type keypair_type;
                     typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
+                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
@@ -90,6 +97,17 @@ namespace nil {
                                             std::move(r1cs_copy));
 
                         return {std::move(pk), std::move(vk)};
+                    }
+
+                    template<typename DistributionType =
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline aggregate_srs_pair_type process(std::size_t num_proofs) {
+
+                        aggregate_srs_type srs(num_proofs,
+                                               random_element<scalar_field_type, DistributionType, GeneratorType>(),
+                                               random_element<scalar_field_type, DistributionType, GeneratorType>());
+                        return srs.specialize(num_proofs);
                     }
                 };
             }    // namespace snark

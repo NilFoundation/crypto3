@@ -43,6 +43,8 @@
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/proof.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/srs.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/transcript.hpp>
@@ -461,7 +463,7 @@ namespace nil {
                         std::is_same<typename CurveType::scalar_field_type::value_type,
                                      typename std::iterator_traits<InputScalarIterator>::value_type>::value,
                     tipp_mipp_proof<CurveType>>::type
-                    prove_tipp_mipp(const r1cs_gg_ppzksnark_proving_srs<CurveType> &srs,
+                    prove_tipp_mipp(const r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> &srs,
                                     transcript<CurveType, Hash> &tr, InputG1Iterator1 a_first, InputG1Iterator1 a_last,
                                     InputG2Iterator b_first, InputG2Iterator b_last, InputG1Iterator2 c_first,
                                     InputG1Iterator2 c_last, const r1cs_gg_ppzksnark_ipp2_wkey<CurveType> &wkey,
@@ -509,7 +511,7 @@ namespace nil {
                         std::is_same<typename std::iterator_traits<InputProofIterator>::value_type,
                                      r1cs_gg_ppzksnark_proof<CurveType>>::value,
                     r1cs_gg_ppzksnark_aggregate_proof<CurveType>>::type
-                    aggregate_proofs(const r1cs_gg_ppzksnark_proving_srs<CurveType> &srs,
+                    aggregate_proofs(const r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> &srs,
                                      InputTranscriptIncludeIterator tr_include_first,
                                      InputTranscriptIncludeIterator tr_include_last, InputProofIterator proofs_first,
                                      InputProofIterator proofs_last) {
@@ -605,6 +607,58 @@ namespace nil {
 
                     return {com_ab, com_c, ip_ab, agg_c, proof};
                 }
+
+                template<typename CurveType, typename BasicProver>
+                class r1cs_gg_ppzksnark_aggregate_prover {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::g1_type g1_type;
+                    typedef typename CurveType::g2_type g2_type;
+                    typedef typename CurveType::gt_type gt_type;
+
+                public:
+                    typedef BasicProver basic_prover;
+
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
+                    typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
+
+                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
+                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
+                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
+                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+
+                    typedef typename policy_type::proof_type proof_type;
+                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
+
+                    // Aggregate prove
+                    template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
+                    static inline aggregate_proof_type process(const aggregate_proving_srs_type &srs,
+                                                               InputTranscriptIncludeIterator transcript_include_first,
+                                                               InputTranscriptIncludeIterator transcript_include_last,
+                                                               InputProofIterator proofs_first,
+                                                               InputProofIterator proofs_last) {
+                        return aggregate_proofs<CurveType, Hash>(srs, transcript_include_first, transcript_include_last,
+                                                                 proofs_first, proofs_last);
+                    }
+
+                    // Basic prove
+                    static inline proof_type prove(const proving_key_type &pk,
+                                                   const primary_input_type &primary_input,
+                                                   const auxiliary_input_type &auxiliary_input) {
+
+                        return BasicProver::process(pk, primary_input, auxiliary_input);
+                    }
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

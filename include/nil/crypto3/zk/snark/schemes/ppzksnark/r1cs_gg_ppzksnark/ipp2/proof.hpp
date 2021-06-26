@@ -107,7 +107,7 @@ namespace nil {
                     bool is_valid() const {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
-                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_srs<curve_type>::MAX_SRS_SIZE) {
+                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two

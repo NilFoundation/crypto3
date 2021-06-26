@@ -226,8 +226,11 @@ namespace nil {
                         accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                   std::move(gamma_ABC_g1_values));
 
-                        return std::make_tuple(alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query,
-                                               B_query, H_query, L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1);
+                        return std::make_tuple(std::move(alpha_g1), std::move(beta_g1), std::move(beta_g2),
+                                               std::move(delta_g1), std::move(delta_g2), std::move(gamma_g2),
+                                               std::move(A_query), std::move(B_query), std::move(H_query),
+                                               std::move(L_query), std::move(r1cs_copy), std::move(alpha_g1_beta_g2),
+                                               std::move(gamma_ABC_g1));
                     }
 
                     template<typename DistributionType =
@@ -236,8 +239,7 @@ namespace nil {
                     static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                         auto [alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query, B_query, H_query,
-                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1] =
-                            std::move(basic_process(constraint_system));
+                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1] = basic_process(constraint_system);
 
                         verification_key_type vk =
                             verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);

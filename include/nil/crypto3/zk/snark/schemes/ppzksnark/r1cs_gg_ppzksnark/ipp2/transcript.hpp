@@ -36,7 +36,6 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
 #include <nil/crypto3/algebra/marshalling.hpp>
 
 namespace nil {
