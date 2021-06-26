@@ -20,7 +20,7 @@ is called primary_input and the witness (or secret values) is called auxiliary_i
 Let `bp` be a blueprint and `A` and `B` are vectors which inner product `res` has 
 to be calculated. 
 
-```c++
+```cpp
 blueprint<FieldType> bp;
 blueprint_variable_vector<FieldType> A;
 blueprint_variable_vector<FieldType> B;
@@ -31,7 +31,7 @@ Then we associate the variables to a blueprint by using the function `allocate()
 The variable `n` shows the size of the vectors `A` and `B`. Note, that each use of 
 `allocate()` increases the size of `auxiliary_input`.
 
-```c++
+```cpp
 res.allocate(bp);
 A.allocate(bp, n);
 B.allocate(bp, n);
@@ -56,14 +56,14 @@ Now we initialize the simple component `inner_product`. The function `generate_r
 adds R1CS constraints to the blueprint corresponding to the circuit. 
 
 
-```c++
+```cpp
 inner_product<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
 compute_inner_product.generate_r1cs_constraints();
 ```
 
 Next, we set the random values to vectors. 
 
-```c++
+```cpp
 for (std::size_t i = 0; i < n; ++i) {
     bp.val(A[i]) = algebra::random_element<FieldType>();
     bp.val(B[i]) = algebra::random_element<FieldType>();
@@ -73,7 +73,7 @@ for (std::size_t i = 0; i < n; ++i) {
 The function `generate_r1cs_witness()` computes intermediate witness value for the 
 public values and the inner product for the `res`. 
 
-```c++
+```cpp
 compute_inner_product.generate_r1cs_witness();
 ```
 
@@ -92,7 +92,7 @@ and `output` at the blueprint. The allocation on the blueprint proceeds at the c
 of digest_variable. Then we initialize the  component ` sha256_two_to_one_hash_component ` 
 and add constraints at the `generate_r1cs_constraints()` function.
 
-```c++
+```cpp
 blueprint<field_type> bp;
 
 digest_variable<field_type> left(bp, hashes::sha2<256>::digest_bits);
@@ -109,7 +109,7 @@ bit vectors.
 We use a custom `pack`, which allows us to convert data from an arbitrary data 
 type to bit vectors. The following code can be used for this purpose:
 
-```c++
+```cpp
 std::array<std::uint32_t, 8> array_a_intermediate;
 std::array<std::uint32_t, 8> array_b_intermediate;
 std::array<std::uint32_t, 8> array_c_intermediate;
@@ -155,7 +155,7 @@ detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
 
 After getting bit vectors, we can generate r1cs witnesses.
 
-```c++
+```cpp
 left.generate_r1cs_witness(left_bv);
 
 right.generate_r1cs_witness(right_bv);
@@ -178,7 +178,7 @@ our constraints system.
 * The proving key `keypair.first`, public input `bp.primary_input`, and private input 
 `bp.auxiliary_input` are used for the constructing of the proof (`grth16::prover`). 
 
-```c++
+```cpp
 using grth16 = r1cs_gg_ppzksnark<curve_type>;
 typename grth16::keypair_type keypair = grth16::generator(bp.get_constraint_system());
 
