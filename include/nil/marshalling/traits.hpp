@@ -37,15 +37,6 @@
 namespace nil {
     namespace marshalling {
         namespace traits {
-            namespace endian {
-
-                /// @brief Empty class used in traits to indicate big endian.
-                using big = processing::traits::endian::big;
-
-                /// @brief Empty class used in traits to indicate little endian.
-                using little = processing::traits::endian::little;
-
-            }    // namespace endian
 
             namespace units {
 

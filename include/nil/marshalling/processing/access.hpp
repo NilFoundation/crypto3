@@ -32,24 +32,11 @@
 #include <limits>
 #include <iterator>
 
+#include <nil/marshalling/endianness.hpp>
+
 namespace nil {
     namespace marshalling {
-
         namespace processing {
-
-            namespace traits {
-
-                namespace endian {
-
-                    /// @brief Empty class used in traits to indicate big endian.
-                    struct big { };
-
-                    /// @brief Empty class used in traits to indicate little endian.
-                    struct little { };
-
-                }    // namespace endian
-
-            }    // namespace traits
 
             namespace detail {
 
@@ -192,7 +179,7 @@ namespace nil {
                 struct write_unsigned_func_wrapper;
 
                 template<>
-                struct write_unsigned_func_wrapper<traits::endian::big> {
+                struct write_unsigned_func_wrapper<endian::big_endian> {
                     template<typename T, typename TIter>
                     static void write(T value, std::size_t size, TIter &iter) {
                         write_big_unsigned(value, size, iter);
@@ -200,7 +187,7 @@ namespace nil {
                 };
 
                 template<>
-                struct write_unsigned_func_wrapper<traits::endian::little> {
+                struct write_unsigned_func_wrapper<endian::little_endian> {
                     template<typename T, typename TIter>
                     static void write(T value, std::size_t size, TIter &iter) {
                         write_little_unsigned(value, size, iter);
@@ -327,7 +314,7 @@ namespace nil {
                 struct read_unsigned_func_wrapper;
 
                 template<>
-                struct read_unsigned_func_wrapper<traits::endian::big> {
+                struct read_unsigned_func_wrapper<endian::big_endian> {
                     template<typename T, typename TIter>
                     static T read(std::size_t size, TIter &iter) {
                         return read_big_unsigned<T>(size, iter);
@@ -335,7 +322,7 @@ namespace nil {
                 };
 
                 template<>
-                struct read_unsigned_func_wrapper<traits::endian::little> {
+                struct read_unsigned_func_wrapper<endian::little_endian> {
                     template<typename T, typename TIter>
                     static T read(std::size_t size, TIter &iter) {
                         return read_little_unsigned<T>(size, iter);
@@ -474,7 +461,7 @@ namespace nil {
             /// @post The iterator is advanced.
             template<std::size_t TSize, typename T, typename TIter>
             void write_big(T value, TIter &iter) {
-                detail::writer<detail::write_helper>::template write<traits::endian::big, TSize>(value, iter);
+                detail::writer<detail::write_helper>::template write<endian::big_endian, TSize>(value, iter);
             }
 
             /// @brief Write integral value into the output area using big
@@ -502,7 +489,7 @@ namespace nil {
             /// @post The iterator is advanced.
             template<typename T, std::size_t TSize, typename TIter>
             T read_big(TIter &iter) {
-                return detail::reader<detail::read_helper>::template read<traits::endian::big, T, TSize>(iter);
+                return detail::reader<detail::read_helper>::template read<endian::big_endian, T, TSize>(iter);
             }
 
             /// @brief Read integral value from the input area using big
@@ -530,7 +517,7 @@ namespace nil {
             /// @post The iterator is advanced.
             template<std::size_t TSize, typename T, typename TIter>
             void write_little(T value, TIter &iter) {
-                detail::writer<detail::write_helper>::template write<traits::endian::little, TSize>(value, iter);
+                detail::writer<detail::write_helper>::template write<endian::little_endian, TSize>(value, iter);
             }
 
             /// @brief Write integral value into the output area using big
@@ -558,7 +545,7 @@ namespace nil {
             /// @post The iterator is advanced.
             template<typename T, std::size_t TSize, typename TIter>
             T read_little(TIter &iter) {
-                return detail::reader<detail::read_helper>::template read<traits::endian::little, T, TSize>(iter);
+                return detail::reader<detail::read_helper>::template read<endian::little_endian, T, TSize>(iter);
             }
 
             /// @brief Read integral value from the input area using little
@@ -577,56 +564,56 @@ namespace nil {
 
             /// @brief Same as writeBig<T, TIter>()
             template<typename T, typename TIter>
-            void write_data(T value, TIter &iter, const traits::endian::big &endian) {
+            void write_data(T value, TIter &iter, const endian::big_endian &endian) {
                 static_cast<void>(endian);
                 write_big(value, iter);
             }
 
             /// @brief Same as writeBig<TSize, T, TIter>()
             template<std::size_t TSize, typename T, typename TIter>
-            void write_data(T value, TIter &iter, const traits::endian::big &endian) {
+            void write_data(T value, TIter &iter, const endian::big_endian &endian) {
                 static_cast<void>(endian);
                 write_big<TSize>(value, iter);
             }
 
             /// @brief Same as writeLittle<T, TIter>()
             template<typename T, typename TIter>
-            void write_data(T value, TIter &iter, const traits::endian::little &endian) {
+            void write_data(T value, TIter &iter, const endian::little_endian &endian) {
                 static_cast<void>(endian);
                 write_little(value, iter);
             }
 
             /// @brief Same as writeLittle<TSize, T, TIter>()
             template<std::size_t TSize, typename T, typename TIter>
-            void write_data(T value, TIter &iter, const traits::endian::little &endian) {
+            void write_data(T value, TIter &iter, const endian::little_endian &endian) {
                 static_cast<void>(endian);
                 return write_little<TSize>(value, iter);
             }
 
             /// @brief Same as readBig<T, TIter>()
             template<typename T, typename TIter>
-            T read_data(TIter &iter, const traits::endian::big &endian) {
+            T read_data(TIter &iter, const endian::big_endian &endian) {
                 static_cast<void>(endian);
                 return read_big<T>(iter);
             }
 
             /// @brief Same as readBig<T, TSize, TIter>()
             template<typename T, std::size_t TSize, typename TIter>
-            T read_data(TIter &iter, const traits::endian::big &endian) {
+            T read_data(TIter &iter, const endian::big_endian &endian) {
                 static_cast<void>(endian);
                 return read_big<T, TSize>(iter);
             }
 
             /// @brief Same as readLittle<T, TIter>()
             template<typename T, typename TIter>
-            T read_data(TIter &iter, const traits::endian::little &endian) {
+            T read_data(TIter &iter, const endian::little_endian &endian) {
                 static_cast<void>(endian);
                 return read_little<T>(iter);
             }
 
             /// @brief Same as read_data<T, TSize, TIter>()
             template<typename T, std::size_t TSize, typename TIter>
-            T read_data(TIter &iter, const traits::endian::little &endian) {
+            T read_data(TIter &iter, const endian::little_endian &endian) {
                 static_cast<void>(endian);
                 return read_little<T, TSize>(iter);
             }

@@ -198,7 +198,7 @@ namespace nil {
             /// @detail The type exists only if nil::marshalling::option::big_endian or
             ///     nil::marshalling::option::little_endian options were used to specify it.
             /// @see @ref has_endian()
-            using endian = typename base_impl_type::endian;
+            using endian_type = typename base_impl_type::endian_base_type;
 
             /// @brief type of default base class for all the fields.
             /// @detail Requires definition of the @ref endian type, i.e. the type
