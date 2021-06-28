@@ -44,12 +44,17 @@ namespace nil {
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
-                    constexpr static constants_operator_policy_type get_policy_constant_operator() {
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    static constants_operator_policy_type get_policy_constant_operator() {
                         return constants_operator_policy_type();
                     }
 
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
                     constexpr
-                        static inline const constants_operator_policy_type policy_constants_operator =
+#endif
+                    static inline const constants_operator_policy_type policy_constants_operator =
                         get_policy_constant_operator();
 
                     static inline void permute(state_type &A) {

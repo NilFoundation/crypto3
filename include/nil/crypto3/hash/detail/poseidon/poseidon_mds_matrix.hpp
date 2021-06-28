@@ -43,8 +43,7 @@ namespace nil {
                         A_vector = algebra::vectmatmul(A_vector, mds_matrix);
                     }
 
-                    constexpr
-                        void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
+                    constexpr void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
                                                                            state_vector_type &A_vector_out) const {
                         A_vector_out = algebra::vectmatmul(A_vector_in, mds_matrix_inverse);
                     }
@@ -76,7 +75,10 @@ namespace nil {
                     }
 
                     // private:
-                    constexpr inline mds_matrix_type generate_mds_matrix() {
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type new_mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
@@ -89,7 +91,10 @@ namespace nil {
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
-                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                        constexpr
+#endif
+                        equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
                             M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
@@ -130,7 +135,10 @@ namespace nil {
                         return equivalent_mds_matrix.M_i;
                     }
 
-                    constexpr poseidon_mds_matrix() :
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    poseidon_mds_matrix() :
                         mds_matrix(generate_mds_matrix()), mds_matrix_inverse(algebra::inverse(mds_matrix)),
                         equivalent_mds_matrix(mds_matrix) {
                     }

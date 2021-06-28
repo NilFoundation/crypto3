@@ -145,7 +145,10 @@ namespace nil {
                                                            constants_number_base);
                     }
 
-                    constexpr inline void generate_equivalent_round_constants() {
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    inline void generate_equivalent_round_constants() {
                         state_vector_type inv_cip1;
                         state_vector_type agregated_round_constants;
                         std::size_t equivalent_constant_number_base =
@@ -181,7 +184,10 @@ namespace nil {
                         return equivalent_round_constants[constant_number];
                     }
 
-                    constexpr poseidon_constants_operator() :
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    poseidon_constants_operator() :
                         policy_matrix(), round_constants_generator(), equivalent_round_constants() {
                         generate_equivalent_round_constants();
                     }
