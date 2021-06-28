@@ -60,31 +60,31 @@
 
 using namespace nil::marshalling;
 
-static_assert(detail::has_clear_func<std::string>::value, "Invalid function presence detection");
-static_assert(detail::has_clear_func<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(detail::has_clear_func<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(detail::has_clear_func<processing::static_vector<std::uint8_t, 5>>::value,
+static_assert(has_member_function_clear<std::string>::value, "Invalid function presence detection");
+static_assert(has_member_function_clear<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
+static_assert(has_member_function_clear<processing::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_clear<processing::static_vector<std::uint8_t, 5>>::value,
               "Invalid function presence detection");
-static_assert(!detail::has_clear_func<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!detail::has_clear_func<processing::array_view<std::uint8_t>>::value,
-              "Invalid function presence detection");
-
-static_assert(detail::has_resize_func<std::string>::value, "Invalid function presence detection");
-static_assert(detail::has_resize_func<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(detail::has_resize_func<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(detail::has_resize_func<processing::static_vector<std::uint8_t, 5>>::value,
-              "Invalid function presence detection");
-static_assert(!detail::has_resize_func<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!detail::has_resize_func<processing::array_view<std::uint8_t>>::value,
+static_assert(!has_member_function_clear<processing::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_clear<processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
-static_assert(detail::has_reserve_func<std::string>::value, "Invalid function presence detection");
-static_assert(detail::has_reserve_func<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(detail::has_reserve_func<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(detail::has_reserve_func<processing::static_vector<std::uint8_t, 5>>::value,
+static_assert(has_member_function_resize<std::string>::value, "Invalid function presence detection");
+static_assert(has_member_function_resize<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
+static_assert(has_member_function_resize<processing::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_resize<processing::static_vector<std::uint8_t, 5>>::value,
               "Invalid function presence detection");
-static_assert(!detail::has_reserve_func<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!detail::has_reserve_func<processing::array_view<std::uint8_t>>::value,
+static_assert(!has_member_function_resize<processing::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_resize<processing::array_view<std::uint8_t>>::value,
+              "Invalid function presence detection");
+
+static_assert(has_member_function_reserve<std::string>::value, "Invalid function presence detection");
+static_assert(has_member_function_reserve<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
+static_assert(has_member_function_reserve<processing::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_reserve<processing::static_vector<std::uint8_t, 5>>::value,
+              "Invalid function presence detection");
+static_assert(!has_member_function_reserve<processing::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_reserve<processing::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 struct types_fixture {

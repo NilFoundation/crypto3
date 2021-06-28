@@ -32,6 +32,7 @@
 
 #include <nil/detail/type_traits.hpp>
 
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/assert_type.hpp>
@@ -39,7 +40,6 @@
 
 #include <nil/marshalling/protocol/detail/protocol_layer_base_options_parser.hpp>
 #include <nil/marshalling/detail/protocol_layers_access.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -81,7 +81,7 @@ namespace nil {
                 template<typename T>
                 struct protocol_layer_has_fields_impl {
                     static const bool value = protocol_layer_has_fields_impl_helper<
-                        T, nil::marshalling::detail::has_impl_options<T>::value>::value;
+                        T, has_type_impl_options_type<T>::value>::value;
                 };
 
                 template<typename T, bool THasImpl>
@@ -100,7 +100,7 @@ namespace nil {
                 template<typename T>
                 struct protocol_layer_has_do_get_id {
                     static const bool value = protocol_layer_has_do_get_id_helper<
-                        T, nil::marshalling::detail::has_impl_options<T>::value>::value;
+                        T, has_type_impl_options_type<T>::value>::value;
                 };
 
                 template<class T, class R = void>
@@ -688,7 +688,7 @@ namespace nil {
                 ///     @b false otherwise.
                 template<typename T>
                 static constexpr bool is_message_obj_ref() {
-                    return nil::marshalling::detail::has_impl_options<T>::value;
+                    return has_type_impl_options_type<T>::value;
                 }
 
                 /// @brief Reset msg in case it is a smart pointer (@ref msg_ptr_type).

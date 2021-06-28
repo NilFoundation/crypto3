@@ -36,7 +36,6 @@
 #include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 #include <nil/marshalling/types/basic/common_funcs.hpp>
 
 namespace nil {
@@ -191,7 +190,7 @@ namespace nil {
                     }
 
                     void clear() {
-                        static_assert(nil::marshalling::detail::has_clear_func<value_type>::value,
+                        static_assert(has_member_function_clear<value_type>::value,
                                       "The used storage type for array_list must have clear() member function");
 
                         value_.clear();
@@ -529,7 +528,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read_internal(TIter &iter, std::size_t len, field_elem_tag) {
-                        static_assert(nil::marshalling::detail::has_clear_func<value_type>::value,
+                        static_assert(has_member_function_clear<value_type>::value,
                                       "The used storage type for array_list must have clear() member function");
                         value_.clear();
                         auto remLen = len;

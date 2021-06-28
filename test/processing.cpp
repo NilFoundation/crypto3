@@ -819,25 +819,19 @@ BOOST_AUTO_TEST_CASE(test24) {
                       nil::marshalling::processing::array_view<std::uint8_t>>::value,
                   "array_view has assign");
 
-    static_assert(nil::marshalling::detail::has_reserve_func<std::string>::value, "std::string must have reserve");
-
-    static_assert(nil::marshalling::detail::has_reserve_func<StaticStr>::value, "static_string must have reserve");
-
-    static_assert(nil::marshalling::detail::has_reserve_func<StaticVec>::value, "static_vector must have reserve");
-
-    static_assert(!nil::marshalling::detail::has_reserve_func<nil::marshalling::processing::string_view>::value,
+    static_assert(has_member_function_reserve<std::string>::value, "std::string must have reserve");
+    static_assert(has_member_function_reserve<StaticStr>::value, "static_string must have reserve");
+    static_assert(has_member_function_reserve<StaticVec>::value, "static_vector must have reserve");
+    static_assert(!has_member_function_reserve<nil::marshalling::processing::string_view>::value,
                   "string_view mustn't have reserve");
 
-    static_assert(nil::marshalling::detail::has_clear_func<std::string>::value, "std::string must have clear");
-
-    static_assert(nil::marshalling::detail::has_clear_func<StaticStr>::value, "static_string must have clear");
-
-    static_assert(nil::marshalling::detail::has_clear_func<StaticVec>::value, "static_vector must have clear");
-
-    static_assert(!nil::marshalling::detail::has_clear_func<nil::marshalling::processing::string_view>::value,
+    static_assert(has_member_function_func<std::string>::value, "std::string must have clear");
+    static_assert(has_member_function_func<StaticStr>::value, "static_string must have clear");
+    static_assert(has_member_function_func<StaticVec>::value, "static_vector must have clear");
+    static_assert(!has_member_function_func<nil::marshalling::processing::string_view>::value,
                   "string_view mustn't have clear");
 
-    static_assert(nil::marshalling::detail::has_remove_suffix_func<nil::marshalling::processing::string_view>::value,
+    static_assert(has_member_function_remove_suffix<nil::marshalling::processing::string_view>::value,
                   "string_view must have remove_suffix");
 
     static_assert(std::is_base_of<nil::marshalling::processing::detail::static_vector_casted<char, unsigned char, 20>,

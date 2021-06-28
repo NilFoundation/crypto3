@@ -40,7 +40,6 @@
 
 #include <nil/marshalling/detail/message/interface_builder.hpp>
 #include <nil/marshalling/detail/transport_fields_access.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -533,15 +532,6 @@ namespace nil {
         template<typename TMessage, typename TVal>
         typename TMessage::write_iterator write_iterator_for(const TVal& val) {
             return typename TMessage::write_iterator(val);
-        }
-
-        /// @brief Compile time check of of whether the type
-        ///     is a message.
-        /// @details Checks existence of @b interface_options_type inner
-        ///     type.
-        template<typename T>
-        constexpr bool is_message() {
-            return detail::has_interface_options<T>::value;
         }
 
     }    // namespace marshalling

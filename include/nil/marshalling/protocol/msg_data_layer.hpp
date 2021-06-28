@@ -26,11 +26,13 @@
 #ifndef MARSHALLING_MSG_DATA_LAYER_HPP
 #define MARSHALLING_MSG_DATA_LAYER_HPP
 
-#include <nil/detail/type_traits.hpp>
-
 #include <tuple>
 #include <iterator>
 #include <type_traits>
+
+#include <nil/detail/type_traits.hpp>
+
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
@@ -126,7 +128,7 @@ namespace nil {
                 static status_type read(TMsg &msg, TIter &iter, std::size_t size, std::size_t *missingSize = nullptr) {
 
                     using msg_type = typename std::decay<decltype(msg)>::type;
-                    using tag = typename std::conditional<nil::marshalling::detail::has_impl_options<msg_type>::value,
+                    using tag = typename std::conditional<has_type_impl_options_type<msg_type>::value,
                                                           direct_op_tag, polymorphic_op_tag>::type;
 
                     return read_internal(msg, iter, size, missingSize, tag());

@@ -39,6 +39,9 @@ namespace nil {
 
         BOOST_TTI_HAS_TYPE(tag)
 
+        BOOST_TTI_HAS_TYPE(interface_options_type)
+        BOOST_TTI_HAS_TYPE(impl_options_type)
+
         /// @brief Compile time check function of whether a provided type is any
         ///     variant of nil::marshalling::types::array_list.
         /// @tparam T Any type.
@@ -188,6 +191,89 @@ namespace nil {
             static const bool value = std::is_same<std::uint8_t, T>::value
                                       || std::is_same<std::int8_t, T>::value
                                       || std::is_same<char, T>::value;
+        };
+
+        /// @brief Compile time check of of whether the type
+        ///     is a message.
+        /// @details Checks existence of @b interface_options_type inner
+        ///     type.
+        template<typename T>
+        struct is_message {
+            static const bool value = has_type_interface_options_type<T>::value;
+        };
+
+        /// @brief Compile time check of of whether the type
+        ///     is a message extending @ref nil::marshalling::message_base.
+        /// @details Checks existence of @b impl_options_type inner
+        ///     type.
+        template<typename T>
+        struct is_message_base {
+            static const bool value = has_type_impl_options_type<T>::value;
+        };
+
+        // The following four functions we need only because of absence of BOOST_TTI_HAS_MEMBER_FUNCTION for std::string
+        template<typename T>
+        class has_member_function_clear {
+            struct no { };
+
+        protected:
+            template<typename C>
+            static auto test(std::nullptr_t) -> decltype(std::declval<C>().clear());
+
+            template<typename>
+            static no test(...);
+
+        public:
+            constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+        };
+
+        template<typename T>
+        class has_member_function_reserve {
+            struct no { };
+
+        protected:
+            template<typename C>
+            static auto test(std::nullptr_t) -> decltype(std::declval<C>().reserve(0U));
+
+            template<typename>
+            static no test(...);
+
+        public:
+            constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+        };
+
+        template<typename T>
+        class has_member_function_resize {
+            struct no { };
+
+        protected:
+            template<typename C>
+            static auto test(std::nullptr_t) -> decltype(std::declval<C>().resize(0U));
+
+            template<typename>
+            static no test(...);
+
+        public:
+            constexpr static const bool value = !std::is_same<no, decltype(test<T>(nullptr))>::value;
+        };
+
+        template<typename T>
+        class has_member_function_remove_suffix {
+        protected:
+            typedef char Yes;
+            typedef unsigned no;
+
+            template<typename U, U>
+            struct ReallyHas;
+
+            template<typename C>
+            static Yes test(ReallyHas<void (C::*)(typename C::size_type), &C::remove_suffix> *);
+
+            template<typename>
+            static no test(...);
+
+        public:
+            constexpr static const bool value = (sizeof(test<T>(nullptr)) == sizeof(Yes));
         };
     }        // namespace marshalling
 }    // namespace nil

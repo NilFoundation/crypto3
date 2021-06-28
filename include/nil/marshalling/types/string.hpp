@@ -28,6 +28,7 @@
 
 #include <vector>
 
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
@@ -378,9 +379,9 @@ namespace nil {
 
                 void eval_resize(std::size_t count) {
                     using TagTmp = typename std::conditional<
-                        nil::marshalling::detail::has_resize_func<value_type>::value,
+                        has_member_function_resize<value_type>::value,
                         has_resize_tag,
-                        typename std::conditional<nil::marshalling::detail::has_remove_suffix_func<value_type>::value,
+                        typename std::conditional<has_member_function_remove_suffix<value_type>::value,
                                                   has_remove_suffix_tag,
                                                   void>::type>::type;
 
