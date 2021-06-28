@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/traits.hpp
+/// @file nil/marshalling/endianness.hpp
 /// This file contains all the classes necessary to properly
 /// define message traits.
 

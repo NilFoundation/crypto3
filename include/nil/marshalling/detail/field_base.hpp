@@ -26,7 +26,6 @@
 #ifndef MARSHALLING_FIELD_BASE_HPP
 #define MARSHALLING_FIELD_BASE_HPP
 
-#include <nil/marshalling/traits.hpp>
 #include <nil/marshalling/endianness.hpp>
 #include <nil/marshalling/options.hpp>
 

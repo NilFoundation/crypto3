@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/traits.hpp
+/// @file nil/marshalling/units_types.hpp
 /// This file contains all the classes necessary to properly
 /// define message traits.
 
@@ -37,7 +37,6 @@
 namespace nil {
     namespace marshalling {
         namespace traits {
-
             namespace units {
 
                 /// @brief Tag class used to indicate time value

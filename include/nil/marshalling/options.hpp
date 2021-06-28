@@ -37,7 +37,7 @@
 #include <cstddef>
 
 #include <nil/marshalling/endianness.hpp>
-#include <nil/marshalling/traits.hpp>
+#include <nil/marshalling/units_types.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/types/optional_mode.hpp>
 

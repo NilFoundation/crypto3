@@ -32,7 +32,7 @@
 #include <ratio>
 #include <type_traits>
 
-#include <nil/marshalling/traits.hpp>
+#include <nil/marshalling/units_types.hpp>
 
 namespace nil {
     namespace marshalling {
