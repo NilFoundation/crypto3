@@ -28,6 +28,7 @@
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/inject.hpp>
 
 namespace nil {
     namespace crypto3 {

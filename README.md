@@ -20,11 +20,7 @@ library in a project it is required to:
 ### Internal
 
 * [Block Ciphers](https://github.com/nilfoundation/block.git)
-* [Boost.Predef](https://github.com/nilfoundation/predef.git) (until https://github.com/boostorg/predef/pull/108
-  and https://github.com/boostorg/predef/pull/107 are accepted)
-* [Boost.Config](https://github.com/nilfoundation/config.git) (until https://github.com/boostorg/config/pull/338
-  and https://github.com/boostorg/config/pull/339 are accepted)
 
 ### External
 
-* [Boost](https://boost.org) (>= 1.58)
+* [Boost](https://boost.org) (>= 1.74)
