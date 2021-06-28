@@ -38,6 +38,13 @@ macro(define_hash_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-steps=4294967295")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
 endmacro()
 
 set(TESTS_NAMES

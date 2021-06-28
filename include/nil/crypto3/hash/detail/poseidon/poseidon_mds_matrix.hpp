@@ -39,24 +39,25 @@ namespace nil {
                     typedef algebra::vector<element_type, state_words - 1> substate_vector_type;
                     typedef algebra::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
 
-                    inline void product_with_mds_matrix(state_vector_type &A_vector) {
+                    inline void product_with_mds_matrix(state_vector_type &A_vector) const {
                         A_vector = algebra::vectmatmul(A_vector, mds_matrix);
                     }
 
-                    inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
-                                                                        state_vector_type &A_vector_out) {
+                    constexpr
+                        void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
+                                                                           state_vector_type &A_vector_out) const {
                         A_vector_out = algebra::vectmatmul(A_vector_in, mds_matrix_inverse);
                     }
 
                     inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector,
-                                                                        std::size_t round_number) {
+                                                                        std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix_init");
                         A_vector = algebra::vectmatmul(A_vector, get_M_i());
                     }
 
                     inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
-                                                                   std::size_t round_number) {
+                                                                   std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix");
@@ -88,7 +89,7 @@ namespace nil {
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
-                        explicit constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
+                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
                             M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
@@ -116,16 +117,16 @@ namespace nil {
                         element_type M_0_0;
                     };
 
-                    inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) {
+                    inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) const {
                         return equivalent_mds_matrix.w_hat_list[w_hat_number];
                     }
-                    inline const substate_vector_type &get_v(std::size_t v_number) {
+                    inline const substate_vector_type &get_v(std::size_t v_number) const {
                         return equivalent_mds_matrix.v_list[v_number];
                     }
-                    inline const element_type &get_M_0_0() {
+                    inline const element_type &get_M_0_0() const {
                         return equivalent_mds_matrix.M_0_0;
                     }
-                    inline const mds_matrix_type &get_M_i() {
+                    inline const mds_matrix_type &get_M_i() const {
                         return equivalent_mds_matrix.M_i;
                     }
 

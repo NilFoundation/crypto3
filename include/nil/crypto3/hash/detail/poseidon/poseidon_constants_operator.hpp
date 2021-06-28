@@ -50,7 +50,7 @@ namespace nil {
                      */
 
                     inline void arc_sbox_mds_full_round_optimized_first(state_vector_type &A,
-                                                                        std::size_t round_number) {
+                                                                        std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_first");
                         std::size_t constant_number_base = round_number * state_words;
@@ -61,7 +61,8 @@ namespace nil {
                         policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A,
+                                                                       std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_last");
                         std::size_t constant_number_base =
@@ -74,7 +75,8 @@ namespace nil {
                         policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    inline void arc_mds_part_round_optimized_init(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_mds_part_round_optimized_init(state_vector_type &A,
+                                                                  std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: arc_mds_part_round_optimized_init");
                         std::size_t constant_number_base = half_full_rounds * state_words;
@@ -84,7 +86,8 @@ namespace nil {
                         policy_matrix.product_with_equivalent_mds_matrix_init(A, round_number);
                     }
 
-                    inline void sbox_arc_mds_part_round_optimized(state_vector_type &A, std::size_t round_number) {
+                    inline void sbox_arc_mds_part_round_optimized(state_vector_type &A,
+                                                                  std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds - 1,
                                          "wrong using: sbox_arc_mds_part_round_optimized");
@@ -95,7 +98,8 @@ namespace nil {
                         policy_matrix.product_with_equivalent_mds_matrix(A, round_number);
                     }
 
-                    inline void sbox_mds_part_round_optimized_last(state_vector_type &A, std::size_t round_number) {
+                    inline void sbox_mds_part_round_optimized_last(state_vector_type &A,
+                                                                   std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds + part_rounds - 1,
                                          "wrong using: sbox_mds_part_round_optimized_last");
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
@@ -108,7 +112,7 @@ namespace nil {
                      * =========================================================
                      */
 
-                    inline void arc_sbox_mds_full_round(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_full_round(state_vector_type &A, std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds ||
                                              round_number >= half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_full_round");
@@ -119,7 +123,7 @@ namespace nil {
                         policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    inline void arc_sbox_mds_part_round(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_part_round(state_vector_type &A, std::size_t round_number) const {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_part_round");
@@ -131,11 +135,12 @@ namespace nil {
                     }
 
                     // private:
-                    constexpr inline const element_type &get_round_constant(std::size_t constant_number) {
+                    constexpr inline const element_type &get_round_constant(std::size_t constant_number) const {
                         return round_constants_generator.round_constants[constant_number];
                     }
 
-                    constexpr inline state_vector_type get_round_constants_slice(std::size_t constants_number_base) {
+                    constexpr inline state_vector_type
+                        get_round_constants_slice(std::size_t constants_number_base) const {
                         return algebra::slice<state_words>(round_constants_generator.round_constants,
                                                            constants_number_base);
                     }
@@ -172,7 +177,7 @@ namespace nil {
                         }
                     }
 
-                    inline const element_type &get_equivalent_round_constant(std::size_t constant_number) {
+                    inline const element_type &get_equivalent_round_constant(std::size_t constant_number) const {
                         return equivalent_round_constants[constant_number];
                     }
 

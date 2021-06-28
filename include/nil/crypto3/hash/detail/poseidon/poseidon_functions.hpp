@@ -48,8 +48,8 @@ namespace nil {
                         return constants_operator_policy_type();
                     }
 
-                    // add constexpr
-                    static inline constants_operator_policy_type policy_constants_operator =
+                    constexpr
+                        static inline const constants_operator_policy_type policy_constants_operator =
                         get_policy_constant_operator();
 
                     static inline void permute(state_type &A) {

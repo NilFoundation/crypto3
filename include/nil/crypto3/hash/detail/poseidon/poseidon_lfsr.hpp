@@ -101,9 +101,7 @@ namespace nil {
                     }
 
                     constexpr inline bool get_lfsr_state_bit(lfsr_state_type state, std::size_t pos) {
-                        lfsr_state_type bit_getter = 1;
-                        bit_getter <<= (lfsr_state_bits - 1 - pos);
-                        return (state & bit_getter) ? true : false;
+                        return bit_test(state, lfsr_state_bits - 1 - pos);
                     }
 
                     template<typename T>
