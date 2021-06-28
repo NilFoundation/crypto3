@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <limits>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/processing/size_to_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
@@ -114,7 +116,7 @@ namespace nil {
                 class bitfield : public TFieldBase {
                     using base_impl_type = TFieldBase;
 
-                    static_assert(nil::marshalling::processing::is_tuple<TMembers>::value,
+                    static_assert(nil::detail::is_tuple<TMembers>::value,
                                   "TMembers is expected to be a tuple of BitfieldMember<...>");
 
                     static_assert(1U < std::tuple_size<TMembers>::value,

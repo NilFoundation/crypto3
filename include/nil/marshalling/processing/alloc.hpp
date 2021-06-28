@@ -35,6 +35,8 @@
 #include <array>
 #include <algorithm>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 
@@ -175,7 +177,7 @@ namespace nil {
                         static_assert(std::is_base_of<TInterface, TObj>::value,
                                       "TObj does not inherit from TInterface");
 
-                        static_assert(nil::marshalling::processing::is_in_tuple<TObj, TAllTypes>::value,
+                        static_assert(nil::detail::is_in_tuple<TObj, TAllTypes>::value,
                                       ""
                                       "TObj must be in provided tuple of supported types");
 

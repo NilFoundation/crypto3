@@ -360,16 +360,6 @@ namespace nil {
                 return field1.value() < field2.value();
             }
 
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::bitfield.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref bitfield
-            /// @related nil::marshalling::types::bitfield
-            template<typename T>
-            constexpr bool is_bitfield() {
-                return std::is_same<typename T::tag, tag::bitfield>::value;
-            }
-
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::bitfield type
             ///     in order to have access to its internal types.
             /// @related nil::marshalling::types::bitfield

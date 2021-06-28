@@ -30,7 +30,8 @@
 #include <nil/marshalling/accumulators/marshalling.hpp>
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
 #include <nil/marshalling/accumulators/parameters/expected_status.hpp>
-#include <nil/marshalling/detail/type_traits.hpp>
+#include <nil/marshalling/type_traits.hpp>
+#include <nil/detail/type_traits.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -64,8 +65,8 @@ namespace nil {
          * @return
          */
         template<typename MarshallingInputType, typename MarshallingOutputType>
-        typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+        typename std::enable_if<marshalling::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
             pack(MarshallingInputType input_field, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
@@ -96,8 +97,8 @@ namespace nil {
         template<typename MarshallingInputType, typename MarshallingOutputType,
                  typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                    && marshalling::is_marshalling_field<MarshallingInputType>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
             pack(MarshallingInputType input_field, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {
@@ -132,8 +133,8 @@ namespace nil {
          * @return
          */
         template<typename MarshallingOutputType, typename InputIterator>
-        typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+        typename std::enable_if<nil::detail::is_iterator<InputIterator>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
             pack(InputIterator first, InputIterator last, status_type expectedStatus = status_type::success) {
             typedef accumulator_set<MarshallingOutputType> accumulator_set_type;
@@ -166,8 +167,8 @@ namespace nil {
         template<typename MarshallingOutputType, typename InputIterator,
                  typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_iterator<InputIterator>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                    && nil::detail::is_iterator<InputIterator>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
             pack(InputIterator first, InputIterator last, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {
@@ -197,8 +198,8 @@ namespace nil {
          * @return
          */
         template<typename MarshallingOutputType, typename SinglePassRange>
-        typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type
             pack(const SinglePassRange &rng, status_type expectedStatus = status_type::success) {
 
@@ -230,8 +231,8 @@ namespace nil {
         template<typename MarshallingOutputType, typename SinglePassRange,
                  typename MarshallingOutputTypeAccumulator = accumulator_set<MarshallingOutputType>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_range<SinglePassRange>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingOutputType>::value,
+                                    && nil::detail::is_range<SinglePassRange>::value
+                                    && marshalling::is_marshalling_field<MarshallingOutputType>::value,
                                 MarshallingOutputType>::type &
             pack(const SinglePassRange &rng, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {
@@ -263,8 +264,8 @@ namespace nil {
          * @return
          */
         template<typename MarshallingInputType, typename OutputIterator>
-        typename std::enable_if<marshalling::detail::is_marshalling_field<MarshallingInputType>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+        typename std::enable_if<marshalling::is_marshalling_field<MarshallingInputType>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(MarshallingInputType input_field, OutputIterator out,
                  status_type expectedStatus = status_type::success) {
@@ -310,8 +311,8 @@ namespace nil {
          */
         template<typename MarshallingInputType, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_marshalling_field<MarshallingInputType>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                    && marshalling::is_marshalling_field<MarshallingInputType>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(MarshallingInputType input_field, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {
@@ -360,8 +361,8 @@ namespace nil {
          * @return
          */
         template<typename InputIterator, typename OutputIterator>
-        typename std::enable_if<marshalling::detail::is_iterator<InputIterator>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+        typename std::enable_if<nil::detail::is_iterator<InputIterator>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(InputIterator first, InputIterator last, OutputIterator out,
                  status_type expectedStatus = status_type::success) {
@@ -409,8 +410,8 @@ namespace nil {
          */
         template<typename InputIterator, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_iterator<InputIterator>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                    && nil::detail::is_iterator<InputIterator>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(InputIterator first, InputIterator last, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {
@@ -452,8 +453,8 @@ namespace nil {
          * @return
          */
         template<typename SinglePassRange, typename OutputIterator>
-        typename std::enable_if<marshalling::detail::is_range<SinglePassRange>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+        typename std::enable_if<nil::detail::is_range<SinglePassRange>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(const SinglePassRange &rng, OutputIterator out, status_type expectedStatus = status_type::success) {
 
@@ -497,8 +498,8 @@ namespace nil {
          */
         template<typename SinglePassRange, typename OutputIterator, typename MarshallingOutputTypeAccumulator>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<MarshallingOutputTypeAccumulator>::value
-                                    && marshalling::detail::is_range<SinglePassRange>::value
-                                    && marshalling::detail::is_iterator<OutputIterator>::value,
+                                    && nil::detail::is_range<SinglePassRange>::value
+                                    && nil::detail::is_iterator<OutputIterator>::value,
                                 OutputIterator>::type
             pack(const SinglePassRange &rng, OutputIterator out, MarshallingOutputTypeAccumulator &acc,
                  status_type expectedStatus = status_type::success) {

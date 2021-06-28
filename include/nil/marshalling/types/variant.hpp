@@ -26,6 +26,8 @@
 #ifndef MARSHALLING_VARIANT_HPP
 #define MARSHALLING_VARIANT_HPP
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/types/basic/variant.hpp>
@@ -96,7 +98,7 @@ namespace nil {
                 using base_impl_type
                     = detail::adapt_basic_field_type<basic::variant<TFieldBase, TMembers>, TOptions...>;
 
-                static_assert(nil::marshalling::processing::is_tuple<TMembers>::value,
+                static_assert(nil::detail::is_tuple<TMembers>::value,
                               "TMembers is expected to be a tuple of std::tuple<...>");
 
                 static_assert(1U < std::tuple_size<TMembers>::value, "Number of members is expected to be at least 2.");
@@ -497,16 +499,6 @@ namespace nil {
             bool operator!=(const variant<TFieldBase, TMembers, TOptions...> &field1,
                             const variant<TFieldBase, TMembers, TOptions...> &field2) {
                 return field1.value() != field2.value();
-            }
-
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::variant.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref variant
-            /// @related nil::marshalling::types::variant
-            template<typename T>
-            constexpr bool is_variant() {
-                return std::is_same<typename T::tag, tag::variant>::value;
             }
 
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::variant type

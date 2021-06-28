@@ -26,6 +26,8 @@
 #ifndef MARSHALLING_MSG_FACTORY_BIN_SEARCH_BASE_HPP
 #define MARSHALLING_MSG_FACTORY_BIN_SEARCH_BASE_HPP
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/detail/msg_factory/base.hpp>
 
 namespace nil {
@@ -78,7 +80,7 @@ namespace nil {
 
                 template<bool TStrong, typename TMessage1>
                 struct bin_search_sorted_check_helper<TStrong, TMessage1> {
-                    static_assert(!nil::marshalling::processing::is_tuple<TMessage1>::value,
+                    static_assert(!nil::detail::is_tuple<TMessage1>::value,
                                   "TMessage1 mustn't be tuple");
                     static const bool value = true;
                 };
@@ -119,7 +121,7 @@ namespace nil {
                     }
 
                 protected:
-                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
+                    static_assert(nil::detail::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static const std::size_t messages_amount = std::tuple_size<all_messages_type>::value;

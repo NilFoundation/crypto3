@@ -30,6 +30,8 @@
 #include <utility>
 #include <algorithm>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/assert_type.hpp>
@@ -717,7 +719,7 @@ namespace nil {
 
                 template<std::size_t TIdx, typename TAllFields>
                 static field_type &get_field(TAllFields &allFields) {
-                    static_assert(nil::marshalling::processing::is_tuple<TAllFields>::value,
+                    static_assert(nil::detail::is_tuple<TAllFields>::value,
                                   "Expected TAllFields to be a tuple");
                     static_assert(TIdx < std::tuple_size<TAllFields>::value, "Invalid tuple access index");
 
@@ -958,7 +960,7 @@ namespace nil {
                     msg.reset();
                 }
 
-                static_assert(nil::marshalling::processing::is_tuple<all_fields_type>::value, "Must be tuple");
+                static_assert(nil::detail::is_tuple<all_fields_type>::value, "Must be tuple");
                 next_layer_type nextLayer_;
             };
 

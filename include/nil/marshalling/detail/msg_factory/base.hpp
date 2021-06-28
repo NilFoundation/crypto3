@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <memory>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/processing/alloc.hpp>
@@ -184,7 +186,7 @@ namespace nil {
 
                         static_assert(
                             (!parsed_options_internal_type::has_in_place_allocation)
-                                || nil::marshalling::processing::is_in_tuple<TObj, all_messages_internal_type>::value,
+                                || nil::detail::is_in_tuple<TObj, all_messages_internal_type>::value,
                             "TObj must be in provided tuple of supported messages");
 
                         return alloc_.template alloc<TObj>(std::forward<TArgs>(args)...);
