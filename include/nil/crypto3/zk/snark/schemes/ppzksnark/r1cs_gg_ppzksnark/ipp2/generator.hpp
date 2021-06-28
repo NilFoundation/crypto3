@@ -35,7 +35,7 @@ namespace nil {
             namespace snark {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_aggregate_generator {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -50,15 +50,12 @@ namespace nil {
 
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-                    typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
 
                     typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
                     typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
                     typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
                     typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
@@ -67,7 +64,7 @@ namespace nil {
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline aggregate_keypair_type process(const constraint_system_type &constraint_system) {
+                    static inline keypair_type process(const constraint_system_type &constraint_system) {
 
                         auto [alpha_g1,
                               beta_g1,
@@ -83,7 +80,7 @@ namespace nil {
                               alpha_g1_beta_g2,
                               gamma_ABC_g1] = std::move(basic_process(constraint_system));
 
-                        aggregate_verification_key_type vk(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
+                        verification_key_type vk(alpha_g1, beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
 
                         proving_key_type pk(std::move(alpha_g1),
                                             std::move(beta_g1),

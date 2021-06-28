@@ -610,7 +610,7 @@ namespace nil {
 
                 template<typename CurveType, typename BasicProver>
                 class r1cs_gg_ppzksnark_aggregate_prover {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type g1_type;
@@ -626,15 +626,12 @@ namespace nil {
 
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-                    typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
 
                     typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
                     typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
                     typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
                     typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
@@ -652,9 +649,9 @@ namespace nil {
                     }
 
                     // Basic prove
-                    static inline proof_type prove(const proving_key_type &pk,
-                                                   const primary_input_type &primary_input,
-                                                   const auxiliary_input_type &auxiliary_input) {
+                    static inline proof_type process(const proving_key_type &pk,
+                                                     const primary_input_type &primary_input,
+                                                     const auxiliary_input_type &auxiliary_input) {
 
                         return BasicProver::process(pk, primary_input, auxiliary_input);
                     }

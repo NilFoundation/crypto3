@@ -56,7 +56,7 @@ namespace nil {
                          typename InputPrimaryInputRange,
                          typename InputIterator>
                 bool verify(const typename ProofSystemType::aggregate_verification_srs_type &ip_verifier_srs,
-                            const typename ProofSystemType::aggregate_verification_key_type &pvk,
+                            const typename ProofSystemType::verification_key_type &pvk,
                             const InputPrimaryInputRange &public_inputs,
                             const typename ProofSystemType::aggregate_proof_type &proof,
                             InputIterator transcript_include_first,

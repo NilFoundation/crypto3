@@ -31,6 +31,7 @@
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
 
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/modes.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/generator.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/prover.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verifier.hpp>
@@ -42,28 +43,25 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                enum class ProvingMode {
-                    Basic,
-                    Aggregate,
-                };
-
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_basic_mode = typename std::enable_if<
+                using is_basic_mode = typename std::integral_constant<
+                    bool,
                     std::is_same<r1cs_gg_ppzksnark_generator<CurveType>, Generator>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
-                    (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
-                     std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>, Verifier>::value ||
-                     std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
-                                  Verifier>::value)>::type;
+                        std::is_same<r1cs_gg_ppzksnark_prover<CurveType>, Prover>::value &&
+                        (std::is_same<r1cs_gg_ppzksnark_verifier_weak_input_consistency<CurveType>, Verifier>::value ||
+                         std::is_same<r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
+                                      Verifier>::value ||
+                         std::is_same<r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency<CurveType>,
+                                      Verifier>::value)>;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                using is_aggregate_mode = typename std::enable_if<
+                using is_aggregate_mode = typename std::integral_constant<
+                    bool,
                     std::is_same<r1cs_gg_ppzksnark_aggregate_generator<CurveType>, Generator>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_aggregate_prover<CurveType, typename Prover::basic_prover>,
-                                 Prover>::value &&
-                    std::is_same<r1cs_gg_ppzksnark_aggregate_verifier<CurveType, typename Verifier::basic_verifier>,
-                                 Verifier>::value>::type;
-
+                        std::is_same<r1cs_gg_ppzksnark_aggregate_prover<CurveType, typename Prover::basic_prover>,
+                                     Prover>::value &&
+                        std::is_same<r1cs_gg_ppzksnark_aggregate_verifier<CurveType, typename Verifier::basic_verifier>,
+                                     Verifier>::value>;
                 /*!
                  * @brief ppzkSNARK for R1CS with a security proof in the generic group (GG) model
                  * @tparam CurveType
@@ -92,18 +90,17 @@ namespace nil {
                  * Cryptology ePrint Archive, Report 2019/1177, 2019
                  * <https://eprint.iacr.org/2019/1177.pdf>
                  */
-                // template<typename CurveType, typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
-                //          typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
-                //          typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
-                //          ProvingMode mode = ProvingMode::Basic, typename = void>
-                template<typename CurveType, typename Generator, typename Prover, typename Verifier, ProvingMode mode,
-                         typename = void>
+                template<typename CurveType, typename Generator = r1cs_gg_ppzksnark_generator<CurveType>,
+                         typename Prover = r1cs_gg_ppzksnark_prover<CurveType>,
+                         typename Verifier = r1cs_gg_ppzksnark_verifier_strong_input_consistency<CurveType>,
+                         ProvingMode mode = ProvingMode::Basic, typename = void>
                 class r1cs_gg_ppzksnark;
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, ProvingMode::Basic,
-                                        is_basic_mode<CurveType, Generator, Prover, Verifier>> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                class r1cs_gg_ppzksnark<
+                    CurveType, Generator, Prover, Verifier, ProvingMode::Basic,
+                    typename std::enable_if<is_basic_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -137,9 +134,10 @@ namespace nil {
                 };
 
                 template<typename CurveType, typename Generator, typename Prover, typename Verifier>
-                class r1cs_gg_ppzksnark<CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
-                                        is_aggregate_mode<CurveType, Generator, Prover, Verifier>> {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                class r1cs_gg_ppzksnark<
+                    CurveType, Generator, Prover, Verifier, ProvingMode::Aggregate,
+                    typename std::enable_if<is_aggregate_mode<CurveType, Generator, Prover, Verifier>::value>::type> {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -148,15 +146,12 @@ namespace nil {
 
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
-                    typedef typename policy_type::processed_verification_key_type processed_verification_key_type;
-                    typedef typename policy_type::aggregate_verification_key_type aggregate_verification_key_type;
 
                     typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
                     typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
                     typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_keypair_type aggregate_keypair_type;
                     typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
@@ -166,7 +161,7 @@ namespace nil {
                     template<typename DistributionType = boost::random::uniform_int_distribution<
                                  typename CurveType::scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline aggregate_keypair_type generate(const constraint_system_type &constraint_system) {
+                    static inline keypair_type generate(const constraint_system_type &constraint_system) {
                         return Generator::template process<DistributionType, GeneratorType>(constraint_system);
                     }
 
@@ -212,7 +207,7 @@ namespace nil {
                              typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,
                              typename InputPrimaryInputRange, typename InputIterator>
                     static inline bool verify(const aggregate_verification_srs_type &ip_verifier_srs,
-                                              const aggregate_verification_key_type &pvk,
+                                              const verification_key_type &pvk,
                                               const InputPrimaryInputRange &public_inputs,
                                               const aggregate_proof_type &proof,
                                               InputIterator transcript_include_first,

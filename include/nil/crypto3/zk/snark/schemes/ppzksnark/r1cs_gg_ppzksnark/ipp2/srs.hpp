@@ -127,9 +127,9 @@ namespace nil {
                     typedef typename g2_type::value_type g2_value_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
 
-                    typedef std::pair<r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType>,
-                                      r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType>>
-                        srs_pair_type;
+                    typedef r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> proving_srs_type;
+                    typedef r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> verification_srs_type;
+                    typedef std::pair<proving_srs_type, verification_srs_type> srs_pair_type;
 
                     /// $\{g^a^i\}_{i=0}^{N}$ where N is the smallest size of the two Groth16 CRS.
                     std::vector<g1_value_type> g_alpha_powers;
@@ -173,7 +173,7 @@ namespace nil {
                                                                                    h_alpha_powers.begin() + h_up};
                         std::vector<typename CurveType::g2_type::value_type> v2 = {h_beta_powers.begin() + h_low,
                                                                                    h_beta_powers.begin() + h_up};
-                        typename r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType>::vkey_type vkey = {v1, v2};
+                        typename proving_srs_type::vkey_type vkey = {v1, v2};
                         BOOST_ASSERT(vkey.has_correct_len(n));
                         // however, here we only need the "right" shifted bases for the
                         // commitment scheme.
@@ -181,24 +181,23 @@ namespace nil {
                                                                                    g_alpha_powers.begin() + g_up};
                         std::vector<typename CurveType::g1_type::value_type> w2 = {g_beta_powers.begin() + n,
                                                                                    g_beta_powers.begin() + g_up};
-                        typename r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType>::wkey_type wkey = {w1, w2};
+                        typename proving_srs_type::wkey_type wkey = {w1, w2};
                         BOOST_ASSERT(wkey.has_correct_len(n));
 
-                        r1cs_gg_ppzksnark_aggregate_proving_srs<CurveType> pk = {
-                            n,
-                            {g_alpha_powers.begin() + g_low, g_alpha_powers.begin() + g_up},
-                            {h_alpha_powers.begin() + h_low, h_alpha_powers.begin() + h_up},
-                            {g_beta_powers.begin() + g_low, g_beta_powers.begin() + g_up},
-                            {h_beta_powers.begin() + h_low, h_beta_powers.begin() + h_up},
-                            vkey,
-                            wkey};
-                        r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> vk = {n,
-                                                                                      g_alpha_powers[0],
-                                                                                      h_alpha_powers[0],
-                                                                                      g_alpha_powers[1],
-                                                                                      g_beta_powers[1],
-                                                                                      h_alpha_powers[1],
-                                                                                      h_beta_powers[1]};
+                        proving_srs_type pk = {n,
+                                               {g_alpha_powers.begin() + g_low, g_alpha_powers.begin() + g_up},
+                                               {h_alpha_powers.begin() + h_low, h_alpha_powers.begin() + h_up},
+                                               {g_beta_powers.begin() + g_low, g_beta_powers.begin() + g_up},
+                                               {h_beta_powers.begin() + h_low, h_beta_powers.begin() + h_up},
+                                               vkey,
+                                               wkey};
+                        verification_srs_type vk = {n,
+                                                    g_alpha_powers[0],
+                                                    h_alpha_powers[0],
+                                                    g_alpha_powers[1],
+                                                    g_beta_powers[1],
+                                                    h_alpha_powers[1],
+                                                    h_beta_powers[1]};
                         return std::make_pair(pk, vk);
                     }
                 };

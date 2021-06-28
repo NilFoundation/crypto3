@@ -60,7 +60,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_generator {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
