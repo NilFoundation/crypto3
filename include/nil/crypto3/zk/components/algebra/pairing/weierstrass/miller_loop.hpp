@@ -34,7 +34,6 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp>
 
@@ -107,8 +106,8 @@ namespace nil {
                                 *(c.gamma_X) + *(c.RY) * (-field_type::value_type::one()) +
                                     (*g_RR_at_P_c1) * (-field_type::value_type::one())));
                         }
-                        g_RR_at_P.reset(new typename component_policy::Fqk_variable_type(
-                            bp, *(prec_P.PY_twist_squared), *g_RR_at_P_c1));
+                        g_RR_at_P.reset(new typename component_policy::Fqk_variable_type(bp, *(prec_P.PY_twist_squared),
+                                                                                         *g_RR_at_P_c1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -184,26 +183,24 @@ namespace nil {
                                 typename component_policy::Fqe_variable_type(this->bp, -gamma_twist_const,
                                                                              prec_P.P->X) +
                                 *(c.gamma_X) +
-                                *(Q.Y) *
-                                    (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
+                                *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                         } else if (prec_P.P->X.is_constant()) {
                             prec_P.P->X.evaluate(bp);
                             const typename field_type::value_type P_X_const = prec_P.P->X.constant_term();
                             g_RQ_at_P_c1.reset(new typename component_policy::Fqe_variable_type(
                                 *gamma_twist * (-P_X_const) + *(c.gamma_X) +
-                                *(Q.Y) *
-                                    (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
+                                *(Q.Y) * (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one())));
                         } else {
                             g_RQ_at_P_c1.reset(new typename component_policy::Fqe_variable_type(bp));
                             compute_g_RQ_at_P_c1.reset(new typename component_policy::Fqe_mul_by_lc_component_type(
                                 bp, *gamma_twist, prec_P.P->X,
                                 *(c.gamma_X) +
-                                    *(Q.Y) * (!invert_Q ? -field_type::value_type::one() :
-                                                          field_type::value_type::one()) +
+                                    *(Q.Y) *
+                                        (!invert_Q ? -field_type::value_type::one() : field_type::value_type::one()) +
                                     (*g_RQ_at_P_c1) * (-field_type::value_type::one())));
                         }
-                        g_RQ_at_P.reset(new typename component_policy::Fqk_variable_type(
-                            bp, *(prec_P.PY_twist_squared), *g_RQ_at_P_c1));
+                        g_RQ_at_P.reset(new typename component_policy::Fqk_variable_type(bp, *(prec_P.PY_twist_squared),
+                                                                                         *g_RQ_at_P_c1));
                     }
                     void generate_r1cs_constraints() {
                         if (!gamma_twist->is_constant() && !prec_P.P->X.is_constant()) {
@@ -246,11 +243,9 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_add_line_eval<CurveType>>> addition_steps;
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps;
 
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls;
                     std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -317,24 +312,21 @@ namespace nil {
                             doubling_steps[dbl_id].reset(new mnt_miller_loop_dbl_line_eval<CurveType>(
                                 bp, prec_P, *prec_Q.coeffs[prec_id], g_RR_at_Ps[dbl_id]));
                             ++prec_id;
-                            dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
-                                bp, *fs[f_id], *fs[f_id + 1]));
+                            dbl_sqrs[dbl_id].reset(
+                                new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                bp, *fs[f_id], *g_RR_at_Ps[dbl_id],
-                                (f_id + 1 == f_count ? result : *fs[f_id + 1])));
+                                bp, *fs[f_id], *g_RR_at_Ps[dbl_id], (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                             ++f_id;
                             ++dbl_id;
 
                             if (NAF[i] != 0) {
                                 addition_steps[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
-                                    bp, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q,
-                                    g_RQ_at_Ps[add_id]));
+                                    bp, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q, g_RQ_at_Ps[add_id]));
                                 ++prec_id;
-                                add_muls[add_id].reset(new
-                                                       typename component_policy::Fqk_special_mul_component_type(
-                                                           bp, *fs[f_id], *g_RQ_at_Ps[add_id],
-                                                           (f_id + 1 == f_count ? result : *fs[f_id + 1])));
+                                add_muls[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, *fs[f_id], *g_RQ_at_Ps[add_id],
+                                    (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                                 ++f_id;
                                 ++add_id;
                             }
@@ -408,14 +400,10 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps2;
 
                     std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls1;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls1;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls2;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls2;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls1;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls1;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls2;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls2;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -439,8 +427,7 @@ namespace nil {
                         f_count = add_count = dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
@@ -497,15 +484,14 @@ namespace nil {
                                 bp, prec_P2, *prec_Q2.coeffs[prec_id], g_RR_at_P2s[dbl_id]));
                             ++prec_id;
 
-                            dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
-                                bp, *fs[f_id], *fs[f_id + 1]));
+                            dbl_sqrs[dbl_id].reset(
+                                new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls1[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
                                 bp, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls2[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id],
-                                *fs[f_id]));
+                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id], *fs[f_id]));
                             ++f_id;
                             ++dbl_id;
 
@@ -517,14 +503,12 @@ namespace nil {
                                     bp, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q,
                                     g_RQ_at_P2s[add_id]));
                                 ++prec_id;
-                                add_muls1[add_id].reset(new
-                                                        typename component_policy::Fqk_special_mul_component_type(
-                                                            bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                add_muls1[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                 ++f_id;
-                                add_muls2[add_id].reset(new
-                                                        typename component_policy::Fqk_special_mul_component_type(
-                                                            bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]),
-                                                            *g_RQ_at_P2s[add_id], *fs[f_id]));
+                                add_muls2[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P2s[add_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++add_id;
                             }
@@ -556,8 +540,7 @@ namespace nil {
                         std::size_t f_id = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
@@ -625,18 +608,12 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps3;
 
                     std::vector<std::shared_ptr<typename component_policy::Fqk_sqr_component_type>> dbl_sqrs;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls1;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls1;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls2;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls2;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        dbl_muls3;
-                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>>
-                        add_muls3;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls1;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls1;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls2;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls2;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> dbl_muls3;
+                    std::vector<std::shared_ptr<typename component_policy::Fqk_special_mul_component_type>> add_muls3;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -666,8 +643,7 @@ namespace nil {
                         f_count = add_count = dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
@@ -732,8 +708,8 @@ namespace nil {
                                 bp, prec_P3, *prec_Q3.coeffs[prec_id], g_RR_at_P3s[dbl_id]));
                             ++prec_id;
 
-                            dbl_sqrs[dbl_id].reset(new typename component_policy::Fqk_sqr_component_type(
-                                bp, *fs[f_id], *fs[f_id + 1]));
+                            dbl_sqrs[dbl_id].reset(
+                                new typename component_policy::Fqk_sqr_component_type(bp, *fs[f_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls1[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
                                 bp, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
@@ -742,8 +718,7 @@ namespace nil {
                                 bp, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
                             ++f_id;
                             dbl_muls3[dbl_id].reset(new typename component_policy::Fqk_special_mul_component_type(
-                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id],
-                                *fs[f_id]));
+                                bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id], *fs[f_id]));
                             ++f_id;
                             ++dbl_id;
 
@@ -758,18 +733,15 @@ namespace nil {
                                     bp, NAF[i] < 0, prec_P3, *prec_Q3.coeffs[prec_id], *prec_Q3.Q,
                                     g_RQ_at_P3s[add_id]));
                                 ++prec_id;
-                                add_muls1[add_id].reset(new
-                                                        typename component_policy::Fqk_special_mul_component_type(
-                                                            bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                add_muls1[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                                 ++f_id;
-                                add_muls2[add_id].reset(new
-                                                        typename component_policy::Fqk_special_mul_component_type(
-                                                            bp, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
+                                add_muls2[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
                                 ++f_id;
-                                add_muls3[add_id].reset(new
-                                                        typename component_policy::Fqk_special_mul_component_type(
-                                                            bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]),
-                                                            *g_RQ_at_P3s[add_id], *fs[f_id]));
+                                add_muls3[add_id].reset(new typename component_policy::Fqk_special_mul_component_type(
+                                    bp, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P3s[add_id],
+                                    *fs[f_id]));
                                 ++f_id;
                                 ++add_id;
                             }
@@ -805,9 +777,8 @@ namespace nil {
                         std::size_t f_id = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
-                        
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -851,8 +822,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_HPP

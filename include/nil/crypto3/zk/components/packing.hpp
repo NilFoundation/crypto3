@@ -84,8 +84,9 @@ namespace nil {
                         packed.evaluate(this->bp);
                         auto lc_val = this->bp.lc_val(packed).data;
 
-                        assert(lc_val == 0 || multiprecision::msb(lc_val) + 1 <=
-                               bits.size());    // `bits` is large enough to represent this packed value
+                        assert(lc_val == 0 ||
+                               multiprecision::msb(lc_val) + 1 <=
+                                   bits.size());    // `bits` is large enough to represent this packed value
                         bits.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(packed));
                     }
 
@@ -205,8 +206,8 @@ namespace nil {
                                               const blueprint_linear_combination<FieldType> &do_copy,
                                               std::size_t chunk_size) :
                         component<FieldType>(bp),
-                        source_bits(source_bits), target_bits(target_bits), do_copy(do_copy),
-                        chunk_size(chunk_size), num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
+                        source_bits(source_bits), target_bits(target_bits), do_copy(do_copy), chunk_size(chunk_size),
+                        num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
 
                         assert(source_bits.size() == target_bits.size());
 
@@ -253,8 +254,7 @@ namespace nil {
                     blueprint_variable<FieldType> packed;
                     blueprint_variable_vector<FieldType> bits;
 
-                    dual_variable_component(blueprint<FieldType> &bp, std::size_t width) :
-                        component<FieldType>(bp) {
+                    dual_variable_component(blueprint<FieldType> &bp, std::size_t width) : component<FieldType>(bp) {
                         packed.allocate(bp);
                         bits.allocate(bp, width);
                         consistency_check.reset(new packing_component<FieldType>(bp, bits, packed));
@@ -332,7 +332,7 @@ namespace nil {
                 }
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_BASIC_COMPONENTS_HPP

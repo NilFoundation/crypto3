@@ -102,8 +102,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_COMPONENT_FROM_R1CS_HPP

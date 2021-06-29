@@ -46,9 +46,12 @@ namespace nil {
                  * Note that the power is a constant (i.e., hardcoded into the component).
                  */
                 template<typename FpkT,
-                         template<class> class Fpk_variableT,
-                         template<class> class Fpk_mul_componentT,
-                         template<class> class Fpk_sqr_componentT,
+                         template<class>
+                         class Fpk_variableT,
+                         template<class>
+                         class Fpk_mul_componentT,
+                         template<class>
+                         class Fpk_sqr_componentT,
                          typename NumberType = typename FpkT::number_type>
                 class exponentiation_component : component<typename FpkT::base_field_type> {
                 public:
@@ -70,8 +73,7 @@ namespace nil {
                     std::size_t sub_count;
                     std::size_t dbl_count;
 
-                    template<typename Backend,
-                             typename multiprecision::expression_template_option ExpressionTemplates>
+                    template<typename Backend, typename multiprecision::expression_template_option ExpressionTemplates>
                     exponentiation_component(blueprint<FieldType> &bp,
                                              const Fpk_variableT<FpkT> &elt,
                                              const multiprecision::number<Backend, ExpressionTemplates> &power,
@@ -137,16 +139,14 @@ namespace nil {
                                         bp,
                                         *intermediate[intermed_id],
                                         elt,
-                                        (intermed_id + 1 == intermed_count ? result :
-                                                                             *intermediate[intermed_id + 1])));
+                                        (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])));
                                     ++add_id;
                                     ++intermed_id;
                                 } else {
                                     /* next = cur / elt, i.e. next * elt = cur */
                                     subtraction_steps[sub_id].reset(new Fpk_mul_componentT<FpkT>(
                                         bp,
-                                        (intermed_id + 1 == intermed_count ? result :
-                                                                             *intermediate[intermed_id + 1]),
+                                        (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1]),
                                         elt,
                                         *intermediate[intermed_id]));
                                     ++sub_id;
@@ -189,8 +189,7 @@ namespace nil {
                                     ++intermed_id;
                                     ++add_id;
                                 } else {
-                                    const typename FpkT::value_type cur_val =
-                                        intermediate[intermed_id]->get_element();
+                                    const typename FpkT::value_type cur_val = intermediate[intermed_id]->get_element();
                                     const typename FpkT::value_type elt_val = elt.get_element();
                                     const typename FpkT::value_type next_val = cur_val * elt_val.inversed();
 
@@ -207,8 +206,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_EXPONENTIATION_COMPONENT_HPP

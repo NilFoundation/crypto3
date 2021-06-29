@@ -217,7 +217,8 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                snark::linear_combination<FieldType> blueprint_sum(const blueprint_linear_combination_vector<FieldType> &v) {
+                snark::linear_combination<FieldType>
+                    blueprint_sum(const blueprint_linear_combination_vector<FieldType> &v) {
 
                     snark::linear_combination<FieldType> result;
                     for (auto &term : v) {

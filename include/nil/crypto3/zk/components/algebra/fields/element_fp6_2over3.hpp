@@ -47,33 +47,33 @@ namespace nil {
                 /**
                  * Component that represents an Fp6 element.
                  */
-                template<typename FieldType>    // Fp6 2over3 
+                template<typename FieldType>    // Fp6 2over3
                 class element_fp6_2over3 : public component<typename FieldType::base_field_type> {
-                    
+
                     using field_type = FieldType;
                     using base_field_type = typename field_type::base_field_type;
                     using underlying_field_type = typename field_type::underlying_field_type;
 
                     using underlying_element_type = element_fp3<underlying_field_type>;
 
-                    using data_type = std::array<
-                        underlying_element_type, 
-                        field_type::arity / underlying_field_type::arity>;
+                    using data_type =
+                        std::array<underlying_element_type, field_type::arity / underlying_field_type::arity>;
+
                 public:
                     data_type data;
 
                     element_fp6_2over3(blueprint<base_field_type> &bp) :
-                        component<base_field_type>(bp), data({underlying_element_type(bp), underlying_element_type(bp)}) {
+                        component<base_field_type>(bp),
+                        data({underlying_element_type(bp), underlying_element_type(bp)}) {
                     }
 
-                    element_fp6_2over3(blueprint<base_field_type> &bp,
-                                        const typename field_type::value_type &el) :
+                    element_fp6_2over3(blueprint<base_field_type> &bp, const typename field_type::value_type &el) :
                         component<base_field_type>(bp),
                         data({underlying_element_type(bp, el.data[0]), underlying_element_type(bp, el.data[1])}) {
                     }
 
                     element_fp6_2over3(blueprint<base_field_type> &bp, const underlying_element_type &in_data0,
-                                        const underlying_element_type &in_data1) :
+                                       const underlying_element_type &in_data1) :
                         component<base_field_type>(bp),
                         data({underlying_element_type(in_data0), underlying_element_type(in_data1)}) {
                     }
@@ -96,21 +96,25 @@ namespace nil {
                     }
 
                     element_fp6_2over3<field_type> Frobenius_map(const std::size_t power) const {
-                        blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c0c2, new_c1c0,
-                            new_c1c1, new_c1c2;
+                        blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1,
+                            new_c1c2;
                         new_c0c0.assign(this->bp, data[0].data[0]);
                         new_c0c1.assign(this->bp,
-                                        data[0].data[1] * underlying_field_type::value_type::Frobenius_coeffs_c1[power % 3]);
+                                        data[0].data[1] *
+                                            underlying_field_type::value_type::Frobenius_coeffs_c1[power % 3]);
                         new_c0c2.assign(this->bp,
-                                        data[0].data[2] * underlying_field_type::value_type::Frobenius_coeffs_c2[power % 3]);
+                                        data[0].data[2] *
+                                            underlying_field_type::value_type::Frobenius_coeffs_c2[power % 3]);
                         new_c1c0.assign(this->bp,
                                         data[1].data[0] * field_type::value_type::Frobenius_coeffs_c1[power % 6]);
                         new_c1c1.assign(this->bp,
-                                        data[1].data[1] * (field_type::value_type::Frobenius_coeffs_c1[power % 6] *
-                                                           underlying_field_type::value_type::Frobenius_coeffs_c1[power % 3]));
+                                        data[1].data[1] *
+                                            (field_type::value_type::Frobenius_coeffs_c1[power % 6] *
+                                             underlying_field_type::value_type::Frobenius_coeffs_c1[power % 3]));
                         new_c1c2.assign(this->bp,
-                                        data[1].data[2] * (field_type::value_type::Frobenius_coeffs_c1[power % 6] *
-                                                           underlying_field_type::value_type::Frobenius_coeffs_c2[power % 3]));
+                                        data[1].data[2] *
+                                            (field_type::value_type::Frobenius_coeffs_c1[power % 6] *
+                                             underlying_field_type::value_type::Frobenius_coeffs_c2[power % 3]));
 
                         return element_fp6_2over3<field_type>(
                             this->bp,
@@ -139,7 +143,6 @@ namespace nil {
                     using underlying_element_type = element_fp3<underlying_field_type>;
 
                 public:
-
                     element_fp6_2over3<field_type> A;
                     element_fp6_2over3<field_type> B;
                     element_fp6_2over3<field_type> result;
@@ -171,9 +174,9 @@ namespace nil {
                     std::shared_ptr<element_fp3_mul<underlying_field_type>> compute_result_c1;
 
                     element_fp6_2over3_mul(blueprint<base_field_type> &bp,
-                                             const element_fp6_2over3<field_type> &A,
-                                             const element_fp6_2over3<field_type> &B,
-                                             const element_fp6_2over3<field_type> &result) :
+                                           const element_fp6_2over3<field_type> &A,
+                                           const element_fp6_2over3<field_type> &B,
+                                           const element_fp6_2over3<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), B(B), result(result) {
                         /*
@@ -197,8 +200,7 @@ namespace nil {
 
                         compute_v1.reset(new element_fp3_mul<underlying_field_type>(bp, A.data[1], B.data[1], *v1));
 
-                        v0_c0.assign(bp, result.data[0].data[0] -
-                                             field_type::value_type::non_residue * v1->data[2]);
+                        v0_c0.assign(bp, result.data[0].data[0] - field_type::value_type::non_residue * v1->data[2]);
 
                         v0_c1.assign(bp, result.data[0].data[1] - v1->data[0]);
                         v0_c2.assign(bp, result.data[0].data[2] - v1->data[1]);
@@ -222,12 +224,12 @@ namespace nil {
                         result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                         result_c1_plus_v0_plus_v1_c2.assign(bp, result.data[1].data[2] + v0->data[2] + v1->data[2]);
                         result_c1_plus_v0_plus_v1.reset(new underlying_element_type(bp,
-                                                                               result_c1_plus_v0_plus_v1_c0,
-                                                                               result_c1_plus_v0_plus_v1_c1,
-                                                                               result_c1_plus_v0_plus_v1_c2));
+                                                                                    result_c1_plus_v0_plus_v1_c0,
+                                                                                    result_c1_plus_v0_plus_v1_c1,
+                                                                                    result_c1_plus_v0_plus_v1_c2));
 
-                        compute_result_c1.reset(new element_fp3_mul<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
-                                                                            *result_c1_plus_v0_plus_v1));
+                        compute_result_c1.reset(new element_fp3_mul<underlying_field_type>(
+                            bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -280,7 +282,6 @@ namespace nil {
                     using underlying_element_type = element_fp3<underlying_field_type>;
 
                 public:
-
                     element_fp6_2over3<field_type> A;
                     element_fp6_2over3<field_type> B;
                     element_fp6_2over3<field_type> result;
@@ -311,9 +312,9 @@ namespace nil {
                     std::shared_ptr<element_fp3_mul<underlying_field_type>> compute_result_c1;
 
                     element_fp6_2over3_mul_by_2345(blueprint<base_field_type> &bp,
-                                                     const element_fp6_2over3<field_type> &A,
-                                                     const element_fp6_2over3<field_type> &B,
-                                                     const element_fp6_2over3<field_type> &result) :
+                                                   const element_fp6_2over3<field_type> &A,
+                                                   const element_fp6_2over3<field_type> &B,
+                                                   const element_fp6_2over3<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), B(B), result(result) {
                         /*
@@ -364,12 +365,12 @@ namespace nil {
                         result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
                         result_c1_plus_v0_plus_v1_c2.assign(bp, result.data[1].data[2] + v0->data[2] + v1->data[2]);
                         result_c1_plus_v0_plus_v1.reset(new underlying_element_type(bp,
-                                                                               result_c1_plus_v0_plus_v1_c0,
-                                                                               result_c1_plus_v0_plus_v1_c1,
-                                                                               result_c1_plus_v0_plus_v1_c2));
+                                                                                    result_c1_plus_v0_plus_v1_c0,
+                                                                                    result_c1_plus_v0_plus_v1_c1,
+                                                                                    result_c1_plus_v0_plus_v1_c2));
 
-                        compute_result_c1.reset(new element_fp3_mul<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
-                                                                            *result_c1_plus_v0_plus_v1));
+                        compute_result_c1.reset(new element_fp3_mul<underlying_field_type>(
+                            bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -437,15 +438,14 @@ namespace nil {
                     using underlying_element_type = element_fp3<underlying_field_type>;
 
                 public:
-
                     element_fp6_2over3<field_type> A;
                     element_fp6_2over3<field_type> result;
 
                     std::shared_ptr<element_fp6_2over3_mul<field_type>> mul;
 
                     element_fp6_2over3_squared(blueprint<base_field_type> &bp,
-                                             const element_fp6_2over3<field_type> &A,
-                                             const element_fp6_2over3<field_type> &result) :
+                                               const element_fp6_2over3<field_type> &A,
+                                               const element_fp6_2over3<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), result(result) {
                         mul.reset(new element_fp6_2over3_mul<field_type>(bp, A, A, result));
@@ -467,8 +467,7 @@ namespace nil {
                  * Component that creates constraints for Fp6 cyclotomic squaring
                  */
                 template<typename FieldType>
-                class element_fp6_2over3_cyclotomic_squared
-                    : public component<typename FieldType::base_field_type> {
+                class element_fp6_2over3_cyclotomic_squared : public component<typename FieldType::base_field_type> {
 
                     using field_type = FieldType;
                     using base_field_type = typename field_type::base_field_type;
@@ -479,7 +478,6 @@ namespace nil {
                     typedef typename field_type::underlying_field_type Fp2T;
 
                 public:
-
                     element_fp6_2over3<field_type> A;
                     element_fp6_2over3<field_type> result;
 
@@ -505,8 +503,8 @@ namespace nil {
                     std::shared_ptr<element_fp2_squared<Fp2T>> compute_csq;
 
                     element_fp6_2over3_cyclotomic_squared(blueprint<base_field_type> &bp,
-                                                        const element_fp6_2over3<field_type> &A,
-                                                        const element_fp6_2over3<field_type> &result) :
+                                                          const element_fp6_2over3<field_type> &A,
+                                                          const element_fp6_2over3<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), result(result) {
                         /*
@@ -546,10 +544,10 @@ namespace nil {
 
                         csq_c0.assign(bp, (result.data[0].data[2] + 2 * b->data[1]) *
                                               typename base_field_type::value_type(3).inversed());
-                        csq_c1.assign(bp,
-                                      (result.data[1].data[0] - 2 * b->data[0]) *
-                                          (typename base_field_type::value_type(3) * Fp2T::value_type::non_residue)
-                                              .inversed());
+                        csq_c1.assign(
+                            bp,
+                            (result.data[1].data[0] - 2 * b->data[0]) *
+                                (typename base_field_type::value_type(3) * Fp2T::value_type::non_residue).inversed());
 
                         asq.reset(new element_fp2<Fp2T>(bp, asq_c0, asq_c1));
                         bsq.reset(new element_fp2<Fp2T>(bp, bsq_c0, bsq_c1));
@@ -582,8 +580,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_FP6_2OVER3_COMPONENTS_HPP

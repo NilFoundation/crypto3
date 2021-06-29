@@ -72,8 +72,8 @@ namespace nil {
                     typedef element_fp4_squared<fqk_type> Fqk_sqr_component_type;
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_MNT6_BASIC_CURVE_COMPONENT_POLICY_HPP

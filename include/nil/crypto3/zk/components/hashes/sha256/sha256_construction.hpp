@@ -260,8 +260,7 @@ namespace nil {
 
                         this->bp.val(unreduced_new_a) = this->bp.val(packed_h) + this->bp.val(sigma1) +
                                                         this->bp.val(choice) + typename FieldType::value_type(K) +
-                                                        this->bp.val(W) + this->bp.val(sigma0) +
-                                                        this->bp.val(majority);
+                                                        this->bp.val(W) + this->bp.val(sigma0) + this->bp.val(majority);
                         this->bp.val(unreduced_new_e) = this->bp.val(packed_d) + this->bp.val(packed_h) +
                                                         this->bp.val(sigma1) + this->bp.val(choice) +
                                                         typename FieldType::value_type(K) + this->bp.val(W);
@@ -295,8 +294,8 @@ namespace nil {
                 }
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_SHA256_COMPONENTS_HPP

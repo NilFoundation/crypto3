@@ -93,7 +93,7 @@ namespace nil {
                                 curve_type::g2_type::underlying_field_type::underlying_field_type::value_type::zero());
                     };
                 }    // namespace detail
-            }    // namespace components
+            }        // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

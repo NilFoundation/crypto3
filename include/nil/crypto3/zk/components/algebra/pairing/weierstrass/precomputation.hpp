@@ -34,7 +34,6 @@
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
@@ -69,9 +68,8 @@ namespace nil {
                         // will be filled in precompute_G1_component, so do nothing here
                     }
 
-                    g1_precomputation(
-                        blueprint<FieldType> &bp,
-                        const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P_val) {
+                    g1_precomputation(blueprint<FieldType> &bp,
+                                      const typename CurveType::pairing::pair_curve_type::g1_type::value_type &P_val) {
                         typename CurveType::pairing::pair_curve_type::g1_type::value_type P_val_copy =
                             P_val.to_affine();
                         P.reset(new element_g1<CurveType>(bp, P_val_copy));
@@ -101,8 +99,8 @@ namespace nil {
                         blueprint<FieldType> &bp,
                         const element_g1<CurveType> &P,
                         g1_precomputation<CurveType> &precomp,    // will allocate this inside
-                        const typename std::enable_if<fqk_type::arity == 4, typename FieldType::value_type>::type
-                            & = typename FieldType::value_type()) :
+                        const typename std::enable_if<fqk_type::arity == 4, typename FieldType::value_type>::type & =
+                            typename FieldType::value_type()) :
                         component<FieldType>(bp),
                         precomp(precomp) {
 
@@ -113,8 +111,7 @@ namespace nil {
                         c1.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[1]));
 
                         precomp.P.reset(new element_g1<CurveType>(P));
-                        precomp.PY_twist_squared.reset(new
-                                                       typename component_policy::Fqe_variable_type(bp, c0, c1));
+                        precomp.PY_twist_squared.reset(new typename component_policy::Fqe_variable_type(bp, c0, c1));
                     }
 
                     template<typename FieldType>
@@ -122,8 +119,8 @@ namespace nil {
                         blueprint<FieldType> &bp,
                         const element_g1<CurveType> &P,
                         g1_precomputation<CurveType> &precomp,    // will allocate this inside
-                        const typename std::enable_if<fqk_type::arity == 6, typename FieldType::value_type>::type
-                            & = typename FieldType::value_type()) :
+                        const typename std::enable_if<fqk_type::arity == 6, typename FieldType::value_type>::type & =
+                            typename FieldType::value_type()) :
                         component<FieldType>(bp),
                         precomp(precomp) {
 
@@ -135,8 +132,8 @@ namespace nil {
                         c2.assign(bp, P.Y * ((twist_curve_type::pairing::twist).squared().data[2]));
 
                         precomp.P.reset(new element_g1<CurveType>(P));
-                        precomp.PY_twist_squared.reset(
-                            new typename component_policy::Fqe_variable_type(bp, c0, c1, c2));
+                        precomp.PY_twist_squared.reset(new
+                                                       typename component_policy::Fqe_variable_type(bp, c0, c1, c2));
                     }
 
                     void generate_r1cs_constraints() {
@@ -201,9 +198,8 @@ namespace nil {
 
                     g2_precomputation() {
                     }
-                    g2_precomputation(
-                        blueprint<FieldType> &bp,
-                        const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q_val) {
+                    g2_precomputation(blueprint<FieldType> &bp,
+                                      const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q_val) {
                         Q.reset(new element_g2<CurveType>(bp, Q_val));
                         const typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp
                             native_precomp =
@@ -213,14 +209,14 @@ namespace nil {
                                       1);    // the last precomp remains for convenient programming
                         for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
                             coeffs[i].reset(new precompute_G2_component_coeffs<CurveType>());
-                            coeffs[i]->RX.reset(new typename component_policy::Fqe_variable_type(
-                                bp, native_precomp.coeffs[i].old_RX));
-                            coeffs[i]->RY.reset(new typename component_policy::Fqe_variable_type(
-                                bp, native_precomp.coeffs[i].old_RY));
-                            coeffs[i]->gamma.reset(new typename component_policy::Fqe_variable_type(
-                                bp, native_precomp.coeffs[i].gamma));
-                            coeffs[i]->gamma_X.reset(new typename component_policy::Fqe_variable_type(
-                                bp, native_precomp.coeffs[i].gamma_X));
+                            coeffs[i]->RX.reset(
+                                new typename component_policy::Fqe_variable_type(bp, native_precomp.coeffs[i].old_RX));
+                            coeffs[i]->RY.reset(
+                                new typename component_policy::Fqe_variable_type(bp, native_precomp.coeffs[i].old_RY));
+                            coeffs[i]->gamma.reset(
+                                new typename component_policy::Fqe_variable_type(bp, native_precomp.coeffs[i].gamma));
+                            coeffs[i]->gamma_X.reset(
+                                new typename component_policy::Fqe_variable_type(bp, native_precomp.coeffs[i].gamma_X));
                         }
                     }
                 };
@@ -245,8 +241,7 @@ namespace nil {
                  * RY = prev_gamma * (prev_RX - RX) - prev_RY
                  */
                 template<typename CurveType>
-                class precompute_G2_component_doubling_step
-                    : public component<typename CurveType::scalar_field_type> {
+                class precompute_G2_component_doubling_step : public component<typename CurveType::scalar_field_type> {
                     using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                 public:
@@ -298,8 +293,7 @@ namespace nil {
 
                         RX_minus_next_RX.reset(new typename component_policy::Fqe_variable_type(
                             *(cur.RX) + *(next.RX) * (-FieldType::value_type::one())));
-                        RY_plus_next_RY.reset(new
-                                              typename component_policy::Fqe_variable_type(*(cur.RY) + *(next.RY)));
+                        RY_plus_next_RY.reset(new typename component_policy::Fqe_variable_type(*(cur.RY) + *(next.RY)));
                         compute_next_RY.reset(new typename component_policy::Fqe_mul_component_type(
                             bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                     }
@@ -330,8 +324,7 @@ namespace nil {
                         const typename fqe_type::value_type RX_val = cur.RX->get_element();
                         const typename fqe_type::value_type RY_val = cur.RY->get_element();
                         const typename fqe_type::value_type next_RX_val = gamma_val.squared() - RX_val - RX_val;
-                        const typename fqe_type::value_type next_RY_val =
-                            gamma_val * (RX_val - next_RX_val) - RY_val;
+                        const typename fqe_type::value_type next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
 
                         next.RX->generate_r1cs_witness(next_RX_val);
                         next.RY->generate_r1cs_witness(next_RY_val);
@@ -362,8 +355,7 @@ namespace nil {
                  * If invert_Q is set to true: use -QY in place of QY everywhere above.
                  */
                 template<typename CurveType>
-                class precompute_G2_component_addition_step
-                    : public component<typename CurveType::scalar_field_type> {
+                class precompute_G2_component_addition_step : public component<typename CurveType::scalar_field_type> {
                     using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                 public:
@@ -412,8 +404,7 @@ namespace nil {
 
                         RX_minus_next_RX.reset(new typename component_policy::Fqe_variable_type(
                             *(cur.RX) + *(next.RX) * (-FieldType::value_type::one())));
-                        RY_plus_next_RY.reset(new
-                                              typename component_policy::Fqe_variable_type(*(cur.RY) + *(next.RY)));
+                        RY_plus_next_RY.reset(new typename component_policy::Fqe_variable_type(*(cur.RY) + *(next.RY)));
                         compute_next_RY.reset(new typename component_policy::Fqe_mul_component_type(
                             bp, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                     }
@@ -431,8 +422,7 @@ namespace nil {
 
                         const typename fqe_type::value_type RY_minus_QY_val = RY_minus_QY->get_element();
                         const typename fqe_type::value_type RX_minus_QX_val = RX_minus_QX->get_element();
-                        const typename fqe_type::value_type gamma_val =
-                            RY_minus_QY_val * RX_minus_QX_val.inversed();
+                        const typename fqe_type::value_type gamma_val = RY_minus_QY_val * RX_minus_QX_val.inversed();
                         cur.gamma->generate_r1cs_witness(gamma_val);
 
                         compute_gamma->generate_r1cs_witness();
@@ -442,8 +432,7 @@ namespace nil {
                         const typename fqe_type::value_type RY_val = cur.RY->get_element();
                         const typename fqe_type::value_type QX_val = Q.X->get_element();
                         const typename fqe_type::value_type next_RX_val = gamma_val.squared() - RX_val - QX_val;
-                        const typename fqe_type::value_type next_RY_val =
-                            gamma_val * (RX_val - next_RX_val) - RY_val;
+                        const typename fqe_type::value_type next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
 
                         next.RX->generate_r1cs_witness(next_RX_val);
                         next.RY->generate_r1cs_witness(next_RY_val);
@@ -488,8 +477,7 @@ namespace nil {
                         this->dbl_count = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
@@ -535,11 +523,7 @@ namespace nil {
 
                             if (NAF[i] != 0) {
                                 addition_steps[add_id].reset(new precompute_G2_component_addition_step<CurveType>(
-                                    bp,
-                                    NAF[i] < 0,
-                                    *(precomp.coeffs[coeff_id]),
-                                    *(precomp.coeffs[coeff_id + 1]),
-                                    Q));
+                                    bp, NAF[i] < 0, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1]), Q));
                                 ++add_id;
                                 ++coeff_id;
                             }
@@ -564,9 +548,8 @@ namespace nil {
                         std::size_t dbl_id = 0;
 
                         bool found_nonzero = false;
-                        std::vector<long> NAF = find_wnaf(1, 
-                            CurveType::pairing::pairing_loop_count);
-                        
+                        std::vector<long> NAF = find_wnaf(1, CurveType::pairing::pairing_loop_count);
+
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {
                                 /* this skips the MSB itself */
@@ -585,8 +568,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_AS_WAKSMAN_HPP

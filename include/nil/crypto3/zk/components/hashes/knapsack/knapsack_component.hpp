@@ -154,8 +154,7 @@ namespace nil {
                             sample_randomness(input.size());
                         }
 
-                        std::vector<typename FieldType::value_type> result(dimension,
-                                                                           FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> result(dimension, FieldType::value_type::zero());
 
                         for (std::size_t i = 0; i < dimension; ++i) {
                             for (std::size_t k = 0; k < input.size(); ++k) {
@@ -169,10 +168,8 @@ namespace nil {
                     }
 
                     static void sample_randomness(std::size_t input_len) {
-                        const std::size_t num_coefficients = 
-                            knapsack_dimension<FieldType>::dimension * input_len;
-                        random::hash<hashes::sha2<512>, 
-                            typename FieldType::value_type> rng;
+                        const std::size_t num_coefficients = knapsack_dimension<FieldType>::dimension * input_len;
+                        random::hash<hashes::sha2<512>, typename FieldType::value_type> rng;
 
                         if (num_coefficients > num_cached_coefficients) {
                             knapsack_coefficients.resize(num_coefficients);
@@ -227,8 +224,8 @@ namespace nil {
                                                  output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
                         }
 
-                        hasher.reset(new knapsack_crh_with_field_out_component<FieldType>(
-                            bp, input_len, input_block, output));
+                        hasher.reset(
+                            new knapsack_crh_with_field_out_component<FieldType>(bp, input_len, input_block, output));
                     }
 
                     void generate_r1cs_constraints(bool enforce_bitness = true) {
@@ -272,14 +269,14 @@ namespace nil {
                             modulus_type;
 
                         for (const typename FieldType::value_type &elt : hash_elems) {
-                            //std::vector<std::uint8_t> elt_bytes;
+                            // std::vector<std::uint8_t> elt_bytes;
                             std::vector<bool> elt_bits(FieldType::modulus_bits);
 
                             std::vector<bool>::iterator write_iter = elt_bits.begin();
                             // little-endian, to preserve compatibility with blueprint_packing_sum.
                             auto end = ::nil::crypto3::multiprecision::export_bits(
                                 modulus_type(elt.data), write_iter, 1, false);
-                            
+
                             result.insert(result.end(), elt_bits.begin(), elt_bits.end());
                         }
 
@@ -305,8 +302,8 @@ namespace nil {
                 template<typename FieldType>
                 std::size_t knapsack_crh_with_field_out_component<FieldType>::num_cached_coefficients;
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP

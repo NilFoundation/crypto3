@@ -139,8 +139,7 @@ namespace nil {
                             if (packet_idx < lines_to_unpack) {
                                 unpack_outputs[packet_idx].generate_r1cs_constraints(true);
                             } else {
-                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
-                                     ++subpacket_idx) {
+                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
                                     this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
                                         1, routed_packets[0][packet_idx][subpacket_idx],
                                         routed_packets[num_columns][packet_idx][subpacket_idx]));
@@ -205,8 +204,7 @@ namespace nil {
                                         typename FieldType::value_type(routing[column_idx][packet_idx] ? 1 : 0);
                                 }
 
-                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
-                                     ++subpacket_idx) {
+                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
                                     this->bp.val(routing[column_idx][packet_idx] ?
                                                      routed_packets[column_idx + 1][cross_edge][subpacket_idx] :
                                                      routed_packets[column_idx + 1][straight_edge][subpacket_idx]) =
@@ -223,8 +221,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_BENES_ROUTING_COMPONENT_HPP

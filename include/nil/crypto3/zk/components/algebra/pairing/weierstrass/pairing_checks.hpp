@@ -47,13 +47,12 @@ namespace nil {
 
                 template<typename CurveType>
                 class check_e_equals_e_component : public component<typename CurveType::scalar_field_type> {
-                    
+
                     using component_policy = detail::basic_pairing_component_policy<CurveType>;
 
                     using Fqk_variable_type = typename component_policy::Fqk_variable_type;
 
                 public:
-
                     typedef typename CurveType::scalar_field_type field_type;
 
                     std::shared_ptr<Fqk_variable_type> ratio;
@@ -76,8 +75,8 @@ namespace nil {
                         component<field_type>(bp),
                         lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
                         ratio.reset(new Fqk_variable_type(bp));
-                        compute_ratio.reset(
-                            new mnt_e_over_e_miller_loop_component<CurveType>(bp, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
+                        compute_ratio.reset(new mnt_e_over_e_miller_loop_component<CurveType>(
+                            bp, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
                         check_finexp.reset(new final_exp_component<CurveType>(bp, *ratio, result));
                     }
 
@@ -100,7 +99,6 @@ namespace nil {
                     using Fqk_variable_type = typename component_policy::Fqk_variable_type;
 
                 public:
-
                     typedef typename CurveType::scalar_field_type field_type;
 
                     std::shared_ptr<Fqk_variable_type> ratio;

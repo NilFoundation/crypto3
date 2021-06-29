@@ -89,7 +89,7 @@ namespace nil {
                                 g1_coeff_b *curve_type::g2_type::underlying_field_type::value_type::non_residue);
                     };
                 }    // namespace detail
-            }    // namespace components
+            }        // namespace components
         }            // namespace zk
     }                // namespace crypto3
 }    // namespace nil

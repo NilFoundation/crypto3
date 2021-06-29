@@ -53,7 +53,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class element_g2 : public component<typename CurveType::scalar_field_type> {
-                    
+
                     using underlying_field_type = typename CurveType::scalar_field_type;
 
                     using field_type = typename CurveType::pairing::fp_type;
@@ -77,10 +77,9 @@ namespace nil {
                         all_vars.insert(all_vars.end(), Y->all_vars.begin(), Y->all_vars.end());
                     }
                     element_g2(blueprint<field_type> &bp,
-                                const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
+                               const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) :
                         component<field_type>(bp) {
-                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy =
-                            Q.to_affine();
+                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Q_copy = Q.to_affine();
 
                         X.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.X));
                         Y.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.Y));
@@ -91,8 +90,7 @@ namespace nil {
 
                     void generate_r1cs_witness(
                         const typename CurveType::pairing::pair_curve_type::g2_type::value_type &Q) {
-                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Qcopy =
-                            Q.to_affine();
+                        typename CurveType::pairing::pair_curve_type::g2_type::value_type Qcopy = Q.to_affine();
 
                         X->generate_r1cs_witness(Qcopy.X);
                         Y->generate_r1cs_witness(Qcopy.Y);
@@ -163,8 +161,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G2_COMPONENT_HPP

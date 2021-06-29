@@ -63,10 +63,10 @@ namespace nil {
                     const blueprint_variable<FieldType> success_flag;
 
                     loose_multiplexing(blueprint<FieldType> &bp,
-                                                 const blueprint_linear_combination_vector<FieldType> &arr,
-                                                 const blueprint_variable<FieldType> &index,
-                                                 const blueprint_variable<FieldType> &result,
-                                                 const blueprint_variable<FieldType> &success_flag) :
+                                       const blueprint_linear_combination_vector<FieldType> &arr,
+                                       const blueprint_variable<FieldType> &index,
+                                       const blueprint_variable<FieldType> &result,
+                                       const blueprint_variable<FieldType> &success_flag) :
                         component<FieldType>(bp),
                         arr(arr), index(index), result(result), success_flag(success_flag) {
                         alpha.allocate(bp, arr.size());
@@ -106,8 +106,7 @@ namespace nil {
                         /* assumes that idx can be fit in ulong; true for our purposes for now */
                         const typename FieldType::value_type valint = this->bp.val(index);
 
-                        unsigned long idx =
-                            static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
+                        unsigned long idx = static_cast<unsigned long>(non_fixed_precision_modulus_type(valint.data));
 
                         if (idx >= arr.size() || non_fixed_precision_modulus_type(valint.data) >= arr.size()) {
                             for (std::size_t i = 0; i < arr.size(); ++i) {
@@ -129,7 +128,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_LOOSE_MULTIPLEXING_COMPONENT_HPP

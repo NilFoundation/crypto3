@@ -64,14 +64,13 @@ namespace nil {
                     merkle_authentication_path_variable<FieldType, Hash> path;
                     blueprint_linear_combination<FieldType> read_successful;
 
-                    merkle_tree_check_read_component(
-                        blueprint<FieldType> &bp,
-                        const std::size_t tree_depth,
-                        const blueprint_linear_combination_vector<FieldType> &address_bits,
-                        const digest_variable<FieldType> &leaf_digest,
-                        const digest_variable<FieldType> &root_digest,
-                        const merkle_authentication_path_variable<FieldType, Hash> &path,
-                        const blueprint_linear_combination<FieldType> &read_successful);
+                    merkle_tree_check_read_component(blueprint<FieldType> &bp,
+                                                     const std::size_t tree_depth,
+                                                     const blueprint_linear_combination_vector<FieldType> &address_bits,
+                                                     const digest_variable<FieldType> &leaf_digest,
+                                                     const digest_variable<FieldType> &root_digest,
+                                                     const merkle_authentication_path_variable<FieldType, Hash> &path,
+                                                     const blueprint_linear_combination<FieldType> &read_successful);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -129,8 +128,8 @@ namespace nil {
                             address_bits[tree_depth - 1 - i], path.left_digests[i], path.right_digests[i]));
                     }
 
-                    check_root.reset(new bit_vector_copy_component<FieldType>(
-                        bp, computed_root->bits, root.bits, read_successful, FieldType::number_bits));
+                    check_root.reset(new bit_vector_copy_component<FieldType>(bp, computed_root->bits, root.bits,
+                                                                              read_successful, FieldType::number_bits));
                 }
 
                 template<typename FieldType, typename Hash>
@@ -184,8 +183,8 @@ namespace nil {
                 }
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_READ_COMPONENT_HPP

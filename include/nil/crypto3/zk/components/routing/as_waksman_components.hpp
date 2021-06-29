@@ -94,8 +94,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_as_waksman_routing_component(const std::size_t num_packets,
-                                                       const std::size_t packet_size);
+                void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size);
 
                 template<typename FieldType>
                 as_waksman_routing_component<FieldType>::as_waksman_routing_component(
@@ -207,8 +206,7 @@ namespace nil {
                                                                             asw_switch_bits[column_idx][row_idx]);
 
                                 /* route forward according to the switch bit */
-                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
-                                     ++subpacket_idx) {
+                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
                                     /*
                                       (1-switch_bit) * (cur-straight_edge) + switch_bit * (cur-cross_edge) = 0
                                       switch_bit * (cross_edge-straight_edge) = cur-straight_edge
@@ -250,8 +248,7 @@ namespace nil {
                                 /* this is a straight edge, so just pass the values forward */
                                 const std::size_t next = neighbors[column_idx][row_idx].first;
 
-                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets;
-                                     ++subpacket_idx) {
+                                for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
                                     this->bp.val(routed_packets[column_idx + 1][next][subpacket_idx]) =
                                         this->bp.val(routed_packets[column_idx][row_idx][subpacket_idx]);
                                 }
@@ -291,8 +288,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_as_waksman_routing_component(const std::size_t num_packets,
-                                                       const std::size_t packet_size) {
+                void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
                     blueprint<FieldType> bp;
                     integer_permutation permutation(num_packets);
                     permutation.random_shuffle();
@@ -325,8 +321,8 @@ namespace nil {
                 }
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_AS_WAKSMAN_ROUTING_COMPONENT_HPP

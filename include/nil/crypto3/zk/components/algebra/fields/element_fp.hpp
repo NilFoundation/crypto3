@@ -46,8 +46,8 @@ namespace nil {
                 template<typename FieldType>
                 using element_fp = blueprint_linear_combination<FieldType>;
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP

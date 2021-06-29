@@ -55,24 +55,23 @@ namespace nil {
 
                     using underlying_element_type = element_fp2<underlying_field_type>;
 
-                    using data_type = std::array<
-                        underlying_element_type, 
-                        field_type::arity / underlying_field_type::arity>;
+                    using data_type =
+                        std::array<underlying_element_type, field_type::arity / underlying_field_type::arity>;
 
                     data_type data;
 
                     element_fp4(blueprint<base_field_type> &bp) :
-                        component<base_field_type>(bp), data({underlying_element_type(bp), underlying_element_type(bp)}) {
+                        component<base_field_type>(bp),
+                        data({underlying_element_type(bp), underlying_element_type(bp)}) {
                     }
 
-                    element_fp4(blueprint<base_field_type> &bp, 
-                        const typename field_type::value_type &el) :
+                    element_fp4(blueprint<base_field_type> &bp, const typename field_type::value_type &el) :
                         component<base_field_type>(bp),
                         data({underlying_element_type(bp, el.data[0]), underlying_element_type(bp, el.data[1])}) {
                     }
 
                     element_fp4(blueprint<base_field_type> &bp, const underlying_element_type &in_data0,
-                                 const underlying_element_type &in_data1) :
+                                const underlying_element_type &in_data1) :
                         component<base_field_type>(bp),
                         data({underlying_element_type(in_data0), underlying_element_type(in_data1)}) {
                     }
@@ -97,15 +96,16 @@ namespace nil {
                     element_fp4<field_type> Frobenius_map(const std::size_t power) const {
                         blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
                         new_c0c0.assign(this->bp, data[0].data[0]);
-                        new_c0c1.assign(this->bp, data[0].data[1] * underlying_field_type::Frobenius_coeffs_c1[power % 2]);
+                        new_c0c1.assign(this->bp,
+                                        data[0].data[1] * underlying_field_type::Frobenius_coeffs_c1[power % 2]);
                         new_c1c0.assign(this->bp, data[1].data[0] * field_type::Frobenius_coeffs_c1[power % 4]);
                         new_c1c1.assign(this->bp,
                                         data[1].data[1] * field_type::Frobenius_coeffs_c1[power % 4] *
                                             underlying_field_type::Frobenius_coeffs_c1[power % 2]);
 
                         return element_fp4<field_type>(this->bp,
-                                                  underlying_element_type(this->bp, new_c0c0, new_c0c1),
-                                                  underlying_element_type(this->bp, new_c1c0, new_c1c1));
+                                                       underlying_element_type(this->bp, new_c0c0, new_c0c1),
+                                                       underlying_element_type(this->bp, new_c1c0, new_c1c1));
                     }
 
                     void evaluate() const {
@@ -156,9 +156,9 @@ namespace nil {
                     std::shared_ptr<element_fp2_mul<underlying_field_type>> compute_result_c1;
 
                     element_fp4_tower_mul(blueprint<base_field_type> &bp,
-                                            const element_fp4<field_type> &A,
-                                            const element_fp4<field_type> &B,
-                                            const element_fp4<field_type> &result) :
+                                          const element_fp4<field_type> &A,
+                                          const element_fp4<field_type> &B,
+                                          const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), B(B), result(result) {
                         /*
@@ -199,11 +199,11 @@ namespace nil {
 
                         result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
                         result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
-                        result_c1_plus_v0_plus_v1.reset(
-                            new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
+                        result_c1_plus_v0_plus_v1.reset(new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0,
+                                                                                    result_c1_plus_v0_plus_v1_c1));
 
-                        compute_result_c1.reset(new element_fp2_mul<underlying_field_type>(bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1,
-                                                                            *result_c1_plus_v0_plus_v1));
+                        compute_result_c1.reset(new element_fp2_mul<underlying_field_type>(
+                            bp, *Ac0_plus_Ac1, *Bc0_plus_Bc1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -257,9 +257,9 @@ namespace nil {
                     blueprint_variable<base_field_type> v6;
 
                     element_fp4_direct_mul(blueprint<base_field_type> &bp,
-                                             const element_fp4<field_type> &A,
-                                             const element_fp4<field_type> &B,
-                                             const element_fp4<field_type> &result) :
+                                           const element_fp4<field_type> &A,
+                                           const element_fp4<field_type> &B,
+                                           const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), B(B), result(result) {
                         /*
@@ -404,14 +404,12 @@ namespace nil {
                                                                             &b2 = B.data[0].data[1],
                                                                             &b3 = B.data[1].data[1];
 
-                        this->bp.val(v1) = ((this->bp.lc_val(a0) + this->bp.lc_val(a1) + this->bp.lc_val(a2) +
-                                             this->bp.lc_val(a3)) *
-                                            (this->bp.lc_val(b0) + this->bp.lc_val(b1) + this->bp.lc_val(b2) +
-                                             this->bp.lc_val(b3)));
-                        this->bp.val(v2) = ((this->bp.lc_val(a0) - this->bp.lc_val(a1) + this->bp.lc_val(a2) -
-                                             this->bp.lc_val(a3)) *
-                                            (this->bp.lc_val(b0) - this->bp.lc_val(b1) + this->bp.lc_val(b2) -
-                                             this->bp.lc_val(b3)));
+                        this->bp.val(v1) =
+                            ((this->bp.lc_val(a0) + this->bp.lc_val(a1) + this->bp.lc_val(a2) + this->bp.lc_val(a3)) *
+                             (this->bp.lc_val(b0) + this->bp.lc_val(b1) + this->bp.lc_val(b2) + this->bp.lc_val(b3)));
+                        this->bp.val(v2) =
+                            ((this->bp.lc_val(a0) - this->bp.lc_val(a1) + this->bp.lc_val(a2) - this->bp.lc_val(a3)) *
+                             (this->bp.lc_val(b0) - this->bp.lc_val(b1) + this->bp.lc_val(b2) - this->bp.lc_val(b3)));
                         this->bp.val(v6) = this->bp.lc_val(a3) * this->bp.lc_val(b3);
 
                         const typename field_type::value_type Aval = A.get_element();
@@ -466,8 +464,8 @@ namespace nil {
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_result_c1;
 
                     element_fp4_squared(blueprint<base_field_type> &bp,
-                                      const element_fp4<field_type> &A,
-                                      const element_fp4<field_type> &result) :
+                                        const element_fp4<field_type> &A,
+                                        const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), result(result) {
                         /*
@@ -504,11 +502,11 @@ namespace nil {
 
                         result_c1_plus_v0_plus_v1_c0.assign(bp, result.data[1].data[0] + v0->data[0] + v1->data[0]);
                         result_c1_plus_v0_plus_v1_c1.assign(bp, result.data[1].data[1] + v0->data[1] + v1->data[1]);
-                        result_c1_plus_v0_plus_v1.reset(
-                            new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0, result_c1_plus_v0_plus_v1_c1));
+                        result_c1_plus_v0_plus_v1.reset(new underlying_element_type(bp, result_c1_plus_v0_plus_v1_c0,
+                                                                                    result_c1_plus_v0_plus_v1_c1));
 
-                        compute_result_c1.reset(
-                            new element_fp2_squared<underlying_field_type>(bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
+                        compute_result_c1.reset(new element_fp2_squared<underlying_field_type>(
+                            bp, *Ac0_plus_Ac1, *result_c1_plus_v0_plus_v1));
                     }
 
                     void generate_r1cs_constraints() {
@@ -568,8 +566,8 @@ namespace nil {
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_c1_expr;
 
                     element_fp4_cyclotomic_squared(blueprint<base_field_type> &bp,
-                                                 const element_fp4<field_type> &A,
-                                                 const element_fp4<field_type> &result) :
+                                                   const element_fp4<field_type> &A,
+                                                   const element_fp4<field_type> &result) :
                         component<base_field_type>(bp),
                         A(A), result(result) {
                         /*
@@ -620,7 +618,8 @@ namespace nil {
 
                         c1_expr.reset(new underlying_element_type(bp, c1_expr_c0, c1_expr_c1));
 
-                        compute_c1_expr.reset(new element_fp2_squared<underlying_field_type>(bp, *A_c0_plus_A_c1, *c1_expr));
+                        compute_c1_expr.reset(
+                            new element_fp2_squared<underlying_field_type>(bp, *A_c0_plus_A_c1, *c1_expr));
                     }
 
                     void generate_r1cs_constraints() {
@@ -641,8 +640,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_FP4_COMPONENTS_HPP

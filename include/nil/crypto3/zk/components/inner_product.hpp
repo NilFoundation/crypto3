@@ -59,9 +59,9 @@ namespace nil {
                     const blueprint_variable<FieldType> result;
 
                     inner_product(blueprint<FieldType> &bp,
-                                            const blueprint_linear_combination_vector<FieldType> &A,
-                                            const blueprint_linear_combination_vector<FieldType> &B,
-                                            const blueprint_variable<FieldType> &result) :
+                                  const blueprint_linear_combination_vector<FieldType> &A,
+                                  const blueprint_linear_combination_vector<FieldType> &B,
+                                  const blueprint_variable<FieldType> &result) :
                         component<FieldType>(bp),
                         A(A), B(B), result(result) {
                         assert(A.size() >= 1);
@@ -97,7 +97,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_INNER_PRODUCT_COMPONENT_HPP

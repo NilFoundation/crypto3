@@ -57,8 +57,8 @@ namespace nil {
                     const blueprint_variable<FieldType> output;
 
                     conjunction(blueprint<FieldType> &bp,
-                                          const blueprint_variable_vector<FieldType> &inputs,
-                                          const blueprint_variable<FieldType> &output) :
+                                const blueprint_variable_vector<FieldType> &inputs,
+                                const blueprint_variable<FieldType> &output) :
                         component<FieldType>(bp),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
@@ -107,7 +107,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_CONJUNCTION_COMPONENT_HPP

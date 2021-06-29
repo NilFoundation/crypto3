@@ -67,11 +67,11 @@ namespace nil {
                     const blueprint_variable<FieldType> less_or_eq;
 
                     comparison(blueprint<FieldType> &bp,
-                                         std::size_t n,
-                                         const blueprint_linear_combination<FieldType> &A,
-                                         const blueprint_linear_combination<FieldType> &B,
-                                         const blueprint_variable<FieldType> &less,
-                                         const blueprint_variable<FieldType> &less_or_eq) :
+                               std::size_t n,
+                               const blueprint_linear_combination<FieldType> &A,
+                               const blueprint_linear_combination<FieldType> &B,
+                               const blueprint_variable<FieldType> &less,
+                               const blueprint_variable<FieldType> &less_or_eq) :
                         component<FieldType>(bp),
                         n(n), A(A), B(B), less(less), less_or_eq(less_or_eq) {
                         alpha.allocate(bp, n);
@@ -83,8 +83,7 @@ namespace nil {
                         pack_alpha.reset(new packing_component<FieldType>(bp, alpha, alpha_packed));
 
                         all_zeros_test.reset(new disjunction<FieldType>(
-                            bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n),
-                            not_all_zeros));
+                            bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
                     };
 
                     void generate_r1cs_constraints() {
@@ -113,7 +112,8 @@ namespace nil {
 
                         /* compute result */
                         all_zeros_test->generate_r1cs_constraints();
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
+                        this->bp.add_r1cs_constraint(
+                            snark::r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
                     }
 
                     void generate_r1cs_witness() {
@@ -132,7 +132,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_COMPARISON_COMPONENT_HPP

@@ -160,8 +160,8 @@ namespace nil {
                         for (std::size_t i = 0; i < 32; ++i) {
                             compute_bits[i].reset(new XOR3_component<FieldType>(
                                 bp, SHA256_COMPONENT_ROTR(W, i, rot1), SHA256_COMPONENT_ROTR(W, i, rot2),
-                                (i + shift < 32 ? W[i + shift] : blueprint_variable<FieldType>(0)),
-                                (i + shift >= 32), result_bits[i]));
+                                (i + shift < 32 ? W[i + shift] : blueprint_variable<FieldType>(0)), (i + shift >= 32),
+                                result_bits[i]));
                         }
                         pack_result.reset(new packing_component<FieldType>(bp, result_bits, result));
                     }
@@ -313,7 +313,7 @@ namespace nil {
                             generate_boolean_r1cs_constraint<FieldType>(this->bp, result_bits[i]);
                             this->bp.add_r1cs_constraint(
                                 snark::r1cs_constraint<FieldType>(X[i] + Y[i] + Z[i] - 2 * result_bits[i],
-                                                           1 - (X[i] + Y[i] + Z[i] - 2 * result_bits[i]), 0));
+                                                                  1 - (X[i] + Y[i] + Z[i] - 2 * result_bits[i]), 0));
                         }
                         pack_result->generate_r1cs_constraints(false);
                     }
@@ -338,8 +338,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }            // namespace zk
-    }                // namespace crypto3
+        }        // namespace zk
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
