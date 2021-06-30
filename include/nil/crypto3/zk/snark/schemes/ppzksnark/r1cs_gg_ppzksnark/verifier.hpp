@@ -70,7 +70,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_process_verification_key {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
 
@@ -117,7 +117,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_verifier_weak_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -197,7 +197,7 @@ namespace nil {
 
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_verifier_strong_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                 public:
                     typedef typename policy_type::constraint_system_type constraint_system_type;
@@ -255,7 +255,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_affine_verifier_weak_input_consistency {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;

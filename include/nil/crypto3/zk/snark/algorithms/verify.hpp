@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -40,10 +41,27 @@ namespace nil {
 
                 template<typename ProofSystemType>
                 bool verify(const typename ProofSystemType::processed_verification_key_type &pvk,
-                                   const typename ProofSystemType::primary_input_type &primary_input,
-                                   const typename ProofSystemType::proof_type &proof) {
+                            const typename ProofSystemType::primary_input_type &primary_input,
+                            const typename ProofSystemType::proof_type &proof) {
 
                     return ProofSystemType::verify(pvk, primary_input, proof);
+                }
+
+                template<typename ProofSystemType,
+                         typename DistributionType,
+                         typename GeneratorType,
+                         typename Hash,
+                         typename InputPrimaryInputRange,
+                         typename InputIterator>
+                bool verify(const typename ProofSystemType::verification_srs_type &ip_verifier_srs,
+                            const typename ProofSystemType::verification_key_type &pvk,
+                            const InputPrimaryInputRange &public_inputs,
+                            const typename ProofSystemType::aggregate_proof_type &proof,
+                            InputIterator transcript_include_first,
+                            InputIterator transcript_include_last) {
+
+                    return ProofSystemType::template verify<DistributionType, GeneratorType, Hash>(
+                        ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first, transcript_include_last);
                 }
             }    // namespace snark
         }        // namespace zk

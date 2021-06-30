@@ -69,8 +69,10 @@ namespace nil {
 
                     /// final commitment keys $v$ and $w$ - there is only one element at the
                     /// end for v1 and v2 hence it's a tuple.
-                    std::pair<typename curve_type::g2_type::value_type, typename curve_type::g2_type::value_type> final_vkey;
-                    std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type> final_wkey;
+                    std::pair<typename curve_type::g2_type::value_type, typename curve_type::g2_type::value_type>
+                        final_vkey;
+                    std::pair<typename curve_type::g1_type::value_type, typename curve_type::g1_type::value_type>
+                        final_wkey;
 
                     static std::size_t log_proofs(std::size_t nproofs) {
                         return std::ceil(std::log2(nproofs));
@@ -107,7 +109,7 @@ namespace nil {
                     bool is_valid() const {
                         // 1. Check length of the proofs
                         if (tmipp.gipa.nproofs < 2 ||
-                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_srs<curve_type>::MAX_SRS_SIZE) {
+                            tmipp.gipa.nproofs > r1cs_gg_pp_zksnark_aggregate_srs<curve_type>::MAX_SRS_SIZE) {
                             return false;
                         }
                         // 2. Check if it's a power of two

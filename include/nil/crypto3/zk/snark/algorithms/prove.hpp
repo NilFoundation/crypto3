@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -37,6 +38,21 @@ namespace nil {
                           const typename ProofSystemType::auxiliary_input_type &auxiliary_input) {
 
                     return ProofSystemType::prove(pk, primary_input, auxiliary_input);
+                }
+
+                template<typename ProofSystemType,
+                         typename Hash,
+                         typename InputTranscriptIncludeIterator,
+                         typename InputProofIterator>
+                typename ProofSystemType::aggregate_proof_type
+                    prove(const typename ProofSystemType::proving_srs_type &srs,
+                          InputTranscriptIncludeIterator transcript_include_first,
+                          InputTranscriptIncludeIterator transcript_include_last,
+                          InputProofIterator proofs_first,
+                          InputProofIterator proofs_last) {
+
+                    return ProofSystemType::template prove<Hash>(
+                        srs, transcript_include_first, transcript_include_last, proofs_first, proofs_last);
                 }
             }    // namespace snark
         }        // namespace zk

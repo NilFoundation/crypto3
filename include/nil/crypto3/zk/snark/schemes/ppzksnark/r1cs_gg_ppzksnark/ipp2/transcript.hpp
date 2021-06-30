@@ -36,7 +36,7 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/marshalling.hpp>
+#include <nil/crypto3/algebra/marshalling.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,9 +48,10 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef Hash hash_type;
 
-                    typedef marshalling::ipp2_aggregation_bincode<curve_type> bincode;
+                    typedef marshalling::curve_bincode<curve_type> bincode;
 
                     std::vector<std::uint8_t> buffer;
+                    ::nil::crypto3::accumulator_set<Hash> hasher_acc;
 
                     template<
                         typename InputIterator,
@@ -59,6 +60,8 @@ namespace nil {
                             bool>::type = true>
                     transcript(InputIterator first, InputIterator last) {
                         buffer.insert(buffer.end(), first, last);
+                        hash<hash_type>(buffer, hasher_acc);
+                        buffer.clear();
                     }
 
                     template<
@@ -68,6 +71,8 @@ namespace nil {
                             bool>::type = true>
                     inline void write_domain_separator(InputIterator first, InputIterator last) {
                         buffer.insert(buffer.end(), first, last);
+                        hash<hash_type>(buffer, hasher_acc);
+                        buffer.clear();
                     }
 
                     template<typename FieldType>
@@ -76,22 +81,44 @@ namespace nil {
                         std::is_same<typename curve_type::scalar_field_type, FieldType>::value ||
                         std::is_same<typename curve_type::gt_type, FieldType>::value>::type
                         write(const typename FieldType::value_type &x) {
-                        buffer.resize(buffer.size() + bincode::template get_element_size<FieldType>());
-                        bincode::template field_element_to_bytes<FieldType>(
-                            x, buffer.end() - bincode::template get_element_size<FieldType>(), buffer.end());
+                        buffer.resize(bincode::template get_element_size<FieldType>());
+                        bincode::template field_element_to_bytes<FieldType>(x, buffer.begin(), buffer.end());
+                        hash<hash_type>(buffer, hasher_acc);
+                        buffer.clear();
                     }
 
                     template<typename GroupType>
                     inline typename std::enable_if<std::is_same<typename curve_type::g1_type, GroupType>::value ||
                                                    std::is_same<typename curve_type::g2_type, GroupType>::value>::type
                         write(const typename GroupType::value_type &x) {
-                        buffer.resize(buffer.size() + bincode::template get_element_size<GroupType>());
-                        bincode::template point_to_bytes<GroupType>(
-                            x, buffer.end() - bincode::template get_element_size<GroupType>(), buffer.end());
+                        buffer.resize(bincode::template get_element_size<GroupType>());
+                        bincode::template point_to_bytes<GroupType>(x, buffer.begin(), buffer.end());
+                        hash<hash_type>(buffer, hasher_acc);
+                        buffer.clear();
+                    }
+
+                    template<typename InputIterator>
+                    inline typename std::enable_if<
+                        std::is_same<std::uint8_t,
+                                     typename std::iterator_traits<InputIterator>::value_type>::value>::type
+                        write(InputIterator first, InputIterator last) {
+                        std::array<std::uint8_t, sizeof(std::uint64_t)> len_bytes;
+                        nil::crypto3::detail::pack<stream_endian::little_byte_big_bit,
+                                                   stream_endian::big_byte_big_bit,
+                                                   sizeof(std::uint64_t) * 8,
+                                                   8>(
+                            std::vector<std::uint64_t> {
+                                static_cast<std::uint64_t>(std::distance(first, last)),
+                            },
+                            len_bytes);
+                        buffer.insert(buffer.end(), len_bytes.begin(), len_bytes.end());
+                        buffer.insert(buffer.end(), first, last);
+                        hash<hash_type>(buffer, hasher_acc);
+                        buffer.clear();
                     }
 
                     inline typename curve_type::scalar_field_type::value_type read_challenge() {
-                        std::vector<std::uint8_t> state = buffer;
+                        auto hasher_state = hasher_acc;
                         std::size_t counter_nonce = 0;
                         std::array<std::uint8_t, sizeof(std::size_t)> counter_nonce_bytes;
                         while (true) {
@@ -105,17 +132,20 @@ namespace nil {
                                 },
                                 counter_nonce_bytes);
 
-                            state.insert(state.end(), counter_nonce_bytes.begin(), counter_nonce_bytes.end());
-                            typename hash_type::digest_type res = hash<hash_type>(state);
-                            typename curve_type::scalar_field_type::value_type res_deser =
+                            hash<hash_type>(counter_nonce_bytes, hasher_state);
+                            typename hash_type::digest_type hasher_res =
+                                boost::accumulators::extract_result<typename boost::mpl::front<
+                                    typename ::nil::crypto3::accumulator_set<Hash>::features_type>::type>(hasher_state);
+                            std::pair<bool, typename curve_type::scalar_field_type::value_type> hasher_res_deser =
                                 bincode::template field_element_from_bytes<typename curve_type::scalar_field_type>(
-                                    res.begin(), res.end());
+                                    hasher_res.begin(), hasher_res.end());
 
-                            if (res_deser == curve_type::scalar_field_type::value_type::zero() ||
-                                res_deser == curve_type::scalar_field_type::value_type::one()) {
+                            if (!hasher_res_deser.first ||
+                                hasher_res_deser.second == curve_type::scalar_field_type::value_type::zero() ||
+                                hasher_res_deser.second == curve_type::scalar_field_type::value_type::one()) {
                                 continue;
                             }
-                            return res_deser;
+                            return hasher_res_deser.second;
                         }
                     }
                 };

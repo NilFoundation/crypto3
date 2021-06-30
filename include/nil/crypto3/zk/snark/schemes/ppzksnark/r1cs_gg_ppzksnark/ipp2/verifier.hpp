@@ -27,8 +27,10 @@
 #ifndef CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 #define CRYPTO3_R1CS_GG_PPZKSNARK_IPP2_VERIFY_HPP
 
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/verification_key.hpp>
-#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prove.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
+
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/verification_key.hpp>
+#include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/ipp2/prover.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -54,6 +56,16 @@ namespace nil {
                         tab(curve_type::gt_type::value_type::one()), uab(curve_type::gt_type::value_type::one()),
                         zab(curve_type::gt_type::value_type::one()), tc(curve_type::gt_type::value_type::one()),
                         uc(curve_type::gt_type::value_type::one()), zc(curve_type::g1_type::value_type::zero()) {
+                    }
+
+                    inline gipa_tuz(const typename curve_type::gt_type::value_type &tab,
+                                    const typename curve_type::gt_type::value_type &uab,
+                                    const typename curve_type::gt_type::value_type &zab,
+                                    const typename curve_type::gt_type::value_type &tc,
+                                    const typename curve_type::gt_type::value_type &uc,
+                                    const typename curve_type::g1_type::value_type &zc) :
+                        tab(tab),
+                        uab(uab), zab(zab), tc(tc), uc(uc), zc(zc) {
                     }
 
                     inline void merge(const gipa_tuz &other) {
@@ -93,9 +105,11 @@ namespace nil {
                     gt_value_type left;
                     gt_value_type right;
                     bool non_random_check_done;
+                    bool valid;
 
                     inline pairing_check() :
-                        left(gt_value_type::one()), right(gt_value_type::one()), non_random_check_done(false) {
+                        left(gt_value_type::one()), right(gt_value_type::one()), non_random_check_done(false),
+                        valid(true) {
                     }
 
                     /// returns a pairing tuple that is scaled by a random element.
@@ -116,7 +130,7 @@ namespace nil {
                     inline pairing_check(InputG1Iterator a_first, InputG1Iterator a_last, InputG2Iterator b_first,
                                          InputG2Iterator b_last, const gt_value_type &out) :
                         left(gt_value_type::one()),
-                        right(gt_value_type::one()), non_random_check_done(false) {
+                        right(gt_value_type::one()), non_random_check_done(false), valid(true) {
                         merge_random(a_first, a_last, b_first, b_last, out);
                     }
 
@@ -135,15 +149,18 @@ namespace nil {
                         BOOST_ASSERT(len > 0);
                         BOOST_ASSERT(len == std::distance(b_first, b_last));
 
+                        if (!valid) {
+                            return;
+                        }
+
                         scalar_field_value_type coeff = derive_non_zero();
                         std::for_each(boost::make_zip_iterator(boost::make_tuple(a_first, b_first)),
                                       boost::make_zip_iterator(boost::make_tuple(a_last, b_last)),
-                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &,
-                                                             const gt_value_type &> &t) {
+                                      [&](const boost::tuple<const g1_value_type &, const g2_value_type &> &t) {
                                           left = left * algebra::pair<curve_type>(coeff * t.template get<0>(),
                                                                                   t.template get<1>());
                                       });
-                        right = right * (out.is_one() ? out : out.pow(coeff));
+                        right = right * (out == CurveType::gt_type::value_type::one() ? out : out.pow(coeff.data));
                     }
 
                     template<typename InputGTIterator>
@@ -153,7 +170,11 @@ namespace nil {
                         BOOST_ASSERT(!non_random_check_done);
                         BOOST_ASSERT(std::distance(a_first, a_last) > 0);
 
-                        for (auto a_it = a_first; a_it != last; ++a_it) {
+                        if (!valid) {
+                            return;
+                        }
+
+                        for (auto a_it = a_first; a_it != a_last; ++a_it) {
                             left = left * (*a_it);
                         }
                         right = right * out;
@@ -162,7 +183,7 @@ namespace nil {
                     }
 
                     inline bool verify() {
-                        return algebra::final_exponentiation<curve_type>(left) == right;
+                        return valid && (algebra::final_exponentiation<curve_type>(left) == right);
                     }
 
                     inline scalar_field_value_type derive_non_zero() {
@@ -172,6 +193,10 @@ namespace nil {
                             coeff = algebra::random_element<scalar_field_type, DistributionType, GeneratorType>();
                         }
                         return coeff;
+                    }
+
+                    inline void invalidate() {
+                        valid = false;
                     }
                 };
 
@@ -183,7 +208,7 @@ namespace nil {
                 inline typename std::enable_if<
                     std::is_same<typename CurveType::scalar_field_type::value_type,
                                  typename std::iterator_traits<InputScalarIterator>::value_type>::value>::type
-                    verify_kzg_v(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                    verify_kzg_v(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::g2_type::value_type,
                                                  typename CurveType::g2_type::value_type> &final_vkey,
                                  const kzg_opening<typename CurveType::g2_type> &vkey_opening,
@@ -191,7 +216,7 @@ namespace nil {
                                  const typename CurveType::scalar_field_type::value_type &kzg_challenge,
                                  pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
                     // f_v(z)
-                    std::vector<typename CurveType::scalar_field_type::value_type> vpoly_eval_z =
+                    typename CurveType::scalar_field_type::value_type vpoly_eval_z =
                         polynomial_evaluation_product_form_from_transcript<typename CurveType::scalar_field_type>(
                             challenges_first, challenges_last, kzg_challenge,
                             CurveType::scalar_field_type::value_type::one());
@@ -226,7 +251,7 @@ namespace nil {
                     std::vector<typename CurveType::g2_type::value_type> b_input2 {
                         // in additive notation: final_vkey = uH,
                         // uH - f_v(z)H = (u - f_v)H --> v1h^{-f_v(z)}
-                        final_vkey.second - (v_srs.h - vpoly_eval_z),
+                        final_vkey.second - (v_srs.h * vpoly_eval_z),
                         vkey_opening.second,
                     };
                     pc.merge_random(a_input2.begin(), a_input2.end(), b_input2.begin(), b_input2.end(),
@@ -235,11 +260,11 @@ namespace nil {
 
                 /// Similar to verify_kzg_opening_g2 but for g1.
                 template<typename CurveType, typename DistributionType, typename GeneratorType,
-                         typename InputScalarType>
+                         typename InputScalarIterator>
                 inline typename std::enable_if<
                     std::is_same<typename CurveType::scalar_field_type::value_type,
-                                 typename std::iterator_traits<InputScalarType>::value_type>::value>::type
-                    verify_kzg_w(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                                 typename std::iterator_traits<InputScalarIterator>::value_type>::value>::type
+                    verify_kzg_w(const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                  const std::pair<typename CurveType::g1_type::value_type,
                                                  typename CurveType::g1_type::value_type> &final_wkey,
                                  const kzg_opening<typename CurveType::g1_type> &wkey_opening,
@@ -300,11 +325,11 @@ namespace nil {
                     gipa_verify_tipp_mipp(transcript<CurveType, Hash> &tr,
                                           const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                           const typename CurveType::scalar_field_type::value_type &r_shift) {
-                    constexpr std::array<std::uint8_t, 4> domain_separator = {'g', 'i', 'p', 'a'};
-                    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
-
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges;
                     std::vector<typename CurveType::scalar_field_type::value_type> challenges_inv;
+
+                    constexpr std::array<std::uint8_t, 4> domain_separator = {'g', 'i', 'p', 'a'};
+                    tr.write_domain_separator(domain_separator.begin(), domain_separator.end());
 
                     // We first generate all challenges as this is the only consecutive process
                     // that can not be parallelized then we scale the commitments in a
@@ -318,8 +343,8 @@ namespace nil {
                                               proof.tmipp.gipa.comms_c.end(), proof.tmipp.gipa.z_c.end())),
                         [&](const boost::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename curve_type::gt_type::value_type,
-                                                               typename curve_type::gt_type::value_type> &,
+                                               const std::pair<typename CurveType::gt_type::value_type,
+                                                               typename CurveType::gt_type::value_type> &,
                                                const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                                const std::pair<typename CurveType::g1_type::value_type,
@@ -378,8 +403,8 @@ namespace nil {
                                               challenges.end(), challenges_inv.end())),
                         [&](const boost::tuple<const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
-                                               const std::pair<typename curve_type::gt_type::value_type,
-                                                               typename curve_type::gt_type::value_type> &,
+                                               const std::pair<typename CurveType::gt_type::value_type,
+                                                               typename CurveType::gt_type::value_type> &,
                                                const std::pair<r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>,
                                                                r1cs_gg_ppzksnark_ipp2_commitment_output<CurveType>> &,
                                                const std::pair<typename CurveType::g1_type::value_type,
@@ -387,25 +412,25 @@ namespace nil {
                                                const typename CurveType::scalar_field_type::value_type &,
                                                const typename CurveType::scalar_field_type::value_type &> &t) {
                             // Op::TAB::<E>(tab_l, c_repr),
-                            res.tab = res.tab * t.template get<0>().first.first.pow(t.template get<4>());
+                            res.tab = res.tab * t.template get<0>().first.first.pow(t.template get<4>().data);
                             // Op::TAB(tab_r, c_inv_repr),
-                            res.tab = res.tab * t.template get<0>().second.first.pow(t.template get<5>());
+                            res.tab = res.tab * t.template get<0>().second.first.pow(t.template get<5>().data);
                             // Op::UAB(uab_l, c_repr),
-                            res.uab = res.uab * t.template get<0>().first.second.pow(t.template get<4>());
+                            res.uab = res.uab * t.template get<0>().first.second.pow(t.template get<4>().data);
                             // Op::UAB(uab_r, c_inv_repr),
-                            res.uab = res.uab * t.template get<0>().second.second.pow(t.template get<5>());
+                            res.uab = res.uab * t.template get<0>().second.second.pow(t.template get<5>().data);
                             // Op::ZAB(zab_l, c_repr),
-                            res.zab = res.zab * t.template get<1>().first.pow(t.template get<4>());
+                            res.zab = res.zab * t.template get<1>().first.pow(t.template get<4>().data);
                             // Op::ZAB(zab_r, c_inv_repr),
-                            res.zab = res.zab * t.template get<1>().second.pow(t.template get<5>());
+                            res.zab = res.zab * t.template get<1>().second.pow(t.template get<5>().data);
                             // Op::TC::<E>(tc_l, c_repr),
-                            res.tc = res.tc * t.template get<2>().first.first.pow(t.template get<4>());
+                            res.tc = res.tc * t.template get<2>().first.first.pow(t.template get<4>().data);
                             // Op::TC(tc_r, c_inv_repr),
-                            res.tc = res.tc * t.template get<2>().second.first.pow(t.template get<5>());
+                            res.tc = res.tc * t.template get<2>().second.first.pow(t.template get<5>().data);
                             // Op::UC(uc_l, c_repr),
-                            res.uc = res.uc * t.template get<2>().first.second.pow(t.template get<4>());
+                            res.uc = res.uc * t.template get<2>().first.second.pow(t.template get<4>().data);
                             // Op::UC(uc_r, c_inv_repr),
-                            res.uc = res.uc * t.template get<2>().second.second.pow(t.template get<5>());
+                            res.uc = res.uc * t.template get<2>().second.second.pow(t.template get<5>().data);
                             // Op::ZC(zc_l, c_repr),
                             res.zc = res.zc + (t.template get<4>() * t.template get<3>().first);
                             // Op::ZC(zc_r, c_inv_repr),
@@ -433,7 +458,7 @@ namespace nil {
                 template<typename CurveType, typename DistributionType, typename GeneratorType,
                          typename Hash = hashes::sha2<256>>
                 inline void verify_tipp_mipp(transcript<CurveType, Hash> &tr,
-                                             const r1cs_gg_ppzksnark_verifying_srs<CurveType> &v_srs,
+                                             const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &v_srs,
                                              const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
                                              const typename CurveType::scalar_field_type::value_type &r_shift,
                                              pairing_check<CurveType, DistributionType, GeneratorType> &pc) {
@@ -474,10 +499,12 @@ namespace nil {
                         proof.tmipp.gipa.final_b,
                     };
                     pc.merge_random(a_input1.begin(), a_input1.end(), b_input1.begin(), b_input1.end(), final_res.zab);
+
                     //  final_aB.0 = T = e(A,v1)e(w1,B)
                     a_input1.template emplace_back(proof.tmipp.gipa.final_wkey.first);
                     b_input1.template emplace(b_input1.begin(), proof.tmipp.gipa.final_vkey.first);
                     pc.merge_random(a_input1.begin(), a_input1.end(), b_input1.begin(), b_input1.end(), final_res.tab);
+
                     //  final_aB.1 = U = e(A,v2)e(w2,B)
                     a_input1.pop_back();
                     a_input1.template emplace_back(proof.tmipp.gipa.final_wkey.second);
@@ -489,6 +516,7 @@ namespace nil {
                     // Verify base inner product commitment
                     // Z ==  c ^ r
                     typename CurveType::g1_type::value_type final_z = final_r * proof.tmipp.gipa.final_c;
+
                     // Check commiment correctness
                     // T = e(C,v1)
                     std::vector<typename CurveType::g1_type::value_type> a_input2 {
@@ -498,13 +526,13 @@ namespace nil {
                         proof.tmipp.gipa.final_vkey.first,
                     };
                     pc.merge_random(a_input2.begin(), a_input2.end(), b_input2.begin(), b_input2.end(), final_res.tc);
+
                     // U = e(A,v2)
                     b_input2.pop_back();
                     b_input2.template emplace_back(proof.tmipp.gipa.final_vkey.second);
                     pc.merge_random(a_input2.begin(), a_input2.end(), b_input2.begin(), b_input2.end(), final_res.uc);
 
                     if (final_z != final_res.zc) {
-                        // TODO:
                         pc.invalidate();
                     }
                 }
@@ -522,22 +550,26 @@ namespace nil {
                 /// number of proofs and public inputs (+100ms in our case). In the case of Filecoin, the only
                 /// non-fixed part of the public inputs are the challenges derived from a seed. Even though this
                 /// seed comes from a random beeacon, we are hashing this as a safety precaution.
-                template<typename CurveType, typename DistributionType, typename GeneratorType,
-                         typename Hash = hashes::sha2<256>, typename InputRanges, typename InputIterator>
+                template<typename CurveType,
+                         typename DistributionType = boost::random::uniform_int_distribution<
+                             typename CurveType::scalar_field_type::modulus_type>,
+                         typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,
+                         typename InputRangesRange, typename InputIterator>
                 inline typename std::enable_if<
                     std::is_same<typename CurveType::scalar_field_type::value_type,
                                  typename std::iterator_traits<typename std::iterator_traits<
-                                     typename InputRanges::iterator>::value_type::iterator>::value_type>::value &&
+                                     typename InputRangesRange::iterator>::value_type::iterator>::value_type>::value &&
                         std::is_same<std::uint8_t, typename std::iterator_traits<InputIterator>::value_type>::value,
                     bool>::type
-                    verify_aggregate_proof(const r1cs_gg_ppzksnark_verifying_srs<CurveType> &ip_verifier_srs,
-                                           const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                           const InputRanges &public_inputs,
-                                           const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
-                                           InputIterator transcript_include_first,
-                                           InputIterator transcript_include_last) {
+                    verify_aggregate_proof(
+                        const r1cs_gg_ppzksnark_aggregate_verification_srs<CurveType> &ip_verifier_srs,
+                        const r1cs_gg_ppzksnark_aggregate_verification_key<CurveType> &pvk,
+                        const InputRangesRange &public_inputs,
+                        const r1cs_gg_ppzksnark_aggregate_proof<CurveType> &proof,
+                        InputIterator transcript_include_first,
+                        InputIterator transcript_include_last) {
                     for (const auto &public_input : public_inputs) {
-                        BOOST_ASSERT((public_input.size() + 1) == vk.gamma_ABC_g1.size());
+                        BOOST_ASSERT((public_input.size()) == pvk.gamma_ABC_g1.size());
                     }
 
                     // Random linear combination of proofs
@@ -550,13 +582,14 @@ namespace nil {
                     tr.template write<typename CurveType::gt_type>(proof.com_ab.second);
                     tr.template write<typename CurveType::gt_type>(proof.com_c.first);
                     tr.template write<typename CurveType::gt_type>(proof.com_c.second);
-                    tr.write_domain_separator(transcript_include_first, transcript_include_last);
+                    tr.write(transcript_include_first, transcript_include_last);
                     typename CurveType::scalar_field_type::value_type r = tr.read_challenge();
                     tr.template write<typename CurveType::gt_type>(proof.ip_ab);
                     tr.template write<typename CurveType::g1_type>(proof.agg_c);
 
                     pairing_check<CurveType, DistributionType, GeneratorType> pc;
 
+                    // TODO: parallel
                     // 1.Check TIPA proof ab
                     // 2.Check TIPA proof c
                     verify_tipp_mipp<CurveType, DistributionType, GeneratorType, Hash>(
@@ -583,22 +616,25 @@ namespace nil {
                     // randomized already. When merging all pairing checks together, this will be the only one
                     // non-randomized.
                     //
-                    std::vector<typename CurveType::scalar_field_type::value_type> r_vec =
+                    // now we do the multi exponentiation
+                    std::vector<typename CurveType::scalar_field_type::value_type> powers =
                         structured_scalar_power<typename CurveType::scalar_field_type>(public_inputs.size(), r);
                     std::vector<typename CurveType::scalar_field_type::value_type> multi_r_vec;
                     // i denotes the column of the public input, and j denotes which public input
                     for (std::size_t i = 0; i < public_inputs[0].size(); ++i) {
                         typename CurveType::scalar_field_type::value_type c = public_inputs[0][i];
                         for (std::size_t j = 1; j < public_inputs.size(); ++j) {
-                            c = c + public_inputs[j][i] * r_vec[j];
+                            c = c + public_inputs[j][i] * powers[j];
                         }
+                        multi_r_vec.emplace_back(c);
                     }
 
                     // 3. Compute left part of the final pairing equation
-                    typename CurveType::gt_type::value_type left = vk.alpha_g1_beta_g2.pow(r_sum);
+                    typename CurveType::gt_type::value_type left =
+                        algebra::pair<CurveType>(pvk.alpha_g1 * r_sum, pvk.beta_g2);
 
                     // 4. Compute right part of the final pairing equation
-                    typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, vk.delta_g2);
+                    typename CurveType::gt_type::value_type right = algebra::pair<CurveType>(proof.agg_c, pvk.delta_g2);
 
                     // 5. compute the middle part of the final pairing equation, the one
                     //    with the public inputs
@@ -609,18 +645,78 @@ namespace nil {
                     // input element
                     // We incrementally build the r vector and the table
                     // NOTE: in this version it's not r^2j but simply r^j
-                    // TODO: how to get element of accumulation vector
-                    typename CurveType::g1_type::value_type g_ic = vk.gamma_ABC_g1.first * r_sum;
-                    // TODO: it seems to be incorrect
+                    typename CurveType::g1_type::value_type g_ic = pvk.gamma_ABC_g1.first * r_sum;
+                    // TODO: do without using of accumulation_vector
                     typename CurveType::g1_type::value_type totsi =
-                        vk.gamma_ABC_g1.template accumulate_chunk(r_vec.begin(), r_vec.end(), 1).first;
+                        pvk.gamma_ABC_g1.accumulate_chunk(multi_r_vec.begin(), multi_r_vec.end(), 0).first -
+                        pvk.gamma_ABC_g1.first;
                     g_ic = g_ic + totsi;
-                    typename CurveType::gt_type::value_type ml = algebra::pair<CurveType>(g_ic, vk.gamma_g2);
+                    typename CurveType::gt_type::value_type middle = algebra::pair<CurveType>(g_ic, pvk.gamma_g2);
 
-                    std::vector<typename CurveType::scalar_field_type::value_type> a_input {left, middle, right};
-                    pc.template merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
+                    std::vector<typename CurveType::gt_type::value_type> a_input {left, middle, right};
+                    pc.merge_nonrandom(a_input.begin(), a_input.end(), proof.ip_ab);
                     return pc.verify();
                 }
+
+                template<typename CurveType, typename BasicVerifier>
+                class r1cs_gg_ppzksnark_aggregate_verifier {
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Aggregate> policy_type;
+
+                    typedef typename CurveType::pairing pairing_policy;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::g1_type g1_type;
+                    typedef typename CurveType::gt_type gt_type;
+                    typedef typename pairing_policy::g1_precomp g1_precomp;
+                    typedef typename pairing_policy::g2_precomp g2_precomp;
+                    typedef typename pairing_policy::fqk_type fqk_type;
+
+                public:
+                    typedef BasicVerifier basic_verifier;
+
+                    typedef typename policy_type::constraint_system_type constraint_system_type;
+                    typedef typename policy_type::primary_input_type primary_input_type;
+                    typedef typename policy_type::auxiliary_input_type auxiliary_input_type;
+
+                    typedef typename policy_type::proving_key_type proving_key_type;
+                    typedef typename policy_type::verification_key_type verification_key_type;
+
+                    typedef typename policy_type::srs_type srs_type;
+                    typedef typename policy_type::proving_srs_type proving_srs_type;
+                    typedef typename policy_type::verification_srs_type verification_srs_type;
+
+                    typedef typename policy_type::keypair_type keypair_type;
+                    typedef typename policy_type::srs_pair_type srs_pair_type;
+
+                    typedef typename policy_type::proof_type proof_type;
+                    typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
+
+                    // Aggregate verify
+                    template<typename DistributionType, typename GeneratorType, typename Hash,
+                             typename InputPrimaryInputRange, typename InputIterator>
+                    static inline typename std::enable_if<
+                        std::is_same<primary_input_type,
+                                     typename std::iterator_traits<
+                                         typename InputPrimaryInputRange::iterator>::value_type>::value,
+                        bool>::type
+                        process(const verification_srs_type &ip_verifier_srs,
+                                const verification_key_type &pvk,
+                                const InputPrimaryInputRange &public_inputs,
+                                const aggregate_proof_type &proof,
+                                InputIterator transcript_include_first,
+                                InputIterator transcript_include_last) {
+                        return verify_aggregate_proof<CurveType, DistributionType, GeneratorType, Hash>(
+                            ip_verifier_srs, pvk, public_inputs, proof, transcript_include_first,
+                            transcript_include_last);
+                    }
+
+                    // Basic verify
+                    template<typename VerificationKey>
+                    static inline bool process(const VerificationKey &vk,
+                                               const primary_input_type &primary_input,
+                                               const proof_type &proof) {
+                        return BasicVerifier::process(vk, primary_input, proof);
+                    }
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

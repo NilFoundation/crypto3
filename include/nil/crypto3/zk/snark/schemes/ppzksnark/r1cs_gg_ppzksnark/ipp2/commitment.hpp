@@ -62,7 +62,7 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
-#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 

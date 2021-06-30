@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_ELEMENT_HPP
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_ELEMENT_HPP
 
-#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
@@ -183,8 +183,8 @@ namespace nil {
                         typename Type2,
                         typename FieldValueType,
                         typename = typename std::enable_if<
-                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
-                                !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                            algebra::is_field<typename FieldValueType::field_type>::value &&
+                                !algebra::is_extended_field<typename FieldValueType::field_type>::value,
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
@@ -196,8 +196,8 @@ namespace nil {
                         typename Type2,
                         typename FieldValueType,
                         typename = typename std::enable_if<
-                            ::nil::crypto3::detail::is_field<typename FieldValueType::field_type>::value &&
-                                !::nil::crypto3::detail::is_extended_field<typename FieldValueType::field_type>::value,
+                            algebra::is_field<typename FieldValueType::field_type>::value &&
+                                !algebra::is_extended_field<typename FieldValueType::field_type>::value,
                             FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 

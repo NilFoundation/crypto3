@@ -16,6 +16,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::blueprint
                        ${CMAKE_WORKSPACE_NAME}::fft
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::marshalling
 
                        ${Boost_LIBRARIES})
 
@@ -65,7 +66,7 @@ set(TESTS_NAMES
     "schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "schemes/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "schemes/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
-    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation")
+    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})

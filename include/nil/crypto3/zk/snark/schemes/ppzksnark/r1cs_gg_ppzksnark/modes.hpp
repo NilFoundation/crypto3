@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -24,34 +23,20 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
-#define CRYPTO3_ZK_SNARK_ALGORITHMS_GENERATE_HPP
+#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_MODES_HPP
+#define CRYPTO3_R1CS_GG_PPZKSNARK_MODES_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type
-                    generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
-
-                    return ProofSystemType::generate(constraint_system);
-                }
-
-                template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type generate(const typename ProofSystemType::circuit_type &circuit) {
-
-                    return ProofSystemType::generate(circuit);
-                }
-
-                template<typename ProofSystemType>
-                typename ProofSystemType::srs_pair_type generate(std::size_t num_proofs) {
-
-                    return ProofSystemType::generate(num_proofs);
-                }
+                enum class ProvingMode {
+                    Basic,
+                    Aggregate,
+                };
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_HPP
+#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_MODES_HPP

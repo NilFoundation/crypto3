@@ -75,8 +75,12 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 
+#include <nil/crypto3/algebra/marshalling.hpp>
+
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
+
+#include <nil/marshalling/status_type.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -103,7 +107,7 @@ namespace nil {
                 modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
-            static inline typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
@@ -120,7 +124,7 @@ namespace nil {
             }
 
             template<typename FieldType>
-            static inline typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator &read_iter) {
 
@@ -319,7 +323,7 @@ namespace nil {
             template<typename FieldType>
 
             static inline
-                typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -332,7 +336,7 @@ namespace nil {
 
             template<typename FieldType>
             static inline
-                typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -512,53 +516,102 @@ namespace nil {
                 (CurveType::scalar_field_type::modulus_bits % chunk_size ? 1 : 0);
 
             template<typename FieldType>
-            static inline typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                   typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                   typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                   status_type &processingStatus) {
+
+                processingStatus = status_type::success;
 
                 using modulus_type = typename FieldType::modulus_type;
                 using field_type = FieldType;
-                constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
-                constexpr const std::size_t modulus_chunks =
-                    modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
+                /*constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
+                constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1
+: 0);
+
+                if (std::distance(read_iter_begin, read_iter_end) < modulus_chunks){
+                    processingStatus = status_type::not_enough_data;
+
+                    return field_type::value_type::zero();
+                }
 
                 modulus_type fp_out;
 
                 nil::crypto3::multiprecision::import_bits(fp_out, read_iter_begin, read_iter_begin + modulus_chunks,
-                                                          chunk_size, false);
+                                                          chunk_size, false);*/
 
-                return typename field_type::value_type(fp_out);
+                std::pair<bool, typename field_type::value_type> processed =
+                    field_bincode<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
+
+                if (!std::get<0>(processed)) {
+                    processingStatus = status_type::invalid_msg_data;
+
+                    return field_type::value_type::zero();
+                }
+
+                return std::get<1>(processed);
             }
 
             template<typename FieldType>
-            static inline typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value,
+            static inline typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value,
                                                   typename FieldType::value_type>::type
                 field_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                   typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                   typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                   status_type &processingStatus) {
 
                 using modulus_type = typename FieldType::modulus_type;
                 using field_type = FieldType;
-                constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
-                constexpr const std::size_t modulus_chunks =
-                    modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
+                // constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
+                // constexpr const std::size_t modulus_chunks = modulus_bits / chunk_size + (modulus_bits % chunk_size ?
+                // 1 : 0);
 
-                typename field_type::value_type::data_type data;
-                const std::size_t data_dimension = field_type::arity / field_type::underlying_field_type::arity;
+                // if (std::distance(read_iter_begin, read_iter_end) <
+                //     field_type::arity * modulus_chunks){
 
-                for (int n = 0; n < data_dimension; ++n) {
-                    data[n] = field_type_process<typename field_type::underlying_field_type>(
-                        read_iter_begin + n * field_type::underlying_field_type::arity * modulus_chunks,
-                        read_iter_begin + (n + 1) * field_type::underlying_field_type::arity * modulus_chunks);
+                //     processingStatus = status_type::not_enough_data;
+
+                //     return field_type::value_type::zero();
+                // }
+
+                // typename field_type::value_type::data_type data;
+                // const std::size_t data_dimension =
+                //     field_type::arity / field_type::underlying_field_type::arity;
+
+                // for (int n = 0; n < data_dimension; ++n) {
+                //     data[n] = field_type_process<typename field_type::underlying_field_type>(read_iter_begin + n *
+                //     field_type::underlying_field_type::arity * modulus_chunks,
+                //                                                                              read_iter_begin + (n +
+                //                                                                              1) *
+                //                                                                              field_type::underlying_field_type::arity
+                //                                                                              * modulus_chunks,
+                //                                                                              processingStatus);
+                //     if (processingStatus != status_type::success){
+                //         return field_type::value_type::zero();
+                //     }
+                // }
+
+                // return typename field_type::value_type(data);
+
+                std::pair<bool, typename field_type::value_type> processed =
+                    field_bincode<field_type>::field_element_from_bytes(read_iter_begin, read_iter_end);
+
+                if (!std::get<0>(processed)) {
+                    processingStatus = status_type::invalid_msg_data;
+
+                    return field_type::value_type::zero();
                 }
 
-                return typename field_type::value_type(data);
+                return std::get<1>(processed);
             }
 
             template<typename GroupType>
             static inline typename GroupType::value_type
                 g1_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                      typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                      typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                      status_type &processingStatus) {
+
+                processingStatus = status_type::success;
 
                 typename curve_element_serializer<CurveType>::compressed_g1_octets input_array;
 
@@ -572,7 +625,10 @@ namespace nil {
             template<typename GroupType>
             static inline typename GroupType::value_type
                 g2_group_type_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                      typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                      typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                      status_type &processingStatus) {
+
+                processingStatus = status_type::success;
 
                 typename curve_element_serializer<CurveType>::compressed_g2_octets input_array;
 
@@ -585,7 +641,17 @@ namespace nil {
 
             static inline std::size_t
                 std_size_t_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                   typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                   typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                   status_type &processingStatus) {
+
+                processingStatus = status_type::success;
+
+                if (std::distance(read_iter_begin, read_iter_end) < std_size_t_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return 0;
+                }
 
                 std::vector<std::size_t> vector_s(1, 0);
                 auto iter = vector_s.begin();
@@ -604,17 +670,42 @@ namespace nil {
             template<typename T>
             static inline sparse_vector<T>
                 g1_sparse_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                         typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                         typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                         status_type &processingStatus) {
+
+                if (std::distance(read_iter_begin, read_iter_end) < std_size_t_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return sparse_vector<T>();
+                }
 
                 std::size_t indices_count =
-                    std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size);
+                    std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return sparse_vector<T>();
+                }
+
+                if (std::distance(read_iter_begin, read_iter_end) <
+                    std_size_t_byteblob_size + indices_count * std_size_t_byteblob_size +
+                        indices_count * g1_byteblob_size + std_size_t_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return sparse_vector<T>();
+                }
 
                 std::vector<std::size_t> indices(indices_count, 0);
 
                 for (std::size_t i = 0; i < indices_count; i++) {
                     indices[i] = std_size_t_process(
                         read_iter_begin + std_size_t_byteblob_size + std_size_t_byteblob_size * i,
-                        read_iter_begin + std_size_t_byteblob_size + (i + 1) * std_size_t_byteblob_size);
+                        read_iter_begin + std_size_t_byteblob_size + (i + 1) * std_size_t_byteblob_size,
+                        processingStatus);
+                    if (processingStatus != status_type::success) {
+                        return sparse_vector<T>();
+                    }
                 }
 
                 std::vector<typename T::value_type> values(indices_count);
@@ -624,14 +715,22 @@ namespace nil {
                         read_iter_begin + std_size_t_byteblob_size + indices_count * std_size_t_byteblob_size +
                             i * g1_byteblob_size,
                         read_iter_begin + std_size_t_byteblob_size + indices_count * std_size_t_byteblob_size +
-                            (i + 1) * g1_byteblob_size);
+                            (i + 1) * g1_byteblob_size,
+                        processingStatus);
+                    if (processingStatus != status_type::success) {
+                        return sparse_vector<T>();
+                    }
                 }
 
                 std::size_t domain_size_ = std_size_t_process(
                     read_iter_begin + std_size_t_byteblob_size + indices_count * std_size_t_byteblob_size +
                         indices_count * g1_byteblob_size,
                     read_iter_begin + std_size_t_byteblob_size + indices_count * std_size_t_byteblob_size +
-                        indices_count * g1_byteblob_size + std_size_t_byteblob_size);
+                        indices_count * g1_byteblob_size + std_size_t_byteblob_size,
+                    processingStatus);
+                if (processingStatus != status_type::success) {
+                    return sparse_vector<T>();
+                }
 
                 sparse_vector<T> sv;
 
@@ -648,47 +747,121 @@ namespace nil {
             template<typename T>
             static inline accumulation_vector<T>
                 g1_accumulation_vector_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                               typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                               typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                               status_type &processingStatus) {
+
+                if (std::distance(read_iter_begin, read_iter_end) < g1_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return accumulation_vector<T>();
+                }
 
                 typename T::value_type first =
-                    g1_group_type_process<T>(read_iter_begin, read_iter_begin + g1_byteblob_size);
-                sparse_vector<T> rest = g1_sparse_vector_process<T>(read_iter_begin + g1_byteblob_size, read_iter_end);
+                    g1_group_type_process<T>(read_iter_begin, read_iter_begin + g1_byteblob_size, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return accumulation_vector<T>();
+                }
+
+                sparse_vector<T> rest =
+                    g1_sparse_vector_process<T>(read_iter_begin + g1_byteblob_size, read_iter_end, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return accumulation_vector<T>();
+                }
 
                 return accumulation_vector<T>(std::move(first), std::move(rest));
             }
 
             static inline typename scheme_type::verification_key_type
                 verification_key_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                         typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                         typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                         status_type &processingStatus) {
+
+                if (std::distance(read_iter_begin, read_iter_end) <
+                    gt_byteblob_size + g2_byteblob_size + g2_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return typename scheme_type::verification_key_type();
+                }
 
                 typename CurveType::gt_type::value_type alpha_g1_beta_g2 =
-                    field_type_process<typename CurveType::gt_type>(read_iter_begin,
-                                                                    read_iter_begin + gt_byteblob_size);
+                    field_type_process<typename CurveType::gt_type>(read_iter_begin, read_iter_begin + gt_byteblob_size,
+                                                                    processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::verification_key_type();
+                }
+
                 typename CurveType::g2_type::value_type gamma_g2 = g2_group_type_process<typename CurveType::g2_type>(
-                    read_iter_begin + gt_byteblob_size, read_iter_begin + gt_byteblob_size + g2_byteblob_size);
+                    read_iter_begin + gt_byteblob_size,
+                    read_iter_begin + gt_byteblob_size + g2_byteblob_size,
+                    processingStatus);
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::verification_key_type();
+                }
+
                 typename CurveType::g2_type::value_type delta_g2 = g2_group_type_process<typename CurveType::g2_type>(
                     read_iter_begin + gt_byteblob_size + g2_byteblob_size,
-                    read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size);
+                    read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size,
+                    processingStatus);
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::verification_key_type();
+                }
 
                 accumulation_vector<typename CurveType::g1_type> gamma_ABC_g1 =
-                    g1_accumulation_vector_process<typename CurveType::g1_type>(
-                        read_iter_begin + gt_byteblob_size + g2_byteblob_size + g2_byteblob_size, read_iter_end);
+                    g1_accumulation_vector_process<typename CurveType::g1_type>(read_iter_begin + gt_byteblob_size +
+                                                                                    g2_byteblob_size + g2_byteblob_size,
+                                                                                read_iter_end,
+                                                                                processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::verification_key_type();
+                }
 
                 return typename scheme_type::verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);
             }
 
             static inline typename scheme_type::primary_input_type
                 primary_input_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                      typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                      typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                      status_type &processingStatus) {
 
-                std::size_t pi_count = std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size);
+                if (std::distance(read_iter_begin, read_iter_end) < std_size_t_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return typename scheme_type::primary_input_type();
+                }
+
+                std::size_t pi_count =
+                    std_size_t_process(read_iter_begin, read_iter_begin + std_size_t_byteblob_size, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::primary_input_type();
+                }
+
+                if (std::distance(read_iter_begin, read_iter_end) <
+                    std_size_t_byteblob_size + pi_count * fr_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return typename scheme_type::primary_input_type();
+                }
 
                 std::vector<typename CurveType::scalar_field_type::value_type> pi(pi_count);
 
                 for (std::size_t i = 0; i < pi_count; i++) {
                     pi[i] = field_type_process<typename CurveType::scalar_field_type>(
                         read_iter_begin + std_size_t_byteblob_size + i * fr_byteblob_size,
-                        read_iter_begin + std_size_t_byteblob_size + (i + 1) * fr_byteblob_size);
+                        read_iter_begin + std_size_t_byteblob_size + (i + 1) * fr_byteblob_size,
+                        processingStatus);
+
+                    if (processingStatus != status_type::success) {
+                        return typename scheme_type::primary_input_type();
+                    }
                 }
 
                 return typename scheme_type::primary_input_type(pi);
@@ -696,17 +869,41 @@ namespace nil {
 
             static inline typename scheme_type::proof_type
                 proof_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                              typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                              typename std::vector<chunk_type>::const_iterator read_iter_end,
+                              status_type &processingStatus) {
+
+                if (std::distance(read_iter_begin, read_iter_end) <
+                    g1_byteblob_size + g2_byteblob_size + g1_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return typename scheme_type::proof_type();
+                }
 
                 typename CurveType::g1_type::value_type g_A = g1_group_type_process<typename CurveType::g1_type>(
-                    read_iter_begin, read_iter_begin + g1_byteblob_size);
+                    read_iter_begin, read_iter_begin + g1_byteblob_size, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::proof_type();
+                }
 
                 typename CurveType::g2_type::value_type g_B = g2_group_type_process<typename CurveType::g2_type>(
-                    read_iter_begin + g1_byteblob_size, read_iter_begin + g1_byteblob_size + g2_byteblob_size);
+                    read_iter_begin + g1_byteblob_size,
+                    read_iter_begin + g1_byteblob_size + g2_byteblob_size,
+                    processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::proof_type();
+                }
 
                 typename CurveType::g1_type::value_type g_C = g1_group_type_process<typename CurveType::g1_type>(
                     read_iter_begin + g1_byteblob_size + g2_byteblob_size,
-                    read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size);
+                    read_iter_begin + g1_byteblob_size + g2_byteblob_size + g1_byteblob_size,
+                    processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return typename scheme_type::proof_type();
+                }
 
                 return typename scheme_type::proof_type(std::move(g_A), std::move(g_B), std::move(g_C));
             }
@@ -714,24 +911,62 @@ namespace nil {
             static inline std::tuple<typename scheme_type::verification_key_type,
                                      typename scheme_type::primary_input_type, typename scheme_type::proof_type>
                 verifier_input_process(typename std::vector<chunk_type>::const_iterator read_iter_begin,
-                                       typename std::vector<chunk_type>::const_iterator read_iter_end) {
+                                       typename std::vector<chunk_type>::const_iterator read_iter_end,
+                                       status_type &processingStatus) {
 
                 const std::size_t proof_byteblob_size = g1_byteblob_size + g2_byteblob_size + g1_byteblob_size;
 
+                if (std::distance(read_iter_begin, read_iter_end) < proof_byteblob_size) {
+
+                    processingStatus = status_type::not_enough_data;
+
+                    return std::make_tuple(typename scheme_type::verification_key_type(),
+                                           typename scheme_type::primary_input_type(),
+                                           typename scheme_type::proof_type());
+                }
+
                 typename scheme_type::proof_type de_prf =
-                    proof_process(read_iter_begin, read_iter_begin + proof_byteblob_size);
+                    proof_process(read_iter_begin, read_iter_begin + proof_byteblob_size, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return std::make_tuple(typename scheme_type::verification_key_type(),
+                                           typename scheme_type::primary_input_type(),
+                                           typename scheme_type::proof_type());
+                }
 
                 const std::size_t primary_input_byteblob_size =
                     std_size_t_byteblob_size +
                     fr_byteblob_size *
                         std_size_t_process(read_iter_begin + proof_byteblob_size,
-                                           read_iter_begin + proof_byteblob_size + std_size_t_byteblob_size);
+                                           read_iter_begin + proof_byteblob_size + std_size_t_byteblob_size,
+                                           processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return std::make_tuple(typename scheme_type::verification_key_type(),
+                                           typename scheme_type::primary_input_type(),
+                                           typename scheme_type::proof_type());
+                }
 
                 typename scheme_type::primary_input_type de_pi =
                     primary_input_process(read_iter_begin + proof_byteblob_size,
-                                          read_iter_begin + proof_byteblob_size + primary_input_byteblob_size);
-                typename scheme_type::verification_key_type de_vk = verification_key_process(
-                    read_iter_begin + proof_byteblob_size + primary_input_byteblob_size, read_iter_end);
+                                          read_iter_begin + proof_byteblob_size + primary_input_byteblob_size,
+                                          processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return std::make_tuple(typename scheme_type::verification_key_type(),
+                                           typename scheme_type::primary_input_type(),
+                                           typename scheme_type::proof_type());
+                }
+
+                typename scheme_type::verification_key_type de_vk =
+                    verification_key_process(read_iter_begin + proof_byteblob_size + primary_input_byteblob_size,
+                                             read_iter_end, processingStatus);
+
+                if (processingStatus != status_type::success) {
+                    return std::make_tuple(typename scheme_type::verification_key_type(),
+                                           typename scheme_type::primary_input_type(),
+                                           typename scheme_type::proof_type());
+                }
 
                 return std::make_tuple(de_vk, de_pi, de_prf);
             }
@@ -753,7 +988,7 @@ namespace nil {
             template<typename FieldType>
 
             static inline
-                typename std::enable_if<!::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<!::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
@@ -771,7 +1006,7 @@ namespace nil {
 
             template<typename FieldType>
             static inline
-                typename std::enable_if<::nil::crypto3::detail::is_extended_field<FieldType>::value, void>::type
+                typename std::enable_if<::nil::crypto3::algebra::is_extended_field<FieldType>::value, void>::type
                 field_type_process(typename FieldType::value_type input_fp,
                                    typename std::vector<chunk_type>::iterator &write_iter) {
 
