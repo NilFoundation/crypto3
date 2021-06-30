@@ -37,7 +37,6 @@
 namespace nil {
     namespace marshalling {
         namespace processing {
-
             namespace detail {
 
                 template<typename T, bool TMakeIntSize>
@@ -54,7 +53,7 @@ namespace nil {
                 };
 
                 template<typename T>
-                using optimised_value_type = typename type_optimiser<T, sizeof(T) < sizeof(int)>::type;
+                using optimised_value_type = typename type_optimiser<T, (sizeof(T) < sizeof(int))>::type;
 
                 template<typename TUnsignedByteType, typename T>
                 typename std::decay<T>::type sign_ext_common(T value, std::size_t size) {
@@ -447,7 +446,6 @@ namespace nil {
                         return static_cast<T>(retval);
                     }
                 };
-
             }    // namespace detail
 
             /// @brief Write part of integral value into the output area using big
@@ -619,7 +617,6 @@ namespace nil {
             }
 
         }    // namespace processing
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ACCESS_HPP
