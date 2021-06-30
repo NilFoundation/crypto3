@@ -35,7 +35,6 @@ include(CMDeploy)
 include(FindPkgConfig)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
-option(BUILD_WITH_PROCPS "Build with procps for memory profiling" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 
 if(UNIX AND BUILD_WITH_CCACHE)
@@ -157,11 +156,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 
                            ${Boost_INCLUDE_DIRS})
 
-if(PROCPS_FOUND)
-    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                               "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PROCPS")
-endif()
-
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
                       ${Boost_LIBRARIES}
@@ -169,8 +163,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::fft
                       ${CMAKE_WORKSPACE_NAME}::hash
-                      ${CMAKE_WORKSPACE_NAME}::multiprecision
-                      ${CMAKE_WORKSPACE_NAME}::marshalling)
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
