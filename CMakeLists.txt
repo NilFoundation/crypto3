@@ -35,7 +35,6 @@ include(CMDeploy)
 include(FindPkgConfig)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
-option(BUILD_WITH_PROCPS "Build with procps for memory profiling" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
@@ -121,11 +120,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                            ${Boost_INCLUDE_DIRS})
-
-if(PROCPS_FOUND)
-    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                               "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PROCPS")
-endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
