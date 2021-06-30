@@ -44,10 +44,8 @@ namespace nil {
                          typename Hash,
                          typename InputTranscriptIncludeIterator,
                          typename InputProofIterator>
-                // TODO: refactor architecture to use fixed typedefs like proof_type instead of context dependent
-                //  typedefs like aggregate_proof_type
                 typename ProofSystemType::aggregate_proof_type
-                    prove(const typename ProofSystemType::aggregate_proving_srs_type &srs,
+                    prove(const typename ProofSystemType::proving_srs_type &srs,
                           InputTranscriptIncludeIterator transcript_include_first,
                           InputTranscriptIncludeIterator transcript_include_last,
                           InputProofIterator proofs_first,

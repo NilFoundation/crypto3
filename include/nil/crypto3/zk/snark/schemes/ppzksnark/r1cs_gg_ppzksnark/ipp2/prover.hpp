@@ -627,19 +627,19 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
 
-                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
-                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
-                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+                    typedef typename policy_type::srs_type srs_type;
+                    typedef typename policy_type::proving_srs_type proving_srs_type;
+                    typedef typename policy_type::verification_srs_type verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+                    typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
 
                     // Aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type process(const aggregate_proving_srs_type &srs,
+                    static inline aggregate_proof_type process(const proving_srs_type &srs,
                                                                InputTranscriptIncludeIterator transcript_include_first,
                                                                InputTranscriptIncludeIterator transcript_include_last,
                                                                InputProofIterator proofs_first,

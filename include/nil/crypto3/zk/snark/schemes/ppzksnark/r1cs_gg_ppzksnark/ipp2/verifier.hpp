@@ -680,12 +680,12 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
 
-                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
-                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
-                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+                    typedef typename policy_type::srs_type srs_type;
+                    typedef typename policy_type::proving_srs_type proving_srs_type;
+                    typedef typename policy_type::verification_srs_type verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+                    typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
@@ -698,7 +698,7 @@ namespace nil {
                                      typename std::iterator_traits<
                                          typename InputPrimaryInputRange::iterator>::value_type>::value,
                         bool>::type
-                        process(const aggregate_verification_srs_type &ip_verifier_srs,
+                        process(const verification_srs_type &ip_verifier_srs,
                                 const verification_key_type &pvk,
                                 const InputPrimaryInputRange &public_inputs,
                                 const aggregate_proof_type &proof,

@@ -47,15 +47,13 @@ namespace nil {
                     return ProofSystemType::verify(pvk, primary_input, proof);
                 }
 
-                // TODO: refactor architecture to use fixed typedefs like verification_key_type instead of context
-                //  dependent typedefs like aggregate_verification_key_type
                 template<typename ProofSystemType,
                          typename DistributionType,
                          typename GeneratorType,
                          typename Hash,
                          typename InputPrimaryInputRange,
                          typename InputIterator>
-                bool verify(const typename ProofSystemType::aggregate_verification_srs_type &ip_verifier_srs,
+                bool verify(const typename ProofSystemType::verification_srs_type &ip_verifier_srs,
                             const typename ProofSystemType::verification_key_type &pvk,
                             const InputPrimaryInputRange &public_inputs,
                             const typename ProofSystemType::aggregate_proof_type &proof,

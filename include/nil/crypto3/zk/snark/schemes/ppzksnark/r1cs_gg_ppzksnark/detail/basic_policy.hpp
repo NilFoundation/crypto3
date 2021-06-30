@@ -191,21 +191,21 @@ namespace nil {
                         /**
                          * A SRS (Structured Reference String) for the R1CS GG-ppzkSNARK aggregation scheme.
                          */
-                        typedef r1cs_gg_pp_zksnark_aggregate_srs<CurveType> aggregate_srs_type;
+                        typedef r1cs_gg_pp_zksnark_aggregate_srs<CurveType> srs_type;
 
                         /******************************** Proving SRS for aggregation ********************************/
 
                         /**
                          * A proving SRS for the R1CS GG-ppzkSNARK aggregation scheme.
                          */
-                        typedef typename aggregate_srs_type::proving_srs_type aggregate_proving_srs_type;
+                        typedef typename srs_type::proving_srs_type proving_srs_type;
 
                         /**************************** Verification SRS for aggregation ********************************/
 
                         /**
                          * A verification SRS for the R1CS GG-ppzkSNARK aggregation scheme.
                          */
-                        typedef typename aggregate_srs_type::verification_srs_type aggregate_verification_srs_type;
+                        typedef typename srs_type::verification_srs_type verification_srs_type;
 
                         /********************************** Aggregation SRS pair *********************************/
 
@@ -213,7 +213,7 @@ namespace nil {
                          * A SRS pair for the R1CS GG-ppzkSNARK aggregation scheme consisting of a proving SRS and
                          * a verification SRS.
                          */
-                        typedef typename aggregate_srs_type::srs_pair_type aggregate_srs_pair_type;
+                        typedef typename srs_type::srs_pair_type srs_pair_type;
 
                         /*********************************** Proof ***********************************/
 

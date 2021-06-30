@@ -51,12 +51,12 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
 
-                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
-                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
-                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+                    typedef typename policy_type::srs_type srs_type;
+                    typedef typename policy_type::proving_srs_type proving_srs_type;
+                    typedef typename policy_type::verification_srs_type verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+                    typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
@@ -99,11 +99,11 @@ namespace nil {
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline aggregate_srs_pair_type process(std::size_t num_proofs) {
+                    static inline srs_pair_type process(std::size_t num_proofs) {
 
-                        aggregate_srs_type srs(num_proofs,
-                                               random_element<scalar_field_type, DistributionType, GeneratorType>(),
-                                               random_element<scalar_field_type, DistributionType, GeneratorType>());
+                        srs_type srs(num_proofs,
+                                     random_element<scalar_field_type, DistributionType, GeneratorType>(),
+                                     random_element<scalar_field_type, DistributionType, GeneratorType>());
                         return srs.specialize(num_proofs);
                     }
                 };

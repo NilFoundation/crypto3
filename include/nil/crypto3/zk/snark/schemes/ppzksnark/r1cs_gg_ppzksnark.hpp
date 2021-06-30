@@ -147,12 +147,12 @@ namespace nil {
                     typedef typename policy_type::proving_key_type proving_key_type;
                     typedef typename policy_type::verification_key_type verification_key_type;
 
-                    typedef typename policy_type::aggregate_srs_type aggregate_srs_type;
-                    typedef typename policy_type::aggregate_proving_srs_type aggregate_proving_srs_type;
-                    typedef typename policy_type::aggregate_verification_srs_type aggregate_verification_srs_type;
+                    typedef typename policy_type::srs_type srs_type;
+                    typedef typename policy_type::proving_srs_type proving_srs_type;
+                    typedef typename policy_type::verification_srs_type verification_srs_type;
 
                     typedef typename policy_type::keypair_type keypair_type;
-                    typedef typename policy_type::aggregate_srs_pair_type aggregate_srs_pair_type;
+                    typedef typename policy_type::srs_pair_type srs_pair_type;
 
                     typedef typename policy_type::proof_type proof_type;
                     typedef typename policy_type::aggregate_proof_type aggregate_proof_type;
@@ -169,7 +169,7 @@ namespace nil {
                     template<typename DistributionType = boost::random::uniform_int_distribution<
                                  typename CurveType::scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline aggregate_srs_pair_type generate(std::size_t num_proofs) {
+                    static inline srs_pair_type generate(std::size_t num_proofs) {
                         return Generator::template process<DistributionType, GeneratorType>(num_proofs);
                     }
 
@@ -183,7 +183,7 @@ namespace nil {
 
                     // Aggregate prove
                     template<typename Hash, typename InputTranscriptIncludeIterator, typename InputProofIterator>
-                    static inline aggregate_proof_type prove(const aggregate_proving_srs_type &srs,
+                    static inline aggregate_proof_type prove(const proving_srs_type &srs,
                                                              InputTranscriptIncludeIterator transcript_include_first,
                                                              InputTranscriptIncludeIterator transcript_include_last,
                                                              InputProofIterator proofs_first,
@@ -206,7 +206,7 @@ namespace nil {
                                  typename CurveType::scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937, typename Hash = hashes::sha2<256>,
                              typename InputPrimaryInputRange, typename InputIterator>
-                    static inline bool verify(const aggregate_verification_srs_type &ip_verifier_srs,
+                    static inline bool verify(const verification_srs_type &ip_verifier_srs,
                                               const verification_key_type &pvk,
                                               const InputPrimaryInputRange &public_inputs,
                                               const aggregate_proof_type &proof,

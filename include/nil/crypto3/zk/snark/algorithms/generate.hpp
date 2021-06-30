@@ -31,9 +31,9 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                // TODO: refactor architecture to use fixed typedefs like keypair_type instead of auto
                 template<typename ProofSystemType>
-                auto generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
+                typename ProofSystemType::keypair_type
+                    generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
                     return ProofSystemType::generate(constraint_system);
                 }
@@ -44,10 +44,8 @@ namespace nil {
                     return ProofSystemType::generate(circuit);
                 }
 
-                // TODO: refactor architecture to use fixed typedefs like srs_pair_type instead of context
-                //  dependent typedefs like aggregate_srs_pair_type
                 template<typename ProofSystemType>
-                typename ProofSystemType::aggregate_srs_pair_type generate(std::size_t num_proofs) {
+                typename ProofSystemType::srs_pair_type generate(std::size_t num_proofs) {
 
                     return ProofSystemType::generate(num_proofs);
                 }
