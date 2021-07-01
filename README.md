@@ -3,7 +3,7 @@
 This module is supposed to be used together with =nil;Crypto3 
 [zk](https://github.com/NilFoundation/crypto3-zk). The blueprint module is used to generate the input data in form of a constraint system, while [crypto3-zk](https://github.com/NilFoundation/crypto3-zk) is used to process them as input for what to prove.
 
-In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/examples/simple_example.hpp).
+In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/example/simple_example.hpp).
 
 ## Preliminaries
 
