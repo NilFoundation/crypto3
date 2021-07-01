@@ -5,11 +5,11 @@ This module is supposed to be used together with =nil;Crypto3
 
 In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/example/simple_example.hpp).
 
-# Preliminaries
+## Preliminaries
 
 If you are a developer who is completely new to zk-SNARKS we would recommend you to look through this [great resource](https://zkp.science) with the list of the most meaningfull zk-related papers and posts. You can find there both thorough pure-technical papers and high-level overview of zk technologies.
 
-# Quick intro to R1CS
+## Quick intro to R1CS
 
 A *Rank One Constraint System* (R1CS) is a way to express a computation that makes it amenable to zero knowledge proofs. Basically any computation can be reduced (or flattened) to an R1CS. A single rank one constraint on a vector w is defined as
 
@@ -28,7 +28,9 @@ Where `A`, `B`, `C` are vectors of the same length as `w`, and `<>` denotes inne
 
 The vector `w` is called a *witness* and zk-SNARK proofs can always be reduced to proving that *the prover knows a witness w such that the R1CS is satisfied*. 
 
-# =nil;Crypto3 Blueprint basics: 1. The Blueprint
+## =nil;Crypto3 Blueprint basics: 
+
+### 1. The Blueprint
 
 In the =nil;Crypto3 Blueprint tool, the blueprint is where our "circuits" (i.e. R1CS and components) will be collected.
 
@@ -174,7 +176,7 @@ bool verified = verify<snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.vk, bp.prim
 
 At this stage the boolean `verified` should have the value `true`, given that we put in the correct values for the witness variables.
 
-# =nil;Crypto3 Blueprint basics: 2. Components
+### 2. Components
 
 The =nil;Crypto3 Blueprint library uses *components* to package up R1CS into more manageable pieces and to create cleaner interfaces for developers. They do this by being a wrapper around a blueprint and handling generating R1CS constraints and also generating witness values.
 
@@ -198,11 +200,11 @@ y.allocate(this->bp);
 sym_2.allocate(this->bp);
 ```
 
-## Function `generate_r1cs_constraints()`
+### Function `generate_r1cs_constraints()`
 
 This function adds the R1CS constraints corresponding to the circuits. These are the same constraints as we added manually earlier, just bundled up inside this function.
 
-## Function `generate_r1cs_witness()`
+### Function `generate_r1cs_witness()`
 
 This function assumes that we've already set the public value `out`, and the witness value `x`. It then computes the inferred witness values for the intermediate variables `sym_1`, `y`, `sym_2`. Thus the user of the component never needs to worry about the intermediate variables.
 
