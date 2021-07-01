@@ -45,10 +45,6 @@ if(UNIX AND BUILD_WITH_CCACHE)
     endif(CCACHE_FOUND)
 endif()
 
-if(UNIX AND BUILD_WITH_PROCPS)
-    find_package(Procps)
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/accumulators/snark.hpp
 
