@@ -3,14 +3,14 @@
 This module is supposed to be used together with =nil;Crypto3 
 [zk](https://github.com/NilFoundation/crypto3-zk). The blueprint module is used to generate the input data in form of a constraint system, while [crypto3-zk](https://github.com/NilFoundation/crypto3-zk) is used to process them as input for what to prove.
 
-In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/examples/simple_example.hpp).
+In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/example/simple_example.hpp).
 
 # Preliminaries
 
 If you are a developer who is completely new to zk-SNARKS we would recommend you to look through this [great resource](https://zkp.science) with the list of the most meaningfull zk-related papers and posts. You can find there both thorough pure-technical papers and high-level overview of zk technologies.
 
 # Quick intro to R1CS
- 
+
 A *Rank One Constraint System* (R1CS) is a way to express a computation that makes it amenable to zero knowledge proofs. Basically any computation can be reduced (or flattened) to an R1CS. A single rank one constraint on a vector w is defined as
 
 ```
