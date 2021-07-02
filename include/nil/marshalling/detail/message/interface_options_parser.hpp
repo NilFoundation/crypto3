@@ -29,6 +29,8 @@
 #include <cstdint>
 #include <tuple>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 
@@ -144,7 +146,7 @@ namespace nil {
                 class interface_options_parser<nil::marshalling::option::extra_transport_fields<TFields>, TOptions...>
                     : public interface_options_parser<TOptions...> {
                     static_assert(
-                        nil::marshalling::processing::is_tuple<TFields>::value,
+                        nil::detail::is_tuple<TFields>::value,
                         "Template parameter to nil::marshalling::option::extra_transport_fields is expected to "
                         "be std::tuple.");
 

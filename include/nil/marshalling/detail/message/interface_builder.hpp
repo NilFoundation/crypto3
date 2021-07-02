@@ -28,7 +28,8 @@
 
 #include <type_traits>
 #include <cstddef>
-#include <tuple>
+
+#include <nil/detail/type_traits.hpp>
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
@@ -158,7 +159,7 @@ namespace nil {
                 public:
                     using transport_fields_type = TFields;
 
-                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::detail::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
                     transport_fields_type &transport_fields() {
@@ -204,7 +205,7 @@ namespace nil {
                 public:
                     using transport_fields_type = typename TBase::transport_fields_type;
 
-                    static_assert(nil::marshalling::processing::is_tuple<transport_fields_type>::value,
+                    static_assert(nil::detail::is_tuple<transport_fields_type>::value,
                                   "transport_fields_type is expected to be tuple");
 
                     static_assert(

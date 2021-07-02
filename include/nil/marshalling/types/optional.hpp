@@ -384,16 +384,6 @@ namespace nil {
                 return field2 <= field1;
             }
 
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::optional.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref optional
-            /// @related nil::marshalling::types::optional
-            template<typename T>
-            constexpr bool is_optional() {
-                return std::is_same<typename T::tag, tag::optional>::value;
-            }
-
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::optional type
             ///     in order to have access to its internal types.
             /// @related nil::marshalling::types::optional

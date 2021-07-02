@@ -463,21 +463,6 @@ namespace nil {
                 return !(field1 != field2);
             }
 
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::array_list.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref array_list
-            /// @related nil::marshalling::types::array_list
-            template<typename T>
-            constexpr bool is_array_list() {
-                return std::is_same<typename T::tag, tag::array_list>::value;
-            }
-
-            template<typename T>
-            constexpr bool is_raw_array_list() {
-                return std::is_same<typename T::tag, tag::raw_array_list>::value;
-            }
-
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::array_list type
             ///     in order to have access to its internal types.
             /// @related nil::marshalling::types::array_list

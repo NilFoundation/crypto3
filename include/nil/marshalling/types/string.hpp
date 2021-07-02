@@ -28,6 +28,7 @@
 
 #include <vector>
 
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
@@ -378,9 +379,9 @@ namespace nil {
 
                 void eval_resize(std::size_t count) {
                     using TagTmp = typename std::conditional<
-                        nil::marshalling::detail::has_resize_func<value_type>::value,
+                        has_member_function_resize<value_type>::value,
                         has_resize_tag,
-                        typename std::conditional<nil::marshalling::detail::has_remove_suffix_func<value_type>::value,
+                        typename std::conditional<has_member_function_remove_suffix<value_type>::value,
                                                   has_remove_suffix_tag,
                                                   void>::type>::type;
 
@@ -457,16 +458,6 @@ namespace nil {
             bool operator<(const string<TFieldBase, TOptions...> &field1,
                            const string<TFieldBase, TOptions...> &field2) {
                 return field1.value() < field2.value();
-            }
-
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::string.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref string
-            /// @related nil::marshalling::types::string
-            template<typename T>
-            constexpr bool is_string() {
-                return std::is_same<typename T::tag, tag::string>::value;
             }
 
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::string type

@@ -26,7 +26,7 @@
 #ifndef MARSHALLING_FIELD_BASE_HPP
 #define MARSHALLING_FIELD_BASE_HPP
 
-#include <nil/marshalling/traits.hpp>
+#include <nil/marshalling/endianness.hpp>
 #include <nil/marshalling/options.hpp>
 
 namespace nil {
@@ -40,7 +40,7 @@ namespace nil {
             class field_base<> {
             protected:
                 // Use big endian by default
-                using endian_type = nil::marshalling::traits::endian::big;
+                using endian_type = nil::marshalling::endian::big_endian;
 
                 // Use unsigned type by default for versioning
                 using version_type = unsigned;

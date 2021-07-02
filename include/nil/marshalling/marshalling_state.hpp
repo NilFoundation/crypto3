@@ -28,7 +28,7 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/marshalling/detail/type_traits.hpp>
+#include <nil/marshalling/type_traits.hpp>
 
 #include <nil/marshalling/accumulators/marshalling.hpp>
 
@@ -36,7 +36,7 @@ namespace nil {
     namespace marshalling {
         template<typename TypeToProcess,
                  typename =
-                     typename std::enable_if<marshalling::detail::is_marshalling_field<TypeToProcess>::value>::type>
+                     typename std::enable_if<marshalling::is_marshalling_field<TypeToProcess>::value>::type>
         using accumulator_set = boost::accumulators::accumulator_set<
             TypeToProcess, boost::accumulators::features<accumulators::tag::marshalling<TypeToProcess>>, std::size_t>;
     }    // namespace marshalling

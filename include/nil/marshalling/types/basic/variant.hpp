@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <algorithm>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
@@ -575,7 +577,7 @@ namespace nil {
                     std::size_t memIdx_ = members_count;
 
                     static const std::size_t members_count = std::tuple_size<members_type>::value;
-                    static_assert(nil::marshalling::processing::is_tuple<members_type>::value,
+                    static_assert(nil::detail::is_tuple<members_type>::value,
                                   "value_type must be tuple");
                     static_assert(0U < members_count, "value_type must be non-empty tuple");
                 };

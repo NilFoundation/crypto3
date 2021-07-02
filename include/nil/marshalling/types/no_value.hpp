@@ -220,16 +220,6 @@ namespace nil {
                 return false;
             }
 
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::no_value.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref no_value
-            /// @related nil::marshalling::types::no_value
-            template<typename T>
-            constexpr bool is_no_value() {
-                return std::is_same<typename T::tag, tag::no_value>::value;
-            }
-
         }    // namespace types
     }        // namespace marshalling
 }    // namespace nil

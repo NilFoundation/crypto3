@@ -32,7 +32,6 @@
 #include <nil/marshalling/detail/message/implementation_builder.hpp>
 #include <nil/marshalling/detail/macro_common.hpp>
 #include <nil/marshalling/detail/fields_access.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -817,15 +816,6 @@ namespace nil {
         inline const message_base<TMessage, TOptions...>&
             to_message_base(const message_base<TMessage, TOptions...>& msg) {
             return msg;
-        }
-
-        /// @brief Compile time check of of whether the type
-        ///     is a message extending @ref nil::marshalling::message_base.
-        /// @details Checks existence of @b impl_options_type inner
-        ///     type.
-        template<typename T>
-        constexpr bool is_message_base() {
-            return detail::has_impl_options<T>::value;
         }
 
     }    // namespace marshalling

@@ -422,16 +422,6 @@ namespace nil {
                 return field1.value() < field2.value();
             }
 
-            /// @brief Compile time check function of whether a provided type is any
-            ///     variant of nil::marshalling::types::int_value.
-            /// @tparam T Any type.
-            /// @return true in case provided type is any variant of @ref int_value
-            /// @related nil::marshalling::types::int_value
-            template<typename T>
-            constexpr bool is_int_value() {
-                return std::is_same<typename T::tag, tag::integer>::value;
-            }
-
             /// @brief Upcast type of the field definition to its parent nil::marshalling::types::int_value type
             ///     in order to have access to its internal types.
             /// @related nil::marshalling::types::int_value

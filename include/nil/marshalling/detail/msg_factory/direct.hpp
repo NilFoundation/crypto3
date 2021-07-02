@@ -26,6 +26,8 @@
 #ifndef MARSHALLING_MSG_FACTORY_DIRECT_HPP
 #define MARSHALLING_MSG_FACTORY_DIRECT_HPP
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/detail/msg_factory/base.hpp>
 
 namespace nil {
@@ -73,7 +75,7 @@ namespace nil {
                     }
 
                 private:
-                    static_assert(nil::marshalling::processing::is_tuple<all_messages_type>::value,
+                    static_assert(nil::detail::is_tuple<all_messages_type>::value,
                                   "TAllMessages is expected to be a tuple.");
 
                     static_assert(0U < std::tuple_size<all_messages_type>::value,

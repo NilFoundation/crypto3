@@ -28,9 +28,9 @@
 
 #include <cstddef>
 
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 #include <nil/marshalling/types/basic/common_funcs.hpp>
 
 namespace nil {
@@ -147,7 +147,7 @@ namespace nil {
                         }
 
                         using tag =
-                            typename std::conditional<nil::marshalling::detail::has_resize_func<element_type>::value,
+                            typename std::conditional<has_member_function_resize<element_type>::value,
                                                       has_resize_tag, no_resize_tag>::type;
 
                         return eval_refresh(tag());

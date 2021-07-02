@@ -28,23 +28,20 @@
 #define MARSHALLING_ACCUMULATORS_MARSHALLING_HPP
 
 #include <boost/parameter/value_type.hpp>
-
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 #include <boost/accumulators/statistics/count.hpp>
-
 #include <boost/container/static_vector.hpp>
 
-#include <nil/marshalling/field_type.hpp>
+#include <nil/detail/type_traits.hpp>
 
+#include <nil/marshalling/field_type.hpp>
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/accumulators/parameters/buffer_length.hpp>
 #include <nil/marshalling/accumulators/parameters/expected_status.hpp>
-
 #include <nil/marshalling/types/array_list.hpp>
-
-#include <nil/marshalling/detail/type_traits.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -81,8 +78,8 @@ namespace nil {
                     // because byte iterator can be directly processed
                     template<typename InputIterator>
                     inline typename std::enable_if<
-                        marshalling::detail::is_iterator<InputIterator>::value
-                            && marshalling::detail::is_supported_representation_type<
+                        nil::detail::is_iterator<InputIterator>::value
+                            && marshalling::is_supported_representation_type<
                                 typename std::iterator_traits<InputIterator>::value_type>::value,
                         status_type>::type
                         resolve_type(InputIterator first, std::size_t buf_len) {
@@ -100,10 +97,10 @@ namespace nil {
 
                     template<typename InputIterator>
                     inline typename std::enable_if<
-                        marshalling::detail::is_iterator<InputIterator>::value
-                            && !(marshalling::detail::is_supported_representation_type<
+                        nil::detail::is_iterator<InputIterator>::value
+                            && !(marshalling::is_supported_representation_type<
                                  typename std::iterator_traits<InputIterator>::value_type>::value)
-                            && marshalling::detail::is_marshalling_field<
+                            && marshalling::is_marshalling_field<
                                 typename std::iterator_traits<InputIterator>::value_type>::value,
                         status_type>::type
                         resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
@@ -131,8 +128,8 @@ namespace nil {
                     // Probably there is a way to directly convert between marshalling fields
                     template<typename OtherFieldType>
                     inline
-                        typename std::enable_if<!marshalling::detail::is_iterator<OtherFieldType>::value
-                                                    && marshalling::detail::is_marshalling_field<OtherFieldType>::value,
+                        typename std::enable_if<!nil::detail::is_iterator<OtherFieldType>::value
+                                                    && marshalling::is_marshalling_field<OtherFieldType>::value,
                                                 status_type>::type
                         resolve_type(const OtherFieldType other_field, ...) {
 

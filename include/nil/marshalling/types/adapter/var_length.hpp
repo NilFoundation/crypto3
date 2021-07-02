@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <limits>
 
+#include <nil/marshalling/endianness.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/size_to_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
@@ -235,14 +236,14 @@ namespace nil {
 
                     static void add_byte_to_serialized_value(std::uint8_t byte, std::size_t byteCount,
                                                              unsigned_serialized_type &val,
-                                                             nil::marshalling::traits::endian::big) {
+                                                             nil::marshalling::endian::big_endian) {
                         static_cast<void>(byteCount);
                         add_byte_to_serialized_value_big_endian(byte, val);
                     }
 
                     static void add_byte_to_serialized_value(std::uint8_t byte, std::size_t byteCount,
                                                              unsigned_serialized_type &val,
-                                                             nil::marshalling::traits::endian::little) {
+                                                             nil::marshalling::endian::little_endian) {
                         add_byte_to_serialized_value_little_endian(byte, byteCount, val);
                     }
 
@@ -290,14 +291,14 @@ namespace nil {
                     static std::uint8_t remove_byte_from_serialized_value(unsigned_serialized_type &val,
                                                                           std::size_t byteCount, std::size_t min_length,
                                                                           bool &lastByte,
-                                                                          nil::marshalling::traits::endian::big) {
+                                                                          nil::marshalling::endian::big_endian) {
                         return remove_byte_from_serialized_value_big_endian(val, byteCount, min_length, lastByte);
                     }
 
                     static std::uint8_t remove_byte_from_serialized_value(unsigned_serialized_type &val,
                                                                           std::size_t byteCount, std::size_t min_length,
                                                                           bool &lastByte,
-                                                                          nil::marshalling::traits::endian::little) {
+                                                                          nil::marshalling::endian::little_endian) {
                         return remove_byte_from_serialized_value_little_endian(val, byteCount, min_length, lastByte);
                     }
 

@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <algorithm>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
@@ -405,7 +407,7 @@ namespace nil {
                         return write_no_status_helper<TIter>(iter);
                     }
 
-                    static_assert(nil::marshalling::processing::is_tuple<value_type>::value,
+                    static_assert(nil::detail::is_tuple<value_type>::value,
                                   "value_type must be tuple");
                     value_type members_;
                 };

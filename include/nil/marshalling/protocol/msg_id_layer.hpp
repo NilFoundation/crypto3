@@ -36,15 +36,17 @@
 #include <tuple>
 #include <limits>
 
+#include <nil/detail/type_traits.hpp>
+
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 #include <nil/marshalling/protocol/protocol_layer_base.hpp>
 #include <nil/marshalling/msg_factory.hpp>
 #include <nil/marshalling/types/no_value.hpp>
+#include <nil/marshalling/type_traits.hpp>
 
 namespace nil {
     namespace marshalling {
-
         namespace protocol {
 
             /// @brief Protocol layer that uses uses message ID field as a prefix to all the
@@ -65,7 +67,7 @@ namespace nil {
             class msg_id_layer
                 : public protocol_layer_base<TField, TNextLayer,
                                              msg_id_layer<TField, TMessage, TAllMessages, TNextLayer, TOptions...>> {
-                static_assert(processing::is_tuple<TAllMessages>::value, "TAllMessages must be of std::tuple type");
+                static_assert(nil::detail::is_tuple<TAllMessages>::value, "TAllMessages must be of std::tuple type");
                 using base_impl_type
                     = protocol_layer_base<TField, TNextLayer,
                                           msg_id_layer<TField, TMessage, TAllMessages, TNextLayer, TOptions...>>;
@@ -97,9 +99,9 @@ namespace nil {
                 /// @brief Type of the field object used to read/write message ID value.
                 using field_type = typename base_impl_type::field_type;
 
-                static_assert(nil::marshalling::types::is_int_value<field_type>()
-                                  || nil::marshalling::types::is_enum_value<field_type>()
-                                  || nil::marshalling::types::is_no_value<field_type>(),
+                static_assert(is_int_value<field_type>::value
+                                  || is_enum_value<field_type>::value
+                                  || is_no_value<field_type>::value,
                               "field_type must be of int_value or enum_value types");
 
                 /// @brief Default constructor.

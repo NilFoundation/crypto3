@@ -36,7 +36,8 @@
 #include <cstdint>
 #include <cstddef>
 
-#include <nil/marshalling/traits.hpp>
+#include <nil/marshalling/endianness.hpp>
+#include <nil/marshalling/units_types.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/types/optional_mode.hpp>
 
@@ -65,19 +66,19 @@ namespace nil {
             // message/field_t common options
 
             /// @brief options to specify endian.
-            /// @tparam TEndian endian_type type. Must be either nil::marshalling::traits::endian::big or
-            ///     nil::marshalling::traits::endian::little.
+            /// @tparam TEndian endian_type type. Must be either nil::marshalling::endian::big_endian or
+            ///     nil::marshalling::endian::little_endian.
             /// @headerfile nil/marshalling/options.h
             template<typename TEndian>
             struct endian { };
 
             /// @brief Alias option to endian_type specifying big endian.
             /// @headerfile nil/marshalling/options.h
-            using big_endian = endian<nil::marshalling::traits::endian::big>;
+            using big_endian = endian<nil::marshalling::endian::big_endian>;
 
             /// @brief Alias option to endian_type specifying little endian.
             /// @headerfile nil/marshalling/options.h
-            using little_endian = endian<nil::marshalling::traits::endian::little>;
+            using little_endian = endian<nil::marshalling::endian::little_endian>;
 
             /// @brief No-op option, doesn't have any effect.
             /// @headerfile nil/marshalling/options.h

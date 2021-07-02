@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -22,8 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_TYPE_TRAITS_HPP
-#define MARSHALLING_TYPE_TRAITS_HPP
+#ifndef NIL_DETAIL_TYPE_TRAITS_HPP
+#define NIL_DETAIL_TYPE_TRAITS_HPP
+
+#include <complex>
+
+#include <iterator>
+#include <tuple>
+
+#include <boost/tti/tti.hpp>
 
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
@@ -176,66 +184,88 @@
     };
 
 namespace nil {
-    namespace marshalling {
-        namespace detail {
-            GENERATE_HAS_MEMBER_TYPE(iterator)
-            GENERATE_HAS_MEMBER_TYPE(const_iterator)
+    namespace detail {
 
-            GENERATE_HAS_MEMBER(rounds)
+        GENERATE_HAS_MEMBER_TYPE(iterator)
+        GENERATE_HAS_MEMBER_TYPE(const_iterator)
 
-            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
-            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
+        GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
+        GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
+        
+        template<typename T>
+        struct is_iterator {
+            static char test(...);
 
-            template<typename T>
-            struct is_iterator {
-                static char test(...);
+            template<typename U, typename = typename std::iterator_traits<U>::difference_type,
+                     typename = typename std::iterator_traits<U>::pointer,
+                     typename = typename std::iterator_traits<U>::reference,
+                     typename = typename std::iterator_traits<U>::value_type,
+                     typename = typename std::iterator_traits<U>::iterator_category>
+            static long test(U &&);
 
-                template<typename U, typename = typename std::iterator_traits<U>::difference_type,
-                         typename = typename std::iterator_traits<U>::pointer,
-                         typename = typename std::iterator_traits<U>::reference,
-                         typename = typename std::iterator_traits<U>::value_type,
-                         typename = typename std::iterator_traits<U>::iterator_category>
-                static long test(U &&);
+            constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
+        };
 
-                constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
-            };
+        template<typename Range>
+        struct is_range {
+            static const bool value = has_begin<Range>::value && has_end<Range>::value;
+        };
 
-            template<typename Range>
-            struct is_range {
-                static const bool value = has_begin<Range>::value && has_end<Range>::value;
-            };
+        template<typename Container>
+        struct is_container {
+            static const bool value
+                = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
+        };
 
-            template<typename Container>
-            struct is_container {
-                static const bool value
-                    = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
-            };
+        /// @brief Check whether provided type is a variant of
+        ///     <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>.
+        /// @tparam TType Type to check.
+        template<typename TType>
+        struct is_tuple {
+            /// @brief By default Value has value false. Will be true for any
+            /// variant of <a href="http://en.cppreference.com/w/cpp/utility/tuple">std::tuple</a>.
+            static const bool value = false;
+        };
 
-            template<typename Container>
-            struct is_marshalling_field {
-                static const bool value = true;
-                // static const bool value = types::is_array_list<Container>() ||
-                //                           types::is_raw_array_list<Container>() ||
-                //                           types::is_bitfield<Container>() ||
-                //                           types::is_bitmask_value<Container>() ||
-                //                           types::is_bundle<Container>() ||
-                //                           types::is_enum_value<Container>() ||
-                //                           types::is_float_value<Container>() ||
-                //                           types::is_int_value<Container>() ||
-                //                           types::is_no_value<Container>() ||
-                //                           types::is_optional<Container>() ||
-                //                           types::is_string<Container>() ||
-                //                           types::is_variant<Container>();
-            };
+        /// @cond SKIP_DOC
+        template<typename... TArgs>
+        struct is_tuple<std::tuple<TArgs...>> {
+            static const bool value = true;
+        };
+        /// @endcond
 
-            template<typename Container>
-            struct is_supported_representation_type {
-                static const bool value = std::is_same<std::uint8_t, Container>::value
-                                          || std::is_same<std::int8_t, Container>::value
-                                          || std::is_same<char, Container>::value;
-            };
-        }    // namespace detail
-    }        // namespace marshalling
+        //----------------------------------------
+
+        /// @brief Check whether TType type is included in the tuple TTuple
+        /// @tparam TType Type to check
+        /// @tparam TTuple Tuple
+        /// @pre @code IsTuple<TTuple>::value == true @endcode
+        template<typename TType, typename TTuple>
+        class is_in_tuple {
+            static_assert(is_tuple<TTuple>::value, "TTuple must be std::tuple");
+
+        public:
+            /// @brief By default the value is false, will be set to true if TType
+            ///     is found in TTuple.
+            static const bool value = false;
+        };
+
+        /// @cond SKIP_DOC
+        template<typename TType, typename TFirst, typename... TRest>
+        class is_in_tuple<TType, std::tuple<TFirst, TRest...>> {
+        public:
+            static const bool value
+                = std::is_same<TType, TFirst>::value || is_in_tuple<TType, std::tuple<TRest...>>::value;
+        };
+
+        template<typename TType>
+        class is_in_tuple<TType, std::tuple<>> {
+        public:
+            static const bool value = false;
+        };
+
+        /// @endcond
+    }    // namespace detail
 }    // namespace nil
 
-#endif    // MARSHALLING_TYPE_TRAITS_HPP
+#endif    // NIL_DETAIL_TYPE_TRAITS_HPP

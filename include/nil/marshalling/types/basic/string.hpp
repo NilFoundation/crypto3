@@ -31,12 +31,12 @@
 #include <limits>
 #include <numeric>
 
+#include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 
 #include <nil/marshalling/types/basic/common_funcs.hpp>
 
@@ -153,7 +153,7 @@ namespace nil {
                     }
 
                     void clear() {
-                        static_assert(nil::marshalling::detail::has_clear_func<value_type>::value,
+                        static_assert(has_member_function_clear<value_type>::value,
                                       "The string type must have clear() member function");
                         value_.clear();
                     }
@@ -330,7 +330,7 @@ namespace nil {
 
                     void eval_reserve(std::size_t len) {
                         using tag =
-                            typename std::conditional<nil::marshalling::detail::has_reserve_func<value_type>::value,
+                            typename std::conditional<has_member_function_reserve<value_type>::value,
                                                       reserve_exists_tag,
                                                       reserve_missing_tag>::type;
                         eval_reserve(len, tag());

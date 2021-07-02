@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/traits.hpp
+/// @file nil/marshalling/units_types.hpp
 /// This file contains all the classes necessary to properly
 /// define message traits.
 
@@ -37,16 +37,6 @@
 namespace nil {
     namespace marshalling {
         namespace traits {
-            namespace endian {
-
-                /// @brief Empty class used in traits to indicate big endian.
-                using big = processing::traits::endian::big;
-
-                /// @brief Empty class used in traits to indicate little endian.
-                using little = processing::traits::endian::little;
-
-            }    // namespace endian
-
             namespace units {
 
                 /// @brief Tag class used to indicate time value

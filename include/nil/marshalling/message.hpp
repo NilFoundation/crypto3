@@ -40,7 +40,6 @@
 
 #include <nil/marshalling/detail/message/interface_builder.hpp>
 #include <nil/marshalling/detail/transport_fields_access.hpp>
-#include <nil/marshalling/detail/detect.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -198,7 +197,7 @@ namespace nil {
             /// @detail The type exists only if nil::marshalling::option::big_endian or
             ///     nil::marshalling::option::little_endian options were used to specify it.
             /// @see @ref has_endian()
-            using endian = typename base_impl_type::endian;
+            using endian_type = typename base_impl_type::endian_base_type;
 
             /// @brief type of default base class for all the fields.
             /// @detail Requires definition of the @ref endian type, i.e. the type
@@ -533,15 +532,6 @@ namespace nil {
         template<typename TMessage, typename TVal>
         typename TMessage::write_iterator write_iterator_for(const TVal& val) {
             return typename TMessage::write_iterator(val);
-        }
-
-        /// @brief Compile time check of of whether the type
-        ///     is a message.
-        /// @details Checks existence of @b interface_options_type inner
-        ///     type.
-        template<typename T>
-        constexpr bool is_message() {
-            return detail::has_interface_options<T>::value;
         }
 
     }    // namespace marshalling

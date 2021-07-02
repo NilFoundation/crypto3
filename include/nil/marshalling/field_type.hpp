@@ -52,8 +52,8 @@ namespace nil {
 
         public:
             /// @brief endian_type type
-            /// @details Equal to either @ref nil::marshalling::traits::endian::big or
-            ///     @ref nil::marshalling::traits::endian::little
+            /// @details Equal to either @ref nil::marshalling::endian::big_endian or
+            ///     @ref nil::marshalling::endian::little_endian
             using endian_type = typename base_impl_type::endian_type;
 
             /// @brief Version type
