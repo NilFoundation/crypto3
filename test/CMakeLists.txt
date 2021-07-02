@@ -16,7 +16,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::blueprint
                        ${CMAKE_WORKSPACE_NAME}::fft
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
-                       ${CMAKE_WORKSPACE_NAME}::marshalling
+                       nil::marshalling
 
                        ${Boost_LIBRARIES})
 
