@@ -193,24 +193,6 @@ namespace nil {
                                       || std::is_same<char, T>::value;
         };
 
-        /// @brief Compile time check of of whether the type
-        ///     is a message.
-        /// @details Checks existence of @b interface_options_type inner
-        ///     type.
-        template<typename T>
-        struct is_message {
-            static const bool value = has_type_interface_options_type<T>::value;
-        };
-
-        /// @brief Compile time check of of whether the type
-        ///     is a message extending @ref nil::marshalling::message_base.
-        /// @details Checks existence of @b impl_options_type inner
-        ///     type.
-        template<typename T>
-        struct is_message_base {
-            static const bool value = has_type_impl_options_type<T>::value;
-        };
-
         // The following four functions we need only because of absence of BOOST_TTI_HAS_MEMBER_FUNCTION for std::string
         template<typename T>
         class has_member_function_clear {
