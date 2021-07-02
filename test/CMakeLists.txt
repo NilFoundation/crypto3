@@ -40,6 +40,7 @@ macro(define_marshalling_test name)
 endmacro()
 
 set(TESTS_NAMES
+    "pack"
     "processing"
     "checksum_prefix_layer"
     "types"

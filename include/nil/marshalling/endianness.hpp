@@ -71,10 +71,10 @@ namespace nil {
             typedef host_unit<CHAR_BIT> host_byte;
 
             /// @brief Empty class used in traits to indicate big endian.
-            struct big_endian { };
+            using big_endian = big_octet_big_bit;
 
             /// @brief Empty class used in traits to indicate little endian.
-            struct little_endian { };
+            using little_endian = little_octet_big_bit;
 
         }    // namespace endian
     }            // namespace marshalling
