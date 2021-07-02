@@ -350,7 +350,16 @@ namespace nil {
                     }
 
                     bool operator==(const linear_combination &other) const {
-                        return (this->terms == other.terms);
+
+                        std::vector<linear_term<FieldType>> thisterms = this->terms;
+                        std::sort(thisterms.begin(), thisterms.end(),
+                                  [](linear_term<FieldType> a, linear_term<FieldType> b) { return a.index < b.index; });
+
+                        std::vector<linear_term<FieldType>> otherterms = other.terms;
+                        std::sort(otherterms.begin(), otherterms.end(),
+                                  [](linear_term<FieldType> a, linear_term<FieldType> b) { return a.index < b.index; });
+
+                        return (thisterms == otherterms);
                     }
 
                     bool is_valid(size_t num_variables) const {
