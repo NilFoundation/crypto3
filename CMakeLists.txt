@@ -12,9 +12,6 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
-message("CMAKE_WORKSPACE_NAME:")
-message(${CMAKE_WORKSPACE_NAME})
-
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
         find_package(${ARGV})
@@ -41,9 +38,6 @@ if((UNIX) AND (NOT CC_NO_CCACHE))
         set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
     endif(CCACHE_FOUND)
 endif()
-
-message("CURRENT_PROJECT_NAME:")
-message(${CURRENT_PROJECT_NAME})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/marshalling/accumulators/parameters/buffer_length.hpp
