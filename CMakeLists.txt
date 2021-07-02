@@ -12,14 +12,15 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
+message("CMAKE_WORKSPACE_NAME:")
+message(${CMAKE_WORKSPACE_NAME})
+
 macro(cm_find_package NAME)
-    foreach(ITERATOR ${CMAKE_WORKSPACE_LIST})
-        if(NOT "${NAME}" MATCHES "^${ITERATOR}_.*$" AND NOT "${NAME}" STREQUAL CM)
-            find_package(${ARGV})
-        else()
-            set(${ARGV0}_FOUND ON CACHE BOOL "")
-        endif()
-    endforeach()
+    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
+        find_package(${ARGV})
+    else()
+        set(${ARGV0}_FOUND ON CACHE BOOL "")
+    endif()
 endmacro()
 
 cm_project(marshalling WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
@@ -41,6 +42,8 @@ if((UNIX) AND (NOT CC_NO_CCACHE))
     endif(CCACHE_FOUND)
 endif()
 
+message("CURRENT_PROJECT_NAME:")
+message(${CURRENT_PROJECT_NAME})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/marshalling/accumulators/parameters/buffer_length.hpp
@@ -181,6 +184,9 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
+
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                      ${Boost_LIBRARIES})
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
