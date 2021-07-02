@@ -12,6 +12,8 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
+cm_workspace(nil)
+
 macro(cm_find_package NAME)
     if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
         find_package(${ARGV})
