@@ -46,18 +46,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ProofSystem>
-                bool run_verifier_with_byte_input(std::vector<std::uint8_t> data) {
-                    using proof_system_policy = ProofSystem;
-
-                    typename nil::marshalling::verifier_data_from_bits<proof_system_policy>::verifier_data vd =
-                        nil::marshalling::verifier_data_from_bits<proof_system_policy>::process(data);
-
-                    std::cout << "Data converted from byte blob" << std::endl;
-
-                    return verify<proof_system_policy>(vd.vk, vd.pi, vd.pr);
-                }
-
                 /**
                  * The code below provides an example of all stages of running a R1CS GG-ppzkSNARK.
                  *
@@ -72,6 +60,57 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark_tvm_marshalling(const r1cs_example<typename CurveType::scalar_field_type> &example);
+
+                template<typename CurveType>
+                void print_proving_key(r1cs_gg_ppzksnark_proving_key<CurveType> pk){
+                    std::cout << "alpha_g1: " 
+                    << pk.alpha_g1.to_affine().X.data << " " << pk.alpha_g1.to_affine().Y.data << " " << pk.alpha_g1.to_affine().Z.data << std::endl
+                    << "beta_g1: " 
+                    << pk.beta_g1.to_affine().X.data << " " << pk.beta_g1.to_affine().Y.data << " " << pk.beta_g1.to_affine().Z.data << std::endl
+                    << "beta_g2: " 
+                    << pk.beta_g2.to_affine().X.data[0].data << " " << pk.beta_g2.to_affine().Y.data[0].data << " " << pk.beta_g2.to_affine().Z.data[0].data << std::endl
+                    << pk.beta_g2.to_affine().X.data[1].data << " " << pk.beta_g2.to_affine().Y.data[1].data << " " << pk.beta_g2.to_affine().Z.data[1].data << std::endl
+                    << "delta_g1: " 
+                    << pk.delta_g1.to_affine().X.data << " " << pk.delta_g1.to_affine().Y.data << " " << pk.delta_g1.to_affine().Z.data << std::endl
+                    << "delta_g2: " 
+                    << pk.delta_g2.to_affine().X.data[0].data << " " << pk.delta_g2.to_affine().Y.data[0].data << " " << pk.delta_g2.to_affine().Z.data[0].data << std::endl
+                    << pk.delta_g2.to_affine().X.data[1].data << " " << pk.delta_g2.to_affine().Y.data[1].data << " " << pk.delta_g2.to_affine().Z.data[1].data << std::endl;
+                }
+
+                template<typename CurveType>
+                void print_verification_key(r1cs_gg_ppzksnark_verification_key<CurveType> vk){
+                    std::cout << "gamma_g2: " 
+                        << vk.gamma_g2.to_affine().X.data[0].data << " " << vk.gamma_g2.to_affine().Y.data[0].data << " " << vk.gamma_g2.to_affine().Z.data[0].data << std::endl
+                        << vk.gamma_g2.to_affine().X.data[1].data << " " << vk.gamma_g2.to_affine().Y.data[1].data << " " << vk.gamma_g2.to_affine().Z.data[1].data << std::endl
+                        << "delta_g2: " 
+                        << vk.delta_g2.to_affine().X.data[0].data << " " << vk.delta_g2.to_affine().Y.data[0].data << " " << vk.delta_g2.to_affine().Z.data[0].data << std::endl
+                        << vk.delta_g2.to_affine().X.data[1].data << " " << vk.delta_g2.to_affine().Y.data[1].data << " " << vk.delta_g2.to_affine().Z.data[1].data << std::endl;
+                }
+
+                template<typename FieldType>
+                void print_r1cs_constraint(
+                        r1cs_constraint<FieldType> rc){
+                    std::cout << "a" << std::endl;
+                    for (auto it = rc.a.terms.begin(); 
+                            it != rc.a.terms.end();
+                            it++ ){
+                        std::cout << it->index << ": " << it->coeff.data << std::endl;
+                    }
+
+                    std::cout << "b" << std::endl;
+                    for (auto it = rc.b.terms.begin(); 
+                            it != rc.b.terms.end();
+                            it++ ){
+                        std::cout << it->index << ": " << it->coeff.data << std::endl;
+                    }
+
+                    std::cout << "c" << std::endl;
+                    for (auto it = rc.c.terms.begin(); 
+                            it != rc.c.terms.end();
+                            it++ ){
+                        std::cout << it->index << ": " << it->coeff.data << std::endl;
+                    }
+                }
 
                 template<>
                 bool run_r1cs_gg_ppzksnark_tvm_marshalling<nil::crypto3::algebra::curves::bls12<381>>(
@@ -96,12 +135,11 @@ namespace nil {
                                                                 << proof.g_B.to_affine().Y.data[1].data << " " << proof.g_B.to_affine().Z.data[0].data << " " << proof.g_B.to_affine().Z.data[1].data << std::endl
                                                                 << proof.g_C.to_affine().X.data << " " << proof.g_C.to_affine().Y.data << " " << proof.g_C.to_affine().Z.data << std::endl;
 
-                    std::cout << std::hex << "Obtained verification key: " << "gamma_g2: " 
-                                                                << keypair.second.gamma_g2.to_affine().X.data[0].data << " " << keypair.second.gamma_g2.to_affine().Y.data[0].data << " " << keypair.second.gamma_g2.to_affine().Z.data[0].data << std::endl
-                                                                << keypair.second.gamma_g2.to_affine().X.data[1].data << " " << keypair.second.gamma_g2.to_affine().Y.data[1].data << " " << keypair.second.gamma_g2.to_affine().Z.data[1].data << std::endl
-                                                                << "delta_g2: " 
-                                                                << keypair.second.delta_g2.to_affine().X.data[0].data << " " << keypair.second.delta_g2.to_affine().Y.data[0].data << " " << keypair.second.delta_g2.to_affine().Z.data[0].data << std::endl
-                                                                << keypair.second.delta_g2.to_affine().X.data[1].data << " " << keypair.second.delta_g2.to_affine().Y.data[1].data << " " << keypair.second.delta_g2.to_affine().Z.data[1].data << std::endl;
+                    std::cout << std::hex << "Obtained proving key: " << std::endl;
+                    print_proving_key(keypair.first);
+
+                    std::cout << std::hex << "Obtained verification key: " << std::endl;
+                    print_verification_key(keypair.second);
 
                     std::cout << std::hex << "Obtained primary input: " << std::endl;
 
@@ -110,6 +148,37 @@ namespace nil {
                     }
                     std::cout << std::endl;
 
+                    std::vector<std::uint8_t> proving_key_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
+                        keypair.first);
+
+                    marshalling::status_type provingProcessingStatus = marshalling::status_type::success;
+
+                    typename scheme_type::proving_key_type other = 
+                        nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::proving_key_process( 
+                            proving_key_byteblob.cbegin(), 
+                            proving_key_byteblob.cend(),
+                            provingProcessingStatus);
+
+                    std::cout << "Decoded proving key:" << std::endl;
+                    print_proving_key(other);
+
+                    BOOST_CHECK(keypair.first == other);
+                    BOOST_CHECK(keypair.first.alpha_g1 == other.alpha_g1 && keypair.first.beta_g1 == other.beta_g1);
+                    BOOST_CHECK(keypair.first.beta_g2 == other.beta_g2 && keypair.first.delta_g1 == other.delta_g1);
+                    BOOST_CHECK(keypair.first.delta_g2 == other.delta_g2 && keypair.first.A_query == other.A_query);
+                    BOOST_CHECK(keypair.first.B_query == other.B_query && keypair.first.H_query == other.H_query);
+                    BOOST_CHECK(keypair.first.L_query == other.L_query);
+                    BOOST_CHECK(keypair.first.constraint_system == other.constraint_system);
+                    BOOST_CHECK(keypair.first.constraint_system.primary_input_size == other.constraint_system.primary_input_size);
+                    BOOST_CHECK(keypair.first.constraint_system.auxiliary_input_size == other.constraint_system.auxiliary_input_size);
+                    BOOST_CHECK(keypair.first.constraint_system.constraints.size() == other.constraint_system.constraints.size());
+
+                    for (std::size_t i = 0; i < keypair.first.constraint_system.constraints.size(); i++){
+                        std::cout << std::endl << "i:" << i << std::endl;
+                        // print_r1cs_constraint(keypair.first.constraint_system.constraints[i]);
+                        // print_r1cs_constraint(other.constraint_system.constraints[i]);
+                        BOOST_CHECK(keypair.first.constraint_system.constraints[i] == other.constraint_system.constraints[i]);
+                    }
 
                     std::vector<std::uint8_t> verification_key_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
                         keypair.second);
@@ -214,7 +283,7 @@ namespace nil {
                     ans = verify<scheme_type>(de_vk, de_pi, de_prf);
 
                     std::cout << "Verifier with decoded input finished, result: " << ans << std::endl;
-
+    
                     return ans;
                 }
             }    // namespace snark
