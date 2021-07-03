@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 
+cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0028 NEW)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
@@ -52,7 +53,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/detail/set_commitment.hpp
      include/nil/crypto3/zk/snark/detail/sparse_vector.hpp
 
-     include/nil/crypto3/zk/snark/commitments/kc_multiexp.hpp
+     include/nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp
      include/nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp
 
      include/nil/crypto3/zk/snark/schemes/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp

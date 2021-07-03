@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -31,7 +32,7 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
@@ -59,7 +60,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_generator {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::pairing pairing_policy;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -82,7 +83,7 @@ namespace nil {
                     template<typename DistributionType =
                                  boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
                              typename GeneratorType = boost::random::mt19937>
-                    static inline keypair_type process(const constraint_system_type &constraint_system) {
+                    static inline auto basic_process(const constraint_system_type &constraint_system) {
 
                         /* Make the B_query "lighter" if possible */
                         constraint_system_type r1cs_copy(constraint_system);
@@ -224,6 +225,21 @@ namespace nil {
 
                         accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                   std::move(gamma_ABC_g1_values));
+
+                        return std::make_tuple(std::move(alpha_g1), std::move(beta_g1), std::move(beta_g2),
+                                               std::move(delta_g1), std::move(delta_g2), std::move(gamma_g2),
+                                               std::move(A_query), std::move(B_query), std::move(H_query),
+                                               std::move(L_query), std::move(r1cs_copy), std::move(alpha_g1_beta_g2),
+                                               std::move(gamma_ABC_g1));
+                    }
+
+                    template<typename DistributionType =
+                                 boost::random::uniform_int_distribution<typename scalar_field_type::modulus_type>,
+                             typename GeneratorType = boost::random::mt19937>
+                    static inline keypair_type process(const constraint_system_type &constraint_system) {
+
+                        auto [alpha_g1, beta_g1, beta_g2, delta_g1, delta_g2, gamma_g2, A_query, B_query, H_query,
+                              L_query, r1cs_copy, alpha_g1_beta_g2, gamma_ABC_g1] = basic_process(constraint_system);
 
                         verification_key_type vk =
                             verification_key_type(alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC_g1);

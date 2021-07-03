@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP
 
-#include <nil/crypto3/zk/snark/commitments/detail/element_kc.hpp>
+#include <nil/crypto3/zk/snark/commitments/detail/element_knowledge_commitment.hpp>
 
 #include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
@@ -49,7 +49,7 @@ namespace nil {
                 template<typename Type1, typename Type2>
                 struct knowledge_commitment {
 
-                    using value_type = detail::element_kc<Type1, Type2>;
+                    typedef detail::element_kc<Type1, Type2> value_type;
 
                     constexpr static const std::size_t value_bits = Type1::value_bits + Type2::value_bits;
                 };

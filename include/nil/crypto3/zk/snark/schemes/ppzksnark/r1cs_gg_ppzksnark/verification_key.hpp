@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -55,7 +56,8 @@ namespace nil {
                         const typename CurveType::g2_type::value_type &delta_g2,
                         const accumulation_vector<typename CurveType::g1_type> &gamma_ABC_g1) :
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
-                        gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
+                        gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {
+                    }
 
                     std::size_t G1_size() const {
                         return gamma_ABC_g1.size();

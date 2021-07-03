@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -40,7 +40,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark/detail/basic_policy.hpp>
@@ -60,7 +60,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_prover {
-                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType> policy_type;
+                    typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, ProvingMode::Basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::g1_type g1_type;
@@ -93,7 +93,7 @@ namespace nil {
 
                         /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                            and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
-                        //BOOST_ASSERT(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
+                        // BOOST_ASSERT(!qap_wit.coefficients_for_H[qap_wit.degree - 2].is_zero());
                         BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree - 1].is_zero());
                         BOOST_ASSERT(qap_wit.coefficients_for_H[qap_wit.degree].is_zero());
 

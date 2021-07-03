@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -38,10 +39,15 @@ namespace nil {
                 }
 
                 template<typename ProofSystemType>
-                typename ProofSystemType::keypair_type
-                    generate(const typename ProofSystemType::circuit_type &circuit) {
+                typename ProofSystemType::keypair_type generate(const typename ProofSystemType::circuit_type &circuit) {
 
                     return ProofSystemType::generate(circuit);
+                }
+
+                template<typename ProofSystemType>
+                typename ProofSystemType::srs_pair_type generate(std::size_t num_proofs) {
+
+                    return ProofSystemType::generate(num_proofs);
                 }
             }    // namespace snark
         }        // namespace zk

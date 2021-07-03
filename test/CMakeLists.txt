@@ -30,7 +30,7 @@ macro(define_zk_test test)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(zk_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(zk_${name}_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -38,6 +38,13 @@ macro(define_zk_test test)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-steps=2147483647")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
 endmacro()
 
 set(TESTS_NAMES
@@ -58,7 +65,8 @@ set(TESTS_NAMES
     "schemes/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
     "schemes/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "schemes/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
-    "schemes/ppzksnark/uscs_ppzksnark/uscs_ppzksnark")
+    "schemes/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
+    "schemes/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_zk_test(${TEST_NAME})
