@@ -32,7 +32,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/types/basic/no_value.hpp>
+#include <nil/marshalling/types/no_value/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 
 #include <nil/marshalling/types/tag.hpp>

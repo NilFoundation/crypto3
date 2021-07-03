@@ -30,8 +30,8 @@
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/marshalling/types/basic/array_list.hpp>
-#include <nil/marshalling/types/basic/string.hpp>
+#include <nil/marshalling/types/array_list/type_traits.hpp>
+#include <nil/marshalling/types/string/type_traits.hpp>
 
 #include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/static_string.hpp>

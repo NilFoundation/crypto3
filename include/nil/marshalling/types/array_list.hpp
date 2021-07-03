@@ -32,7 +32,7 @@
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/array_view.hpp>
-#include <nil/marshalling/types/basic/array_list.hpp>
+#include <nil/marshalling/types/array_list/behavior.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
 
@@ -41,84 +41,6 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace detail {
-
-                template<bool THasOrigDataViewStorage>
-                struct array_list_orig_data_view_storage_type;
-
-                template<>
-                struct array_list_orig_data_view_storage_type<true> {
-                    template<typename TElement>
-                    using type = nil::marshalling::processing::array_view<TElement>;
-                };
-
-                template<>
-                struct array_list_orig_data_view_storage_type<false> {
-                    template<typename TElement>
-                    using type = std::vector<TElement>;
-                };
-
-                template<bool THasSequenceFixedSizeUseFixedSizeStorage>
-                struct array_list_sequence_fixed_size_use_fixed_size_storage_type;
-
-                template<>
-                struct array_list_sequence_fixed_size_use_fixed_size_storage_type<true> {
-                    template<typename TElement, typename TOpt>
-                    using type = nil::marshalling::processing::static_vector<TElement, TOpt::sequence_fixed_size>;
-                };
-
-                template<>
-                struct array_list_sequence_fixed_size_use_fixed_size_storage_type<false> {
-                    template<typename TElement, typename TOpt>
-                    using type = typename array_list_orig_data_view_storage_type<
-                        TOpt::has_orig_data_view && std::is_integral<TElement>::value
-                        && (sizeof(TElement) == sizeof(std::uint8_t))>::template type<TElement>;
-                };
-
-                template<bool THasFixedSizeStorage>
-                struct array_list_fixed_size_storage_type;
-
-                template<>
-                struct array_list_fixed_size_storage_type<true> {
-                    template<typename TElement, typename TOpt>
-                    using type = nil::marshalling::processing::static_vector<TElement, TOpt::fixed_size_storage>;
-                };
-
-                template<>
-                struct array_list_fixed_size_storage_type<false> {
-                    template<typename TElement, typename TOpt>
-                    using type = typename array_list_sequence_fixed_size_use_fixed_size_storage_type<
-                        TOpt::has_sequence_fixed_size_use_fixed_size_storage>::template type<TElement, TOpt>;
-                };
-
-                template<bool THasCustomStorage>
-                struct array_list_custom_array_list_storage_type;
-
-                template<>
-                struct array_list_custom_array_list_storage_type<true> {
-                    template<typename TElement, typename TOpt>
-                    using type = typename TOpt::custom_storage_type;
-                };
-
-                template<>
-                struct array_list_custom_array_list_storage_type<false> {
-                    template<typename TElement, typename TOpt>
-                    using type = typename array_list_fixed_size_storage_type<
-                        TOpt::has_fixed_size_storage>::template type<TElement, TOpt>;
-                };
-
-                template<typename TElement, typename TOpt>
-                using array_list_storage_type_type = typename array_list_custom_array_list_storage_type<
-                    TOpt::has_custom_storage_type>::template type<TElement, TOpt>;
-
-                template<typename TFieldBase, typename TElement, typename... TOptions>
-                using array_list_base_type = adapt_basic_field_type<
-                    nil::marshalling::types::basic::array_list<
-                        TFieldBase, array_list_storage_type_type<TElement, options_parser<TOptions...>>>,
-                    TOptions...>;
-
-            }    // namespace detail
-
             /// @brief field_type that represents a sequential collection of fields.
             /// @details By default uses
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a>,

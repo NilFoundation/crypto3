@@ -33,7 +33,7 @@
 
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
-#include <nil/marshalling/types/basic/enum_value.hpp>
+#include <nil/marshalling/types/enum_value/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/tag.hpp>
 

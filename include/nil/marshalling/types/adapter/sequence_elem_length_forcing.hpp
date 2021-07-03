@@ -31,7 +31,7 @@
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/types/basic/common_funcs.hpp>
+#include <nil/marshalling/types/detail/common_funcs.hpp>
 
 namespace nil {
     namespace marshalling {

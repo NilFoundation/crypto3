@@ -30,7 +30,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/marshalling/types/basic/int_value.hpp>
+#include <nil/marshalling/types/int_value/basic_type.hpp>
 
 namespace nil {
     namespace marshalling {

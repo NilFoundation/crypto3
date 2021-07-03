@@ -30,7 +30,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/types/basic/bundle.hpp>
+#include <nil/marshalling/types/bundle/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 
 #include <nil/marshalling/types/tag.hpp>
