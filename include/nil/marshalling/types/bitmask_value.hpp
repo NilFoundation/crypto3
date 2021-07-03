@@ -93,15 +93,15 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::fixed_length
             ///     @li @ref nil::marshalling::option::fixed_bit_length
             ///     @li @ref nil::marshalling::option::default_value_initializer or
-            ///     nil::marshalling::option::DefaultNumValue.
-            ///     @li @ref nil::marshalling::option::ContentsValidator or
+            ///     nil::marshalling::option::default_num_value.
+            ///     @li @ref nil::marshalling::option::contents_validator or
             ///     nil::marshalling::option::BitmaskReservedBits.
-            ///     @li @ref nil::marshalling::option::ContentsRefresher
+            ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
-            ///     @li @ref nil::marshalling::option::FailOnInvalid
-            ///     @li @ref nil::marshalling::option::IgnoreInvalid
-            ///     @li @ref nil::marshalling::option::EmptySerialization
+            ///     @li @ref nil::marshalling::option::fail_on_invalid
+            ///     @li @ref nil::marshalling::option::ignore_invalid
+            ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/bitmask_value.h

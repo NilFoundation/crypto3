@@ -58,14 +58,14 @@ namespace nil {
             ///         also possible to provide initialiser for the bundle field which
             ///         will set appropriate values to the fields based on some
             ///         internal logic.
-            ///     @li @ref nil::marshalling::option::ContentsValidator - All wrapped fields may specify
+            ///     @li @ref nil::marshalling::option::contents_validator - All wrapped fields may specify
             ///         their independent validators. The bundle field considered to
             ///         be valid if all the wrapped fields are valid. This option though,
             ///         provides an ability to add extra validation logic that can
             ///         observe value of more than one wrapped fields. For example,
             ///         protocol specifies that if one specific field has value X, than
             ///         other field is NOT allowed to have value Y.
-            ///     @li @ref nil::marshalling::option::ContentsRefresher - The default refreshing
+            ///     @li @ref nil::marshalling::option::contents_refresher - The default refreshing
             ///         behaviour is to call the @b refresh() member function of every
             ///         member field. This option provides an ability to set a custom
             ///         "refreshing" logic.
@@ -76,7 +76,7 @@ namespace nil {
             ///         option.
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
-            ///     @li @ref nil::marshalling::option::EmptySerialization
+            ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/bundle.h

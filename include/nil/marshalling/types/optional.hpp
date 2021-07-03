@@ -49,8 +49,8 @@ namespace nil {
             ///     nil::marshalling::option::DefaultOptionalMode,
             ///         @ref nil::marshalling::option::OptionalMissingByDefault, or @ref
             ///         nil::marshalling::option::OptionalExistsByDefault.
-            ///     @li @ref nil::marshalling::option::ContentsValidator.
-            ///     @li @ref nil::marshalling::option::ContentsRefresher
+            ///     @li @ref nil::marshalling::option::contents_validator.
+            ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
             ///     @li @ref nil::marshalling::option::version_storage

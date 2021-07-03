@@ -70,22 +70,22 @@ namespace nil {
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::fixed_length
             ///     @li @ref nil::marshalling::option::fixed_bit_length
-            ///     @li @ref nil::marshalling::option::VarLength
-            ///     @li @ref nil::marshalling::option::NumValueSerOffset
+            ///     @li @ref nil::marshalling::option::var_length
+            ///     @li @ref nil::marshalling::num_value_ser_offset
             ///     @li @ref nil::marshalling::option::default_value_initializer or
-            ///     nil::marshalling::option::DefaultNumValue.
+            ///     nil::marshalling::option::default_num_value.
             ///     @li @ref nil::marshalling::option::ContentsValidator
-            ///     @li @ref nil::marshalling::option::ValidNumValueRange, @ref nil::marshalling::option::ValidNumValue,
+            ///     @li @ref nil::marshalling::option::valid_num_value_range, @ref nil::marshalling::option::ValidNumValue,
             ///         @ref nil::marshalling::option::ValidBigUnsignedNumValueRange, @ref
             ///         nil::marshalling::option::ValidBigUnsignedNumValue
-            ///     @li @ref nil::marshalling::option::ValidRangesClear
-            ///     @li @ref nil::marshalling::option::ContentsRefresher
+            ///     @li @ref nil::marshalling::option::valid_ranges_clear
+            ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
-            ///     @li @ref nil::marshalling::option::FailOnInvalid
-            ///     @li @ref nil::marshalling::option::IgnoreInvalid
-            ///     @li @ref nil::marshalling::option::EmptySerialization
-            ///     @li @ref nil::marshalling::option::InvalidByDefault
+            ///     @li @ref nil::marshalling::option::fail_on_invalid
+            ///     @li @ref nil::marshalling::option::ignore_invalid
+            ///     @li @ref nil::marshalling::option::empty_serialization
+            ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/enum_value.h

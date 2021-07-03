@@ -55,21 +55,21 @@ namespace nil {
             ///     be serialized using big endian notation.@n
             ///     Supported options are:
             ///     @li @ref nil::marshalling::option::default_value_initializer or @ref
-            ///     nil::marshalling::option::DefaultNumValue.
+            ///     nil::marshalling::option::default_num_value.
             ///     @li @ref nil::marshalling::option::ContentsValidator
-            ///     @li @ref nil::marshalling::option::ValidNumValueRange, @ref nil::marshalling::option::ValidNumValue,
+            ///     @li @ref nil::marshalling::option::valid_num_value_range, @ref nil::marshalling::option::ValidNumValue,
             ///         @ref nil::marshalling::option::ValidBigUnsignedNumValueRange, @ref
             ///         nil::marshalling::option::ValidBigUnsignedNumValue
-            ///     @li @ref nil::marshalling::option::ValidRangesClear
-            ///     @li @ref nil::marshalling::option::ContentsRefresher
+            ///     @li @ref nil::marshalling::option::valid_ranges_clear
+            ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
-            ///     @li @ref nil::marshalling::option::FailOnInvalid
-            ///     @li @ref nil::marshalling::option::IgnoreInvalid
+            ///     @li @ref nil::marshalling::option::fail_on_invalid
+            ///     @li @ref nil::marshalling::option::ignore_invalid
             ///     @li @b nil::marshalling::option::Units* - all variants of value units, see
             ///         @ref sec_field_tutorial_int_value_units for details.
-            ///     @li @ref nil::marshalling::option::EmptySerialization
-            ///     @li @ref nil::marshalling::option::InvalidByDefault
+            ///     @li @ref nil::marshalling::option::empty_serialization
+            ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/float_value.h

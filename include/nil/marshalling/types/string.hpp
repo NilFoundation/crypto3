@@ -135,15 +135,15 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::sequence_termination_field_suffix
             ///     @li @ref nil::marshalling::option::sequence_trailing_field_suffix
             ///     @li @ref nil::marshalling::option::default_value_initializer
-            ///     @li @ref nil::marshalling::option::ContentsValidator
-            ///     @li @ref nil::marshalling::option::ContentsRefresher
+            ///     @li @ref nil::marshalling::option::contents_validator
+            ///     @li @ref nil::marshalling::option::contents_refresher
             ///     @li @ref nil::marshalling::option::has_custom_read
             ///     @li @ref nil::marshalling::option::has_custom_refresh
-            ///     @li @ref nil::marshalling::option::FailOnInvalid
-            ///     @li @ref nil::marshalling::option::IgnoreInvalid
+            ///     @li @ref nil::marshalling::option::fail_on_invalid
+            ///     @li @ref nil::marshalling::option::ignore_invalid
             ///     @li @ref nil::marshalling::option::OrigDataView
-            ///     @li @ref nil::marshalling::option::EmptySerialization
-            ///     @li @ref nil::marshalling::option::InvalidByDefault
+            ///     @li @ref nil::marshalling::option::empty_serialization
+            ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/string.h

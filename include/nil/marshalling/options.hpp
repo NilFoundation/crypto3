@@ -68,84 +68,84 @@ namespace nil {
             /// @brief options to specify endian.
             /// @tparam TEndian endian_type type. Must be either nil::marshalling::endian::big_endian or
             ///     nil::marshalling::endian::little_endian.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TEndian>
             struct endian { };
 
             /// @brief Alias option to endian_type specifying big endian.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using big_endian = endian<nil::marshalling::endian::big_endian>;
 
             /// @brief Alias option to endian_type specifying little endian.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using little_endian = endian<nil::marshalling::endian::little_endian>;
 
             /// @brief No-op option, doesn't have any effect.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct empty_option { };
 
             /// @brief Option used to specify type of the ID.
             /// @tparam T Type of the message ID.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct msg_id_type { };
 
             /// @brief Option used to specify type of iterator used for reading.
             /// @tparam TIter Type of the iterator.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TIter>
             struct read_iterator { };
 
             /// @brief Option used to specify type of iterator used for writing.
             /// @tparam TIter Type of the iterator.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TIter>
             struct write_iterator { };
 
             /// @brief Option used to add @b get_id() function into message interface.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct id_info_interface { };
 
             /// @brief Option used to add @b valid() function into message interface.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct valid_check_interface { };
 
             /// @brief Option used to add @b length() function into message interface.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct length_info_interface { };
 
             /// @brief Option used to add @b refresh() function into message interface.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct refresh_interface { };
 
             /// @brief Option used to add @b name() function into message interface.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct name_interface { };
 
             /// @brief Option used to specify type of the message handler.
             /// @tparam T Type of the handler.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct handler { };
 
             /// @brief Option used to specify numeric ID of the message.
             /// @tparam TId Numeric ID value.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::intmax_t TId>
             struct static_num_id_impl { };
 
             /// @brief Option used to specify that message doesn't have valid ID.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_id_impl { };
 
             /// @brief Option used to specify actual type of the message.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TMsg>
             struct msg_type { };
 
             /// @brief Option used to inhibit default implementation of @b dispatch_impl()
             ///     in nil::marshalling::message_base.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_dispatch_impl { };
 
             /// @brief Option used to specify some extra fields from transport framing.
@@ -155,7 +155,7 @@ namespace nil {
             ///     of such fields, bundled in @b std::tuple, to @ref nil::marshalling::message interface
             ///     class.
             /// @tparam TFields The fields of the message bundled in std::tuple.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TFields>
             struct extra_transport_fields { };
 
@@ -163,7 +163,7 @@ namespace nil {
             ///     extra transport fields tuple provided with @ref
             ///     nil::marshalling::option::extra_transport_fields_type option.
             /// @tparam TIdx Index of the field inside the tuple.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TIdx>
             struct version_in_extra_transport_fields { };
 
@@ -171,7 +171,7 @@ namespace nil {
             ///     of default read, write, validity check, and length retrieval information
             ///     of the message.
             /// @tparam TFields The fields of the message bundled in std::tuple.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TFields>
             struct fields_impl;
 
@@ -181,49 +181,49 @@ namespace nil {
             /// @endcond
 
             /// @brief Alias to FieldsImpl<std::tuple<> >
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using zero_fields_impl = fields_impl<std::tuple<>>;
 
             /// @brief Option that inhibits implementation of nil::marshalling::message_base::read_impl()
             ///     regardless of other availability conditions.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_read_impl { };
 
             /// @brief Option that inhibits implementation of nil::marshalling::message_base::write_impl()
             ///     regardless of other availability conditions.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_write_impl { };
 
             /// @brief Option that inhibits implementation of nil::marshalling::message_base::valid_impl()
             ///     regardless of other availability conditions.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_valid_impl { };
 
             /// @brief Option that inhibits implementation of nil::marshalling::message_base::length_impl()
             ///     regardless of other availability conditions.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_length_impl { };
 
             /// @brief Option that inhibits implementation of nil::marshalling::message_base::refresh_impl()
             ///     regardless of other availability conditions.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_refresh_impl { };
 
             /// @brief Option that notifies nil::marshalling::message_base about existence of
             ///     @b eval_get_id() member function in derived class.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct has_do_get_id { };
 
             /// @brief Option that notifies nil::marshalling::message_base about existence of
             ///     access to fields.
             /// @details Can be useful when there is a chain of inheritances from
             ///     nil::marshalling::message_base.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct assume_fields_existence { };
 
             /// @brief Option that forces "in place" allocation with placement "new" for
             ///     initialisation, instead of usage of dynamic memory allocation.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct in_place_allocation { };
 
             /// @brief Option used to allow @ref nil::marshalling::generic_message generation inside
@@ -252,7 +252,7 @@ namespace nil {
             ///     @endcode
             /// @tparam TLen length of the serialized value.
             /// @tparam TSignExtend Perform sign extension, relevant only to signed types.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TLen, bool TSignExtend = true>
             struct fixed_length { };
 
@@ -281,7 +281,7 @@ namespace nil {
             ///         >;
             ///     @endcode
             /// @tparam TLen length of the serialized value in bits.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TLen>
             struct fixed_bit_length { };
 
@@ -301,13 +301,13 @@ namespace nil {
             ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::uint32_t,
-            ///             nil::marshalling::option::VarLength<1, 4>
+            ///             nil::marshalling::option::var_length<1, 4>
             ///         >;
             ///         @endcode
             /// @tparam TMin Minimal length the field may consume.
             /// @tparam TMax Maximal length the field may consume.
             /// @pre TMin <= TMax
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TMin, std::size_t TMax>
             struct var_length {
                 static_assert(TMin <= TMax, "TMin must not be greater that TMax.");
@@ -323,7 +323,7 @@ namespace nil {
             ///     single byte, i.e. to specify year 2015 is to write value 15.
             ///     However it may be inconvenient to manually adjust serialized/deserialized
             ///     value by predefined offset 2000. To help with such case option
-            ///     nil::marshalling::option::NumValueSerOffset can be used. For example:
+            ///     nil::marshalling::option::num_value_ser_offset can be used. For example:
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
@@ -331,7 +331,7 @@ namespace nil {
             ///             MyFieldBase,
             ///             std::uint16_t,
             ///             nil::marshalling::option::fixed_length<1>,
-            ///             nil::marshalling::option::NumValueSerOffset<-2000>
+            ///             nil::marshalling::option::num_value_ser_offset<-2000>
             ///         >;
             ///     @endcode
             ///     Note that in the example above the field value (accessible by @b value() member
@@ -339,7 +339,7 @@ namespace nil {
             ///     say 2015, while when serialized it consumes only 1 byte (thanks to
             ///     nil::marshalling::option::fixed_length option) and reduced value of 15 is written.
             /// @tparam TOffset Offset value to be added when serialising field.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::intmax_t TOffset>
             struct num_value_ser_offset { };
 
@@ -355,7 +355,7 @@ namespace nil {
             ///     nil::marshalling::processing::StaticString with the capacity provided by this option.
             /// @tparam TSize Size of the storage area in number of elements, for strings it does @b NOT include
             ///     the '\0' terminating character.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TSize>
             struct fixed_size_storage { };
 
@@ -372,7 +372,7 @@ namespace nil {
             ///     nil::marshalling::types::string) or @b std::vector (when used with
             ///     nil::marshalling::types::array_list).
             /// @tparam TType Custom storage type
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TType>
             struct custom_storage_type { };
 
@@ -403,7 +403,7 @@ namespace nil {
             ///     @endcode
             /// @tparam TNum Numerator of the scaling ratio.
             /// @tparam TDenom Denominator of the scaling ratio.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::intmax_t TNum, std::intmax_t TDenom>
             struct scaling_ratio {
                 static_assert(TNum != 0, "Wrong scaling ratio");
@@ -431,7 +431,7 @@ namespace nil {
             ///         >;
             ///     @endcode
             /// @tparam TField Type of the field that represents size
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField>
             struct sequence_size_field_prefix { };
 
@@ -458,7 +458,7 @@ namespace nil {
             ///     @endcode
             /// @tparam TField Type of the field that represents serialization length
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
                      nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
             struct sequence_ser_length_field_prefix { };
@@ -469,7 +469,7 @@ namespace nil {
             ///     list, every element is prepended with its serialization length.
             /// @tparam TField Type of the field that represents serialization length
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
                      nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
             struct sequence_elem_ser_length_field_prefix { };
@@ -482,7 +482,7 @@ namespace nil {
             ///     with its size.
             /// @tparam TField Type of the field that represents serialization length
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
                      nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
             struct sequence_elem_fixed_ser_length_field_prefix { };
@@ -499,12 +499,12 @@ namespace nil {
             ///             MyFieldBase,
             ///             nil::marshalling::option::sequence_termination_field_suffix<
             ///                 nil::marshalling::types::int_value<MyFieldBase, char,
-            ///                 nil::marshalling::option::DefaultNumValue<0> >
+            ///                 nil::marshalling::option::default_num_value<0> >
             ///             >
             ///         >;
             ///     @endcode
             /// @tparam TField Type of the field that represents suffix
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField>
             struct sequence_termination_field_suffix { };
 
@@ -524,12 +524,12 @@ namespace nil {
             ///             nil::marshalling::option::sequence_fixed_size<5>,
             ///             nil::marshalling::option::sequence_trailing_field_suffix<
             ///                 nil::marshalling::types::int_value<MyFieldBase, char,
-            ///                 nil::marshalling::option::DefaultNumValue<0> >
+            ///                 nil::marshalling::option::default_num_value<0> >
             ///             >
             ///         >;
             ///     @endcode
             /// @tparam TField Type of the field that represents suffix
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TField>
             struct sequence_trailing_field_suffix { };
 
@@ -543,7 +543,7 @@ namespace nil {
             ///     the collection fields, such as nil::marshalling::types::array_list or
             ///     nil::marshalling::types::string which can be used to specify the size information after it was read
             ///     independently.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct sequence_size_forcing_enabled { };
 
             /// @brief Option to enable external forcing of the collection's serialization length
@@ -557,7 +557,7 @@ namespace nil {
             ///     the collection fields, such as nil::marshalling::types::array_list or
             ///     nil::marshalling::types::string which can be used to specify the size information after it was read
             ///     independently.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct sequence_length_forcing_enabled { };
 
             /// @brief Option to enable external forcing of the collection element
@@ -569,7 +569,7 @@ namespace nil {
             ///     the nil::marshalling::types::array_list
             ///     which can be used to specify the element serialization length after it was read
             ///     independently. @n
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct sequence_elem_length_forcing_enabled { };
 
             /// @brief Option used to define exact number of elements in the collection field.
@@ -577,7 +577,7 @@ namespace nil {
             ///     elements in the sequence. Use sequence_fixed_size option to convey
             ///     this information to the field definition, which will force @b read() and
             ///     @b write() member functions of the collection field to behave as expected.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TSize>
             struct sequence_fixed_size { };
 
@@ -587,7 +587,7 @@ namespace nil {
             ///     to sequence types @ref nil::marshalling::types::array_list or @ref nil::marshalling::types::string,
             ///     that alrady use @ref sequence_fixed_size option. Usage of this option do not require knowledge of
             ///     the storage area size.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct sequence_fixed_size_use_fixed_size_storage { };
 
             /// @brief Option that specifies default initialisation class.
@@ -623,7 +623,7 @@ namespace nil {
             ///         >;
             ///     @endcode
             /// @tparam T Type of the initialiser class.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct default_value_initialiser { };
 
@@ -659,7 +659,7 @@ namespace nil {
             ///     using MyField =
             ///         nil::marshalling::types::string<
             ///             MyFieldBase,
-            ///             nil::marshalling::option::ContentsValidator<MyStringValidator>
+            ///             nil::marshalling::option::contents_validator<MyStringValidator>
             ///         >;
             ///     @endcode
             ///     Note that in the example above the default constructed MyField will
@@ -667,7 +667,7 @@ namespace nil {
             ///     nil::marshalling::option::default_value_initializer option to specify proper default
             ///     value.
             /// @tparam T Type of the validator class.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct contents_validator { };
 
@@ -688,7 +688,7 @@ namespace nil {
             ///     };
             ///     @endcode
             /// @tparam T Type of the refresher class.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct contents_refresher { };
 
@@ -760,7 +760,7 @@ namespace nil {
             ///     };
             ///     @endcode
             /// @tparam T Type of the custom reader class.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename T>
             struct custom_value_reader { };
 
@@ -768,11 +768,11 @@ namespace nil {
             ///     is received.
             /// @details Sometimes protocol is very strict about what field's values are
             ///     allowed and forces to abandon a message if invalid value is received.
-            ///     If nil::marshalling::option::FailOnInvalid is provided as an option to a field,
+            ///     If nil::marshalling::option::fail_on_invalid is provided as an option to a field,
             ///     the validity is going to checked automatically after the read. If invalid
             ///     value is identified, error will be returned from the @b read() operation.
             /// @tparam TStatus Error status to return when the content of the read field is invalid.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<nil::marshalling::status_type TStatus = nil::marshalling::status_type::invalid_msg_data>
             struct fail_on_invalid { };
 
@@ -782,12 +782,12 @@ namespace nil {
             ///     check the validity of the read value. If it is identified as invalid,
             ///     the read value is not assigned to the field, i.e. the field's value
             ///     remains unchanged, although no error is reported.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct ignore_invalid { };
 
             /// @brief Force the destructor of nil::marshalling::message class to be @b non-virtual,
             ///     even if there are other virtual functions defined.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct no_virtual_destructor { };
 
             /// @brief options to specify units of the field.
@@ -795,7 +795,7 @@ namespace nil {
             ///     namespace.
             /// @tparam TRatio Ratio within the units type, must be a variant of
             ///     @b std::ratio type.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<typename TType, typename TRatio>
             struct units {
                 static_assert(detail::is_ratio_t<TRatio>(), "TRatio parameter must be a variant of std::ratio");
@@ -805,187 +805,187 @@ namespace nil {
             };
 
             /// @brief Alias option, specifying field value units are "nanoseconds".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_nanoseconds
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::nanoseconds_ratio>;
 
             /// @brief Alias option, specifying field value units are "microseconds".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_microseconds
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::microseconds_ratio>;
 
             /// @brief Alias option, specifying field value units are "milliseconds".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_milliseconds
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::milliseconds_ratio>;
 
             /// @brief Alias option, specifying field value units are "seconds".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_seconds
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::seconds_ratio>;
 
             /// @brief Alias option, specifying field value units are "minutes".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_minutes
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::minutes_ratio>;
 
             /// @brief Alias option, specifying field value units are "hours".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_hours
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::hours_ratio>;
 
             /// @brief Alias option, specifying field value units are "days".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_days
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::days_ratio>;
 
             /// @brief Alias option, specifying field value units are "weeks".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_weeks
                 = units<nil::marshalling::traits::units::Time, nil::marshalling::traits::units::weeks_ratio>;
 
             /// @brief Alias option, specifying field value units are "nanometers".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_nanometers
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::nanometers_ratio>;
 
             /// @brief Alias option, specifying field value units are "micrometers".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_micrometers
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::micrometers_ratio>;
 
             /// @brief Alias option, specifying field value units are "millimeters".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_millimeters
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::millimeters_ratio>;
 
             /// @brief Alias option, specifying field value units are "centimeters".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_centimeters
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::centimeters_ratio>;
 
             /// @brief Alias option, specifying field value units are "meters".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_meters
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::meters_ratio>;
 
             /// @brief Alias option, specifying field value units are "kilometers".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kilometers
                 = units<nil::marshalling::traits::units::distance, nil::marshalling::traits::units::kilometers_ratio>;
 
             /// @brief Alias option, specifying field value units are "nanometers per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_nanometers_per_second = units<nil::marshalling::traits::units::speed,
                                                       nil::marshalling::traits::units::nanometers_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "micrometers per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_micrometers_per_second = units<nil::marshalling::traits::units::speed,
                                                        nil::marshalling::traits::units::micrometers_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "millimeters per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_millimeters_per_second = units<nil::marshalling::traits::units::speed,
                                                        nil::marshalling::traits::units::millimeters_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "centimeters per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_centimeters_per_second = units<nil::marshalling::traits::units::speed,
                                                        nil::marshalling::traits::units::centimeters_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "meters per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_meters_per_second = units<nil::marshalling::traits::units::speed,
                                                   nil::marshalling::traits::units::meters_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "kilometers per second".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kilometers_per_second = units<nil::marshalling::traits::units::speed,
                                                       nil::marshalling::traits::units::kilometers_per_second_ratio>;
 
             /// @brief Alias option, specifying field value units are "kilometers per hour".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kilometers_per_hour = units<nil::marshalling::traits::units::speed,
                                                     nil::marshalling::traits::units::kilometers_per_hour_ratio>;
 
             /// @brief Alias option, specifying field value units are "hertz".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_hertz
                 = units<nil::marshalling::traits::units::frequency, nil::marshalling::traits::units::hz_ratio>;
 
             /// @brief Alias option, specifying field value units are "kilohertz".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kilohertz
                 = units<nil::marshalling::traits::units::frequency, nil::marshalling::traits::units::kilo_hz_ratio>;
 
             /// @brief Alias option, specifying field value units are "megahertz".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_megahertz
                 = units<nil::marshalling::traits::units::frequency, nil::marshalling::traits::units::mega_hz_ratio>;
 
             /// @brief Alias option, specifying field value units are "gigahertz".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_gigahertz
                 = units<nil::marshalling::traits::units::frequency, nil::marshalling::traits::units::giga_hz_ratio>;
 
             /// @brief Alias option, specifying field value units are "degrees".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_degrees
                 = units<nil::marshalling::traits::units::angle, nil::marshalling::traits::units::degrees_ratio>;
 
             /// @brief Alias option, specifying field value units are "radians".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_radians
                 = units<nil::marshalling::traits::units::angle, nil::marshalling::traits::units::radians_ratio>;
 
             /// @brief Alias option, specifying field value units are "nanoamps".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_nanoamps
                 = units<nil::marshalling::traits::units::current, nil::marshalling::traits::units::nanoamps_ratio>;
 
             /// @brief Alias option, specifying field value units are "microamps".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_microamps
                 = units<nil::marshalling::traits::units::current, nil::marshalling::traits::units::microamps_ratio>;
 
             /// @brief Alias option, specifying field value units are "milliamps".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_milliamps
                 = units<nil::marshalling::traits::units::current, nil::marshalling::traits::units::milliamps_ratio>;
 
             /// @brief Alias option, specifying field value units are "amps".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_amps
                 = units<nil::marshalling::traits::units::current, nil::marshalling::traits::units::amps_ratio>;
 
             /// @brief Alias option, specifying field value units are "kiloamps".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kiloamps
                 = units<nil::marshalling::traits::units::current, nil::marshalling::traits::units::kiloamps_ratio>;
 
             /// @brief Alias option, specifying field value units are "nanovolts".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_nanovolts
                 = units<nil::marshalling::traits::units::voltage, nil::marshalling::traits::units::nanovolts_ratio>;
 
             /// @brief Alias option, specifying field value units are "microvolts".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_microvolts
                 = units<nil::marshalling::traits::units::voltage, nil::marshalling::traits::units::microvolts_ratio>;
 
             /// @brief Alias option, specifying field value units are "millivolts".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_millivolts
                 = units<nil::marshalling::traits::units::voltage, nil::marshalling::traits::units::millivolts_ratio>;
 
             /// @brief Alias option, specifying field value units are "volts".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_volts
                 = units<nil::marshalling::traits::units::voltage, nil::marshalling::traits::units::volts_ratio>;
 
             /// @brief Alias option, specifying field value units are "kilovolts".
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using units_kilovolts
                 = units<nil::marshalling::traits::units::voltage, nil::marshalling::traits::units::kilovolts_ratio>;
 
@@ -1084,7 +1084,7 @@ namespace nil {
             ///     class instead.
             /// @tparam TVal Numeric value is to be assigned to the field in default constructor.
             /// @see @ref DefaultBigUnsignedNumValue
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::intmax_t TVal>
             using default_num_value
                 = default_value_initialiser<detail::default_num_value_initialiser<std::intmax_t, TVal>>;
@@ -1092,11 +1092,11 @@ namespace nil {
             /// @brief Alias to default_value_initializer, it defines initialiser class that
             ///     assigns big unsigned numeric value provided as the template argument to this option.
             /// @details If the required numeric value is small enough to fit into @b
-            ///     std::intmax_t type, it is recommended to use @ref DefaultNumValue option
+            ///     std::intmax_t type, it is recommended to use @ref default_num_value option
             ///     class instead.
             /// @tparam TVal Numeric value is to be assigned to the field in default constructor.
             /// @see @ref DefaultBigUnsignedNumValue
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::uintmax_t TVal>
             using default_big_unsigned_num_value
                 = default_value_initialiser<detail::default_num_value_initialiser<std::uintmax_t, TVal>>;
@@ -1111,11 +1111,11 @@ namespace nil {
             /// @tparam TMaxValue Maximal valid numeric value
             /// @note The intersection of the provided multiple ranges is @b NOT checked.
             /// @warning Some older compilers (@b gcc-4.7) fail to compile valid C++11 code
-            ///     that allows usage of multiple @ref ValidNumValueRange options. If this is
-            ///     the case, please don't pass more than one @ref ValidNumValueRange option.
+            ///     that allows usage of multiple @ref valid_num_value_range options. If this is
+            ///     the case, please don't pass more than one @ref valid_num_value_range option.
             /// @see @ref ValidNumValue
             /// @see @ref ValidBigUnsignedNumValueRange
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::intmax_t TMinValue, std::intmax_t TMaxValue>
             struct valid_num_value_range {
                 static_assert(TMinValue <= TMaxValue, "Invalid range");
@@ -1124,39 +1124,39 @@ namespace nil {
             /// @brief Clear accumulated ranges of valid values.
             struct valid_ranges_clear { };
 
-            /// @brief Similar to @ref ValidNumValueRange, but overrides (nullifies)
+            /// @brief Similar to @ref valid_num_value_range, but overrides (nullifies)
             ///     all previously set valid values ranges.
             /// @see @ref ValidNumValueOverride
             /// @see @ref ValidBigUnsignedNumValueRangeOverride
-            /// @deprecated Use @ref ValidRangesClear instead.
+            /// @deprecated Use @ref valid_ranges_clear instead.
             template<std::intmax_t TMinValue, std::intmax_t TMaxValue>
             using valid_num_value_range_override
                 = std::tuple<valid_num_value_range<TMinValue, TMaxValue>, valid_ranges_clear>;
 
-            /// @brief Alias to @ref ValidNumValueRange.
-            /// @details Equivalent to @b ValidNumValueRange<TValue, TValue>
+            /// @brief Alias to @ref valid_num_value_range.
+            /// @details Equivalent to @b valid_num_value_range<TValue, TValue>
             template<std::intmax_t TValue>
             using valid_num_value = valid_num_value_range<TValue, TValue>;
 
-            /// @brief Alias to @ref ValidNumValueRangeOverride.
-            /// @details Equivalent to @b ValidNumValueRangeOverride<TValue, TValue>
-            /// @deprecated Use @ref ValidRangesClear instead.
+            /// @brief Alias to @ref valid_num_value_rangeOverride.
+            /// @details Equivalent to @b valid_num_value_rangeOverride<TValue, TValue>
+            /// @deprecated Use @ref valid_ranges_clear instead.
             template<std::intmax_t TValue>
             using valid_num_value_override = valid_num_value_range_override<TValue, TValue>;
 
             /// @brief Provide range of valid unsigned numeric values.
-            /// @details Similar to @ref ValidNumValueRange, but dedicated to
+            /// @details Similar to @ref valid_num_value_range, but dedicated to
             ///     big unsigned numbers, which don't fit into @b std::intmax_t type.
             /// @tparam TMinValue Minimal valid numeric value
             /// @tparam TMaxValue Maximal valid numeric value
             /// @note The intersection of the provided multiple ranges is @b NOT checked.
             /// @warning Some older compilers (@b gcc-4.7) fail to compile valid C++11 code
-            ///     that allows usage of multiple @ref ValidNumValueRange options. If this is
+            ///     that allows usage of multiple @ref valid_num_value_range options. If this is
             ///     the case, please don't pass more than one
-            ///     @ref ValidNumValueRange or @ref ValidBigUnsignedNumValueRange option.
-            /// @see @ref ValidNumValueRange
+            ///     @ref valid_num_value_range or @ref ValidBigUnsignedNumValueRange option.
+            /// @see @ref valid_num_value_range
             /// @see @ref ValidBigUnsignedNumValue
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::uintmax_t TMinValue, std::uintmax_t TMaxValue>
             struct valid_big_unsigned_num_value_range {
                 static_assert(TMinValue <= TMaxValue, "Invalid range");
@@ -1166,7 +1166,7 @@ namespace nil {
             ///     all previously set valid values ranges.
             /// @see @ref ValidNumValueOverride
             /// @see @ref ValidBigUnsignedNumValueOverride
-            /// @deprecated Use @ref ValidRangesClear instead.
+            /// @deprecated Use @ref valid_ranges_clear instead.
             template<std::uintmax_t TMinValue, std::uintmax_t TMaxValue>
             using valid_big_unsigned_num_value_range_override
                 = std::tuple<valid_big_unsigned_num_value_range<TMinValue, TMaxValue>, valid_ranges_clear>;
@@ -1178,11 +1178,11 @@ namespace nil {
 
             /// @brief Alias to @ref ValidBigUnsignedNumValueRangeOverride.
             /// @details Equivalent to @b ValidBigUnsignedNumValueRangeOverride<TValue, TValue>
-            /// @deprecated Use @ref ValidRangesClear instead.
+            /// @deprecated Use @ref valid_ranges_clear instead.
             template<std::uintmax_t TValue>
             using valid_big_unsigned_num_value_override = valid_big_unsigned_num_value_range_override<TValue, TValue>;
 
-            /// @brief Alias to ContentsValidator, it defines validator class that checks
+            /// @brief Alias to contents_validator, it defines validator class that checks
             ///     that reserved bits of the field have expected values.
             /// @details It is usually used with nil::marshalling::types::BitmaskValue field to
             ///     specify values of the unused/reserved bits.
@@ -1192,7 +1192,7 @@ namespace nil {
             ///     @endcode
             /// @tparam TMask Mask that specifies reserved bits.
             /// @tparam TValue Expected value of the reserved bits. Defaults to 0.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::uintmax_t TMask, std::uintmax_t TValue = 0U>
             using bitmask_reserved_bits = contents_validator<detail::bitmask_reserved_bits_validator<TMask, TValue>>;
 
@@ -1201,7 +1201,7 @@ namespace nil {
             /// @tparam TVal optional mode value is to be assigned to the field in default constructor.
             /// @see @ref MissingByDefault
             /// @see @ref ExistsByDefault
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<nil::marshalling::types::optional_mode TVal>
             using default_optional_mode = default_value_initialiser<detail::default_opt_mode_initialiser<TVal>>;
 
@@ -1228,14 +1228,14 @@ namespace nil {
             /// @brief Alias to default_value_initializer, it initalises nil::marshalling::types::variant field
             ///     to contain valid default value of the specified member.
             /// @tparam TIdx Index of the default member.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             template<std::size_t TIdx>
             using default_variant_index = default_value_initialiser<detail::default_variant_index_initialiser<TIdx>>;
 
             /// @brief Force nil::marshalling::protocol::ChecksumLayer and
             ///     nil::marshalling::protocol::ChecksumPrefixLayer, to verify checksum prior to
             ///     forwarding read to the wrapped layer(s).
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct checksum_layer_verify_before_read { };
 
             /// @brief Use "view" on original raw data instead of copying it.
@@ -1248,7 +1248,7 @@ namespace nil {
             /// @note Incompatible with other options that contol data storage type,
             ///     such as @ref nil::marshalling::option::custom_storage_type or @ref
             ///     nil::marshalling::option::fixed_size_storage
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct orig_data_view { };
 
             /// @brief Force field not to be serialized during read/write operations
@@ -1258,7 +1258,7 @@ namespace nil {
             ///     serialized. Using this option will have such effect: read/write operaitons
             ///     will not change the value of iterators and will report immediate success.
             ///     The serialization length is always reported as 0.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct empty_serialization { };
 
             /// @brief Option to force @ref nil::marshalling::protocol::ProtocolLayerBase class to
@@ -1266,7 +1266,7 @@ namespace nil {
             /// @details Can be used by some layers which require its read operation to be
             ///     fully complete before read is forwared to data layer, i.e. until message
             ///     contents being read.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct protocol_layer_force_read_until_data_split { };
 
             /// @brief Disallow usage of @ref ProtocolLayerForceReadUntilDataSplit option in
@@ -1275,28 +1275,28 @@ namespace nil {
             ///     split their "read" operation to "until" and "from" data layer. They can
             ///     use this option to prevent outer layers from using
             ///     @ref ProtocolLayerForceReadUntilDataSplit one.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct protocol_layer_disallow_read_until_data_split { };
 
             /// @brief Mark this class to have custom
             ///     implementation of @b read functionality.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct has_custom_read { };
 
             /// @brief Mark this class to have custom
             ///     implementation of @b refresh functionality.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct has_custom_refresh { };
 
             /// @brief Mark this class as providing its name information
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct has_name { };
 
             /// @brief Option that notifies nil::marshalling::message_base about existence of
             ///     custom refresh functionality in derived class.
             /// @details Alias to @ref has_custom_refresh for backward compatibility.
             /// @deprecated Use @ref has_custom_refresh instead.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             using has_do_refresh = has_custom_refresh;
 
             /// @brief Option for @ref nil::marshalling::protocol::TransportValueLayer to
@@ -1313,7 +1313,7 @@ namespace nil {
 
             /// @brief Mark this class to have custom
             ///     implementation of version update functionality.
-            /// @headerfile nil/marshalling/options.h
+            /// @headerfile nil/marshalling/options.hpp
             struct has_custom_version_update { };
 
             /// @brief Mark an @ref nil::marshalling::types::optional field as existing
