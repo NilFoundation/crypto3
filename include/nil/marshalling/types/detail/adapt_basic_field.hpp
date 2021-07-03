@@ -26,7 +26,32 @@
 #ifndef MARSHALLING_ADAPT_BASIC_FIELD_HPP
 #define MARSHALLING_ADAPT_BASIC_FIELD_HPP
 
-#include <nil/marshalling/types/detail/adapters.hpp>
+#include <nil/marshalling/types/adapter/custom_value_reader.hpp>
+#include <nil/marshalling/types/adapter/ser_offset.hpp>
+#include <nil/marshalling/types/adapter/fixed_length.hpp>
+#include <nil/marshalling/types/adapter/fixed_bit_length.hpp>
+#include <nil/marshalling/types/adapter/var_length.hpp>
+#include <nil/marshalling/types/adapter/sequence_elem_length_forcing.hpp>
+#include <nil/marshalling/types/adapter/sequence_size_forcing.hpp>
+#include <nil/marshalling/types/adapter/sequence_length_forcing.hpp>
+#include <nil/marshalling/types/adapter/sequence_fixed_size.hpp>
+#include <nil/marshalling/types/adapter/sequence_size_field_prefix.hpp>
+#include <nil/marshalling/types/adapter/sequence_ser_length_field_prefix.hpp>
+#include <nil/marshalling/types/adapter/sequence_elem_ser_length_field_prefix.hpp>
+#include <nil/marshalling/types/adapter/sequence_elem_fixed_ser_length_field_prefix.hpp>
+#include <nil/marshalling/types/adapter/sequence_trailing_field_suffix.hpp>
+#include <nil/marshalling/types/adapter/sequence_termination_field_suffix.hpp>
+#include <nil/marshalling/types/adapter/default_value_initialiser.hpp>
+#include <nil/marshalling/types/adapter/num_value_multi_range_validator.hpp>
+#include <nil/marshalling/types/adapter/custom_validator.hpp>
+#include <nil/marshalling/types/adapter/custom_refresher.hpp>
+#include <nil/marshalling/types/adapter/fail_on_invalid.hpp>
+#include <nil/marshalling/types/adapter/ignore_invalid.hpp>
+#include <nil/marshalling/types/adapter/empty_serialization.hpp>
+#include <nil/marshalling/types/adapter/exists_between_versions.hpp>
+#include <nil/marshalling/types/adapter/invalid_by_default.hpp>
+#include <nil/marshalling/types/adapter/version_storage.hpp>
+
 #include <nil/marshalling/types/detail/options_parser.hpp>
 
 namespace nil {

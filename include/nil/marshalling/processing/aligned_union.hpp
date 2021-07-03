@@ -30,7 +30,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace processing {
 
             /// @cond SKIP_DOC
@@ -61,7 +60,6 @@ namespace nil {
             /// @endcond
 
         }    // namespace processing
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ALIGNED_UNION_HPP

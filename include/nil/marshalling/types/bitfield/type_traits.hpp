@@ -38,7 +38,6 @@
 #include <nil/marshalling/status_type.hpp>
 
 #include <nil/marshalling/types/int_value.hpp>
-#include <nil/marshalling/types/detail/common_funcs.hpp>
 
 namespace nil {
     namespace marshalling {

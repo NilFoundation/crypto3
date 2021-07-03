@@ -37,75 +37,14 @@
 
 #include <nil/detail/type_traits.hpp>
 
+#include <nil/marshalling/processing/detail/alloc.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/processing/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
-
         namespace processing {
-
             namespace alloc {
-
-                namespace detail {
-
-                    template<typename T>
-                    class in_place_deleter {
-                        template<typename U>
-                        friend class in_place_deleter;
-
-                    public:
-                        in_place_deleter(bool *allocated = nullptr) : allocated_(allocated) {
-                        }
-
-                        in_place_deleter(const in_place_deleter &other) = delete;
-
-                        template<typename U>
-                        in_place_deleter(in_place_deleter<U> &&other) : allocated_(other.allocated_) {
-                            static_assert(std::is_base_of<T, U>::value || std::is_base_of<U, T>::value
-                                              || std::is_convertible<U, T>::value || std::is_convertible<T, U>::value,
-                                          "To make Deleter convertible, their template parameters "
-                                          "must be convertible.");
-
-                            other.allocated_ = nullptr;
-                        }
-
-                        ~in_place_deleter() noexcept {
-                            MARSHALLING_ASSERT(allocated_ == nullptr);
-                        }
-
-                        in_place_deleter &operator=(const in_place_deleter &other) = delete;
-
-                        template<typename U>
-                        in_place_deleter &operator=(in_place_deleter<U> &&other) {
-                            static_assert(std::is_base_of<T, U>::value || std::is_base_of<U, T>::value
-                                              || std::is_convertible<U, T>::value || std::is_convertible<T, U>::value,
-                                          "To make Deleter convertible, their template parameters "
-                                          "must be convertible.");
-
-                            if (reinterpret_cast<void *>(this) == reinterpret_cast<const void *>(&other)) {
-                                return *this;
-                            }
-
-                            MARSHALLING_ASSERT(allocated_ == nullptr);
-                            allocated_ = other.allocated_;
-                            other.allocated_ = nullptr;
-                            return *this;
-                        }
-
-                        void operator()(T *obj) {
-                            MARSHALLING_ASSERT(allocated_ != nullptr);
-                            MARSHALLING_ASSERT(*allocated_);
-                            obj->~T();
-                            *allocated_ = false;
-                            allocated_ = nullptr;
-                        }
-
-                    private:
-                        bool *allocated_;
-                    };
-
-                }    // namespace detail
 
                 /// @brief Dynamic memory allocator
                 /// @details Uses standard operator "new" to allocate and initialise requested
@@ -286,9 +225,7 @@ namespace nil {
                 };
 
             }    // namespace alloc
-
         }    // namespace processing
-
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_ALLOC_HPP

@@ -36,9 +36,7 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace processing {
-
             namespace detail {
 
                 template<typename T>

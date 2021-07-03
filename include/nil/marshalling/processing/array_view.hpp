@@ -36,7 +36,6 @@
 
 namespace nil {
     namespace marshalling {
-
         namespace processing {
 
             /// @brief Describes an object that can refer to a constant contiguous
@@ -266,7 +265,6 @@ namespace nil {
             }
 
         }    // namespace processing
-
     }    // namespace marshalling
 }    // namespace nil
 

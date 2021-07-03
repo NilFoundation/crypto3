@@ -38,7 +38,6 @@
 #include <nil/marshalling/processing/static_string.hpp>
 
 #include <nil/marshalling/types/string/type_traits.hpp>
-#include <nil/marshalling/types/detail/common_funcs.hpp>
 
 namespace nil {
     namespace marshalling {

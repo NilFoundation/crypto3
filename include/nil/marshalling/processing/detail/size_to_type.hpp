@@ -23,40 +23,64 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_SIZE_TO_TYPE_HPP
-#define MARSHALLING_SIZE_TO_TYPE_HPP
+#ifndef MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP
+#define MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP
 
 #include <array>
 #include <cstdint>
 
-#include <nil/marshalling/processing/detail/size_to_type.hpp>
-
 namespace nil {
     namespace marshalling {
         namespace processing {
-            /// @cond SKIP_DOC
+            namespace detail {
 
-            template<std::size_t TSize, bool TSigned = false>
-            class size_to_type {
-                using byte_type = typename size_to_type<1, TSigned>::type;
+                template<std::size_t TSize>
+                struct size_to_type_helper {
+                    using type = std::array<std::uint8_t, TSize>;
+                };
 
-            public:
-                using type = std::array<byte_type, TSize>;
-            };
+                template<>
+                struct size_to_type_helper<1> {
+                    using type = std::uint8_t;
+                };
 
-            template<std::size_t TSize>
-            struct size_to_type<TSize, false> {
-                using type = typename detail::size_to_type_helper<TSize>::type;
-            };
+                template<>
+                struct size_to_type_helper<2> {
+                    using type = std::uint16_t;
+                };
 
-            template<std::size_t TSize>
-            struct size_to_type<TSize, true> {
-                using type = typename std::make_signed<typename size_to_type<TSize, false>::type>::type;
-            };
+                template<>
+                struct size_to_type_helper<4> {
+                    using type = std::uint32_t;
+                };
 
-            /// @endcond
+                template<>
+                struct size_to_type_helper<8> {
+                    using type = std::uint64_t;
+                };
 
+                template<>
+                struct size_to_type_helper<3> {
+                    using type = size_to_type_helper<4>::type;
+                };
+
+                template<>
+                struct size_to_type_helper<5> {
+                    using type = size_to_type_helper<8>::type;
+                };
+
+                template<>
+                struct size_to_type_helper<6> {
+                    using type = size_to_type_helper<8>::type;
+                };
+
+                template<>
+                struct size_to_type_helper<7> {
+                    using type = size_to_type_helper<8>::type;
+                };
+
+            }    // namespace detail
         }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_SIZE_TO_TYPE_HPP
+#endif    // MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP

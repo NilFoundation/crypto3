@@ -32,8 +32,7 @@
 
 namespace nil {
     namespace marshalling {
-
-        namespace util {
+        namespace processing {
 
             /// @brief Implements <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Scope_Guard">Scope Guard
             /// Idiom</a>.
@@ -165,8 +164,7 @@ namespace nil {
 
             // Class implementation part
 
-        }    // namespace util
-
+        }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_SCOPE_GUARD_HPP

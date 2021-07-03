@@ -45,9 +45,7 @@
 
 namespace nil {
     namespace marshalling {
-
-        namespace util {
-
+        namespace processing {
             namespace detail {
 
                 template<typename T>
@@ -2800,8 +2798,7 @@ namespace nil {
 
             /// @endcond
 
-        }    // namespace util
-
+        }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_STATIC_QUEUE_HPP
