@@ -33,9 +33,9 @@
 #include <nil/marshalling/types/array_list/type_traits.hpp>
 #include <nil/marshalling/types/string/type_traits.hpp>
 
-#include <nil/marshalling/processing/static_vector.hpp>
-#include <nil/marshalling/processing/static_string.hpp>
-#include <nil/marshalling/processing/string_view.hpp>
+#include <nil/marshalling/processing/types/static_vector.hpp>
+#include <nil/marshalling/processing/types/static_string.hpp>
+#include <nil/marshalling/processing/types/string_view.hpp>
 
 using namespace nil::marshalling;
 

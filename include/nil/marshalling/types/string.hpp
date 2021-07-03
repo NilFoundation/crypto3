@@ -31,8 +31,8 @@
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/processing/static_string.hpp>
-#include <nil/marshalling/processing/string_view.hpp>
+#include <nil/marshalling/processing/types/static_string.hpp>
+#include <nil/marshalling/processing/types/string_view.hpp>
 #include <nil/marshalling/types/string/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>

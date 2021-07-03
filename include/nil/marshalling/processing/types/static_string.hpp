@@ -32,7 +32,7 @@
 #include <initializer_list>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/processing/static_vector.hpp>
+#include <nil/marshalling/processing/types/static_vector.hpp>
 
 namespace nil {
     namespace marshalling {

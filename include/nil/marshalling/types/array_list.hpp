@@ -30,8 +30,8 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/processing/static_vector.hpp>
-#include <nil/marshalling/processing/array_view.hpp>
+#include <nil/marshalling/processing/types/static_vector.hpp>
+#include <nil/marshalling/processing/types/array_view.hpp>
 #include <nil/marshalling/types/array_list/behavior.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>

@@ -35,7 +35,7 @@
 #include <string>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/processing/array_view.hpp>
+#include <nil/marshalling/processing/types/array_view.hpp>
 
 namespace nil {
     namespace marshalling {

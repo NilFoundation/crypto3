@@ -34,8 +34,8 @@
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
-#include <nil/marshalling/processing/static_vector.hpp>
-#include <nil/marshalling/processing/static_string.hpp>
+#include <nil/marshalling/processing/types/static_vector.hpp>
+#include <nil/marshalling/processing/types/static_string.hpp>
 #include <nil/marshalling/types/detail/common_funcs.hpp>
 
 #include <nil/marshalling/types/array_list/type_traits.hpp>

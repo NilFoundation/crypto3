@@ -33,7 +33,7 @@
 
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/processing/tuple.hpp>
+#include <nil/marshalling/processing/types/tuple.hpp>
 
 namespace nil {
     namespace marshalling {
