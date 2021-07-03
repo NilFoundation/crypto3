@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -78,7 +78,7 @@ namespace nil {
                     }
                 };
 
-                // TODO: optimize this simple version of pairing checker
+                /// TODO: optimize this simple version of pairing checker
                 /// PairingCheck represents a check of the form e(A,B)e(C,D)... = T. Checks can
                 /// be aggregated together using random linear combination. The efficiency comes
                 /// from keeping the results from the miller loop output before proceding to a final

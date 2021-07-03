@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
@@ -32,7 +32,7 @@
 
 #include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/commitments/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/kc_multiexp.hpp>
+#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs.hpp>
 
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
