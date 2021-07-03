@@ -29,7 +29,7 @@ macro(define_hash_test name)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(hash_${name}_test PROPERTIES
-                          CXX_STANDARD 14
+                          CXX_STANDARD 17
                           CXX_STANDARD_REQUIRED TRUE)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
@@ -38,6 +38,13 @@ macro(define_hash_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-steps=4294967295")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(hash_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
 endmacro()
 
 set(TESTS_NAMES
@@ -46,6 +53,7 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "pack"
+    "poseidon"
     "ripemd"
     "sha"
     "sha1"

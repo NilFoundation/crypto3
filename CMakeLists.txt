@@ -67,6 +67,7 @@ option(CRYPTO3_HASH_SHAKE "Build with Shake hash support" TRUE)
 option(CRYPTO3_HASH_STREEBOG "Build with Streebog hash support" TRUE)
 option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
+option(CRYPTO3_HASH_POSEIDON "Build with Poseidon hash support" TRUE)
 
 set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 
@@ -176,6 +177,15 @@ if(CRYPTO3_HASH_TIGER)
          ${${CURRENT_PROJECT_NAME}_TIGER_HEADERS})
 endif()
 
+if(CRYPTO3_HASH_POSEIDON)
+    list(APPEND ${CURRENT_PROJECT_NAME}_POSEIDON_HEADERS
+         include/nil/crypto3/hash/poseidon.hpp)
+
+    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_POSEIDON)
+    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+         ${${CURRENT_PROJECT_NAME}_POSEIDON_HEADERS})
+endif()
+
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
 
@@ -187,6 +197,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
 
                       ${Boost_LIBRARIES})
 
