@@ -33,7 +33,6 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 #include <boost/accumulators/statistics/count.hpp>
-#include <boost/container/static_vector.hpp>
 
 #include <nil/detail/type_traits.hpp>
 
