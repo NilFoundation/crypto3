@@ -132,7 +132,7 @@ namespace nil {
                 using byte_type = typename byte_type_retriever<TIter, std::is_pointer<TIter>::value>::type;
 
                 template<typename T, typename TIter>
-                void write_big_unsigned(T value, std::size_t size, TIter &iter) {
+                void write_big_endian_unsigned(T value, std::size_t size, TIter &iter) {
                     using value_type = typename std::decay<T>::type;
                     static_assert(std::is_unsigned<value_type>::value, "T type must be unsigned");
                     static_assert(std::is_integral<value_type>::value, "T must be integral type");
@@ -153,7 +153,7 @@ namespace nil {
                 }
 
                 template<typename T, typename TIter>
-                void write_little_unsigned(T value, std::size_t size, TIter &iter) {
+                void write_little_endian_unsigned(T value, std::size_t size, TIter &iter) {
                     using value_type = typename std::decay<T>::type;
                     static_assert(std::is_integral<value_type>::value, "T must be integral type");
                     static_assert(std::is_unsigned<value_type>::value, "T type must be unsigned");
@@ -181,7 +181,7 @@ namespace nil {
                 struct write_unsigned_func_wrapper<endian::big_endian> {
                     template<typename T, typename TIter>
                     static void write(T value, std::size_t size, TIter &iter) {
-                        write_big_unsigned(value, size, iter);
+                        write_big_endian_unsigned(value, size, iter);
                     }
                 };
 
@@ -189,7 +189,7 @@ namespace nil {
                 struct write_unsigned_func_wrapper<endian::little_endian> {
                     template<typename T, typename TIter>
                     static void write(T value, std::size_t size, TIter &iter) {
-                        write_little_unsigned(value, size, iter);
+                        write_little_endian_unsigned(value, size, iter);
                     }
                 };
 
@@ -263,7 +263,7 @@ namespace nil {
                 };
 
                 template<typename T, typename TIter>
-                T read_big_unsigned(std::size_t size, TIter &iter) {
+                T read_big_endian_unsigned(std::size_t size, TIter &iter) {
                     using value_type = typename std::decay<T>::type;
                     static_assert(std::is_integral<value_type>::value, "T must be integral type");
                     static_assert(std::is_unsigned<value_type>::value, "T type must be unsigned");
@@ -286,7 +286,7 @@ namespace nil {
                 }
 
                 template<typename T, typename TIter>
-                T read_little_unsigned(std::size_t size, TIter &iter) {
+                T read_little_endian_unsigned(std::size_t size, TIter &iter) {
                     using value_type = typename std::decay<T>::type;
                     static_assert(std::is_integral<value_type>::value, "T must be integral type");
                     static_assert(std::is_unsigned<value_type>::value, "T type must be unsigned");
@@ -316,7 +316,7 @@ namespace nil {
                 struct read_unsigned_func_wrapper<endian::big_endian> {
                     template<typename T, typename TIter>
                     static T read(std::size_t size, TIter &iter) {
-                        return read_big_unsigned<T>(size, iter);
+                        return read_big_endian_unsigned<T>(size, iter);
                     }
                 };
 
@@ -324,7 +324,7 @@ namespace nil {
                 struct read_unsigned_func_wrapper<endian::little_endian> {
                     template<typename T, typename TIter>
                     static T read(std::size_t size, TIter &iter) {
-                        return read_little_unsigned<T>(size, iter);
+                        return read_little_endian_unsigned<T>(size, iter);
                     }
                 };
 

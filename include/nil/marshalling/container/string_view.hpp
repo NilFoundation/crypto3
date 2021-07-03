@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 
 /// @file
-/// @brief Contains nil::marshalling::processing::string_view class.
+/// @brief Contains nil::marshalling::container::string_view class.
 
 #ifndef MARSHALLING_STRING_VIEW_HPP
 #define MARSHALLING_STRING_VIEW_HPP
@@ -35,11 +35,11 @@
 #include <string>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/processing/types/array_view.hpp>
+#include <nil/marshalling/container/array_view.hpp>
 
 namespace nil {
     namespace marshalling {
-        namespace processing {
+        namespace container {
 
             /// @brief Describes an object that can refer to a constant contiguous
             ///     sequence of char-like objects with the first element of the
@@ -47,7 +47,7 @@ namespace nil {
             /// @details Similar to <a
             /// href="http://en.cppreference.com/w/cpp/string/basic_string_view">std::string_view</a>
             ///     introduced in C++17.
-            /// @headerfile "marshalling/processing/StringView.h"
+            /// @headerfile "marshalling/container/string_view.h"
             class string_view : public array_view<char> {
                 using base_type = array_view<char>;
 
@@ -555,47 +555,47 @@ namespace nil {
 
             /// @brief Lexicographical compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator<(const string_view &str1, const string_view &str2) {
                 return std::lexicographical_compare(str1.begin(), str1.end(), str2.begin(), str2.end());
             }
 
             /// @brief Lexicographical compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator<=(const string_view &str1, const string_view &str2) {
                 return !(str2 < str1);
             }
 
             /// @brief Lexicographical compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator>(const string_view &str1, const string_view &str2) {
                 return (str2 < str1);
             }
 
             /// @brief Lexicographical compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator>=(const string_view &str1, const string_view &str2) {
                 return !(str1 < str2);
             }
 
             /// @brief Equality compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator==(const string_view &str1, const string_view &str2) {
                 return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin());
             }
 
             /// @brief Inequality compare between the string views.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StringView
+            /// @related string_view
             inline bool operator!=(const string_view &str1, const string_view &str2) {
                 return !(str1 == str2);
             }
 
-        }    // namespace processing
+        }    // namespace container
 
     }    // namespace marshalling
 }    // namespace nil
@@ -604,8 +604,8 @@ namespace std {
 
     /// @brief Specializes the std::swap algorithm.
     /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/swap2">Reference</a>
-    /// @related nil::marshalling::processing::StringView
-    inline void swap(nil::marshalling::processing::string_view &str1, nil::marshalling::processing::string_view &str2) {
+    /// @related nil::marshalling::container::string_view
+    inline void swap(nil::marshalling::container::string_view &str1, nil::marshalling::container::string_view &str2) {
         str1.swap(str2);
     }
 

@@ -351,7 +351,7 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> or
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>
             ///     for their internal data storage. If this option is used, it will force
-            ///     such fields to use @ref nil::marshalling::processing::static_vector or @ref
+            ///     such fields to use @ref nil::marshalling::container::static_vector or @ref
             ///     nil::marshalling::processing::StaticString with the capacity provided by this option.
             /// @tparam TSize Size of the storage area in number of elements, for strings it does @b NOT include
             ///     the '\0' terminating character.
@@ -367,7 +367,7 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a> as
             ///     their internal storage types. The @ref fixed_size_storage option forces
             ///     them to use nil::marshalling::processing::StaticString and
-            ///     nil::marshalling::processing::static_vector instead. This option can be used to provide any other
+            ///     nil::marshalling::container::static_vector instead. This option can be used to provide any other
             ///     third party type. Such type must define the same public interface as @b std::string (when used with
             ///     nil::marshalling::types::string) or @b std::vector (when used with
             ///     nil::marshalling::types::array_list).

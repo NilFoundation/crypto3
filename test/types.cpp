@@ -53,33 +53,39 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
+#include <nil/marshalling/container/array_view.hpp>
+#include <nil/marshalling/container/static_vector.hpp>
+#include <nil/marshalling/container/static_string.hpp>
+#include <nil/marshalling/container/string_view.hpp>
+#include <nil/marshalling/container/type_traits.hpp>
+
 using namespace nil::marshalling;
 
 static_assert(has_member_function_clear<std::string>::value, "Invalid function presence detection");
 static_assert(has_member_function_clear<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(has_member_function_clear<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(has_member_function_clear<processing::static_vector<std::uint8_t, 5>>::value,
+static_assert(has_member_function_clear<container::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_clear<container::static_vector<std::uint8_t, 5>>::value,
               "Invalid function presence detection");
-static_assert(!has_member_function_clear<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!has_member_function_clear<processing::array_view<std::uint8_t>>::value,
+static_assert(!has_member_function_clear<container::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_clear<container::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 static_assert(has_member_function_resize<std::string>::value, "Invalid function presence detection");
 static_assert(has_member_function_resize<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(has_member_function_resize<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(has_member_function_resize<processing::static_vector<std::uint8_t, 5>>::value,
+static_assert(has_member_function_resize<container::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_resize<container::static_vector<std::uint8_t, 5>>::value,
               "Invalid function presence detection");
-static_assert(!has_member_function_resize<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!has_member_function_resize<processing::array_view<std::uint8_t>>::value,
+static_assert(!has_member_function_resize<container::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_resize<container::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 static_assert(has_member_function_reserve<std::string>::value, "Invalid function presence detection");
 static_assert(has_member_function_reserve<std::vector<std::uint8_t>>::value, "Invalid function presence detection");
-static_assert(has_member_function_reserve<processing::static_string<5>>::value, "Invalid function presence detection");
-static_assert(has_member_function_reserve<processing::static_vector<std::uint8_t, 5>>::value,
+static_assert(has_member_function_reserve<container::static_string<5>>::value, "Invalid function presence detection");
+static_assert(has_member_function_reserve<container::static_vector<std::uint8_t, 5>>::value,
               "Invalid function presence detection");
-static_assert(!has_member_function_reserve<processing::string_view>::value, "Invalid function presence detection");
-static_assert(!has_member_function_reserve<processing::array_view<std::uint8_t>>::value,
+static_assert(!has_member_function_reserve<container::string_view>::value, "Invalid function presence detection");
+static_assert(!has_member_function_reserve<container::array_view<std::uint8_t>>::value,
               "Invalid function presence detection");
 
 struct types_fixture {
@@ -2570,7 +2576,7 @@ BOOST_AUTO_TEST_CASE(test71) {
 }
 
 BOOST_AUTO_TEST_CASE(test72) {
-    static_assert(!types::basic::detail::string_has_push_back<processing::string_view>::value,
+    static_assert(!types::basic::detail::string_has_push_back<container::string_view>::value,
                   "string_view doesn't have push_back");
 
     typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t> SizeField;
@@ -2666,7 +2672,7 @@ BOOST_AUTO_TEST_CASE(test74) {
     field.value() = "foo";
     BOOST_CHECK(field.value().size() == 3U);
     BOOST_CHECK(std::string(field.value().data()) == "foo");
-    BOOST_CHECK(field.value() == processing::string_view("foo"));
+    BOOST_CHECK(field.value() == container::string_view("foo"));
     BOOST_CHECK(field.length() == 6U);
 
     static const std::vector<char> ExpectedBuf2 = {'f', 'o', 'o', 0x0, 0x0, 0x0};
@@ -2681,7 +2687,7 @@ BOOST_AUTO_TEST_CASE(test75) {
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
-    static_assert(std::is_same<testing_type::value_type, processing::array_view<std::uint8_t>>::value,
+    static_assert(std::is_same<testing_type::value_type, container::array_view<std::uint8_t>>::value,
                   "Expected to be array view");
 
     testing_type field;
@@ -2949,7 +2955,7 @@ BOOST_AUTO_TEST_CASE(test83) {
     static_assert(testing_type::min_length() == 5U, "Invalid min length");
     static_assert(testing_type::max_length() == 5U, "Invalid max length");
 
-    static_assert(processing::is_static_vector<testing_type::value_type>(), "The storage typ is incorrect");
+    static_assert(container::is_static_vector<testing_type::value_type>(), "The storage typ is incorrect");
 
     testing_type field;
     BOOST_CHECK(field.valid());
@@ -2970,7 +2976,7 @@ BOOST_AUTO_TEST_CASE(test84) {
 
     static_assert(testing_type::min_length() == 5U, "Invalid min length");
     static_assert(testing_type::max_length() == 5U, "Invalid max length");
-    static_assert(processing::is_static_string<testing_type::value_type>(), "Invalid storage type");
+    static_assert(container::is_static_string<testing_type::value_type>(), "Invalid storage type");
 
     testing_type field;
     BOOST_CHECK(field.valid());

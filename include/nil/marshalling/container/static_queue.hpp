@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-/// @file nil/marshalling/processing/static_queue.hpp
+/// @file nil/marshalling/container/static_queue.hpp
 /// This file contains the definition and implementation of the static queue,
 /// which also can be used as circular buffer.
 
@@ -45,7 +45,7 @@
 
 namespace nil {
     namespace marshalling {
-        namespace processing {
+        namespace container {
             namespace detail {
 
                 template<typename T>
@@ -2798,7 +2798,7 @@ namespace nil {
 
             /// @endcond
 
-        }    // namespace processing
+        }    // namespace container
     }    // namespace marshalling
 }    // namespace nil
 #endif    // MARSHALLING_STATIC_QUEUE_HPP

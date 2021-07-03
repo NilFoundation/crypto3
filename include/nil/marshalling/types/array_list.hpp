@@ -30,8 +30,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/processing/types/static_vector.hpp>
-#include <nil/marshalling/processing/types/array_view.hpp>
+#include <nil/marshalling/container/static_vector.hpp>
 #include <nil/marshalling/types/array_list/behavior.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
@@ -45,7 +44,7 @@ namespace nil {
             /// @details By default uses
             ///     <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a>,
             ///     for internal storage, unless nil::marshalling::option::fixed_size_storage option is used,
-            ///     which forces usage of nil::marshalling::processing::static_vector instead.
+            ///     which forces usage of nil::marshalling::container::static_vector instead.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @tparam TElement Element of the collection, can be either basic integral value
@@ -119,7 +118,7 @@ namespace nil {
                 /// @brief Type of underlying value.
                 /// @details If nil::marshalling::option::fixed_size_storage option is NOT used, the
                 ///     value_type is std::vector<TElement>, otherwise it becomes
-                ///     nil::marshalling::processing::static_vector<TElement, TSize>, where TSize is a size
+                ///     nil::marshalling::container::static_vector<TElement, TSize>, where TSize is a size
                 ///     provided to nil::marshalling::option::fixed_size_storage option.
                 using value_type = typename base_impl_type::value_type;
 

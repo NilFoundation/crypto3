@@ -35,7 +35,7 @@
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
-#include <nil/marshalling/processing/types/static_string.hpp>
+#include <nil/marshalling/container/static_string.hpp>
 
 #include <nil/marshalling/types/detail/common_funcs.hpp>
 
@@ -51,7 +51,7 @@ namespace nil {
                     };
 
                     template<std::size_t TSize>
-                    struct string_max_length_retrieve_helper<nil::marshalling::processing::static_string<TSize>> {
+                    struct string_max_length_retrieve_helper<nil::marshalling::container::static_string<TSize>> {
                         static const std::size_t value = TSize - 1;
                     };
 

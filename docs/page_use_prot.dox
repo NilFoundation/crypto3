@@ -1556,7 +1556,7 @@
 /// multiple options to change the default storage type. 
 /// There is @ref nil::marshalling::option::fixed_size_storage option. When passed to the
 /// @ref nil::marshalling::types::array_list or @ref nil::marshalling::types::String, it changes the
-/// default storage type to be @ref nil::marshalling::processing::static_vector or
+/// default storage type to be @ref nil::marshalling::container::static_vector or
 /// @ref nil::marshalling::processing::StaticString respectively. These types expose the same
 /// public API as @b std::vector or @b std::string, but use pre-allocated 
 /// storage area (as their private member) to store the elements / characters.
@@ -1565,7 +1565,7 @@
 /// stored. If the field definition already uses @ref nil::marshalling::option::sequence_fixed_size
 /// option to specify that number of elements is fixed, there is 
 /// @ref nil::marshalling::option::sequence_fixed_size_use_fixed_size_storage
-/// option which has the same effect of forcing @ref nil::marshalling::processing::static_vector
+/// option which has the same effect of forcing @ref nil::marshalling::container::static_vector
 /// or @ref nil::marshalling::processing::StaticString to be storage types, but does not
 /// require repeating specification of storage area size.
 /// For example, if message type is defined to use provided @b DefaultOptions, then
@@ -1580,10 +1580,10 @@
 /// @code
 /// using MyMessage1 = my_protocol::Message1<MyMessage, MyOptions>;
 /// MyMessage1 msg;
-/// nil::marshalling::processing::static_string<32>& field3Str = msg.field_value3().value();
+/// nil::marshalling::container::static_string<32>& field3Str = msg.field_value3().value();
 /// @endcode
 /// NOTE, that using default @b std::vector / @b std::string or provided
-/// @ref nil::marshalling::processing::static_vector / @ref nil::marshalling::processing::StaticString will involve
+/// @ref nil::marshalling::container::static_vector / @ref nil::marshalling::processing::StaticString will involve
 /// copying of the data to these storage areas during the @b read operation. If
 /// the input buffer is contiguous, i.e the pointer to the last element is @b always
 /// greater than pointer to the first one (not some kind of circular buffer), then

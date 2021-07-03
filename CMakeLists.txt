@@ -72,15 +72,15 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/marshalling/processing/access.hpp
      include/nil/marshalling/processing/aligned_union.hpp
      include/nil/marshalling/processing/alloc.hpp
-     include/nil/marshalling/processing/array_view.hpp
      include/nil/marshalling/processing/bit_size_to_byte_size.hpp
      include/nil/marshalling/processing/scope_guard.hpp
      include/nil/marshalling/processing/size_to_type.hpp
-     include/nil/marshalling/processing/static_queue.hpp
-     include/nil/marshalling/processing/static_string.hpp
-     include/nil/marshalling/processing/static_vector.hpp
-     include/nil/marshalling/processing/string_view.hpp
      include/nil/marshalling/processing/tuple.hpp
+     include/nil/marshalling/container/array_view.hpp
+     include/nil/marshalling/container/static_queue.hpp
+     include/nil/marshalling/container/static_string.hpp
+     include/nil/marshalling/container/static_vector.hpp
+     include/nil/marshalling/container/string_view.hpp
      include/nil/marshalling/protocol/checksum/basic_sum.hpp
      include/nil/marshalling/protocol/checksum/crc.hpp
      include/nil/marshalling/protocol/detail/checksum_layer_options_parser.hpp

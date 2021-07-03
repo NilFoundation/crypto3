@@ -33,9 +33,11 @@
 #include <nil/marshalling/types/array_list/type_traits.hpp>
 #include <nil/marshalling/types/string/type_traits.hpp>
 
-#include <nil/marshalling/processing/types/static_vector.hpp>
-#include <nil/marshalling/processing/types/static_string.hpp>
-#include <nil/marshalling/processing/types/string_view.hpp>
+#include <nil/marshalling/container/array_view.hpp>
+#include <nil/marshalling/container/static_vector.hpp>
+#include <nil/marshalling/container/static_string.hpp>
+#include <nil/marshalling/container/string_view.hpp>
+#include <nil/marshalling/container/type_traits.hpp>
 
 using namespace nil::marshalling;
 
@@ -44,7 +46,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(status_type)
 BOOST_AUTO_TEST_SUITE(marshalling_processing_test_suite)
 
 BOOST_AUTO_TEST_CASE(test1) {
-    typedef processing::static_vector<std::uint8_t, 20> static_vector;
+    typedef container::static_vector<std::uint8_t, 20> static_vector;
 
     static const std::uint8_t Data[] = {0, 1, 2, 3, 4, 5, 6};
     static const auto DataSize = std::extent<decltype(Data)>::value;
@@ -105,8 +107,8 @@ BOOST_AUTO_TEST_CASE(test1) {
 }
 
 BOOST_AUTO_TEST_CASE(test2) {
-    typedef processing::static_vector<std::uint8_t, 20> Vec1;
-    typedef processing::static_vector<std::uint8_t, 40> Vec2;
+    typedef container::static_vector<std::uint8_t, 20> Vec1;
+    typedef container::static_vector<std::uint8_t, 40> Vec2;
 
     static const std::uint8_t Data1[] = {0, 1, 2, 3, 4, 5, 6};
 
@@ -134,8 +136,8 @@ BOOST_AUTO_TEST_CASE(test2) {
 }
 
 BOOST_AUTO_TEST_CASE(test3) {
-    typedef processing::static_string<20> Str;
-    typedef processing::static_string<30> Str2;
+    typedef container::static_string<20> Str;
+    typedef container::static_string<30> Str2;
 
     Str str1;
     BOOST_CHECK(str1.empty());
@@ -174,8 +176,8 @@ BOOST_AUTO_TEST_CASE(test3) {
 }
 
 BOOST_AUTO_TEST_CASE(test4) {
-    typedef processing::static_string<20> Str1;
-    typedef processing::static_string<30> Str2;
+    typedef container::static_string<20> Str1;
+    typedef container::static_string<30> Str2;
 
     Str1 str1("bla");
     Str2 str2("hello");
@@ -200,8 +202,8 @@ BOOST_AUTO_TEST_CASE(test4) {
 }
 
 BOOST_AUTO_TEST_CASE(test5) {
-    typedef processing::static_string<20> Str1;
-    typedef processing::static_string<30> Str2;
+    typedef container::static_string<20> Str1;
+    typedef container::static_string<30> Str2;
 
     Str1 str1("bla");
     Str2 str2("hello");
@@ -237,7 +239,7 @@ BOOST_AUTO_TEST_CASE(test5) {
 }
 
 BOOST_AUTO_TEST_CASE(test6) {
-    typedef processing::static_string<20> Str;
+    typedef container::static_string<20> Str;
 
     Str str("hello");
 
@@ -261,8 +263,8 @@ BOOST_AUTO_TEST_CASE(test6) {
 }
 
 BOOST_AUTO_TEST_CASE(test7) {
-    typedef processing::static_string<20> Str1;
-    typedef processing::static_string<10> Str2;
+    typedef container::static_string<20> Str1;
+    typedef container::static_string<10> Str2;
 
     Str1 str1("hello");
     Str2 str2;
@@ -288,7 +290,7 @@ BOOST_AUTO_TEST_CASE(test7) {
 }
 
 BOOST_AUTO_TEST_CASE(test8) {
-    typedef processing::static_string<20> Str;
+    typedef container::static_string<20> Str;
 
     static const char *OrigStr = "hello";
     Str str(OrigStr);
@@ -353,8 +355,8 @@ BOOST_AUTO_TEST_CASE(test8) {
 }
 
 BOOST_AUTO_TEST_CASE(test9) {
-    typedef processing::static_string<100> Str;
-    typedef processing::static_string<20> Str2;
+    typedef container::static_string<100> Str;
+    typedef container::static_string<20> Str2;
 
     Str str("abc");
     Str2 strTmp("ABCDEFGHIJK");
@@ -372,8 +374,8 @@ BOOST_AUTO_TEST_CASE(test9) {
 }
 
 BOOST_AUTO_TEST_CASE(test10) {
-    typedef processing::static_string<100> Str;
-    typedef processing::static_string<20> Str2;
+    typedef container::static_string<100> Str;
+    typedef container::static_string<20> Str2;
 
     Str str("abc");
     Str2 strTmp("ABCDEFGHIJK");
@@ -384,8 +386,8 @@ BOOST_AUTO_TEST_CASE(test10) {
 }
 
 BOOST_AUTO_TEST_CASE(test11) {
-    typedef processing::static_string<100> Str;
-    typedef processing::static_string<20> Str2;
+    typedef container::static_string<100> Str;
+    typedef container::static_string<20> Str2;
 
     Str str("abcdefghijklmnopqrst");
     Str2 str2("fghijklm");
@@ -399,8 +401,8 @@ BOOST_AUTO_TEST_CASE(test11) {
 }
 
 BOOST_AUTO_TEST_CASE(test12) {
-    typedef processing::static_string<100> Str;
-    typedef processing::static_string<50> Str2;
+    typedef container::static_string<100> Str;
+    typedef container::static_string<50> Str2;
 
     Str str("abcdefg");
     Str2 str2("HIJKLMNOP");
@@ -440,7 +442,7 @@ BOOST_AUTO_TEST_CASE(test12) {
 }
 
 BOOST_AUTO_TEST_CASE(test13) {
-    typedef processing::static_string<100> Str;
+    typedef container::static_string<100> Str;
 
     Str str("hello");
     auto str2 = str.substr(2);
@@ -451,7 +453,7 @@ BOOST_AUTO_TEST_CASE(test13) {
 }
 
 BOOST_AUTO_TEST_CASE(test14) {
-    typedef processing::static_string<100> Str;
+    typedef container::static_string<100> Str;
 
     Str str("hello");
 
@@ -464,7 +466,7 @@ BOOST_AUTO_TEST_CASE(test14) {
 }
 
 BOOST_AUTO_TEST_CASE(test15) {
-    typedef processing::static_string<100> Str;
+    typedef container::static_string<100> Str;
 
     Str str("hello");
 
@@ -477,8 +479,8 @@ BOOST_AUTO_TEST_CASE(test15) {
 }
 
 BOOST_AUTO_TEST_CASE(test16) {
-    typedef processing::static_string<100> Str1;
-    typedef processing::static_string<50> Str2;
+    typedef container::static_string<100> Str1;
+    typedef container::static_string<50> Str2;
 
     Str1 str1("hello");
     Str2 str2("dead beef");
@@ -491,7 +493,7 @@ BOOST_AUTO_TEST_CASE(test16) {
 }
 
 BOOST_AUTO_TEST_CASE(test17) {
-    typedef processing::static_string<100> Str;
+    typedef container::static_string<100> Str;
 
     Str str1("abcdefabc");
     Str emptyStr;
@@ -558,9 +560,9 @@ BOOST_AUTO_TEST_CASE(test17) {
 }
 
 BOOST_AUTO_TEST_CASE(test18) {
-    typedef processing::static_string<100> Str1;
-    typedef processing::static_string<50> Str2;
-    typedef processing::static_string<70> Str3;
+    typedef container::static_string<100> Str1;
+    typedef container::static_string<50> Str2;
+    typedef container::static_string<70> Str3;
 
     Str1 str1("abcd");
     Str2 str2("abce");
@@ -576,8 +578,8 @@ BOOST_AUTO_TEST_CASE(test18) {
 }
 
 BOOST_AUTO_TEST_CASE(test19) {
-    typedef processing::static_vector<int, 100> Vec1;
-    typedef processing::static_vector<int, 50> Vec2;
+    typedef container::static_vector<int, 100> Vec1;
+    typedef container::static_vector<int, 50> Vec2;
 
     Vec1 vec1;
     BOOST_CHECK(vec1.empty());
@@ -615,8 +617,8 @@ BOOST_AUTO_TEST_CASE(test19) {
 }
 
 BOOST_AUTO_TEST_CASE(test20) {
-    typedef processing::static_vector<std::string, 100> Vec1;
-    typedef processing::static_vector<std::string, 50> Vec2;
+    typedef container::static_vector<std::string, 100> Vec1;
+    typedef container::static_vector<std::string, 50> Vec2;
 
     Vec1 vec1;
     BOOST_CHECK(vec1.empty());
@@ -666,9 +668,9 @@ BOOST_AUTO_TEST_CASE(test20) {
 }
 
 BOOST_AUTO_TEST_CASE(test21) {
-    typedef processing::static_vector<std::string, 100> Vec1;
-    typedef processing::static_vector<std::string, 50> Vec2;
-    typedef processing::static_vector<std::string, 70> Vec3;
+    typedef container::static_vector<std::string, 100> Vec1;
+    typedef container::static_vector<std::string, 50> Vec2;
+    typedef container::static_vector<std::string, 70> Vec3;
 
     const Vec1 vec1 = {"str1", "str2", "str3"};
 
@@ -684,7 +686,7 @@ BOOST_AUTO_TEST_CASE(test21) {
 }
 
 BOOST_AUTO_TEST_CASE(test22) {
-    typedef processing::static_vector<std::string, 100> Vec;
+    typedef container::static_vector<std::string, 100> Vec;
 
     Vec vec1 = {"str1", "str2", "str3", "str4"};
 
@@ -752,8 +754,8 @@ BOOST_AUTO_TEST_CASE(test22) {
 }
 
 BOOST_AUTO_TEST_CASE(test23) {
-    typedef processing::static_vector<std::string, 100> Vec1;
-    typedef processing::static_vector<std::string, 50> Vec2;
+    typedef container::static_vector<std::string, 100> Vec1;
+    typedef container::static_vector<std::string, 50> Vec2;
 
     const Vec1 origVec1 = {"str1", "str2", "str3"};
 
@@ -785,9 +787,9 @@ BOOST_AUTO_TEST_CASE(test23) {
 }
 
 BOOST_AUTO_TEST_CASE(test24) {
-    typedef processing::static_string<20> StaticStr;
-    typedef processing::static_vector<std::uint8_t, 20> StaticVec;
-    typedef processing::static_vector<char, 20> StaticVecChar;
+    typedef container::static_string<20> StaticStr;
+    typedef container::static_vector<std::uint8_t, 20> StaticVec;
+    typedef container::static_vector<char, 20> StaticVecChar;
 
     static_assert(types::basic::detail::string_has_push_back<std::string>::value,
                   "std::string must have push_back");
@@ -796,7 +798,7 @@ BOOST_AUTO_TEST_CASE(test24) {
                   "static_string must have push_back");
 
     static_assert(
-        !types::basic::detail::string_has_push_back<processing::string_view>::value,
+        !types::basic::detail::string_has_push_back<container::string_view>::value,
         "string_view doesn't have push_back");
 
     static_assert(types::basic::detail::string_has_assign<std::string>::value,
@@ -808,7 +810,7 @@ BOOST_AUTO_TEST_CASE(test24) {
                   "assign");
 
     static_assert(
-        !types::basic::detail::string_has_assign<processing::string_view>::value,
+        !types::basic::detail::string_has_assign<container::string_view>::value,
         "string_view doesn't have assign");
 
     static_assert(types::basic::detail::vector_has_assign<std::vector<std::uint8_t>>::value,
@@ -819,35 +821,35 @@ BOOST_AUTO_TEST_CASE(test24) {
                   "have assign");
 
     static_assert(!types::basic::detail::vector_has_assign<
-                      processing::array_view<std::uint8_t>>::value,
+                      container::array_view<std::uint8_t>>::value,
                   "array_view has assign");
 
     static_assert(has_member_function_reserve<std::string>::value, "std::string must have reserve");
     static_assert(has_member_function_reserve<StaticStr>::value, "static_string must have reserve");
     static_assert(has_member_function_reserve<StaticVec>::value, "static_vector must have reserve");
-    static_assert(!has_member_function_reserve<processing::string_view>::value,
+    static_assert(!has_member_function_reserve<container::string_view>::value,
                   "string_view mustn't have reserve");
 
     static_assert(has_member_function_clear<std::string>::value, "std::string must have clear");
     static_assert(has_member_function_clear<StaticStr>::value, "static_string must have clear");
     static_assert(has_member_function_clear<StaticVec>::value, "static_vector must have clear");
-    static_assert(!has_member_function_clear<processing::string_view>::value,
+    static_assert(!has_member_function_clear<container::string_view>::value,
                   "string_view mustn't have clear");
 
-    static_assert(has_member_function_remove_suffix<processing::string_view>::value,
+    static_assert(has_member_function_remove_suffix<container::string_view>::value,
                   "string_view must have remove_suffix");
 
-    static_assert(std::is_base_of<processing::detail::static_vector_casted<char, unsigned char, 20>,
+    static_assert(std::is_base_of<container::detail::static_vector_casted<char, unsigned char, 20>,
                                   StaticVecChar>::value,
                   "Wrong base class");
 
-    static_assert(std::is_base_of<processing::detail::static_vector_generic<unsigned char, 20>,
+    static_assert(std::is_base_of<container::detail::static_vector_generic<unsigned char, 20>,
                                   StaticVecChar>::value,
                   "Wrong base class");
 }
 
 BOOST_AUTO_TEST_CASE(test25) {
-    processing::string_view str("hello");
+    container::string_view str("hello");
     BOOST_CHECK(str.size() == 5U);
     BOOST_CHECK(!str.empty());
     BOOST_CHECK(std::string(str.begin(), str.end()) == "hello");
@@ -862,7 +864,7 @@ BOOST_AUTO_TEST_CASE(test25) {
     BOOST_CHECK(0 < str.compare("hell"));
     BOOST_CHECK(0 < str.compare("hebbol"));
     BOOST_CHECK(str.find("el") == 1);
-    BOOST_CHECK(str.find("le") == processing::string_view::npos);
+    BOOST_CHECK(str.find("le") == container::string_view::npos);
     BOOST_CHECK(str.find('l', 3) == 3);
     BOOST_CHECK(str.find_first_of("ollh") == 0);
     BOOST_CHECK(str.find_last_of("llh") == 3);

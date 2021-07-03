@@ -31,8 +31,8 @@
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/processing/types/static_string.hpp>
-#include <nil/marshalling/processing/types/string_view.hpp>
+#include <nil/marshalling/container/static_string.hpp>
+#include <nil/marshalling/container/string_view.hpp>
 #include <nil/marshalling/types/string/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
@@ -49,7 +49,7 @@ namespace nil {
 
                 template<>
                 struct string_orig_data_view_storage_type<true> {
-                    using type = nil::marshalling::processing::string_view;
+                    using type = nil::marshalling::container::string_view;
                 };
 
                 template<>
@@ -63,7 +63,7 @@ namespace nil {
                 template<>
                 struct string_fixed_size_use_fixed_size_storage_type<true> {
                     template<typename TOpt>
-                    using type = nil::marshalling::processing::static_string<TOpt::sequence_fixed_size>;
+                    using type = nil::marshalling::container::static_string<TOpt::sequence_fixed_size>;
                 };
 
                 template<>
@@ -78,7 +78,7 @@ namespace nil {
                 template<>
                 struct string_fixed_size_storage_type<true> {
                     template<typename TOpt>
-                    using type = nil::marshalling::processing::static_string<TOpt::fixed_size_storage>;
+                    using type = nil::marshalling::container::static_string<TOpt::fixed_size_storage>;
                 };
 
                 template<>
@@ -167,7 +167,7 @@ namespace nil {
                 /// @brief Type of underlying value.
                 /// @details If nil::marshalling::option::fixed_size_storage option is NOT used, the
                 ///     value_type is std::string, otherwise it becomes
-                ///     nil::marshalling::processing::static_string<TSize>, where TSize is a size
+                ///     nil::marshalling::container::static_string<TSize>, where TSize is a size
                 ///     provided to nil::marshalling::option::fixed_size_storage option.
                 using value_type = typename base_impl_type::value_type;
 

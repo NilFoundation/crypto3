@@ -32,13 +32,11 @@
 #include <initializer_list>
 
 #include <nil/marshalling/assert_type.hpp>
-#include <nil/marshalling/processing/types/static_vector.hpp>
+#include <nil/marshalling/container/static_vector.hpp>
 
 namespace nil {
     namespace marshalling {
-
-        namespace processing {
-
+        namespace container {
             namespace detail {
 
                 template<typename TChar>
@@ -678,7 +676,7 @@ namespace nil {
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>.
             /// @tparam TSize Maximum length of the string, not including zero termination character.
             /// @tparam Type of the single character.
-            /// @headerfile "marshalling/processing/StaticString.h"
+            /// @headerfile "marshalling/container/static_string.h"
             template<std::size_t TSize, typename TChar = char>
             class static_string : public detail::static_string_storage_base<TChar, TSize + 1>,
                                   public detail::static_string_base<TChar> {
@@ -725,7 +723,7 @@ namespace nil {
                 }
 
                 /// @brief Constructor variant.
-                /// @details Allows reception of any other StaticString with any size.
+                /// @details Allows reception of any other static_string with any size.
                 /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/basic_string">Reference</a>
                 template<std::size_t TOtherSize>
                 static_string(const static_string<TOtherSize, TChar> &other, size_type pos, size_type count = npos) :
@@ -1572,7 +1570,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator<(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return std::lexicographical_compare(str1.begin(), str1.end(), str2.begin(), str2.end());
@@ -1580,7 +1578,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator<(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return (str2 > str1);
@@ -1588,7 +1586,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator<=(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return !(str2 < str1);
@@ -1596,7 +1594,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator<=(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return !(str2 < str1);
@@ -1604,7 +1602,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator>(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return (str2 < str1);
@@ -1612,7 +1610,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator>(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return (str2 < str1);
@@ -1620,7 +1618,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator>=(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return !(str1 < str2);
@@ -1628,7 +1626,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator>=(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return !(str1 < str2);
@@ -1636,7 +1634,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator>=(const static_string<TSize1, TChar> &str1, const TChar *str2) {
                 return !(str1 < str2);
@@ -1644,7 +1642,7 @@ namespace nil {
 
             /// @brief Lexicographical compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator==(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return (str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin());
@@ -1652,7 +1650,7 @@ namespace nil {
 
             /// @brief Equality compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator==(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return str2 == str1;
@@ -1660,7 +1658,7 @@ namespace nil {
 
             /// @brief Inequality compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, typename TChar>
             bool operator!=(const TChar *str1, const static_string<TSize1, TChar> &str2) {
                 return !(str2 == str1);
@@ -1668,36 +1666,12 @@ namespace nil {
 
             /// @brief Inequality compare between the strings.
             /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp">Reference</a>
-            /// @related StaticString
+            /// @related static_string
             template<std::size_t TSize1, std::size_t TSize2, typename TChar>
             bool operator!=(const static_string<TSize1, TChar> &str1, const static_string<TSize2, TChar> &str2) {
                 return !(str1 == str2);
             }
-
-            namespace detail {
-
-                template<typename T>
-                struct is_static_string {
-                    static const bool value = false;
-                };
-
-                template<std::size_t TSize>
-                struct is_static_string<nil::marshalling::processing::static_string<TSize>> {
-                    static const bool value = true;
-                };
-
-            }    // namespace detail
-
-            /// @brief Compile time check whether the provided type is a variant of
-            ///     @ref nil::marshalling::processing::StaticString
-            /// @related nil::marshalling::processing::StaticString
-            template<typename T>
-            static constexpr bool is_static_string() {
-                return detail::is_static_string<T>::value;
-            }
-
-        }    // namespace processing
-
+        }    // namespace container
     }    // namespace marshalling
 }    // namespace nil
 
@@ -1705,10 +1679,10 @@ namespace std {
 
     /// @brief Specializes the std::swap algorithm.
     /// @see <a href="http://en.cppreference.com/w/cpp/string/basic_string/swap2">Reference</a>
-    /// @related nil::marshalling::processing::StaticString
+    /// @related nil::marshalling::container::static_string
     template<std::size_t TSize1, std::size_t TSize2, typename TChar>
-    void swap(nil::marshalling::processing::static_string<TSize1, TChar> &str1,
-              nil::marshalling::processing::static_string<TSize2, TChar> &str2) {
+    void swap(nil::marshalling::container::static_string<TSize1, TChar> &str1,
+              nil::marshalling::container::static_string<TSize2, TChar> &str2) {
         str1.swap(str2);
     }
 
