@@ -42,15 +42,7 @@ endmacro()
 set(TESTS_NAMES
     "pack"
     "processing"
-    "checksum_prefix_layer"
-    "types"
-    "msg_size_layer"
-    "message"
-    "msg_id_layer"
-    "sync_prefix_layer"
-    "msg_data_layer"
-    "checksum_layer"
-    "transport_value_layer")
+    "types")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})

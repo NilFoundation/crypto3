@@ -35,7 +35,6 @@
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
-#include <nil/marshalling/processing/static_vector.hpp>
 #include <nil/marshalling/processing/static_string.hpp>
 
 #include <nil/marshalling/types/basic/common_funcs.hpp>

@@ -26,7 +26,6 @@
 #define BOOST_TEST_MODULE hash_pack_test
 
 #include <boost/array.hpp>
-#include<boost/container/static_vector.hpp>
 #include <boost/cstdint.hpp>
 
 #include <boost/test/unit_test.hpp>
