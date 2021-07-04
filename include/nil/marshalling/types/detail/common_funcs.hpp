@@ -151,13 +151,13 @@ namespace nil {
 
                     template<typename TFields>
                     static constexpr bool are_members_version_dependent() {
-                        return nil::marshalling::processing::tuple_type_accumulate<TFields>(
+                        return processing::tuple_type_accumulate<TFields>(
                             false, version_dependency_checker());
                     }
 
                     template<typename TFields, typename TVersionType>
                     static bool set_version_for_members(TFields &fields, TVersionType version) {
-                        return nil::marshalling::processing::tuple_accumulate(fields, false,
+                        return processing::tuple_accumulate(fields, false,
                                                                               make_version_updater(version));
                     }
 

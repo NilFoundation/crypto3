@@ -135,14 +135,14 @@ namespace nil {
                             return status_type::not_enough_data;
                         }
 
-                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
+                        elem = processing::read_data<element_type>(iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
 
                     template<typename TIter>
                     static void read_element_no_status(element_type &elem, TIter &iter) {
-                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
+                        elem = processing::read_data<element_type>(iter, endian_type());
                     }
 
                     template<typename TIter>
@@ -195,14 +195,14 @@ namespace nil {
                             return status_type::buffer_overflow;
                         }
 
-                        nil::marshalling::processing::write_data(elem, iter, endian_type());
+                        processing::write_data(elem, iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
 
                     template<typename TIter>
                     static void write_element_no_status(const element_type &elem, TIter &iter) {
-                        nil::marshalling::processing::write_data(elem, iter, endian_type());
+                        processing::write_data(elem, iter, endian_type());
                     }
 
                     template<typename TIter>

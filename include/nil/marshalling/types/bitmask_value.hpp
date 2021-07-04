@@ -49,7 +49,7 @@ namespace nil {
                 struct bitmask_undertlying_type<true> {
                     template<typename TOptionsBundle>
                     using type =
-                        typename nil::marshalling::processing::size_to_type<TOptionsBundle::fixed_length, false>::type;
+                        typename processing::size_to_type<TOptionsBundle::fixed_length, false>::type;
                 };
 
                 template<>

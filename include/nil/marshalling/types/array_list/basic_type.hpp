@@ -302,7 +302,7 @@ namespace nil {
                             return status_type::not_enough_data;
                         }
 
-                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
+                        elem = processing::read_data<element_type>(iter, endian_type());
                         len -= sizeof(element_type);
                         return status_type::success;
                     }
@@ -326,7 +326,7 @@ namespace nil {
 
                     template<typename TIter>
                     static void read_no_status_integral_element(element_type &elem, TIter &iter) {
-                        elem = nil::marshalling::processing::read_data<element_type>(iter, endian_type());
+                        elem = processing::read_data<element_type>(iter, endian_type());
                     }
 
                     template<typename TIter>

@@ -47,7 +47,7 @@ namespace nil {
                     using value_type = T;
 
                     using serialized_type =
-                        typename nil::marshalling::processing::size_to_type<sizeof(value_type), false>::type;
+                        typename processing::size_to_type<sizeof(value_type), false>::type;
 
                     using scaling_ratio_type = std::ratio<1, 1>;
 

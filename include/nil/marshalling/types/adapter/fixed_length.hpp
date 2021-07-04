@@ -50,7 +50,7 @@ namespace nil {
 
                     using serialized_type = typename std::conditional<
                         (TLen < sizeof(base_serialized_type)),
-                        typename nil::marshalling::processing::
+                        typename processing::
                             size_to_type<TLen, std::is_signed<base_serialized_type>::value>::type,
                         base_serialized_type>::type;
 
@@ -101,7 +101,7 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue = nil::marshalling::processing::read_data<serialized_type, byte_length>(
+                        auto serializedValue = processing::read_data<serialized_type, byte_length>(
                             iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }

@@ -73,7 +73,7 @@ namespace nil {
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
                         auto serializedValue
-                            = nil::marshalling::processing::read_data<serialized_type>(iter, endian_type());
+                            = processing::read_data<serialized_type>(iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }
 
@@ -89,7 +89,7 @@ namespace nil {
 
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
-                        nil::marshalling::processing::write_data(to_serialized(base_impl_type::value()), iter,
+                        processing::write_data(to_serialized(base_impl_type::value()), iter,
                                                                  endian_type());
                     }
 

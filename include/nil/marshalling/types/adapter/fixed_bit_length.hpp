@@ -46,7 +46,7 @@ namespace nil {
 
                     static const std::size_t bit_length = TLen;
                     static const std::size_t byte_length
-                        = nil::marshalling::processing::bit_size_to_byte_size<bit_length>::value;
+                        = processing::bit_size_to_byte_size<bit_length>::value;
 
                     static_assert(0 < bit_length, "Bit length is expected to be greater than 0");
                     static_assert(byte_length <= sizeof(base_serialized_type), "The provided length limit is too big");
@@ -56,7 +56,7 @@ namespace nil {
 
                     using serialized_type = typename std::conditional<
                         (byte_length < sizeof(base_serialized_type)),
-                        typename nil::marshalling::processing::
+                        typename processing::
                             size_to_type<byte_length, std::is_signed<base_serialized_type>::value>::type,
                         base_serialized_type>::type;
 
@@ -107,7 +107,7 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue = nil::marshalling::processing::read_data<serialized_type, byte_length>(
+                        auto serializedValue = processing::read_data<serialized_type, byte_length>(
                             iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }

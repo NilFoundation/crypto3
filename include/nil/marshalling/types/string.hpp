@@ -43,7 +43,7 @@ namespace nil {
             /// @details By default uses
             ///     <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>,
             ///     for internal storage, unless nil::marshalling::option::fixed_size_storage option is used,
-            ///     which forces usage of nil::marshalling::processing::StaticString instead.
+            ///     which forces usage of nil::marshalling::container::static_string instead.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @tparam TOptions Zero or more options that modify/refine default behaviour

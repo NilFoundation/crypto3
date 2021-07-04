@@ -1580,10 +1580,10 @@ namespace nil {
                 class StaticQueueBaseOptimised<T *>
                     : public CastWrapperQueueBase<
                           T *,
-                          typename nil::marshalling::processing::size_to_type<sizeof(T *)>::type> {
+                          typename processing::size_to_type<sizeof(T *)>::type> {
                     using Base
                         = CastWrapperQueueBase<T *,
-                                               typename nil::marshalling::processing::size_to_type<sizeof(T *)>::type>;
+                                               typename processing::size_to_type<sizeof(T *)>::type>;
 
                 protected:
                     using Base = typename Base::StorageTypePtr;

@@ -44,7 +44,7 @@ namespace nil {
                 class variant : public TFieldBase {
                 public:
                     using members_type = TMembers;
-                    using value_type = nil::marshalling::processing::tuple_as_aligned_union_type<members_type>;
+                    using value_type = processing::tuple_as_aligned_union_type<members_type>;
 
                     variant() = default;
 
@@ -59,7 +59,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             other.memIdx_, copy_construct_helper(&storage_, &other.storage_));
 
                         memIdx_ = other.memIdx_;
@@ -70,7 +70,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             other.memIdx_, move_construct_helper(&storage_, &other.storage_));
 
                         memIdx_ = other.memIdx_;
@@ -90,7 +90,7 @@ namespace nil {
                             return *this;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             other.memIdx_, copy_construct_helper(&storage_, &other.storage_));
 
                         memIdx_ = other.memIdx_;
@@ -108,7 +108,7 @@ namespace nil {
                             return *this;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             other.memIdx_, move_construct_helper(&storage_, &other.storage_));
 
                         memIdx_ = other.memIdx_;
@@ -129,7 +129,7 @@ namespace nil {
                         }
 
                         std::size_t len = std::numeric_limits<std::size_t>::max();
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, length_calc_helper(len, &storage_));
                         return len;
                     }
@@ -139,7 +139,7 @@ namespace nil {
                     }
 
                     static constexpr std::size_t max_length() {
-                        return nil::marshalling::processing::tuple_type_accumulate<members_type>(
+                        return processing::tuple_type_accumulate<members_type>(
                             std::size_t(0), max_length_calc_helper());
                     }
 
@@ -149,7 +149,7 @@ namespace nil {
                         }
 
                         bool val = false;
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, valid_check_helper(val, &storage_));
                         return val;
                     }
@@ -160,7 +160,7 @@ namespace nil {
                         }
 
                         bool val = false;
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, refresh_helper(val, &storage_));
                         return val;
                     }
@@ -169,7 +169,7 @@ namespace nil {
                     status_type read(TIter &iter, std::size_t len) {
                         check_destruct();
                         auto es = status_type::error_status_amount;
-                        nil::marshalling::processing::tuple_for_each_type<members_type>(
+                        processing::tuple_for_each_type<members_type>(
                             make_read_helper(es, iter, len, &storage_));
                         MARSHALLING_ASSERT((es == status_type::success)
                                            || (members_count <= memIdx_));
@@ -188,7 +188,7 @@ namespace nil {
                         }
 
                         auto es = status_type::error_status_amount;
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, make_write_helper(es, iter, len, &storage_));
                         return es;
                     }
@@ -199,7 +199,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, make_write_no_status_helper(iter, &storage_));
                     }
 
@@ -217,7 +217,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             idx, construct_helper(&storage_));
                         memIdx_ = idx;
                     }
@@ -229,7 +229,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, make_exec_helper(std::forward<TFunc>(func)));
                     }
 
@@ -240,7 +240,7 @@ namespace nil {
                             return;
                         }
 
-                        nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                        processing::tuple_for_selected_type<members_type>(
                             memIdx_, make_const_exec_helper(std::forward<TFunc>(func)));
                     }
 
@@ -563,7 +563,7 @@ namespace nil {
 
                     void check_destruct() {
                         if (current_field_valid()) {
-                            nil::marshalling::processing::tuple_for_selected_type<members_type>(
+                            processing::tuple_for_selected_type<members_type>(
                                 memIdx_, destruct_helper(&storage_));
                             memIdx_ = members_count;
                         }

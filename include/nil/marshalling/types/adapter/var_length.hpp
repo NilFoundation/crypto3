@@ -53,7 +53,7 @@ namespace nil {
 
                     using serialized_type =
                         typename std::conditional<(TMaxLen < sizeof(base_serialized_type)),
-                                                  typename nil::marshalling::processing::size_to_type<
+                                                  typename processing::size_to_type<
                                                       TMaxLen, std::is_signed<base_serialized_type>::value>::type,
                                                   base_serialized_type>::type;
 
@@ -117,7 +117,7 @@ namespace nil {
                                 return status_type::not_enough_data;
                             }
 
-                            auto byte = nil::marshalling::processing::read_data<std::uint8_t>(iter, endian_type());
+                            auto byte = processing::read_data<std::uint8_t>(iter, endian_type());
                             auto byteValue = byte & var_length_value_bits_mask;
                             add_byte_to_serialized_value(byteValue, byteCount, val,
                                                          typename base_impl_type::endian_type());
@@ -164,7 +164,7 @@ namespace nil {
                                 byte |= var_length_continue_bit;
                             }
 
-                            nil::marshalling::processing::write_data(byte, iter, endian_type());
+                            processing::write_data(byte, iter, endian_type());
                             ++byteCount;
                             MARSHALLING_ASSERT(byteCount <= max_length());
                             --size;
@@ -188,7 +188,7 @@ namespace nil {
                                 byte |= var_length_continue_bit;
                             }
 
-                            nil::marshalling::processing::write_data(byte, iter, endian_type());
+                            processing::write_data(byte, iter, endian_type());
                             ++byteCount;
                             MARSHALLING_ASSERT(byteCount <= max_length());
                         }

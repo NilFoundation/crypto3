@@ -66,7 +66,7 @@ namespace nil {
 
                     bool valid() const {
                         return base_impl_type::valid()
-                               && nil::marshalling::processing::tuple_type_accumulate<TRanges>(
+                               && processing::tuple_type_accumulate<TRanges>(
                                    false, Validator(base_impl_type::value()));
                     }
 
