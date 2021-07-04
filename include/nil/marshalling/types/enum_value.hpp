@@ -88,7 +88,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/enum_value.h
+            /// @headerfile nil/marshalling/types/enum_value.hpp
             template<typename TFieldBase, typename TEnum, typename... TOptions>
             class enum_value
                 : private detail::adapt_basic_field_type<basic::enum_value<TFieldBase, TEnum>, TOptions...> {

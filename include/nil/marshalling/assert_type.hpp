@@ -41,7 +41,7 @@ namespace nil {
         /// @details In order to implement custom assertion failure behaviour it
         ///          is necessary to inherit from this class and override
         ///          fail() virtual member function.
-        /// @headerfile nil/marshalling/assert_type.h
+        /// @headerfile nil/marshalling/assert_type.hpp
         class assert_type {
         public:
             /// @brief Destructor
@@ -104,7 +104,7 @@ namespace nil {
         /// @tparam TAssert Class derived from Assert that implements new custom
         ///                 behaviour of the assertion failure.
         /// @pre TAssert class must be derived from nil::marshalling::assert_type.
-        /// @headerfile nil/marshalling/assert_type.h
+        /// @headerfile nil/marshalling/assert_type.hpp
         template<typename TAssert>
         class enable_assert {
             static_assert(std::is_base_of<assert_type, TAssert>::value,

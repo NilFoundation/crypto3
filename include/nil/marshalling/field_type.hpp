@@ -45,7 +45,7 @@ namespace nil {
         ///     @li nil::marshalling::option::BigEndian or nil::marshalling::option::LittleEndian - Option to
         ///         specify serialization endian. If none is provided big endian is
         ///         assumed.
-        /// @headerfile nil/marshalling/field_type.h
+        /// @headerfile nil/marshalling/field_type.hpp
         template<typename... TOptions>
         class field_type : public detail::field_base<TOptions...> {
             using base_impl_type = detail::field_base<TOptions...>;

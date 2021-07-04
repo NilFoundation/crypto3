@@ -105,7 +105,7 @@ namespace nil {
             /// @pre Every field member specifies its length in bits using
             ///     nil::marshalling::option::fixed_bit_length option.
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/bitfield.h
+            /// @headerfile nil/marshalling/types/bitfield.hpp
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS()
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>

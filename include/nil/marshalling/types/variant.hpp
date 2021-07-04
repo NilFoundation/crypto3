@@ -90,7 +90,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/variant.h
+            /// @headerfile nil/marshalling/types/variant.hpp
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS()
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>

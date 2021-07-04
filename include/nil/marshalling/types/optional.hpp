@@ -55,7 +55,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::has_custom_refresh
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/optional.h
+            /// @headerfile nil/marshalling/types/optional.hpp
             template<typename TField, typename... TOptions>
             class optional : private detail::adapt_basic_field_type<basic::optional<TField>, TOptions...> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::optional<TField>, TOptions...>;

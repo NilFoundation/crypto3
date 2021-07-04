@@ -46,7 +46,7 @@ namespace nil {
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/no_value.h
+            /// @headerfile nil/marshalling/types/no_value.hpp
             template<typename TFieldBase>
             class no_value : private detail::adapt_basic_field_type<basic::no_value<TFieldBase>> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::no_value<TFieldBase>>;

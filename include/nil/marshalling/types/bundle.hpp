@@ -79,7 +79,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/bundle.h
+            /// @headerfile nil/marshalling/types/bundle.hpp
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS()
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>

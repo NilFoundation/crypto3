@@ -29,10 +29,7 @@
 #include <vector>
 
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/options.hpp>
-#include <nil/marshalling/container/static_vector.hpp>
-#include <nil/marshalling/types/array_list/behavior.hpp>
-#include <nil/marshalling/types/detail/adapt_basic_field.hpp>
+#include <nil/marshalling/types/array_list/behaviour.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
 
 #include <nil/marshalling/types/tag.hpp>
@@ -48,7 +45,7 @@ namespace nil {
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
             /// @tparam TElement Element of the collection, can be either basic integral value
-            ///     (such as std::uint8_t) or any other field from nil::marshalling::field namespace.@n
+            ///     (such as std::uint8_t) or any other field from nil::marshalling::types namespace.@n
             ///     For example:
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
@@ -96,7 +93,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/array_list.h
+            /// @headerfile nil/marshalling/types/array_list.hpp
             template<typename TFieldBase, typename TElement, typename... TOptions>
             class array_list : private detail::array_list_base_type<TFieldBase, TElement, TOptions...> {
                 using base_impl_type = detail::array_list_base_type<TFieldBase, TElement, TOptions...>;

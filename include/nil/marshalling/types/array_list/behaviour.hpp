@@ -23,13 +23,12 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_ARRAY_LIST_BEHAVIOR_HPP
-#define MARSHALLING_ARRAY_LIST_BEHAVIOR_HPP
+#ifndef MARSHALLING_ARRAY_LIST_BEHAVIOUR_HPP
+#define MARSHALLING_ARRAY_LIST_BEHAVIOUR_HPP
 
 #include <vector>
 
 #include <nil/marshalling/status_type.hpp>
-#include <nil/marshalling/options.hpp>
 #include <nil/marshalling/container/static_vector.hpp>
 #include <nil/marshalling/container/array_view.hpp>
 #include <nil/marshalling/types/array_list/basic_type.hpp>
@@ -121,4 +120,4 @@ namespace nil {
         }    // namespace types
     }        // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_ARRAY_LIST_BEHAVIOR_HPP
+#endif    // MARSHALLING_ARRAY_LIST_BEHAVIOUR_HPP

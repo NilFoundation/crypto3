@@ -34,7 +34,7 @@ namespace nil {
         namespace types {
 
             /// @brief Mode to be used by nil::marshalling::types::optional
-            /// @headerfile nil/marshalling/types/optional_mode.h
+            /// @headerfile nil/marshalling/types/optional_mode.hpp
             enum class optional_mode {
                 tentative,      ///< The field existence is tentative, i.e. If there is enough bytes
                                 /// to read the field's value, than field exists, if not

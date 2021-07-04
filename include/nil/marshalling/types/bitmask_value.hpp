@@ -104,7 +104,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/bitmask_value.h
+            /// @headerfile nil/marshalling/types/bitmask_value.hpp
             /// @see MARSHALLING_BITMASK_BITS()
             /// @see MARSHALLING_BITMASK_BITS_ACCESS()
             /// @see MARSHALLING_BITMASK_BITS_ACCESS_NOTEMPLATE()
@@ -113,13 +113,6 @@ namespace nil {
             template<typename TFieldBase, typename... TOptions>
             class bitmask_value : public TFieldBase {
                 using base_impl_type = TFieldBase;
-
-                using options_bundle_type = detail::options_parser<TOptions...>;
-
-                using int_value_type = detail::bitmask_undertlying_type_type<options_bundle_type>;
-
-                using int_value_field_type = int_value<TFieldBase, int_value_type, TOptions...>;
-
             public:
                 /// @brief endian_type used for serialization.
                 using endian_type = typename base_impl_type::endian_type;
@@ -128,7 +121,15 @@ namespace nil {
                 using version_type = typename base_impl_type::version_type;
 
                 /// @brief All the options provided to this class bundled into struct.
-                using parsed_options_type = options_bundle_type;
+                using parsed_options_type = detail::options_parser<TOptions...>;
+
+            private:
+                
+                using int_value_type = detail::bitmask_undertlying_type_type<parsed_options_type>;
+
+                using int_value_field_type = int_value<TFieldBase, int_value_type, TOptions...>;
+
+            public:
 
                 /// @brief Tag indicating type of the field
                 using tag = tag::bitmask;

@@ -72,7 +72,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/float_value.h
+            /// @headerfile nil/marshalling/types/float_value.hpp
             template<typename TFieldBase, typename T, typename... TOptions>
             class float_value : private detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...> {
                 using base_impl_type = detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...>;
