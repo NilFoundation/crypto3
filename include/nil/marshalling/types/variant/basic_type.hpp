@@ -168,7 +168,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         check_destruct();
-                        auto es = status_type::error_status_amount;
+                        status_type es = status_type::error_status_amount;
                         processing::tuple_for_each_type<members_type>(
                             make_read_helper(es, iter, len, &storage_));
                         MARSHALLING_ASSERT((es == status_type::success)
@@ -187,7 +187,7 @@ namespace nil {
                             return status_type::success;
                         }
 
-                        auto es = status_type::error_status_amount;
+                        status_type es = status_type::error_status_amount;
                         processing::tuple_for_selected_type<members_type>(
                             memIdx_, make_write_helper(es, iter, len, &storage_));
                         return es;
@@ -481,7 +481,7 @@ namespace nil {
                             auto *field = new (storage_) TField;
 
                             auto iterTmp = iter_;
-                            auto es = field->read(iterTmp, len_);
+                            status_type es = field->read(iterTmp, len_);
                             if (es == status_type::success) {
                                 iter_ = iterTmp;
                                 es_ = es;

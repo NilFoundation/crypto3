@@ -1060,7 +1060,7 @@ BOOST_AUTO_TEST_CASE(test32) {
 
     testing_type fieldTmp;
     auto readIter = &ExpectedBuf[0];
-    auto es = fieldTmp.read_from_until<0, 2>(readIter, ExpectedBuf.size());
+    status_type es = fieldTmp.read_from_until<0, 2>(readIter, ExpectedBuf.size());
     BOOST_CHECK(es == status_type::success);
     BOOST_CHECK(fieldTmp == field);
 
@@ -1157,7 +1157,7 @@ BOOST_AUTO_TEST_CASE(test35) {
 
     std::vector<std::uint8_t> buf;
     auto writeIter = std::back_inserter(buf);
-    auto es = field.write(writeIter, buf.max_size());
+    status_type es = field.write(writeIter, buf.max_size());
     BOOST_CHECK(es == status_type::success);
     BOOST_CHECK(buf.size() == sizeof(float));
 
@@ -1527,7 +1527,7 @@ struct BundleCustomReaderTest49 {
         auto &first = std::get<0>(members);
         auto &second = std::get<1>(members);
 
-        auto es = first.read(iter, len);
+        status_type es = first.read(iter, len);
         if (es != status_type::success) {
             return es;
         }
@@ -2512,7 +2512,7 @@ struct Test71_Field
 
     template<typename TIter>
     status_type read(TIter &iter, std::size_t len) {
-        auto es = field_mask().read(iter, len);
+        status_type es = field_mask().read(iter, len);
 
         if (es != status_type::success) {
             return es;
@@ -2940,7 +2940,7 @@ BOOST_AUTO_TEST_CASE(test82) {
 
     testing_type fieldTmp;
     auto readIter = &ExpectedBuf[0];
-    auto es = fieldTmp.read_from_until<0, 1>(readIter, ExpectedBuf.size());
+    status_type es = fieldTmp.read_from_until<0, 1>(readIter, ExpectedBuf.size());
     BOOST_CHECK(es == status_type::success);
     BOOST_CHECK(fieldTmp == field);
 }
@@ -3021,7 +3021,7 @@ BOOST_AUTO_TEST_CASE(test85) {
 
     std::vector<std::uint8_t> outBuf;
     auto writeIter = std::back_inserter(outBuf);
-    auto es = field.write(writeIter, outBuf.max_size());
+    status_type es = field.write(writeIter, outBuf.max_size());
     BOOST_CHECK(es == status_type::success);
     BOOST_CHECK(outBuf.size() == ExpectedBuf.size());
     BOOST_CHECK(std::equal(outBuf.begin(), outBuf.end(), std::begin(ExpectedBuf)));

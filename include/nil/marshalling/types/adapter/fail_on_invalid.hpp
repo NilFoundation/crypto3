@@ -60,7 +60,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         base_impl_type tmp;
-                        auto es = tmp.read(iter, len);
+                        status_type es = tmp.read(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }

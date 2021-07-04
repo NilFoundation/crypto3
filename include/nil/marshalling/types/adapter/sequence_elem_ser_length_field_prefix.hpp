@@ -85,7 +85,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_element(element_type &elem, TIter &iter, std::size_t &len) const {
                         LenField lenField;
-                        auto es = lenField.read(iter, len);
+                        status_type es = lenField.read(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -136,7 +136,7 @@ namespace nil {
                         auto elemLength = base_impl_type::element_length(elem);
                         LenField lenField;
                         lenField.value() = elemLength;
-                        auto es = lenField.write(iter, len);
+                        status_type es = lenField.write(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }

@@ -98,7 +98,7 @@ namespace nil {
                     status_type write(TIter &iter, std::size_t len) const {
                         term_field_type termField;
                         auto trailLen = termField.length();
-                        auto es = base_impl_type::write(iter, len - trailLen);
+                        status_type es = base_impl_type::write(iter, len - trailLen);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -123,7 +123,7 @@ namespace nil {
                         term_field_type termField;
                         while (true) {
                             auto iterCpy = iter;
-                            auto es = termField.read(iterCpy, len);
+                            status_type es = termField.read(iterCpy, len);
                             if ((es == status_type::success) && (termField == term_field_type())) {
                                 std::advance(iter, termField.length());
                                 return es;
@@ -146,7 +146,7 @@ namespace nil {
                         std::size_t consumed = 0;
                         while (consumed < len) {
                             auto iterCpy = iter + consumed;
-                            auto es = termField.read(iterCpy, len);
+                            status_type es = termField.read(iterCpy, len);
                             if ((es == status_type::success) && (termField == term_field_type())) {
                                 break;
                             }
@@ -158,7 +158,7 @@ namespace nil {
                             return status_type::not_enough_data;
                         }
 
-                        auto es = base_impl_type::read(iter, consumed);
+                        status_type es = base_impl_type::read(iter, consumed);
                         if (es != status_type::success) {
                             return es;
                         }

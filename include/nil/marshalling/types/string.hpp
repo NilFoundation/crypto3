@@ -139,7 +139,7 @@ namespace nil {
                 /// @post Iterator is advanced.
                 template<typename TIter>
                 status_type read(TIter &iter, std::size_t len) {
-                    auto es = base_impl_type::read(iter, len);
+                    status_type es = base_impl_type::read(iter, len);
                     using TagTmp = typename std::conditional<parsed_options_type::has_sequence_fixed_size,
                                                              adjustment_needed_tag,
                                                              no_adjustment_tag>::type;

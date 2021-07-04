@@ -113,6 +113,7 @@ namespace nil {
                         return base_impl_type::read_element(elem, iterTmp, remLen);
                     }
 
+                    // Why is this so? Function declared void, but in fact it returns status_type
                     template<typename TIter>
                     void read_element_no_status(element_type &elem, TIter &iter) const {
                         using IterType = typename std::decay<decltype(iter)>::type;

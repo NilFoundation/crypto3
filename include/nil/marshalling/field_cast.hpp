@@ -48,7 +48,7 @@ namespace nil {
                     static const auto MaxBufSize = TFieldFrom::max_length();
                     std::uint8_t buf[MaxBufSize] = {0};
                     auto *writeIter = &buf[0];
-                    auto es = field.write(writeIter, MaxBufSize);
+                    status_type es = field.write(writeIter, MaxBufSize);
                     MARSHALLING_ASSERT(es == status_type::success);
                     if (es != status_type::success) {
                         return TFieldTo();

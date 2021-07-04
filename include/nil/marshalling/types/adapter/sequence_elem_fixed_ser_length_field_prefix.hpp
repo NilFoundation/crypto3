@@ -93,7 +93,7 @@ namespace nil {
                         }
 
                         std::size_t elemLen = elemLen_;
-                        auto es = base_impl_type::read_element(elem, iter, elemLen);
+                        status_type es = base_impl_type::read_element(elem, iter, elemLen);
                         if (es == status_type::not_enough_data) {
                             return TStatus;
                         }
@@ -113,7 +113,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
-                        auto es = read_len(iter, len);
+                        status_type es = read_len(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -127,7 +127,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_n(std::size_t count, TIter &iter, std::size_t &len) {
                         if (0U < count) {
-                            auto es = read_len(iter, len);
+                            status_type es = read_len(iter, len);
                             if (es != status_type::success) {
                                 return es;
                             }
@@ -143,7 +143,7 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         if (!base_impl_type::value().empty()) {
-                            auto es = write_len(iter, len);    // len is updated
+                            status_type es = write_len(iter, len);    // len is updated
                             if (es != status_type::success) {
                                 return es;
                             }
@@ -163,7 +163,7 @@ namespace nil {
                     template<typename TIter>
                     status_type write_n(std::size_t count, TIter &iter, std::size_t &len) const {
                         if (0U < count) {
-                            auto es = write_len(iter, len);    // len is updated
+                            status_type es = write_len(iter, len);    // len is updated
                             if (es != status_type::success) {
                                 return es;
                             }
@@ -216,7 +216,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_len(TIter &iter, std::size_t &len) {
                         len_field_type lenField;
-                        auto es = lenField.read(iter, len);
+                        status_type es = lenField.read(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -233,10 +233,10 @@ namespace nil {
 
                     template<typename TIter>
                     status_type write_len(TIter &iter, std::size_t &len) const {
-                        auto elemLength = base_impl_type::min_element_length();
+                        std::size_t elemLength = base_impl_type::min_element_length();
                         len_field_type lenField;
                         lenField.value() = elemLength;
-                        auto es = lenField.write(iter, len);
+                        status_type es = lenField.write(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -247,7 +247,7 @@ namespace nil {
 
                     template<typename TIter>
                     void write_len_no_status(TIter &iter) const {
-                        auto elemLength = base_impl_type::min_element_length();
+                        std::size_t elemLength = base_impl_type::min_element_length();
                         len_field_type lenField;
                         lenField.value() = elemLength;
                         lenField.write_no_status(iter);

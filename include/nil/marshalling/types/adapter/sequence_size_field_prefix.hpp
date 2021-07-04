@@ -87,7 +87,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         size_field_type sizeField;
-                        auto es = sizeField.read(iter, len);
+                        status_type es = sizeField.read(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -111,7 +111,7 @@ namespace nil {
                         using SizeValueType = typename size_field_type::value_type;
                         size_field_type sizeField;
                         sizeField.value() = static_cast<SizeValueType>(base_impl_type::value().size());
-                        auto es = sizeField.write(iter, len);
+                        status_type es = sizeField.write(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }

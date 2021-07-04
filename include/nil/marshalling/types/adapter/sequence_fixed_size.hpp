@@ -96,7 +96,7 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         auto writeCount = std::min(base_impl_type::value().size(), fixedSize_);
-                        auto es = base_impl_type::write_n(writeCount, iter, len);
+                        status_type es = base_impl_type::write_n(writeCount, iter, len);
                         if (es != status_type::success) {
                             return es;
                         }

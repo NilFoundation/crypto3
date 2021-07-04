@@ -44,7 +44,7 @@ namespace nil {
                         auto remLen = len;
                         while (0 < remLen) {
                             auto &elem = field.create_back();
-                            auto es = field.read_element(elem, iter, remLen);
+                            status_type es = field.read_element(elem, iter, remLen);
                             if (es != status_type::success) {
                                 field.value().pop_back();
                                 return es;
@@ -60,7 +60,7 @@ namespace nil {
                         field.clear();
                         while (0 < count) {
                             auto &elem = field.create_back();
-                            auto es = field.read_element(elem, iter, len);
+                            status_type es = field.read_element(elem, iter, len);
                             if (es != status_type::success) {
                                 field.value().pop_back();
                                 return es;
@@ -83,7 +83,7 @@ namespace nil {
                     template<typename TField, typename TIter>
                     static status_type write_sequence(const TField &field, TIter &iter,
                                                                         std::size_t len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         auto remainingLen = len;
                         for (auto &elem : field.value()) {
                             es = field.write_element(elem, iter, remainingLen);
@@ -105,7 +105,7 @@ namespace nil {
                     template<typename TField, typename TIter>
                     static status_type write_sequence_n(const TField &field, std::size_t count,
                                                                           TIter &iter, std::size_t &len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         for (auto &elem : field.value()) {
                             if (count == 0) {
                                 break;

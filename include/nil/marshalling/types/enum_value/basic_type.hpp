@@ -102,7 +102,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t size) {
                         int_value_field_type intField;
-                        auto es = intField.read(iter, size);
+                        status_type es = intField.read(iter, size);
                         if (es == status_type::success) {
                             value_ = static_cast<decltype(value_)>(intField.value());
                         }

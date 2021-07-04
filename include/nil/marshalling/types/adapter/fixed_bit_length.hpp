@@ -107,7 +107,8 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue = processing::read_data<serialized_type, byte_length>(
+                        serialized_type serializedValue = 
+                            processing::read_data<serialized_type, byte_length>(
                             iter, endian_type());
                         base_impl_type::value() = from_serialized(serializedValue);
                     }
@@ -149,7 +150,8 @@ namespace nil {
                     }
 
                     static serialized_type adjust_to_serialized(base_serialized_type val, signed_tag) {
-                        auto valueTmp = static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
+                        unsigned_serialized_type valueTmp = 
+                            static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
 
                         return sign_ext_unsigned_serialized(valueTmp);
                     }
@@ -159,7 +161,8 @@ namespace nil {
                     }
 
                     static base_serialized_type adjust_from_serialized(serialized_type val, signed_tag) {
-                        auto valueTmp = static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
+                        unsigned_serialized_type valueTmp = 
+                            static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
                         return static_cast<base_serialized_type>(sign_ext_unsigned_serialized(valueTmp));
                     }
 

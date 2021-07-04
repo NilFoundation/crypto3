@@ -70,9 +70,10 @@ namespace nil {
 
                     bool set_version(version_type version) {
                         bool updated = base_impl_type::set_version(version);
-                        auto mode = nil::marshalling::types::optional_mode::missing;
+                        typename types::optional_mode mode = 
+                            types::optional_mode::missing;
                         if (above_from(version) && below_until(version)) {
-                            mode = nil::marshalling::types::optional_mode::exists;
+                            mode = types::optional_mode::exists;
                         }
 
                         if (mode == base_impl_type::get_mode()) {

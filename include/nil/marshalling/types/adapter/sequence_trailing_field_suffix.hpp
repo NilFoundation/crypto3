@@ -80,7 +80,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
-                        auto es = base_impl_type::read(iter, len - trail_field_type::min_length());
+                        status_type es = base_impl_type::read(iter, len - trail_field_type::min_length());
                         if (es != status_type::success) {
                             return es;
                         }
@@ -94,7 +94,7 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         auto trailLen = trailField_.length();
-                        auto es = base_impl_type::write(iter, len - trailLen);
+                        status_type es = base_impl_type::write(iter, len - trailLen);
                         if (es != status_type::success) {
                             return es;
                         }

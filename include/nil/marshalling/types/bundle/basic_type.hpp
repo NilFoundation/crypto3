@@ -158,14 +158,14 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::tuple_for_each(value(), make_read_helper(es, iter, len));
                         return es;
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     status_type read_from(TIter &iter, std::size_t len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
@@ -173,7 +173,7 @@ namespace nil {
 
                     template<std::size_t TUntilIdx, typename TIter>
                     status_type read_until(TIter &iter, std::size_t len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
@@ -181,7 +181,7 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     status_type read_from_until(TIter &iter, std::size_t len) {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_read_helper(es, iter, len));
                         return es;
@@ -212,14 +212,14 @@ namespace nil {
 
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::tuple_for_each(value(), make_write_helper(es, iter, len));
                         return es;
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
                     status_type write_from(TIter &iter, std::size_t len) const {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_from<TFromIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;
@@ -227,7 +227,7 @@ namespace nil {
 
                     template<std::size_t TUntilIdx, typename TIter>
                     status_type write_until(TIter &iter, std::size_t len) const {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_until<TUntilIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;
@@ -235,7 +235,7 @@ namespace nil {
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
                     status_type write_from_until(TIter &iter, std::size_t len) const {
-                        auto es = status_type::success;
+                        status_type es = status_type::success;
                         processing::template tuple_for_each_from_until<TFromIdx, TUntilIdx>(
                             value(), make_write_helper(es, iter, len));
                         return es;

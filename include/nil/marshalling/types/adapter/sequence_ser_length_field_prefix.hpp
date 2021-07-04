@@ -87,7 +87,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         len_field_type lenField;
-                        auto es = lenField.read(iter, len);
+                        status_type es = lenField.read(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }
@@ -109,7 +109,7 @@ namespace nil {
                         auto lenVal = base_impl_type::length();
                         len_field_type lenField;
                         lenField.value() = static_cast<LenValueType>(lenVal);
-                        auto es = lenField.write(iter, len);
+                        status_type es = lenField.write(iter, len);
                         if (es != status_type::success) {
                             return es;
                         }

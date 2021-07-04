@@ -77,7 +77,7 @@ namespace nil {
                 template<>
                 struct adapt_field_version_storage<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::version_storage<TField>;
+                    using type = types::adapter::version_storage<TField>;
                 };
 
                 template<>
@@ -96,7 +96,7 @@ namespace nil {
                 template<>
                 struct adapt_field_invalid_by_default<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::invalid_by_default<TField>;
+                    using type = types::adapter::invalid_by_default<TField>;
                 };
 
                 template<>
@@ -116,7 +116,7 @@ namespace nil {
                 struct adapt_field_custom_value_reader<true> {
                     template<typename TField, typename TOpts>
                     using type
-                        = nil::marshalling::types::adapter::custom_value_reader<typename TOpts::custom_value_reader,
+                        = types::adapter::custom_value_reader<typename TOpts::custom_value_reader,
                                                                                 TField>;
                 };
 
@@ -137,7 +137,7 @@ namespace nil {
                 template<>
                 struct adapt_field_ser_offset<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::ser_offset<TOpts::ser_offset, TField>;
+                    using type = types::adapter::ser_offset<TOpts::ser_offset, TField>;
                 };
 
                 template<>
@@ -156,7 +156,7 @@ namespace nil {
                 template<>
                 struct adapt_field_versions_range<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         exists_between_versions<TOpts::exists_from_version, TOpts::exists_until_version, TField>;
                 };
 
@@ -176,7 +176,7 @@ namespace nil {
                 template<>
                 struct adapt_field_fixed_length<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         fixed_length<TOpts::fixed_length, TOpts::fixed_length_sign_extend, TField>;
                 };
 
@@ -196,7 +196,7 @@ namespace nil {
                 template<>
                 struct adapt_field_fixed_bit_length<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::fixed_bit_length<TOpts::fixed_bit_length, TField>;
+                    using type = types::adapter::fixed_bit_length<TOpts::fixed_bit_length, TField>;
                 };
 
                 template<>
@@ -216,7 +216,7 @@ namespace nil {
                 template<>
                 struct adapt_field_var_length<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         var_length<TOpts::min_var_length, TOpts::max_var_length, TField>;
                 };
 
@@ -236,7 +236,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_elem_length_forcing<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::sequence_elem_length_forcing<TField>;
+                    using type = types::adapter::sequence_elem_length_forcing<TField>;
                 };
 
                 template<>
@@ -255,7 +255,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_size_forcing<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::sequence_size_forcing<TField>;
+                    using type = types::adapter::sequence_size_forcing<TField>;
                 };
 
                 template<>
@@ -274,7 +274,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_length_forcing<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::sequence_length_forcing<TField>;
+                    using type = types::adapter::sequence_length_forcing<TField>;
                 };
 
                 template<>
@@ -294,7 +294,7 @@ namespace nil {
                 struct adapt_field_sequence_fixed_size<true> {
                     template<typename TField, typename TOpts>
                     using type
-                        = nil::marshalling::types::adapter::sequence_fixed_size<TOpts::sequence_fixed_size, TField>;
+                        = types::adapter::sequence_fixed_size<TOpts::sequence_fixed_size, TField>;
                 };
 
                 template<>
@@ -314,7 +314,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_size_field_prefix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         sequence_size_field_prefix<typename TOpts::sequence_size_field_prefix_type, TField>;
                 };
 
@@ -335,7 +335,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::sequence_ser_length_field_prefix<
+                    using type = types::adapter::sequence_ser_length_field_prefix<
                         typename TOpts::sequence_ser_length_field_prefix_type,
                         TOpts::sequence_ser_length_field_read_error_status,
                         TField>;
@@ -360,7 +360,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_elem_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::sequence_elem_ser_length_field_prefix<
+                    using type = types::adapter::sequence_elem_ser_length_field_prefix<
                         typename TOpts::sequence_elem_ser_length_field_prefix_type,
                         TOpts::sequence_elem_ser_length_field_read_error_status,
                         TField>;
@@ -385,7 +385,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_elem_fixed_ser_length_field_prefix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::sequence_elem_fixed_ser_length_field_prefix<
+                    using type = types::adapter::sequence_elem_fixed_ser_length_field_prefix<
                         typename TOpts::sequence_elem_fixed_ser_length_field_prefix_type,
                         TOpts::sequence_elem_fixed_ser_length_field_read_error_status,
                         TField>;
@@ -410,7 +410,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_trailing_field_suffix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         sequence_trailing_field_suffix<typename TOpts::sequence_trailing_field_suffix, TField>;
                 };
 
@@ -431,7 +431,7 @@ namespace nil {
                 template<>
                 struct adapt_field_sequence_termination_field_suffix<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         sequence_termination_field_suffix<typename TOpts::sequence_termination_field_suffix, TField>;
                 };
 
@@ -452,7 +452,7 @@ namespace nil {
                 template<>
                 struct adapt_field_default_value_initialiser<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         default_value_initialiser<typename TOpts::default_value_initializer, TField>;
                 };
 
@@ -472,7 +472,7 @@ namespace nil {
                 template<>
                 struct adapt_field_num_value_multi_range_validator<true> {
                     template<typename TField, typename TOpts>
-                    using type = nil::marshalling::types::adapter::
+                    using type = types::adapter::
                         num_value_multi_range_validator<typename TOpts::multi_range_validation_ranges, TField>;
                 };
 
@@ -494,7 +494,7 @@ namespace nil {
                 struct adapt_field_custom_validator<true> {
                     template<typename TField, typename TOpts>
                     using type
-                        = nil::marshalling::types::adapter::custom_validator<typename TOpts::custom_validator, TField>;
+                        = types::adapter::custom_validator<typename TOpts::custom_validator, TField>;
                 };
 
                 template<>
@@ -514,7 +514,7 @@ namespace nil {
                 struct adapt_field_custom_refresher<true> {
                     template<typename TField, typename TOpts>
                     using type
-                        = nil::marshalling::types::adapter::custom_refresher<typename TOpts::custom_refresher, TField>;
+                        = types::adapter::custom_refresher<typename TOpts::custom_refresher, TField>;
                 };
 
                 template<>
@@ -534,7 +534,7 @@ namespace nil {
                 struct adapt_field_fail_on_invalid<true> {
                     template<typename TField, typename TOpts>
                     using type
-                        = nil::marshalling::types::adapter::fail_on_invalid<TOpts::fail_on_invalid_status, TField>;
+                        = types::adapter::fail_on_invalid<TOpts::fail_on_invalid_status, TField>;
                 };
 
                 template<>
@@ -553,7 +553,7 @@ namespace nil {
                 template<>
                 struct adapt_field_ignore_invalid<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::ignore_invalid<TField>;
+                    using type = types::adapter::ignore_invalid<TField>;
                 };
 
                 template<>
@@ -572,7 +572,7 @@ namespace nil {
                 template<>
                 struct adapt_field_empty_serialization<true> {
                     template<typename TField>
-                    using type = nil::marshalling::types::adapter::empty_serialization<TField>;
+                    using type = types::adapter::empty_serialization<TField>;
                 };
 
                 template<>

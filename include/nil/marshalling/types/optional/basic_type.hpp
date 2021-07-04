@@ -137,7 +137,7 @@ namespace nil {
                             return status_type::success;
                         }
 
-                        auto es = field_.read(iter, len);
+                        status_type es = field_.read(iter, len);
                         if (es == status_type::success) {
                             mode_ = mode_type::exists;
                         }

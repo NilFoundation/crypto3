@@ -288,7 +288,7 @@ namespace nil {
 
                     template<typename TIter>
                     static status_type read_field_element(element_type &elem, TIter &iter, std::size_t &len) {
-                        auto es = elem.read(iter, len);
+                        status_type es = elem.read(iter, len);
                         if (es == status_type::success) {
                             MARSHALLING_ASSERT(elem.length() <= len);
                             len -= elem.length();
@@ -341,7 +341,7 @@ namespace nil {
 
                     template<typename TIter>
                     static status_type write_field_element(const element_type &elem, TIter &iter, std::size_t &len) {
-                        auto es = elem.write(iter, len);
+                        status_type es = elem.write(iter, len);
                         if (es == status_type::success) {
                             len -= elem.length();
                         }
@@ -445,7 +445,7 @@ namespace nil {
                         auto remLen = len;
                         while (0 < remLen) {
                             element_type &elem = create_back();
-                            auto es = read_element(elem, iter, remLen);
+                            status_type es = read_element(elem, iter, remLen);
                             if (es != status_type::success) {
                                 value_.pop_back();
                                 return es;
@@ -481,7 +481,7 @@ namespace nil {
                         clear();
                         while (0 < count) {
                             auto &elem = create_back();
-                            auto es = read_element(elem, iter, len);
+                            status_type es = read_element(elem, iter, len);
                             if (es != status_type::success) {
                                 value_.pop_back();
                                 return es;
