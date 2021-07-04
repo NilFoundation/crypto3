@@ -25,10 +25,12 @@
 #ifndef MARSHALLING_TYPE_TRAITS_HPP
 #define MARSHALLING_TYPE_TRAITS_HPP
 
+#include <boost/type_traits.hpp>
 #include <boost/tti/tti.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <nil/marshalling/detail/field_base.hpp>
 
 #include <nil/marshalling/types/tag.hpp>
 
@@ -171,19 +173,9 @@ namespace nil {
         };
 
         template<typename T>
-        struct is_marshalling_field {
-            static const bool value = is_array_list<T>::value ||
-                                      is_raw_array_list<T>::value ||
-                                      is_bitfield<T>::value ||
-                                      is_bitmask_value<T>::value ||
-                                      is_bundle<T>::value ||
-                                      is_enumeration<T>::value ||
-                                      is_float_value<T>::value ||
-                                      is_integral<T>::value ||
-                                      is_no_value<T>::value ||
-                                      is_optional<T>::value ||
-                                      is_string<T>::value ||
-                                      is_variant<T>::value;
+        struct is_marshalling_type {
+            static const bool value = 
+                boost::is_base_of<detail::field_base<>, T>::value;
         };
 
         template<typename T>

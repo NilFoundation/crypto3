@@ -99,7 +99,7 @@ namespace nil {
                         nil::detail::is_iterator<InputIterator>::value
                             && !(marshalling::is_supported_representation_type<
                                  typename std::iterator_traits<InputIterator>::value_type>::value)
-                            && marshalling::is_marshalling_field<
+                            && marshalling::is_marshalling_type<
                                 typename std::iterator_traits<InputIterator>::value_type>::value,
                         status_type>::type
                         resolve_type(const InputIterator other_field_begin, std::size_t buf_len) {
@@ -128,7 +128,7 @@ namespace nil {
                     template<typename OtherFieldType>
                     inline
                         typename std::enable_if<!nil::detail::is_iterator<OtherFieldType>::value
-                                                    && marshalling::is_marshalling_field<OtherFieldType>::value,
+                                                    && marshalling::is_marshalling_type<OtherFieldType>::value,
                                                 status_type>::type
                         resolve_type(const OtherFieldType other_field, ...) {
 
