@@ -84,7 +84,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         return base_impl_type::read_n(fixedSize_, iter, len);
                     }
 
@@ -94,10 +94,10 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t len) const {
+                    status_type write(TIter &iter, std::size_t len) const {
                         auto writeCount = std::min(base_impl_type::value().size(), fixedSize_);
                         auto es = base_impl_type::write_n(writeCount, iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 

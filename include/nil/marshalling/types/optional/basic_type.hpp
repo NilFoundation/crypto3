@@ -129,16 +129,16 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         if (mode_ == mode_type::missing) {
-                            return nil::marshalling::status_type::success;
+                            return status_type::success;
                         }
 
                         if ((mode_ == mode_type::tentative) && (0U == len)) {
                             mode_ = mode_type::missing;
-                            return nil::marshalling::status_type::success;
+                            return status_type::success;
                         }
 
                         auto es = field_.read(iter, len);
-                        if (es == nil::marshalling::status_type::success) {
+                        if (es == status_type::success) {
                             mode_ = mode_type::exists;
                         }
                         return es;
@@ -158,11 +158,11 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         if (mode_ == mode_type::missing) {
-                            return nil::marshalling::status_type::success;
+                            return status_type::success;
                         }
 
                         if ((mode_ == mode_type::tentative) && (0U == len)) {
-                            return nil::marshalling::status_type::success;
+                            return status_type::success;
                         }
 
                         return field_.write(iter, len);

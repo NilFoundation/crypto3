@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP
-#define MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP
+#ifndef MARSHALLING_PROCESSING_BIT_SIZE_TO_BYTE_SIZE_HPP
+#define MARSHALLING_PROCESSING_BIT_SIZE_TO_BYTE_SIZE_HPP
 
 #include <cstdint>
 
@@ -65,4 +65,4 @@ namespace nil {
         }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_BIT_SIZE_TO_BYTE_SIZE_HPP
+#endif    // MARSHALLING_PROCESSING_BIT_SIZE_TO_BYTE_SIZE_HPP

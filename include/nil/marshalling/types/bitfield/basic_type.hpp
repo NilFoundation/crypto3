@@ -31,8 +31,8 @@
 
 #include <nil/detail/type_traits.hpp>
 
-#include <nil/marshalling/processing/tuple.hpp>
-#include <nil/marshalling/processing/size_to_type.hpp>
+// #include <nil/marshalling/processing/tuple.hpp>
+//#include <nil/marshalling/processing/size_to_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
@@ -50,7 +50,7 @@ namespace nil {
                 class bitfield : public TFieldBase {
                     using base_impl_type = TFieldBase;
 
-                    static_assert(nil::detail::is_tuple<TMembers>::value,
+                    static_assert(::nil::detail::is_tuple<TMembers>::value,
                                   "TMembers is expected to be a tuple of BitfieldMember<...>");
 
                     static_assert(1U < std::tuple_size<TMembers>::value,
@@ -62,12 +62,11 @@ namespace nil {
 
                     static const std::size_t length_ = total_bits / std::numeric_limits<std::uint8_t>::digits;
                     static_assert(0U < length_, "Serialised length is expected to be greater than 0");
-                    using serialized_type = typename nil::marshalling::processing::size_to_type<length_, false>::type;
+                    using serialized_type = typename processing::size_to_type<length_, false>::type;
 
-                    using fixed_int_value_field_type = nil::marshalling::types::
-                        int_value<TFieldBase, serialized_type, nil::marshalling::option::fixed_length<length_>>;
+                    using fixed_int_value_field_type = types::int_value<TFieldBase, serialized_type, option::fixed_length<length_>>;
 
-                    using simple_int_value_field_type = nil::marshalling::types::int_value<TFieldBase, serialized_type>;
+                    using simple_int_value_field_type = types::int_value<TFieldBase, serialized_type>;
 
                     using int_value_field_type = typename std::conditional<((length_ & (length_ - 1)) == 0),
                                                                            simple_int_value_field_type,
@@ -114,7 +113,7 @@ namespace nil {
 
                         auto serValue = base_impl_type::template read_data<serialized_type, length_>(iter);
                         status_type es = status_type::success;
-                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(members_,
+                        processing::tuple_for_each_with_template_param_idx(members_,
                                                                                              read_helper(serValue, es));
                         return es;
                     }
@@ -122,7 +121,7 @@ namespace nil {
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
                         auto serValue = base_impl_type::template read_data<serialized_type, length_>(iter);
-                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(
+                        processing::tuple_for_each_with_template_param_idx(
                             members_, read_no_status_helper(serValue));
                     }
 
@@ -134,10 +133,10 @@ namespace nil {
 
                         serialized_type serValue = 0;
                         status_type es = status_type::success;
-                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(
+                        processing::tuple_for_each_with_template_param_idx(
                             members_, write_helper(serValue, es));
                         if (es == status_type::success) {
-                            nil::marshalling::processing::write_data<length_>(serValue, iter, endian_type());
+                            processing::write_data<length_>(serValue, iter, endian_type());
                         }
                         return es;
                     }
@@ -145,17 +144,17 @@ namespace nil {
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
                         serialized_type serValue = 0;
-                        nil::marshalling::processing::tuple_for_each_with_template_param_idx(
+                        processing::tuple_for_each_with_template_param_idx(
                             members_, write_no_status_helper(serValue));
-                        nil::marshalling::processing::write_data<length_>(serValue, iter, endian_type());
+                        processing::write_data<length_>(serValue, iter, endian_type());
                     }
 
                     constexpr bool valid() const {
-                        return nil::marshalling::processing::tuple_accumulate(members_, true, valid_helper());
+                        return processing::tuple_accumulate(members_, true, valid_helper());
                     }
 
                     bool refresh() {
-                        return nil::marshalling::processing::tuple_accumulate(members_, false, refresh_helper());
+                        return processing::tuple_accumulate(members_, false, refresh_helper());
                     }
 
                     template<std::size_t TIdx>
@@ -182,7 +181,7 @@ namespace nil {
 
                         template<std::size_t TIdx, typename TFieldParam>
                         void operator()(TFieldParam &&field) {
-                            if (es_ != nil::marshalling::status_type::success) {
+                            if (es_ != status_type::success) {
                                 return;
                             }
 
@@ -201,7 +200,7 @@ namespace nil {
                             std::uint8_t buf[max_length];
                             auto *writeIter = &buf[0];
                             using FieldEndian = typename field_type::endian_type;
-                            nil::marshalling::processing::write_data<max_length>(
+                            processing::write_data<max_length>(
                                 fieldSerValue, writeIter, FieldEndian());
 
                             const auto *readIter = &buf[0];
@@ -235,7 +234,7 @@ namespace nil {
                             std::uint8_t buf[max_length];
                             auto *writeIter = &buf[0];
                             using FieldEndian = typename field_type::endian_type;
-                            nil::marshalling::processing::write_data<max_length>(
+                            processing::write_data<max_length>(
                                 fieldSerValue, writeIter, FieldEndian());
 
                             const auto *readIter = &buf[0];
@@ -253,7 +252,7 @@ namespace nil {
 
                         template<std::size_t TIdx, typename TFieldParam>
                         void operator()(TFieldParam &&field) {
-                            if (es_ != nil::marshalling::status_type::success) {
+                            if (es_ != status_type::success) {
                                 return;
                             }
 
@@ -266,13 +265,13 @@ namespace nil {
                             std::uint8_t buf[max_length];
                             auto *writeIter = &buf[0];
                             es_ = field.write(writeIter, max_length);
-                            if (es_ != nil::marshalling::status_type::success) {
+                            if (es_ != status_type::success) {
                                 return;
                             }
 
                             using FieldEndian = typename field_type::endian_type;
                             const auto *readIter = &buf[0];
-                            auto fieldSerValue = nil::marshalling::processing::read_data<serialized_type, max_length>(
+                            auto fieldSerValue = processing::read_data<serialized_type, max_length>(
                                 readIter, FieldEndian());
 
                             static const auto Pos = detail::get_member_shift_pos<TIdx, value_type>();
@@ -313,7 +312,7 @@ namespace nil {
 
                             using FieldEndian = typename field_type::endian_type;
                             const auto *readIter = &buf[0];
-                            auto fieldSerValue = nil::marshalling::processing::read_data<serialized_type, max_length>(
+                            auto fieldSerValue = processing::read_data<serialized_type, max_length>(
                                 readIter, FieldEndian());
 
                             using FieldOptions = typename field_type::parsed_options_type;

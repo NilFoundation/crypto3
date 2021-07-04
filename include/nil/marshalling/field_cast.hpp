@@ -49,8 +49,8 @@ namespace nil {
                     std::uint8_t buf[MaxBufSize] = {0};
                     auto *writeIter = &buf[0];
                     auto es = field.write(writeIter, MaxBufSize);
-                    MARSHALLING_ASSERT(es == nil::marshalling::status_type::success);
-                    if (es != nil::marshalling::status_type::success) {
+                    MARSHALLING_ASSERT(es == status_type::success);
+                    if (es != status_type::success) {
                         return TFieldTo();
                     }
 
@@ -61,7 +61,7 @@ namespace nil {
                     const auto *readIter = &buf[0];
                     es = result.read(readIter, len);
                     static_cast<void>(es);
-                    MARSHALLING_ASSERT(es == nil::marshalling::status_type::success);
+                    MARSHALLING_ASSERT(es == status_type::success);
                     return result;
                 }
             };

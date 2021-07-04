@@ -109,12 +109,12 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t size) {
+                    status_type read(TIter &iter, std::size_t size) {
                         unsigned_serialized_type val = 0;
                         std::size_t byteCount = 0;
                         while (true) {
                             if (size == 0) {
-                                return nil::marshalling::status_type::not_enough_data;
+                                return status_type::not_enough_data;
                             }
 
                             auto byte = nil::marshalling::processing::read_data<std::uint8_t>(iter, endian_type());
@@ -140,14 +140,14 @@ namespace nil {
 
                         auto adjustedValue = sign_ext_unsigned_serialized(val, byteCount, has_sign_tag());
                         base_impl_type::value() = base_impl_type::from_serialized(adjustedValue);
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
+                    status_type write(TIter &iter, std::size_t size) const {
                         auto val = adjust_to_unsigned_serialized_var_length(
                             base_impl_type::to_serialized(base_impl_type::value()));
                         std::size_t byteCount = 0;

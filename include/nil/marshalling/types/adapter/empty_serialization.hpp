@@ -70,8 +70,8 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    static nil::marshalling::status_type read(TIter &, std::size_t) {
-                        return nil::marshalling::status_type::success;
+                    static status_type read(TIter &, std::size_t) {
+                        return status_type::success;
                     }
 
                     template<typename TIter>
@@ -79,8 +79,8 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    static nil::marshalling::status_type write(TIter &, std::size_t) {
-                        return nil::marshalling::status_type::success;
+                    static status_type write(TIter &, std::size_t) {
+                        return status_type::success;
                     }
 
                     template<typename TIter>

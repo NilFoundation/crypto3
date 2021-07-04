@@ -496,7 +496,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_internal_n(std::size_t count, TIter &iter, std::size_t len, raw_data_tag) {
                         if (len < count) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         return read_internal(iter, count, raw_data_tag());

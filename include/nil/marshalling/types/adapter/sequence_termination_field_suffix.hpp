@@ -75,7 +75,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         using IterType = typename std::decay<decltype(iter)>::type;
                         using IterTag = typename std::iterator_traits<IterType>::iterator_category;
                         static_assert(std::is_base_of<std::random_access_iterator_tag, IterTag>::value,
@@ -95,11 +95,11 @@ namespace nil {
                     void read_no_status(TIter &iter) = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t len) const {
+                    status_type write(TIter &iter, std::size_t len) const {
                         term_field_type termField;
                         auto trailLen = termField.length();
                         auto es = base_impl_type::write(iter, len - trailLen);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -118,36 +118,36 @@ namespace nil {
                     struct field_tag { };
 
                     template<typename TIter>
-                    nil::marshalling::status_type read_internal(TIter &iter, std::size_t len, field_tag) {
+                    status_type read_internal(TIter &iter, std::size_t len, field_tag) {
                         base_impl_type::clear();
                         term_field_type termField;
                         while (true) {
                             auto iterCpy = iter;
                             auto es = termField.read(iterCpy, len);
-                            if ((es == nil::marshalling::status_type::success) && (termField == term_field_type())) {
+                            if ((es == status_type::success) && (termField == term_field_type())) {
                                 std::advance(iter, termField.length());
                                 return es;
                             }
 
                             auto &elem = base_impl_type::create_back();
                             es = base_impl_type::read_element(elem, iter, len);
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 base_impl_type::value().pop_back();
                                 return es;
                             }
                         }
 
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read_internal(TIter &iter, std::size_t len, raw_data_tag) {
+                    status_type read_internal(TIter &iter, std::size_t len, raw_data_tag) {
                         term_field_type termField;
                         std::size_t consumed = 0;
                         while (consumed < len) {
                             auto iterCpy = iter + consumed;
                             auto es = termField.read(iterCpy, len);
-                            if ((es == nil::marshalling::status_type::success) && (termField == term_field_type())) {
+                            if ((es == status_type::success) && (termField == term_field_type())) {
                                 break;
                             }
 
@@ -155,16 +155,16 @@ namespace nil {
                         }
 
                         if (len <= consumed) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         auto es = base_impl_type::read(iter, consumed);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
                         std::advance(iter, termField.length());
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
                 };
 

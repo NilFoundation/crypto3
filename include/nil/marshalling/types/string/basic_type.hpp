@@ -178,7 +178,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_n(std::size_t count, TIter &iter, std::size_t &len) {
                         if (len < count) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         return read(iter, count);
@@ -208,11 +208,11 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         if (len < length()) {
-                            return nil::marshalling::status_type::buffer_overflow;
+                            return status_type::buffer_overflow;
                         }
 
                         write_no_status(iter);
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TIter>
@@ -226,11 +226,11 @@ namespace nil {
                         count = std::min(count, value_.size());
 
                         if (len < count) {
-                            return nil::marshalling::status_type::buffer_overflow;
+                            return status_type::buffer_overflow;
                         }
 
                         write_no_status_n(count, iter);
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TIter>

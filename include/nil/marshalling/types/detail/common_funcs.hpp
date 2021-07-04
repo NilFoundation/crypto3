@@ -39,13 +39,13 @@ namespace nil {
 
                 struct common_funcs {
                     template<typename TField, typename TIter>
-                    static nil::marshalling::status_type read_sequence(TField &field, TIter &iter, std::size_t len) {
+                    static status_type read_sequence(TField &field, TIter &iter, std::size_t len) {
                         field.clear();
                         auto remLen = len;
                         while (0 < remLen) {
                             auto &elem = field.create_back();
                             auto es = field.read_element(elem, iter, remLen);
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 field.value().pop_back();
                                 return es;
                             }
@@ -55,19 +55,19 @@ namespace nil {
                     }
 
                     template<typename TField, typename TIter>
-                    static nil::marshalling::status_type read_sequence_n(TField &field, std::size_t count, TIter &iter,
+                    static status_type read_sequence_n(TField &field, std::size_t count, TIter &iter,
                                                                          std::size_t &len) {
                         field.clear();
                         while (0 < count) {
                             auto &elem = field.create_back();
                             auto es = field.read_element(elem, iter, len);
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 field.value().pop_back();
                                 return es;
                             }
                             --count;
                         }
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TField, typename TIter>
@@ -81,13 +81,13 @@ namespace nil {
                     }
 
                     template<typename TField, typename TIter>
-                    static nil::marshalling::status_type write_sequence(const TField &field, TIter &iter,
+                    static status_type write_sequence(const TField &field, TIter &iter,
                                                                         std::size_t len) {
                         auto es = status_type::success;
                         auto remainingLen = len;
                         for (auto &elem : field.value()) {
                             es = field.write_element(elem, iter, remainingLen);
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 break;
                             }
                         }
@@ -103,7 +103,7 @@ namespace nil {
                     }
 
                     template<typename TField, typename TIter>
-                    static nil::marshalling::status_type write_sequence_n(const TField &field, std::size_t count,
+                    static status_type write_sequence_n(const TField &field, std::size_t count,
                                                                           TIter &iter, std::size_t &len) {
                         auto es = status_type::success;
                         for (auto &elem : field.value()) {

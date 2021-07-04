@@ -85,10 +85,10 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         size_field_type sizeField;
                         auto es = sizeField.read(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -107,12 +107,12 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t len) const {
+                    status_type write(TIter &iter, std::size_t len) const {
                         using SizeValueType = typename size_field_type::value_type;
                         size_field_type sizeField;
                         sizeField.value() = static_cast<SizeValueType>(base_impl_type::value().size());
                         auto es = sizeField.write(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 

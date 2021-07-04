@@ -57,18 +57,18 @@ namespace nil {
                     custom_value_reader &operator=(custom_value_reader &&) = default;
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t size) {
+                    status_type read(TIter &iter, std::size_t size) {
                         return T()(static_cast<base_impl_type &>(*this), iter, size);
                     }
 
                     template<std::size_t TFromIdx, typename TIter>
-                    nil::marshalling::status_type read_from(TIter &iter, std::size_t size) = delete;
+                    status_type read_from(TIter &iter, std::size_t size) = delete;
 
                     template<std::size_t TUntilIdx, typename TIter>
-                    nil::marshalling::status_type read_until(TIter &iter, std::size_t size) = delete;
+                    status_type read_until(TIter &iter, std::size_t size) = delete;
 
                     template<std::size_t TFromIdx, std::size_t TUntilIdx, typename TIter>
-                    nil::marshalling::status_type read_from_until(TIter &iter, std::size_t size) = delete;
+                    status_type read_from_until(TIter &iter, std::size_t size) = delete;
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) = delete;

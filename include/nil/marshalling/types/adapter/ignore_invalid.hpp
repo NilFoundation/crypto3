@@ -58,10 +58,10 @@ namespace nil {
                     ignore_invalid &operator=(ignore_invalid &&) = default;
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         base_impl_type tmp;
                         auto es = tmp.read(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -69,7 +69,7 @@ namespace nil {
                             static_cast<base_impl_type &>(*this) = std::move(tmp);
                         }
 
-                        return nil::marshalling::status_type::success;
+                        return status_type::success;
                     }
 
                     template<typename TIter>

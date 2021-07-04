@@ -316,12 +316,12 @@ namespace nil {
 
                         template<typename TField>
                         void operator()(TField &field) {
-                            if (es_ != nil::marshalling::status_type::success) {
+                            if (es_ != status_type::success) {
                                 return;
                             }
 
                             es_ = field.read(iter_, len_);
-                            if (es_ == nil::marshalling::status_type::success) {
+                            if (es_ == status_type::success) {
                                 len_ -= field.length();
                             }
                         }
@@ -333,7 +333,7 @@ namespace nil {
                     };
 
                     template<typename TIter>
-                    static read_helper<TIter> make_read_helper(nil::marshalling::status_type &es, TIter &iter,
+                    static read_helper<TIter> make_read_helper(status_type &es, TIter &iter,
                                                                std::size_t len) {
                         return read_helper<TIter>(es, iter, len);
                     }
@@ -366,12 +366,12 @@ namespace nil {
 
                         template<typename TField>
                         void operator()(const TField &field) {
-                            if (es_ != nil::marshalling::status_type::success) {
+                            if (es_ != status_type::success) {
                                 return;
                             }
 
                             es_ = field.write(iter_, len_);
-                            if (es_ == nil::marshalling::status_type::success) {
+                            if (es_ == status_type::success) {
                                 len_ -= field.length();
                             }
                         }

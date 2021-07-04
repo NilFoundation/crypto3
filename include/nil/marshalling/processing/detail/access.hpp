@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_ACCESS_DETAIL_HPP
-#define MARSHALLING_ACCESS_DETAIL_HPP
+#ifndef MARSHALLING_PROCESSING_ACCESS_DETAIL_HPP
+#define MARSHALLING_PROCESSING_ACCESS_DETAIL_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -450,4 +450,4 @@ namespace nil {
         }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_ACCESS_DETAIL_HPP
+#endif    // MARSHALLING_PROCESSING_ACCESS_DETAIL_HPP

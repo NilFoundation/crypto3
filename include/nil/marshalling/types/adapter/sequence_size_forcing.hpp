@@ -70,7 +70,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         if (forced_ == cleared) {
                             return base_impl_type::read(iter, len);
                         }

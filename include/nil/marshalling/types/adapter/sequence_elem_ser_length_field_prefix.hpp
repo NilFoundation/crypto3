@@ -37,7 +37,7 @@ namespace nil {
         namespace types {
             namespace adapter {
 
-                template<typename TLenField, nil::marshalling::status_type TStatus, typename TBase>
+                template<typename TLenField, status_type TStatus, typename TBase>
                 class sequence_elem_ser_length_field_prefix : public TBase {
                     using base_impl_type = TBase;
                     using LenField = TLenField;
@@ -92,7 +92,7 @@ namespace nil {
 
                         len -= lenField.length();
                         if (len < lenField.value()) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         const auto reqLen = static_cast<std::size_t>(lenField.value());
@@ -116,7 +116,7 @@ namespace nil {
                     void read_element_no_status(element_type &elem, TIter &iter) const = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         return basic::common_funcs::read_sequence(*this, iter, len);
                     }
 

@@ -79,9 +79,9 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         auto es = base_impl_type::read(iter, len - trail_field_type::min_length());
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -92,10 +92,10 @@ namespace nil {
                     void read_no_status(TIter &iter) = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t len) const {
+                    status_type write(TIter &iter, std::size_t len) const {
                         auto trailLen = trailField_.length();
                         auto es = base_impl_type::write(iter, len - trailLen);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 

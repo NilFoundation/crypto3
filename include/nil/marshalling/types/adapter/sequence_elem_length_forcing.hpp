@@ -103,7 +103,7 @@ namespace nil {
                         }
 
                         if (len < forced_) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         auto iterTmp = iter;
@@ -127,7 +127,7 @@ namespace nil {
 
                         auto fromIter = iter;
                         auto es = base_impl_type::read_element_no_status(elem, iter);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -138,7 +138,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         return basic::common_funcs::read_sequence(*this, iter, len);
                     }
 

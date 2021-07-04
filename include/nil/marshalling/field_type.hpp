@@ -295,14 +295,14 @@ namespace nil {
 #define MARSHALLING_FIELD_MEMBERS_ACCESS(...)                                         \
     MARSHALLING_EXPAND(MARSHALLING_DEFINE_FIELD_ENUM(__VA_ARGS__))                    \
     MARSHALLING_FIELD_VALUE_ACCESS_FUNC {                                             \
-        auto &val = nil::marshalling::types::to_field_base(*this).value();            \
+        auto &val = types::to_field_base(*this).value();            \
         using AllFieldsTuple = typename std::decay<decltype(val)>::type;              \
         static_assert(std::tuple_size<AllFieldsTuple>::value == FieldIdx_numOfValues, \
                       "Invalid number of names for fields tuple");                    \
         return val;                                                                   \
     }                                                                                 \
     MARSHALLING_FIELD_VALUE_ACCESS_CONST_FUNC {                                       \
-        auto &val = nil::marshalling::types::to_field_base(*this).value();            \
+        auto &val = types::to_field_base(*this).value();            \
         using AllFieldsTuple = typename std::decay<decltype(val)>::type;              \
         static_assert(std::tuple_size<AllFieldsTuple>::value == FieldIdx_numOfValues, \
                       "Invalid number of names for fields tuple");                    \

@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP
-#define MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP
+#ifndef MARSHALLING_PROCESSING_SIZE_TO_TYPE_DETAIL_HPP
+#define MARSHALLING_PROCESSING_SIZE_TO_TYPE_DETAIL_HPP
 
 #include <array>
 #include <cstdint>
@@ -83,4 +83,4 @@ namespace nil {
         }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_SIZE_TO_TYPE_DETAIL_HPP
+#endif    // MARSHALLING_PROCESSING_SIZE_TO_TYPE_DETAIL_HPP

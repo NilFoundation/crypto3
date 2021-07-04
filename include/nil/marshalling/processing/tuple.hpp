@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_TUPLE_HPP
-#define MARSHALLING_TUPLE_HPP
+#ifndef MARSHALLING_PROCESSING_TUPLE_HPP
+#define MARSHALLING_PROCESSING_TUPLE_HPP
 
 #include <tuple>
 #include <utility>
@@ -746,7 +746,7 @@ namespace nil {
             }
 
         }    // namespace processing
-
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_TUPLE_HPP
+
+#endif    // MARSHALLING_PROCESSING_TUPLE_HPP

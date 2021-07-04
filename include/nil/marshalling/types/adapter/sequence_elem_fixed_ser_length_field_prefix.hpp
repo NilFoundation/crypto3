@@ -37,7 +37,7 @@ namespace nil {
         namespace types {
             namespace adapter {
 
-                template<typename TLenField, nil::marshalling::status_type TStatus, typename TBase>
+                template<typename TLenField, status_type TStatus, typename TBase>
                 class sequence_elem_fixed_ser_length_field_prefix : public TBase {
                     using base_impl_type = TBase;
                     using len_field_type = TLenField;
@@ -112,9 +112,9 @@ namespace nil {
                     void read_element_no_status(element_type &elem, TIter &iter) const = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         auto es = read_len(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
@@ -128,7 +128,7 @@ namespace nil {
                     status_type read_n(std::size_t count, TIter &iter, std::size_t &len) {
                         if (0U < count) {
                             auto es = read_len(iter, len);
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 return es;
                             }
                         } else {
@@ -144,7 +144,7 @@ namespace nil {
                     status_type write(TIter &iter, std::size_t len) const {
                         if (!base_impl_type::value().empty()) {
                             auto es = write_len(iter, len);    // len is updated
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 return es;
                             }
                         }
@@ -164,7 +164,7 @@ namespace nil {
                     status_type write_n(std::size_t count, TIter &iter, std::size_t &len) const {
                         if (0U < count) {
                             auto es = write_len(iter, len);    // len is updated
-                            if (es != nil::marshalling::status_type::success) {
+                            if (es != status_type::success) {
                                 return es;
                             }
                         }

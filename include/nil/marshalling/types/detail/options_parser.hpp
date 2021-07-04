@@ -171,36 +171,36 @@ namespace nil {
                     using sequence_size_field_prefix_type = TSizeField;
                 };
 
-                template<typename TField, nil::marshalling::status_type TReadErrorStatus, typename... TOptions>
+                template<typename TField, status_type TReadErrorStatus, typename... TOptions>
                 class options_parser<
                     nil::marshalling::option::sequence_ser_length_field_prefix<TField, TReadErrorStatus>,
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_ser_length_field_prefix = true;
                     using sequence_ser_length_field_prefix_type = TField;
-                    static const nil::marshalling::status_type sequence_ser_length_field_read_error_status
+                    static const status_type sequence_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
 
-                template<typename TField, nil::marshalling::status_type TReadErrorStatus, typename... TOptions>
+                template<typename TField, status_type TReadErrorStatus, typename... TOptions>
                 class options_parser<
                     nil::marshalling::option::sequence_elem_ser_length_field_prefix<TField, TReadErrorStatus>,
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_elem_ser_length_field_prefix = true;
                     using sequence_elem_ser_length_field_prefix_type = TField;
-                    static const nil::marshalling::status_type sequence_elem_ser_length_field_read_error_status
+                    static const status_type sequence_elem_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
 
-                template<typename TField, nil::marshalling::status_type TReadErrorStatus, typename... TOptions>
+                template<typename TField, status_type TReadErrorStatus, typename... TOptions>
                 class options_parser<
                     nil::marshalling::option::sequence_elem_fixed_ser_length_field_prefix<TField, TReadErrorStatus>,
                     TOptions...> : public options_parser<TOptions...> {
                 public:
                     static const bool has_sequence_elem_fixed_ser_length_field_prefix = true;
                     using sequence_elem_fixed_ser_length_field_prefix_type = TField;
-                    static const nil::marshalling::status_type sequence_elem_fixed_ser_length_field_read_error_status
+                    static const status_type sequence_elem_fixed_ser_length_field_read_error_status
                         = TReadErrorStatus;
                 };
 
@@ -251,12 +251,12 @@ namespace nil {
                     static const bool has_custom_refresh = true;
                 };
 
-                template<nil::marshalling::status_type TStatus, typename... TOptions>
+                template<status_type TStatus, typename... TOptions>
                 class options_parser<nil::marshalling::option::fail_on_invalid<TStatus>, TOptions...>
                     : public options_parser<TOptions...> {
                 public:
                     static const bool has_fail_on_invalid = true;
-                    static const nil::marshalling::status_type fail_on_invalid_status = TStatus;
+                    static const status_type fail_on_invalid_status = TStatus;
                 };
 
                 template<typename... TOptions>

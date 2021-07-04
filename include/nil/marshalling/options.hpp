@@ -460,7 +460,7 @@ namespace nil {
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
             /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
-                     nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
+                     status_type TReadErrorStatus = status_type::invalid_msg_data>
             struct sequence_ser_length_field_prefix { };
 
             /// @brief Option that forces <b>every element</b> of @ref nil::marshalling::types::array_list to
@@ -471,7 +471,7 @@ namespace nil {
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
             /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
-                     nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
+                     status_type TReadErrorStatus = status_type::invalid_msg_data>
             struct sequence_elem_ser_length_field_prefix { };
 
             /// @brief Option that forces @b first element only of @ref nil::marshalling::types::array_list to
@@ -484,7 +484,7 @@ namespace nil {
             /// @tparam TReadErrorStatus Error status to return in case read operation fails when should not
             /// @headerfile nil/marshalling/options.hpp
             template<typename TField,
-                     nil::marshalling::status_type TReadErrorStatus = nil::marshalling::status_type::invalid_msg_data>
+                     status_type TReadErrorStatus = status_type::invalid_msg_data>
             struct sequence_elem_fixed_ser_length_field_prefix { };
 
             /// @brief Option that forces termination of the sequence when predefined value
@@ -773,7 +773,7 @@ namespace nil {
             ///     value is identified, error will be returned from the @b read() operation.
             /// @tparam TStatus Error status to return when the content of the read field is invalid.
             /// @headerfile nil/marshalling/options.hpp
-            template<nil::marshalling::status_type TStatus = nil::marshalling::status_type::invalid_msg_data>
+            template<status_type TStatus = status_type::invalid_msg_data>
             struct fail_on_invalid { };
 
             /// @brief Option that forces field's read operation to ignore read data if invalid value

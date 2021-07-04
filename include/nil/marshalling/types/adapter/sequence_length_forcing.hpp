@@ -71,13 +71,13 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         if (forced_ == Cleared) {
                             return base_impl_type::read(iter, len);
                         }
 
                         if (len < forced_) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         return base_impl_type::read(iter, forced_);
@@ -90,7 +90,7 @@ namespace nil {
                         }
 
                         if (len < forced_) {
-                            return nil::marshalling::status_type::not_enough_data;
+                            return status_type::not_enough_data;
                         }
 
                         return base_impl_type::read_n(count, iter, forced_);

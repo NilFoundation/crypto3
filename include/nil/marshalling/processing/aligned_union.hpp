@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_ALIGNED_UNION_HPP
-#define MARSHALLING_ALIGNED_UNION_HPP
+#ifndef MARSHALLING_PROCESSING_ALIGNED_UNION_HPP
+#define MARSHALLING_PROCESSING_ALIGNED_UNION_HPP
 
 #include <type_traits>
 
@@ -62,4 +62,4 @@ namespace nil {
         }    // namespace processing
     }    // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_ALIGNED_UNION_HPP
+#endif    // MARSHALLING_PROCESSING_ALIGNED_UNION_HPP

@@ -38,7 +38,6 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace detail {
 
             /// @brief field_type that represents a string.
             /// @details By default uses

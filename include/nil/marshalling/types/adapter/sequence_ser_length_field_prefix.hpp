@@ -34,7 +34,7 @@ namespace nil {
         namespace types {
             namespace adapter {
 
-                template<typename TLenField, nil::marshalling::status_type TStatus, typename TBase>
+                template<typename TLenField, status_type TStatus, typename TBase>
                 class sequence_ser_length_field_prefix : public TBase {
                     using base_impl_type = TBase;
                     using len_field_type = TLenField;
@@ -85,15 +85,15 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t len) {
+                    status_type read(TIter &iter, std::size_t len) {
                         len_field_type lenField;
                         auto es = lenField.read(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 
                         es = base_impl_type::read(iter, static_cast<std::size_t>(lenField.value()));
-                        if (es == nil::marshalling::status_type::not_enough_data) {
+                        if (es == status_type::not_enough_data) {
                             return TStatus;
                         }
 
@@ -104,13 +104,13 @@ namespace nil {
                     void read_no_status(TIter &iter) = delete;
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t len) const {
+                    status_type write(TIter &iter, std::size_t len) const {
                         using LenValueType = typename len_field_type::value_type;
                         auto lenVal = base_impl_type::length();
                         len_field_type lenField;
                         lenField.value() = static_cast<LenValueType>(lenVal);
                         auto es = lenField.write(iter, len);
-                        if (es != nil::marshalling::status_type::success) {
+                        if (es != status_type::success) {
                             return es;
                         }
 

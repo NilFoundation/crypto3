@@ -90,7 +90,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type read(TIter &iter, std::size_t size) {
+                    status_type read(TIter &iter, std::size_t size) {
                         if (size < length()) {
                             return status_type::not_enough_data;
                         }
@@ -107,7 +107,7 @@ namespace nil {
                     }
 
                     template<typename TIter>
-                    nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
+                    status_type write(TIter &iter, std::size_t size) const {
                         if (size < length()) {
                             return status_type::buffer_overflow;
                         }

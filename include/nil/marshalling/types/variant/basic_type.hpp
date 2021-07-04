@@ -168,12 +168,12 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
                         check_destruct();
-                        auto es = nil::marshalling::status_type::error_status_amount;
+                        auto es = status_type::error_status_amount;
                         nil::marshalling::processing::tuple_for_each_type<members_type>(
                             make_read_helper(es, iter, len, &storage_));
-                        MARSHALLING_ASSERT((es == nil::marshalling::status_type::success)
+                        MARSHALLING_ASSERT((es == status_type::success)
                                            || (members_count <= memIdx_));
-                        MARSHALLING_ASSERT((es != nil::marshalling::status_type::success) || (memIdx_ < members_count));
+                        MARSHALLING_ASSERT((es != status_type::success) || (memIdx_ < members_count));
 
                         return es;
                     }
@@ -184,7 +184,7 @@ namespace nil {
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
                         if (!current_field_valid()) {
-                            return nil::marshalling::status_type::success;
+                            return status_type::success;
                         }
 
                         auto es = status_type::error_status_amount;
@@ -460,7 +460,7 @@ namespace nil {
                     template<typename TIter>
                     class read_helper {
                     public:
-                        read_helper(std::size_t &idx, nil::marshalling::status_type &es, TIter &iter, std::size_t len,
+                        read_helper(std::size_t &idx, status_type &es, TIter &iter, std::size_t len,
                                     void *storage) :
                             idx_(idx),
                             es_(es), iter_(iter), len_(len), storage_(storage) {
@@ -469,7 +469,7 @@ namespace nil {
                             static_assert(std::is_base_of<std::random_access_iterator_tag, IterCategory>::value,
                                           "variant field only supports read with random access iterators");
 
-                            es_ = nil::marshalling::status_type::error_status_amount;
+                            es_ = status_type::error_status_amount;
                         }
 
                         template<typename TField>
@@ -482,7 +482,7 @@ namespace nil {
 
                             auto iterTmp = iter_;
                             auto es = field->read(iterTmp, len_);
-                            if (es == nil::marshalling::status_type::success) {
+                            if (es == status_type::success) {
                                 iter_ = iterTmp;
                                 es_ = es;
                                 readComplete_ = true;
@@ -491,8 +491,8 @@ namespace nil {
 
                             field->~TField();
 
-                            if ((es_ == nil::marshalling::status_type::error_status_amount)
-                                || (es == nil::marshalling::status_type::not_enough_data)) {
+                            if ((es_ == status_type::error_status_amount)
+                                || (es == status_type::not_enough_data)) {
                                 es_ = es;
                             }
 
@@ -501,7 +501,7 @@ namespace nil {
 
                     private:
                         std::size_t &idx_;
-                        nil::marshalling::status_type &es_;
+                        status_type &es_;
                         TIter &iter_;
                         std::size_t len_ = 0;
                         void *storage_ = nullptr;
@@ -509,7 +509,7 @@ namespace nil {
                     };
 
                     template<typename TIter>
-                    read_helper<TIter> make_read_helper(nil::marshalling::status_type &es, TIter &iter, std::size_t len,
+                    read_helper<TIter> make_read_helper(status_type &es, TIter &iter, std::size_t len,
                                                         void *storage) {
                         memIdx_ = 0;
                         return read_helper<TIter>(memIdx_, es, iter, len, storage);
@@ -535,7 +535,7 @@ namespace nil {
                     };
 
                     template<typename TIter>
-                    static write_helper<TIter> make_write_helper(nil::marshalling::status_type &es, TIter &iter,
+                    static write_helper<TIter> make_write_helper(status_type &es, TIter &iter,
                                                                  std::size_t len, const void *storage) {
                         return write_helper<TIter>(es, iter, len, storage);
                     }
