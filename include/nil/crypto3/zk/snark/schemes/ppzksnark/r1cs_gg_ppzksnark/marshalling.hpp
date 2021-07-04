@@ -1084,7 +1084,19 @@ namespace nil {
 
             static inline std::vector<chunk_type> process(typename scheme_type::proving_key_type pk) {
 
-                std::size_t proving_key_size = 1000 * g2_byteblob_size;
+                std::size_t proving_key_size = 3*g1_byteblob_size + 
+                    2*g2_byteblob_size + pk.A_query.size()*g1_byteblob_size +
+                    get_g2g1_knowledge_commitment_vector_size(pk.B_query) + 
+                    pk.H_query.size()*g1_byteblob_size + 
+                    pk.L_query.size()*g1_byteblob_size +
+                    2 * std_size_t_byteblob_size;
+
+                for (auto it = pk.constraint_system.constraints.begin(); 
+                        it != pk.constraint_system.constraints.end(); it++) {
+                    proving_key_size += get_r1cs_constraint_byteblob_size(*it);
+                }
+
+                proving_key_size *= 2;
 
                 std::vector<chunk_type> output(proving_key_size);
 
