@@ -67,15 +67,15 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::fail_on_invalid
             ///     @li @ref nil::marshalling::option::ignore_invalid
             ///     @li @b nil::marshalling::option::Units* - all variants of value units, see
-            ///         @ref sec_field_tutorial_int_value_units for details.
+            ///         @ref sec_field_tutorial_integral_units for details.
             ///     @li @ref nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/float_value.hpp
             template<typename TFieldBase, typename T, typename... TOptions>
-            class float_value : private detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...> {
-                using base_impl_type = detail::adapt_basic_field_type<basic::float_value<TFieldBase, T>, TOptions...>;
+            class float_value : private detail::adapt_basic_field_type<detail::basic_float_value<TFieldBase, T>, TOptions...> {
+                using base_impl_type = detail::adapt_basic_field_type<detail::basic_float_value<TFieldBase, T>, TOptions...>;
 
             public:
                 /// @brief endian_type used for serialization.

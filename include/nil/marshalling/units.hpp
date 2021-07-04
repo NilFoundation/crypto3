@@ -427,7 +427,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -441,7 +441,7 @@ namespace nil {
             ///     provided nanoseconds into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -457,7 +457,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -471,7 +471,7 @@ namespace nil {
             ///     provided microseconds into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -487,7 +487,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -501,7 +501,7 @@ namespace nil {
             ///     provided milliseconds into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -517,7 +517,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -531,7 +531,7 @@ namespace nil {
             ///     provided seconds into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -547,7 +547,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -561,7 +561,7 @@ namespace nil {
             ///     provided minutes into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -577,7 +577,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -591,7 +591,7 @@ namespace nil {
             ///     provided hours into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -607,7 +607,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -621,7 +621,7 @@ namespace nil {
             ///     provided days into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -637,7 +637,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
             ///     nil::marshalling::option::UnitsSeconds, etc...
@@ -651,7 +651,7 @@ namespace nil {
             ///     provided weeks into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any time value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliseconds,
@@ -667,7 +667,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -681,7 +681,7 @@ namespace nil {
             ///     provided nanometers into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -697,7 +697,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -711,7 +711,7 @@ namespace nil {
             ///     provided micrometers into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -728,7 +728,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -742,7 +742,7 @@ namespace nil {
             ///     provided millimeters into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -759,7 +759,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -773,7 +773,7 @@ namespace nil {
             ///     provided centimeters into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -790,7 +790,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -804,7 +804,7 @@ namespace nil {
             ///     provided meters into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -820,7 +820,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
             ///     nil::marshalling::option::UnitsMeters, etc...
@@ -834,7 +834,7 @@ namespace nil {
             ///     provided kilometers into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any distance value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimeters,
@@ -850,7 +850,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -864,7 +864,7 @@ namespace nil {
             ///     provided nm/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -881,7 +881,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -895,7 +895,7 @@ namespace nil {
             ///     provided um/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -912,7 +912,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -926,7 +926,7 @@ namespace nil {
             ///     provided mm/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -943,7 +943,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -957,7 +957,7 @@ namespace nil {
             ///     provided cm/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -974,7 +974,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -988,7 +988,7 @@ namespace nil {
             ///     provided m/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -1005,7 +1005,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -1019,7 +1019,7 @@ namespace nil {
             ///     provided km/s into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -1036,7 +1036,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
             ///     nil::marshalling::option::UnitsMetersPerSecond, etc...
@@ -1050,7 +1050,7 @@ namespace nil {
             ///     provided km/h into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any speed value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillimetersPerSecond,
@@ -1067,7 +1067,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
             ///     nil::marshalling::option::UnitsKilohertz, etc...
@@ -1081,7 +1081,7 @@ namespace nil {
             ///     provided hertz into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
@@ -1097,7 +1097,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
             ///     nil::marshalling::option::UnitsKilohertz, etc...
@@ -1111,7 +1111,7 @@ namespace nil {
             ///     provided kilohertz into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
@@ -1127,7 +1127,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
             ///     nil::marshalling::option::UnitsKilohertz, etc...
@@ -1141,7 +1141,7 @@ namespace nil {
             ///     provided megahertz into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
@@ -1157,7 +1157,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
             ///     nil::marshalling::option::UnitsKilohertz, etc...
@@ -1171,7 +1171,7 @@ namespace nil {
             ///     provided gigahertz into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any frequency value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsHertz,
@@ -1187,7 +1187,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any angle measurement value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsDegrees or
             ///     nil::marshalling::option::UnitsRadians
@@ -1201,7 +1201,7 @@ namespace nil {
             ///     provided degrees into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any angle measurement value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsDegrees or
@@ -1217,7 +1217,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any angle measurement value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsDegrees or
             ///     nil::marshalling::option::UnitsRadians
@@ -1231,7 +1231,7 @@ namespace nil {
             ///     provided radians into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any angle measurement value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsDegrees or
@@ -1247,7 +1247,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
             ///     nil::marshalling::option::UnitsAmps, etc...
@@ -1261,7 +1261,7 @@ namespace nil {
             ///     provided nanoamps into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
@@ -1277,7 +1277,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
             ///     nil::marshalling::option::UnitsAmps, etc...
@@ -1291,7 +1291,7 @@ namespace nil {
             ///     provided microamps into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
@@ -1307,7 +1307,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
             ///     nil::marshalling::option::UnitsAmps, etc...
@@ -1321,7 +1321,7 @@ namespace nil {
             ///     provided milliamps into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
@@ -1337,7 +1337,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
             ///     nil::marshalling::option::UnitsAmps, etc...
@@ -1351,7 +1351,7 @@ namespace nil {
             ///     provided amps into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
@@ -1367,7 +1367,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
             ///     nil::marshalling::option::UnitsAmps, etc...
@@ -1381,7 +1381,7 @@ namespace nil {
             ///     provided kiloamps into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMilliamps,
@@ -1397,7 +1397,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical current value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
             ///     nil::marshalling::option::UnitsVolts, etc...
@@ -1411,7 +1411,7 @@ namespace nil {
             ///     provided nanovolts into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
@@ -1427,7 +1427,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
             ///     nil::marshalling::option::UnitsVolts, etc...
@@ -1441,7 +1441,7 @@ namespace nil {
             ///     provided microvolts into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
@@ -1457,7 +1457,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
             ///     nil::marshalling::option::UnitsVolts, etc...
@@ -1471,7 +1471,7 @@ namespace nil {
             ///     provided millivolts into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
@@ -1487,7 +1487,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
             ///     nil::marshalling::option::UnitsVolts, etc...
@@ -1501,7 +1501,7 @@ namespace nil {
             ///     provided volts into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
@@ -1517,7 +1517,7 @@ namespace nil {
             ///     type.
             /// @tparam TRet Return type
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,
             ///     nil::marshalling::option::UnitsVolts, etc...
@@ -1531,7 +1531,7 @@ namespace nil {
             ///     provided kilovolts into the units stored by the field and update the
             ///     internal value of the latter accordingly.
             /// @tparam TField Type of the field, expected to be a field with integral
-            ///     internal value, such as a variant of nil::marshalling::types::int_value.
+            ///     internal value, such as a variant of nil::marshalling::types::integral.
             /// @tparam TVal Type of value to assign.
             /// @pre The @b TField type must be defined containing any electrical voltage value, using
             ///     any of the relevant options: nil::marshalling::option::UnitsMillivolts,

@@ -33,27 +33,27 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase>
-                class no_value : public TFieldBase {
+                class basic_no_value : public TFieldBase {
                     using base_impl_type = TFieldBase;
 
                 public:
                     using value_type = unsigned;
                     using serialized_type = value_type;
 
-                    no_value() = default;
+                    basic_no_value() = default;
 
-                    no_value(const no_value &) = default;
+                    basic_no_value(const basic_no_value &) = default;
 
-                    no_value(no_value &&) = default;
+                    basic_no_value(basic_no_value &&) = default;
 
-                    ~no_value() noexcept = default;
+                    ~basic_no_value() noexcept = default;
 
-                    no_value &operator=(const no_value &) = default;
+                    basic_no_value &operator=(const basic_no_value &) = default;
 
-                    no_value &operator=(no_value &&) = default;
+                    basic_no_value &operator=(basic_no_value &&) = default;
 
                     static value_type &value() {
                         static value_type value = value_type();
@@ -105,7 +105,7 @@ namespace nil {
                     }
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

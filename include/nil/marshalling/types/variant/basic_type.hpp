@@ -38,23 +38,23 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename TMembers>
-                class variant : public TFieldBase {
+                class basic_variant : public TFieldBase {
                 public:
                     using members_type = TMembers;
                     using value_type = processing::tuple_as_aligned_union_type<members_type>;
 
-                    variant() = default;
+                    basic_variant() = default;
 
-                    variant(const value_type &val) : storage_(val) {
+                    basic_variant(const value_type &val) : storage_(val) {
                     }
 
-                    variant(value_type &&val) : storage_(std::move(val)) {
+                    basic_variant(value_type &&val) : storage_(std::move(val)) {
                     }
 
-                    variant(const variant &other) {
+                    basic_variant(const basic_variant &other) {
                         if (!other.current_field_valid()) {
                             return;
                         }
@@ -65,7 +65,7 @@ namespace nil {
                         memIdx_ = other.memIdx_;
                     }
 
-                    variant(variant &&other) {
+                    basic_variant(basic_variant &&other) {
                         if (!other.current_field_valid()) {
                             return;
                         }
@@ -76,11 +76,11 @@ namespace nil {
                         memIdx_ = other.memIdx_;
                     }
 
-                    ~variant() noexcept {
+                    ~basic_variant() noexcept {
                         check_destruct();
                     }
 
-                    variant &operator=(const variant &other) {
+                    basic_variant &operator=(const basic_variant &other) {
                         if (this == &other) {
                             return *this;
                         }
@@ -97,7 +97,7 @@ namespace nil {
                         return *this;
                     }
 
-                    variant &operator=(variant &&other) {
+                    basic_variant &operator=(basic_variant &&other) {
                         if (this == &other) {
                             return *this;
                         }
@@ -467,7 +467,7 @@ namespace nil {
                             using IterType = typename std::decay<decltype(iter)>::type;
                             using IterCategory = typename std::iterator_traits<IterType>::iterator_category;
                             static_assert(std::is_base_of<std::random_access_iterator_tag, IterCategory>::value,
-                                          "variant field only supports read with random access iterators");
+                                          "basic_variant field only supports read with random access iterators");
 
                             es_ = status_type::error_status_amount;
                         }
@@ -582,7 +582,7 @@ namespace nil {
                     static_assert(0U < members_count, "value_type must be non-empty tuple");
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

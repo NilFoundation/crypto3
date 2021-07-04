@@ -109,7 +109,7 @@ namespace nil {
 
                 template<typename TFieldBase, typename... TOptions>
                 using string_base_type = adapt_basic_field_type<
-                    basic::string<TFieldBase, string_storage_type<options_parser<TOptions...>>>,
+                    basic_string<TFieldBase, string_storage_type<options_parser<TOptions...>>>,
                     TOptions...>;
 
             }    // namespace detail

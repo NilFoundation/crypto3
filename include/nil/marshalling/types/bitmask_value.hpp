@@ -31,7 +31,7 @@
 #include <nil/marshalling/types/detail/options_parser.hpp>
 #include <nil/marshalling/detail/gen_enum.hpp>
 #include <nil/marshalling/detail/bits_access.hpp>
-#include <nil/marshalling/types/int_value.hpp>
+#include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/tag.hpp>
 #include <nil/marshalling/types/bitmask_value/behaviour.hpp>
 
@@ -42,7 +42,7 @@ namespace nil {
             /// @brief Bitmask value field.
             /// @details Quite often communication protocols specify bitmask values, where
             ///     any bit has a specific meaning. Although such masks are can be handled
-            ///     as unsigned integer values using nil::marshalling::types::int_value field type,
+            ///     as unsigned integer values using nil::marshalling::types::integral field type,
             ///     using nil::marshalling::types::Bitmask may be a bit more convenient.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
@@ -53,7 +53,7 @@ namespace nil {
             ///     For example:
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::types::enum_value<MyFieldBase>;
+            ///         using MyField =nil::marshalling::types::enumeration<MyFieldBase>;
             ///     @endcode
             ///     The serialized value of the field in the example above will consume
             ///     sizeof(unsigned) bytes, because the underlying type chosen to be "unsigned"
@@ -61,7 +61,7 @@ namespace nil {
             ///     2 bytes serialization length:
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::types::enum_value<MyFieldBase,
+            ///         using MyField =nil::marshalling::types::enumeration<MyFieldBase,
             ///         nil::marshalling::option::fixed_length<2> >;
             ///     @endcode
             ///     Supported options are:
@@ -103,8 +103,8 @@ namespace nil {
                 using bitmask_behaviour_type = 
                     detail::bitmask_undertlying_type_type<parsed_options_type>;
 
-                using int_value_field_type = 
-                    int_value<TFieldBase, bitmask_behaviour_type, TOptions...>;
+                using integral_type = 
+                    integral<TFieldBase, bitmask_behaviour_type, TOptions...>;
 
             public:
 
@@ -114,7 +114,7 @@ namespace nil {
                 /// @brief Type of underlying integral value.
                 /// @details Unsigned integral type, which depends on the length of the
                 ///     mask determined by the nil::marshalling::option::fixed_length option.
-                using value_type = typename int_value_field_type::value_type;
+                using value_type = typename integral_type::value_type;
 
                 /// @brief Default constructor.
                 /// @brief Initial bitmask has all bits cleared (equals 0)
@@ -155,13 +155,13 @@ namespace nil {
                 /// @brief Get maximal length that is required to serialise field of this type.
                 /// @return Maximal number of bytes required serialise the field value.
                 static constexpr std::size_t max_length() {
-                    return int_value_field_type::max_length();
+                    return integral_type::max_length();
                 }
 
                 /// @brief Get minimal length that is required to serialise field of this type.
                 /// @return Minimal number of bytes required serialise the field value.
                 static constexpr std::size_t min_length() {
-                    return int_value_field_type::min_length();
+                    return integral_type::min_length();
                 }
 
                 /// @brief Read field value from input data sequence
@@ -260,7 +260,7 @@ namespace nil {
 
                 /// @brief Compile time check if this class is version dependent
                 static constexpr bool is_version_dependent() {
-                    return int_value_field_type::is_version_dependent();
+                    return integral_type::is_version_dependent();
                 }
 
                 /// @brief Get version of the field.
@@ -347,7 +347,7 @@ namespace nil {
                     !parsed_options_type::has_invalid_by_default,
                     "nil::marshalling::option::invalid_by_default option is not applicable to bitmask_value field");
 
-                int_value_field_type intValue_;
+                integral_type intValue_;
             };
 
             // Implementation

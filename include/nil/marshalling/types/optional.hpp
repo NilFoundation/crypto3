@@ -57,8 +57,8 @@ namespace nil {
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/optional.hpp
             template<typename TField, typename... TOptions>
-            class optional : private detail::adapt_basic_field_type<basic::optional<TField>, TOptions...> {
-                using base_impl_type = detail::adapt_basic_field_type<basic::optional<TField>, TOptions...>;
+            class optional : private detail::adapt_basic_field_type<detail::basic_optional<TField>, TOptions...> {
+                using base_impl_type = detail::adapt_basic_field_type<detail::basic_optional<TField>, TOptions...>;
 
             public:
                 /// @brief endian_type used for serialization.

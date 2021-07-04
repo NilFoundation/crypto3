@@ -60,9 +60,9 @@ namespace nil {
             ///             std::types::bundle<
             ///                 MyFieldBase,
             ///                 std::tuple<
-            ///                     nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
-            ///                     nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>
-            ///                     nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>
+            ///                     nil::marshalling::types::integral<MyFieldBase, std::uint16_t>
+            ///                     nil::marshalling::types::integral<MyFieldBase, std::uint8_t>
+            ///                     nil::marshalling::types::integral<MyFieldBase, std::uint8_t>
             ///                 >
             ///             >
             ///         >;

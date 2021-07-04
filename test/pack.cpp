@@ -33,9 +33,9 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
-#include <nil/marshalling/types/int_value.hpp>
+#include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/bitmask_value.hpp>
-#include <nil/marshalling/types/enum_value.hpp>
+#include <nil/marshalling/types/enumeration.hpp>
 #include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/types/string.hpp>
 #include <nil/marshalling/types/bitfield.hpp>
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(be_to_be_1) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<2>>;
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(be_to_be_2) {
 
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(be_to_be_2) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -127,13 +127,13 @@ BOOST_AUTO_TEST_CASE(be_to_be_2) {
 BOOST_AUTO_TEST_CASE(be_to_le_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type =  
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint32_t>;
 
@@ -160,13 +160,13 @@ BOOST_AUTO_TEST_CASE(be_to_le_1) {
 // BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
 //     using input_type = types::array_list<
 //             field_type<option::little_endian>, 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_endian>, 
 //                 std::uint8_t>,
 //             option::fixed_size_storage<4>>;
 //     using input_seed_type = typename input_type::value_type;
 //     using output_type =  
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_octet_little_bit>, 
 //                 std::uint32_t>;
 
@@ -203,13 +203,13 @@ BOOST_AUTO_TEST_CASE(be_to_le_1) {
 BOOST_AUTO_TEST_CASE(be_to_le_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<8>>;
     using input_seed_type = typename input_type::value_type;
     using output_type =  
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint64_t>;
 
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(be_to_le_2) {
 BOOST_AUTO_TEST_CASE(be_to_le_3) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(be_to_le_3) {
     using output_type =  
             types::array_list<
                 field_type<option::little_endian>, 
-                types::int_value<
+                types::integral<
                     field_type<option::little_endian>, 
                     std::uint32_t>,
                 option::fixed_size_storage<2>>;
@@ -277,13 +277,13 @@ BOOST_AUTO_TEST_CASE(be_to_le_3) {
 BOOST_AUTO_TEST_CASE(bubb_to_lulb_4) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<2>>;
     using input_seed_type = typename input_type::value_type;
     using output_type =  
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint32_t>;
 
@@ -307,13 +307,13 @@ BOOST_AUTO_TEST_CASE(bubb_to_lulb_4) {
 // BOOST_AUTO_TEST_CASE(bubb_to_lulb_1) {
 //     using input_type = types::array_list<
 //             field_type<option::little_endian>, 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_endian>, 
 //                 std::uint16_t>,
 //             option::fixed_size_storage<2>>;
 //     using input_seed_type = typename input_type::value_type;
 //     using output_type =  
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::little_octet_little_bit>, 
 //                 std::uint32_t>;
 
@@ -348,13 +348,13 @@ BOOST_AUTO_TEST_CASE(bubb_to_lulb_4) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type =  
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint64_t>;
 
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
     using output_type =  
             types::array_list<
                 field_type<option::little_endian>, 
-                types::int_value<
+                types::integral<
                     field_type<option::big_endian>, 
                     std::uint16_t>,
                 option::fixed_size_storage<2>>;
@@ -441,13 +441,13 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
     using input_seed_type = typename input_type::value_type;
     using output_type =  
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>;
 
@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     using output_type =  
             types::array_list<
                 field_type<option::little_endian>, 
-                types::int_value<
+                types::integral<
                     field_type<option::little_endian>, 
                     std::uint32_t>,
                 option::fixed_size_storage<2>>;
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_SUITE(pack_exploder_test_suite)
 BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<2>>;
@@ -708,7 +708,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -743,7 +743,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
 BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -751,7 +751,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -785,14 +785,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 
 // BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
 //     using input_type = 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_endian>, 
 //                 std::uint32_t>;
 //     using input_seed_type = typename input_type::value_type;
 //     using output_type = 
 //         types::array_list<
 //             field_type<option::little_endian>, 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_octet_little_bit>, 
 //                 std::uint8_t>,
 //             option::fixed_size_storage<4>>;
@@ -810,7 +810,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 // BOOST_AUTO_TEST_CASE(bubb_to_bulb_2) {
 //     using input_type = types::array_list<
 //             field_type<option::little_endian>, 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_endian>, 
 //                 std::uint32_t>,
 //             option::fixed_size_storage<2>>;
@@ -818,7 +818,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 //     using output_type = 
 //         types::array_list<
 //             field_type<option::little_endian>, 
-//             types::int_value<
+//             types::integral<
 //                 field_type<option::big_octet_little_bit>, 
 //                 std::uint16_t>,
 //             option::fixed_size_storage<4>>;
@@ -835,14 +835,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
     using input_type = 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint64_t>;
     using input_seed_type = typename input_type::value_type;
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<8>>;
@@ -870,7 +870,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -878,7 +878,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -932,14 +932,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
 
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
     using input_type = 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint64_t>;
     using input_seed_type = typename input_type::value_type;
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -967,7 +967,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<2>>;
@@ -975,7 +975,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -1029,14 +1029,14 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
 
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
     using input_type = 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>;
     using input_seed_type = typename input_type::value_type;
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
@@ -1063,7 +1063,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -1071,7 +1071,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     using output_type = 
         types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -1292,7 +1292,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
 
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -1329,7 +1329,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
@@ -1365,7 +1365,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_bubb_3) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
@@ -1401,7 +1401,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_3) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
@@ -1437,7 +1437,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
@@ -1473,7 +1473,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
 BOOST_AUTO_TEST_CASE(lubb_to_lubb_3) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<2>>;
@@ -1569,14 +1569,14 @@ BOOST_AUTO_TEST_CASE(lubb_to_lubb_3) {
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -1610,14 +1610,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -1651,14 +1651,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_3) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint16_t>,
             option::fixed_size_storage<4>>;
@@ -1737,14 +1737,14 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_3) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -1778,14 +1778,14 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint8_t>,
             option::fixed_size_storage<4>>;
@@ -1819,14 +1819,14 @@ BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(lubb_to_bubb_3) {
     using input_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::little_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;
     using input_seed_type = typename input_type::value_type;
     using output_type = types::array_list<
             field_type<option::little_endian>, 
-            types::int_value<
+            types::integral<
                 field_type<option::big_endian>, 
                 std::uint32_t>,
             option::fixed_size_storage<2>>;

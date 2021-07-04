@@ -32,7 +32,7 @@
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
-#include <nil/marshalling/types/int_value/basic_type.hpp>
+#include <nil/marshalling/types/integral/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/tag.hpp>
 
@@ -48,7 +48,7 @@ namespace nil {
             ///     of the field. If no option is provided The field's value is serialized as is.
             ///     @code
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>;
+            ///         using MyField = nil::marshalling::types::integral<MyFieldBase, std::uint16_t>;
             ///     @endcode
             ///     In the example above it will
             ///     consume 2 bytes (because sizeof(std::uint16_t) == 2) and will
@@ -72,15 +72,15 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::ignore_invalid
             ///     @li @ref nil::marshalling::option::scaling_ratio
             ///     @li @b nil::marshalling::option::Units* - all variants of value units, see
-            ///         @ref sec_field_tutorial_int_value_units for details.
+            ///         @ref sec_field_tutorial_integral_units for details.
             ///     @li nil::marshalling::option::empty_serialization
             ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/int_value.hpp
+            /// @headerfile nil/marshalling/types/integral.hpp
             template<typename TFieldBase, typename T, typename... TOptions>
-            class int_value : private detail::adapt_basic_field_type<basic::int_value<TFieldBase, T>, TOptions...> {
-                using base_impl_type = detail::adapt_basic_field_type<basic::int_value<TFieldBase, T>, TOptions...>;
+            class integral : private detail::adapt_basic_field_type<detail::basic_integral<TFieldBase, T>, TOptions...> {
+                using base_impl_type = detail::adapt_basic_field_type<detail::basic_integral<TFieldBase, T>, TOptions...>;
 
             public:
                 /// @brief endian_type used for serialization.
@@ -93,7 +93,7 @@ namespace nil {
                 using parsed_options_type = detail::options_parser<TOptions...>;
 
                 /// @brief Tag indicating type of the field
-                using tag = tag::integer;
+                using tag = tag::integral;
 
                 /// @brief Type of underlying integral value.
                 /// @details Same as template parameter T to this class.
@@ -101,20 +101,20 @@ namespace nil {
 
                 /// @brief Default constructor
                 /// @details Initialises internal value to 0.
-                int_value() = default;
+                integral() = default;
 
                 /// @brief Constructor
-                explicit int_value(const value_type &val) : base_impl_type(val) {
+                explicit integral(const value_type &val) : base_impl_type(val) {
                 }
 
                 /// @brief Copy constructor
-                int_value(const int_value &) = default;
+                integral(const integral &) = default;
 
                 /// @brief Destructor
-                ~int_value() noexcept = default;
+                ~integral() noexcept = default;
 
                 /// @brief Copy assignment
-                int_value &operator=(const int_value &) = default;
+                integral &operator=(const integral &) = default;
 
                 /// @brief Scales value according to ratio specified in provided
                 ///     nil::marshalling::option::scaling_ratio option.
@@ -341,62 +341,62 @@ namespace nil {
 
                 static_assert(!parsed_options_type::has_sequence_elem_length_forcing,
                               "nil::marshalling::option::SequenceElemLengthForcingEnabled option is not applicable to "
-                              "int_value field");
+                              "integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_size_forcing,
-                    "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to int_value field");
+                    "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to integral field");
                 static_assert(!parsed_options_type::has_sequence_length_forcing,
                               "nil::marshalling::option::SequenceLengthForcingEnabled option is not applicable to "
-                              "int_value field");
+                              "integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size,
-                    "nil::marshalling::option::sequence_fixed_size option is not applicable to int_value field");
+                    "nil::marshalling::option::sequence_fixed_size option is not applicable to integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size_use_fixed_size_storage,
                     "nil::marshalling::option::SequenceFixedSizeUseFixedSizeStorage option is not applicable to "
-                    "int_value field");
+                    "integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_size_field_prefix,
-                    "nil::marshalling::option::sequence_size_field_prefix option is not applicable to int_value field");
+                    "nil::marshalling::option::sequence_size_field_prefix option is not applicable to integral field");
                 static_assert(!parsed_options_type::has_sequence_ser_length_field_prefix,
                               "nil::marshalling::option::sequence_ser_length_field_prefix option is not applicable to "
-                              "int_value field");
+                              "integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_elem_ser_length_field_prefix,
                     "nil::marshalling::option::sequence_elem_ser_length_field_prefix option is not applicable to "
-                    "int_value field");
+                    "integral field");
                 static_assert(
                     !parsed_options_type::has_sequence_elem_fixed_ser_length_field_prefix,
                     "nil::marshalling::option::SequenceElemSerLengthFixedFieldPrefix option is not applicable to "
-                    "int_value field");
+                    "integral field");
                 static_assert(!parsed_options_type::has_sequence_trailing_field_suffix,
                               "nil::marshalling::option::sequence_trailing_field_suffix option is not applicable to "
-                              "int_value field");
+                              "integral field");
                 static_assert(!parsed_options_type::has_sequence_termination_field_suffix,
                               "nil::marshalling::option::sequence_termination_field_suffix option is not applicable to "
-                              "int_value field");
+                              "integral field");
                 static_assert(
                     !parsed_options_type::has_fixed_size_storage,
-                    "nil::marshalling::option::fixed_size_storage option is not applicable to int_value field");
+                    "nil::marshalling::option::fixed_size_storage option is not applicable to integral field");
                 static_assert(
                     !parsed_options_type::has_custom_storage_type,
-                    "nil::marshalling::option::custom_storage_type option is not applicable to int_value field");
+                    "nil::marshalling::option::custom_storage_type option is not applicable to integral field");
                 static_assert(!parsed_options_type::has_orig_data_view,
-                              "nil::marshalling::option::orig_data_view option is not applicable to int_value field");
+                              "nil::marshalling::option::orig_data_view option is not applicable to integral field");
                 static_assert(
                     !parsed_options_type::has_versions_range,
                     "nil::marshalling::option::exists_between_versions (or similar) option is not applicable to "
-                    "int_value field");
+                    "integral field");
             };
 
             /// @brief Equality comparison operator.
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related int_value
+            /// @related integral
             template<typename TFieldBase, typename T, typename... TOptions>
-            bool operator==(const int_value<TFieldBase, T, TOptions...> &field1,
-                            const int_value<TFieldBase, T, TOptions...> &field2) {
+            bool operator==(const integral<TFieldBase, T, TOptions...> &field1,
+                            const integral<TFieldBase, T, TOptions...> &field2) {
                 return field1.value() == field2.value();
             }
 
@@ -404,10 +404,10 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related int_value
+            /// @related integral
             template<typename TFieldBase, typename T, typename... TOptions>
-            bool operator!=(const int_value<TFieldBase, T, TOptions...> &field1,
-                            const int_value<TFieldBase, T, TOptions...> &field2) {
+            bool operator!=(const integral<TFieldBase, T, TOptions...> &field1,
+                            const integral<TFieldBase, T, TOptions...> &field2) {
                 return field1.value() != field2.value();
             }
 
@@ -415,27 +415,27 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related int_value
+            /// @related integral
             template<typename TFieldBase, typename T, typename... TOptions>
-            bool operator<(const int_value<TFieldBase, T, TOptions...> &field1,
-                           const int_value<TFieldBase, T, TOptions...> &field2) {
+            bool operator<(const integral<TFieldBase, T, TOptions...> &field1,
+                           const integral<TFieldBase, T, TOptions...> &field2) {
                 return field1.value() < field2.value();
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::int_value type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::integral type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::types::int_value
+            /// @related nil::marshalling::types::integral
             template<typename TFieldBase, typename T, typename... TOptions>
-            inline int_value<TFieldBase, T, TOptions...> &to_field_base(int_value<TFieldBase, T, TOptions...> &field) {
+            inline integral<TFieldBase, T, TOptions...> &to_field_base(integral<TFieldBase, T, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::int_value type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::integral type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::types::int_value
+            /// @related nil::marshalling::types::integral
             template<typename TFieldBase, typename T, typename... TOptions>
-            inline const int_value<TFieldBase, T, TOptions...> &
-                to_field_base(const int_value<TFieldBase, T, TOptions...> &field) {
+            inline const integral<TFieldBase, T, TOptions...> &
+                to_field_base(const integral<TFieldBase, T, TOptions...> &field) {
                 return field;
             }
 

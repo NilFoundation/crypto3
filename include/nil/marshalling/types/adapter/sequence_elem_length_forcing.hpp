@@ -87,7 +87,7 @@ namespace nil {
                     }
 
                     static constexpr std::size_t max_element_length() {
-                        return basic::common_funcs::max_supported_length();
+                        return detail::common_funcs::max_supported_length();
                     }
 
                     template<typename TIter>
@@ -140,7 +140,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
-                        return basic::common_funcs::read_sequence(*this, iter, len);
+                        return detail::common_funcs::read_sequence(*this, iter, len);
                     }
 
                     template<typename TIter>
@@ -148,12 +148,12 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read_n(std::size_t count, TIter &iter, std::size_t &len) {
-                        return basic::common_funcs::read_sequence_n(*this, count, iter, len);
+                        return detail::common_funcs::read_sequence_n(*this, count, iter, len);
                     }
 
                     template<typename TIter>
                     void read_no_status_n(std::size_t count, TIter &iter) {
-                        basic::common_funcs::read_sequence_no_status_n(*this, count, iter);
+                        detail::common_funcs::read_sequence_no_status_n(*this, count, iter);
                     }
 
                 private:

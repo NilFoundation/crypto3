@@ -94,9 +94,9 @@ namespace nil {
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS()
             /// @see MARSHALLING_VARIANT_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
-            class variant : private detail::adapt_basic_field_type<basic::variant<TFieldBase, TMembers>, TOptions...> {
+            class variant : private detail::adapt_basic_field_type<detail::basic_variant<TFieldBase, TMembers>, TOptions...> {
                 using base_impl_type
-                    = detail::adapt_basic_field_type<basic::variant<TFieldBase, TMembers>, TOptions...>;
+                    = detail::adapt_basic_field_type<detail::basic_variant<TFieldBase, TMembers>, TOptions...>;
 
                 static_assert(nil::detail::is_tuple<TMembers>::value,
                               "TMembers is expected to be a tuple of std::tuple<...>");

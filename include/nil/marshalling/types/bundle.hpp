@@ -83,8 +83,8 @@ namespace nil {
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS()
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
-            class bundle : private detail::adapt_basic_field_type<basic::bundle<TFieldBase, TMembers>, TOptions...> {
-                using base_impl_type = detail::adapt_basic_field_type<basic::bundle<TFieldBase, TMembers>, TOptions...>;
+            class bundle : private detail::adapt_basic_field_type<detail::basic_bundle<TFieldBase, TMembers>, TOptions...> {
+                using base_impl_type = detail::adapt_basic_field_type<detail::basic_bundle<TFieldBase, TMembers>, TOptions...>;
                 static_assert(nil::detail::is_tuple<TMembers>::value,
                               "TMembers is expected to be a tuple of std::tuple<...>");
 

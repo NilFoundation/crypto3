@@ -40,31 +40,31 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename TMembers>
-                class bundle : public TFieldBase {
+                class basic_bundle : public TFieldBase {
                 public:
                     using value_type = TMembers;
                     using version_type = typename TFieldBase::version_type;
 
-                    bundle() = default;
+                    basic_bundle() = default;
 
-                    explicit bundle(const value_type &val) : members_(val) {
+                    explicit basic_bundle(const value_type &val) : members_(val) {
                     }
 
-                    explicit bundle(value_type &&val) : members_(std::move(val)) {
+                    explicit basic_bundle(value_type &&val) : members_(std::move(val)) {
                     }
 
-                    bundle(const bundle &) = default;
+                    basic_bundle(const basic_bundle &) = default;
 
-                    bundle(bundle &&) = default;
+                    basic_bundle(basic_bundle &&) = default;
 
-                    ~bundle() noexcept = default;
+                    ~basic_bundle() noexcept = default;
 
-                    bundle &operator=(const bundle &) = default;
+                    basic_bundle &operator=(const basic_bundle &) = default;
 
-                    bundle &operator=(bundle &&) = default;
+                    basic_bundle &operator=(basic_bundle &&) = default;
 
                     const value_type &value() const {
                         return members_;
@@ -412,7 +412,7 @@ namespace nil {
                     value_type members_;
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

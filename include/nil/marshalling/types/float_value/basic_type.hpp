@@ -35,10 +35,10 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename T>
-                class float_value : public TFieldBase {
+                class basic_float_value : public TFieldBase {
                     static_assert(std::is_floating_point<T>::value, "T must be floating point value");
 
                     using base_impl_type = TFieldBase;
@@ -51,20 +51,20 @@ namespace nil {
 
                     using scaling_ratio_type = std::ratio<1, 1>;
 
-                    float_value() = default;
+                    basic_float_value() = default;
 
-                    explicit float_value(value_type val) : value_(val) {
+                    explicit basic_float_value(value_type val) : value_(val) {
                     }
 
-                    float_value(const float_value &) = default;
+                    basic_float_value(const basic_float_value &) = default;
 
-                    float_value(float_value &&) = default;
+                    basic_float_value(basic_float_value &&) = default;
 
-                    ~float_value() noexcept = default;
+                    ~basic_float_value() noexcept = default;
 
-                    float_value &operator=(const float_value &) = default;
+                    basic_float_value &operator=(const basic_float_value &) = default;
 
-                    float_value &operator=(float_value &&) = default;
+                    basic_float_value &operator=(basic_float_value &&) = default;
 
                     const value_type &value() const {
                         return value_;
@@ -110,7 +110,8 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        auto serializedValue = base_impl_type::template read_data<serialized_type>(iter);
+                        serialized_type serializedValue = 
+                            base_impl_type::template read_data<serialized_type>(iter);
                         value_ = from_serialized(serializedValue);
                     }
 
@@ -138,7 +139,7 @@ namespace nil {
                     value_type value_ = static_cast<value_type>(0.0);
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

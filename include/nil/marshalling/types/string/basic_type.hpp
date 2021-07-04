@@ -42,10 +42,10 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename TStorage>
-                class string : public TFieldBase {
+                class basic_string : public TFieldBase {
                     using base_impl_type = TFieldBase;
 
                 public:
@@ -54,26 +54,26 @@ namespace nil {
                     using value_type = TStorage;
                     using element_type = typename TStorage::value_type;
 
-                    static_assert(std::is_integral<element_type>::value, "string of characters only supported");
+                    static_assert(std::is_integral<element_type>::value, "basic_string of characters only supported");
                     static_assert(sizeof(element_type) == sizeof(char), "Single byte charactes only supported");
 
-                    string() = default;
+                    basic_string() = default;
 
-                    explicit string(const value_type &val) : value_(val) {
+                    explicit basic_string(const value_type &val) : value_(val) {
                     }
 
-                    explicit string(value_type &&val) : value_(std::move(val)) {
+                    explicit basic_string(value_type &&val) : value_(std::move(val)) {
                     }
 
-                    string(const string &) = default;
+                    basic_string(const basic_string &) = default;
 
-                    string(string &&) = default;
+                    basic_string(basic_string &&) = default;
 
-                    string &operator=(const string &) = default;
+                    basic_string &operator=(const basic_string &) = default;
 
-                    string &operator=(string &&) = default;
+                    basic_string &operator=(basic_string &&) = default;
 
-                    ~string() noexcept = default;
+                    ~basic_string() noexcept = default;
 
                     const value_type &value() const {
                         return value_;
@@ -86,7 +86,7 @@ namespace nil {
                     template<typename U>
                     void push_back(U &&val) {
                         static_assert(detail::string_has_push_back<value_type>::value,
-                                      "The string type must have push_back() member function");
+                                      "The basic_string type must have push_back() member function");
                         value_.push_back(static_cast<typename value_type::value_type>(val));
                     }
 
@@ -97,7 +97,7 @@ namespace nil {
 
                     void clear() {
                         static_assert(has_member_function_clear<value_type>::value,
-                                      "The string type must have clear() member function");
+                                      "The basic_string type must have clear() member function");
                         value_.clear();
                     }
 
@@ -307,7 +307,7 @@ namespace nil {
                     value_type value_;
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

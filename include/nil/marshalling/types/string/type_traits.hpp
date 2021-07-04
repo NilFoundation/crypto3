@@ -42,64 +42,62 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
-                namespace detail {
+            namespace detail {
 
-                    template<typename TStorage>
-                    struct string_max_length_retrieve_helper {
-                        static const std::size_t value = common_funcs::max_supported_length();
-                    };
+                template<typename TStorage>
+                struct string_max_length_retrieve_helper {
+                    static const std::size_t value = common_funcs::max_supported_length();
+                };
 
-                    template<std::size_t TSize>
-                    struct string_max_length_retrieve_helper<nil::marshalling::container::static_string<TSize>> {
-                        static const std::size_t value = TSize - 1;
-                    };
+                template<std::size_t TSize>
+                struct string_max_length_retrieve_helper<nil::marshalling::container::static_string<TSize>> {
+                    static const std::size_t value = TSize - 1;
+                };
 
-                    template<typename T>
-                    class string_has_assign {
-                    protected:
-                        typedef char Yes;
-                        typedef unsigned No;
+                template<typename T>
+                class string_has_assign {
+                protected:
+                    typedef char Yes;
+                    typedef unsigned No;
 
-                        template<typename U, U>
-                        struct ReallyHas;
+                    template<typename U, U>
+                    struct ReallyHas;
 
-                        template<typename C>
-                        static Yes
-                            test(ReallyHas<C &(C::*)(typename C::const_pointer, typename C::size_type), &C::assign> *);
+                    template<typename C>
+                    static Yes
+                        test(ReallyHas<C &(C::*)(typename C::const_pointer, typename C::size_type), &C::assign> *);
 
-                        template<typename C>
-                        static Yes test(
-                            ReallyHas<void (C::*)(typename C::const_pointer, typename C::size_type), &C::assign> *);
+                    template<typename C>
+                    static Yes test(
+                        ReallyHas<void (C::*)(typename C::const_pointer, typename C::size_type), &C::assign> *);
 
-                        template<typename>
-                        static No test(...);
+                    template<typename>
+                    static No test(...);
 
-                    public:
-                        static const bool value = (sizeof(test<T>(0)) == sizeof(Yes));
-                    };
+                public:
+                    static const bool value = (sizeof(test<T>(0)) == sizeof(Yes));
+                };
 
-                    template<typename T>
-                    class string_has_push_back {
-                    protected:
-                        typedef char Yes;
-                        typedef unsigned No;
+                template<typename T>
+                class string_has_push_back {
+                protected:
+                    typedef char Yes;
+                    typedef unsigned No;
 
-                        template<typename U, U>
-                        struct ReallyHas;
+                    template<typename U, U>
+                    struct ReallyHas;
 
-                        template<typename C>
-                        static Yes test(ReallyHas<void (C::*)(char), &C::push_back> *);
+                    template<typename C>
+                    static Yes test(ReallyHas<void (C::*)(char), &C::push_back> *);
 
-                        template<typename>
-                        static No test(...);
+                    template<typename>
+                    static No test(...);
 
-                    public:
-                        static const bool value = (sizeof(test<T>(0)) == sizeof(Yes));
-                    };
+                public:
+                    static const bool value = (sizeof(test<T>(0)) == sizeof(Yes));
+                };
 
-                }    // namespace detail
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

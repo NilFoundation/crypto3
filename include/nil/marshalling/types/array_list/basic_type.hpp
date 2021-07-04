@@ -34,8 +34,6 @@
 #include <nil/marshalling/assert_type.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
-#include <nil/marshalling/container/static_vector.hpp>
-#include <nil/marshalling/container/static_string.hpp>
 #include <nil/marshalling/types/detail/common_funcs.hpp>
 
 #include <nil/marshalling/types/array_list/type_traits.hpp>
@@ -43,12 +41,12 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename TStorage>
-                class array_list
+                class basic_array_list
                     : public TFieldBase,
-                      public basic::detail::version_storage<
+                      public detail::version_storage<
                           typename TFieldBase::version_type,
                           detail::array_list_element_is_version_dependent<typename TStorage::value_type>()> {
                     using base_impl_type = TFieldBase;
@@ -63,23 +61,23 @@ namespace nil {
                     using element_type = typename TStorage::value_type;
                     using value_type = TStorage;
 
-                    array_list() = default;
+                    basic_array_list() = default;
 
-                    explicit array_list(const value_type &val) : value_(val) {
+                    explicit basic_array_list(const value_type &val) : value_(val) {
                     }
 
-                    explicit array_list(value_type &&val) : value_(std::move(val)) {
+                    explicit basic_array_list(value_type &&val) : value_(std::move(val)) {
                     }
 
-                    array_list(const array_list &) = default;
+                    basic_array_list(const basic_array_list &) = default;
 
-                    array_list(array_list &&) = default;
+                    basic_array_list(basic_array_list &&) = default;
 
-                    array_list &operator=(const array_list &) = default;
+                    basic_array_list &operator=(const basic_array_list &) = default;
 
-                    array_list &operator=(array_list &&) = default;
+                    basic_array_list &operator=(basic_array_list &&) = default;
 
-                    ~array_list() noexcept = default;
+                    ~basic_array_list() noexcept = default;
 
                     const value_type &value() const {
                         return value_;
@@ -102,7 +100,7 @@ namespace nil {
 
                     void clear() {
                         static_assert(has_member_function_clear<value_type>::value,
-                                      "The used storage type for array_list must have clear() member function");
+                                      "The used storage type for basic_array_list must have clear() member function");
 
                         value_.clear();
                     }
@@ -440,7 +438,7 @@ namespace nil {
                     template<typename TIter>
                     status_type read_internal(TIter &iter, std::size_t len, field_elem_tag) {
                         static_assert(has_member_function_clear<value_type>::value,
-                                      "The used storage type for array_list must have clear() member function");
+                                      "The used storage type for basic_array_list must have clear() member function");
                         value_.clear();
                         auto remLen = len;
                         while (0 < remLen) {
@@ -541,8 +539,7 @@ namespace nil {
 
                     value_type value_;
                 };
-
-            }    // namespace basic
+            }        // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

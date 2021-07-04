@@ -117,7 +117,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
-                        return basic::common_funcs::read_sequence(*this, iter, len);
+                        return detail::common_funcs::read_sequence(*this, iter, len);
                     }
 
                     template<typename TIter>
@@ -125,7 +125,7 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read_n(std::size_t count, TIter &iter, std::size_t &len) {
-                        return basic::common_funcs::read_sequence_n(*this, count, iter, len);
+                        return detail::common_funcs::read_sequence_n(*this, count, iter, len);
                     }
 
                     template<typename TIter>
@@ -156,22 +156,22 @@ namespace nil {
 
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t len) const {
-                        return basic::common_funcs::write_sequence(*this, iter, len);
+                        return detail::common_funcs::write_sequence(*this, iter, len);
                     }
 
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
-                        basic::common_funcs::write_sequence_no_status(*this, iter);
+                        detail::common_funcs::write_sequence_no_status(*this, iter);
                     }
 
                     template<typename TIter>
                     status_type write_n(std::size_t count, TIter &iter, std::size_t &len) const {
-                        return basic::common_funcs::write_sequence_n(*this, count, iter, len);
+                        return detail::common_funcs::write_sequence_n(*this, count, iter, len);
                     }
 
                     template<typename TIter>
                     void write_no_status_n(std::size_t count, TIter &iter) const {
-                        basic::common_funcs::write_sequence_no_status_n(*this, count, iter);
+                        detail::common_funcs::write_sequence_no_status_n(*this, count, iter);
                     }
 
                 private:

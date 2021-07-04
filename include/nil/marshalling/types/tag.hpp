@@ -41,11 +41,11 @@ namespace nil {
 
                 struct bundle { };
 
-                struct enumerate { };
+                struct enumeration { };
 
                 struct floating_point { };
 
-                struct integer { };
+                struct integral { };
 
                 struct no_value { };
 

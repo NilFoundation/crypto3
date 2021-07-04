@@ -791,36 +791,36 @@ BOOST_AUTO_TEST_CASE(test24) {
     typedef container::static_vector<std::uint8_t, 20> StaticVec;
     typedef container::static_vector<char, 20> StaticVecChar;
 
-    static_assert(types::basic::detail::string_has_push_back<std::string>::value,
+    static_assert(types::detail::string_has_push_back<std::string>::value,
                   "std::string must have push_back");
 
-    static_assert(types::basic::detail::string_has_push_back<StaticStr>::value,
+    static_assert(types::detail::string_has_push_back<StaticStr>::value,
                   "static_string must have push_back");
 
     static_assert(
-        !types::basic::detail::string_has_push_back<container::string_view>::value,
+        !types::detail::string_has_push_back<container::string_view>::value,
         "string_view doesn't have push_back");
 
-    static_assert(types::basic::detail::string_has_assign<std::string>::value,
+    static_assert(types::detail::string_has_assign<std::string>::value,
                   "std::string must have "
                   "assign");
 
-    static_assert(types::basic::detail::string_has_assign<StaticStr>::value,
+    static_assert(types::detail::string_has_assign<StaticStr>::value,
                   "static_string must have "
                   "assign");
 
     static_assert(
-        !types::basic::detail::string_has_assign<container::string_view>::value,
+        !types::detail::string_has_assign<container::string_view>::value,
         "string_view doesn't have assign");
 
-    static_assert(types::basic::detail::vector_has_assign<std::vector<std::uint8_t>>::value,
+    static_assert(types::detail::vector_has_assign<std::vector<std::uint8_t>>::value,
                   "std::vector doesn't have assign");
 
-    static_assert(types::basic::detail::vector_has_assign<StaticVec>::value,
+    static_assert(types::detail::vector_has_assign<StaticVec>::value,
                   "static_vector doesn't "
                   "have assign");
 
-    static_assert(!types::basic::detail::vector_has_assign<
+    static_assert(!types::detail::vector_has_assign<
                       container::array_view<std::uint8_t>>::value,
                   "array_view has assign");
 

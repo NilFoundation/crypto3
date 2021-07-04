@@ -59,12 +59,12 @@ namespace nil {
             ///             nil::marshalling::types::bitfield<
             ///                 MyFieldBase,
             ///                 std::tuple<
-            ///                     nil::marshalling::types::enum_value<
+            ///                     nil::marshalling::types::enumeration<
             ///                         MyFieldBase,
             ///                         MyEnumType,
             ///                         nil::marshalling::option::fixed_bit_length<2>
             ///                     >,
-            ///                     nil::marshalling::types::int_value<
+            ///                     nil::marshalling::types::integral<
             ///                         MyFieldBase,
             ///                         std::uint8_t,
             ///                         nil::marshalling::option::fixed_bit_length<6>
@@ -110,9 +110,9 @@ namespace nil {
             /// @see @ref MARSHALLING_FIELD_MEMBERS_ACCESS_NOTEMPLATE()
             template<typename TFieldBase, typename TMembers, typename... TOptions>
             class bitfield
-                : private detail::adapt_basic_field_type<basic::bitfield<TFieldBase, TMembers>, TOptions...> {
+                : private detail::adapt_basic_field_type<detail::basic_bitfield<TFieldBase, TMembers>, TOptions...> {
                 using base_impl_type
-                    = detail::adapt_basic_field_type<basic::bitfield<TFieldBase, TMembers>, TOptions...>;
+                    = detail::adapt_basic_field_type<detail::basic_bitfield<TFieldBase, TMembers>, TOptions...>;
 
             public:
                 /// @brief endian_type used for serialization.

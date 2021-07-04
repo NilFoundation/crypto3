@@ -234,8 +234,8 @@ namespace nil {
             struct support_generic_message { };
 
             /// @brief Option used to specify number of bytes that is used for field serialization.
-            /// @details Applicable only to numeric fields, such as nil::marshalling::types::int_value or
-            ///     nil::marshalling::types::enum_value.
+            /// @details Applicable only to numeric fields, such as nil::marshalling::types::integral or
+            ///     nil::marshalling::types::enumeration.
             ///
             ///     For example, protocol specifies that some field is serialized using
             ///     only 3 bytes. There is no basic integral type that takes 3 bytes
@@ -244,7 +244,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::types::int_value<
+            ///         nil::marshalling::types::integral<
             ///             MyFieldBase,
             ///             std::uint32_t,
             ///             nil::marshalling::option::fixed_length<3>
@@ -267,12 +267,12 @@ namespace nil {
             ///         nil::marshalling::types::bitfield<
             ///             MyFieldBase,
             ///             std::tuple<
-            ///                 nil::marshalling::types::int_value<
+            ///                 nil::marshalling::types::integral<
             ///                     MyFieldBase,
             ///                     std::uint8_t,
             ///                     nil::marshalling::option::fixed_bit_length<6>
             ///                 >,
-            ///                 nil::marshalling::types::int_value<
+            ///                 nil::marshalling::types::integral<
             ///                     MyFieldBase,
             ///                     std::uint16_t,
             ///                     nil::marshalling::option::fixed_bit_length<10>
@@ -286,8 +286,8 @@ namespace nil {
             struct fixed_bit_length { };
 
             /// @brief Option used to specify that field may have variable serialization length
-            /// @details Applicable only to numeric fields, such as nil::marshalling::types::int_value
-            ///     or nil::marshalling::types::enum_value.
+            /// @details Applicable only to numeric fields, such as nil::marshalling::types::integral
+            ///     or nil::marshalling::types::enumeration.
             ///     Use this option to specify that serialized value has
             ///     <a href="https://en.wikipedia.org/wiki/Variable-length_quantity">Base-128</a>
             ///     encoding, i.e. the most significant bit in the byte indicates whether
@@ -298,7 +298,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::types::int_value<
+            ///         nil::marshalling::types::integral<
             ///             MyFieldBase,
             ///             std::uint32_t,
             ///             nil::marshalling::option::var_length<1, 4>
@@ -314,8 +314,8 @@ namespace nil {
             };
 
             /// @brief Option to specify numeric value serialization offset.
-            /// @details Applicable only to numeric fields such as nil::marshalling::types::int_value or
-            ///     nil::marshalling::types::enum_value.
+            /// @details Applicable only to numeric fields such as nil::marshalling::types::integral or
+            ///     nil::marshalling::types::enumeration.
             ///     The provided value will be added to the field's value and the
             ///     result will be written to the buffer when serialising. Good example
             ///     for such option would be serialising a "current year" value. Most protocols
@@ -327,7 +327,7 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::types::int_value<
+            ///         nil::marshalling::types::integral<
             ///             MyFieldBase,
             ///             std::uint16_t,
             ///             nil::marshalling::option::fixed_length<1>,
@@ -377,7 +377,7 @@ namespace nil {
             struct custom_storage_type { };
 
             /// @brief Option to specify scaling ratio.
-            /// @details Applicable only to nil::marshalling::types::int_value.
+            /// @details Applicable only to nil::marshalling::types::integral.
             ///     Sometimes the protocol specifies values being transmitted in
             ///     one units while when handling the message they are better to be handled
             ///     in another. For example, some distance information is transmitted as
@@ -386,14 +386,14 @@ namespace nil {
             ///     @code
             ///     using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
             ///     using MyField =
-            ///         nil::marshalling::types::int_value<
+            ///         nil::marshalling::types::integral<
             ///             MyFieldBase,
             ///             std::int32_t,
             ///             nil::marshalling::option::scaling_ratio<1, 100>
             ///         >;
             ///     @endcode
             ///     Then, to accessed the scaled value of the field use @b scale_as() or
-            ///     @b set_scaled() methods of nil::marshalling::types::int_value field:
+            ///     @b set_scaled() methods of nil::marshalling::types::integral field:
             ///     @code
             ///     void processField(const MyField& field)
             ///     {
@@ -426,7 +426,7 @@ namespace nil {
             ///             MyFieldBase,
             ///             std::uint8_t,
             ///             nil::marshalling::option::sequence_size_field_prefix_type<
-            ///                 nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
+            ///                 nil::marshalling::types::integral<MyFieldBase, std::uint16_t>
             ///             >
             ///         >;
             ///     @endcode
@@ -447,12 +447,12 @@ namespace nil {
             ///             MyFieldBase,
             ///             nil::marshalling::types::bundle<
             ///                 std::tuple<
-            ///                     nil::marshalling::types::int_value<MyFieldBase, std::uint32_t>,
+            ///                     nil::marshalling::types::integral<MyFieldBase, std::uint32_t>,
             ///                     nil::marshalling::types::string<MyFieldBase>
             ///                 >
             ///             >,
             ///             nil::marshalling::option::sequence_ser_length_field_prefix_type<
-            ///                 nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
+            ///                 nil::marshalling::types::integral<MyFieldBase, std::uint16_t>
             ///             >
             ///         >;
             ///     @endcode
@@ -498,7 +498,7 @@ namespace nil {
             ///         nil::marshalling::types::string<
             ///             MyFieldBase,
             ///             nil::marshalling::option::sequence_termination_field_suffix<
-            ///                 nil::marshalling::types::int_value<MyFieldBase, char,
+            ///                 nil::marshalling::types::integral<MyFieldBase, char,
             ///                 nil::marshalling::option::default_num_value<0> >
             ///             >
             ///         >;
@@ -523,7 +523,7 @@ namespace nil {
             ///             MyFieldBase,
             ///             nil::marshalling::option::sequence_fixed_size<5>,
             ///             nil::marshalling::option::sequence_trailing_field_suffix<
-            ///                 nil::marshalling::types::int_value<MyFieldBase, char,
+            ///                 nil::marshalling::types::integral<MyFieldBase, char,
             ///                 nil::marshalling::option::default_num_value<0> >
             ///             >
             ///         >;
@@ -704,12 +704,12 @@ namespace nil {
             ///     typedef nil::marshalling::types::bundle<
             ///         nil::marshalling::field_type<BigEndianOpt>,
             ///         std::tuple<
-            ///             nil::marshalling::types::int_value<
+            ///             nil::marshalling::types::integral<
             ///                 nil::marshalling::field_type<BigEndianOpt>,
             ///                 std::uint8_t
             ///             >,
             ///             nil::marshalling::types::optional<
-            ///                 nil::marshalling::types::int_value<
+            ///                 nil::marshalling::types::integral<
             ///                     nil::marshalling::field_type<BigEndianOpt>,
             ///                     std::uint16_t
             ///                 >
@@ -1102,8 +1102,8 @@ namespace nil {
                 = default_value_initialiser<detail::default_num_value_initialiser<std::uintmax_t, TVal>>;
 
             /// @brief Provide range of valid numeric values.
-            /// @details Quite often numeric fields such as nil::marshalling::types::int_value or
-            ///     nil::marshalling::types::enum_value have limited number of valid values ranges.
+            /// @details Quite often numeric fields such as nil::marshalling::types::integral or
+            ///     nil::marshalling::types::enumeration have limited number of valid values ranges.
             ///     This option can be used multiple times to provide several valid ranges.@n
             ///     If values are too big to fit into @b std::intmax_t type, please use
             ///     @ref ValidBigUnsignedNumValueRange option instead.

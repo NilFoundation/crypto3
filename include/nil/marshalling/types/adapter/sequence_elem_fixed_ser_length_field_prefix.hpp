@@ -81,7 +81,7 @@ namespace nil {
                     }
 
                     static constexpr std::size_t max_length() {
-                        return basic::common_funcs::max_supported_length();
+                        return detail::common_funcs::max_supported_length();
                     }
 
                     template<typename TIter>
@@ -118,7 +118,7 @@ namespace nil {
                             return es;
                         }
 
-                        return basic::common_funcs::read_sequence(*this, iter, len);
+                        return detail::common_funcs::read_sequence(*this, iter, len);
                     }
 
                     template<typename TIter>
@@ -134,7 +134,7 @@ namespace nil {
                         } else {
                             elemLen_ = 0U;
                         }
-                        return basic::common_funcs::read_sequence_n(*this, count, iter, len);
+                        return detail::common_funcs::read_sequence_n(*this, count, iter, len);
                     }
 
                     template<typename TIter>
@@ -149,7 +149,7 @@ namespace nil {
                             }
                         }
 
-                        return basic::common_funcs::write_sequence(*this, iter, len);
+                        return detail::common_funcs::write_sequence(*this, iter, len);
                     }
 
                     template<typename TIter>
@@ -157,7 +157,7 @@ namespace nil {
                         if (!base_impl_type::value().empty()) {
                             write_len_no_status(iter);
                         }
-                        basic::common_funcs::write_sequence_no_status(*this, iter);
+                        detail::common_funcs::write_sequence_no_status(*this, iter);
                     }
 
                     template<typename TIter>
@@ -169,7 +169,7 @@ namespace nil {
                             }
                         }
 
-                        return basic::common_funcs::write_sequence_n(*this, count, iter, len);
+                        return detail::common_funcs::write_sequence_n(*this, count, iter, len);
                     }
 
                     template<typename TIter>
@@ -177,7 +177,7 @@ namespace nil {
                         if (0U < count) {
                             write_len_no_status(iter);
                         }
-                        basic::common_funcs::write_sequence_no_status_n(*this, count, iter);
+                        detail::common_funcs::write_sequence_no_status_n(*this, count, iter);
                     }
 
                 private:
@@ -210,7 +210,7 @@ namespace nil {
 
                     template<typename TIter>
                     static void advance_write_iterator(TIter &iter, std::size_t len) {
-                        basic::common_funcs::advance_write_iterator(iter, len);
+                        detail::common_funcs::advance_write_iterator(iter, len);
                     }
 
                     template<typename TIter>

@@ -94,14 +94,14 @@ namespace nil {
         };
 
         /// @brief Compile time check function of whether a provided type is any
-        ///     variant of nil::marshalling::types::enum_value.
+        ///     variant of nil::marshalling::types::enumeration.
         /// @tparam T Any type.
-        /// @return true in case provided type is any variant of @ref enum_value
-        /// @related nil::marshalling::types::enum_value
+        /// @return true in case provided type is any variant of @ref enumeration
+        /// @related nil::marshalling::types::enumeration
         template<typename T>
-        struct is_enum_value {
+        struct is_enumeration {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::enumerate>>::value;
+                boost::is_same<_1, types::tag::enumeration>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -116,14 +116,14 @@ namespace nil {
         };
 
         /// @brief Compile time check function of whether a provided type is any
-        ///     variant of nil::marshalling::types::int_value.
+        ///     variant of nil::marshalling::types::integral.
         /// @tparam T Any type.
-        /// @return true in case provided type is any variant of @ref int_value
-        /// @related nil::marshalling::types::int_value
+        /// @return true in case provided type is any variant of @ref integral
+        /// @related nil::marshalling::types::integral
         template<typename T>
-        struct is_int_value {
+        struct is_integral {
             static const bool value = has_type_tag<T, 
-                boost::is_same<_1, types::tag::integer>>::value;
+                boost::is_same<_1, types::tag::integral>>::value;
         };
 
         /// @brief Compile time check function of whether a provided type is any
@@ -177,9 +177,9 @@ namespace nil {
                                       is_bitfield<T>::value ||
                                       is_bitmask_value<T>::value ||
                                       is_bundle<T>::value ||
-                                      is_enum_value<T>::value ||
+                                      is_enumeration<T>::value ||
                                       is_float_value<T>::value ||
-                                      is_int_value<T>::value ||
+                                      is_integral<T>::value ||
                                       is_no_value<T>::value ||
                                       is_optional<T>::value ||
                                       is_string<T>::value ||

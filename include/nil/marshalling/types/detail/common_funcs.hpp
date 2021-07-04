@@ -35,7 +35,7 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 struct common_funcs {
                     template<typename TField, typename TIter>
@@ -190,7 +190,7 @@ namespace nil {
                     }
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

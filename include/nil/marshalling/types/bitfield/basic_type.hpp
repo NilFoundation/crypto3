@@ -38,16 +38,16 @@
 #include <nil/marshalling/status_type.hpp>
 
 #include <nil/marshalling/types/bitfield/type_traits.hpp>
-#include <nil/marshalling/types/int_value.hpp>
+#include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/types/detail/common_funcs.hpp>
 
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename TMembers>
-                class bitfield : public TFieldBase {
+                class basic_bitfield : public TFieldBase {
                     using base_impl_type = TFieldBase;
 
                     static_assert(::nil::detail::is_tuple<TMembers>::value,
@@ -64,25 +64,25 @@ namespace nil {
                     static_assert(0U < length_, "Serialised length is expected to be greater than 0");
                     using serialized_type = typename processing::size_to_type<length_, false>::type;
 
-                    using fixed_int_value_field_type = types::int_value<TFieldBase, serialized_type, option::fixed_length<length_>>;
+                    using fixed_integral_type = types::integral<TFieldBase, serialized_type, option::fixed_length<length_>>;
 
-                    using simple_int_value_field_type = types::int_value<TFieldBase, serialized_type>;
+                    using simple_integral_type = types::integral<TFieldBase, serialized_type>;
 
-                    using int_value_field_type = typename std::conditional<((length_ & (length_ - 1)) == 0),
-                                                                           simple_int_value_field_type,
-                                                                           fixed_int_value_field_type>::type;
+                    using integral_type = typename std::conditional<((length_ & (length_ - 1)) == 0),
+                                                                           simple_integral_type,
+                                                                           fixed_integral_type>::type;
 
                 public:
                     using endian_type = typename base_impl_type::endian_type;
                     using version_type = typename base_impl_type::version_type;
                     using value_type = TMembers;
 
-                    bitfield() = default;
+                    basic_bitfield() = default;
 
-                    explicit bitfield(const value_type &val) : members_(val) {
+                    explicit basic_bitfield(const value_type &val) : members_(val) {
                     }
 
-                    explicit bitfield(value_type &&val) : members_(std::move(val)) {
+                    explicit basic_bitfield(value_type &&val) : members_(std::move(val)) {
                     }
 
                     const value_type &value() const {
@@ -194,7 +194,7 @@ namespace nil {
                             auto fieldSerValue = static_cast<serialized_type>((value_ >> Pos) & Mask);
 
                             static_assert(field_type::min_length() == field_type::max_length(),
-                                          "bitfield doesn't support members with variable length");
+                                          "basic_bitfield doesn't support members with variable length");
 
                             static const std::size_t max_length = field_type::max_length();
                             std::uint8_t buf[max_length];
@@ -228,7 +228,7 @@ namespace nil {
                             auto fieldSerValue = static_cast<serialized_type>((value_ >> Pos) & Mask);
 
                             static_assert(field_type::min_length() == field_type::max_length(),
-                                          "bitfield doesn't support members with variable length");
+                                          "basic_bitfield doesn't support members with variable length");
 
                             static const std::size_t max_length = field_type::max_length();
                             std::uint8_t buf[max_length];
@@ -259,7 +259,7 @@ namespace nil {
                             using field_type = typename std::decay<decltype(field)>::type;
 
                             static_assert(field_type::min_length() == field_type::max_length(),
-                                          "bitfield supports fixed length members only.");
+                                          "basic_bitfield supports fixed length members only.");
 
                             static const std::size_t max_length = field_type::max_length();
                             std::uint8_t buf[max_length];
@@ -303,7 +303,7 @@ namespace nil {
                             using field_type = typename std::decay<decltype(field)>::type;
 
                             static_assert(field_type::min_length() == field_type::max_length(),
-                                          "bitfield supports fixed length members only.");
+                                          "basic_bitfield supports fixed length members only.");
 
                             static const std::size_t max_length = field_type::max_length();
                             std::uint8_t buf[max_length];
@@ -349,7 +349,7 @@ namespace nil {
                     value_type members_;
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

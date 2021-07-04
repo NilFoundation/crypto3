@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 
 /// @file
-/// Contains definition of nil::marshalling::types::enum_value
+/// Contains definition of nil::marshalling::types::enumeration
 
 #ifndef MARSHALLING_ENUM_VALUE_HPP
 #define MARSHALLING_ENUM_VALUE_HPP
@@ -33,7 +33,7 @@
 
 #include <nil/marshalling/options.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
-#include <nil/marshalling/types/enum_value/basic_type.hpp>
+#include <nil/marshalling/types/enumeration/basic_type.hpp>
 #include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/tag.hpp>
 
@@ -43,8 +43,8 @@ namespace nil {
 
             /// @brief Enumerator value field.
             /// @details Sometimes dealing with enum values is much more convenient that
-            ///     using integral values. nil::marshalling::types::enum_value is very similar to
-            ///     nil::marshalling::types::int_value, but receives underlying enum type in its
+            ///     using integral values. nil::marshalling::types::enumeration is very similar to
+            ///     nil::marshalling::types::integral, but receives underlying enum type in its
             ///     template parameters instead of integral one.
             /// @tparam TFieldBase Base class for this field, expected to be a variant of
             ///     nil::marshalling::field_type.
@@ -61,7 +61,7 @@ namespace nil {
             ///             Value3
             ///         }
             ///         using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::BigEndian>;
-            ///         using MyField =nil::marshalling::types::enum_value<MyFieldBase, MyEnum>;
+            ///         using MyField =nil::marshalling::types::enumeration<MyFieldBase, MyEnum>;
             ///     @endcode
             ///     The serialized value of the field in the example above will consume
             ///     2 bytes, because the underlying type of MyEnum is
@@ -88,12 +88,12 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::invalid_by_default
             ///     @li @ref nil::marshalling::option::version_storage
             /// @extends nil::marshalling::field_type
-            /// @headerfile nil/marshalling/types/enum_value.hpp
+            /// @headerfile nil/marshalling/types/enumeration.hpp
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            class enum_value
-                : private detail::adapt_basic_field_type<basic::enum_value<TFieldBase, TEnum>, TOptions...> {
+            class enumeration
+                : private detail::adapt_basic_field_type<detail::basic_enumeration<TFieldBase, TEnum>, TOptions...> {
                 using base_impl_type
-                    = detail::adapt_basic_field_type<basic::enum_value<TFieldBase, TEnum>, TOptions...>;
+                    = detail::adapt_basic_field_type<detail::basic_enumeration<TFieldBase, TEnum>, TOptions...>;
                 static_assert(std::is_enum<TEnum>::value, "TEnum must be enum type");
 
             public:
@@ -107,27 +107,27 @@ namespace nil {
                 using parsed_options_type = detail::options_parser<TOptions...>;
 
                 /// @brief Tag indicating type of the field
-                using tag = tag::enumerate;
+                using tag = tag::enumeration;
 
                 /// @brief Type of underlying enum value.
                 /// @details Same as template parameter TEnum to this class.
                 using value_type = typename base_impl_type::value_type;
 
                 /// @brief Default constructor.
-                enum_value() = default;
+                enumeration() = default;
 
                 /// @brief Constructor
-                explicit enum_value(const value_type &val) : base_impl_type(val) {
+                explicit enumeration(const value_type &val) : base_impl_type(val) {
                 }
 
                 /// @brief Copy constructor
-                enum_value(const enum_value &) = default;
+                enumeration(const enumeration &) = default;
 
                 /// @brief Destructor
-                ~enum_value() noexcept = default;
+                ~enumeration() noexcept = default;
 
                 /// @brief Copy assignment
-                enum_value &operator=(const enum_value &) = default;
+                enumeration &operator=(const enumeration &) = default;
 
                 /// @brief Get access to enum value storage.
                 const value_type &value() const {
@@ -232,57 +232,57 @@ namespace nil {
             private:
                 static_assert(!parsed_options_type::has_sequence_elem_length_forcing,
                               "nil::marshalling::option::SequenceElemLengthForcingEnabled option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_size_forcing,
                               "nil::marshalling::option::SequenceSizeForcingEnabled option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_length_forcing,
                               "nil::marshalling::option::SequenceLengthForcingEnabled option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size,
-                    "nil::marshalling::option::sequence_fixed_size option is not applicable to enum_value field");
+                    "nil::marshalling::option::sequence_fixed_size option is not applicable to enumeration field");
                 static_assert(
                     !parsed_options_type::has_sequence_fixed_size_use_fixed_size_storage,
                     "nil::marshalling::option::SequenceFixedSizeUseFixedSizeStorage option is not applicable to "
-                    "enum_value field");
+                    "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_size_field_prefix,
                               "nil::marshalling::option::sequence_size_field_prefix option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_ser_length_field_prefix,
                               "nil::marshalling::option::sequence_ser_length_field_prefix option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(
                     !parsed_options_type::has_sequence_elem_ser_length_field_prefix,
                     "nil::marshalling::option::sequence_elem_ser_length_field_prefix option is not applicable to "
-                    "enum_value field");
+                    "enumeration field");
                 static_assert(
                     !parsed_options_type::has_sequence_elem_fixed_ser_length_field_prefix,
                     "nil::marshalling::option::SequenceElemSerLengthFixedFieldPrefix option is not applicable to "
-                    "enum_value field");
+                    "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_trailing_field_suffix,
                               "nil::marshalling::option::sequence_trailing_field_suffix option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(!parsed_options_type::has_sequence_termination_field_suffix,
                               "nil::marshalling::option::sequence_termination_field_suffix option is not applicable to "
-                              "enum_value field");
+                              "enumeration field");
                 static_assert(
                     !parsed_options_type::has_fixed_size_storage,
-                    "nil::marshalling::option::fixed_size_storage option is not applicable to enum_value field");
+                    "nil::marshalling::option::fixed_size_storage option is not applicable to enumeration field");
                 static_assert(
                     !parsed_options_type::has_custom_storage_type,
-                    "nil::marshalling::option::custom_storage_type option is not applicable to enum_value field");
+                    "nil::marshalling::option::custom_storage_type option is not applicable to enumeration field");
                 static_assert(
                     !parsed_options_type::has_scaling_ratio,
-                    "nil::marshalling::option::scaling_ratio_type option is not applicable to enum_value field");
+                    "nil::marshalling::option::scaling_ratio_type option is not applicable to enumeration field");
                 static_assert(!parsed_options_type::has_units,
-                              "nil::marshalling::option::Units option is not applicable to enum_value field");
+                              "nil::marshalling::option::Units option is not applicable to enumeration field");
                 static_assert(!parsed_options_type::has_orig_data_view,
-                              "nil::marshalling::option::orig_data_view option is not applicable to enum_value field");
+                              "nil::marshalling::option::orig_data_view option is not applicable to enumeration field");
                 static_assert(
                     !parsed_options_type::has_versions_range,
                     "nil::marshalling::option::exists_between_versions (or similar) option is not applicable to "
-                    "enum_value field");
+                    "enumeration field");
             };
 
             // Implementation
@@ -291,10 +291,10 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are equal, false otherwise.
-            /// @related enum_value
+            /// @related enumeration
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            bool operator==(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
-                            const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
+            bool operator==(const enumeration<TFieldBase, TEnum, TOptions...> &field1,
+                            const enumeration<TFieldBase, TEnum, TOptions...> &field2) {
                 return field1.value() == field2.value();
             }
 
@@ -302,10 +302,10 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case fields are NOT equal, false otherwise.
-            /// @related enum_value
+            /// @related enumeration
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            bool operator!=(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
-                            const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
+            bool operator!=(const enumeration<TFieldBase, TEnum, TOptions...> &field1,
+                            const enumeration<TFieldBase, TEnum, TOptions...> &field2) {
                 return field1.value() != field2.value();
             }
 
@@ -313,28 +313,28 @@ namespace nil {
             /// @param[in] field1 First field.
             /// @param[in] field2 Second field.
             /// @return true in case value of the first field is lower than than the value of the second.
-            /// @related enum_value
+            /// @related enumeration
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            bool operator<(const enum_value<TFieldBase, TEnum, TOptions...> &field1,
-                           const enum_value<TFieldBase, TEnum, TOptions...> &field2) {
+            bool operator<(const enumeration<TFieldBase, TEnum, TOptions...> &field1,
+                           const enumeration<TFieldBase, TEnum, TOptions...> &field2) {
                 return field1.value() < field2.value();
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::enum_value type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::enumeration type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::types::enum_value
+            /// @related nil::marshalling::types::enumeration
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            inline enum_value<TFieldBase, TEnum, TOptions...> &
-                to_field_base(enum_value<TFieldBase, TEnum, TOptions...> &field) {
+            inline enumeration<TFieldBase, TEnum, TOptions...> &
+                to_field_base(enumeration<TFieldBase, TEnum, TOptions...> &field) {
                 return field;
             }
 
-            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::enum_value type
+            /// @brief Upcast type of the field definition to its parent nil::marshalling::types::enumeration type
             ///     in order to have access to its internal types.
-            /// @related nil::marshalling::types::enum_value
+            /// @related nil::marshalling::types::enumeration
             template<typename TFieldBase, typename TEnum, typename... TOptions>
-            inline const enum_value<TFieldBase, TEnum, TOptions...> &
-                to_field_base(const enum_value<TFieldBase, TEnum, TOptions...> &field) {
+            inline const enumeration<TFieldBase, TEnum, TOptions...> &
+                to_field_base(const enumeration<TFieldBase, TEnum, TOptions...> &field) {
                 return field;
             }
 

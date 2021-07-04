@@ -34,10 +34,10 @@
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TField>
-                class optional : public nil::marshalling::field_type<
+                class basic_optional : public nil::marshalling::field_type<
                                      nil::marshalling::option::endian<typename TField::endian_type>,
                                      nil::marshalling::option::version_type<typename TField::version_type>> {
                     using base_impl_type = nil::marshalling::field_type<
@@ -50,25 +50,25 @@ namespace nil {
                     using mode_type = types::optional_mode;
                     using version_type = typename base_impl_type::version_type;
 
-                    optional() = default;
+                    basic_optional() = default;
 
-                    explicit optional(const field_type &fieldSrc, mode_type mode = mode_type::tentative) :
+                    explicit basic_optional(const field_type &fieldSrc, mode_type mode = mode_type::tentative) :
                         field_(fieldSrc), mode_(mode) {
                     }
 
-                    explicit optional(field_type &&fieldSrc, mode_type mode = mode_type::tentative) :
+                    explicit basic_optional(field_type &&fieldSrc, mode_type mode = mode_type::tentative) :
                         field_(std::move(fieldSrc)), mode_(mode) {
                     }
 
-                    optional(const optional &) = default;
+                    basic_optional(const basic_optional &) = default;
 
-                    optional(optional &&) = default;
+                    basic_optional(basic_optional &&) = default;
 
-                    ~optional() noexcept = default;
+                    ~basic_optional() noexcept = default;
 
-                    optional &operator=(const optional &) = default;
+                    basic_optional &operator=(const basic_optional &) = default;
 
-                    optional &operator=(optional &&) = default;
+                    basic_optional &operator=(basic_optional &&) = default;
 
                     field_type &field() {
                         return field_;
@@ -190,7 +190,7 @@ namespace nil {
                     mode_type mode_ = mode_type::tentative;
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil

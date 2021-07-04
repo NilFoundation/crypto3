@@ -48,8 +48,8 @@ namespace nil {
             /// @extends nil::marshalling::field_type
             /// @headerfile nil/marshalling/types/no_value.hpp
             template<typename TFieldBase>
-            class no_value : private detail::adapt_basic_field_type<basic::no_value<TFieldBase>> {
-                using base_impl_type = detail::adapt_basic_field_type<basic::no_value<TFieldBase>>;
+            class no_value : private detail::adapt_basic_field_type<detail::basic_no_value<TFieldBase>> {
+                using base_impl_type = detail::adapt_basic_field_type<detail::basic_no_value<TFieldBase>>;
 
             public:
                 /// @brief endian_type used for serialization.

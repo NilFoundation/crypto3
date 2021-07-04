@@ -112,7 +112,7 @@ namespace nil {
 
                 template<typename TFieldBase, typename TElement, typename... TOptions>
                 using array_list_base_type = adapt_basic_field_type<
-                    types::basic::array_list<
+                    basic_array_list<
                         TFieldBase, array_list_storage_type_type<TElement, options_parser<TOptions...>>>,
                     TOptions...>;
 

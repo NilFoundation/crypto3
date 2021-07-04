@@ -23,53 +23,44 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef MARSHALLING_BASIC_ENUM_VALUE_HPP
-#define MARSHALLING_BASIC_ENUM_VALUE_HPP
+#ifndef MARSHALLING_BASIC_INTEGRAL_HPP
+#define MARSHALLING_BASIC_INTEGRAL_HPP
 
 #include <type_traits>
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/marshalling/types/int_value/basic_type.hpp>
-
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace basic {
+            namespace detail {
 
                 template<typename TFieldBase, typename T>
-                class enum_value : public TFieldBase {
-                    static_assert(std::is_enum<T>::value, "T must be enum");
-
-                    using underlying_type = typename std::underlying_type<T>::type;
+                class basic_integral : public TFieldBase {
+                    static_assert(std::is_integral<T>::value, "T must be integral value");
 
                     using base_impl_type = TFieldBase;
-
-                    using int_value_field_type = int_value<base_impl_type, underlying_type>;
-
-                    using int_value_type = typename int_value_field_type::value_type;
 
                 public:
                     using value_type = T;
 
-                    using serialized_type = typename int_value_field_type::value_type;
+                    using serialized_type = value_type;
+                    using scaling_ratio_type = std::ratio<1, 1>;
 
-                    using scaling_ratio_type = typename int_value_field_type::scaling_ratio_type;
+                    basic_integral() = default;
 
-                    enum_value() = default;
-
-                    explicit enum_value(value_type val) : value_(val) {
+                    explicit basic_integral(value_type val) : value_(val) {
                     }
 
-                    enum_value(const enum_value &) = default;
+                    basic_integral(const basic_integral &) = default;
 
-                    enum_value(enum_value &&) = default;
+                    basic_integral(basic_integral &&) = default;
 
-                    ~enum_value() noexcept = default;
+                    ~basic_integral() noexcept = default;
 
-                    enum_value &operator=(const enum_value &) = default;
+                    basic_integral &operator=(const basic_integral &) = default;
 
-                    enum_value &operator=(enum_value &&) = default;
+                    basic_integral &operator=(basic_integral &&) = default;
 
                     const value_type &value() const {
                         return value_;
@@ -80,7 +71,7 @@ namespace nil {
                     }
 
                     static constexpr std::size_t length() {
-                        return int_value_field_type::length();
+                        return sizeof(serialized_type);
                     }
 
                     static constexpr std::size_t min_length() {
@@ -92,46 +83,50 @@ namespace nil {
                     }
 
                     static constexpr serialized_type to_serialized(value_type val) {
-                        return int_value_field_type::to_serialized(static_cast<int_value_type>(val));
+                        return static_cast<serialized_type>(val);
                     }
 
                     static constexpr value_type from_serialized(serialized_type val) {
-                        return static_cast<value_type>(int_value_field_type::from_serialized(val));
+                        return static_cast<value_type>(val);
                     }
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t size) {
-                        int_value_field_type intField;
-                        status_type es = intField.read(iter, size);
-                        if (es == status_type::success) {
-                            value_ = static_cast<decltype(value_)>(intField.value());
+                        if (size < length()) {
+                            return status_type::not_enough_data;
                         }
-                        return es;
+
+                        read_no_status(iter);
+                        return status_type::success;
                     }
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        int_value_field_type intField;
-                        intField.read_no_status(iter);
-                        value_ = static_cast<decltype(value_)>(intField.value());
+                        serialized_type serializedValue = base_impl_type::template read_data<serialized_type>(iter);
+                        value_ = from_serialized(serializedValue);
                     }
 
                     template<typename TIter>
                     status_type write(TIter &iter, std::size_t size) const {
-                        return int_value_field_type(static_cast<int_value_type>(value_)).write(iter, size);
+                        if (size < length()) {
+                            return status_type::buffer_overflow;
+                        }
+
+                        write_no_status(iter);
+                        return status_type::success;
                     }
 
                     template<typename TIter>
                     void write_no_status(TIter &iter) const {
-                        int_value_field_type(static_cast<int_value_type>(value_)).write_no_status(iter);
+                        base_impl_type::write_data(to_serialized(value_), iter);
                     }
 
                 private:
-                    value_type value_;
+                    value_type value_ = static_cast<value_type>(0);
                 };
 
-            }    // namespace basic
+            }    // namespace detail
         }        // namespace types
     }            // namespace marshalling
 }    // namespace nil
-#endif    // MARSHALLING_BASIC_ENUM_VALUE_HPP
+#endif    // MARSHALLING_BASIC_INTEGRAL_HPP
