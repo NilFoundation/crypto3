@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test_minus3) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test1) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04};
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test1) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test2) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::fixed_length<3>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::fixed_length<3>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test2) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test3) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int16_t> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::int16_t> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test3) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test4) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int16_t> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, (char)0xff};
     testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test4) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test5) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::int16_t> testing_type;
+    typedef types::int_value<field_type<option::little_endian>, std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {0x0, (char)0x80};
     testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test5) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test6) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int16_t, option::fixed_length<1>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::int16_t, option::fixed_length<1>> testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, 0x00};
     testing_type field = pack<testing_type>(Buf.begin(), Buf.end());
@@ -267,7 +267,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test6) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test7) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int16_t, option::fixed_length<1>,
+    typedef types::int_value<field_type<option::big_endian>, std::int16_t, option::fixed_length<1>,
                              option::num_value_ser_offset<-2000>>
         testing_type;
 
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test7) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test8) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::fixed_length<3>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::fixed_length<3>,
                              option::valid_num_value_range<0, 0x010200>>
         testing_type;
 
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test8) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test9) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 10>,
 #ifndef CC_COMPILER_GCC47
                              option::valid_num_value_range<20, 30>,
 #endif
@@ -345,7 +345,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test9) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test10) {
-    typedef types::bitmask_value<field_type<BigEndianOpt>, option::fixed_length<2>> testing_type;
+    typedef types::bitmask_value<field_type<option::big_endian>, option::fixed_length<2>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
     testing_type field;
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test10) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test11) {
-    typedef types::bitmask_value<field_type<LittleEndianOpt>, option::fixed_length<3>,
+    typedef types::bitmask_value<field_type<option::little_endian>, option::fixed_length<3>,
                                  option::default_num_value<0xffffff>, option::bitmask_reserved_bits<0xff0000, 0>>
         testing_type;
 
@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test11) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test12) {
-    typedef types::enum_value<field_type<BigEndianOpt>, Enum1, option::fixed_length<1>,
+    typedef types::enum_value<field_type<option::big_endian>, Enum1, option::fixed_length<1>,
                               option::valid_num_value_range<0, Enum1_NumOfValues - 1>,
                               option::default_num_value<Enum1_NumOfValues>>
         testing_type;
@@ -469,7 +469,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test12) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test13) {
-    typedef types::enum_value<field_type<BigEndianOpt>, Enum2, option::fixed_length<2>,
+    typedef types::enum_value<field_type<option::big_endian>, Enum2, option::fixed_length<2>,
                               option::valid_num_value_range<0, (int)(Enum2::NumOfValues)-1>,
                               option::default_num_value<(int)Enum2::NumOfValues>>
         testing_type;
@@ -496,7 +496,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test13) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test14) {
-    typedef types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint8_t>>
+    typedef types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint8_t>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -512,7 +512,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test14) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test15) {
-    typedef types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
+    typedef types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint8_t>,
                               option::fixed_size_storage<32>>
         testing_type;
 
@@ -533,13 +533,13 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test15) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test16) {
-    struct SizeField : public types::int_value<field_type<BigEndianOpt>, std::uint8_t> { };
+    struct SizeField : public types::int_value<field_type<option::big_endian>, std::uint8_t> { };
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>> testing_type;
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::fixed_size_storage<256>>
         StaticStorageField;
 
@@ -571,18 +571,18 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test16) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test17) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 4>> SizeField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 4>> SizeField;
 
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>> testing_type;
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     BOOST_CHECK(testing_type::min_length() == SizeField::max_length());
     BOOST_CHECK(testing_type::max_length() == SizeField::max_length() + std::numeric_limits<std::uint16_t>::max());
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::fixed_size_storage<256>>
         StaticStorageField;
 
@@ -622,17 +622,17 @@ struct HelloInitialiser {
 };
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test18) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint16_t> SizeField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint16_t> SizeField;
 
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::default_value_initialiser<HelloInitialiser>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::default_value_initialiser<HelloInitialiser>, option::fixed_size_storage<64>>
         StaticStorageField;
 
@@ -666,15 +666,15 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test18) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test19) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t> SizeField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t> SizeField;
 
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>> testing_type;
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::fixed_size_storage<64>>
         StaticStorageField;
 
@@ -707,7 +707,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test19) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test20) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::uint16_t, option::var_length<1, 2>> testing_type;
+    typedef types::int_value<field_type<option::little_endian>, std::uint16_t, option::var_length<1, 2>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -726,7 +726,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test20) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test21) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 3>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 3>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -756,7 +756,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test21) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test22) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 3>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 3>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -766,7 +766,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test22) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test23) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::int16_t, option::var_length<1, 2>> testing_type;
+    typedef types::int_value<field_type<option::little_endian>, std::int16_t, option::var_length<1, 2>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -786,7 +786,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test23) {
 }
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test24) {
-    typedef types::int_value<field_type<BigEndianOpt>, unsigned, option::fixed_length<2>,
+    typedef types::int_value<field_type<option::big_endian>, unsigned, option::fixed_length<2>,
                              option::num_value_ser_offset<2>, option::valid_num_value_range<0, 2>>
         testing_type;
 
@@ -807,11 +807,11 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test24) {
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test25) {
     typedef std::tuple<
-        types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::fixed_bit_length<2>>,
-        types::bitmask_value<field_type<BigEndianOpt>, option::fixed_length<1>, option::fixed_bit_length<6>>>
+        types::int_value<field_type<option::big_endian>, std::uint8_t, option::fixed_bit_length<2>>,
+        types::bitmask_value<field_type<option::big_endian>, option::fixed_length<1>, option::fixed_bit_length<6>>>
         BitfileMembers;
 
-    typedef types::bitfield<field_type<BigEndianOpt>, BitfileMembers> testing_type;
+    typedef types::bitfield<field_type<option::big_endian>, BitfileMembers> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -834,11 +834,11 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test25) {
 
 BOOST_AUTO_TEST_CASE(test26) {
     typedef std::tuple<
-        types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::fixed_bit_length<3>>,
-        types::bitmask_value<field_type<BigEndianOpt>, option::fixed_length<1>, option::fixed_bit_length<5>>>
+        types::int_value<field_type<option::big_endian>, std::uint8_t, option::fixed_bit_length<3>>,
+        types::bitmask_value<field_type<option::big_endian>, option::fixed_length<1>, option::fixed_bit_length<5>>>
         BitfileMembers;
 
-    typedef types::bitfield<field_type<BigEndianOpt>, BitfileMembers> testing_type;
+    typedef types::bitfield<field_type<option::big_endian>, BitfileMembers> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -900,9 +900,9 @@ BOOST_AUTO_TEST_CASE(test27) {
 
 BOOST_AUTO_TEST_CASE(test28) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
-        types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 5>>,
-        option::sequence_size_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint16_t>>>
+        field_type<option::big_endian>,
+        types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 5>>,
+        option::sequence_size_field_prefix<types::int_value<field_type<option::big_endian>, std::uint16_t>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -926,7 +926,7 @@ BOOST_AUTO_TEST_CASE(test28) {
 }
 
 BOOST_AUTO_TEST_CASE(test29) {
-    typedef types::enum_value<field_type<BigEndianOpt>, Enum1, option::fixed_length<2>,
+    typedef types::enum_value<field_type<option::big_endian>, Enum1, option::fixed_length<2>,
                               option::valid_num_value_range<0, Enum1_NumOfValues - 1>,
                               option::default_num_value<Enum1_Value2>,
                               option::fail_on_invalid<status_type::protocol_error>>
@@ -956,7 +956,7 @@ BOOST_AUTO_TEST_CASE(test29) {
 }
 
 BOOST_AUTO_TEST_CASE(test30) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::default_num_value<0x2>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::default_num_value<0x2>,
                              option::valid_num_value_range<0x2, 0x2>, option::ignore_invalid>
         testing_type;
 
@@ -984,7 +984,7 @@ BOOST_AUTO_TEST_CASE(test30) {
 BOOST_AUTO_TEST_CASE(test31) {
 
     typedef types::optional<
-        types::int_value<field_type<BigEndianOpt>, std::uint16_t, option::valid_num_value_range<0, 10>>>
+        types::int_value<field_type<option::big_endian>, std::uint16_t, option::valid_num_value_range<0, 10>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -1009,10 +1009,10 @@ BOOST_AUTO_TEST_CASE(test31) {
 BOOST_AUTO_TEST_CASE(test32) {
 
     typedef types::bundle<
-        field_type<BigEndianOpt>,
-        std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint16_t, option::valid_num_value_range<0, 10>,
+        field_type<option::big_endian>,
+        std::tuple<types::int_value<field_type<option::big_endian>, std::uint16_t, option::valid_num_value_range<0, 10>,
                                     option::default_num_value<5>>,
-                   types::enum_value<field_type<BigEndianOpt>, Enum1, option::fixed_length<1>,
+                   types::enum_value<field_type<option::big_endian>, Enum1, option::fixed_length<1>,
                                      option::valid_num_value_range<0, Enum1_NumOfValues - 1>,
                                      option::default_num_value<Enum1_Value2>>>>
         testing_type;
@@ -1092,15 +1092,15 @@ BOOST_AUTO_TEST_CASE(test32) {
 }
 
 BOOST_AUTO_TEST_CASE(test33) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t> SizeField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t> SizeField;
 
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>> StringField;
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>> StringField;
 
     static_assert(!StringField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::array_list<field_type<BigEndianOpt>, StringField> testing_type;
+    typedef types::array_list<field_type<option::big_endian>, StringField> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1122,7 +1122,7 @@ BOOST_AUTO_TEST_CASE(test33) {
 }
 
 BOOST_AUTO_TEST_CASE(test34) {
-    typedef types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
+    typedef types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint8_t>,
                               option::sequence_size_forcing_enabled>
         testing_type;
 
@@ -1146,7 +1146,7 @@ BOOST_AUTO_TEST_CASE(test34) {
 }
 
 BOOST_AUTO_TEST_CASE(test35) {
-    typedef types::float_value<field_type<BigEndianOpt>, float> testing_type;
+    typedef types::float_value<field_type<option::big_endian>, float> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1171,7 +1171,7 @@ BOOST_AUTO_TEST_CASE(test35) {
 }
 
 BOOST_AUTO_TEST_CASE(test36) {
-    typedef types::array_list<field_type<BigEndianOpt>, std::uint8_t, option::sequence_fixed_size<5>> testing_type;
+    typedef types::array_list<field_type<option::big_endian>, std::uint8_t, option::sequence_fixed_size<5>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1194,7 +1194,7 @@ BOOST_AUTO_TEST_CASE(test36) {
 }
 
 BOOST_AUTO_TEST_CASE(test37) {
-    typedef types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint16_t>,
+    typedef types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint16_t>,
                               option::sequence_fixed_size<3>>
         testing_type;
 
@@ -1217,11 +1217,11 @@ BOOST_AUTO_TEST_CASE(test37) {
 }
 
 BOOST_AUTO_TEST_CASE(test38) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
 
     static_assert(!TrailField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_fixed_size<5>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_fixed_size<5>,
                           option::sequence_trailing_field_suffix<TrailField>>
         testing_type;
 
@@ -1253,7 +1253,7 @@ BOOST_AUTO_TEST_CASE(test38) {
 }
 
 BOOST_AUTO_TEST_CASE(test39) {
-    typedef types::float_value<field_type<BigEndianOpt>, float, option::valid_num_value_range<5, 10>> testing_type;
+    typedef types::float_value<field_type<option::big_endian>, float, option::valid_num_value_range<5, 10>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1269,7 +1269,7 @@ BOOST_AUTO_TEST_CASE(test39) {
 }
 
 BOOST_AUTO_TEST_CASE(test40) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 100>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 100>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1288,11 +1288,11 @@ BOOST_AUTO_TEST_CASE(test40) {
 }
 
 BOOST_AUTO_TEST_CASE(test41) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 0>> TermField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 0>> TermField;
 
     static_assert(!TermField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_termination_field_suffix<TermField>> testing_type;
+    typedef types::string<field_type<option::big_endian>, option::sequence_termination_field_suffix<TermField>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1315,7 +1315,7 @@ BOOST_AUTO_TEST_CASE(test41) {
 }
 
 BOOST_AUTO_TEST_CASE(test42) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 4>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 4>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1361,7 +1361,7 @@ BOOST_AUTO_TEST_CASE(test42) {
 }
 
 BOOST_AUTO_TEST_CASE(test43) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::uint32_t, option::var_length<1, 4>> testing_type;
+    typedef types::int_value<field_type<option::little_endian>, std::uint32_t, option::var_length<1, 4>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1407,7 +1407,7 @@ BOOST_AUTO_TEST_CASE(test43) {
 }
 
 BOOST_AUTO_TEST_CASE(test44) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<2, 4>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<2, 4>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1433,7 +1433,7 @@ BOOST_AUTO_TEST_CASE(test44) {
 }
 
 BOOST_AUTO_TEST_CASE(test45) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::uint32_t, option::var_length<2, 4>> testing_type;
+    typedef types::int_value<field_type<option::little_endian>, std::uint32_t, option::var_length<2, 4>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1459,7 +1459,7 @@ BOOST_AUTO_TEST_CASE(test45) {
 }
 
 BOOST_AUTO_TEST_CASE(test46) {
-    typedef types::no_value<field_type<BigEndianOpt>> testing_type;
+    typedef types::no_value<field_type<option::big_endian>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1481,9 +1481,9 @@ struct BundleInitialiserTest47 {
 };
 
 BOOST_AUTO_TEST_CASE(test47) {
-    typedef types::bundle<field_type<BigEndianOpt>,
-                          std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint16_t>,
-                                     types::int_value<field_type<BigEndianOpt>, std::uint8_t>>,
+    typedef types::bundle<field_type<option::big_endian>,
+                          std::tuple<types::int_value<field_type<option::big_endian>, std::uint16_t>,
+                                     types::int_value<field_type<option::big_endian>, std::uint8_t>>,
                           option::default_value_initialiser<BundleInitialiserTest47>>
         testing_type;
 
@@ -1500,7 +1500,7 @@ BOOST_AUTO_TEST_CASE(test47) {
 
 BOOST_AUTO_TEST_CASE(test48) {
 
-    typedef types::optional<types::int_value<field_type<BigEndianOpt>, std::uint16_t>,
+    typedef types::optional<types::int_value<field_type<option::big_endian>, std::uint16_t>,
                             option::default_optional_mode<types::optional_mode::exists>>
         testing_type;
 
@@ -1543,9 +1543,9 @@ struct BundleCustomReaderTest49 {
 
 BOOST_AUTO_TEST_CASE(test49) {
 
-    typedef types::bundle<field_type<BigEndianOpt>,
-                          std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
-                                     types::optional<types::int_value<field_type<BigEndianOpt>, std::uint16_t>>>,
+    typedef types::bundle<field_type<option::big_endian>,
+                          std::tuple<types::int_value<field_type<option::big_endian>, std::uint8_t>,
+                                     types::optional<types::int_value<field_type<option::big_endian>, std::uint16_t>>>,
                           option::custom_value_reader<BundleCustomReaderTest49>>
         testing_type;
 
@@ -1659,11 +1659,11 @@ BOOST_AUTO_TEST_CASE(test51) {
 }
 
 BOOST_AUTO_TEST_CASE(test52) {
-    typedef std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::fixed_bit_length<8>>,
-                       types::int_value<field_type<BigEndianOpt>, std::int8_t, option::fixed_bit_length<8>>>
+    typedef std::tuple<types::int_value<field_type<option::big_endian>, std::uint8_t, option::fixed_bit_length<8>>,
+                       types::int_value<field_type<option::big_endian>, std::int8_t, option::fixed_bit_length<8>>>
         BitfildMembers;
 
-    typedef types::bitfield<field_type<BigEndianOpt>, BitfildMembers> testing_type;
+    typedef types::bitfield<field_type<option::big_endian>, BitfildMembers> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1685,7 +1685,7 @@ BOOST_AUTO_TEST_CASE(test52) {
 }
 
 BOOST_AUTO_TEST_CASE(test53) {
-    typedef types::int_value<field_type<LittleEndianOpt>, std::int32_t, option::fixed_bit_length<23>,
+    typedef types::int_value<field_type<option::little_endian>, std::int32_t, option::fixed_bit_length<23>,
                              option::scaling_ratio<180, 0x800000>>
         testing_type;
 
@@ -1697,7 +1697,7 @@ BOOST_AUTO_TEST_CASE(test53) {
 }
 
 BOOST_AUTO_TEST_CASE(test54) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int8_t, option::scaling_ratio<100, 1>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::int8_t, option::scaling_ratio<100, 1>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1717,7 +1717,7 @@ BOOST_AUTO_TEST_CASE(test54) {
 }
 
 BOOST_AUTO_TEST_CASE(test55) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int16_t, option::scaling_ratio<1, 100>> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::int16_t, option::scaling_ratio<1, 100>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1731,11 +1731,11 @@ BOOST_AUTO_TEST_CASE(test55) {
 }
 
 BOOST_AUTO_TEST_CASE(test56) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
 
     static_assert(!TrailField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_fixed_size<5>, option::fixed_size_storage<5>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_fixed_size<5>, option::fixed_size_storage<5>,
                           option::sequence_trailing_field_suffix<TrailField>>
         testing_type;
 
@@ -1766,7 +1766,7 @@ BOOST_AUTO_TEST_CASE(test56) {
 }
 
 BOOST_AUTO_TEST_CASE(test57) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::scaling_ratio<1, 10>,
                              option::units_milliseconds>
         testing_type;
 
@@ -1837,7 +1837,7 @@ BOOST_AUTO_TEST_CASE(test57) {
 
 BOOST_AUTO_TEST_CASE(test58) {
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_nanoseconds>
         Field1;
 
@@ -1850,7 +1850,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(std::abs(units::get_microseconds<double>(field) - 0.1) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_microseconds>
         Field2;
 
@@ -1863,7 +1863,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(std::abs(units::get_milliseconds<double>(field) - 0.5) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_milliseconds> Field3;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_milliseconds> Field3;
 
     static_assert(!Field3::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1874,7 +1874,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(std::abs(units::get_seconds<double>(field) - 0.2) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_seconds>
         Field4;
 
@@ -1887,7 +1887,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(units::get_milliseconds<unsigned>(field) == 100U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_minutes>
         Field5;
 
@@ -1900,7 +1900,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(units::get_seconds<unsigned>(field) == 6U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>, option::units_hours>
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>, option::units_hours>
         Field6;
 
     static_assert(!Field6::is_version_dependent(), "Invalid version dependency assumption");
@@ -1912,7 +1912,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(units::get_seconds<unsigned>(field) == 6U * 60U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 12>, option::units_days>
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 12>, option::units_days>
         Field7;
 
     static_assert(!Field7::is_version_dependent(), "Invalid version dependency assumption");
@@ -1925,7 +1925,7 @@ BOOST_AUTO_TEST_CASE(test58) {
         BOOST_CHECK(units::get_hours<unsigned>(field) == 2U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_weeks> Field8;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_weeks> Field8;
 
     static_assert(!Field8::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1938,7 +1938,7 @@ BOOST_AUTO_TEST_CASE(test58) {
 }
 
 BOOST_AUTO_TEST_CASE(test59) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::units_millimeters> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::units_millimeters> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -1974,7 +1974,7 @@ BOOST_AUTO_TEST_CASE(test59) {
 }
 
 BOOST_AUTO_TEST_CASE(test60) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_nanometers>
         Field1;
 
@@ -1987,7 +1987,7 @@ BOOST_AUTO_TEST_CASE(test60) {
         BOOST_CHECK(std::abs(units::get_micrometers<double>(field) - 0.1) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_micrometers>
         Field2;
 
@@ -2000,7 +2000,7 @@ BOOST_AUTO_TEST_CASE(test60) {
         BOOST_CHECK(std::abs(units::get_millimeters<double>(field) - 0.5) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_millimeters> Field3;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_millimeters> Field3;
 
     static_assert(!Field3::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2011,7 +2011,7 @@ BOOST_AUTO_TEST_CASE(test60) {
         BOOST_CHECK(std::abs(units::getMeters<double>(field) - 0.2) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>, option::units_meters>
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>, option::units_meters>
         Field4;
 
     static_assert(!Field4::is_version_dependent(), "Invalid version dependency assumption");
@@ -2023,7 +2023,7 @@ BOOST_AUTO_TEST_CASE(test60) {
         BOOST_CHECK(units::get_millimeters<unsigned>(field) == 100U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_centimeters>
         Field5;
 
@@ -2036,7 +2036,7 @@ BOOST_AUTO_TEST_CASE(test60) {
         BOOST_CHECK(units::get_millimeters<unsigned>(field) == 1U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_kilometers>
         Field6;
 
@@ -2051,7 +2051,7 @@ BOOST_AUTO_TEST_CASE(test60) {
 }
 
 BOOST_AUTO_TEST_CASE(test61) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::units_centimeters_per_second>
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::units_centimeters_per_second>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -2094,7 +2094,7 @@ BOOST_AUTO_TEST_CASE(test61) {
 }
 
 BOOST_AUTO_TEST_CASE(test62) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_nanometers_per_second>
         Field1;
 
@@ -2108,7 +2108,7 @@ BOOST_AUTO_TEST_CASE(test62) {
                     <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<100, 1>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<100, 1>,
                              option::units_micrometers_per_second>
         Field2;
 
@@ -2122,7 +2122,7 @@ BOOST_AUTO_TEST_CASE(test62) {
                     <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_millimeters_per_second> Field3;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_millimeters_per_second> Field3;
 
     static_assert(!Field3::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2133,7 +2133,7 @@ BOOST_AUTO_TEST_CASE(test62) {
         BOOST_CHECK(std::abs(units::getMetersPerSecond<double>(field) - 0.2) <= std::numeric_limits<double>::epsilon());
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_meters_per_second>
         Field4;
 
@@ -2146,7 +2146,7 @@ BOOST_AUTO_TEST_CASE(test62) {
         BOOST_CHECK(units::getMillimetersPerSecond<unsigned>(field) == 100U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::scaling_ratio<1, 10>,
                              option::units_centimeters_per_second>
         Field5;
 
@@ -2160,7 +2160,7 @@ BOOST_AUTO_TEST_CASE(test62) {
         BOOST_CHECK(units::getMillimetersPerSecond<unsigned>(field) == 1U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_kilometers_per_hour> Field6;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_kilometers_per_hour> Field6;
 
     static_assert(!Field6::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2170,7 +2170,7 @@ BOOST_AUTO_TEST_CASE(test62) {
         BOOST_CHECK(units::getMetersPerSecond<unsigned>(field) == 10U);
     } while (false);
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::units_kilometers_per_second> Field7;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::units_kilometers_per_second> Field7;
 
     static_assert(!Field7::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2182,7 +2182,7 @@ BOOST_AUTO_TEST_CASE(test62) {
 }
 
 BOOST_AUTO_TEST_CASE(test63) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::units_kilohertz> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::units_kilohertz> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2207,7 +2207,7 @@ BOOST_AUTO_TEST_CASE(test63) {
 }
 
 BOOST_AUTO_TEST_CASE(test64) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::scaling_ratio<1, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::scaling_ratio<1, 10>,
                              option::units_degrees>
         testing_type;
 
@@ -2230,7 +2230,7 @@ BOOST_AUTO_TEST_CASE(test64) {
 }
 
 BOOST_AUTO_TEST_CASE(test65) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::scaling_ratio<1, 100>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::scaling_ratio<1, 100>,
                              option::units_radians>
         testing_type;
 
@@ -2253,7 +2253,7 @@ BOOST_AUTO_TEST_CASE(test65) {
 }
 
 BOOST_AUTO_TEST_CASE(test66) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::units_milliamps> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::units_milliamps> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2285,7 +2285,7 @@ BOOST_AUTO_TEST_CASE(test66) {
 }
 
 BOOST_AUTO_TEST_CASE(test67) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::units_millivolts> testing_type;
+    typedef types::int_value<field_type<option::big_endian>, std::uint32_t, option::units_millivolts> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2317,7 +2317,7 @@ BOOST_AUTO_TEST_CASE(test67) {
 }
 
 BOOST_AUTO_TEST_CASE(test68) {
-    typedef types::float_value<field_type<BigEndianOpt>, float, option::units_seconds> testing_type;
+    typedef types::float_value<field_type<option::big_endian>, float, option::units_seconds> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2342,11 +2342,11 @@ BOOST_AUTO_TEST_CASE(test68) {
 }
 
 BOOST_AUTO_TEST_CASE(test69) {
-    struct LenField : public types::int_value<field_type<BigEndianOpt>, std::uint8_t> { };
+    struct LenField : public types::int_value<field_type<option::big_endian>, std::uint8_t> { };
 
     static_assert(!LenField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint16_t>,
+    typedef types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint16_t>,
                               option::sequence_ser_length_field_prefix<LenField>>
         testing_type;
 
@@ -2579,11 +2579,11 @@ BOOST_AUTO_TEST_CASE(test72) {
     static_assert(!types::basic::detail::string_has_push_back<container::string_view>::value,
                   "string_view doesn't have push_back");
 
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t> SizeField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t> SizeField;
 
     static_assert(!SizeField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<SizeField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<SizeField>,
                           option::orig_data_view>
         testing_type;
 
@@ -2610,11 +2610,11 @@ BOOST_AUTO_TEST_CASE(test72) {
 }
 
 BOOST_AUTO_TEST_CASE(test73) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 0>> TermField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 0>> TermField;
 
     static_assert(!TermField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_termination_field_suffix<TermField>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_termination_field_suffix<TermField>,
                           option::orig_data_view>
         testing_type;
 
@@ -2642,11 +2642,11 @@ BOOST_AUTO_TEST_CASE(test73) {
 }
 
 BOOST_AUTO_TEST_CASE(test74) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 0>> TrailField;
 
     static_assert(!TrailField::is_version_dependent(), "Invalid version dependency assumption");
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_fixed_size<5>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_fixed_size<5>,
                           option::sequence_trailing_field_suffix<TrailField>, option::orig_data_view>
         testing_type;
 
@@ -2683,7 +2683,7 @@ BOOST_AUTO_TEST_CASE(test74) {
 }
 
 BOOST_AUTO_TEST_CASE(test75) {
-    typedef types::array_list<field_type<BigEndianOpt>, std::uint8_t, option::orig_data_view> testing_type;
+    typedef types::array_list<field_type<option::big_endian>, std::uint8_t, option::orig_data_view> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -2708,8 +2708,8 @@ BOOST_AUTO_TEST_CASE(test75) {
 
 BOOST_AUTO_TEST_CASE(test76) {
     typedef types::array_list<
-        field_type<BigEndianOpt>, std::uint8_t,
-        option::sequence_size_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint16_t>>,
+        field_type<option::big_endian>, std::uint8_t,
+        option::sequence_size_field_prefix<types::int_value<field_type<option::big_endian>, std::uint16_t>>,
         option::orig_data_view>
         testing_type;
 
@@ -2735,7 +2735,7 @@ BOOST_AUTO_TEST_CASE(test76) {
 }
 
 BOOST_AUTO_TEST_CASE(test77) {
-    typedef types::array_list<field_type<BigEndianOpt>, std::uint8_t, option::sequence_fixed_size<6>,
+    typedef types::array_list<field_type<option::big_endian>, std::uint8_t, option::sequence_fixed_size<6>,
                               option::orig_data_view>
         testing_type;
 
@@ -2797,7 +2797,7 @@ BOOST_AUTO_TEST_CASE(test78) {
 
 BOOST_AUTO_TEST_CASE(test79) {
     class testing_type
-        : public types::array_list<field_type<BigEndianOpt>, types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
+        : public types::array_list<field_type<option::big_endian>, types::int_value<field_type<option::big_endian>, std::uint8_t>,
                                    option::sequence_elem_length_forcing_enabled, option::sequence_fixed_size<3>> {
     public:
         testing_type() {
@@ -2827,12 +2827,12 @@ BOOST_AUTO_TEST_CASE(test79) {
 
 BOOST_AUTO_TEST_CASE(test80) {
     typedef types::bundle<
-        field_type<BigEndianOpt>,
-        std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint16_t, option::valid_num_value_range<0, 10>,
+        field_type<option::big_endian>,
+        std::tuple<types::int_value<field_type<option::big_endian>, std::uint16_t, option::valid_num_value_range<0, 10>,
                                     option::default_num_value<5>>,
-                   types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<100, 100>,
+                   types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<100, 100>,
                                     option::default_num_value<100>, option::empty_serialization>,
-                   types::enum_value<field_type<BigEndianOpt>, Enum1, option::fixed_length<1>,
+                   types::enum_value<field_type<option::big_endian>, Enum1, option::fixed_length<1>,
                                      option::valid_num_value_range<0, Enum1_NumOfValues - 1>,
                                      option::default_num_value<Enum1_Value2>>>>
         testing_type;
@@ -2900,8 +2900,8 @@ BOOST_AUTO_TEST_CASE(test81) {
 BOOST_AUTO_TEST_CASE(test82) {
 
     typedef types::bundle<
-        field_type<BigEndianOpt>,
-        std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint16_t, option::valid_num_value_range<0, 10>,
+        field_type<option::big_endian>,
+        std::tuple<types::int_value<field_type<option::big_endian>, std::uint16_t, option::valid_num_value_range<0, 10>,
                                     option::default_num_value<5>>>>
         testing_type;
 
@@ -2946,7 +2946,7 @@ BOOST_AUTO_TEST_CASE(test82) {
 }
 
 BOOST_AUTO_TEST_CASE(test83) {
-    typedef types::array_list<field_type<BigEndianOpt>, std::uint8_t, option::sequence_fixed_size<5>,
+    typedef types::array_list<field_type<option::big_endian>, std::uint8_t, option::sequence_fixed_size<5>,
                               option::sequence_fixed_size_use_fixed_size_storage>
         testing_type;
 
@@ -2970,7 +2970,7 @@ BOOST_AUTO_TEST_CASE(test83) {
 }
 
 BOOST_AUTO_TEST_CASE(test84) {
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_fixed_size<5>,
+    typedef types::string<field_type<option::big_endian>, option::sequence_fixed_size<5>,
                           option::sequence_fixed_size_use_fixed_size_storage>
         testing_type;
 
@@ -3004,7 +3004,7 @@ BOOST_AUTO_TEST_CASE(test84) {
 }
 
 BOOST_AUTO_TEST_CASE(test85) {
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_fixed_size<5>> testing_type;
+    typedef types::string<field_type<option::big_endian>, option::sequence_fixed_size<5>> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3028,7 +3028,7 @@ BOOST_AUTO_TEST_CASE(test85) {
 }
 
 BOOST_AUTO_TEST_CASE(test86) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range_override<0, 10>,
+    typedef types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range_override<0, 10>,
                              option::valid_num_value_range<20, 30>, option::default_num_value<20>>
         testing_type;
 
@@ -3043,10 +3043,10 @@ BOOST_AUTO_TEST_CASE(test86) {
 
 BOOST_AUTO_TEST_CASE(test87) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
-        types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::valid_num_value_range<0, 5>>,
-        option::sequence_size_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint16_t>>,
-        option::sequence_elem_ser_length_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint8_t>>>
+        field_type<option::big_endian>,
+        types::int_value<field_type<option::big_endian>, std::uint8_t, option::valid_num_value_range<0, 5>>,
+        option::sequence_size_field_prefix<types::int_value<field_type<option::big_endian>, std::uint16_t>>,
+        option::sequence_elem_ser_length_field_prefix<types::int_value<field_type<option::big_endian>, std::uint8_t>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -3083,15 +3083,15 @@ BOOST_AUTO_TEST_CASE(test87) {
 
 BOOST_AUTO_TEST_CASE(test88) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
+        field_type<option::big_endian>,
         types::bundle<
-            field_type<BigEndianOpt>,
-            std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
-                       types::string<field_type<BigEndianOpt>, option::sequence_size_field_prefix<types::int_value<
-                                                                   field_type<BigEndianOpt>, std::uint8_t>>>>>,
-        option::sequence_size_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint8_t>>,
+            field_type<option::big_endian>,
+            std::tuple<types::int_value<field_type<option::big_endian>, std::uint8_t>,
+                       types::string<field_type<option::big_endian>, option::sequence_size_field_prefix<types::int_value<
+                                                                   field_type<option::big_endian>, std::uint8_t>>>>>,
+        option::sequence_size_field_prefix<types::int_value<field_type<option::big_endian>, std::uint8_t>>,
         option::sequence_elem_ser_length_field_prefix<
-            types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 4>>>>
+            types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 4>>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -3142,17 +3142,17 @@ BOOST_AUTO_TEST_CASE(test88) {
 
 BOOST_AUTO_TEST_CASE(test89) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
+        field_type<option::big_endian>,
         types::bundle<
-            field_type<LittleEndianOpt>,
-            std::tuple<types::int_value<field_type<LittleEndianOpt>, std::uint32_t, option::var_length<1, 4>>,
-                       types::string<field_type<LittleEndianOpt>,
+            field_type<option::little_endian>,
+            std::tuple<types::int_value<field_type<option::little_endian>, std::uint32_t, option::var_length<1, 4>>,
+                       types::string<field_type<option::little_endian>,
                                      option::sequence_size_field_prefix<types::int_value<
-                                         field_type<LittleEndianOpt>, std::uint16_t, option::var_length<1, 2>>>>>>,
+                                         field_type<option::little_endian>, std::uint16_t, option::var_length<1, 2>>>>>>,
         option::sequence_ser_length_field_prefix<
-            types::int_value<field_type<LittleEndianOpt>, std::uint32_t, option::var_length<1, 4>>>,
+            types::int_value<field_type<option::little_endian>, std::uint32_t, option::var_length<1, 4>>>,
         option::sequence_elem_ser_length_field_prefix<
-            types::int_value<field_type<LittleEndianOpt>, std::uint32_t, option::var_length<1, 4>>>>
+            types::int_value<field_type<option::little_endian>, std::uint32_t, option::var_length<1, 4>>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -3211,12 +3211,12 @@ BOOST_AUTO_TEST_CASE(test89) {
 
 BOOST_AUTO_TEST_CASE(test90) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
-        types::bundle<field_type<BigEndianOpt>, std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
-                                                           types::int_value<field_type<BigEndianOpt>, std::uint16_t>>>,
-        option::sequence_size_field_prefix<types::int_value<field_type<BigEndianOpt>, std::uint8_t>>,
+        field_type<option::big_endian>,
+        types::bundle<field_type<option::big_endian>, std::tuple<types::int_value<field_type<option::big_endian>, std::uint8_t>,
+                                                           types::int_value<field_type<option::big_endian>, std::uint16_t>>>,
+        option::sequence_size_field_prefix<types::int_value<field_type<option::big_endian>, std::uint8_t>>,
         option::sequence_elem_fixed_ser_length_field_prefix<
-            types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 4>>>>
+            types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 4>>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -3251,12 +3251,12 @@ BOOST_AUTO_TEST_CASE(test90) {
 
 BOOST_AUTO_TEST_CASE(test91) {
     typedef types::array_list<
-        field_type<BigEndianOpt>,
-        types::bundle<field_type<BigEndianOpt>, std::tuple<types::int_value<field_type<BigEndianOpt>, std::uint8_t>,
-                                                           types::int_value<field_type<BigEndianOpt>, std::uint16_t>>>,
+        field_type<option::big_endian>,
+        types::bundle<field_type<option::big_endian>, std::tuple<types::int_value<field_type<option::big_endian>, std::uint8_t>,
+                                                           types::int_value<field_type<option::big_endian>, std::uint16_t>>>,
         option::sequence_fixed_size<2>,
         option::sequence_elem_fixed_ser_length_field_prefix<
-            types::int_value<field_type<BigEndianOpt>, std::uint32_t, option::var_length<1, 4>>>>
+            types::int_value<field_type<option::big_endian>, std::uint32_t, option::var_length<1, 4>>>>
         testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
@@ -3284,12 +3284,12 @@ BOOST_AUTO_TEST_CASE(test91) {
 }
 
 BOOST_AUTO_TEST_CASE(test92) {
-    typedef std::tuple<types::int_value<field_type<LittleEndianOpt>, std::uint8_t>,
-                       types::int_value<field_type<LittleEndianOpt>, std::uint8_t>,
-                       types::int_value<field_type<LittleEndianOpt>, std::uint8_t>>
+    typedef std::tuple<types::int_value<field_type<option::little_endian>, std::uint8_t>,
+                       types::int_value<field_type<option::little_endian>, std::uint8_t>,
+                       types::int_value<field_type<option::little_endian>, std::uint8_t>>
         BitfileMembers;
 
-    typedef types::bitfield<field_type<LittleEndianOpt>, BitfileMembers> testing_type;
+    typedef types::bitfield<field_type<option::little_endian>, BitfileMembers> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3316,15 +3316,15 @@ BOOST_AUTO_TEST_CASE(test92) {
 }
 
 BOOST_AUTO_TEST_CASE(test93) {
-    typedef std::tuple<types::int_value<field_type<LittleEndianOpt>, std::uint8_t, option::fixed_bit_length<4>,
+    typedef std::tuple<types::int_value<field_type<option::little_endian>, std::uint8_t, option::fixed_bit_length<4>,
                                         option::default_num_value<0xf>>,
-                       types::int_value<field_type<LittleEndianOpt>, std::int16_t, option::default_num_value<2016>,
+                       types::int_value<field_type<option::little_endian>, std::int16_t, option::default_num_value<2016>,
                                         option::num_value_ser_offset<-2000>, option::fixed_bit_length<8>>,
-                       types::int_value<field_type<LittleEndianOpt>, std::uint16_t, option::fixed_bit_length<12>,
+                       types::int_value<field_type<option::little_endian>, std::uint16_t, option::fixed_bit_length<12>,
                                         option::default_num_value<0x801>>>
         BitfileMembers;
 
-    typedef types::bitfield<field_type<LittleEndianOpt>, BitfileMembers> testing_type;
+    typedef types::bitfield<field_type<option::little_endian>, BitfileMembers> testing_type;
 
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3349,15 +3349,15 @@ BOOST_AUTO_TEST_CASE(test93) {
 }
 
 BOOST_AUTO_TEST_CASE(test94) {
-    using Mem1 = types::int_value<field_type<BigEndianOpt>, std::uint16_t>;
+    using Mem1 = types::int_value<field_type<option::big_endian>, std::uint16_t>;
 
-    struct Mem2 : public types::int_value<field_type<BigEndianOpt>, std::uint16_t, option::has_custom_version_update> {
+    struct Mem2 : public types::int_value<field_type<option::big_endian>, std::uint16_t, option::has_custom_version_update> {
         bool set_version(unsigned) {
             return true;
         }
     };
 
-    typedef types::bundle<field_type<BigEndianOpt>, std::tuple<Mem1, Mem2>> testing_type;
+    typedef types::bundle<field_type<option::big_endian>, std::tuple<Mem1, Mem2>> testing_type;
 
     static_assert(testing_type::is_version_dependent(), "Invalid version dependency assumption");
     testing_type field;
@@ -3365,11 +3365,11 @@ BOOST_AUTO_TEST_CASE(test94) {
 }
 
 BOOST_AUTO_TEST_CASE(test95) {
-    using Mem1 = types::int_value<field_type<BigEndianOpt>, std::uint16_t>;
+    using Mem1 = types::int_value<field_type<option::big_endian>, std::uint16_t>;
 
     using Mem2 = types::optional<Mem1, option::exists_since_version<5>, option::exists_by_default>;
 
-    typedef types::bundle<field_type<BigEndianOpt>, std::tuple<Mem1, Mem2>> testing_type;
+    typedef types::bundle<field_type<option::big_endian>, std::tuple<Mem1, Mem2>> testing_type;
 
     static_assert(testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3384,16 +3384,16 @@ BOOST_AUTO_TEST_CASE(test95) {
 }
 
 BOOST_AUTO_TEST_CASE(test96) {
-    using Mem1 = types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::fixed_bit_length<4>>;
+    using Mem1 = types::int_value<field_type<option::big_endian>, std::uint8_t, option::fixed_bit_length<4>>;
 
-    struct Mem2 : public types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::has_custom_version_update,
+    struct Mem2 : public types::int_value<field_type<option::big_endian>, std::uint8_t, option::has_custom_version_update,
                                           option::fixed_bit_length<4>> {
         bool set_version(unsigned) {
             return true;
         }
     };
 
-    typedef types::bitfield<field_type<BigEndianOpt>, std::tuple<Mem1, Mem2>> testing_type;
+    typedef types::bitfield<field_type<option::big_endian>, std::tuple<Mem1, Mem2>> testing_type;
 
     static_assert(testing_type::is_version_dependent(), "Invalid version dependency assumption");
     testing_type field;
@@ -3401,15 +3401,15 @@ BOOST_AUTO_TEST_CASE(test96) {
 }
 
 BOOST_AUTO_TEST_CASE(test97) {
-    using Mem1 = types::int_value<field_type<BigEndianOpt>, std::uint16_t>;
+    using Mem1 = types::int_value<field_type<option::big_endian>, std::uint16_t>;
 
     using Mem2 = types::optional<Mem1, option::exists_since_version<5>, option::exists_by_default>;
 
-    using ListElem = types::bundle<field_type<BigEndianOpt>, std::tuple<Mem1, Mem2>>;
+    using ListElem = types::bundle<field_type<option::big_endian>, std::tuple<Mem1, Mem2>>;
 
     static_assert(ListElem::is_version_dependent(), "Invalid version dependency assumption");
 
-    using testing_type = types::array_list<field_type<BigEndianOpt>, ListElem>;
+    using testing_type = types::array_list<field_type<option::big_endian>, ListElem>;
 
     static_assert(testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3456,7 +3456,7 @@ BOOST_AUTO_TEST_CASE(test97) {
 
 BOOST_AUTO_TEST_CASE(test98) {
     using testing_type
-        = types::int_value<field_type<BigEndianOpt>, std::uint8_t, option::invalid_by_default, option::version_storage>;
+        = types::int_value<field_type<option::big_endian>, std::uint8_t, option::invalid_by_default, option::version_storage>;
 
     testing_type field;
     BOOST_CHECK(!field.valid());
@@ -3465,7 +3465,7 @@ BOOST_AUTO_TEST_CASE(test98) {
     BOOST_CHECK(field.get_version() == 5U);
 
     using Field2
-        = types::bitmask_value<field_type<BigEndianOpt>, option::fixed_length<1U>, option::default_num_value<0x6U>,
+        = types::bitmask_value<field_type<option::big_endian>, option::fixed_length<1U>, option::default_num_value<0x6U>,
                                option::version_storage, option::bitmask_reserved_bits<0xc2U, 0x2U>>;
 
     Field2 field2;
@@ -3475,7 +3475,7 @@ BOOST_AUTO_TEST_CASE(test98) {
 }
 
 BOOST_AUTO_TEST_CASE(test99) {
-    typedef types::array_list<field_type<BigEndianOpt>, std::uint8_t, option::sequence_length_forcing_enabled> Field1;
+    typedef types::array_list<field_type<option::big_endian>, std::uint8_t, option::sequence_length_forcing_enabled> Field1;
 
     static_assert(!Field1::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3494,7 +3494,7 @@ BOOST_AUTO_TEST_CASE(test99) {
     BOOST_CHECK(field1.valid());
     field1.clear_read_length_forcing();
 
-    typedef types::string<field_type<BigEndianOpt>, option::sequence_length_forcing_enabled> Field2;
+    typedef types::string<field_type<option::big_endian>, option::sequence_length_forcing_enabled> Field2;
 
     static_assert(!Field2::is_version_dependent(), "Invalid version dependency assumption");
 
@@ -3514,7 +3514,7 @@ BOOST_AUTO_TEST_CASE(test99) {
 }
 
 BOOST_AUTO_TEST_CASE(test100) {
-    typedef types::int_value<field_type<BigEndianOpt>, std::int64_t, option::fixed_length<5U, false>,
+    typedef types::int_value<field_type<option::big_endian>, std::int64_t, option::fixed_length<5U, false>,
                              option::num_value_ser_offset<0x492559f64fLL>, option::scaling_ratio<1, 0x174878e800LL>>
         testing_type;
 

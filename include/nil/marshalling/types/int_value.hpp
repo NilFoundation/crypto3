@@ -70,7 +70,7 @@ namespace nil {
             ///     @li @ref nil::marshalling::option::has_custom_refresh
             ///     @li @ref nil::marshalling::option::fail_on_invalid
             ///     @li @ref nil::marshalling::option::ignore_invalid
-            ///     @li @ref nil::marshalling::option::scaling_ratio_type
+            ///     @li @ref nil::marshalling::option::scaling_ratio
             ///     @li @b nil::marshalling::option::Units* - all variants of value units, see
             ///         @ref sec_field_tutorial_int_value_units for details.
             ///     @li nil::marshalling::option::empty_serialization
@@ -117,9 +117,9 @@ namespace nil {
                 int_value &operator=(const int_value &) = default;
 
                 /// @brief Scales value according to ratio specified in provided
-                ///     nil::marshalling::option::scaling_ratio_type option.
-                /// @details If nil::marshalling::option::scaling_ratio_type option wasn't used, then
-                ///     nil::marshalling::option::scaling_ratio_type<1,1> is assumed.
+                ///     nil::marshalling::option::scaling_ratio option.
+                /// @details If nil::marshalling::option::scaling_ratio option wasn't used, then
+                ///     nil::marshalling::option::scaling_ratio<1,1> is assumed.
                 /// @tparam TRet Return type for the scaled value.
                 /// @return "(value() * Scaling_Num) / Scaling_Denom" when all values are
                 ///     casted to TRet type.

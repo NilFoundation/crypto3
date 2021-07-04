@@ -1,0 +1,60 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+
+#ifndef MARSHALLING_BITMASK_VALUE_BEHAVIOUR_HPP
+#define MARSHALLING_BITMASK_VALUE_BEHAVIOUR_HPP
+
+#include <nil/marshalling/processing/size_to_type.hpp>
+
+namespace nil {
+    namespace marshalling {
+        namespace types {
+            namespace detail {
+
+                template<bool THasFixedLength>
+                struct bitmask_undertlying_type;
+
+                template<>
+                struct bitmask_undertlying_type<true> {
+                    template<typename ParsedOptions>
+                    using type =
+                        typename processing::size_to_type<ParsedOptions::fixed_length, false>::type;
+                };
+
+                template<>
+                struct bitmask_undertlying_type<false> {
+                    template<typename ParsedOptions>
+                    using type = unsigned;
+                };
+
+                template<typename ParsedOptions>
+                using bitmask_undertlying_type_type = typename bitmask_undertlying_type<
+                    ParsedOptions::has_fixed_length_limit>::template type<ParsedOptions>;
+
+            }    // namespace detail
+        }    // namespace types
+    }        // namespace marshalling
+}    // namespace nil
+#endif    // MARSHALLING_BITMASK_VALUE_BEHAVIOUR_HPP

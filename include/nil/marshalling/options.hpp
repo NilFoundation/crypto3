@@ -389,7 +389,7 @@ namespace nil {
             ///         nil::marshalling::types::int_value<
             ///             MyFieldBase,
             ///             std::int32_t,
-            ///             nil::marshalling::option::scaling_ratio_type<1, 100>
+            ///             nil::marshalling::option::scaling_ratio<1, 100>
             ///         >;
             ///     @endcode
             ///     Then, to accessed the scaled value of the field use @b scale_as() or

@@ -27,42 +27,17 @@
 #define MARSHALLING_BITMASK_VALUE_HPP
 
 #include <limits>
-#include <nil/marshalling/field_type.hpp>
 
-#include <nil/marshalling/processing/size_to_type.hpp>
-#include <nil/marshalling/types/detail/adapt_basic_field.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
 #include <nil/marshalling/detail/gen_enum.hpp>
 #include <nil/marshalling/detail/bits_access.hpp>
 #include <nil/marshalling/types/int_value.hpp>
 #include <nil/marshalling/types/tag.hpp>
+#include <nil/marshalling/types/bitmask_value/behaviour.hpp>
 
 namespace nil {
     namespace marshalling {
         namespace types {
-            namespace detail {
-
-                template<bool THasFixedLength>
-                struct bitmask_undertlying_type;
-
-                template<>
-                struct bitmask_undertlying_type<true> {
-                    template<typename TOptionsBundle>
-                    using type =
-                        typename processing::size_to_type<TOptionsBundle::fixed_length, false>::type;
-                };
-
-                template<>
-                struct bitmask_undertlying_type<false> {
-                    template<typename TOptionsBundle>
-                    using type = unsigned;
-                };
-
-                template<typename TOptionsBundle>
-                using bitmask_undertlying_type_type = typename bitmask_undertlying_type<
-                    TOptionsBundle::has_fixed_length_limit>::template type<TOptionsBundle>;
-
-            }    // namespace detail
 
             /// @brief Bitmask value field.
             /// @details Quite often communication protocols specify bitmask values, where
@@ -125,9 +100,11 @@ namespace nil {
 
             private:
                 
-                using int_value_type = detail::bitmask_undertlying_type_type<parsed_options_type>;
+                using bitmask_behaviour_type = 
+                    detail::bitmask_undertlying_type_type<parsed_options_type>;
 
-                using int_value_field_type = int_value<TFieldBase, int_value_type, TOptions...>;
+                using int_value_field_type = 
+                    int_value<TFieldBase, bitmask_behaviour_type, TOptions...>;
 
             public:
 
