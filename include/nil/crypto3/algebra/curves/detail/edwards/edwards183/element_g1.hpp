@@ -94,7 +94,7 @@ namespace nil {
                          *
                          */
                         constexpr element_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
-                            element_edwards_g1(X, Y, X * Y) {};
+                            element_edwards_g1(Y, X, X * Y) {};
 
                         /** @brief Get the point at infinity
                          *
