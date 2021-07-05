@@ -73,24 +73,18 @@ namespace nil {
                          *
                          */
                         constexpr element_twisted_edwards_g1() : element_twisted_edwards_g1(policy_type::g1_zero_fill[0], 
-                            policy_type::g1_zero_fill[1]) {};
+                            policy_type::g1_zero_fill[1], policy_type::g1_zero_fill[2]) {};
 
                         /** @brief
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
                         constexpr element_twisted_edwards_g1(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                           underlying_field_value_type in_Z) {
+                                           underlying_field_value_type in_Z = underlying_field_value_type::one()) {
                             this->X = in_X;
                             this->Y = in_Y;
                             this->Z = in_Z;
                         };
-                        /** @brief
-                         *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
-                         *
-                         */
-                        constexpr element_twisted_edwards_g1(underlying_field_value_type X, underlying_field_value_type Y) :
-                            element_twisted_edwards_g1(X, Y, X * Y) {};
 
                         /** @brief Get the point at infinity
                          *
@@ -102,7 +96,8 @@ namespace nil {
                          *
                          */
                         static element_twisted_edwards_g1 one() {
-                            return element_twisted_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1]);
+                            return element_twisted_edwards_g1(policy_type::g1_one_fill[0], policy_type::g1_one_fill[1],
+                                                              policy_type::g1_one_fill[2]);
                         }
 
                         /*************************  Comparison operations  ***********************************/
@@ -139,7 +134,7 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         bool is_zero() const {
-                            return (this->Y.is_zero() && this->Z.is_zero());
+                            return (this->X.is_zero() && this->Y.is_one() && this->Z.is_zero());
                         }
                         /** @brief
                          *

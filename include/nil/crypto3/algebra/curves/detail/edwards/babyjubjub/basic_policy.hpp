@@ -82,18 +82,18 @@ namespace nil {
                         constexpr static const number_type d =
                             0x292F8_cppui18;                                ///< twisted Edwards elliptic curve 
                                                                             ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
-                        /*constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
-                            typename g1_field_type::value_type(0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
-                            typename g1_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254),
-                            g1_field_type::value_type::zero()};    //< Third value is not correct!*/
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
                             g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
                             g1_field_type::value_type::zero()};
 
+                        // constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
+                        //     typename g1_field_type::value_type(0x23343E3445B673D38BCBA38F25645ADB494B1255B1162BB40F41A59F4D4B45E_cppui250),
+                        //     typename g1_field_type::value_type(0xC19139CB84C680A6E14116DA06056174A0CFA121E6E5C2450F87D64FC000001_cppui252),
+                        //     g1_field_type::value_type::one()};
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
-                            typename g1_field_type::value_type(0x23343E3445B673D38BCBA38F25645ADB494B1255B1162BB40F41A59F4D4B45E_cppui250),
-                            typename g1_field_type::value_type(0xC19139CB84C680A6E14116DA06056174A0CFA121E6E5C2450F87D64FC000001_cppui252),
-                            g1_field_type::value_type::zero()};    //< Third value is not correct!
+                            typename g1_field_type::value_type(0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
+                            typename g1_field_type::value_type(0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254),
+                            g1_field_type::value_type::one()};
 
                         // constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
                         //     g2_field_type::value_type::zero(), g2_field_type::value_type::one(),                            // Temporary value for compiling testing
