@@ -46,8 +46,8 @@ namespace nil {
                 struct babyjubjub_scalar_field;
 
                 template<>
-                struct babyjubjub_scalar_field<254> : public field<254> {
-                    typedef field<254> policy_type;
+                struct babyjubjub_scalar_field<254> : public field<251> {
+                    typedef field<251> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -58,9 +58,9 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const modulus_type modulus =
-                        0x30644E72E131A029B85045B68181585D59F76DC1C90770533B94BEE1C9093788_cppui254;
+                        0x60c89ce5c263405370a08b6d0302b0bab3eedb83920ee0a677297dc392126f1_cppui251;
 
-                    typedef typename detail::element_fp<params<jubjub_scalar_field<254>>> value_type;
+                    typedef typename detail::element_fp<params<babyjubjub_scalar_field<254>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
