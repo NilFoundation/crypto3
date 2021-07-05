@@ -33,7 +33,6 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 #include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
 #include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
