@@ -38,7 +38,7 @@ namespace nil {
         namespace random {
             /**
              * The class template algebraic_random_device models a \UniformRandomBitGenerator.
-             * https://www.boost.org/doc/libs/1_75_0/doc/html/boost_random/reference.html#boost_random.reference.concepts.uniform_random_number_generator
+             * https://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator
              *
              * The template parameter AlgebraicType shall denote an some algebraic type (field or curve type).
              */

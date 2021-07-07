@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE algebraic_random_device_test
+#define BOOST_TEST_MODULE algebraic_engine_test
 
 #include <string>
 #include <tuple>
@@ -33,6 +33,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -159,6 +160,79 @@ void test_UniformRandomBitGenerator() {
     }
 }
 
+// TODO: add custom Generator
+template<typename T>
+void test_RandomNumberEngine() {
+    constexpr std::size_t n = 5;
+    using generator_type = random::algebraic_engine<T>;
+    using printer_type = boost::test_tools::tt_detail::print_log_value<typename generator_type::result_type>;
+    generator_type g;
+    printer_type print;
+    boost::random::mt19937 seed_seq;
+
+    std::cout << "min = ";
+    print(std::cout, generator_type::min());
+    std::cout << std::endl;
+
+    std::cout << "max = ";
+    print(std::cout, generator_type::max());
+    std::cout << std::endl;
+
+    std::cout << "operator():" << std::endl;
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+
+    std::cout << "seed():" << std::endl;
+    g.seed();
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+
+    std::cout << "seed(value):" << std::endl;
+    g.seed(0);
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+
+    std::cout << "seed(Sseq):" << std::endl;
+    g.seed(seed_seq);
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+
+    std::cout << "discard(z):" << std::endl;
+    g.discard(n);
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+
+    std::cout << "operator== and operator!=:" << std::endl;
+    generator_type g1;
+    std::cout << (g == g1) << std::endl;
+    std::cout << (g != g1) << std::endl;
+    g.seed();
+    std::cout << (g == g1) << std::endl;
+    std::cout << (g != g1) << std::endl;
+
+    std::cout << "operator<<:" << std::endl;
+    std::cout << g << std::endl;
+
+    std::cout << "operator>>:" << std::endl;
+    std::stringstream test_stream;
+    test_stream << 1440;
+    test_stream >> g;
+    for (auto i = 0; i < n; i++) {
+        print(std::cout, g());
+        std::cout << std::endl;
+    }
+}
+
 BOOST_AUTO_TEST_SUITE(algebraic_random_device_tests)
 
 BOOST_AUTO_TEST_CASE(mnt4_test) {
@@ -181,6 +255,32 @@ BOOST_AUTO_TEST_CASE(bls12_381_test) {
     test_UniformRandomBitGenerator<typename curve_type::g2_type::underlying_field_type>();
     test_UniformRandomBitGenerator<typename curve_type::g1_type>();
     test_UniformRandomBitGenerator<typename curve_type::g2_type>();
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(algebraic_engine_tests)
+
+BOOST_AUTO_TEST_CASE(mnt4_test) {
+    using curve_type = algebra::curves::mnt4<298>;
+    using scalar_field_type = typename curve_type::scalar_field_type;
+
+    test_RandomNumberEngine<scalar_field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
+    // test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
+    // test_RandomNumberEngine<typename curve_type::g1_type>();
+    // test_RandomNumberEngine<typename curve_type::g2_type>();
+}
+
+BOOST_AUTO_TEST_CASE(bls12_381_test) {
+    using curve_type = algebra::curves::bls12<381>;
+    using scalar_field_type = typename curve_type::scalar_field_type;
+
+    test_RandomNumberEngine<scalar_field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
+    // test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
+    // test_RandomNumberEngine<typename curve_type::g1_type>();
+    // test_RandomNumberEngine<typename curve_type::g2_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
