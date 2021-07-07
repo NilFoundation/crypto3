@@ -86,10 +86,11 @@ namespace nil {
                             g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
                             g1_field_type::value_type::zero()};
 
+                        // according to https://neuromancer.sk/std/other/JubJub
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
-                            typename g1_field_type::value_type(0x187D2619FF114316D237E86684FB6E3C6B15E9B924FA4E322764D3177508297A_cppui253),
-                            typename g1_field_type::value_type(0x6230C613F1B460E026221BE21CF4EABD5A8EA552DB565CB18D3CABC39761EB9B_cppui255),
-                            g1_field_type::value_type::zero()};    //< Third value is not correct!                                                                  
+                            typename g1_field_type::value_type(0x11dafe5d23e1218086a365b99fbf3d3be72f6afd7d1f72623e6b071492d1122b_cppui253),
+                            typename g1_field_type::value_type(0x1d523cf1ddab1a1793132e78c866c0c33e26ba5cc220fed7cc3f870e59d292aa_cppui253),
+                            g1_field_type::value_type::one()};    //< Third value is not correct!
                     };
 
                     constexpr typename edwards_basic_policy<255>::number_type const
