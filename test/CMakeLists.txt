@@ -32,4 +32,7 @@ set_target_properties(${CURRENT_PROJECT_NAME}_chacha_test PROPERTIES CXX_STANDAR
 cm_test(NAME ${CURRENT_PROJECT_NAME}_hash_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/hash.cpp)
 set_target_properties(${CURRENT_PROJECT_NAME}_hash_test PROPERTIES CXX_STANDARD 17)
 
+cm_test(NAME ${CURRENT_PROJECT_NAME}_algebraic_random_device_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/algebraic_random_device.cpp)
+set_target_properties(${CURRENT_PROJECT_NAME}_algebraic_random_device_test PROPERTIES CXX_STANDARD 17)
+
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
