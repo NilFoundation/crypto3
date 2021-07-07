@@ -35,7 +35,7 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/processing/access.hpp>
 #include <nil/marshalling/types/detail/common_funcs.hpp>
-
+#include <nil/marshalling/types/type_traits.hpp>
 #include <nil/marshalling/types/array_list/type_traits.hpp>
 
 namespace nil {
