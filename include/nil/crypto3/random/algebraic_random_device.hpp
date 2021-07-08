@@ -36,11 +36,15 @@
 namespace nil {
     namespace crypto3 {
         namespace random {
-            /**
+            /*!
+             * @brief
+             * @tparam AlgebraicType denote an some algebraic type (field, curve group types).
+             *
+             * algebraic_random_device is adapter wrapping boost::random_device producing random values of algebraic
+             * type.
+             *
              * The class template algebraic_random_device models a \UniformRandomBitGenerator.
              * https://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator
-             *
-             * The template parameter AlgebraicType shall denote an some algebraic type (field or curve type).
              */
             template<typename AlgebraicType, typename = void>
             struct algebraic_random_device;
@@ -63,15 +67,18 @@ namespace nil {
             public:
                 typedef field_value_type result_type;
 
+                /** Returns a random value in the range [min, max]. */
                 result_type operator()() {
                     return dist(gen);
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 constexpr static inline result_type min() {
                     constexpr result_type min_value(_min);
                     return min_value;
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 constexpr static inline result_type max() {
                     constexpr result_type max_value(_max);
                     return max_value;
@@ -96,6 +103,7 @@ namespace nil {
             public:
                 typedef extended_field_value_type result_type;
 
+                /** Returns a random value in the range [min, max]. */
                 result_type operator()() {
                     result_type result;
                     for (auto &coord : result.data) {
@@ -105,6 +113,7 @@ namespace nil {
                     return result;
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate min_value at compile-time
                 constexpr static inline result_type min() {
                     result_type min_value;
@@ -115,6 +124,7 @@ namespace nil {
                     return min_value;
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate max_value at compile-time
                 constexpr static inline result_type max() {
                     result_type max_value;
@@ -142,16 +152,22 @@ namespace nil {
             public:
                 typedef group_value_type result_type;
 
+                /**
+                 * Returns a random value in the range [min, max]. Elements of group are ordered in exponent growing
+                 * order with respect to group base element.
+                 */
                 // TODO: check correctness of the generation method
                 result_type operator()() {
                     return result_type::one() * gen();
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate returned value at compile-time
                 constexpr static inline result_type min() {
                     return result_type::zero();
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate returned value at compile-time
                 constexpr static inline result_type max() {
                     return result_type::one() * (scalar_field_type::modulus - 1);

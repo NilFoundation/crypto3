@@ -39,19 +39,19 @@
 namespace nil {
     namespace crypto3 {
         namespace random {
-            /**
-             * The class template algebraic_engine is a pseudo-random number engine adaptor that discards a
-             * certain amount of data produced by the base engine. It models (not fully) a \RandomNumberEngine.
-             * https://en.cppreference.com/w/cpp/named_req/RandomNumberEngine
+            /*!
+             * @brief
+             * @tparam AlgebraicType denote an some algebraic type (field, curve group types).
+             * @tparam Engine denote an some base \RandomNumberEngine generating random numbers
              *
-             * The class template algebraic_engine differs from \RandomNumberEngine as it doesn't have constructor and
-             * seed function with parameter of result_type. This is due to the fact that algebraic_engine is adapter
-             * wrapping some base \RandomNumberEngine (Engine), so instead it has constructor and seed function with
-             * parameter of Engine::result_type;
+             * The class template algebraic_engine is a pseudo-random number engine adaptor that generate random values
+             * of algebraic type using data produced by the base engine. It models (not fully) a
+             * \RandomNumberEngine. https://en.cppreference.com/w/cpp/named_req/RandomNumberEngine
              *
-             *
-             * The template parameter Engine shall denote an some base \RandomNumberEngine generating random numbers.
-             * The template parameter AlgebraicType shall denote an some algebraic type (field or curve type).
+             * @warning The class template algebraic_engine differs from \RandomNumberEngine as it doesn't have
+             * constructor and seed function with parameter of result_type. This is due to the fact that
+             * algebraic_engine is adapter wrapping some base \RandomNumberEngine (Engine), so instead it has
+             * constructor and seed function with parameter of Engine::result_type.
              */
             template<typename AlgebraicType, typename Engine = boost::random::mt19937, typename = void>
             struct algebraic_engine;
@@ -77,46 +77,70 @@ namespace nil {
             public:
                 typedef field_value_type result_type;
 
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed().
+                 */
                 algebraic_engine() {
                     seed();
                 }
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed(value).
+                 */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
                     seed(value);
                 }
+                /**
+                 * Constructs a algebraic_engine and calls @c seed(seq).
+                 *
+                 * @xmlnote
+                 * The copy constructor will always be preferred over
+                 * the templated constructor.
+                 * @endxmlnote
+                 */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
                     seed(seq);
                 }
 
+                /** Calls @c seed(default_seed) of base Engine. */
                 void seed() {
                     gen.seed();
                 }
+                /** Calls @c seed(value) of base Engine. */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
                     gen.seed(value);
                 }
+                /** Calls @c seed(seq) of base Engine. */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
                     gen.seed(seq);
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 constexpr static inline result_type min() {
                     constexpr result_type min_value(_min);
                     return min_value;
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 constexpr static inline result_type max() {
                     constexpr result_type max_value(_max);
                     return max_value;
                 }
 
+                /** Returns a random value in the range [min, max]. */
                 result_type operator()() {
                     return dist(gen);
                 }
 
+                /**
+                 * Advances the state of the generator by @c z steps.  Equivalent to
+                 */
                 void discard(std::size_t z) {
                     while (z--) {
                         (*this)();
                     }
                 }
 
+                /** Writes a algebraic_engine to a @c std::ostream */
                 template<class CharT, class Traits>
                 friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
                                                                      const algebraic_engine& ae) {
@@ -124,6 +148,7 @@ namespace nil {
                     return os;
                 }
 
+                /** Reads a algebraic_engine from a @c std::istream */
                 template<class CharT, class Traits>
                 friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
                                                                      algebraic_engine& ae) {
@@ -131,10 +156,17 @@ namespace nil {
                     return is;
                 }
 
+                /**
+                 * Returns true if the two generators are in the same state,
+                 * and will thus produce identical sequences.
+                 */
                 friend bool operator==(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return x_.gen == y_.gen && x_.dist == y_.dist;
                 }
 
+                /**
+                 * Returns true if the two generators are in different states.
+                 */
                 friend bool operator!=(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return !(x_ == y_);
                 }
@@ -161,26 +193,44 @@ namespace nil {
             public:
                 typedef extended_field_value_type result_type;
 
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed().
+                 */
                 algebraic_engine() {
                     seed();
                 }
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed(value).
+                 */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
                     seed(value);
                 }
+                /**
+                 * Constructs a algebraic_engine and calls @c seed(seq).
+                 *
+                 * @xmlnote
+                 * The copy constructor will always be preferred over
+                 * the templated constructor.
+                 * @endxmlnote
+                 */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
                     seed(seq);
                 }
 
+                /** Calls @c seed(default_seed) of base Engine. */
                 void seed() {
                     gen.seed();
                 }
+                /** Calls @c seed(value) of base Engine. */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
                     gen.seed(value);
                 }
+                /** Calls @c seed(seq) of base Engine. */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
                     gen.seed(seq);
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate min_value at compile-time
                 constexpr static inline result_type min() {
                     result_type min_value;
@@ -191,6 +241,7 @@ namespace nil {
                     return min_value;
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate max_value at compile-time
                 constexpr static inline result_type max() {
                     result_type max_value;
@@ -201,6 +252,7 @@ namespace nil {
                     return max_value;
                 }
 
+                /** Returns a random value in the range [min, max]. */
                 result_type operator()() {
                     result_type result;
                     for (auto& coord : result.data) {
@@ -210,12 +262,16 @@ namespace nil {
                     return result;
                 }
 
+                /**
+                 * Advances the state of the generator by @c z steps.  Equivalent to
+                 */
                 void discard(std::size_t z) {
                     while (z--) {
                         (*this)();
                     }
                 }
 
+                /** Writes a algebraic_engine to a @c std::ostream */
                 template<class CharT, class Traits>
                 friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
                                                                      const algebraic_engine& ae) {
@@ -223,6 +279,7 @@ namespace nil {
                     return os;
                 }
 
+                /** Reads a algebraic_engine from a @c std::istream */
                 template<class CharT, class Traits>
                 friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
                                                                      algebraic_engine& ae) {
@@ -230,10 +287,17 @@ namespace nil {
                     return is;
                 }
 
+                /**
+                 * Returns true if the two generators are in the same state,
+                 * and will thus produce identical sequences.
+                 */
                 friend bool operator==(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return x_.gen == y_.gen;
                 }
 
+                /**
+                 * Returns true if the two generators are in different states.
+                 */
                 friend bool operator!=(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return !(x_ == y_);
                 }
@@ -258,47 +322,74 @@ namespace nil {
             public:
                 typedef group_value_type result_type;
 
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed().
+                 */
                 algebraic_engine() {
                     seed();
                 }
+                /**
+                 * Constructs a @c algebraic_engine and calls @c seed(value).
+                 */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
                     seed(value);
                 }
+                /**
+                 * Constructs a algebraic_engine and calls @c seed(seq).
+                 *
+                 * @xmlnote
+                 * The copy constructor will always be preferred over
+                 * the templated constructor.
+                 * @endxmlnote
+                 */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
                     seed(seq);
                 }
 
+                /** Calls @c seed(default_seed) of base Engine. */
                 void seed() {
                     gen.seed();
                 }
+                /** Calls @c seed(value) of base Engine. */
                 BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
                     gen.seed(value);
                 }
+                /** Calls @c seed(seq) of base Engine. */
                 BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
                     gen.seed(seq);
                 }
 
+                /** Returns the smallest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate returned value at compile-time
                 constexpr static inline result_type min() {
                     return result_type::zero();
                 }
 
+                /** Returns the largest value that the \algebraic_random_device can produce. */
                 // TODO: evaluate max_value at compile-time
                 constexpr static inline result_type max() {
                     return result_type::one() * (scalar_field_type::modulus - 1);
                 }
 
+                /**
+                 * Returns a random value in the range [min, max]. Elements of group are ordered in exponent growing
+                 * order with respect to group base element.
+                 */
                 // TODO: check correctness of the generation method
                 result_type operator()() {
                     return result_type::one() * gen();
                 }
 
+                /**
+                 * Advances the state of the generator by @c z steps.  Equivalent to
+                 */
                 void discard(std::size_t z) {
                     while (z--) {
                         (*this)();
                     }
                 }
 
+                /** Writes a algebraic_engine to a @c std::ostream */
                 template<class CharT, class Traits>
                 friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
                                                                      const algebraic_engine& ae) {
@@ -306,6 +397,7 @@ namespace nil {
                     return os;
                 }
 
+                /** Reads a algebraic_engine from a @c std::istream */
                 template<class CharT, class Traits>
                 friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
                                                                      algebraic_engine& ae) {
@@ -313,10 +405,17 @@ namespace nil {
                     return is;
                 }
 
+                /**
+                 * Returns true if the two generators are in the same state,
+                 * and will thus produce identical sequences.
+                 */
                 friend bool operator==(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return x_.gen == y_.gen;
                 }
 
+                /**
+                 * Returns true if the two generators are in different states.
+                 */
                 friend bool operator!=(const algebraic_engine& x_, const algebraic_engine& y_) {
                     return !(x_ == y_);
                 }
