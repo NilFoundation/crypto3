@@ -28,11 +28,17 @@
 
 #include <complex>
 
+#include <boost/type_traits.hpp>
 #include <boost/tti/tti.hpp>
+#include <boost/mpl/placeholders.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
+
+            using namespace boost::mpl::placeholders;
+
             BOOST_TTI_HAS_TYPE(iterator)
             BOOST_TTI_HAS_TYPE(const_iterator)
 
@@ -47,6 +53,8 @@ namespace nil {
             BOOST_TTI_HAS_TYPE(g1_type)
             BOOST_TTI_HAS_TYPE(g2_type)
             BOOST_TTI_HAS_TYPE(gt_type)
+
+            BOOST_TTI_HAS_TYPE(group_type)
 
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(value_bits)
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(modulus_bits)
@@ -100,6 +108,20 @@ namespace nil {
                                           has_static_member_data_modulus_bits<T, const std::size_t>::value &&
                                           has_type_extension_policy<T>::value;
                 typedef T type;
+            };
+
+            template<typename T>
+            struct is_g1_group_element {
+                static const bool value = boost::is_same<
+                    typename T::group_type::curve_type::g1_type,
+                    typename T::group_type>::value;
+            };
+
+            template<typename T>
+            struct is_g2_group_element {
+                static const bool value = boost::is_same<
+                    typename T::group_type::curve_type::g2_type,
+                    typename T::group_type>::value;
             };
 
             template<typename T>
