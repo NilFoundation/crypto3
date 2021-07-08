@@ -29,6 +29,8 @@
 #include <tuple>
 #include <unordered_map>
 #include <sstream>
+#include <cstdlib>
+#include <ctime>
 
 #include <boost/test/unit_test.hpp>
 
@@ -163,6 +165,7 @@ void test_UniformRandomBitGenerator() {
 // TODO: add custom Generator
 template<typename T>
 void test_RandomNumberEngine() {
+    std::srand(std::time(nullptr));
     constexpr std::size_t n = 5;
     using generator_type = random::algebraic_engine<T>;
     using printer_type = boost::test_tools::tt_detail::print_log_value<typename generator_type::result_type>;
@@ -225,7 +228,7 @@ void test_RandomNumberEngine() {
 
     std::cout << "operator>>:" << std::endl;
     std::stringstream test_stream;
-    test_stream << 1440;
+    test_stream << std::rand();
     test_stream >> g;
     for (auto i = 0; i < n; i++) {
         print(std::cout, g());
@@ -267,9 +270,9 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
 
     test_RandomNumberEngine<scalar_field_type>();
     test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
-    // test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
-    // test_RandomNumberEngine<typename curve_type::g1_type>();
-    // test_RandomNumberEngine<typename curve_type::g2_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type>();
 }
 
 BOOST_AUTO_TEST_CASE(bls12_381_test) {
@@ -278,9 +281,9 @@ BOOST_AUTO_TEST_CASE(bls12_381_test) {
 
     test_RandomNumberEngine<scalar_field_type>();
     test_RandomNumberEngine<typename curve_type::g1_type::underlying_field_type>();
-    // test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
-    // test_RandomNumberEngine<typename curve_type::g1_type>();
-    // test_RandomNumberEngine<typename curve_type::g2_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type::underlying_field_type>();
+    test_RandomNumberEngine<typename curve_type::g1_type>();
+    test_RandomNumberEngine<typename curve_type::g2_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

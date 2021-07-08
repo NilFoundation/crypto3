@@ -46,11 +46,11 @@ namespace nil {
              *
              * The class template algebraic_engine differs from \RandomNumberEngine as it doesn't have constructor and
              * seed function with parameter of result_type. This is due to the fact that algebraic_engine is adapter
-             * over other \RandomNumberEngine instance, so instead it has constructor and seed function with parameter
-             * of Engine::result_type;
+             * wrapping some base \RandomNumberEngine (Engine), so instead it has constructor and seed function with
+             * parameter of Engine::result_type;
              *
              *
-             * The template parameter Engine shall denote an some algebraic type (field or curve type).
+             * The template parameter Engine shall denote an some base \RandomNumberEngine generating random numbers.
              * The template parameter AlgebraicType shall denote an some algebraic type (field or curve type).
              */
             template<typename AlgebraicType, typename Engine = boost::random::mt19937, typename = void>
@@ -58,7 +58,8 @@ namespace nil {
 
             template<typename AlgebraicType, typename Engine>
             struct algebraic_engine<
-                AlgebraicType, Engine,
+                AlgebraicType,
+                Engine,
                 typename std::enable_if<algebra::is_field<AlgebraicType>::value &&
                                         !algebra::is_extended_field<AlgebraicType>::value &&
                                         boost::is_integral<typename Engine::result_type>::value>::type> {
@@ -79,8 +80,7 @@ namespace nil {
                 algebraic_engine() {
                     seed();
                 }
-                BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine,
-                                                           typename internal_generator_type::result_type, value) {
+                BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
                     seed(value);
                 }
                 BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
@@ -90,8 +90,7 @@ namespace nil {
                 void seed() {
                     gen.seed();
                 }
-                BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename internal_generator_type::result_type,
-                                                    value) {
+                BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
                     gen.seed(value);
                 }
                 BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
@@ -145,84 +144,186 @@ namespace nil {
                 internal_distribution_type dist = internal_distribution_type(_min, _max);
             };
 
-            // template<typename AlgebraicType>
-            // struct algebraic_random_device<
-            //     AlgebraicType, typename std::enable_if<algebra::is_field<AlgebraicType>::value &&
-            //                                            algebra::is_extended_field<AlgebraicType>::value>::type> {
-            // protected:
-            //     typedef AlgebraicType extended_field_type;
-            //     typedef typename extended_field_type::value_type extended_field_value_type;
-            //     typedef typename extended_field_type::underlying_field_type underlying_field_type;
-            //
-            //     typedef algebraic_random_device<underlying_field_type> internal_generator_type;
-            //
-            // public:
-            //     typedef extended_field_value_type result_type;
-            //
-            //     result_type operator()() {
-            //         result_type result;
-            //         for (auto &coord : result.data) {
-            //             coord = gen();
-            //         }
-            //
-            //         return result;
-            //     }
-            //
-            //     // TODO: evaluate min_value at compile-time
-            //     constexpr static inline result_type min() {
-            //         result_type min_value;
-            //         for (auto &coord : min_value.data) {
-            //             coord = internal_generator_type::min();
-            //         }
-            //
-            //         return min_value;
-            //     }
-            //
-            //     // TODO: evaluate max_value at compile-time
-            //     constexpr static inline result_type max() {
-            //         result_type max_value;
-            //         for (auto &coord : max_value.data) {
-            //             coord = internal_generator_type::max();
-            //         }
-            //
-            //         return max_value;
-            //     }
-            //
-            // protected:
-            //     internal_generator_type gen;
-            // };
-            //
-            // template<typename AlgebraicType>
-            // struct algebraic_random_device<
-            //     AlgebraicType, typename std::enable_if<algebra::is_curve_group<AlgebraicType>::value>::type> {
-            // protected:
-            //     typedef AlgebraicType group_type;
-            //     typedef typename group_type::value_type group_value_type;
-            //     typedef typename group_type::curve_type::scalar_field_type scalar_field_type;
-            //
-            //     typedef algebraic_random_device<scalar_field_type> internal_generator_type;
-            //
-            // public:
-            //     typedef group_value_type result_type;
-            //
-            //     // TODO: check correctness of the generation method
-            //     result_type operator()() {
-            //         return result_type::one() * gen();
-            //     }
-            //
-            //     // TODO: evaluate returned value at compile-time
-            //     constexpr static inline result_type min() {
-            //         return result_type::zero();
-            //     }
-            //
-            //     // TODO: evaluate returned value at compile-time
-            //     constexpr static inline result_type max() {
-            //         return result_type::one() * (scalar_field_type::modulus - 1);
-            //     }
-            //
-            // protected:
-            //     internal_generator_type gen;
-            // };
+            template<typename AlgebraicType, typename Engine>
+            struct algebraic_engine<
+                AlgebraicType,
+                Engine,
+                typename std::enable_if<algebra::is_field<AlgebraicType>::value &&
+                                        algebra::is_extended_field<AlgebraicType>::value &&
+                                        boost::is_integral<typename Engine::result_type>::value>::type> {
+            protected:
+                typedef AlgebraicType extended_field_type;
+                typedef typename extended_field_type::value_type extended_field_value_type;
+                typedef typename extended_field_type::underlying_field_type underlying_field_type;
+
+                typedef algebraic_engine<underlying_field_type, Engine> internal_generator_type;
+
+            public:
+                typedef extended_field_value_type result_type;
+
+                algebraic_engine() {
+                    seed();
+                }
+                BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
+                    seed(value);
+                }
+                BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
+                    seed(seq);
+                }
+
+                void seed() {
+                    gen.seed();
+                }
+                BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
+                    gen.seed(value);
+                }
+                BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
+                    gen.seed(seq);
+                }
+
+                // TODO: evaluate min_value at compile-time
+                constexpr static inline result_type min() {
+                    result_type min_value;
+                    for (auto& coord : min_value.data) {
+                        coord = internal_generator_type::min();
+                    }
+
+                    return min_value;
+                }
+
+                // TODO: evaluate max_value at compile-time
+                constexpr static inline result_type max() {
+                    result_type max_value;
+                    for (auto& coord : max_value.data) {
+                        coord = internal_generator_type::max();
+                    }
+
+                    return max_value;
+                }
+
+                result_type operator()() {
+                    result_type result;
+                    for (auto& coord : result.data) {
+                        coord = gen();
+                    }
+
+                    return result;
+                }
+
+                void discard(std::size_t z) {
+                    while (z--) {
+                        (*this)();
+                    }
+                }
+
+                template<class CharT, class Traits>
+                friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
+                                                                     const algebraic_engine& ae) {
+                    os << ae.gen;
+                    return os;
+                }
+
+                template<class CharT, class Traits>
+                friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
+                                                                     algebraic_engine& ae) {
+                    is >> ae.gen;
+                    return is;
+                }
+
+                friend bool operator==(const algebraic_engine& x_, const algebraic_engine& y_) {
+                    return x_.gen == y_.gen;
+                }
+
+                friend bool operator!=(const algebraic_engine& x_, const algebraic_engine& y_) {
+                    return !(x_ == y_);
+                }
+
+            protected:
+                internal_generator_type gen;
+            };
+
+            template<typename AlgebraicType, typename Engine>
+            struct algebraic_engine<
+                AlgebraicType,
+                Engine,
+                typename std::enable_if<algebra::is_curve_group<AlgebraicType>::value &&
+                                        boost::is_integral<typename Engine::result_type>::value>::type> {
+            protected:
+                typedef AlgebraicType group_type;
+                typedef typename group_type::value_type group_value_type;
+                typedef typename group_type::curve_type::scalar_field_type scalar_field_type;
+
+                typedef algebraic_engine<scalar_field_type, Engine> internal_generator_type;
+
+            public:
+                typedef group_value_type result_type;
+
+                algebraic_engine() {
+                    seed();
+                }
+                BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(algebraic_engine, typename Engine::result_type, value) {
+                    seed(value);
+                }
+                BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(algebraic_engine, SeedSeq, seq) {
+                    seed(seq);
+                }
+
+                void seed() {
+                    gen.seed();
+                }
+                BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(algebraic_engine, typename Engine::result_type, value) {
+                    gen.seed(value);
+                }
+                BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(algebraic_engine, SeeqSeq, seq) {
+                    gen.seed(seq);
+                }
+
+                // TODO: evaluate returned value at compile-time
+                constexpr static inline result_type min() {
+                    return result_type::zero();
+                }
+
+                // TODO: evaluate max_value at compile-time
+                constexpr static inline result_type max() {
+                    return result_type::one() * (scalar_field_type::modulus - 1);
+                }
+
+                // TODO: check correctness of the generation method
+                result_type operator()() {
+                    return result_type::one() * gen();
+                }
+
+                void discard(std::size_t z) {
+                    while (z--) {
+                        (*this)();
+                    }
+                }
+
+                template<class CharT, class Traits>
+                friend std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os,
+                                                                     const algebraic_engine& ae) {
+                    os << ae.gen;
+                    return os;
+                }
+
+                template<class CharT, class Traits>
+                friend std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is,
+                                                                     algebraic_engine& ae) {
+                    is >> ae.gen;
+                    return is;
+                }
+
+                friend bool operator==(const algebraic_engine& x_, const algebraic_engine& y_) {
+                    return x_.gen == y_.gen;
+                }
+
+                friend bool operator!=(const algebraic_engine& x_, const algebraic_engine& y_) {
+                    return !(x_ == y_);
+                }
+
+            protected:
+                internal_generator_type gen;
+            };
         }    // namespace random
     }        // namespace crypto3
 }    // namespace nil
