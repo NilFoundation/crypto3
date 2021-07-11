@@ -37,6 +37,7 @@
 #include <nil/marshalling/types/detail/common_funcs.hpp>
 #include <nil/marshalling/type_traits.hpp>
 #include <nil/marshalling/types/array_list/type_traits.hpp>
+#include <nil/marshalling/container/type_traits.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -150,6 +151,11 @@ namespace nil {
 
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
+
+                        if (len > max_length()){
+                            len = max_length();
+                        }
+
                         using IterType = typename std::decay<decltype(iter)>::type;
                         using IterCategory = typename std::iterator_traits<IterType>::iterator_category;
                         static const bool IsRandomAccessIter
@@ -496,7 +502,6 @@ namespace nil {
                         if (len < count) {
                             return status_type::not_enough_data;
                         }
-
                         return read_internal(iter, count, raw_data_tag());
                     }
 
