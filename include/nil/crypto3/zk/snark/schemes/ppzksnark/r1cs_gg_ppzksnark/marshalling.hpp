@@ -150,6 +150,8 @@ namespace nil {
                                    typename std::vector<chunk_type>::const_iterator read_iter_end,
                                    status_type &processingStatus) {
 
+                processingStatus = status_type::success;
+                
                 using modulus_type = typename FieldType::modulus_type;
                 using field_type = FieldType;
 

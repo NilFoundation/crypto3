@@ -45,10 +45,15 @@ namespace nil {
                  * The indices are selected from the set {0,1,...,domain_size-1}.
                  */
                 template<typename Type>
-                class sparse_vector {
-                    using underlying_value_type = typename Type::value_type;
+                struct sparse_vector {
 
+                    using group_type = Type;
+
+                private:
+                    using underlying_value_type = 
+                        typename group_type::value_type;
                 public:
+                    
                     std::vector<std::size_t> indices;
                     std::vector<underlying_value_type> values;
                     std::size_t domain_size_;
