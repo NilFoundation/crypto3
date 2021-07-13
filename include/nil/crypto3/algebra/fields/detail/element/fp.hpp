@@ -65,7 +65,9 @@ namespace nil {
 
                         constexpr element_fp(modulus_type data) : data(data, modulus) {};
 
-                        constexpr element_fp(int data) : data(data, modulus) {};
+                        template<typename Number,
+                                 typename std::enable_if<boost::is_integral<Number>::value, bool>::type = true>
+                        constexpr element_fp(Number data) : data(data, modulus) {};
 
                         constexpr element_fp(const element_fp &B) {
                             data = B.data;

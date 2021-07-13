@@ -60,7 +60,14 @@ namespace nil {
                                 data_type({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                         }
 
-                        constexpr element_fp3(int in_data0, int in_data1, int in_data2) {
+                        template<typename Number1,
+                                 typename Number2,
+                                 typename Number3,
+                                 typename std::enable_if<boost::is_integral<Number1>::value &&
+                                                             boost::is_integral<Number2>::value &&
+                                                             boost::is_integral<Number3>::value,
+                                                         bool>::type = true>
+                        constexpr element_fp3(Number1 in_data0, Number2 in_data1, Number3 in_data2) {
                             data = data_type(
                                 {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                         }
