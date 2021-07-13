@@ -317,14 +317,18 @@ namespace nil {
                         barrett_reduce(result, result);
                     }
 
-                    template<typename Backend1>
-                    constexpr void barrett_reduce(Backend1& result, int input) const {
-                        using in_number_type = typename boost::mpl::if_c<
+                    //
+                    // this overloaded barrett_reduce is intended to work with built-in integral types
+                    //
+                    template<typename Backend1, typename Backend2>
+                    constexpr typename std::enable_if<boost::is_integral<Backend2>::value>::type
+                        barrett_reduce(Backend1& result, Backend2 input) const {
+                        using input_number_type = typename boost::mpl::if_c<
                             bool(sizeof(int) * CHAR_BIT > MinBits),
                             number<modular_fixed_cpp_int_backend<sizeof(int) * CHAR_BIT, SignType, Checked>>,
                             number_type>::type;
 
-                        in_number_type input_b(input);
+                        input_number_type input_b(input);
                         barrett_reduce(result, input_b.backend());
                     }
 
