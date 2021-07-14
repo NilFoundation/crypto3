@@ -33,8 +33,8 @@ namespace nil {
         namespace pubkey {
             namespace padding {
                 template<typename Hash>
-                secure_vector<uint8_t> iso9796_encoding(const secure_vector<uint8_t> &msg, size_t output_bits, size_t SALT_SIZE,
-                                                        bool implicit, random_number_generator &rng) {
+                secure_vector<uint8_t> iso9796_encoding(const secure_vector<uint8_t> &msg, size_t output_bits,
+                                                        size_t SALT_SIZE, bool implicit, random_number_generator &rng) {
                     const size_t output_length = (output_bits + 7) / 8;
 
                     // set trailer length
@@ -206,8 +206,7 @@ namespace nil {
         }        // namespace pubkey
 
         template<typename Scheme, typename Hash>
-struct  iso_9796 : public emsa<Scheme, Hash> {
-
+        struct iso_9796 : public emsa<Scheme, Hash> {
         protected:
             template<typename InputIterator, typename OutputIterator>
             OutputIterator iso9796_encoding(InputIterator first, InputIterator last, size_t output_bits,
@@ -387,7 +386,7 @@ struct  iso_9796 : public emsa<Scheme, Hash> {
         };
 
         template<typename Scheme, typename Hash>
-        struct  iso_9796_ds2 : public iso_9796<Scheme, Hash> {
+        struct iso_9796_ds2 : public iso_9796<Scheme, Hash> {
             template<typename InputIterator1, typename InputIterator2>
             bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
                         std::size_t key_bits) const {

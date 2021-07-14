@@ -41,9 +41,9 @@ namespace nil {
 
                     typedef typename scheme_type::key_type key_type;
                 };
-            }
-        }
-    }    // namespace crypto3
+            }    // namespace padding
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif

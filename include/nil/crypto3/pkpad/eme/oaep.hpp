@@ -36,9 +36,10 @@ namespace nil {
             namespace padding {
 
                 /*!
-         * @brief OAEP (called EME1 in IEEE 1363 and in earlier versions of the library) as specified in PKCS#1 v2.0 (RFC 2437)
-         * @tparam Hash Hash function type used for optional label hashing
-         * @tparam SequenceContainer Hashed optional label storage container
+                 * @brief OAEP (called EME1 in IEEE 1363 and in earlier versions of the library) as specified in PKCS#1
+                 * v2.0 (RFC 2437)
+                 * @tparam Hash Hash function type used for optional label hashing
+                 * @tparam SequenceContainer Hashed optional label storage container
                  */
                 template<typename Scheme, typename Hash>
                 class oaep : public eme<Scheme, Hash> {
@@ -46,37 +47,37 @@ namespace nil {
                     typedef Hash hash_type;
 
                     /*!
-             * @brief
-             * @tparam InputIterator
-             * @param first
-             * @param last
-             * @param hash
+                     * @brief
+                     * @tparam InputIterator
+                     * @param first
+                     * @param last
+                     * @param hash
                      */
                     template<typename InputIterator>
                     oaep(InputIterator first, InputIterator last) : phash(first, last) {
                     }
 
                     /*!
-             * @brief
-             * @tparam SinglePassRange
-             * @param range
-             * @param hash
+                     * @brief
+                     * @tparam SinglePassRange
+                     * @param range
+                     * @param hash
                      */
                     template<typename SinglePassRange>
                     oaep(const SinglePassRange &range = SequenceContainer()) : phash(range) {
                     }
 
                     /*!
-             * @brief OAEP Pad Operation
-             * @tparam UniformRandomBitGenerator
-             * @tparam InputIterator
-             * @tparam OutputIterator
-             * @param first
-             * @param last
-             * @param out
-             * @param key_length
-             * @param rand
-             * @return
+                     * @brief OAEP Pad Operation
+                     * @tparam UniformRandomBitGenerator
+                     * @tparam InputIterator
+                     * @tparam OutputIterator
+                     * @param first
+                     * @param last
+                     * @param out
+                     * @param key_length
+                     * @param rand
+                     * @return
                      */
                     template<typename UniformRandomBitGenerator, typename RandomNumberDistribution,
                              typename InputIterator, typename OutputIterator>
@@ -109,34 +110,34 @@ namespace nil {
                     }
 
                     /*!
-             * @brief OAEP Unpad Operation
-             * @tparam MaskType
-             * @tparam InputIterator
-             * @tparam OutputIterator
-             * @param first
-             * @param last
-             * @param out
-             * @param valid_mask
-             * @return
-             *
-             *
-             * Must be careful about error messages here; if an attacker can
-             *   distinguish them, it is easy to use the differences as an oracle to
-             *   find the secret key, as described in "A Chosen Ciphertext Attack on
-             *   RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in
-             *   PKCS #1 v2.0", James Manger, Crypto 2001
-             *
-             *   Also have to be careful about timing attacks! Pointed out by Falko
-             *   Strenzke.
-             *
-             *   According to the standard (Section 7.1.1), the encryptor always
-             *   creates a message as follows:
-             *      i. Concatenate a single octet with hexadecimal value 0x00,
-             *         maskedSeed, and maskedDB to form an encoded message EM of
-             *         length k octets as
-             *            EM = 0x00 || maskedSeed || maskedDB.
-             *   where k is the length of the modulus N.
-             *   Therefore, the first byte can always be skipped safely.
+                     * @brief OAEP Unpad Operation
+                     * @tparam MaskType
+                     * @tparam InputIterator
+                     * @tparam OutputIterator
+                     * @param first
+                     * @param last
+                     * @param out
+                     * @param valid_mask
+                     * @return
+                     *
+                     *
+                     * Must be careful about error messages here; if an attacker can
+                     *   distinguish them, it is easy to use the differences as an oracle to
+                     *   find the secret key, as described in "A Chosen Ciphertext Attack on
+                     *   RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in
+                     *   PKCS #1 v2.0", James Manger, Crypto 2001
+                     *
+                     *   Also have to be careful about timing attacks! Pointed out by Falko
+                     *   Strenzke.
+                     *
+                     *   According to the standard (Section 7.1.1), the encryptor always
+                     *   creates a message as follows:
+                     *      i. Concatenate a single octet with hexadecimal value 0x00,
+                     *         maskedSeed, and maskedDB to form an encoded message EM of
+                     *         length k octets as
+                     *            EM = 0x00 || maskedSeed || maskedDB.
+                     *   where k is the length of the modulus N.
+                     *   Therefore, the first byte can always be skipped safely.
                      */
                     template<typename InputIterator, typename OutputIterator>
                     OutputIterator unpad(InputIterator first, InputIterator last, OutputIterator out) {
@@ -196,9 +197,9 @@ namespace nil {
                 protected:
                     SequenceContainer phash;
                 };
-            }
-        }
-    }//namespace crypto3
+            }    // namespace padding
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif
