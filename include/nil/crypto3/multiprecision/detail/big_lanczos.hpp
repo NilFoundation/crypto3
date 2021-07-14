@@ -10,28 +10,27 @@
 #include <boost/math/bindings/detail/big_lanczos.hpp>
 
 namespace boost {
-namespace math {
+    namespace math {
 
-namespace lanczos {
+        namespace lanczos {
 
-template <class T, class Policy>
-struct lanczos;
+            template<class T, class Policy>
+            struct lanczos;
 
-template <class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class Policy>
-struct lanczos<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy>
-{
-   using precision_type = typename boost::math::policies::precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy>::type;
-   using type           = typename std::conditional<
-       precision_type::value && (precision_type::value <= 73),
-       lanczos13UDT,
-       typename std::conditional<
-           precision_type::value && (precision_type::value <= 122),
-           lanczos22UDT,
-           undefined_lanczos>::type>::type;
-};
+            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                     class Policy>
+            struct lanczos<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy> {
+                using precision_type = typename boost::math::policies::precision<
+                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy>::type;
+                using type = typename std::conditional<
+                    precision_type::value && (precision_type::value <= 73), lanczos13UDT,
+                    typename std::conditional<precision_type::value && (precision_type::value <= 122), lanczos22UDT,
+                                              undefined_lanczos>::type>::type;
+            };
 
-}
+        }    // namespace lanczos
 
-}} // namespace boost::math::lanczos
+    }    // namespace math
+}    // namespace boost
 
 #endif

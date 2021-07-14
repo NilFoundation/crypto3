@@ -7,19 +7,18 @@
 #define BOOST_MP_TRANS_RED_TYPE_HPP
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-namespace detail {
+    namespace crypto3 {
+        namespace multiprecision {
+            namespace detail {
 
-template <class T>
-struct transcendental_reduction_type
-{
-   using type = T;
-};
+                template<class T>
+                struct transcendental_reduction_type {
+                    using type = T;
+                };
 
-}
-}
-}
-} // namespace nil::crypto3::multiprecision::detail
+            }    // namespace detail
+        }        // namespace multiprecision
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // BOOST_MP_TRANS_RED_TYPE_HPP
+#endif    // BOOST_MP_TRANS_RED_TYPE_HPP

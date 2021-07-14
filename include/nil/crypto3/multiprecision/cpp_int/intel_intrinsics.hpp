@@ -19,7 +19,8 @@
 // If this is GCC/clang, then check that the actual intrinsic exists:
 //
 #if defined(__has_builtin) && defined(__GNUC__)
-#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))
+#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H) && \
+    !(defined(BOOST_GCC) && (__GNUC__ >= 9))
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 #elif defined(BOOST_MP_HAS_IMMINTRIN_H) && defined(__GNUC__) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))
@@ -71,56 +72,56 @@
 #if defined(BOOST_HAS_INT128)
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-namespace detail {
+    namespace crypto3 {
+        namespace multiprecision {
+            namespace detail {
 
-BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
-{
+                BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b,
+                                                                 limb_type* p_result) {
 #ifdef BOOST_INTEL
-   using cast_type = unsigned __int64;
+                    using cast_type = unsigned __int64;
 #else
-   using cast_type = unsigned long long;
+                    using cast_type = unsigned long long;
 #endif
-   return BOOST_JOIN(BOOST_MP_ADDC, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-}
+                    return BOOST_JOIN(BOOST_MP_ADDC, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+                }
 
-BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
-{
+                BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b,
+                                                                  limb_type* p_result) {
 #ifdef BOOST_INTEL
-   using cast_type = unsigned __int64;
+                    using cast_type = unsigned __int64;
 #else
-   using cast_type = unsigned long long;
+                    using cast_type = unsigned long long;
 #endif
-   return BOOST_JOIN(BOOST_MP_SUBB, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-}
+                    return BOOST_JOIN(BOOST_MP_SUBB, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+                }
 
-}
-}
-}
-} // namespace nil::crypto3::multiprecision::detail
+            }    // namespace detail
+        }        // namespace multiprecision
+    }            // namespace crypto3
+}    // namespace nil
 
 #else
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-namespace detail {
+    namespace crypto3 {
+        namespace multiprecision {
+            namespace detail {
 
-BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
-{
-   return BOOST_JOIN(BOOST_MP_ADDC, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-}
+                BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b,
+                                                                 limb_type* p_result) {
+                    return BOOST_JOIN(BOOST_MP_ADDC, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+                }
 
-BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
-{
-   return BOOST_JOIN(BOOST_MP_SUBB, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-}
+                BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b,
+                                                                  limb_type* p_result) {
+                    return BOOST_JOIN(BOOST_MP_SUBB, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+                }
 
-}
-}
-}
-} // namespace nil::crypto3::multiprecision::detail
+            }    // namespace detail
+        }        // namespace multiprecision
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif
 

@@ -15,11 +15,11 @@
 #include <nil/crypto3/multiprecision/modular/modular_params_tommath.hpp>
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-typedef modular_params<tommath_int>           tom_int_mod_params;
-typedef number<modular_adaptor<tommath_int> > tom_int_mod;
-}
-}
-} // namespace nil::crypto3::multiprecision
-#endif //_MULTIPRECISION_TOMMATH_MODULAR_HPP
+    namespace crypto3 {
+        namespace multiprecision {
+            typedef modular_params<tommath_int> tom_int_mod_params;
+            typedef number<modular_adaptor<tommath_int>> tom_int_mod;
+        }    // namespace multiprecision
+    }        // namespace crypto3
+}    // namespace nil
+#endif    //_MULTIPRECISION_TOMMATH_MODULAR_HPP

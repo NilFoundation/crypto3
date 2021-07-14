@@ -9,19 +9,18 @@
 #define BOOST_MP_DETAIL_REBIND_HPP
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-namespace backends {
-namespace detail {
-template <class value_type, class my_allocator>
-struct rebind
-{
-   using type = typename std::allocator_traits<my_allocator>::template rebind_alloc<value_type>;
-};
-}
-}
-}
-}
-} // namespace nil::crypto3::multiprecision::backends::detail
+    namespace crypto3 {
+        namespace multiprecision {
+            namespace backends {
+                namespace detail {
+                    template<class value_type, class my_allocator>
+                    struct rebind {
+                        using type = typename std::allocator_traits<my_allocator>::template rebind_alloc<value_type>;
+                    };
+                }    // namespace detail
+            }        // namespace backends
+        }            // namespace multiprecision
+    }                // namespace crypto3
+}    // namespace nil
 
-#endif // BOOST_MP_DETAIL_REBIND_HPP
+#endif    // BOOST_MP_DETAIL_REBIND_HPP

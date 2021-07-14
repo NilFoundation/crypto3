@@ -9,24 +9,22 @@
 #include <nil/crypto3/multiprecision/number.hpp>
 
 namespace nil {
-namespace crypto3 {
-namespace multiprecision {
-namespace backends {
+    namespace crypto3 {
+        namespace multiprecision {
+            namespace backends {
 
-template <class Backend, int cat>
-struct extract_exponent_type
-{
-   using type = int;
-};
-template <class Backend>
-struct extract_exponent_type<Backend, number_kind_floating_point>
-{
-   using type = typename Backend::exponent_type;
-};
+                template<class Backend, int cat>
+                struct extract_exponent_type {
+                    using type = int;
+                };
+                template<class Backend>
+                struct extract_exponent_type<Backend, number_kind_floating_point> {
+                    using type = typename Backend::exponent_type;
+                };
 
-}
-}
-}
-} // namespace nil::crypto3::multiprecision::backends
+            }    // namespace backends
+        }        // namespace multiprecision
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif
