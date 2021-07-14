@@ -11,32 +11,35 @@
 #define BOOST_MP_DETAIL_ITOS_HPP
 
 namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
-            namespace detail {
+namespace crypto3 {
+namespace multiprecision {
+namespace detail {
 
-                template<class Integer>
-                std::string itos(Integer val) {
-                    if (!val)
-                        return "0";
-                    std::string result;
-                    bool isneg = false;
-                    if (val < 0) {
-                        val = -val;
-                        isneg = true;
-                    }
-                    while (val) {
-                        result.insert(result.begin(), char('0' + (val % 10)));
-                        val /= 10;
-                    }
-                    if (isneg)
-                        result.insert(result.begin(), '-');
-                    return result;
-                }
+template <class Integer>
+std::string itos(Integer val)
+{
+   if (!val)
+      return "0";
+   std::string result;
+   bool        isneg = false;
+   if (val < 0)
+   {
+      val   = -val;
+      isneg = true;
+   }
+   while (val)
+   {
+      result.insert(result.begin(), char('0' + (val % 10)));
+      val /= 10;
+   }
+   if (isneg)
+      result.insert(result.begin(), '-');
+   return result;
+}
 
-            }    // namespace detail
-        }        // namespace multiprecision
-    }            // namespace crypto3
-}    // namespace nil
+}
+}
+}
+} // namespace nil::crypto3::multiprecision::detail
 
 #endif

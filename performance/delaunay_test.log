@@ -30,7 +30,7 @@ Number of flips = 23892000
 Total execution time = 10.3215
 Time per calculation = 1.03215e-07
 
-Running calculations for: int64_t, boost::multiprecision::int128_t
+Running calculations for: int64_t, nil::crypto3::multiprecision::int128_t
 Number of calculations = 100000000
 Number of flips = 23892000
 Total execution time = 12.848

@@ -10,18 +10,19 @@
 #include <nil/crypto3/multiprecision/complex_adaptor.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
+namespace crypto3 {
+namespace multiprecision {
 
-            typedef number<complex_adaptor<float128_backend>, et_off> complex128;
+using complex128 = number<complex_adaptor<float128_backend>, et_off>;
 
-            template<>
-            struct component_type<number<complex_adaptor<float128_backend>>> {
-                typedef float128 type;
-            };
+template <>
+struct component_type<number<complex_adaptor<float128_backend> > >
+{
+   using type = float128;
+};
 
-        }    // namespace multiprecision
-    }        // namespace crypto3
-}    // namespace nil
+}
+}
+} // namespace nil::crypto3::multiprecision
 
 #endif

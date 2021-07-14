@@ -1,6 +1,6 @@
 
 // Copyright Christopher Kormanyos 2002 - 2011.
-// Copyright 2011 John Maddock. Distributed under the Boost
+// Copyright 2011 John Maddock.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -15,13 +15,14 @@
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326) // comparison of two constants
+#pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
 template <class T>
 void hyp0F1(T& result, const T& b, const T& x)
 {
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   using si_type = typename nil::crypto3::multiprecision::detail::canonical<std::int32_t, T>::type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
 
    // Compute the series representation of Hypergeometric0F1 taken from
    // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric0F1/06/01/01/
@@ -85,7 +86,7 @@ struct scoped_N_precision<T, N, true>
    unsigned old_precision, old_arg_precision;
    scoped_N_precision(T& arg)
    {
-      old_precision = T::default_precision();
+      old_precision     = T::default_precision();
       old_arg_precision = arg.precision();
       T::default_precision(old_arg_precision * N);
       arg.precision(old_arg_precision * N);
@@ -94,7 +95,7 @@ struct scoped_N_precision<T, N, true>
    {
       T::default_precision(old_precision);
    }
-   void reduce(T& arg) 
+   void reduce(T& arg)
    {
       arg.precision(old_arg_precision);
    }
@@ -111,12 +112,12 @@ void reduce_n_half_pi(T& arg, const T& n, bool go_down)
    //
    // More information in ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
    //
-   // There are two mutually exclusive ways to achieve this, both of which are 
+   // There are two mutually exclusive ways to achieve this, both of which are
    // supported here:
    // 1) To define a fixed precision type with 3 times the precision for the calculation.
    // 2) To dynamically increase the precision of the variables.
    //
-   typedef typename nil::crypto3::multiprecision::detail::transcendental_reduction_type<T>::type reduction_type;
+   using reduction_type = typename nil::crypto3::multiprecision::detail::transcendental_reduction_type<T>::type;
    //
    // Make a copy of the arg at higher precision:
    //
@@ -152,7 +153,7 @@ void reduce_n_half_pi(T& arg, const T& n, bool go_down)
 template <class T>
 void eval_sin(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
    BOOST_MATH_INSTRUMENT_CODE(x.str(0, std::ios_base::scientific));
    if (&result == &x)
    {
@@ -162,21 +163,20 @@ void eval_sin(T& result, const T& x)
       return;
    }
 
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
-   typedef typename boost::mpl::front<typename T::float_types>::type                          fp_type;
+   using si_type = typename nil::crypto3::multiprecision::detail::canonical<std::int32_t, T>::type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type;
 
    switch (eval_fpclassify(x))
    {
    case FP_INFINITE:
    case FP_NAN:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = x;
@@ -312,8 +312,8 @@ void eval_sin(T& result, const T& x)
       // divide by three identity a certain number of times.
       // Here we use division by 3^9 --> (19683 = 3^9).
 
-      static const si_type n_scale           = 9;
-      static const si_type n_three_pow_scale = static_cast<si_type>(19683L);
+      constexpr const si_type n_scale           = 9;
+      constexpr const si_type n_three_pow_scale = static_cast<si_type>(19683L);
 
       eval_divide(xx, n_three_pow_scale);
 
@@ -327,7 +327,7 @@ void eval_sin(T& result, const T& x)
       eval_multiply(result, xx);
 
       // Convert back using multiple angle identity.
-      for (boost::int32_t k = static_cast<boost::int32_t>(0); k < n_scale; k++)
+      for (std::int32_t k = static_cast<std::int32_t>(0); k < n_scale; k++)
       {
          // Rescale the cosine value using the multiple angle identity.
          eval_multiply(t2, result, ui_type(3));
@@ -346,7 +346,7 @@ void eval_sin(T& result, const T& x)
 template <class T>
 void eval_cos(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The cos function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The cos function is only valid for floating point types.");
    if (&result == &x)
    {
       T temp;
@@ -355,20 +355,19 @@ void eval_cos(T& result, const T& x)
       return;
    }
 
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   using si_type = typename nil::crypto3::multiprecision::detail::canonical<std::int32_t, T>::type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
 
    switch (eval_fpclassify(x))
    {
    case FP_INFINITE:
    case FP_NAN:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = ui_type(1);
@@ -482,7 +481,7 @@ void eval_cos(T& result, const T& x)
 template <class T>
 void eval_tan(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The tan function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The tan function is only valid for floating point types.");
    if (&result == &x)
    {
       T temp;
@@ -503,7 +502,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    // Abramowitz and Stegun 15.1.1.
    // There are no checks on input range or parameter boundaries.
 
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
 
    T x_pow_n_div_n_fact(x);
    T pochham_a(a);
@@ -561,9 +560,9 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
 template <class T>
 void eval_asin(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
-   typedef typename boost::mpl::front<typename T::float_types>::type                          fp_type;
+   static_assert(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type;
 
    if (&result == &x)
    {
@@ -576,13 +575,12 @@ void eval_asin(T& result, const T& x)
    {
    case FP_NAN:
    case FP_INFINITE:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = x;
@@ -599,13 +597,12 @@ void eval_asin(T& result, const T& x)
    int c = xx.compare(ui_type(1));
    if (c > 0)
    {
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    }
    else if (c == 0)
@@ -651,9 +648,9 @@ void eval_asin(T& result, const T& x)
       return;
    }
 #ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-   typedef typename nil::crypto3::multiprecision::detail::canonical<long double, T>::type guess_type;
+   using guess_type = typename nil::crypto3::multiprecision::detail::canonical<long double, T>::type;
 #else
-   typedef fp_type guess_type;
+   using guess_type = fp_type;
 #endif
    // Get initial estimate using standard math function asin.
    guess_type dd;
@@ -666,10 +663,9 @@ void eval_asin(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? 
-      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
-      : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+                                                                                     : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
    // Newton-Raphson iteration
    while (current_precision > target_precision)
@@ -691,20 +687,19 @@ void eval_asin(T& result, const T& x)
 template <class T>
 inline void eval_acos(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   static_assert(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
 
    switch (eval_fpclassify(x))
    {
    case FP_NAN:
    case FP_INFINITE:
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
       result = get_constant_pi<T>();
@@ -718,13 +713,12 @@ inline void eval_acos(T& result, const T& x)
 
    if (c > 0)
    {
-      if (std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      BOOST_IF_CONSTEXPR(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
       {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
          errno  = EDOM;
       }
-      else
-         BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+      else BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    }
    else if (c == 0)
@@ -736,7 +730,7 @@ inline void eval_acos(T& result, const T& x)
       return;
    }
 
-   typedef typename boost::mpl::front<typename T::float_types>::type fp_type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type;
 
    if (xx.compare(fp_type(1e-3)) < 0)
    {
@@ -778,9 +772,9 @@ inline void eval_acos(T& result, const T& x)
    }
 
 #ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-   typedef typename nil::crypto3::multiprecision::detail::canonical<long double, T>::type guess_type;
+   using guess_type = typename nil::crypto3::multiprecision::detail::canonical<long double, T>::type;
 #else
-   typedef fp_type guess_type;
+   using guess_type = fp_type;
 #endif
    // Get initial estimate using standard math function asin.
    guess_type dd;
@@ -793,10 +787,9 @@ inline void eval_acos(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision = std::numeric_limits<number<T> >::is_specialized ?
-      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
-      : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+                                                                                     : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
    // Newton-Raphson iteration
    while (current_precision > target_precision)
@@ -817,10 +810,10 @@ inline void eval_acos(T& result, const T& x)
 template <class T>
 void eval_atan(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
-   typedef typename boost::mpl::front<typename T::float_types>::type                          fp_type;
+   static_assert(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
+   using si_type = typename nil::crypto3::multiprecision::detail::canonical<std::int32_t, T>::type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
+   using fp_type = typename std::tuple_element<0, typename T::float_types>::type;
 
    switch (eval_fpclassify(x))
    {
@@ -891,10 +884,9 @@ void eval_atan(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction
    // we've just added will finish the job...
 
-   boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ?
-      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
-      : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
+   std::intmax_t current_precision = eval_ilogb(result);
+   std::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+                                                                                     : current_precision - 1 - (nil::crypto3::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
    T s, c, t;
    while (current_precision > target_precision)
@@ -916,7 +908,7 @@ void eval_atan(T& result, const T& x)
 template <class T>
 void eval_atan2(T& result, const T& y, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
+   static_assert(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
    if (&result == &y)
    {
       T temp(y);
@@ -930,7 +922,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       return;
    }
 
-   typedef typename nil::crypto3::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   using ui_type = typename nil::crypto3::multiprecision::detail::canonical<std::uint32_t, T>::type;
 
    switch (eval_fpclassify(y))
    {
@@ -938,8 +930,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       result = y;
       errno  = EDOM;
       return;
-   case FP_ZERO:
-   {
+   case FP_ZERO: {
       if (eval_signbit(x))
       {
          result = get_constant_pi<T>();
@@ -952,8 +943,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       }
       return;
    }
-   case FP_INFINITE:
-   {
+   case FP_INFINITE: {
       if (eval_fpclassify(x) == FP_INFINITE)
       {
          if (eval_signbit(x))
@@ -988,8 +978,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       result = x;
       errno  = EDOM;
       return;
-   case FP_ZERO:
-   {
+   case FP_ZERO: {
       eval_ldexp(result, get_constant_pi<T>(), -1);
       if (eval_get_sign(y) < 0)
          result.negate();
@@ -1028,21 +1017,21 @@ void eval_atan2(T& result, const T& y, const T& x)
    }
 }
 template <class T, class A>
-inline typename boost::enable_if<boost::is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
+inline typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const T& x, const A& a)
 {
-   typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type                                                                      c;
+   using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+   using cast_type      = typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
+   cast_type c;
    c = a;
    eval_atan2(result, x, c);
 }
 
 template <class T, class A>
-inline typename boost::enable_if<boost::is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
+inline typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type eval_atan2(T& result, const A& x, const T& a)
 {
-   typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type          canonical_type;
-   typedef typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type                                                                      c;
+   using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+   using cast_type      = typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
+   cast_type c;
    c = x;
    eval_atan2(result, c, a);
 }

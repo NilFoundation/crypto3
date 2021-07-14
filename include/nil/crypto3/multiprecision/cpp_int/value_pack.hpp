@@ -7,37 +7,40 @@
 #define BOOST_MP_CPP_INT_VP_HPP
 
 namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
+namespace crypto3 {
+namespace multiprecision {
 
-            namespace literals {
-                namespace detail {
+namespace literals { namespace detail {
 
-                    template<limb_type... VALUES>
-                    struct value_pack {
-                        constexpr value_pack() {
-                        }
+template <limb_type... VALUES>
+struct value_pack
+{
+   constexpr value_pack() {}
 
-                        typedef value_pack<0, VALUES...> next_type;
-                    };
-                    template<class T>
-                    struct is_value_pack {
-                        static constexpr bool value = false;
-                    };
-                    template<limb_type... VALUES>
-                    struct is_value_pack<value_pack<VALUES...>> {
-                        static constexpr bool value = true;
-                    };
+   using next_type = value_pack<0, VALUES...>;
+};
+template <class T>
+struct is_value_pack
+{
+   static constexpr bool value = false;
+};
+template <limb_type... VALUES>
+struct is_value_pack<value_pack<VALUES...> >
+{
+   static constexpr bool value = true;
+};
 
-                    struct negate_tag { };
+struct negate_tag
+{};
 
-                    constexpr negate_tag make_negate_tag() {
-                        return negate_tag();
-                    }
-                }    // namespace detail
-            }        // namespace literals
-        }            // namespace multiprecision
-    }                // namespace crypto3
-}    // namespace nil
+constexpr negate_tag make_negate_tag()
+{
+   return negate_tag();
+}
+}
+}
+}
+}
+} // namespace nil::crypto3::multiprecision::literals::detail
 
-#endif    // BOOST_MP_CPP_INT_CORE_HPP
+#endif // BOOST_MP_CPP_INT_CORE_HPP

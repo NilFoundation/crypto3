@@ -18,139 +18,151 @@
 #include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
-            namespace backends {
+namespace crypto3 {
+namespace multiprecision {
+namespace backends {
 
-                template<typename Backend>
-                constexpr Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y) {
-                    if (eval_is_zero(a)) {
-                        typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
-                        x = ui_type(0u);
-                        y = ui_type(1u);
-                        return b;
-                    }
-                    Backend x1, y1, tmp = b;
-                    eval_modulus(tmp, a);
-                    Backend d = eval_extended_euclidean_algorithm(tmp, a, x1, y1);
-                    tmp = b;
-                    eval_divide(tmp, a);
-                    eval_multiply(tmp, x1);
-                    x = y1;
-                    eval_subtract(x, tmp);
-                    y = x1;
-                    return d;
-                }
+template <typename Backend>
+constexpr Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y)
+{
+   if (eval_is_zero(a))
+   {
+      using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+      x = ui_type(0u);
+      y = ui_type(1u);
+      return b;
+   }
+   Backend x1, y1, tmp = b;
+   eval_modulus(tmp, a);
+   Backend d = eval_extended_euclidean_algorithm(tmp, a, x1, y1);
+   tmp       = b;
+   eval_divide(tmp, a);
+   eval_multiply(tmp, x1);
+   x = y1;
+   eval_subtract(x, tmp);
+   y = x1;
+   return d;
+}
 
-                template<typename Backend>
-                constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m) {
-                    using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
+template <typename Backend>
+constexpr Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m)
+{
+   using Backend_doubled = typename default_ops::double_precision_type<Backend>::type;
 
-                    Backend aa = a, mm = m, x, y, g;
-                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
-                    g = eval_extended_euclidean_algorithm(aa, mm, x, y);
-                    if (!eval_eq(g, ui_type(1u))) {
-                        // BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
-                        return ui_type(0u);
-                    } else {
-                        eval_modulus(x, m);
-                        Backend_doubled tmp(x);
-                        eval_add(tmp, m);
-                        eval_modulus(tmp, m);
-                        return static_cast<Backend>(tmp);
-                    }
-                }
+   Backend                                                                    aa = a, mm = m, x, y, g;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+   g = eval_extended_euclidean_algorithm(aa, mm, x, y);
+   if (!eval_eq(g, ui_type(1u)))
+   {
+      // BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
+      return ui_type(0u);
+   }
+   else
+   {
+      eval_modulus(x, m);
+      Backend_doubled tmp(x);
+      eval_add(tmp, m);
+      eval_modulus(tmp, m);
+      return static_cast<Backend>(tmp);
+   }
+}
 
-                template<typename Backend>
-                constexpr typename boost::mpl::front<typename Backend::signed_types>::type
-                    eval_monty_inverse(typename boost::mpl::front<typename Backend::signed_types>::type a) {
-                    typedef typename boost::mpl::front<typename Backend::signed_types>::type si_type;
+template <typename Backend>
+constexpr typename std::tuple_element<0, typename Backend::signed_types>::type
+eval_monty_inverse(typename std::tuple_element<0, typename Backend::signed_types>::type a)
+{
+   using si_type = typename std::tuple_element<0, typename Backend::signed_types>::type;
 
-                    if (a % 2 == 0) {
-                        throw std::invalid_argument("monty_inverse only valid for odd integers");
-                    }
+   if (a % 2 == 0)
+   {
+      throw std::invalid_argument("monty_inverse only valid for odd integers");
+   }
 
-                    /*
+   /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                      * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
                      */
 
-                    si_type b = 1;
-                    si_type r = 0;
+   si_type b = 1;
+   si_type r = 0;
 
-                    for (size_t i = 0; i != sizeof(si_type) * CHAR_BIT; ++i) {
-                        const si_type bi = b % 2;
-                        r >>= 1;
-                        r += bi << (sizeof(si_type) * CHAR_BIT - 1);
+   for (size_t i = 0; i != sizeof(si_type) * CHAR_BIT; ++i)
+   {
+      const si_type bi = b % 2;
+      r >>= 1;
+      r += bi << (sizeof(si_type) * CHAR_BIT - 1);
 
-                        b -= a * bi;
-                        b >>= 1;
-                    }
+      b -= a * bi;
+      b >>= 1;
+   }
 
-                    // Now invert in addition space
-                    r = (~static_cast<si_type>(0) - r) + 1;
+   // Now invert in addition space
+   r = (~static_cast<si_type>(0) - r) + 1;
 
-                    return r;
-                }
+   return r;
+}
 
-                template<typename Backend>
-                constexpr void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k) {
+template <typename Backend>
+constexpr void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k)
+{
 
-                    using default_ops::eval_abs;
-                    using default_ops::eval_gt;
-                    using default_ops::eval_modulus;
-                    using default_ops::eval_subtract;
+   using default_ops::eval_abs;
+   using default_ops::eval_gt;
+   using default_ops::eval_modulus;
+   using default_ops::eval_subtract;
 
-                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
-                    Backend zero = ui_type(0u);
-                    Backend one = ui_type(1u);
-                    Backend two = ui_type(2u);
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
+   Backend                                                                    zero = ui_type(0u);
+   Backend                                                                    one  = ui_type(1u);
+   Backend                                                                    two  = ui_type(2u);
 
-                    /*
+   /*
                      * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                      * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
                      */
-                    Backend c, tmp;
+   Backend c, tmp;
 
-                    // a^(-1) mod p:
-                    c = eval_inverse_extended_euclidean_algorithm(a, p);
+   // a^(-1) mod p:
+   c = eval_inverse_extended_euclidean_algorithm(a, p);
 
-                    Backend bi = one, bt, i = zero, k_negone = k, xi, nextp = one;
-                    eval_subtract(k_negone, one);
-                    res = zero;
+   Backend bi = one, bt, i = zero, k_negone = k, xi, nextp = one;
+   eval_subtract(k_negone, one);
+   res = zero;
 
-                    // ui_type kn = cpp_int(k_negone);
+   // ui_type kn = cpp_int(k_negone);
 
-                    while (!eval_eq(i, k)) {
-                        // xi:
-                        xi = bi;
-                        eval_multiply(xi, c);
-                        eval_modulus(xi, p);
+   while (!eval_eq(i, k))
+   {
+      // xi:
+      xi = bi;
+      eval_multiply(xi, c);
+      eval_modulus(xi, p);
 
-                        if (eval_get_sign(xi) < 0) {
-                            tmp = xi;
-                            eval_abs(tmp, tmp);
-                            eval_modulus(tmp, p);
-                            xi = p;
-                            eval_subtract(xi, tmp);
-                        }
+      if (eval_get_sign(xi) < 0)
+      {
+         tmp = xi;
+         eval_abs(tmp, tmp);
+         eval_modulus(tmp, p);
+         xi = p;
+         eval_subtract(xi, tmp);
+      }
 
-                        // bi:
-                        tmp = a;
-                        eval_multiply(tmp, xi);
-                        eval_subtract(bi, tmp);
-                        eval_divide(bi, p);
+      // bi:
+      tmp = a;
+      eval_multiply(tmp, xi);
+      eval_subtract(bi, tmp);
+      eval_divide(bi, p);
 
-                        // res:
-                        tmp = xi;
-                        eval_multiply(tmp, nextp);
-                        eval_multiply(nextp, p);
-                        eval_add(res, tmp);
-                        eval_add(i, one);
-                    }
-                }
+      // res:
+      tmp = xi;
+      eval_multiply(tmp, nextp);
+      eval_multiply(nextp, p);
+      eval_add(res, tmp);
+      eval_add(i, one);
+   }
+}
 
-                /*
+/*
                 template <typename Backend>
                 inline void bigint_shr1(typename boost::mpl::front<typename Backend::unsigned_types>::type x[], size_t
                 x_size, size_t word_shift, size_t bit_shift)
@@ -327,7 +339,7 @@ namespace nil {
                    BOOST_ASSERT(eval_lt(n, mod));
                    BOOST_ASSERT(eval_ge(mod, 3) && eval_modulus(mod, 2) == 1);*/
 
-                /*
+/*
                 This uses a modular inversion algorithm designed by Niels Möller
                 and implemented in Nettle. The same algorithm was later also
                 adapted to GMP in mpn_sec_invert.
@@ -342,7 +354,7 @@ namespace nil {
                 Thanks to Niels for creating the algorithm, explaining some things
                 about it, and the reference to the paper.
                 */
-                /*
+/*
                    const size_t mod_words = mod.size();
                    BOOST_ASSERT_MSG(mod_words > 0, "Not empty");
 
@@ -415,12 +427,12 @@ namespace nil {
                    // in which case zero out the result to indicate this
                    (~b_is_1).if_set_zero_out(v_w, mod_words);*/
 
-                /*
+/*
                  * We've placed the result in the lowest words of the temp buffer.
                  * So just clear out the other values and then give that buffer to a
                  * BigInt.
                  */
-                /*
+/*
                    clear_mem(&tmp_mem[mod_words], 4 * mod_words);
 
                    CT::unpoison(tmp_mem.data(), tmp_mem.size());
@@ -430,7 +442,7 @@ namespace nil {
                    return r;
                 }*/
 
-                /*
+/*
                 template <typename Backend, expression_template_option ExpressionTemplates>
                 void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
                                              const number<Backend, ExpressionTemplates>& n,
@@ -440,7 +452,7 @@ namespace nil {
                 }
                  */
 
-                /*
+/*
                 template <typename Backend>
                 std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
                                                            const Backend& p)
@@ -492,7 +504,7 @@ namespace nil {
                 }
                 */
 
-                /*
+/*
                 template <typename Backend, expression_template_option ExpressionTemplates>
                 std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
                                                       const number<Backend, ExpressionTemplates>& a,
@@ -502,7 +514,7 @@ namespace nil {
                 }
                 */
 
-                /*
+/*
                 template <typename Backend>
                 Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
                 {
@@ -522,7 +534,7 @@ namespace nil {
                 }
                 */
 
-                /*
+/*
                 template <typename Backend, expression_template_option ExpressionTemplates>
                 number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
                     const number<Backend, ExpressionTemplates>& a,
@@ -533,16 +545,16 @@ namespace nil {
                 }
                  */
 
-                /*
+/*
                 template <typename Backend>
                 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
                 {
                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;*/
-                /*
+/*
                  * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
                  * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
                  */
-                /*
+/*
                    if (eval_integer_modulus(a1, 2) == 0)
                       return 0;
 
@@ -556,12 +568,12 @@ namespace nil {
                    X.grow_to(round_up(k, sizeof(ui_type) * CHAR_BIT) / sizeof(ui_type) * CHAR_BIT);
                    b.grow_to(a_words);
                    */
-                /*
+/*
                 Hide the exact value of k. k is anyway known to word length
                 granularity because of the length of a, so no point in doing more
                 than this.
                 */
-                /*
+/*
 
                    const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
 
@@ -580,7 +592,7 @@ namespace nil {
                 }
                 */
 
-                /*
+/*
                 template <typename Backend, expression_template_option ExpressionTemplates>
                 number<Backend, ExpressionTemplates> inverse_mod_pow2(
                     const number<Backend, ExpressionTemplates>& a1, size_t k)
@@ -590,7 +602,7 @@ namespace nil {
                 }
                 */
 
-                /*
+/*
                 template <typename Backend>
                 Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
                 {
@@ -610,11 +622,11 @@ namespace nil {
                    }
                    if (eval_integer_modulus(n, 2) == 1)
                    {*/
-                /*
+/*
                 Fastpath for common case. This leaks information if n > mod
                 but we don't guarantee const time behavior in that case.
                 */
-                /*
+/*
                       if (eval_gt(mod, n))
                          return eval_inverse_mod_odd_modulus(n, mod);
                       else
@@ -632,13 +644,13 @@ namespace nil {
                       return eval_inverse_mod_pow2(n, mod_lz);
                    }*/
 
-                /*
+/*
                  * In this case we are performing an inversion modulo 2^k*o for
                  * some k > 1 and some odd (not necessarily prime) integer.
                  * Compute the inversions modulo 2^k and modulo o, then combine them
                  * using CRT, which is possible because 2^k and o are relatively prime.
                  */
-                /*
+/*
                    Backend o = mod;
 
                    eval_right_shift(mod, mod_lz);
@@ -679,9 +691,9 @@ namespace nil {
                    return h;
                 }
                 */
-            }    // namespace backends
-        }        // namespace multiprecision
-    }            // namespace crypto3
-}    // namespace nil
+}
+}
+}
+} // namespace nil::crypto3::multiprecision::backends
 
 #endif
