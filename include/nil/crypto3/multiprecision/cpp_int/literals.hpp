@@ -110,7 +110,7 @@ namespace nil {
                     struct combine_value_to_pack;
                     template<limb_type first, limb_type... ARGS, limb_type value>
                     struct combine_value_to_pack<value_pack<first, ARGS...>, value> {
-                        typedef value_pack<first | value, ARGS...> type;
+                        using type = value_pack<first | value, ARGS...>;
                     };
 
                     template<char NextChar, char... CHARS>
@@ -120,62 +120,61 @@ namespace nil {
                         static constexpr limb_type value_to_add =
                             shift ? hex_value<NextChar>::value << shift : hex_value<NextChar>::value;
 
-                        typedef typename pack_values<CHARS...>::type recursive_packed_type;
-                        typedef typename boost::mpl::if_c<shift == 0,
-                                                          typename recursive_packed_type::next_type,
-                                                          recursive_packed_type>::type pack_type;
-                        typedef typename combine_value_to_pack<pack_type, value_to_add>::type type;
+                        using recursive_packed_type = typename pack_values<CHARS...>::type;
+                        using pack_type =
+                            typename std::conditional<shift == 0, typename recursive_packed_type::next_type,
+                                                      recursive_packed_type>::type;
+                        using type = typename combine_value_to_pack<pack_type, value_to_add>::type;
                     };
                     template<char NextChar>
                     struct pack_values<NextChar> {
                         static constexpr limb_type value_to_add = hex_value<NextChar>::value;
 
-                        typedef value_pack<value_to_add> type;
+                        using type = value_pack<value_to_add>;
                     };
 
                     template<class T>
                     struct strip_leading_zeros_from_pack;
                     template<limb_type... PACK>
                     struct strip_leading_zeros_from_pack<value_pack<PACK...>> {
-                        typedef value_pack<PACK...> type;
+                        using type = value_pack<PACK...>;
                     };
                     template<limb_type... PACK>
                     struct strip_leading_zeros_from_pack<value_pack<0u, PACK...>> {
-                        typedef typename strip_leading_zeros_from_pack<value_pack<PACK...>>::type type;
+                        using type = typename strip_leading_zeros_from_pack<value_pack<PACK...>>::type;
                     };
 
                     template<limb_type v, class PACK>
                     struct append_value_to_pack;
                     template<limb_type v, limb_type... PACK>
                     struct append_value_to_pack<v, value_pack<PACK...>> {
-                        typedef value_pack<PACK..., v> type;
+                        using type = value_pack<PACK..., v>;
                     };
 
                     template<class T>
                     struct reverse_value_pack;
                     template<limb_type v, limb_type... VALUES>
                     struct reverse_value_pack<value_pack<v, VALUES...>> {
-                        typedef typename reverse_value_pack<value_pack<VALUES...>>::type lead_values;
-                        typedef typename append_value_to_pack<v, lead_values>::type type;
+                        using lead_values = typename reverse_value_pack<value_pack<VALUES...>>::type;
+                        using type = typename append_value_to_pack<v, lead_values>::type;
                     };
                     template<limb_type v>
                     struct reverse_value_pack<value_pack<v>> {
-                        typedef value_pack<v> type;
+                        using type = value_pack<v>;
                     };
                     template<>
                     struct reverse_value_pack<value_pack<>> {
-                        typedef value_pack<> type;
+                        using type = value_pack<>;
                     };
 
                     template<char l1, char l2, char... STR>
                     struct make_packed_value_from_str {
-                        BOOST_STATIC_ASSERT_MSG(l1 == '0',
-                                                "Multi-precision integer literals must be in hexadecimal notation.");
-                        BOOST_STATIC_ASSERT_MSG((l2 == 'X') || (l2 == 'x'),
-                                                "Multi-precision integer literals must be in hexadecimal notation.");
-                        typedef typename pack_values<STR...>::type packed_type;
-                        typedef typename strip_leading_zeros_from_pack<packed_type>::type stripped_type;
-                        typedef typename reverse_value_pack<stripped_type>::type type;
+                        static_assert(l1 == '0', "Multi-precision integer literals must be in hexadecimal notation.");
+                        static_assert((l2 == 'X') || (l2 == 'x'),
+                                      "Multi-precision integer literals must be in hexadecimal notation.");
+                        using packed_type = typename pack_values<STR...>::type;
+                        using stripped_type = typename strip_leading_zeros_from_pack<packed_type>::type;
+                        using type = typename reverse_value_pack<stripped_type>::type;
                     };
 
                     template<class Pack, class B>
@@ -190,19 +189,19 @@ namespace nil {
                     template<unsigned Digits>
                     struct signed_cpp_int_literal_result_type {
                         static constexpr unsigned bits = Digits * 4;
-                        typedef nil::crypto3::multiprecision::backends::
-                            cpp_int_backend<bits, bits, signed_magnitude, unchecked, void>
-                                backend_type;
-                        typedef number<backend_type, et_off> number_type;
+                        using backend_type =
+                            nil::crypto3::multiprecision::backends::cpp_int_backend<bits, bits, signed_magnitude,
+                                                                                    unchecked, void>;
+                        using number_type = number<backend_type, et_off>;
                     };
 
                     template<unsigned Digits>
                     struct unsigned_cpp_int_literal_result_type {
                         static constexpr unsigned bits = Digits * 4;
-                        typedef nil::crypto3::multiprecision::backends::
-                            cpp_int_backend<bits, bits, unsigned_magnitude, unchecked, void>
-                                backend_type;
-                        typedef number<backend_type, et_off> number_type;
+                        using backend_type =
+                            nil::crypto3::multiprecision::backends::cpp_int_backend<bits, bits, unsigned_magnitude,
+                                                                                    unchecked, void>;
+                        using number_type = number<backend_type, et_off>;
                     };
 
                 }    // namespace detail
@@ -211,60 +210,44 @@ namespace nil {
                 constexpr typename nil::crypto3::multiprecision::literals::detail::signed_cpp_int_literal_result_type<
                     (sizeof...(STR)) - 2>::number_type
                     operator"" _cppi() {
-                    typedef
-                        typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type pt;
+                    using pt = typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<
+                        STR...>::type;
                     return nil::crypto3::multiprecision::literals::detail::make_backend_from_pack<
-                        pt,
-                        typename nil::crypto3::multiprecision::literals::detail::signed_cpp_int_literal_result_type<
-                            (sizeof...(STR)) - 2>::backend_type>::value;
+                        pt, typename nil::crypto3::multiprecision::literals::detail::signed_cpp_int_literal_result_type<
+                                (sizeof...(STR)) - 2>::backend_type>::value;
                 }
 
                 template<char... STR>
                 constexpr typename nil::crypto3::multiprecision::literals::detail::unsigned_cpp_int_literal_result_type<
                     (sizeof...(STR)) - 2>::number_type
                     operator"" _cppui() {
-                    typedef
-                        typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type pt;
+                    using pt = typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<
+                        STR...>::type;
                     return nil::crypto3::multiprecision::literals::detail::make_backend_from_pack<
-                        pt,
-                        typename nil::crypto3::multiprecision::literals::detail::unsigned_cpp_int_literal_result_type<
-                            (sizeof...(STR)) - 2>::backend_type>::value;
+                        pt, typename nil::crypto3::multiprecision::literals::detail::
+                                unsigned_cpp_int_literal_result_type<(sizeof...(STR)) - 2>::backend_type>::value;
                 }
 
-#define BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(Bits)                                                            \
-    template<char... STR>                                                                                      \
-    constexpr nil::crypto3::multiprecision::number<                                                                   \
-        nil::crypto3::multiprecision::backends::cpp_int_backend<Bits,                                                 \
-                                                         Bits,                                                 \
-                                                         nil::crypto3::multiprecision::signed_magnitude,              \
-                                                         nil::crypto3::multiprecision::unchecked,                     \
-                                                         void>>                                                \
-        operator"" BOOST_JOIN(_cppi, Bits)() {                                                                 \
-        typedef typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type pt; \
+#define BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(Bits)                                                                   \
+    template<char... STR>                                                                                             \
+    constexpr nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<           \
+        Bits, Bits, nil::crypto3::multiprecision::signed_magnitude, nil::crypto3::multiprecision::unchecked, void>>   \
+        operator"" BOOST_JOIN(_cppi, Bits)() {                                                                        \
+        using pt = typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type; \
         return nil::crypto3::multiprecision::literals::detail::make_backend_from_pack<                                \
-            pt,                                                                                                \
-            nil::crypto3::multiprecision::backends::cpp_int_backend<Bits,                                             \
-                                                             Bits,                                             \
-                                                             nil::crypto3::multiprecision::signed_magnitude,          \
-                                                             nil::crypto3::multiprecision::unchecked,                 \
-                                                             void>>::value;                                    \
-    }                                                                                                          \
-    template<char... STR>                                                                                      \
-    constexpr nil::crypto3::multiprecision::number<                                                                   \
-        nil::crypto3::multiprecision::backends::cpp_int_backend<Bits,                                                 \
-                                                         Bits,                                                 \
-                                                         nil::crypto3::multiprecision::unsigned_magnitude,            \
-                                                         nil::crypto3::multiprecision::unchecked,                     \
-                                                         void>>                                                \
-        operator"" BOOST_JOIN(_cppui, Bits)() {                                                                \
-        typedef typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type pt; \
+            pt, nil::crypto3::multiprecision::backends::cpp_int_backend<                                              \
+                    Bits, Bits, nil::crypto3::multiprecision::signed_magnitude,                                       \
+                    nil::crypto3::multiprecision::unchecked, void>>::value;                                           \
+    }                                                                                                                 \
+    template<char... STR>                                                                                             \
+    constexpr nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<           \
+        Bits, Bits, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::unchecked, void>> \
+        operator"" BOOST_JOIN(_cppui, Bits)() {                                                                       \
+        using pt = typename nil::crypto3::multiprecision::literals::detail::make_packed_value_from_str<STR...>::type; \
         return nil::crypto3::multiprecision::literals::detail::make_backend_from_pack<                                \
-            pt,                                                                                                \
-            nil::crypto3::multiprecision::backends::cpp_int_backend<Bits,                                             \
-                                                             Bits,                                             \
-                                                             nil::crypto3::multiprecision::unsigned_magnitude,        \
-                                                             nil::crypto3::multiprecision::unchecked,                 \
-                                                             void>>::value;                                    \
+            pt, nil::crypto3::multiprecision::backends::cpp_int_backend<                                              \
+                    Bits, Bits, nil::crypto3::multiprecision::unsigned_magnitude,                                     \
+                    nil::crypto3::multiprecision::unchecked, void>>::value;                                           \
     }
 
                 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(128)

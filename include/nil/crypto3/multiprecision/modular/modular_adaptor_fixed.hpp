@@ -71,19 +71,20 @@ namespace nil {
                     }
 
                     constexpr explicit modular_adaptor(const Backend& m) :
-                        m_base(static_cast<typename boost::mpl::front<unsigned_types>::type>(0u)), m_mod(number_type(m)) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)),
+                        m_mod(number_type(m)) {
                         mod_data().adjust_modular(base_data());
                     }
 
                     constexpr explicit modular_adaptor(const number_type& m) :
-                        m_base(static_cast<typename boost::mpl::front<unsigned_types>::type>(0u)), m_mod(m) {
+                        m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u)), m_mod(m) {
                         mod_data().adjust_modular(base_data());
                     }
 
                     // TODO: check correctness of the method
                     modular_adaptor& operator=(const char* s) {
                         // TODO: why default modulus value equals 0
-                        typedef typename boost::mpl::front<unsigned_types>::type ui_type;
+                        using ui_type = typename std::tuple_element<0, unsigned_types>::type;
                         ui_type zero = 0u;
 
                         using default_ops::eval_fpclassify;

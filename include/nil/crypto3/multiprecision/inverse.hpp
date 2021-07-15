@@ -55,22 +55,22 @@ namespace nil {
             }
 
             /*
-            template <typename IntegerType, typename = typename boost::enable_if<typename
-            is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
-            {
-               return eval_monty_inverse(a);
-            }
-             */
+                        template <typename IntegerType, typename = typename boost::enable_if<typename
+                        is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
+                        {
+                           return eval_monty_inverse(a);
+                        }
+                         */
 
             /*
-            template <typename IntegerType, typename = typename boost::enable_if<!typename
-            is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
-            {
-               IntegerType res;
-               eval_monty_inverse(res.backend(), a.backend());
-               return res;
-            }
-             */
+                        template <typename IntegerType, typename = typename boost::enable_if<!typename
+                        is_trivial_cpp_int<IntegerType>::value>::type> IntegerType monty_inverse(const IntegerType& a)
+                        {
+                           IntegerType res;
+                           eval_monty_inverse(res.backend(), a.backend());
+                           return res;
+                        }
+                         */
 
         }    // namespace multiprecision
     }        // namespace crypto3

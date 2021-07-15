@@ -36,7 +36,7 @@ namespace nil {
                 using default_ops::eval_right_shift;
                 using default_ops::eval_subtract;
 
-                typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
                 Backend zero, posone, two, negone, res;
                 zero = ui_type(0u);
@@ -175,7 +175,7 @@ namespace nil {
                 using default_ops::eval_right_shift;
                 using default_ops::eval_subtract;
 
-                typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
                 Backend zero = ui_type(0u);
                 Backend posone = ui_type(1u);

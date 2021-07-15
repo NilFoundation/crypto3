@@ -6,17 +6,13 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
+#include <boost/core/no_exceptions_support.hpp>    // BOOST_TRY
 #include <boost/math/policies/error_handling.hpp>
 #include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>
 #include <boost/math/special_functions/hypot.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/mpl/front.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/iterator_range.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/type_traits/make_unsigned.hpp>
+#include <cstdint>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
 #endif
@@ -41,28 +37,29 @@ namespace nil {
 
                 template<class To, class From>
                 void generic_interconvert(To& to, const From& from,
-                                          const boost::mpl::int_<number_kind_floating_point>& /*to_type*/,
-                                          const boost::mpl::int_<number_kind_integer>& /*from_type*/);
+                                          const std::integral_constant<int, number_kind_floating_point>& /*to_type*/,
+                                          const std::integral_constant<int, number_kind_integer>& /*from_type*/);
                 template<class To, class From>
                 void generic_interconvert(To& to, const From& from,
-                                          const boost::mpl::int_<number_kind_integer>& /*to_type*/,
-                                          const boost::mpl::int_<number_kind_integer>& /*from_type*/);
+                                          const std::integral_constant<int, number_kind_integer>& /*to_type*/,
+                                          const std::integral_constant<int, number_kind_integer>& /*from_type*/);
                 template<class To, class From>
                 void generic_interconvert(To& to, const From& from,
-                                          const boost::mpl::int_<number_kind_floating_point>& /*to_type*/,
-                                          const boost::mpl::int_<number_kind_floating_point>& /*from_type*/);
+                                          const std::integral_constant<int, number_kind_floating_point>& /*to_type*/,
+                                          const std::integral_constant<int, number_kind_floating_point>& /*from_type*/);
                 template<class To, class From>
                 void generic_interconvert(To& to, const From& from,
-                                          const boost::mpl::int_<number_kind_rational>& /*to_type*/,
-                                          const boost::mpl::int_<number_kind_rational>& /*from_type*/);
+                                          const std::integral_constant<int, number_kind_rational>& /*to_type*/,
+                                          const std::integral_constant<int, number_kind_rational>& /*from_type*/);
                 template<class To, class From>
                 void generic_interconvert(To& to, const From& from,
-                                          const boost::mpl::int_<number_kind_rational>& /*to_type*/,
-                                          const boost::mpl::int_<number_kind_integer>& /*from_type*/);
+                                          const std::integral_constant<int, number_kind_rational>& /*to_type*/,
+                                          const std::integral_constant<int, number_kind_integer>& /*from_type*/);
                 template<class To, class From>
-                constexpr void generic_interconvert(To& to, const From& from,
-                                                    const boost::mpl::int_<number_kind_integer>& /*to_type*/,
-                                                    const boost::mpl::int_<number_kind_modular>& /*from_type*/);
+                constexpr void
+                    generic_interconvert(To& to, const From& from,
+                                         const std::integral_constant<int, number_kind_integer>& /*to_type*/,
+                                         const std::integral_constant<int, number_kind_modular>& /*from_type*/);
 
             }    // namespace detail
 
@@ -86,40 +83,40 @@ namespace nil {
                 // code even more....
                 //
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_convertible<V, T>::value>::type
                     eval_add(T& result, V const& v) {
                     T t;
                     t = v;
                     eval_add(result, t);
                 }
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
                     eval_add(T& result, V const& v) {
                     T t(v);
                     eval_add(result, t);
                 }
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_convertible<V, T>::value>::type
                     eval_subtract(T& result, V const& v) {
                     T t;
                     t = v;
                     eval_subtract(result, t);
                 }
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
                     eval_subtract(T& result, V const& v) {
                     T t(v);
                     eval_subtract(result, t);
                 }
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_convertible<V, T>::value>::type
                     eval_multiply(T& result, V const& v) {
                     T t;
                     t = v;
                     eval_multiply(result, t);
                 }
                 template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_convertible<V, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<V, T>::value>::type
                     eval_multiply(T& result, V const& v) {
                     T t(v);
                     eval_multiply(result, t);
@@ -130,7 +127,7 @@ namespace nil {
 
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type
                     eval_multiply_add(T& t, const U& u, const V& v) {
                     T z;
                     eval_multiply(z, u, v);
@@ -138,13 +135,13 @@ namespace nil {
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type
                     eval_multiply_add(T& t, const U& u, const V& v) {
                     eval_multiply_add(t, v, u);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type
                     eval_multiply_subtract(T& t, const U& u, const V& v) {
                     T z;
                     eval_multiply(z, u, v);
@@ -152,14 +149,14 @@ namespace nil {
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type
                     eval_multiply_subtract(T& t, const U& u, const V& v) {
                     eval_multiply_subtract(t, v, u);
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_divide(T& result, V const& v) {
                     T t;
                     t = v;
@@ -167,16 +164,16 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_divide(T& result, V const& v) {
                     T t(v);
                     eval_divide(result, t);
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_modulus(T& result, V const& v) {
                     T t;
                     t = v;
@@ -184,16 +181,16 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_modulus(T& result, V const& v) {
                     T t(v);
                     eval_modulus(result, t);
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_bitwise_and(T& result, V const& v) {
                     T t;
                     t = v;
@@ -201,16 +198,16 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_bitwise_and(T& result, V const& v) {
                     T t(v);
                     eval_bitwise_and(result, t);
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_bitwise_or(T& result, V const& v) {
                     T t;
                     t = v;
@@ -218,16 +215,16 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_bitwise_or(T& result, V const& v) {
                     T t(v);
                     eval_bitwise_or(result, t);
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_bitwise_xor(T& result, V const& v) {
                     T t;
                     t = v;
@@ -235,8 +232,8 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_bitwise_xor(T& result, V const& v) {
                     T t(v);
                     eval_bitwise_xor(result, t);
@@ -244,8 +241,8 @@ namespace nil {
 
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                !boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            !std::is_convertible<V, T>::value>::type
                     eval_complement(T& result, V const& v) {
                     T t;
                     t = v;
@@ -253,8 +250,8 @@ namespace nil {
                 }
                 template<class T, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<V, number<T, et_on>>::value &&
-                                                boost::is_convertible<V, T>::value>::type
+                    typename std::enable_if<std::is_convertible<V, number<T, et_on>>::value &&
+                                            std::is_convertible<V, T>::value>::type
                     eval_complement(T& result, V const& v) {
                     T t(v);
                     eval_complement(result, t);
@@ -279,8 +276,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_add_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -288,23 +285,29 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_add_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_add(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value>::type
                     eval_add_default(T& t, const U& u, const T& v) {
                     eval_add(t, v, u);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_add_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        eval_add(t, u);
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            eval_add(t, u);
+                        } else {
+                            t = u;
+                            eval_add(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_add(t, v);
                     }
@@ -331,8 +334,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_subtract_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -340,25 +343,24 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_subtract_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_subtract(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                is_signed_number<T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            is_signed_number<T>::value>::type
                     eval_subtract_default(T& t, const U& u, const T& v) {
                     eval_subtract(t, v, u);
                     t.negate();
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value &&
-                                                is_unsigned_number<T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value && is_unsigned_number<T>::value>::type
                     eval_subtract_default(T& t, const U& u, const T& v) {
                     T temp;
                     temp = u;
@@ -366,19 +368,24 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value &&
-                                                is_unsigned_number<T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value && is_unsigned_number<T>::value>::type
                     eval_subtract_default(T& t, const U& u, const T& v) {
                     T temp(u);
                     eval_subtract(t, temp, v);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_subtract_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        eval_subtract(t, u);
-                        t.negate();
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            eval_subtract(t, u);
+                            t.negate();
+                        } else {
+                            t = u;
+                            eval_subtract(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_subtract(t, v);
                     }
@@ -402,8 +409,8 @@ namespace nil {
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_multiply_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -411,24 +418,30 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_multiply_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_multiply(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value>::type
                     eval_multiply_default(T& t, const U& u, const T& v) {
                     eval_multiply(t, v, u);
                 }
 #endif
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        eval_multiply(t, u);
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            eval_multiply(t, u);
+                        } else {
+                            t = number<T>::canonical_value(u);
+                            eval_multiply(t, v);
+                        }
+                    }
+                    else {
                         t = number<T>::canonical_value(u);
                         eval_multiply(t, v);
                     }
@@ -451,7 +464,7 @@ namespace nil {
                 }
 
                 template<class T, class U>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_same<T, U>::value, T>::type
                     make_T(const U& u) {
                     T t;
                     t = number<T>::canonical_value(u);
@@ -464,19 +477,19 @@ namespace nil {
 
                 template<class T, class U, class V, class X>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type
                     eval_multiply_add(T& t, const U& u, const V& v, const X& x) {
                     eval_multiply_add(t, make_T<T>(u), make_T<T>(v), make_T<T>(x));
                 }
                 template<class T, class U, class V, class X>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type
                     eval_multiply_add(T& t, const U& u, const V& v, const X& x) {
                     eval_multiply_add(t, v, u, x);
                 }
                 template<class T, class U, class V, class X>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!(!std::is_same<T, U>::value && std::is_same<T, V>::value)>::type
                     eval_multiply_subtract(T& t, const U& u, const V& v, const X& x) {
                     if ((void*)&x == (void*)&t) {
                         T z;
@@ -489,7 +502,7 @@ namespace nil {
                 }
                 template<class T, class U, class V, class X>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<!boost::is_same<T, U>::value && boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!std::is_same<T, U>::value && std::is_same<T, V>::value>::type
                     eval_multiply_subtract(T& t, const U& u, const V& v, const X& x) {
                     eval_multiply_subtract(t, v, u, x);
                 }
@@ -513,8 +526,8 @@ namespace nil {
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_divide_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -522,16 +535,16 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_divide_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_divide(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_divide_default(T& t, const U& u, const T& v) {
                     T uu;
                     uu = u;
@@ -539,8 +552,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_divide_default(T& t, const U& u, const T& v) {
                     T uu(u);
                     eval_divide(t, uu, v);
@@ -548,12 +561,18 @@ namespace nil {
 #endif
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_divide_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        T temp;
-                        temp = u;
-                        eval_divide(temp, v);
-                        t = temp;
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            T temp;
+                            temp = u;
+                            eval_divide(temp, v);
+                            t = temp;
+                        } else {
+                            t = u;
+                            eval_divide(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_divide(t, v);
                     }
@@ -581,8 +600,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_modulus_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -590,16 +609,16 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_modulus_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_modulus(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_modulus_default(T& t, const U& u, const T& v) {
                     T uu;
                     uu = u;
@@ -607,19 +626,25 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_modulus_default(T& t, const U& u, const T& v) {
                     T uu(u);
                     eval_modulus(t, uu, v);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_modulus_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        T temp(u);
-                        eval_modulus(temp, v);
-                        t = temp;
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            T temp(u);
+                            eval_modulus(temp, v);
+                            t = temp;
+                        } else {
+                            t = u;
+                            eval_modulus(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_modulus(t, v);
                     }
@@ -644,27 +669,27 @@ namespace nil {
                     }
                 }
                 template<class T, class U>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_convertible<U, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!std::is_convertible<U, T>::value>::type
                     eval_bitwise_and_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
                     eval_bitwise_and(t, u, vv);
                 }
                 template<class T, class U>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_convertible<U, T>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<std::is_convertible<U, T>::value>::type
                     eval_bitwise_and_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_bitwise_and(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value>::type
                     eval_bitwise_and_default(T& t, const U& u, const T& v) {
                     eval_bitwise_and(t, v, u);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<boost::is_same<T, U>::value || boost::is_same<T, V>::value>::type
+                    typename std::enable_if<!std::is_same<T, U>::value || std::is_same<T, V>::value>::type
                     eval_bitwise_and_default(T& t, const U& u, const V& v) {
                     t = u;
                     eval_bitwise_and(t, v);
@@ -690,8 +715,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_bitwise_or_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -699,23 +724,29 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_bitwise_or_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_bitwise_or(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value>::type
                     eval_bitwise_or_default(T& t, const U& u, const T& v) {
                     eval_bitwise_or(t, v, u);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        eval_bitwise_or(t, u);
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            eval_bitwise_or(t, u);
+                        } else {
+                            t = u;
+                            eval_bitwise_or(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_bitwise_or(t, v);
                     }
@@ -741,8 +772,8 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                !boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            !std::is_convertible<U, T>::value>::type
                     eval_bitwise_xor_default(T& t, const T& u, const U& v) {
                     T vv;
                     vv = v;
@@ -750,23 +781,29 @@ namespace nil {
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value &&
-                                                boost::is_convertible<U, T>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value &&
+                                            std::is_convertible<U, T>::value>::type
                     eval_bitwise_xor_default(T& t, const T& u, const U& v) {
                     T vv(v);
                     eval_bitwise_xor(t, u, vv);
                 }
                 template<class T, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<boost::is_convertible<U, number<T, et_on>>::value>::type
+                    typename std::enable_if<std::is_convertible<U, number<T, et_on>>::value>::type
                     eval_bitwise_xor_default(T& t, const U& u, const T& v) {
                     eval_bitwise_xor(t, v, u);
                 }
                 template<class T, class U, class V>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const U& u, const V& v) {
-                    if (boost::is_same<T, V>::value && ((void*)&t == (void*)&v)) {
-                        eval_bitwise_xor(t, u);
-                    } else {
+                    BOOST_IF_CONSTEXPR(std::is_same<T, V>::value) {
+                        if ((void*)&t == (void*)&v) {
+                            eval_bitwise_xor(t, u);
+                        } else {
+                            t = u;
+                            eval_bitwise_xor(t, v);
+                        }
+                    }
+                    else {
                         t = u;
                         eval_bitwise_xor(t, v);
                     }
@@ -778,42 +815,42 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(T& val) {
-                    typedef typename boost::mpl::front<typename T::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
                     eval_add(val, static_cast<ui_type>(1u));
                 }
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(T& val) {
-                    typedef typename boost::mpl::front<typename T::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
                     eval_subtract(val, static_cast<ui_type>(1u));
                 }
 
-                template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(T& result, const T& arg, const V val) {
+                template<class T, class U, class V>
+                inline BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(T& result, const U& arg, const V val) {
                     result = arg;
                     eval_left_shift(result, val);
                 }
 
-                template<class T, class V>
-                inline BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(T& result, const T& arg, const V val) {
+                template<class T, class U, class V>
+                inline BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(T& result, const U& arg, const V val) {
                     result = arg;
                     eval_right_shift(result, val);
                 }
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR bool eval_is_zero(const T& val) {
-                    typedef typename boost::mpl::front<typename T::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
                     return val.compare(static_cast<ui_type>(0)) == 0;
                 }
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const T& val) {
-                    typedef typename boost::mpl::front<typename T::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
                     return val.compare(static_cast<ui_type>(0));
                 }
 
                 template<class T, class V, class U>
                 inline BOOST_MP_CXX14_CONSTEXPR void
                     assign_components_imp(T& result, const V& v1, const U& v2,
-                                          const boost::mpl::int_<number_kind_rational>&) {
+                                          const std::integral_constant<int, number_kind_rational>&) {
                     result = v1;
                     T t;
                     t = v2;
@@ -822,8 +859,8 @@ namespace nil {
 
                 template<class T, class V, class U, int N>
                 inline BOOST_MP_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2,
-                                                                           const boost::mpl::int_<N>&) {
-                    typedef typename component_type<number<T>>::type component_number_type;
+                                                                           const std::integral_constant<int, N>&) {
+                    using component_number_type = typename component_type<number<T>>::type;
 
                     component_number_type x(v1), y(v2);
                     assign_components(result, x.backend(), y.backend());
@@ -853,8 +890,8 @@ namespace nil {
                 template<class R, int b>
                 struct has_enough_bits {
                     template<class T>
-                    struct type : public boost::mpl::and_<boost::mpl::not_<boost::is_same<R, T>>,
-                                                          boost::mpl::bool_<std::numeric_limits<T>::digits >= b>> { };
+                    struct type : public std::integral_constant<bool, !std::is_same<R, T>::value &&
+                                                                          (std::numeric_limits<T>::digits >= b)> { };
                 };
 
                 template<class R>
@@ -873,35 +910,39 @@ namespace nil {
                     }
                 };
 
+                template<class Tuple, int i, class T, bool = (i == std::tuple_size<Tuple>::value)>
+                struct find_index_of_type {
+                    static constexpr int value = std::is_same<T, typename std::tuple_element<i, Tuple>::type>::value ?
+                                                     i :
+                                                     find_index_of_type<Tuple, i + 1, T>::value;
+                };
+                template<class Tuple, int i, class T>
+                struct find_index_of_type<Tuple, i, T, true> {
+                    static constexpr int value = -1;
+                };
+
                 template<class R, class B>
                 struct calculate_next_larger_type {
                     // Find which list we're looking through:
-                    typedef typename boost::mpl::if_<
-                        boost::is_signed<R>, typename B::signed_types,
-                        typename boost::mpl::if_<boost::is_unsigned<R>, typename B::unsigned_types,
-                                                 typename B::float_types>::type>::type list_type;
-                    // A predicate to find a type with enough bits:
-                    typedef typename has_enough_bits<R, std::numeric_limits<R>::digits>::template type<boost::mpl::_>
-                        pred_type;
-                    // See if the last type is in the list, if so we have to start after this:
-                    typedef typename boost::mpl::find_if<list_type, boost::is_same<R, boost::mpl::_>>::type start_last;
-                    // Where we're starting from, either the start of the sequence or the last type found:
-                    typedef
-                        typename boost::mpl::if_<boost::is_same<start_last, typename boost::mpl::end<list_type>::type>,
-                                                 typename boost::mpl::begin<list_type>::type, start_last>::type
-                            start_seq;
-                    // The range we're searching:
-                    typedef boost::mpl::iterator_range<start_seq, typename boost::mpl::end<list_type>::type> range;
-                    // Find the next type:
-                    typedef typename boost::mpl::find_if<range, pred_type>::type iter_type;
-                    // Either the next type, or a "terminal" to indicate we've run out of types to search:
-                    typedef typename boost::mpl::eval_if<
-                        boost::is_same<typename boost::mpl::end<list_type>::type, iter_type>,
-                        boost::mpl::identity<terminal<R>>, boost::mpl::deref<iter_type>>::type type;
+                    using list_type = typename std::conditional<
+                        nil::crypto3::multiprecision::detail::is_signed<R>::value &&
+                            nil::crypto3::multiprecision::detail::is_integral<R>::value,
+                        typename B::signed_types,
+                        typename std::conditional<nil::crypto3::multiprecision::detail::is_unsigned<R>::value,
+                                                  typename B::unsigned_types, typename B::float_types>::type>::type;
+                    static constexpr int start = find_index_of_type<list_type, 0, R>::value;
+                    static constexpr int index_of_type =
+                                             nil::crypto3::multiprecision::detail::find_index_of_large_enough_type <
+                                             list_type,
+                                         start == INT_MAX ? 0 : start + 1, std::numeric_limits<R>::digits > ::value;
+                    using type =
+                        typename nil::crypto3::multiprecision::detail::dereference_tuple<index_of_type, list_type,
+                                                                                         terminal<R>>::type;
                 };
 
                 template<class R, class T>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value, bool>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<R>::value, bool>::type
                     check_in_range(const T& t) {
                     // Can t fit in an R?
                     if ((t > 0) && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded &&
@@ -912,89 +953,102 @@ namespace nil {
                 }
 
                 template<class R, class B>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<R>::value>::type
                     eval_convert_to(R* result, const B& backend) {
-                    typedef typename calculate_next_larger_type<R, B>::type next_type;
+                    using next_type = typename calculate_next_larger_type<R, B>::type;
                     next_type n = next_type();
                     eval_convert_to(&n, backend);
-                    if (!boost::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized &&
-                        std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)())) {
-                        *result = (std::numeric_limits<R>::max)();
-                    } else if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded &&
-                               (n < (next_type)(std::numeric_limits<R>::min)())) {
-                        *result = (std::numeric_limits<R>::min)();
-                    } else
-                        *result = static_cast<R>(n);
+                    BOOST_IF_CONSTEXPR(!nil::crypto3::multiprecision::detail::is_unsigned<R>::value &&
+                                       std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded) {
+                        if (n > (next_type)(std::numeric_limits<R>::max)()) {
+                            *result = (std::numeric_limits<R>::max)();
+                            return;
+                        }
+                    }
+                    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded) {
+                        if (n < (next_type)(std::numeric_limits<R>::min)()) {
+                            *result = (std::numeric_limits<R>::min)();
+                            return;
+                        }
+                    }
+                    *result = static_cast<R>(n);
                 }
 
                 template<class R, class B>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<R>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<!nil::crypto3::multiprecision::detail::is_integral<R>::value>::type
                     eval_convert_to(R* result, const B& backend) {
-                    typedef typename calculate_next_larger_type<R, B>::type next_type;
+                    using next_type = typename calculate_next_larger_type<R, B>::type;
                     next_type n = next_type();
                     eval_convert_to(&n, backend);
-                    if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded &&
-                        ((n > (next_type)(std::numeric_limits<R>::max)() ||
-                          (n < (next_type) - (std::numeric_limits<R>::max)())))) {
-                        *result = n > 0 ? (std::numeric_limits<R>::max)() : -(std::numeric_limits<R>::max)();
-                    } else
-                        *result = static_cast<R>(n);
+                    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded) {
+                        if ((n > (next_type)(std::numeric_limits<R>::max)() ||
+                             (n < (next_type) - (std::numeric_limits<R>::max)()))) {
+                            *result = n > 0 ? (std::numeric_limits<R>::max)() : -(std::numeric_limits<R>::max)();
+                        } else
+                            *result = static_cast<R>(n);
+                    }
+                    else* result = static_cast<R>(n);
                 }
 
                 template<class R, class B>
                 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend,
-                                                        const boost::mpl::false_&) {
+                                                        const std::integral_constant<bool, false>&) {
                     //
                     // We ran out of types to try for the conversion, try
                     // a lexical_cast and hope for the best:
                     //
-                    if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed &&
-                        (eval_get_sign(backend) < 0))
+                    BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+                    if (eval_get_sign(backend) < 0)
                         BOOST_THROW_EXCEPTION(std::range_error(
                             "Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-                    try {
+                    BOOST_TRY {
                         result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
-                    } catch (const boost::bad_lexical_cast&) {
+                    }
+                    BOOST_CATCH(const boost::bad_lexical_cast&) {
                         if (eval_get_sign(backend) < 0) {
-                            *result = std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed ?
-                                          (std::numeric_limits<R>::min)() :
-                                          -(std::numeric_limits<R>::max)();
+                            BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed)
+                            *result = (std::numeric_limits<R>::max)();    // we should never get here, exception above
+                                                                          // will be raised.
+                            else BOOST_IF_CONSTEXPR(std::numeric_limits<R>::is_integer)* result =
+                                (std::numeric_limits<R>::min)();
+                            else* result = -(std::numeric_limits<R>::max)();
                         } else
                             *result = (std::numeric_limits<R>::max)();
                     }
+                    BOOST_CATCH_END
                 }
 
                 template<class R, class B>
                 inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend,
-                                                        const boost::mpl::true_&) {
+                                                        const std::integral_constant<bool, true>&) {
                     //
+                    // Last chance conversion to an unsigned integer.
                     // We ran out of types to try for the conversion, try
                     // a lexical_cast and hope for the best:
                     //
-                    if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed &&
-                        (eval_get_sign(backend) < 0))
+                    if (eval_get_sign(backend) < 0)
                         BOOST_THROW_EXCEPTION(std::range_error(
                             "Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-                    try {
+                    BOOST_TRY {
                         B t(backend);
                         R mask = ~static_cast<R>(0u);
                         eval_bitwise_and(t, mask);
                         result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
-                    } catch (const boost::bad_lexical_cast&) {
-                        if (eval_get_sign(backend) < 0) {
-                            *result = std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed ?
-                                          (std::numeric_limits<R>::min)() :
-                                          -(std::numeric_limits<R>::max)();
-                        } else
-                            *result = (std::numeric_limits<R>::max)();
                     }
+                    BOOST_CATCH(const boost::bad_lexical_cast&) {
+                        // We should never really get here...
+                        *result = (std::numeric_limits<R>::max)();
+                    }
+                    BOOST_CATCH_END
                 }
 
                 template<class R, class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend) {
-                    typedef boost::mpl::bool_<boost::is_unsigned<R>::value &&
-                                              number_category<B>::value == number_kind_integer>
-                        tag_type;
+                    using tag_type =
+                        std::integral_constant<bool, nil::crypto3::multiprecision::detail::is_unsigned<R>::value &&
+                                                         number_category<B>::value == number_kind_integer>;
                     last_chance_eval_convert_to(result, backend, tag_type());
                 }
 
@@ -1016,8 +1070,7 @@ namespace nil {
 
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<float>* result, const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
-                        scalar_type;
+                    using scalar_type = typename scalar_result_from_possible_complex<multiprecision::number<B>>::type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1027,8 +1080,7 @@ namespace nil {
 
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<double>* result, const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
-                        scalar_type;
+                    using scalar_type = typename scalar_result_from_possible_complex<multiprecision::number<B>>::type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1039,8 +1091,7 @@ namespace nil {
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<long double>* result,
                                                                      const B& backend) {
-                    typedef typename scalar_result_from_possible_complex<nil::crypto3::multiprecision::number<B>>::type
-                        scalar_type;
+                    using scalar_type = typename scalar_result_from_possible_complex<multiprecision::number<B>>::type;
                     scalar_type re, im;
                     eval_real(re.backend(), backend);
                     eval_imag(im.backend(), backend);
@@ -1052,20 +1103,20 @@ namespace nil {
                 //
                 // Functions:
                 //
-                template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const T& arg) {
-                    typedef typename T::signed_types type_list;
-                    typedef typename boost::mpl::front<type_list>::type front;
+                template<class T, class U>
+                inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const U& arg) {
+                    using type_list = typename U::signed_types;
+                    using front = typename std::tuple_element<0, type_list>::type;
                     result = arg;
                     if (arg.compare(front(0)) < 0)
                         result.negate();
                 }
-                template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const T& arg) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point,
-                                            "The fabs function is only valid for floating point types.");
-                    typedef typename T::signed_types type_list;
-                    typedef typename boost::mpl::front<type_list>::type front;
+                template<class T, class U>
+                inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg) {
+                    static_assert(number_category<T>::value == number_kind_floating_point,
+                                  "The fabs function is only valid for floating point types.");
+                    using type_list = typename U::signed_types;
+                    using front = typename std::tuple_element<0, type_list>::type;
                     result = arg;
                     if (arg.compare(front(0)) < 0)
                         result.negate();
@@ -1073,15 +1124,15 @@ namespace nil {
 
                 template<class Backend>
                 inline BOOST_MP_CXX14_CONSTEXPR int eval_fpclassify(const Backend& arg) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point,
-                                            "The fpclassify function is only valid for floating point types.");
+                    static_assert(number_category<Backend>::value == number_kind_floating_point,
+                                  "The fpclassify function is only valid for floating point types.");
                     return eval_is_zero(arg) ? FP_ZERO : FP_NORMAL;
                 }
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_fmod(T& result, const T& a, const T& b) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point,
-                                            "The fmod function is only valid for floating point types.");
+                    static_assert(number_category<T>::value == number_kind_floating_point,
+                                  "The fmod function is only valid for floating point types.");
                     if ((&result == &a) || (&result == &b)) {
                         T temp;
                         eval_fmod(temp, a, b);
@@ -1115,22 +1166,24 @@ namespace nil {
                     eval_subtract(result, a, n);
                 }
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_arithmetic<A>, void>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type
                     eval_fmod(T& result, const T& x, const A& a) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type canonical_type;
-                    typedef
-                        typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+                    using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+                    using cast_type =
+                        typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
                     cast_type c;
                     c = a;
                     eval_fmod(result, x, c);
                 }
 
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_arithmetic<A>, void>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type
                     eval_fmod(T& result, const A& x, const T& a) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type canonical_type;
-                    typedef
-                        typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+                    using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+                    using cast_type =
+                        typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
                     cast_type c;
                     c = x;
                     eval_fmod(result, c, a);
@@ -1141,8 +1194,8 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_remquo(T& result, const T& a, const T& b, int* pi) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point,
-                                            "The remquo function is only valid for floating point types.");
+                    static_assert(number_category<T>::value == number_kind_floating_point,
+                                  "The remquo function is only valid for floating point types.");
                     if ((&result == &a) || (&result == &b)) {
                         T temp;
                         eval_remquo(temp, a, b, pi);
@@ -1157,21 +1210,23 @@ namespace nil {
                     eval_subtract(result, a, n);
                 }
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_arithmetic<A>, void>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type
                     eval_remquo(T& result, const T& x, const A& a, int* pi) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type canonical_type;
-                    typedef
-                        typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+                    using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+                    using cast_type =
+                        typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
                     cast_type c = cast_type();
                     c = a;
                     eval_remquo(result, x, c, pi);
                 }
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_arithmetic<A>, void>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value, void>::type
                     eval_remquo(T& result, const A& x, const T& a, int* pi) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type canonical_type;
-                    typedef
-                        typename boost::mpl::if_<boost::is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+                    using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
+                    using cast_type =
+                        typename std::conditional<std::is_same<A, canonical_type>::value, T, canonical_type>::type;
                     cast_type c = cast_type();
                     c = x;
                     eval_remquo(result, c, a, pi);
@@ -1193,7 +1248,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_fdim(T& result, const T& a, const T& b) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     const ui_type zero = 0u;
                     switch (eval_fpclassify(b)) {
                         case FP_NAN:
@@ -1216,10 +1271,11 @@ namespace nil {
                 }
 
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value>::type
                     eval_fdim(T& result, const T& a, const A& b) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type arithmetic_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
+                    using arithmetic_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
                     const ui_type zero = 0u;
                     arithmetic_type canonical_b = b;
                     switch ((::boost::math::fpclassify)(b)) {
@@ -1243,10 +1299,11 @@ namespace nil {
                 }
 
                 template<class T, class A>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<A>::value>::type
                     eval_fdim(T& result, const A& a, const T& b) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<A, T>::type arithmetic_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
+                    using arithmetic_type = typename nil::crypto3::multiprecision::detail::canonical<A, T>::type;
                     const ui_type zero = 0u;
                     arithmetic_type canonical_a = a;
                     switch (eval_fpclassify(b)) {
@@ -1271,8 +1328,8 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_trunc(T& result, const T& a) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point,
-                                            "The trunc function is only valid for floating point types.");
+                    static_assert(number_category<T>::value == number_kind_floating_point,
+                                  "The trunc function is only valid for floating point types.");
                     switch (eval_fpclassify(a)) {
                         case FP_NAN:
                             errno = EDOM;
@@ -1290,7 +1347,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_modf(T& result, T const& arg, T* pipart) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     int c = eval_fpclassify(arg);
                     if (c == (int)FP_NAN) {
                         if (pipart)
@@ -1315,9 +1372,9 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a) {
-                    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point,
-                                            "The round function is only valid for floating point types.");
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<float, T>::type fp_type;
+                    static_assert(number_category<T>::value == number_kind_floating_point,
+                                  "The round function is only valid for floating point types.");
+                    using fp_type = typename nil::crypto3::multiprecision::detail::canonical<float, T>::type;
                     int c = eval_fpclassify(a);
                     if (c == (int)FP_NAN) {
                         result = a;
@@ -1341,43 +1398,47 @@ namespace nil {
                 BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b);
 
                 template<class T, class Arithmetic>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_integral<Arithmetic>>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Arithmetic>::value>::type
                     eval_gcd(T& result, const T& a, const Arithmetic& b) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+                    using si_type = typename nil::crypto3::multiprecision::detail::canonical<Arithmetic, T>::type;
                     using default_ops::eval_gcd;
                     T t;
                     t = static_cast<si_type>(b);
                     eval_gcd(result, a, t);
                 }
                 template<class T, class Arithmetic>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_integral<Arithmetic>>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Arithmetic>::value>::type
                     eval_gcd(T& result, const Arithmetic& a, const T& b) {
                     eval_gcd(result, b, a);
                 }
                 template<class T, class Arithmetic>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_integral<Arithmetic>>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Arithmetic>::value>::type
                     eval_lcm(T& result, const T& a, const Arithmetic& b) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+                    using si_type = typename nil::crypto3::multiprecision::detail::canonical<Arithmetic, T>::type;
                     using default_ops::eval_lcm;
                     T t;
                     t = static_cast<si_type>(b);
                     eval_lcm(result, a, t);
                 }
                 template<class T, class Arithmetic>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_integral<Arithmetic>>::type
+                inline BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Arithmetic>::value>::type
                     eval_lcm(T& result, const Arithmetic& a, const T& b) {
                     eval_lcm(result, b, a);
                 }
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const T& val) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     int c = eval_get_sign(val);
                     if (c == 0) {
-                        BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+                        BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
                     }
                     if (c < 0) {
-                        BOOST_THROW_EXCEPTION(std::range_error(
+                        BOOST_THROW_EXCEPTION(std::domain_error(
                             "Testing individual bits in negative values is not supported - results are undefined."));
                     }
                     unsigned result = 0;
@@ -1396,10 +1457,10 @@ namespace nil {
                 inline BOOST_MP_CXX14_CONSTEXPR int eval_msb(const T& val) {
                     int c = eval_get_sign(val);
                     if (c == 0) {
-                        BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+                        BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
                     }
                     if (c < 0) {
-                        BOOST_THROW_EXCEPTION(std::range_error(
+                        BOOST_THROW_EXCEPTION(std::domain_error(
                             "Testing individual bits in negative values is not supported - results are undefined."));
                     }
                     //
@@ -1421,7 +1482,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR bool eval_bit_test(const T& val, unsigned index) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     T mask, t;
                     mask = ui_type(1);
                     eval_left_shift(mask, index);
@@ -1431,7 +1492,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_set(T& val, unsigned index) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     T mask;
                     mask = ui_type(1);
                     eval_left_shift(mask, index);
@@ -1440,7 +1501,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_flip(T& val, unsigned index) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     T mask;
                     mask = ui_type(1);
                     eval_left_shift(mask, index);
@@ -1449,7 +1510,7 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bit_unset(T& val, unsigned index) {
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned, T>::type;
                     T mask, t;
                     mask = ui_type(1);
                     eval_left_shift(mask, index);
@@ -1467,7 +1528,7 @@ namespace nil {
                     // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
                     // at some point.
                     //
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned char, B>::type ui_type;
+                    using ui_type = typename nil::crypto3::multiprecision::detail::canonical<unsigned char, B>::type;
 
                     s = ui_type(0u);
                     if (eval_get_sign(x) == 0) {
@@ -1523,24 +1584,24 @@ namespace nil {
                 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
                 //
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_floor();
+                typename std::enable_if<sizeof(T) == 0>::type eval_floor();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_ceil();
+                typename std::enable_if<sizeof(T) == 0>::type eval_ceil();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_trunc();
+                typename std::enable_if<sizeof(T) == 0>::type eval_trunc();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_sqrt();
+                typename std::enable_if<sizeof(T) == 0>::type eval_sqrt();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_ldexp();
+                typename std::enable_if<sizeof(T) == 0>::type eval_ldexp();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_frexp();
+                typename std::enable_if<sizeof(T) == 0>::type eval_frexp();
                 // TODO implement default versions of these:
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_asinh();
+                typename std::enable_if<sizeof(T) == 0>::type eval_asinh();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_acosh();
+                typename std::enable_if<sizeof(T) == 0>::type eval_acosh();
                 template<class T>
-                typename boost::enable_if_c<sizeof(T) == 0>::type eval_atanh();
+                typename std::enable_if<sizeof(T) == 0>::type eval_atanh();
 
                 //
                 // eval_logb and eval_scalbn simply assume base 2 and forward to
@@ -1548,9 +1609,9 @@ namespace nil {
                 //
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR typename B::exponent_type eval_ilogb(const B& val) {
-                    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B>>::is_specialized ||
-                                                (std::numeric_limits<number<B>>::radix == 2),
-                                            "The default implementation of ilogb requires a base 2 number type");
+                    static_assert(!std::numeric_limits<number<B>>::is_specialized ||
+                                      (std::numeric_limits<number<B>>::radix == 2),
+                                  "The default implementation of ilogb requires a base 2 number type");
                     typename B::exponent_type e(0);
                     switch (eval_fpclassify(val)) {
                         case FP_NAN:
@@ -1591,15 +1652,15 @@ namespace nil {
                                 result.negate();
                             return;
                     }
-                    typedef typename boost::mpl::if_c<boost::is_same<boost::intmax_t, long>::value,
-                                                      boost::long_long_type, boost::intmax_t>::type max_t;
+                    using max_t = typename std::conditional<std::is_same<std::intmax_t, long>::value,
+                                                            boost::long_long_type, std::intmax_t>::type;
                     result = static_cast<max_t>(eval_ilogb(val));
                 }
                 template<class B, class A>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_scalbn(B& result, const B& val, A e) {
-                    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B>>::is_specialized ||
-                                                (std::numeric_limits<number<B>>::radix == 2),
-                                            "The default implementation of scalbn requires a base 2 number type");
+                    static_assert(!std::numeric_limits<number<B>>::is_specialized ||
+                                      (std::numeric_limits<number<B>>::radix == 2),
+                                  "The default implementation of scalbn requires a base 2 number type");
                     eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
                 }
                 template<class B, class A>
@@ -1608,26 +1669,27 @@ namespace nil {
                 }
 
                 template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, boost::mpl::true_ const&,
-                                                                const boost::mpl::false_&) {
+                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, std::integral_constant<bool, true> const&,
+                                                                const std::integral_constant<bool, false>&) {
                     return eval_fpclassify(val) == FP_NAN;
                 }
                 template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val, boost::mpl::false_ const&,
-                                                                const boost::mpl::true_&) {
+                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val,
+                                                                std::integral_constant<bool, false> const&,
+                                                                const std::integral_constant<bool, true>&) {
                     return (boost::math::isnan)(val);
                 }
                 template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, boost::mpl::false_ const&,
-                                                                const boost::mpl::false_&) {
+                inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T&, std::integral_constant<bool, false> const&,
+                                                                const std::integral_constant<bool, false>&) {
                     return false;
                 }
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR bool is_arg_nan(const T& val) {
-                    return is_arg_nan(val,
-                                      boost::mpl::bool_<nil::crypto3::multiprecision::detail::is_backend<T>::value>(),
-                                      boost::is_floating_point<T>());
+                    return is_arg_nan(
+                        val, std::integral_constant<bool, nil::crypto3::multiprecision::detail::is_backend<T>::value>(),
+                        std::is_floating_point<T>());
                 }
 
                 template<class T, class U, class V>
@@ -1733,7 +1795,7 @@ namespace nil {
                 }
                 template<class To, class From>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_imag(To& to, const From&) {
-                    typedef typename boost::mpl::front<typename To::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename To::unsigned_types>::type;
                     to = ui_type(0);
                 }
 
@@ -1742,14 +1804,14 @@ namespace nil {
 
                 template<class To, class From>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_set_real_imp(To& to, const From& from) {
-                    typedef typename component_type<number<To>>::type to_component_type;
+                    using to_component_type = typename component_type<number<To>>::type;
                     typename to_component_type::backend_type to_component;
                     to_component = from;
                     eval_set_real(to, to_component);
                 }
                 template<class To, class From>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_set_imag_imp(To& to, const From& from) {
-                    typedef typename component_type<number<To>>::type to_component_type;
+                    using to_component_type = typename component_type<number<To>>::type;
                     typename to_component_type::backend_type to_component;
                     to_component = from;
                     eval_set_imag(to, to_component);
@@ -1760,13 +1822,13 @@ namespace nil {
 
                 template<class To, class From>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::enable_if_c<number_category<To>::value == number_kind_complex>::type
+                    typename std::enable_if<number_category<To>::value == number_kind_complex>::type
                     eval_set_real(To& to, const From& from) {
                     default_ops_adl::eval_set_real_imp(to, from);
                 }
                 template<class To, class From>
                 inline BOOST_MP_CXX14_CONSTEXPR
-                    typename boost::disable_if_c<number_category<To>::value == number_kind_complex>::type
+                    typename std::enable_if<number_category<To>::value != number_kind_complex>::type
                     eval_set_real(To& to, const From& from) {
                     to = from;
                 }
@@ -1782,8 +1844,8 @@ namespace nil {
                 }
                 template<class T>
                 void BOOST_MP_CXX14_CONSTEXPR eval_set_imag(T&, const T&) {
-                    BOOST_STATIC_ASSERT_MSG(sizeof(T) == INT_MAX,
-                                            "eval_set_imag needs to be specialised for each specific backend");
+                    static_assert(sizeof(T) == INT_MAX,
+                                  "eval_set_imag needs to be specialised for each specific backend");
                 }
 
 //
@@ -1799,173 +1861,159 @@ namespace nil {
             //
             // Default versions of floating point classification routines:
             //
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                using nil::crypto3::multiprecision::default_ops::eval_fpclassify;
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                using multiprecision::default_ops::eval_fpclassify;
                 return eval_fpclassify(arg.backend());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int fpclassify
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 int v = fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg);
                 return (v != (int)FP_INFINITE) && (v != (int)FP_NAN);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isfinite
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnan
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NAN;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnan
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return isnan BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool isinf
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_INFINITE;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isinf
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return isinf BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NORMAL;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR bool isnormal
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
 
             // Default versions of sign manipulation functions, if individual backends can do better than this
             // (for example with signed zero), then they should overload these functions further:
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int sign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR int sign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return arg.sign();
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int sign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int sign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return sign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR int signbit
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 using default_ops::eval_signbit;
                 return eval_signbit(arg.backend());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR int signbit
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return signbit BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                changesign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> changesign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return -arg;
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type changesign
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type changesign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return changesign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> copysign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
                 return (nil::crypto3::multiprecision::signbit)(a) != (nil::crypto3::multiprecision::signbit)(b) ?
                            (nil::crypto3::multiprecision::changesign)(a) :
                            a;
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
-                     class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
+                     class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> copysign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
+                    a, multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
-                     nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
+                     multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> copysign
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
+                    multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
             template<class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b,
                      class A4b>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type copysign
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type copysign
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                    const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
             //
             // real and imag:
             //
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
-                real(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates>>::type
+                real(const multiprecision::number<Backend, ExpressionTemplates>& a) {
                 using default_ops::eval_real;
-                typedef typename scalar_result_from_possible_complex<
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type result_type;
+                using result_type = typename scalar_result_from_possible_complex<
+                    multiprecision::number<Backend, ExpressionTemplates>>::type;
                 nil::crypto3::multiprecision::detail::scoped_default_precision<result_type> precision_guard(a);
                 result_type result;
                 eval_real(result.backend(), a.backend());
                 return result;
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
-                imag(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates>>::type
+                imag(const multiprecision::number<Backend, ExpressionTemplates>& a) {
                 using default_ops::eval_imag;
-                typedef typename scalar_result_from_possible_complex<
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type result_type;
+                using result_type = typename scalar_result_from_possible_complex<
+                    multiprecision::number<Backend, ExpressionTemplates>>::type;
                 nil::crypto3::multiprecision::detail::scoped_default_precision<result_type> precision_guard(a);
                 result_type result;
                 eval_imag(result.backend(), a.backend());
@@ -1974,20 +2022,18 @@ namespace nil {
 
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
-                real(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+                real(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return real(value_type(arg));
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
-                imag(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+                imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return imag(value_type(arg));
             }
@@ -2001,7 +2047,7 @@ namespace nil {
                 typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex,
                                                  component_type<number<T, ExpressionTemplates>>>::type
                 abs(const number<T, ExpressionTemplates>& v) {
-                return BOOST_MP_MOVE(boost::math::hypot(real(v), imag(v)));
+                return std::move(boost::math::hypot(real(v), imag(v)));
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR typename boost::lazy_enable_if_c<
@@ -2009,26 +2055,26 @@ namespace nil {
                     number_kind_complex,
                 component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>>::type
                 abs(const detail::expression<tag, A1, A2, A3, A4>& v) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(abs(static_cast<number_type>(v)));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(abs(static_cast<number_type>(v)));
             }
 
             template<class T, expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<T>::value == number_kind_complex,
                 typename scalar_result_from_possible_complex<number<T, ExpressionTemplates>>::type>::type
                 arg(const number<T, ExpressionTemplates>& v) {
-                return BOOST_MP_MOVE(atan2(imag(v), real(v)));
+                return std::move(atan2(imag(v), real(v)));
             }
             template<class T, expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<T>::value == number_kind_floating_point,
                 typename scalar_result_from_possible_complex<number<T, ExpressionTemplates>>::type>::type
                 arg(const number<T, ExpressionTemplates>&) {
                 return 0;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                         number_kind_complex ||
                     number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
@@ -2036,8 +2082,8 @@ namespace nil {
                 typename scalar_result_from_possible_complex<
                     typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
                 arg(const detail::expression<tag, A1, A2, A3, A4>& v) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(arg(static_cast<number_type>(v)));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(arg(static_cast<number_type>(v)));
             }
 
             template<class T, expression_template_option ExpressionTemplates>
@@ -2046,10 +2092,10 @@ namespace nil {
                                                  component_type<number<T, ExpressionTemplates>>>::type
                 norm(const number<T, ExpressionTemplates>& v) {
                 typename component_type<number<T, ExpressionTemplates>>::type a(real(v)), b(imag(v));
-                return BOOST_MP_MOVE(a * a + b * b);
+                return std::move(a * a + b * b);
             }
             template<class T, expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<T>::value != number_kind_complex,
                 typename scalar_result_from_possible_complex<number<T, ExpressionTemplates>>::type>::type
                 norm(const number<T, ExpressionTemplates>& v) {
@@ -2059,8 +2105,8 @@ namespace nil {
             inline BOOST_MP_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<
                 typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 norm(const detail::expression<tag, A1, A2, A3, A4>& v) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(norm(static_cast<number_type>(v)));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(norm(static_cast<number_type>(v)));
             }
 
             template<class Backend, expression_template_option ExpressionTemplates>
@@ -2074,9 +2120,9 @@ namespace nil {
 
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
                      expression_template_option ExpressionTemplates>
-            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
-                               number<Backend, ExpressionTemplates>>::value,
+            BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
+                             number<Backend, ExpressionTemplates>>::value,
                 typename complex_result_from_scalar<number<Backend, ExpressionTemplates>>::type>::type
                 polar(detail::expression<tag, A1, A2, A3, A4> const& r,
                       number<Backend, ExpressionTemplates> const& theta) {
@@ -2087,9 +2133,9 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2,
                      class A3, class A4>
-            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
-                               number<Backend, ExpressionTemplates>>::value,
+            BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
+                             number<Backend, ExpressionTemplates>>::value,
                 typename complex_result_from_scalar<number<Backend, ExpressionTemplates>>::type>::type
                 polar(number<Backend, ExpressionTemplates> const& r,
                       detail::expression<tag, A1, A2, A3, A4> const& theta) {
@@ -2100,14 +2146,14 @@ namespace nil {
 
             template<class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b,
                      class A4b>
-            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
-                               typename detail::expression<tagb, A1b, A2b, A3b, A4b>::result_type>::value,
+            BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                std::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type,
+                             typename detail::expression<tagb, A1b, A2b, A3b, A4b>::result_type>::value,
                 typename complex_result_from_scalar<
                     typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
                 polar(detail::expression<tag, A1, A2, A3, A4> const& r,
                       detail::expression<tagb, A1b, A2b, A3b, A4b> const& theta) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type scalar_type;
+                using scalar_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)),
                                                                               scalar_type(r * sin(theta)));
             }
@@ -2115,8 +2161,8 @@ namespace nil {
             // We also allow the first argument to polar to be an arithmetic type (probably a literal):
             //
             template<class Scalar, class Backend, expression_template_option ExpressionTemplates>
-            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                boost::is_arithmetic<Scalar>::value,
+            BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                nil::crypto3::multiprecision::detail::is_arithmetic<Scalar>::value,
                 typename complex_result_from_scalar<number<Backend, ExpressionTemplates>>::type>::type
                 polar(Scalar const& r, number<Backend, ExpressionTemplates> const& theta) {
                 return typename complex_result_from_scalar<number<Backend, ExpressionTemplates>>::type(
@@ -2126,11 +2172,11 @@ namespace nil {
 
             template<class tag, class A1, class A2, class A3, class A4, class Scalar>
             BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<boost::is_arithmetic<Scalar>::value,
-                                            typename complex_result_from_scalar<typename detail::expression<
-                                                tag, A1, A2, A3, A4>::result_type>::type>::type
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<Scalar>::value,
+                                        typename complex_result_from_scalar<
+                                            typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
                 polar(Scalar const& r, detail::expression<tag, A1, A2, A3, A4> const& theta) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type scalar_type;
+                using scalar_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)),
                                                                               scalar_type(r * sin(theta)));
             }
@@ -2152,214 +2198,178 @@ namespace nil {
             }
 
         }    // namespace multiprecision
-    }
-}
-namespace boost {
-    namespace math {
 
-        //
-        // Import Math functions here, so they can be found by Boost.Math:
-        //
-        using nil::crypto3::multiprecision::changesign;
-        using nil::crypto3::multiprecision::copysign;
-        using nil::crypto3::multiprecision::fpclassify;
-        using nil::crypto3::multiprecision::isfinite;
-        using nil::crypto3::multiprecision::isinf;
-        using nil::crypto3::multiprecision::isnan;
-        using nil::crypto3::multiprecision::isnormal;
-        using nil::crypto3::multiprecision::sign;
-        using nil::crypto3::multiprecision::signbit;
+        namespace math {
 
-    }    // namespace math
-}
+            //
+            // Import Math functions here, so they can be found by Boost.Math:
+            //
+            using nil::crypto3::multiprecision::changesign;
+            using nil::crypto3::multiprecision::copysign;
+            using nil::crypto3::multiprecision::fpclassify;
+            using nil::crypto3::multiprecision::isfinite;
+            using nil::crypto3::multiprecision::isinf;
+            using nil::crypto3::multiprecision::isnan;
+            using nil::crypto3::multiprecision::isnormal;
+            using nil::crypto3::multiprecision::sign;
+            using nil::crypto3::multiprecision::signbit;
 
-namespace nil {
-    namespace crypto3 {
+        }    // namespace math
+
         namespace multiprecision {
 
-            typedef ::boost::math::policies::policy<
+            using c99_error_policy = ::boost::math::policies::policy<
                 ::boost::math::policies::domain_error<::boost::math::policies::errno_on_error>,
                 ::boost::math::policies::pole_error<::boost::math::policies::errno_on_error>,
                 ::boost::math::policies::overflow_error<::boost::math::policies::errno_on_error>,
                 ::boost::math::policies::evaluation_error<::boost::math::policies::errno_on_error>,
-                ::boost::math::policies::rounding_error<::boost::math::policies::errno_on_error>>
-                c99_error_policy;
+                ::boost::math::policies::rounding_error<::boost::math::policies::errno_on_error>>;
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
-                    asinh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+                typename std::enable_if<number_category<Backend>::value != number_kind_complex,
+                                        multiprecision::number<Backend, ExpressionTemplates>>::type asinh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::asinh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<
-                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type asinh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
+                    number_kind_complex,
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type asinh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return asinh(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
-                    acosh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+                typename std::enable_if<number_category<Backend>::value != number_kind_complex,
+                                        multiprecision::number<Backend, ExpressionTemplates>>::type acosh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::acosh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<
-                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type acosh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
+                    number_kind_complex,
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type acosh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return acosh(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value != number_kind_complex,
-                                            nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::type
-                    atanh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+                typename std::enable_if<number_category<Backend>::value != number_kind_complex,
+                                        multiprecision::number<Backend, ExpressionTemplates>>::type atanh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::atanh(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<
-                    tag, A1, A2, A3, A4>::result_type>::value != number_kind_complex,
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type atanh
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
+                    number_kind_complex,
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type atanh
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return atanh(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates>
+                cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::cbrt(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type cbrt
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type cbrt
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return cbrt(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                erf BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates>
+                erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::erf(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erf
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erf
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return erf(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                erfc BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates>
+                erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::erfc(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erfc
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erfc
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return erfc(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> expm1
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::expm1(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type expm1
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type expm1
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return expm1(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> result;
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> lgamma
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
+                multiprecision::number<Backend, ExpressionTemplates> result;
                 result = boost::math::lgamma(arg, c99_error_policy());
                 if ((nil::crypto3::multiprecision::isnan)(result) && !(nil::crypto3::multiprecision::isnan)(arg)) {
-                    result = std::numeric_limits<
-                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::infinity();
+                    result = std::numeric_limits<multiprecision::number<Backend, ExpressionTemplates>>::infinity();
                     errno = ERANGE;
                 }
                 return result;
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type lgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type lgamma
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return lgamma(value_type(arg));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> tgamma
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 if ((arg == 0) &&
-                    std::numeric_limits<
-                        nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::has_infinity) {
+                    std::numeric_limits<multiprecision::number<Backend, ExpressionTemplates>>::has_infinity) {
                     errno = ERANGE;
                     return 1 / arg;
                 }
@@ -2367,139 +2377,126 @@ namespace nil {
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type tgamma
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type tgamma
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return tgamma(value_type(arg));
             }
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR long lrint
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return lround(arg);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR long lrint
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
                 return lround(arg);
             }
 #ifndef BOOST_NO_LONG_LONG
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
                 return llround(arg);
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(
-                const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+            inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type llrint
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
                 return llround(arg);
             }
 #endif
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                log1p BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(arg);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> log1p
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    arg);
                 return boost::math::log1p(arg, c99_error_policy());
             }
             template<class tag, class A1, class A2, class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type log1p
-                BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type log1p
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(arg);
                 return log1p(value_type(arg));
             }
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nextafter
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return boost::math::nextafter(a, b, c99_error_policy());
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
-                     class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
+                     class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nextafter
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
+                    a, multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
-                     nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+                     multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nextafter
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
+                    multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
             template<class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b,
                      class A4b>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nextafter
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nextafter
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                    const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(a, b);
                 return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nexttoward
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return boost::math::nextafter(a, b, c99_error_policy());
             }
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
-                     class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1,
+                     class A2, class A3, class A4>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nexttoward
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a,
+                                                 const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    a, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(b));
+                    a, multiprecision::number<Backend, ExpressionTemplates>(b));
             }
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
-                     nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>
-                nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& b) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(a, b);
+                     multiprecision::expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR multiprecision::number<Backend, ExpressionTemplates> nexttoward
+                BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                                                 const multiprecision::number<Backend, ExpressionTemplates>& b) {
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>(a), b);
+                    multiprecision::number<Backend, ExpressionTemplates>(a), b);
             }
             template<class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b,
                      class A4b>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nexttoward
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nexttoward
                 BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
-                    const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    value_type;
+                    const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a,
+                    const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b) {
+                using value_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 detail::scoped_default_precision<value_type> precision_guard(a, b);
                 return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
             }
@@ -2508,10 +2505,10 @@ namespace nil {
                      expression_template_option ET3>
             inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a,
                                                                  const number<B3, ET3>& b) {
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B2, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B3, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B2, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B3, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
                 using default_ops::eval_add;
                 eval_add(result.backend(), a.backend(), b.backend());
                 return result;
@@ -2521,10 +2518,10 @@ namespace nil {
                      expression_template_option ET3>
             inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& subtract(number<B1, ET1>& result, const number<B2, ET2>& a,
                                                                       const number<B3, ET3>& b) {
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B2, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B3, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B2, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B3, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
                 using default_ops::eval_subtract;
                 eval_subtract(result.backend(), a.backend(), b.backend());
                 return result;
@@ -2534,10 +2531,10 @@ namespace nil {
                      expression_template_option ET3>
             inline BOOST_MP_CXX14_CONSTEXPR number<B1, ET1>& multiply(number<B1, ET1>& result, const number<B2, ET2>& a,
                                                                       const number<B3, ET3>& b) {
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B2, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
-                BOOST_STATIC_ASSERT_MSG((boost::is_convertible<B3, B1>::value),
-                                        "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B2, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
+                static_assert((std::is_convertible<B3, B1>::value),
+                              "No conversion to the target of a mixed precision addition exists");
                 using default_ops::eval_multiply;
                 eval_multiply(result.backend(), a.backend(), b.backend());
                 return result;
@@ -2545,30 +2542,33 @@ namespace nil {
 
             template<class B, expression_template_option ET, class I>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<boost::is_integral<I>::value, number<B, ET>&>::type
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<I>::value,
+                                        number<B, ET>&>::type
                 add(number<B, ET>& result, const I& a, const I& b) {
                 using default_ops::eval_add;
-                typedef typename detail::canonical<I, B>::type canonical_type;
+                using canonical_type = typename detail::canonical<I, B>::type;
                 eval_add(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
                 return result;
             }
 
             template<class B, expression_template_option ET, class I>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<boost::is_integral<I>::value, number<B, ET>&>::type
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<I>::value,
+                                        number<B, ET>&>::type
                 subtract(number<B, ET>& result, const I& a, const I& b) {
                 using default_ops::eval_subtract;
-                typedef typename detail::canonical<I, B>::type canonical_type;
+                using canonical_type = typename detail::canonical<I, B>::type;
                 eval_subtract(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
                 return result;
             }
 
             template<class B, expression_template_option ET, class I>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<boost::is_integral<I>::value, number<B, ET>&>::type
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<I>::value,
+                                        number<B, ET>&>::type
                 multiply(number<B, ET>& result, const I& a, const I& b) {
                 using default_ops::eval_multiply;
-                typedef typename detail::canonical<I, B>::type canonical_type;
+                using canonical_type = typename detail::canonical<I, B>::type;
                 eval_multiply(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
                 return result;
             }
@@ -2576,16 +2576,16 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type
                 trunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(trunc(number_type(v), pol));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(trunc(number_type(v), pol));
             }
 
             template<class Backend, expression_template_option ExpressionTemplates, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>
                 trunc(const number<Backend, ExpressionTemplates>& v, const Policy&) {
                 using default_ops::eval_trunc;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates>> precision_guard(
+                    v);
                 number<Backend, ExpressionTemplates> result;
                 eval_trunc(result.backend(), v.backend());
                 return result;
@@ -2594,7 +2594,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR int itrunc(const detail::expression<tag, A1, A2, A3, A4>& v,
                                                        const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(trunc(v, pol));
                 if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() ||
                     !(boost::math::isfinite)(v))
@@ -2623,7 +2623,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR long ltrunc(const detail::expression<tag, A1, A2, A3, A4>& v,
                                                         const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(trunc(v, pol));
                 if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() ||
                     !(boost::math::isfinite)(v))
@@ -2652,7 +2652,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type
                 lltrunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(trunc(v, pol));
                 if ((r > (std::numeric_limits<boost::long_long_type>::max)()) ||
                     r < (std::numeric_limits<boost::long_long_type>::min)() || !(boost::math::isfinite)(v))
@@ -2683,15 +2683,14 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type
                 round(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(round(static_cast<number_type>(v), pol));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(round(static_cast<number_type>(v), pol));
             }
             template<class T, expression_template_option ExpressionTemplates, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR number<T, ExpressionTemplates>
                 round(const number<T, ExpressionTemplates>& v, const Policy&) {
                 using default_ops::eval_round;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_round(result.backend(), v.backend());
                 return result;
@@ -2700,7 +2699,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR int iround(const detail::expression<tag, A1, A2, A3, A4>& v,
                                                        const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(round(v, pol));
                 if ((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() ||
                     !(boost::math::isfinite)(v))
@@ -2728,7 +2727,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR long lround(const detail::expression<tag, A1, A2, A3, A4>& v,
                                                         const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(round(v, pol));
                 if ((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() ||
                     !(boost::math::isfinite)(v))
@@ -2757,7 +2756,7 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Policy>
             inline BOOST_MP_CXX14_CONSTEXPR boost::long_long_type
                 llround(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type r(round(v, pol));
                 if ((r > (std::numeric_limits<boost::long_long_type>::max)()) ||
                     r < (std::numeric_limits<boost::long_long_type>::min)() || !(boost::math::isfinite)(v))
@@ -2792,87 +2791,83 @@ namespace nil {
             //
             template<class T, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, short* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                     number_kind_floating_point,
                 typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, short* pint) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(frexp(static_cast<number_type>(v), pint));
             }
             template<class T, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, int* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                     number_kind_floating_point,
                 typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, int* pint) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(frexp(static_cast<number_type>(v), pint));
             }
             template<class T, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, long* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                     number_kind_floating_point,
                 typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, long* pint) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(frexp(static_cast<number_type>(v), pint));
             }
             template<class T, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 frexp(const number<T, ExpressionTemplates>& v, boost::long_long_type* pint) {
                 using default_ops::eval_frexp;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_frexp(result.backend(), v.backend(), pint);
                 return result;
             }
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                     number_kind_floating_point,
                 typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
                 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, boost::long_long_type* pint) {
-                typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
-                return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+                using number_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
+                return std::move(frexp(static_cast<number_type>(v), pint));
             }
             //
             // modf does not return an expression template since we require the
@@ -2881,12 +2876,11 @@ namespace nil {
             //
             template<class T, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 modf(const number<T, ExpressionTemplates>& v, number<T, ExpressionTemplates>* pipart) {
                 using default_ops::eval_modf;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result;
                 eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : 0);
                 return result;
@@ -2894,12 +2888,11 @@ namespace nil {
             template<class T, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3,
                      class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<T>::value == number_kind_floating_point,
-                                            number<T, ExpressionTemplates>>::type
+                typename std::enable_if<number_category<T>::value == number_kind_floating_point,
+                                        number<T, ExpressionTemplates>>::type
                 modf(const detail::expression<tag, A1, A2, A3, A4>& v, number<T, ExpressionTemplates>* pipart) {
                 using default_ops::eval_modf;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<T, ExpressionTemplates>>
-                    precision_guard(v);
+                detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates>> precision_guard(v);
                 number<T, ExpressionTemplates> result, arg(v);
                 eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : 0);
                 return result;
@@ -2909,28 +2902,13 @@ namespace nil {
             // Integer square root:
             //
             template<class B, expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<B>::value == number_kind_integer,
-                                            number<B, ExpressionTemplates>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
+                                                                    number<B, ExpressionTemplates>>::type
                 sqrt(const number<B, ExpressionTemplates>& x) {
                 using default_ops::eval_integer_sqrt;
                 number<B, ExpressionTemplates> s, r;
                 eval_integer_sqrt(s.backend(), r.backend(), x.backend());
                 return s;
-            }
-
-            template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-                number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
-                    number_kind_integer,
-                typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
-                sqrt(const detail::expression<tag, A1, A2, A3, A4>& arg) {
-                using default_ops::eval_integer_sqrt;
-                using result_type = typename detail::expression<tag, A1, A2, A3, A4>::result_type;
-                detail::scoped_default_precision<result_type> precision_guard(arg);
-                result_type result, v(arg), r;
-                eval_integer_sqrt(result.backend(), r.backend(), v.backend());
-                return result;
             }
             //
             // fma:
@@ -2948,11 +2926,12 @@ namespace nil {
             }    // namespace default_ops
 
             template<class Backend, class U, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_on>>::value == number_kind_floating_point>,
-                    boost::mpl::or_<is_number<U>, is_number_expression<U>, boost::is_arithmetic<U>>,
-                    boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<number<Backend, et_on>>::value == number_kind_floating_point) &&
+                    (is_number<U>::value || is_number_expression<U>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<U>::value) &&
+                    (is_number<V>::value || is_number_expression<V>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
                 detail::expression<detail::function, default_ops::fma_func, number<Backend, et_on>, U, V>>::type
                 fma(const number<Backend, et_on>& a, const U& b, const V& c) {
                 return detail::expression<detail::function, default_ops::fma_func, number<Backend, et_on>, U, V>(
@@ -2960,12 +2939,13 @@ namespace nil {
             }
 
             template<class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::mpl::bool_<number_category<typename detail::expression<
-                                                       tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
-                                                   number_kind_floating_point>,
-                                 boost::mpl::or_<is_number<U>, is_number_expression<U>, boost::is_arithmetic<U>>,
-                                 boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
+                 number_kind_floating_point) &&
+                    (is_number<U>::value || is_number_expression<U>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<U>::value) &&
+                    (is_number<V>::value || is_number_expression<V>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
                 detail::expression<detail::function, default_ops::fma_func,
                                    detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, V>>::type
                 fma(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, const V& c) {
@@ -2975,16 +2955,17 @@ namespace nil {
             }
 
             template<class Backend, class U, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_off>>::value == number_kind_floating_point>,
-                    boost::mpl::or_<is_number<U>, is_number_expression<U>, boost::is_arithmetic<U>>,
-                    boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
-                number<Backend, et_off>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename std::enable_if<(number_category<number<Backend, et_off>>::value ==
+                                         number_kind_floating_point) &&
+                                            (is_number<U>::value || is_number_expression<U>::value ||
+                                             nil::crypto3::multiprecision::detail::is_arithmetic<U>::value) &&
+                                            (is_number<V>::value || is_number_expression<V>::value ||
+                                             nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
+                                        number<Backend, et_off>>::type
                 fma(const number<Backend, et_off>& a, const U& b, const V& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    a, b, c);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -2993,11 +2974,11 @@ namespace nil {
             }
 
             template<class U, class Backend, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_on>>::value == number_kind_floating_point>,
-                    boost::is_arithmetic<U>,
-                    boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<number<Backend, et_on>>::value == number_kind_floating_point) &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                    (is_number<V>::value || is_number_expression<V>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
                 detail::expression<detail::function, default_ops::fma_func, U, number<Backend, et_on>, V>>::type
                 fma(const U& a, const number<Backend, et_on>& b, const V& c) {
                 return detail::expression<detail::function, default_ops::fma_func, U, number<Backend, et_on>, V>(
@@ -3005,12 +2986,12 @@ namespace nil {
             }
 
             template<class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::mpl::bool_<number_category<typename detail::expression<
-                                                       tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
-                                                   number_kind_floating_point>,
-                                 boost::is_arithmetic<U>,
-                                 boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
+                 number_kind_floating_point) &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                    (is_number<V>::value || is_number_expression<V>::value ||
+                     nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
                 detail::expression<detail::function, default_ops::fma_func, U,
                                    detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V>>::type
                 fma(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, const V& c) {
@@ -3020,16 +3001,16 @@ namespace nil {
             }
 
             template<class U, class Backend, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_off>>::value == number_kind_floating_point>,
-                    boost::is_arithmetic<U>,
-                    boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_arithmetic<V>>>,
-                number<Backend, et_off>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename std::enable_if<(number_category<number<Backend, et_off>>::value ==
+                                         number_kind_floating_point) &&
+                                            nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                                            (is_number<V>::value || is_number_expression<V>::value ||
+                                             nil::crypto3::multiprecision::detail::is_arithmetic<V>::value),
+                                        number<Backend, et_off>>::type
                 fma(const U& a, const number<Backend, et_off>& b, const V& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    a, b, c);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -3038,10 +3019,10 @@ namespace nil {
             }
 
             template<class U, class V, class Backend>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_on>>::value == number_kind_floating_point>,
-                    boost::is_arithmetic<U>, boost::is_arithmetic<V>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<number<Backend, et_on>>::value == number_kind_floating_point) &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<V>::value,
                 detail::expression<detail::function, default_ops::fma_func, U, V, number<Backend, et_on>>>::type
                 fma(const U& a, const V& b, const number<Backend, et_on>& c) {
                 return detail::expression<detail::function, default_ops::fma_func, U, V, number<Backend, et_on>>(
@@ -3049,11 +3030,11 @@ namespace nil {
             }
 
             template<class U, class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::mpl::bool_<number_category<typename detail::expression<
-                                                       tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
-                                                   number_kind_floating_point>,
-                                 boost::is_arithmetic<U>, boost::is_arithmetic<V>>,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
+                 number_kind_floating_point) &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                    nil::crypto3::multiprecision::detail::is_arithmetic<V>::value,
                 detail::expression<detail::function, default_ops::fma_func, U, V,
                                    detail::expression<tag, Arg1, Arg2, Arg3, Arg4>>>::type
                 fma(const U& a, const V& b, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& c) {
@@ -3063,15 +3044,15 @@ namespace nil {
             }
 
             template<class U, class V, class Backend>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<
-                    boost::mpl::bool_<number_category<number<Backend, et_off>>::value == number_kind_floating_point>,
-                    boost::is_arithmetic<U>, boost::is_arithmetic<V>>,
-                number<Backend, et_off>>::type
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename std::enable_if<(number_category<number<Backend, et_off>>::value ==
+                                         number_kind_floating_point) &&
+                                            nil::crypto3::multiprecision::detail::is_arithmetic<U>::value &&
+                                            nil::crypto3::multiprecision::detail::is_arithmetic<V>::value,
+                                        number<Backend, et_off>>::type
                 fma(const U& a, const V& b, const number<Backend, et_off>& c) {
                 using default_ops::eval_multiply_add;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    a, b, c);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(a, b, c);
                 number<Backend, et_off> result;
                 eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a),
                                   number<Backend, et_off>::canonical_value(b),
@@ -3091,7 +3072,7 @@ namespace nil {
             }    // namespace default_ops
 
             template<class Backend, class U>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<number<Backend, et_on>>::value == number_kind_floating_point,
                 detail::expression<detail::function, default_ops::remquo_func, number<Backend, et_on>, U, int*>>::type
                 remquo(const number<Backend, et_on>& a, const U& b, int* pi) {
@@ -3100,7 +3081,7 @@ namespace nil {
             }
 
             template<class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
                     number_kind_floating_point,
                 detail::expression<detail::function, default_ops::remquo_func,
@@ -3112,7 +3093,7 @@ namespace nil {
             }
 
             template<class U, class Backend>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 (number_category<number<Backend, et_on>>::value == number_kind_floating_point) &&
                     !is_number<U>::value && !is_number_expression<U>::value,
                 detail::expression<detail::function, default_ops::remquo_func, U, number<Backend, et_on>, int*>>::type
@@ -3122,7 +3103,7 @@ namespace nil {
             }
 
             template<class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value ==
                  number_kind_floating_point) &&
                     !is_number<U>::value && !is_number_expression<U>::value,
@@ -3136,67 +3117,48 @@ namespace nil {
 
             template<class Backend, class U>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<number<Backend, et_on>>::value ==
-                                                number_kind_floating_point,
-                                            number<Backend, et_off>>::type
+                typename std::enable_if<number_category<number<Backend, et_on>>::value == number_kind_floating_point,
+                                        number<Backend, et_off>>::type
                 remquo(const number<Backend, et_off>& a, const U& b, int* pi) {
                 using default_ops::eval_remquo;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    a, b);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(a, b);
                 number<Backend, et_off> result;
                 eval_remquo(result.backend(), a.backend(), number<Backend, et_off>::canonical_value(b), pi);
                 return result;
             }
             template<class U, class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<(number_category<number<Backend, et_on>>::value ==
-                                             number_kind_floating_point) &&
-                                                !is_number<U>::value && !is_number_expression<U>::value,
-                                            number<Backend, et_off>>::type
+                typename std::enable_if<(number_category<number<Backend, et_on>>::value ==
+                                         number_kind_floating_point) &&
+                                            !is_number<U>::value && !is_number_expression<U>::value,
+                                        number<Backend, et_off>>::type
                 remquo(const U& a, const number<Backend, et_off>& b, int* pi) {
                 using default_ops::eval_remquo;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    a, b);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(a, b);
                 number<Backend, et_off> result;
                 eval_remquo(result.backend(), number<Backend, et_off>::canonical_value(a), b.backend(), pi);
                 return result;
             }
 
             template<class B, expression_template_option ExpressionTemplates>
-            inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<B>::value == number_kind_integer,
-                                            number<B, ExpressionTemplates>>::type
-                sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r) {
-                using default_ops::eval_integer_sqrt;
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<B, ExpressionTemplates>>
-                    precision_guard(x, r);
-                number<B, ExpressionTemplates> s;
-                eval_integer_sqrt(s.backend(), r.backend(), x.backend());
-                return s;
-            }
-
-            template<class B, expression_template_option ExpressionTemplates, class tag, class Arg1, class Arg2,
-                     class Arg3, class Arg4>
             inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<B>::value == number_kind_integer,
                                                                     number<B, ExpressionTemplates>>::type
-                sqrt(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& arg, number<B, ExpressionTemplates>& r) {
+                sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r) {
                 using default_ops::eval_integer_sqrt;
-                detail::scoped_default_precision<multiprecision::number<B, ExpressionTemplates>> precision_guard(r);
+                detail::scoped_default_precision<multiprecision::number<B, ExpressionTemplates>> precision_guard(x, r);
                 number<B, ExpressionTemplates> s;
-                number<B, ExpressionTemplates> x(arg);
                 eval_integer_sqrt(s.backend(), r.backend(), x.backend());
                 return s;
             }
 
             // clang-format off
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 #define UNARY_OP_FUNCTOR_CXX11_RVALUE(func, category)\
    template <class Backend>                                                                                                                                                                               \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category, number<Backend, et_on> > ::type                                                                      \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> > ::type                                                                      \
    func(number<Backend, et_on>&& arg)                                                                                                                                                                     \
    {                                                                                                                                                                                                      \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                    \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                    \
       number<Backend, et_off>                                                    result;                                                                                                                  \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                         \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend());                                                                                                                                                                  \
@@ -3205,34 +3167,34 @@ namespace nil {
 
 #define BINARY_OP_FUNCTOR_CXX11_RVALUE(func, category)\
    template <class Backend>                                                                                                                                                                                                                                \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, const number<Backend, et_on>& a)                                                                                              \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, const number<Backend, et_on>& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend>                                                                                                                                                                                                                                \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category, number<Backend, et_on> >::type func(const number<Backend, et_on>& arg, number<Backend, et_on>&& a)                                                                                              \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(const number<Backend, et_on>& arg, number<Backend, et_on>&& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend>                                                                                                                                                                                                                                \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, number<Backend, et_on>&& a)                                                                                              \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, number<Backend, et_on> >::type func(number<Backend, et_on>&& arg, number<Backend, et_on>&& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class tag, class A1, class A2, class A3, class A4>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            number<Backend, et_on> > ::type                                                                                                                                                                       \
    func(number<Backend, et_on>&& arg, const detail::expression<tag, A1, A2, A3, A4>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3240,7 +3202,7 @@ namespace nil {
              number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Backend>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            number<Backend, et_on> > ::type                                                                                                                                                                       \
    func(const detail::expression<tag, A1, A2, A3, A4>& arg, number<Backend, et_on>&& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3248,7 +3210,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4>, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),                                                                                                                     \
            number<Backend, et_on> >::type                                                                                                                                                                                                     \
    func(number<Backend, et_on>&& arg, const Arithmetic& a)                                                                                                                                               \
@@ -3257,7 +3219,7 @@ namespace nil {
              number<Backend, et_on>, Arithmetic > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                                                         \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),                                                                                                                     \
            number<Backend, et_on> > ::type                                                                                                                                                                                                    \
    func(const Arithmetic& arg, number<Backend, et_on>&& a)                                                                                                                                              \
@@ -3267,10 +3229,6 @@ namespace nil {
              Arithmetic, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend > (), arg, a);                                                                                                                          \
    }                                                                                                                                                                                                                                                       \
 
-#else
-#define UNARY_OP_FUNCTOR_CXX11_RVALUE(func, category)
-#define BINARY_OP_FUNCTOR_CXX11_RVALUE(func, category)
-#endif
 
 #define UNARY_OP_FUNCTOR(func, category)                                                                                                                                                                  \
    namespace detail {                                                                                                                                                                                     \
@@ -3290,13 +3248,13 @@ namespace nil {
          Backend temp;                                                                                                                                                                                    \
          BOOST_JOIN(eval_, func)                                                                                                                                                                          \
          (temp, arg);                                                                                                                                                                                     \
-         result = temp;                                                                                                                                                                                   \
+         result = std::move(temp);                                                                                                                                                                                   \
       }                                                                                                                                                                                                   \
    };                                                                                                                                                                                                     \
    }                                                                                                                                                                                                      \
                                                                                                                                                                                                           \
    template <class tag, class A1, class A2, class A3, class A4>                                                                                                                                           \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category,                                                                     \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category,                                                                     \
                                                         detail::expression<detail::function,                                                                                                              \
                                                         detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>,            \
                                                         detail::expression<tag, A1, A2, A3, A4> > > ::type                                                                                                \
@@ -3307,7 +3265,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type > (), arg); \
    }                                                                                                                                                                                                      \
    template <class Backend>                                                                                                                                                                               \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category,                                                                                                      \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category,                                                                                                      \
           detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend>, number<Backend, et_on> > > ::type                                                       \
    func(const number<Backend, et_on>& arg)                                                                                                                                                                \
    {                                                                                                                                                                                                      \
@@ -3316,12 +3274,12 @@ namespace nil {
              number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend > (), arg);                                                                                        \
    }                                                                                                                                                                                                      \
    template <class Backend>                                                                                                                                                                               \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                    \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                    \
        nil::crypto3::multiprecision::number_category<Backend>::value == category,                                                                                                                                \
        number<Backend, et_off> >::type                                                                                                                                                                    \
    func(const number<Backend, et_off>& arg)                                                                                                                                                               \
    {                                                                                                                                                                                                      \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                    \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                    \
       number<Backend, et_off>                                                    result;                                                                                                                  \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                         \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend());                                                                                                                                                                  \
@@ -3361,7 +3319,7 @@ namespace nil {
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, a);                                                                                                                                                                                                                                      \
-         result = r;                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg, const Arithmetic& a) const                                                                                                                                                                            \
@@ -3370,7 +3328,7 @@ namespace nil {
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, arg, number<Backend>::canonical_value(a));                                                                                                                                                                                                    \
-         result = r;                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
       template <class U, class Arithmetic>                                                                                                                                                                                                                 \
       BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, const Arithmetic& arg, const Backend& a) const                                                                                                                                                                            \
@@ -3379,12 +3337,12 @@ namespace nil {
          Backend r;                                                                                                                                                                                                                                        \
          BOOST_JOIN(eval_, func)                                                                                                                                                                                                                           \
          (r, number<Backend>::canonical_value(arg), a);                                                                                                                                                                                                    \
-         result = r;                                                                                                                                                                                                                                       \
+         result = std::move(r);                                                                                                                                                                                                                                       \
       }                                                                                                                                                                                                                                                    \
    };                                                                                                                                                                                                                                                      \
    }                                                                                                                                                                                                                                                       \
    template <class Backend>                                                                                                                                                                                                                                \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == category, detail::expression<detail::function, \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<number_category<Backend>::value == category, detail::expression<detail::function, \
          detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>, number<Backend, et_on>, number<Backend, et_on> > > ::type                                                                                                                                                                \
    func(const number<Backend, et_on>& arg, const number<Backend, et_on>& a)                                                                                              \
    {                                                                                                                                                                                                                                                       \
@@ -3392,7 +3350,7 @@ namespace nil {
              number<Backend, et_on>, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                                              \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class tag, class A1, class A2, class A3, class A4>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>, number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > > ::type                                                                                                                                                                       \
    func(const number<Backend, et_on>& arg, const detail::expression<tag, A1, A2, A3, A4>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3400,7 +3358,7 @@ namespace nil {
              number<Backend, et_on>, detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Backend>                                                                                                                                                                             \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category) && (std::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),                           \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>, detail::expression<tag, A1, A2, A3, A4>, number<Backend, et_on> > > ::type                                                                                                                                                                       \
    func(const detail::expression<tag, A1, A2, A3, A4>& arg, const number<Backend, et_on>& a)                                                                                    \
    {                                                                                                                                                                                                                                                       \
@@ -3408,7 +3366,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4>, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                             \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>                                                                                                                                    \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category) && (number_category<detail::expression<tagb, A1b, A2b, A3b, A4b> >::value == category),                                                                          \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category) && (number_category<detail::expression<tagb, A1b, A2b, A3b, A4b> >::value == category),                                                                          \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>,                                                                                  \
            detail::expression<tag, A1, A2, A3, A4>, detail::expression<tagb, A1b, A2b, A3b, A4b> > > ::type                                                                                                                                                 \
    func(const detail::expression<tag, A1, A2, A3, A4>& arg, const detail::expression<tagb, A1b, A2b, A3b, A4b>& a)                                        \
@@ -3417,7 +3375,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4>, detail::expression<tagb, A1b, A2b, A3b, A4b> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>(), arg, a); \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),                                                                                                                     \
            detail::expression<detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend>,                                                                                                                                                        \
            number<Backend, et_on>, Arithmetic> > ::type                                                                                                                                                                                                     \
@@ -3427,7 +3385,7 @@ namespace nil {
              number<Backend, et_on>, Arithmetic > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>(), arg, a);                                                                                                                         \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Arithmetic>                                                                                                                                                                          \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),                                              \
            detail::expression<                                                                                                                                                                                                                             \
                detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>,                                                                                  \
@@ -3439,7 +3397,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4>, Arithmetic > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type > (), arg, a);                                  \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),                                                                                                                     \
            detail::expression<                                                                                                                                                                                                                             \
                detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend>,                                                                                                                                                        \
@@ -3451,7 +3409,7 @@ namespace nil {
              Arithmetic, number<Backend, et_on> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend > (), arg, a);                                                                                                                          \
    }                                                                                                                                                                                                                                                       \
    template <class tag, class A1, class A2, class A3, class A4, class Arithmetic>                                                                                                                                                                          \
-       inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                        \
+       inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                        \
            is_compatible_arithmetic_type<Arithmetic, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),                                              \
            detail::expression<                                                                                                                                                                                                                             \
                detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>,                                                                                  \
@@ -3463,22 +3421,22 @@ namespace nil {
              Arithmetic, detail::expression<tag, A1, A2, A3, A4> > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type > (), arg, a);                                   \
    }                                                                                                                                                                                                                                                       \
    template <class Backend>                                                                                                                                                                                                                                \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(number_category<Backend>::value == category), number<Backend, et_off> >::type                                                                                                                                                                                             \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<(number_category<Backend>::value == category), number<Backend, et_off> >::type                                                                                                                                                                                             \
    func(const number<Backend, et_off>& arg, const number<Backend, et_off>& a)                                                                                                                                                                              \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                                                                  \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)(result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                            \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                            \
        is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off> >::value && (number_category<Backend>::value == category),                                                                                                                        \
        number<Backend, et_off> >::type                                                                                                                                                                                                                     \
    func(const number<Backend, et_off>& arg, const Arithmetic& a)                                                                                                                                                                                           \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                                                                     \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                                                                     \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                                                              \
@@ -3486,12 +3444,12 @@ namespace nil {
       return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                                                            \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                                                            \
        is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off> >::value && (number_category<Backend>::value == category),                                                                                                                        \
        number<Backend, et_off> >::type                                                                                                                                                                                                                     \
    func(const Arithmetic& a, const number<Backend, et_off>& arg)                                                                                                                                                                                           \
    {                                                                                                                                                                                                                                                       \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                                                                     \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg);                                                                                                                                                     \
       number<Backend, et_off>                                                    result;                                                                                                                                                                   \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                                                              \
@@ -3502,7 +3460,7 @@ namespace nil {
 
 #define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)                                                                                                                                                            \
    template <class tag, class A1, class A2, class A3, class A4>                                                                                                                                                     \
-       inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                 \
+       inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                 \
            (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),                                                                                                                          \
            detail::expression<                                                                                                                                                                                      \
                detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>,                                           \
@@ -3514,7 +3472,7 @@ namespace nil {
              detail::expression<tag, A1, A2, A3, A4>, Arg2 > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type > (), arg, a); \
    }                                                                                                                                                                                                                \
    template <class Backend>                                                                                                                                                                                         \
-       inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                 \
+       inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                 \
            (number_category<Backend>::value == category),                                                                                                                                                           \
            detail::expression<                                                                                                                                                                                      \
                detail::function, detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend>,                                                                                                                 \
@@ -3526,12 +3484,12 @@ namespace nil {
              number<Backend, et_on>, Arg2 > (detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct)) < Backend > (), arg, a);                                                                                        \
    }                                                                                                                                                                                                                \
    template <class Backend>                                                                                                                                                                                         \
-   inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<                                                                                                                                                                                     \
+   inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<                                                                                                                                                                                     \
        (number_category<Backend>::value == category),                                                                                                                                                               \
        number<Backend, et_off> >::type                                                                                                                                                                              \
    func(const number<Backend, et_off>& arg, Arg2 const& a)                                                                                                                                                          \
    {                                                                                                                                                                                                                \
-      detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                           \
+      detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(arg, a);                                                                                                           \
       number<Backend, et_off>                                                    result;                                                                                                                            \
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                   \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                       \
@@ -3550,6 +3508,15 @@ namespace nil {
          using default_ops::BOOST_JOIN(eval_, func);                    \
          BOOST_JOIN(eval_, func)                                        \
          (result, arg, a);                                              \
+      }                                                                 \
+      template <class U, class Arg>                                              \
+      BOOST_MP_CXX14_CONSTEXPR void operator()(U& result, Backend const& arg, Arg a) const \
+      {                                                                 \
+         using default_ops::BOOST_JOIN(eval_, func);                    \
+         Backend temp;                                                  \
+         BOOST_JOIN(eval_, func)                                        \
+         (temp, arg, a);                                                \
+         result = std::move(temp);                                  \
       }                                                                 \
    };                                                                   \
    }                                                                    \
@@ -3584,8 +3551,8 @@ namespace nil {
             }    // namespace detail
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<
-                number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value !=
                     number_kind_complex,
                 detail::expression<
                     detail::function,
@@ -3600,8 +3567,8 @@ namespace nil {
                     arg);
             }
             template<class Backend>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<
-                number_category<Backend>::value == number_kind_complex,
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<Backend>::value != number_kind_complex,
                 detail::expression<detail::function, detail::abs_funct<Backend>, number<Backend, et_on>>>::type
                 abs(const number<Backend, et_on>& arg) {
                 return detail::expression<detail::function, detail::abs_funct<Backend>, number<Backend, et_on>>(
@@ -3609,11 +3576,10 @@ namespace nil {
             }
             template<class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::disable_if_c<number_category<Backend>::value == number_kind_complex,
-                                             number<Backend, et_off>>::type
+                typename std::enable_if<number_category<Backend>::value != number_kind_complex,
+                                        number<Backend, et_off>>::type
                 abs(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    arg);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_abs;
                 eval_abs(result.backend(), arg.backend());
@@ -3642,8 +3608,7 @@ namespace nil {
             }
             template<class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, et_off> conj(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    arg);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_conj;
                 eval_conj(result.backend(), arg.backend());
@@ -3672,8 +3637,7 @@ namespace nil {
             }
             template<class Backend>
             inline BOOST_MP_CXX14_CONSTEXPR number<Backend, et_off> proj(const number<Backend, et_off>& arg) {
-                detail::scoped_default_precision<nil::crypto3::multiprecision::number<Backend, et_off>> precision_guard(
-                    arg);
+                detail::scoped_default_precision<multiprecision::number<Backend, et_off>> precision_guard(arg);
                 number<Backend, et_off> result;
                 using default_ops::eval_proj;
                 eval_proj(result.backend(), arg.backend());
@@ -3769,24 +3733,23 @@ namespace nil {
             //
             // ilogb:
             //
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+            template<class Backend, multiprecision::expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_floating_point,
-                                            typename Backend::exponent_type>::type
-                ilogb(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& val) {
+                typename std::enable_if<number_category<Backend>::value == number_kind_floating_point,
+                                        typename Backend::exponent_type>::type
+                ilogb(const multiprecision::number<Backend, ExpressionTemplates>& val) {
                 using default_ops::eval_ilogb;
                 return eval_ilogb(val.backend());
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4>>::value ==
-                                                number_kind_floating_point,
-                                            typename nil::crypto3::multiprecision::detail::expression<
-                                                tag, A1, A2, A3, A4>::result_type::backend_type::exponent_type>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<detail::expression<tag, A1, A2, A3, A4>>::value == number_kind_floating_point,
+                typename multiprecision::detail::expression<tag, A1, A2, A3,
+                                                            A4>::result_type::backend_type::exponent_type>::type
                 ilogb(const detail::expression<tag, A1, A2, A3, A4>& val) {
                 using default_ops::eval_ilogb;
-                typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type arg(val);
+                typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type arg(val);
                 return eval_ilogb(arg.backend());
             }
 
@@ -3811,7 +3774,7 @@ namespace boost {
             nil::crypto3::multiprecision::detail::scoped_default_precision<
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
                 precision_guard(x);
-            return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
+            return std::move(detail::sinc_pi_imp(x));
         }
 
         template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
@@ -3821,7 +3784,7 @@ namespace boost {
             nil::crypto3::multiprecision::detail::scoped_default_precision<
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
                 precision_guard(x);
-            return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
+            return std::move(detail::sinc_pi_imp(x));
         }
 
         template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
@@ -3830,7 +3793,7 @@ namespace boost {
             nil::crypto3::multiprecision::detail::scoped_default_precision<
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
                 precision_guard(x);
-            return BOOST_MP_MOVE(detail::sinhc_pi_imp(x));
+            return std::move(detail::sinhc_pi_imp(x));
         }
 
         template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
@@ -3840,7 +3803,7 @@ namespace boost {
             nil::crypto3::multiprecision::detail::scoped_default_precision<
                 nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>
                 precision_guard(x);
-            return BOOST_MP_MOVE(boost::math::sinhc_pi(x));
+            return std::move(boost::math::sinhc_pi(x));
         }
 
         using nil::crypto3::multiprecision::gcd;
@@ -3857,6 +3820,7 @@ namespace boost {
         using nil::crypto3::multiprecision::lcm;
 
     }    // namespace integer
+
 }    // namespace boost
 
 //

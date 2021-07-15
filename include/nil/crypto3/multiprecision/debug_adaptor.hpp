@@ -14,18 +14,13 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127)    // conditional expression is constant
-#endif
-
                 template<class Backend>
                 struct debug_adaptor {
-                    typedef typename Backend::signed_types signed_types;
-                    typedef typename Backend::unsigned_types unsigned_types;
-                    typedef typename Backend::float_types float_types;
-                    typedef
-                        typename extract_exponent_type<Backend, number_category<Backend>::value>::type exponent_type;
+                    using signed_types = typename Backend::signed_types;
+                    using unsigned_types = typename Backend::unsigned_types;
+                    using float_types = typename Backend::float_types;
+                    using exponent_type =
+                        typename extract_exponent_type<Backend, number_category<Backend>::value>::type;
 
                 private:
                     std::string debug_value;
@@ -57,7 +52,7 @@ namespace nil {
                     }
                     template<class T>
                     debug_adaptor(const T& i,
-                                  const typename boost::enable_if_c<boost::is_convertible<T, Backend>::value>::type* = 0) :
+                                  const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = 0) :
                         m_value(i) {
                         update_view();
                     }
@@ -66,8 +61,9 @@ namespace nil {
                         update_view();
                     }
                     template<class T>
-                    typename boost::enable_if_c<boost::is_arithmetic<T>::value || boost::is_convertible<T, Backend>::value,
-                                         debug_adaptor&>::type
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<T>::value ||
+                                                std::is_convertible<T, Backend>::value,
+                                            debug_adaptor&>::type
                         operator=(const T& i) {
                         m_value = i;
                         update_view();
@@ -105,20 +101,20 @@ namespace nil {
                     template<class Archive>
                     void serialize(Archive& ar, const unsigned int /*version*/) {
                         ar& boost::make_nvp("value", m_value);
-                        typedef typename Archive::is_loading tag;
+                        using tag = typename Archive::is_loading;
                         if (tag::value)
                             update_view();
                     }
-                    static unsigned default_precision() BOOST_NOEXCEPT {
+                    static unsigned default_precision() noexcept {
                         return Backend::default_precision();
                     }
-                    static void default_precision(unsigned v) BOOST_NOEXCEPT {
+                    static void default_precision(unsigned v) noexcept {
                         Backend::default_precision(v);
                     }
-                    unsigned precision() const BOOST_NOEXCEPT {
+                    unsigned precision() const noexcept {
                         return value().precision();
                     }
-                    void precision(unsigned digits10) BOOST_NOEXCEPT {
+                    void precision(unsigned digits10) noexcept {
                         value().precision(digits10);
                     }
                 };
@@ -445,9 +441,6 @@ namespace nil {
             template<class Backend>
             struct number_category<backends::debug_adaptor<Backend>> : public number_category<Backend> { };
 
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
         }    // namespace multiprecision
     }        // namespace crypto3
 }    // namespace nil
@@ -455,40 +448,40 @@ namespace nil {
 namespace std {
 
     template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    class numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates>>
+    class numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates>>
         : public std::numeric_limits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> {
-        typedef std::numeric_limits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> base_type;
-        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::debug_adaptor<Backend>,
-                                              ExpressionTemplates>
-            number_type;
+        using base_type = std::numeric_limits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>;
+        using number_type =
+            nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::debug_adaptor<Backend>,
+                                                 ExpressionTemplates>;
 
     public:
-        static number_type(min)() BOOST_NOEXCEPT {
+        static number_type(min)() noexcept {
             return (base_type::min)();
         }
-        static number_type(max)() BOOST_NOEXCEPT {
+        static number_type(max)() noexcept {
             return (base_type::max)();
         }
-        static number_type lowest() BOOST_NOEXCEPT {
+        static number_type lowest() noexcept {
             return -(max)();
         }
-        static number_type epsilon() BOOST_NOEXCEPT {
+        static number_type epsilon() noexcept {
             return base_type::epsilon();
         }
-        static number_type round_error() BOOST_NOEXCEPT {
+        static number_type round_error() noexcept {
             return epsilon() / 2;
         }
-        static number_type infinity() BOOST_NOEXCEPT {
+        static number_type infinity() noexcept {
             return base_type::infinity();
         }
-        static number_type quiet_NaN() BOOST_NOEXCEPT {
+        static number_type quiet_NaN() noexcept {
             return base_type::quiet_NaN();
         }
-        static number_type signaling_NaN() BOOST_NOEXCEPT {
+        static number_type signaling_NaN() noexcept {
             return base_type::signaling_NaN();
         }
-        static number_type denorm_min() BOOST_NOEXCEPT {
+        static number_type denorm_min() noexcept {
             return base_type::denorm_min();
         }
     };
@@ -500,10 +493,12 @@ namespace boost {
 
         namespace policies {
 
-            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class Policy>
-            struct precision<
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::debug_adaptor<Backend>, ExpressionTemplates>,
-                Policy> : public precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy> { };
+            template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,
+                     class Policy>
+            struct precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::debug_adaptor<Backend>,
+                                                                  ExpressionTemplates>,
+                             Policy>
+                : public precision<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, Policy> { };
 
 #undef NON_MEMBER_OP1
 #undef NON_MEMBER_OP2

@@ -7,8 +7,8 @@
 // on factorials.
 
 #include "constexpr_arithmetric_test.hpp"
-#include "boost/multiprecision/cpp_int.hpp"
-#include "boost/multiprecision/integer.hpp"
+#include "nil/crypto3/multiprecision/cpp_int.hpp"
+#include "nil/crypto3/multiprecision/integer.hpp"
 #include "test.hpp"
 
 template<class F, class V>

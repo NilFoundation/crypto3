@@ -15,9 +15,9 @@ namespace nil {
             namespace backends {
 
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned_constexpr(CppInt1& result, const CppInt2& a,
-                                                                            const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    add_unsigned_constexpr(CppInt1& result, const CppInt2& a,
+                                           const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     using ::nil::crypto3::multiprecision::std_constexpr::swap;
                     //
                     // This is the generic, C++ only version of addition.
@@ -85,9 +85,9 @@ namespace nil {
                 // Core subtraction routine for all non-trivial cpp_int's:
                 //
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result, const CppInt2& a,
-                                                                                 const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    subtract_unsigned_constexpr(CppInt1& result, const CppInt2& a,
+                                                const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     using ::nil::crypto3::multiprecision::std_constexpr::swap;
                     //
                     // This is the generic, C++ only version of subtraction.
@@ -177,8 +177,9 @@ namespace nil {
                 // are required to support these intrinsics.
                 //
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    add_unsigned(CppInt1& result, const CppInt2& a,
+                                 const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                     if (BOOST_MP_IS_CONST_EVALUATED(a.size())) {
                         add_unsigned_constexpr(result, a, b);
@@ -229,13 +230,14 @@ namespace nil {
                         }
 #else
                         for (; i + 4 <= m; i += 4) {
-                            carry = ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 0], pb[i + 0], pr + i);
-                            carry =
-                                ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 1], pb[i + 1], pr + i + 1);
-                            carry =
-                                ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 2], pb[i + 2], pr + i + 2);
-                            carry =
-                                ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 3], pb[i + 3], pr + i + 3);
+                            carry = ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 0], pb[i + 0],
+                                                                                          pr + i);
+                            carry = ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 1], pb[i + 1],
+                                                                                          pr + i + 1);
+                            carry = ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 2], pb[i + 2],
+                                                                                          pr + i + 2);
+                            carry = ::nil::crypto3::multiprecision::detail::addcarry_limb(carry, pa[i + 3], pb[i + 3],
+                                                                                          pr + i + 3);
                         }
 #endif
                         for (; i < m; ++i)
@@ -255,9 +257,9 @@ namespace nil {
                 }
 
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const CppInt2& a,
-                                                                       const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    subtract_unsigned(CppInt1& result, const CppInt2& a,
+                                      const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                     if (BOOST_MP_IS_CONST_EVALUATED(a.size())) {
                         subtract_unsigned_constexpr(result, a, b);
@@ -327,12 +329,12 @@ namespace nil {
 #else
                         for (; i + 4 <= m; i += 4) {
                             borrow = nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
-                            borrow =
-                                nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 1], pb[i + 1], pr + i + 1);
-                            borrow =
-                                nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 2], pb[i + 2], pr + i + 2);
-                            borrow =
-                                nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 3], pb[i + 3], pr + i + 3);
+                            borrow = nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 1], pb[i + 1],
+                                                                                          pr + i + 1);
+                            borrow = nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 2], pb[i + 2],
+                                                                                          pr + i + 2);
+                            borrow = nil::crypto3::multiprecision::detail::subborrow_limb(borrow, pa[i + 3], pb[i + 3],
+                                                                                          pr + i + 3);
                         }
 #endif
                         for (; i < m; ++i)
@@ -361,15 +363,16 @@ namespace nil {
 #else
 
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    add_unsigned(CppInt1& result, const CppInt2& a,
+                                 const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     add_unsigned_constexpr(result, a, b);
                 }
 
                 template<class CppInt1, class CppInt2, class CppInt3>
-                inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const CppInt2& a,
-                                                                       const CppInt3& b)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    subtract_unsigned(CppInt1& result, const CppInt2& a,
+                                      const CppInt3& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     subtract_unsigned_constexpr(result, a, b);
                 }
 
@@ -381,4 +384,3 @@ namespace nil {
 }    // namespace nil
 
 #endif
-

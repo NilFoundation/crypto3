@@ -79,9 +79,9 @@ namespace nil {
                 BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b,
                                                                  limb_type* p_result) {
 #ifdef BOOST_INTEL
-                    typedef unsigned __int64 cast_type;
+                    using cast_type = unsigned __int64;
 #else
-                    typedef unsigned long long cast_type;
+                    using cast_type = unsigned long long;
 #endif
                     return BOOST_JOIN(BOOST_MP_ADDC, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
                 }
@@ -89,9 +89,9 @@ namespace nil {
                 BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b,
                                                                   limb_type* p_result) {
 #ifdef BOOST_INTEL
-                    typedef unsigned __int64 cast_type;
+                    using cast_type = unsigned __int64;
 #else
-                    typedef unsigned long long cast_type;
+                    using cast_type = unsigned long long;
 #endif
                     return BOOST_JOIN(BOOST_MP_SUBB, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
                 }

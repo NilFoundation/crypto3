@@ -25,11 +25,11 @@ namespace boost {
             using namespace nil::crypto3::multiprecision::backends;
 
             template<class T>
-            struct is_binary_archive : public boost::mpl::false_ { };
+            struct is_binary_archive : public std::integral_constant<bool, false> { };
             template<>
-            struct is_binary_archive<boost::archive::binary_oarchive> : public boost::mpl::true_ { };
+            struct is_binary_archive<boost::archive::binary_oarchive> : public std::integral_constant<bool, true> { };
             template<>
-            struct is_binary_archive<boost::archive::binary_iarchive> : public boost::mpl::true_ { };
+            struct is_binary_archive<boost::archive::binary_iarchive> : public std::integral_constant<bool, true> { };
 
             //
             // We have 8 serialization methods to fill out (and test), they are all permutations of:
@@ -38,7 +38,8 @@ namespace boost {
             // Binary or not archive.
             //
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::false_ const&, boost::mpl::false_ const&, boost::mpl::false_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, false> const&,
+                              std::integral_constant<bool, false> const&, std::integral_constant<bool, false> const&) {
                 // Load.
                 // Non-trivial.
                 // Non binary.
@@ -66,7 +67,8 @@ namespace boost {
                 val.normalize();
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::true_ const&, boost::mpl::false_ const&, boost::mpl::false_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, true> const&,
+                              std::integral_constant<bool, false> const&, std::integral_constant<bool, false> const&) {
                 // Store.
                 // Non-trivial.
                 // Non binary.
@@ -88,7 +90,8 @@ namespace boost {
                 }
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::false_ const&, boost::mpl::true_ const&, boost::mpl::false_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, false> const&,
+                              std::integral_constant<bool, true> const&, std::integral_constant<bool, false> const&) {
                 // Load.
                 // Trivial.
                 // Non binary.
@@ -108,7 +111,8 @@ namespace boost {
                     val.negate();
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::true_ const&, boost::mpl::true_ const&, boost::mpl::false_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, true> const&,
+                              std::integral_constant<bool, true> const&, std::integral_constant<bool, false> const&) {
                 // Store.
                 // Trivial.
                 // Non binary.
@@ -126,7 +130,8 @@ namespace boost {
                 }
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::false_ const&, boost::mpl::false_ const&, boost::mpl::true_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, false> const&,
+                              std::integral_constant<bool, false> const&, std::integral_constant<bool, true> const&) {
                 // Load.
                 // Non-trivial.
                 // Binary.
@@ -141,7 +146,8 @@ namespace boost {
                 val.normalize();
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::true_ const&, boost::mpl::false_ const&, boost::mpl::true_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, true> const&,
+                              std::integral_constant<bool, false> const&, std::integral_constant<bool, true> const&) {
                 // Store.
                 // Non-trivial.
                 // Binary.
@@ -152,7 +158,8 @@ namespace boost {
                 ar.save_binary(val.limbs(), c * sizeof(limb_type));
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::false_ const&, boost::mpl::true_ const&, boost::mpl::true_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, false> const&,
+                              std::integral_constant<bool, true> const&, std::integral_constant<bool, true> const&) {
                 // Load.
                 // Trivial.
                 // Binary.
@@ -163,7 +170,8 @@ namespace boost {
                     val.negate();
             }
             template<class Archive, class Int>
-            void do_serialize(Archive& ar, Int& val, boost::mpl::true_ const&, boost::mpl::true_ const&, boost::mpl::true_ const&) {
+            void do_serialize(Archive& ar, Int& val, std::integral_constant<bool, true> const&,
+                              std::integral_constant<bool, true> const&, std::integral_constant<bool, true> const&) {
                 // Store.
                 // Trivial.
                 // Binary.
@@ -178,11 +186,12 @@ namespace boost {
                  mp::cpp_int_check_type Checked, class Allocator>
         void serialize(Archive& ar, mp::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val,
                        const unsigned int /*version*/) {
-            typedef typename Archive::is_saving save_tag;
-            typedef boost::mpl::bool_<mp::backends::is_trivial_cpp_int<
-                mp::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>>::value>
-                trivial_tag;
-            typedef typename cpp_int_detail::is_binary_archive<Archive>::type binary_tag;
+            using archive_save_tag = typename Archive::is_saving;
+            using save_tag = std::integral_constant<bool, archive_save_tag::value>;
+            using trivial_tag =
+                std::integral_constant<bool, mp::backends::is_trivial_cpp_int<mp::cpp_int_backend<
+                                                 MinBits, MaxBits, SignType, Checked, Allocator>>::value>;
+            using binary_tag = typename cpp_int_detail::is_binary_archive<Archive>::type;
 
             // Just dispatch to the correct method:
             cpp_int_detail::do_serialize(ar, val, save_tag(), trivial_tag(), binary_tag());

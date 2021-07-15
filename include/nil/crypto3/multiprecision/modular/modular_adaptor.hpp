@@ -85,11 +85,11 @@ namespace nil {
 
                     // TODO: maybe initialize modulus rather than base
                     modular_adaptor(const Backend& val) :
-                        m_base(val), m_mod(typename boost::mpl::front<unsigned_types>::type(0u)) {
+                        m_base(val), m_mod(typename std::tuple_element<0, unsigned_types>::type(0u)) {
                     }
 
                     modular_adaptor(const modular_params<Backend>& mod) :
-                        m_base(typename boost::mpl::front<unsigned_types>::type(0u)), m_mod(mod) {
+                        m_base(typename std::tuple_element<0, unsigned_types>::type(0u)), m_mod(mod) {
                     }
 
                     modular_adaptor& operator=(const modular_adaptor& o) {
@@ -110,7 +110,7 @@ namespace nil {
 #endif
 
                     modular_adaptor& operator=(const char* s) {
-                        typedef typename boost::mpl::front<unsigned_types>::type ui_type;
+                        using ui_type = typename std::tuple_element<0, unsigned_types>::type;
                         ui_type zero = 0u;
 
                         using default_ops::eval_fpclassify;
@@ -199,8 +199,8 @@ namespace nil {
                 }
 
                 template<class Backend, class T>
-                constexpr typename boost::enable_if<boost::is_arithmetic<T>, bool>::type eval_eq(const modular_adaptor<Backend>& a,
-                                                                                   const T& b) {
+                constexpr typename boost::enable_if<boost::is_arithmetic<T>, bool>::type
+                    eval_eq(const modular_adaptor<Backend>& a, const T& b) {
                     return a.compare(b) == 0;
                 }
 
@@ -224,7 +224,7 @@ namespace nil {
                 template<class Backend>
                 constexpr void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o) {
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
-                    typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
                     eval_subtract(result.base_data(), o.base_data());
                     if (eval_lt(result.base_data(), ui_type(0u))) {
@@ -539,7 +539,7 @@ namespace nil {
 
             template<class Backend>
             struct number_category<modular_adaptor<Backend>>
-                : public boost::mpl::int_<nil::crypto3::multiprecision::number_kind_modular> { };
+                : public std::integral_constant<int, nil::crypto3::multiprecision::number_kind_modular> { };
 
             template<class Backend, expression_template_option ExpressionTemplates>
             struct component_type<number<modular_adaptor<Backend>, ExpressionTemplates>> {

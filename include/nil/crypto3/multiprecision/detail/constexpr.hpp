@@ -11,6 +11,7 @@
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
+
             namespace std_constexpr {
 
                 template<class T>
@@ -69,9 +70,11 @@ namespace nil {
                     }
                     return true;
                 }
+
             }    // namespace std_constexpr
-        }        // namespace multiprecision
-    }            // namespace crypto3
+
+        }    // namespace multiprecision
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

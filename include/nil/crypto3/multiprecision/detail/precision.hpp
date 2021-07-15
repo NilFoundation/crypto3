@@ -16,15 +16,15 @@ namespace nil {
             namespace detail {
 
                 template<class B, nil::crypto3::multiprecision::expression_template_option ET>
-                inline BOOST_CONSTEXPR unsigned
+                inline constexpr unsigned
                     current_precision_of_last_chance_imp(const nil::crypto3::multiprecision::number<B, ET>&,
-                                                         const boost::mpl::false_&) {
+                                                         const std::integral_constant<bool, false>&) {
                     return std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::digits10;
                 }
                 template<class B, nil::crypto3::multiprecision::expression_template_option ET>
                 inline BOOST_MP_CXX14_CONSTEXPR unsigned
                     current_precision_of_last_chance_imp(const nil::crypto3::multiprecision::number<B, ET>& val,
-                                                         const boost::mpl::true_&) {
+                                                         const std::integral_constant<bool, true>&) {
                     //
                     // We have an arbitrary precision integer, take it's "precision" as the
                     // location of the most-significant-bit less the location of the
@@ -36,61 +36,61 @@ namespace nil {
 
                 template<class B, nil::crypto3::multiprecision::expression_template_option ET>
                 inline BOOST_MP_CXX14_CONSTEXPR unsigned
-                    current_precision_of_imp(const nil::crypto3::multiprecision::number<B, ET>& n, const boost::mpl::true_&) {
+                    current_precision_of_imp(const nil::crypto3::multiprecision::number<B, ET>& n,
+                                             const std::integral_constant<bool, true>&) {
                     return n.precision();
                 }
                 template<class B, nil::crypto3::multiprecision::expression_template_option ET>
-                inline BOOST_CONSTEXPR unsigned
-                    current_precision_of_imp(const nil::crypto3::multiprecision::number<B, ET>& val, const boost::mpl::false_&) {
+                inline constexpr unsigned
+                    current_precision_of_imp(const nil::crypto3::multiprecision::number<B, ET>& val,
+                                             const std::integral_constant<bool, false>&) {
                     return current_precision_of_last_chance_imp(
                         val,
-                        boost::mpl::bool_ < std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_specialized &&
-                            std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_integer &&
-                            std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_exact &&
+                        std::integral_constant < bool,
+                        std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_specialized&&
+                                std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_integer&&
+                                    std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_exact &&
                             !std::numeric_limits<nil::crypto3::multiprecision::number<B, ET>>::is_modulo > ());
                 }
 
                 template<class Terminal>
-                inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal&) {
+                inline constexpr unsigned current_precision_of(const Terminal&) {
                     return std::numeric_limits<Terminal>::digits10;
                 }
 
                 template<class Terminal, std::size_t N>
-                inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal (&)[N]) {    // For string literals:
+                inline constexpr unsigned current_precision_of(const Terminal (&)[N]) {    // For string literals:
                     return 0;
                 }
 
                 template<class B, nil::crypto3::multiprecision::expression_template_option ET>
-                inline BOOST_CONSTEXPR unsigned current_precision_of(const nil::crypto3::multiprecision::number<B, ET>& n) {
-                    return current_precision_of_imp(
-                        n,
-                        nil::crypto3::multiprecision::detail::is_variable_precision<nil::crypto3::multiprecision::number<B, ET>>());
+                inline constexpr unsigned current_precision_of(const nil::crypto3::multiprecision::number<B, ET>& n) {
+                    return current_precision_of_imp(n,
+                                                    nil::crypto3::multiprecision::detail::is_variable_precision<
+                                                        nil::crypto3::multiprecision::number<B, ET>>());
                 }
 
                 template<class tag, class Arg1>
-                inline BOOST_CONSTEXPR unsigned
-                    current_precision_of(const expression<tag, Arg1, void, void, void>& expr) {
+                inline constexpr unsigned current_precision_of(const expression<tag, Arg1, void, void, void>& expr) {
                     return current_precision_of(expr.left_ref());
                 }
 
                 template<class Arg1>
-                inline BOOST_CONSTEXPR unsigned
+                inline constexpr unsigned
                     current_precision_of(const expression<terminal, Arg1, void, void, void>& expr) {
                     return current_precision_of(expr.value());
                 }
 
                 template<class tag, class Arg1, class Arg2>
-                inline BOOST_CONSTEXPR unsigned
-                    current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr) {
+                inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr) {
                     return (std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref()));
                 }
 
                 template<class tag, class Arg1, class Arg2, class Arg3>
-                inline BOOST_CONSTEXPR unsigned
-                    current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr) {
-                    return (std::max)(
-                        (std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())),
-                        current_precision_of(expr.middle_ref()));
+                inline constexpr unsigned current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr) {
+                    return (std::max)((std::max)(current_precision_of(expr.left_ref()),
+                                                 current_precision_of(expr.right_ref())),
+                                      current_precision_of(expr.middle_ref()));
                 }
 
 #ifdef BOOST_MSVC
@@ -101,13 +101,13 @@ namespace nil {
                 template<class R, bool = nil::crypto3::multiprecision::detail::is_variable_precision<R>::value>
                 struct scoped_default_precision {
                     template<class T>
-                    BOOST_CONSTEXPR scoped_default_precision(const T&) {
+                    constexpr scoped_default_precision(const T&) {
                     }
                     template<class T, class U>
-                    BOOST_CONSTEXPR scoped_default_precision(const T&, const U&) {
+                    constexpr scoped_default_precision(const T&, const U&) {
                     }
                     template<class T, class U, class V>
-                    BOOST_CONSTEXPR scoped_default_precision(const T&, const U&, const V&) {
+                    constexpr scoped_default_precision(const T&, const U&, const V&) {
                     }
 
                     //
@@ -159,11 +159,13 @@ namespace nil {
                 };
 
                 template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T*, const boost::mpl::false_&) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    maybe_promote_precision(T*, const std::integral_constant<bool, false>&) {
                 }
 
                 template<class T>
-                inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const boost::mpl::true_&) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    maybe_promote_precision(T* obj, const std::integral_constant<bool, true>&) {
                     if (obj->precision() != T::default_precision()) {
                         obj->precision(T::default_precision());
                     }
@@ -172,14 +174,18 @@ namespace nil {
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj) {
                     maybe_promote_precision(
-                        obj, boost::mpl::bool_<nil::crypto3::multiprecision::detail::is_variable_precision<T>::value>());
+                        obj,
+                        std::integral_constant<
+                            bool,
+                            nil::crypto3::multiprecision::detail::is_variable_precision<T>::value>());
                 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 #define BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(T) \
     if constexpr (nil::crypto3::multiprecision::detail::is_variable_precision<T>::value)
 #else
-#define BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(T) if (nil::crypto3::multiprecision::detail::is_variable_precision<T>::value)
+#define BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(T) \
+    if (nil::crypto3::multiprecision::detail::is_variable_precision<T>::value)
 #endif
 
             }    // namespace detail

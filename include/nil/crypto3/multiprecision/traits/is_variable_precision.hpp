@@ -6,8 +6,6 @@
 #ifndef BOOST_MP_IS_VARIABLE_PRECISION_HPP
 #define BOOST_MP_IS_VARIABLE_PRECISION_HPP
 
-#include <boost/type_traits/integral_constant.hpp>
-
 #include <nil/crypto3/multiprecision/detail/number_base.hpp>
 
 namespace nil {
@@ -16,7 +14,7 @@ namespace nil {
             namespace detail {
 
                 template<class Backend>
-                struct is_variable_precision : public boost::false_type { };
+                struct is_variable_precision : public std::integral_constant<bool, false> { };
 
                 template<class Backend, expression_template_option ExpressionTemplates>
                 struct is_variable_precision<number<Backend, ExpressionTemplates>>

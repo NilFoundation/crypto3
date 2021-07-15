@@ -10,13 +10,10 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
-
-#include <boost/cstdint.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/mpl/list.hpp>
-#include <boost/container_hash/hash.hpp>
-
+#include <cstdint>
 #include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/container_hash/hash.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -29,10 +26,10 @@ namespace nil {
 #endif
 
                 struct number_backend_float_architype {
-                    typedef boost::mpl::list<boost::long_long_type> signed_types;
-                    typedef boost::mpl::list<boost::ulong_long_type> unsigned_types;
-                    typedef boost::mpl::list<long double> float_types;
-                    typedef int exponent_type;
+                    using signed_types = std::tuple<boost::long_long_type>;
+                    using unsigned_types = std::tuple<boost::ulong_long_type>;
+                    using float_types = std::tuple<long double>;
+                    using exponent_type = int;
 
                     number_backend_float_architype() {
                         m_value = 0;
@@ -88,8 +85,8 @@ namespace nil {
                             ss.precision(digits);
                         else
                             ss.precision(std::numeric_limits<long double>::digits10 + 3);
-                        boost::intmax_t i = m_value;
-                        boost::uintmax_t u = m_value;
+                        std::intmax_t i = m_value;
+                        std::uintmax_t u = m_value;
                         if (!(f & std::ios_base::scientific) && m_value == i)
                             ss << i;
                         else if (!(f & std::ios_base::scientific) && m_value == u)
@@ -187,13 +184,13 @@ namespace nil {
                     return hasher(v.m_value);
                 }
 
-                typedef nil::crypto3::multiprecision::number<number_backend_float_architype> mp_number_float_architype;
+                using mp_number_float_architype = nil::crypto3::multiprecision::number<number_backend_float_architype>;
 
             }    // namespace concepts
 
             template<>
             struct number_category<concepts::number_backend_float_architype>
-                : public boost::mpl::int_<number_kind_floating_point> { };
+                : public std::integral_constant<int, number_kind_floating_point> { };
 
         }    // namespace multiprecision
     }        // namespace crypto3
@@ -202,39 +199,40 @@ namespace nil {
 namespace std {
 
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    class numeric_limits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype,
-                                                       ExpressionTemplates>> : public std::numeric_limits<long double> {
-        typedef std::numeric_limits<long double> base_type;
-        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype,
-                                              ExpressionTemplates>
-            number_type;
+    class numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates>>
+        : public std::numeric_limits<long double> {
+        using base_type = std::numeric_limits<long double>;
+        using number_type =
+            nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype,
+                                                 ExpressionTemplates>;
 
     public:
-        static number_type(min)() BOOST_NOEXCEPT {
+        static number_type(min)() noexcept {
             return (base_type::min)();
         }
-        static number_type(max)() BOOST_NOEXCEPT {
+        static number_type(max)() noexcept {
             return (base_type::max)();
         }
-        static number_type lowest() BOOST_NOEXCEPT {
+        static number_type lowest() noexcept {
             return -(max)();
         }
-        static number_type epsilon() BOOST_NOEXCEPT {
+        static number_type epsilon() noexcept {
             return base_type::epsilon();
         }
-        static number_type round_error() BOOST_NOEXCEPT {
+        static number_type round_error() noexcept {
             return base_type::round_error();
         }
-        static number_type infinity() BOOST_NOEXCEPT {
+        static number_type infinity() noexcept {
             return base_type::infinity();
         }
-        static number_type quiet_NaN() BOOST_NOEXCEPT {
+        static number_type quiet_NaN() noexcept {
             return base_type::quiet_NaN();
         }
-        static number_type signaling_NaN() BOOST_NOEXCEPT {
+        static number_type signaling_NaN() noexcept {
             return base_type::signaling_NaN();
         }
-        static number_type denorm_min() BOOST_NOEXCEPT {
+        static number_type denorm_min() noexcept {
             return base_type::denorm_min();
         }
     };

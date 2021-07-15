@@ -6,9 +6,13 @@
 #ifndef BOOST_MATH_BN_MPFI_HPP
 #define BOOST_MATH_BN_MPFI_HPP
 
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <type_traits>
+
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/cstdint.hpp>
 #include <nil/crypto3/multiprecision/detail/big_lanczos.hpp>
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
 #include <nil/crypto3/multiprecision/detail/atomic.hpp>
@@ -18,8 +22,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <mpfi.h>
-#include <cmath>
-#include <algorithm>
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20
@@ -37,7 +39,7 @@ namespace nil {
 
             template<unsigned digits10>
             struct number_category<backends::mpfi_float_backend<digits10>>
-                : public boost::mpl::int_<number_kind_floating_point> { };
+                : public std::integral_constant<int, number_kind_floating_point> { };
 
             struct interval_error : public std::runtime_error {
                 interval_error(const std::string& s) : std::runtime_error(s) {
@@ -64,17 +66,17 @@ namespace nil {
                     template<unsigned digits10>
                     struct mpfi_float_imp {
 #ifdef BOOST_HAS_LONG_LONG
-                        typedef boost::mpl::list<long, boost::long_long_type> signed_types;
-                        typedef boost::mpl::list<unsigned long, boost::ulong_long_type> unsigned_types;
+                        using signed_types = std::tuple<long, boost::long_long_type>;
+                        using unsigned_types = std::tuple<unsigned long, boost::ulong_long_type>;
 #else
-                        typedef boost::mpl::list<long> signed_types;
-                        typedef boost::mpl::list<unsigned long> unsigned_types;
+                        using signed_types = std::tuple<long>;
+                        using unsigned_types = std::tuple<unsigned long>;
 #endif
-                        typedef boost::mpl::list<double, long double> float_types;
-                        typedef long exponent_type;
+                        using float_types = std::tuple<double, long double>;
+                        using exponent_type = long;
 
                         mpfi_float_imp() {
-                            mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                            mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                    digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfi_set_ui(m_data, 0u);
                         }
@@ -88,12 +90,11 @@ namespace nil {
                             if (o.m_data[0].left._mpfr_d)
                                 mpfi_set(m_data, o.m_data);
                         }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-                        mpfi_float_imp(mpfi_float_imp&& o) BOOST_NOEXCEPT {
+                        // rvalue copy
+                        mpfi_float_imp(mpfi_float_imp&& o) noexcept {
                             m_data[0] = o.m_data[0];
                             o.m_data[0].left._mpfr_d = 0;
                         }
-#endif
                         mpfi_float_imp& operator=(const mpfi_float_imp& o) {
                             if (m_data[0].left._mpfr_d == 0)
                                 mpfi_init2(m_data, mpfi_get_prec(o.data()));
@@ -107,17 +108,16 @@ namespace nil {
                             }
                             return *this;
                         }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-                        mpfi_float_imp& operator=(mpfi_float_imp&& o) BOOST_NOEXCEPT {
+                        // rvalue assign
+                        mpfi_float_imp& operator=(mpfi_float_imp&& o) noexcept {
                             mpfi_swap(m_data, o.m_data);
                             return *this;
                         }
-#endif
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
                         mpfi_float_imp& operator=(boost::ulong_long_type i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfr_set_uj(left_data(), i, GMP_RNDD);
                             mpfr_set_uj(right_data(), i, GMP_RNDU);
@@ -125,7 +125,7 @@ namespace nil {
                         }
                         mpfi_float_imp& operator=(boost::long_long_type i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfr_set_sj(left_data(), i, GMP_RNDD);
                             mpfr_set_sj(right_data(), i, GMP_RNDU);
@@ -134,16 +134,16 @@ namespace nil {
 #else
                         mpfi_float_imp& operator=(boost::ulong_long_type i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             boost::ulong_long_type mask =
                                 ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
                             unsigned shift = 0;
                             mpfi_t t;
-                            mpfi_init2(
-                                t, (std::max)(
-                                       static_cast<mpfr_prec_t>(std::numeric_limits<boost::ulong_long_type>::digits),
-                                       static_cast<mpfr_prec_t>(multiprecision::detail::digits10_2_2(digits10))));
+                            mpfi_init2(t, (std::max)(static_cast<mpfr_prec_t>(
+                                                         std::numeric_limits<boost::ulong_long_type>::digits),
+                                                     static_cast<mpfr_prec_t>(
+                                                         multiprecision::detail::digits10_2_2(digits10))));
                             mpfi_set_ui(m_data, 0);
                             while (i) {
                                 mpfi_set_ui(t, static_cast<unsigned long>(i & mask));
@@ -158,7 +158,7 @@ namespace nil {
                         }
                         mpfi_float_imp& operator=(boost::long_long_type i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             bool neg = i < 0;
                             *this = nil::crypto3::multiprecision::detail::unsigned_abs(i);
@@ -170,28 +170,28 @@ namespace nil {
 #endif
                         mpfi_float_imp& operator=(unsigned long i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfi_set_ui(m_data, i);
                             return *this;
                         }
                         mpfi_float_imp& operator=(long i) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfi_set_si(m_data, i);
                             return *this;
                         }
                         mpfi_float_imp& operator=(double d) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfi_set_d(m_data, d);
                             return *this;
                         }
                         mpfi_float_imp& operator=(long double a) {
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
                             mpfr_set_ld(left_data(), a, GMP_RNDD);
                             mpfr_set_ld(right_data(), a, GMP_RNDU);
@@ -201,7 +201,7 @@ namespace nil {
                             using default_ops::eval_fpclassify;
 
                             if (m_data[0].left._mpfr_d == 0)
-                                mpfi_init2(m_data, nil::crypto3::multiprecision::detail::digits10_2_2(
+                                mpfi_init2(m_data, multiprecision::detail::digits10_2_2(
                                                        digits10 ? digits10 : (unsigned)get_default_precision()));
 
                             if (s && (*s == '{')) {
@@ -241,7 +241,7 @@ namespace nil {
                             }
                             return *this;
                         }
-                        void swap(mpfi_float_imp& o) BOOST_NOEXCEPT {
+                        void swap(mpfi_float_imp& o) noexcept {
                             mpfi_swap(m_data, o.m_data);
                         }
                         std::string str(std::streamsize digits, std::ios_base::fmtflags f) const {
@@ -257,15 +257,15 @@ namespace nil {
 
                             return "{" + a.str(digits, f) + "," + b.str(digits, f) + "}";
                         }
-                        ~mpfi_float_imp() BOOST_NOEXCEPT {
+                        ~mpfi_float_imp() noexcept {
                             if (m_data[0].left._mpfr_d)
                                 mpfi_clear(m_data);
                         }
-                        void negate() BOOST_NOEXCEPT {
+                        void negate() noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             mpfi_neg(m_data, m_data);
                         }
-                        int compare(const mpfi_float_imp& o) const BOOST_NOEXCEPT {
+                        int compare(const mpfi_float_imp& o) const noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d && o.m_data[0].left._mpfr_d);
                             if (mpfr_cmp(right_data(), o.left_data()) < 0)
                                 return -1;
@@ -278,39 +278,39 @@ namespace nil {
                             return 0;
                         }
                         template<class V>
-                        int compare(V v) const BOOST_NOEXCEPT {
+                        int compare(V v) const noexcept {
                             mpfi_float_imp d;
                             d = v;
                             return compare(d);
                         }
-                        mpfi_t& data() BOOST_NOEXCEPT {
+                        mpfi_t& data() noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return m_data;
                         }
-                        const mpfi_t& data() const BOOST_NOEXCEPT {
+                        const mpfi_t& data() const noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return m_data;
                         }
-                        mpfr_ptr left_data() BOOST_NOEXCEPT {
+                        mpfr_ptr left_data() noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return &(m_data[0].left);
                         }
-                        mpfr_srcptr left_data() const BOOST_NOEXCEPT {
+                        mpfr_srcptr left_data() const noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return &(m_data[0].left);
                         }
-                        mpfr_ptr right_data() BOOST_NOEXCEPT {
+                        mpfr_ptr right_data() noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return &(m_data[0].right);
                         }
-                        mpfr_srcptr right_data() const BOOST_NOEXCEPT {
+                        mpfr_srcptr right_data() const noexcept {
                             BOOST_ASSERT(m_data[0].left._mpfr_d);
                             return &(m_data[0].right);
                         }
 
                     protected:
                         mpfi_t m_data;
-                        static nil::crypto3::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT {
+                        static nil::crypto3::multiprecision::detail::precision_type& get_default_precision() noexcept {
                             static nil::crypto3::multiprecision::detail::precision_type val(
                                 BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION);
                             return val;
@@ -325,20 +325,19 @@ namespace nil {
                     }
                     mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<digits10>(o) {
                     }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+                    // rvalue copy
                     mpfi_float_backend(mpfi_float_backend&& o) :
                         detail::mpfi_float_imp<digits10>(static_cast<detail::mpfi_float_imp<digits10>&&>(o)) {
                     }
-#endif
                     template<unsigned D>
                     mpfi_float_backend(const mpfi_float_backend<D>& val,
-                                       typename boost::enable_if_c<D <= digits10>::type* = 0) :
+                                       typename std::enable_if<D <= digits10>::type* = 0) :
                         detail::mpfi_float_imp<digits10>() {
                         mpfi_set(this->m_data, val.data());
                     }
                     template<unsigned D>
                     explicit mpfi_float_backend(const mpfi_float_backend<D>& val,
-                                                typename boost::disable_if_c<D <= digits10>::type* = 0) :
+                                                typename std::enable_if<!(D <= digits10)>::type* = 0) :
                         detail::mpfi_float_imp<digits10>() {
                         mpfi_set(this->m_data, val.data());
                     }
@@ -352,7 +351,7 @@ namespace nil {
                     }
                     template<unsigned D>
                     mpfi_float_backend(const mpfr_float_backend<D>& val,
-                                       typename boost::enable_if_c<D <= digits10>::type* = 0) :
+                                       typename std::enable_if<D <= digits10>::type* = 0) :
                         detail::mpfi_float_imp<digits10>() {
                         mpfi_set_fr(this->m_data, val.data());
                     }
@@ -363,17 +362,16 @@ namespace nil {
                     }
                     template<unsigned D>
                     explicit mpfi_float_backend(const mpfr_float_backend<D>& val,
-                                                typename boost::disable_if_c<D <= digits10>::type* = 0) :
+                                                typename std::enable_if<!(D <= digits10)>::type* = 0) :
                         detail::mpfi_float_imp<digits10>() {
                         mpfi_set_fr(this->m_data, val.data());
                     }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-                    mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT {
+                    // rvalue copy
+                    mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept {
                         *static_cast<detail::mpfi_float_imp<digits10>*>(this) =
                             static_cast<detail::mpfi_float_imp<digits10>&&>(o);
                         return *this;
                     }
-#endif
                     template<class V>
                     mpfi_float_backend& operator=(const V& v) {
                         *static_cast<detail::mpfi_float_imp<digits10>*>(this) = v;
@@ -396,9 +394,9 @@ namespace nil {
                                        const mpfr_float_backend<D2, AllocationType>& b);
 
                 template<unsigned Digits10, class V>
-                typename boost::enable_if_c<
-                    boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value ||
-                    boost::is_convertible<V, const char*>::value>::type
+                typename std::enable_if<
+                    std::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value ||
+                    std::is_convertible<V, const char*>::value>::type
                     assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b);
 
                 template<>
@@ -410,11 +408,10 @@ namespace nil {
                     }
                     mpfi_float_backend(const mpfi_float_backend& o) : detail::mpfi_float_imp<0>(o) {
                     }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-                    mpfi_float_backend(mpfi_float_backend&& o) BOOST_NOEXCEPT
-                        : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o)) {
+                    // rvalue copy
+                    mpfi_float_backend(mpfi_float_backend&& o) noexcept :
+                        detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o)) {
                     }
-#endif
                     mpfi_float_backend(const mpfi_float_backend& o, unsigned digits10) :
                         detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10)) {
                         mpfi_set(this->m_data, o.data());
@@ -435,12 +432,11 @@ namespace nil {
                         mpfi_set(this->m_data, o.data());
                         return *this;
                     }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-                    mpfi_float_backend& operator=(mpfi_float_backend&& o) BOOST_NOEXCEPT {
+                    // rvalue assign
+                    mpfi_float_backend& operator=(mpfi_float_backend&& o) noexcept {
                         *static_cast<detail::mpfi_float_imp<0>*>(this) = static_cast<detail::mpfi_float_imp<0>&&>(o);
                         return *this;
                     }
-#endif
                     template<class V>
                     mpfi_float_backend& operator=(const V& v) {
                         *static_cast<detail::mpfi_float_imp<0>*>(this) = v;
@@ -457,34 +453,37 @@ namespace nil {
                         mpfi_set(this->m_data, val.data());
                         return *this;
                     }
-                    static unsigned default_precision() BOOST_NOEXCEPT {
+                    static unsigned default_precision() noexcept {
                         return get_default_precision();
                     }
-                    static void default_precision(unsigned v) BOOST_NOEXCEPT {
+                    static void default_precision(unsigned v) noexcept {
                         get_default_precision() = v;
                     }
-                    unsigned precision() const BOOST_NOEXCEPT {
-                        return nil::crypto3::multiprecision::detail::digits2_2_10(mpfi_get_prec(this->m_data));
+                    unsigned precision() const noexcept {
+                        return multiprecision::detail::digits2_2_10(mpfi_get_prec(this->m_data));
                     }
-                    void precision(unsigned digits10) BOOST_NOEXCEPT {
+                    void precision(unsigned digits10) noexcept {
                         mpfi_float_backend t(*this, digits10);
                         this->swap(t);
                     }
                 };
 
                 template<unsigned digits10, class T>
-                inline typename boost::enable_if<boost::is_arithmetic<T>, bool>::type eval_eq(const mpfi_float_backend<digits10>& a,
-                                                                                const T& b) BOOST_NOEXCEPT {
+                inline
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<T>::value, bool>::type
+                    eval_eq(const mpfi_float_backend<digits10>& a, const T& b) noexcept {
                     return a.compare(b) == 0;
                 }
                 template<unsigned digits10, class T>
-                inline typename boost::enable_if<boost::is_arithmetic<T>, bool>::type eval_lt(const mpfi_float_backend<digits10>& a,
-                                                                                const T& b) BOOST_NOEXCEPT {
+                inline
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<T>::value, bool>::type
+                    eval_lt(const mpfi_float_backend<digits10>& a, const T& b) noexcept {
                     return a.compare(b) < 0;
                 }
                 template<unsigned digits10, class T>
-                inline typename boost::enable_if<boost::is_arithmetic<T>, bool>::type eval_gt(const mpfi_float_backend<digits10>& a,
-                                                                                const T& b) BOOST_NOEXCEPT {
+                inline
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_arithmetic<T>::value, bool>::type
+                    eval_gt(const mpfi_float_backend<digits10>& a, const T& b) noexcept {
                     return a.compare(b) > 0;
                 }
 
@@ -528,14 +527,16 @@ namespace nil {
                     if (i > 0)
                         mpfi_add_ui(result.data(), result.data(), i);
                     else
-                        mpfi_sub_ui(result.data(), result.data(), nil::crypto3::multiprecision::detail::unsigned_abs(i));
+                        mpfi_sub_ui(result.data(), result.data(),
+                                    nil::crypto3::multiprecision::detail::unsigned_abs(i));
                 }
                 template<unsigned digits10>
                 inline void eval_subtract(mpfi_float_backend<digits10>& result, long i) {
                     if (i > 0)
                         mpfi_sub_ui(result.data(), result.data(), i);
                     else
-                        mpfi_add_ui(result.data(), result.data(), nil::crypto3::multiprecision::detail::unsigned_abs(i));
+                        mpfi_add_ui(result.data(), result.data(),
+                                    nil::crypto3::multiprecision::detail::unsigned_abs(i));
                 }
                 template<unsigned digits10>
                 inline void eval_multiply(mpfi_float_backend<digits10>& result, long i) {
@@ -673,7 +674,7 @@ namespace nil {
                 }
 
                 template<unsigned digits10>
-                inline bool eval_is_zero(const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT {
+                inline bool eval_is_zero(const mpfi_float_backend<digits10>& val) noexcept {
                     return 0 != mpfi_is_zero(val.data());
                 }
                 template<unsigned digits10>
@@ -708,12 +709,11 @@ namespace nil {
                 }
 #endif
                 template<unsigned digits10>
-                inline void eval_convert_to(double* result, const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT {
+                inline void eval_convert_to(double* result, const mpfi_float_backend<digits10>& val) noexcept {
                     *result = mpfi_get_d(val.data());
                 }
                 template<unsigned digits10>
-                inline void eval_convert_to(long double* result,
-                                            const mpfi_float_backend<digits10>& val) BOOST_NOEXCEPT {
+                inline void eval_convert_to(long double* result, const mpfi_float_backend<digits10>& val) noexcept {
                     mpfr_float_backend<digits10> t;
                     mpfi_mid(t.data(), val.data());
                     eval_convert_to(result, t);
@@ -738,9 +738,9 @@ namespace nil {
                 }
 
                 template<unsigned Digits10, class V>
-                inline typename boost::enable_if_c<
-                    boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value ||
-                    boost::is_convertible<V, const char*>::value>::type
+                inline typename std::enable_if<
+                    std::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value ||
+                    std::is_convertible<V, const char*>::value>::type
                     assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b) {
                     number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);
                     assign_components(result, x.backend(), y.backend());
@@ -817,7 +817,7 @@ namespace nil {
                 }
 
                 template<unsigned Digits10>
-                inline int eval_fpclassify(const mpfi_float_backend<Digits10>& val) BOOST_NOEXCEPT {
+                inline int eval_fpclassify(const mpfi_float_backend<Digits10>& val) noexcept {
                     return mpfi_inf_p(val.data())   ? FP_INFINITE :
                            mpfi_nan_p(val.data())   ? FP_NAN :
                            mpfi_is_zero(val.data()) ? FP_ZERO :
@@ -827,9 +827,9 @@ namespace nil {
                 template<unsigned Digits10>
                 inline void eval_pow(mpfi_float_backend<Digits10>& result, const mpfi_float_backend<Digits10>& b,
                                      const mpfi_float_backend<Digits10>& e) {
-                    typedef
-                        typename nil::crypto3::multiprecision::detail::canonical<unsigned, mpfi_float_backend<Digits10>>::type
-                            ui_type;
+                    using ui_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<unsigned,
+                                                                                 mpfi_float_backend<Digits10>>::type;
                     using default_ops::eval_get_sign;
                     int s = eval_get_sign(b);
                     if (s == 0) {
@@ -850,8 +850,8 @@ namespace nil {
                             eval_divide(result, t1, t2);
                             return;
                         }
-                        typename nil::crypto3::multiprecision::detail::canonical<boost::uintmax_t,
-                                                                          mpfi_float_backend<Digits10>>::type an;
+                        typename nil::crypto3::multiprecision::detail::canonical<std::uintmax_t,
+                                                                                 mpfi_float_backend<Digits10>>::type an;
 #ifndef BOOST_NO_EXCEPTIONS
                         try {
 #endif
@@ -978,8 +978,8 @@ namespace nil {
 
                 template<class To, unsigned D>
                 void generic_interconvert(To& to, const mpfi_float_backend<D>& from,
-                                          const boost::mpl::int_<number_kind_integer>& to_type,
-                                          const boost::mpl::int_<number_kind_floating_point>& from_type) {
+                                          const std::integral_constant<int, number_kind_integer>& to_type,
+                                          const std::integral_constant<int, number_kind_floating_point>& from_type) {
                     using nil::crypto3::multiprecision::detail::generic_interconvert;
                     mpfr_float_backend<D> t;
                     mpfi_mid(t.data(), from.data());
@@ -988,8 +988,8 @@ namespace nil {
 
                 template<class To, unsigned D>
                 void generic_interconvert(To& to, const mpfi_float_backend<D>& from,
-                                          const boost::mpl::int_<number_kind_rational>& to_type,
-                                          const boost::mpl::int_<number_kind_floating_point>& from_type) {
+                                          const std::integral_constant<int, number_kind_rational>& to_type,
+                                          const std::integral_constant<int, number_kind_floating_point>& from_type) {
                     using nil::crypto3::multiprecision::detail::generic_interconvert;
                     mpfr_float_backend<D> t;
                     mpfi_mid(t.data(), from.data());
@@ -998,8 +998,8 @@ namespace nil {
 
                 template<class To, unsigned D>
                 void generic_interconvert(To& to, const mpfi_float_backend<D>& from,
-                                          const boost::mpl::int_<number_kind_floating_point>& to_type,
-                                          const boost::mpl::int_<number_kind_floating_point>& from_type) {
+                                          const std::integral_constant<int, number_kind_floating_point>& to_type,
+                                          const std::integral_constant<int, number_kind_floating_point>& from_type) {
                     using nil::crypto3::multiprecision::detail::generic_interconvert;
                     mpfr_float_backend<D> t;
                     mpfi_mid(t.data(), from.data());
@@ -1008,35 +1008,26 @@ namespace nil {
 
             }    // namespace backends
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
-            namespace detail {
-
-                template<unsigned D1, unsigned D2>
-                struct is_explicitly_convertible<backends::mpfi_float_backend<D1>, backends::mpfi_float_backend<D2>>
-                    : public boost::mpl::true_ { };
-
-            }    // namespace detail
-#endif
-
             namespace detail {
                 template<>
-                struct is_variable_precision<backends::mpfi_float_backend<0>> : public boost::true_type { };
+                struct is_variable_precision<backends::mpfi_float_backend<0>>
+                    : public std::integral_constant<bool, true> { };
             }    // namespace detail
 
             template<>
             struct number_category<detail::canonical<mpfi_t, backends::mpfi_float_backend<0>>::type>
-                : public boost::mpl::int_<number_kind_floating_point> { };
+                : public std::integral_constant<int, number_kind_floating_point> { };
             template<unsigned Digits10>
-            struct is_interval_number<backends::mpfi_float_backend<Digits10>> : public boost::mpl::true_ { };
+            struct is_interval_number<backends::mpfi_float_backend<Digits10>>
+                : public std::integral_constant<bool, true> { };
 
             using nil::crypto3::multiprecision::backends::mpfi_float_backend;
 
-            typedef number<mpfi_float_backend<50>> mpfi_float_50;
-            typedef number<mpfi_float_backend<100>> mpfi_float_100;
-            typedef number<mpfi_float_backend<500>> mpfi_float_500;
-            typedef number<mpfi_float_backend<1000>> mpfi_float_1000;
-            typedef number<mpfi_float_backend<0>> mpfi_float;
+            using mpfi_float_50 = number<mpfi_float_backend<50>>;
+            using mpfi_float_100 = number<mpfi_float_backend<100>>;
+            using mpfi_float_500 = number<mpfi_float_backend<500>>;
+            using mpfi_float_1000 = number<mpfi_float_backend<1000>>;
+            using mpfi_float = number<mpfi_float_backend<0>>;
 
             //
             // Special interval specific functions:
@@ -1151,7 +1142,7 @@ namespace nil {
 
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             struct component_type<number<mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-                typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
+                using type = number<mpfr_float_backend<Digits10>, ExpressionTemplates>;
             };
 
             //
@@ -1159,360 +1150,346 @@ namespace nil {
             //
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 asinh BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_asinh(result.backend().data(), arg.backend().data());
                 return result;
             }
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 acosh BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_acosh(result.backend().data(), arg.backend().data());
                 return result;
             }
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 atanh BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_atanh(result.backend().data(), arg.backend().data());
                 return result;
             }
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_cbrt(result.backend().data(), arg.backend().data());
                 return result;
             }
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_expm1(result.backend().data(), arg.backend().data());
                 return result;
             }
             template<unsigned Digits10, expression_template_option ExpressionTemplates>
             inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                 ExpressionTemplates>
+                                                        ExpressionTemplates>
                 log1p BOOST_PREVENT_MACRO_SUBSTITUTION(
-                    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                        ExpressionTemplates>& arg) {
+                    const nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg) {
                 nil::crypto3::multiprecision::detail::scoped_default_precision<
                     number<mpfi_float_backend<Digits10>, ExpressionTemplates>>
                     precision_guard(arg);
 
-                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                     ExpressionTemplates>
                     result;
                 mpfi_log1p(result.backend().data(), arg.backend().data());
                 return result;
             }
 
         }    // namespace multiprecision
-
-        namespace math {
-
-            namespace tools {
-
-                inline void set_output_precision(const nil::crypto3::multiprecision::mpfi_float& val, std::ostream& os) {
-                    os << std::setprecision(val.precision());
-                }
-
-                template<>
-                inline int digits<nil::crypto3::multiprecision::mpfi_float>()
-#ifdef BOOST_MATH_NOEXCEPT
-                    BOOST_NOEXCEPT
-#endif
-                {
-                    return nil::crypto3::multiprecision::detail::digits10_2_2(nil::crypto3::multiprecision::mpfi_float::default_precision());
-                }
-                template<>
-                inline int digits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                                nil::crypto3::multiprecision::et_off>>()
-#ifdef BOOST_MATH_NOEXCEPT
-                    BOOST_NOEXCEPT
-#endif
-                {
-                    return nil::crypto3::multiprecision::detail::digits10_2_2(nil::crypto3::multiprecision::mpfi_float::default_precision());
-                }
-
-                template<>
-                inline nil::crypto3::multiprecision::mpfi_float max_value<nil::crypto3::multiprecision::mpfi_float>() {
-                    nil::crypto3::multiprecision::mpfi_float result(0.5);
-                    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline nil::crypto3::multiprecision::mpfi_float min_value<nil::crypto3::multiprecision::mpfi_float>() {
-                    nil::crypto3::multiprecision::mpfi_float result(0.5);
-                    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                     nil::crypto3::multiprecision::et_off>
-                    max_value<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                            nil::crypto3::multiprecision::et_off>>() {
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                  nil::crypto3::multiprecision::et_off>
-                        result(0.5);
-                    mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                     nil::crypto3::multiprecision::et_off>
-                    min_value<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                            nil::crypto3::multiprecision::et_off>>() {
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
-                                                  nil::crypto3::multiprecision::et_off>
-                        result(0.5);
-                    mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                // mpfi gets used with logged_adaptor fairly often, so specialize for that use case as well:
-                typedef nil::crypto3::multiprecision::number<
-                    nil::crypto3::multiprecision::backends::logged_adaptor<nil::crypto3::multiprecision::mpfi_float::backend_type>,
-                    nil::crypto3::multiprecision::et_on>
-                    logged_type1;
-                typedef nil::crypto3::multiprecision::number<
-                    nil::crypto3::multiprecision::backends::logged_adaptor<nil::crypto3::multiprecision::mpfi_float::backend_type>,
-                    nil::crypto3::multiprecision::et_off>
-                    logged_type2;
-
-                template<>
-                inline int digits<logged_type1>()
-#ifdef BOOST_MATH_NOEXCEPT
-                    BOOST_NOEXCEPT
-#endif
-                {
-                    return nil::crypto3::multiprecision::detail::digits10_2_2(logged_type1::default_precision());
-                }
-                template<>
-                inline int digits<logged_type2>()
-#ifdef BOOST_MATH_NOEXCEPT
-                    BOOST_NOEXCEPT
-#endif
-                {
-                    return nil::crypto3::multiprecision::detail::digits10_2_2(logged_type1::default_precision());
-                }
-
-                template<>
-                inline logged_type1 max_value<logged_type1>() {
-                    logged_type1 result(0.5);
-                    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline logged_type1 min_value<logged_type1>() {
-                    logged_type1 result(0.5);
-                    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline logged_type2 max_value<logged_type2>() {
-                    logged_type2 result(0.5);
-                    mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-
-                template<>
-                inline logged_type2 min_value<logged_type2>() {
-                    logged_type2 result(0.5);
-                    mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
-                    // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
-                    return result;
-                }
-            }    // namespace tools
-
-            namespace constants {
-                namespace detail {
-
-                    template<class T>
-                    struct constant_pi;
-                    template<class T>
-                    struct constant_ln_two;
-                    template<class T>
-                    struct constant_euler;
-                    template<class T>
-                    struct constant_catalan;
-
-                    //
-                    // Initializer: ensure all our constants are initialized prior to the first call of main:
-                    //
-                    template<class T>
-                    struct mpfi_initializer {
-                        struct init {
-                            init() {
-                                boost::math::constants::pi<T>();
-                                boost::math::constants::ln_two<T>();
-                                boost::math::constants::euler<T>();
-                                boost::math::constants::catalan<T>();
-                            }
-                            void force_instantiate() const {
-                            }
-                        };
-                        static const init initializer;
-                        static void force_instantiate() {
-                            initializer.force_instantiate();
-                        }
-                    };
-
-                    template<class T>
-                    const typename mpfi_initializer<T>::init mpfi_initializer<T>::initializer;
-
-                    template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    struct constant_pi<nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                              ExpressionTemplates>
-                            result_type;
-                        template<int N>
-                        static inline const result_type& get(const boost::integral_constant<int, N>&) {
-                            mpfi_initializer<result_type>::force_instantiate();
-                            static result_type result;
-                            static bool has_init = false;
-                            if (!has_init) {
-                                has_init = true;
-                                mpfi_const_pi(result.backend().data());
-                            }
-                            return result;
-                        }
-                        static inline result_type get(const boost::integral_constant<int, 0>&) {
-                            result_type result;
-                            mpfi_const_pi(result.backend().data());
-                            return result;
-                        }
-                    };
-                    template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    struct constant_ln_two<nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                              ExpressionTemplates>
-                            result_type;
-                        template<int N>
-                        static inline const result_type& get(const boost::integral_constant<int, N>&) {
-                            mpfi_initializer<result_type>::force_instantiate();
-                            static result_type result;
-                            static bool has_init = false;
-                            if (!has_init) {
-                                has_init = true;
-                                mpfi_const_log2(result.backend().data());
-                            }
-                            return result;
-                        }
-                        static inline result_type get(const boost::integral_constant<int, 0>&) {
-                            result_type result;
-                            mpfi_const_log2(result.backend().data());
-                            return result;
-                        }
-                    };
-                    template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    struct constant_euler<nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                              ExpressionTemplates>
-                            result_type;
-                        template<int N>
-                        static inline result_type const& get(const boost::integral_constant<int, N>&) {
-                            mpfi_initializer<result_type>::force_instantiate();
-                            static result_type result;
-                            static bool has_init = false;
-                            if (!has_init) {
-                                has_init = true;
-                                mpfi_const_euler(result.backend().data());
-                            }
-                            return result;
-                        }
-                        static inline result_type get(const boost::integral_constant<int, 0>&) {
-                            result_type result;
-                            mpfi_const_euler(result.backend().data());
-                            return result;
-                        }
-                    };
-                    template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-                    struct constant_catalan<nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-                        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                              ExpressionTemplates>
-                            result_type;
-                        template<int N>
-                        static inline result_type const& get(const boost::integral_constant<int, N>&) {
-                            mpfi_initializer<result_type>::force_instantiate();
-                            static result_type result;
-                            static bool has_init = false;
-                            if (!has_init) {
-                                has_init = true;
-                                mpfi_const_catalan(result.backend().data());
-                            }
-                            return result;
-                        }
-                        static inline result_type get(const boost::integral_constant<int, 0>&) {
-                            result_type result;
-                            mpfi_const_catalan(result.backend().data());
-                            return result;
-                        }
-                    };
-
-                }    // namespace detail
-            }        // namespace constants
-
-        }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
+
+namespace boost {
+    namespace math {
+
+        namespace tools {
+
+            inline void set_output_precision(const nil::crypto3::multiprecision::mpfi_float& val, std::ostream& os) {
+                os << std::setprecision(val.precision());
+            }
+
+            template<>
+            inline int digits<nil::crypto3::multiprecision::mpfi_float>()
+#ifdef BOOST_MATH_NOEXCEPT
+                noexcept
+#endif
+            {
+                return multiprecision::detail::digits10_2_2(
+                    nil::crypto3::multiprecision::mpfi_float::default_precision());
+            }
+            template<>
+            inline int digits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                                   nil::crypto3::multiprecision::et_off>>()
+#ifdef BOOST_MATH_NOEXCEPT
+                noexcept
+#endif
+            {
+                return multiprecision::detail::digits10_2_2(
+                    nil::crypto3::multiprecision::mpfi_float::default_precision());
+            }
+
+            template<>
+            inline nil::crypto3::multiprecision::mpfi_float max_value<nil::crypto3::multiprecision::mpfi_float>() {
+                nil::crypto3::multiprecision::mpfi_float result(0.5);
+                mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline nil::crypto3::multiprecision::mpfi_float min_value<nil::crypto3::multiprecision::mpfi_float>() {
+                nil::crypto3::multiprecision::mpfi_float result(0.5);
+                mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                        nil::crypto3::multiprecision::et_off>
+                max_value<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                               nil::crypto3::multiprecision::et_off>>() {
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                     nil::crypto3::multiprecision::et_off>
+                    result(0.5);
+                mpfi_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                        nil::crypto3::multiprecision::et_off>
+                min_value<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                               nil::crypto3::multiprecision::et_off>>() {
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                     nil::crypto3::multiprecision::et_off>
+                    result(0.5);
+                mpfi_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            // mpfi gets used with logged_adaptor fairly often, so specialize for that use case as well:
+            using logged_type1 =
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::logged_adaptor<
+                                                         nil::crypto3::multiprecision::mpfi_float::backend_type>,
+                                                     nil::crypto3::multiprecision::et_on>;
+            using logged_type2 =
+                nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::logged_adaptor<
+                                                         nil::crypto3::multiprecision::mpfi_float::backend_type>,
+                                                     nil::crypto3::multiprecision::et_off>;
+
+            template<>
+            inline int digits<logged_type1>()
+#ifdef BOOST_MATH_NOEXCEPT
+                noexcept
+#endif
+            {
+                return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+            }
+            template<>
+            inline int digits<logged_type2>()
+#ifdef BOOST_MATH_NOEXCEPT
+                noexcept
+#endif
+            {
+                return multiprecision::detail::digits10_2_2(logged_type1::default_precision());
+            }
+
+            template<>
+            inline logged_type1 max_value<logged_type1>() {
+                logged_type1 result(0.5);
+                mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline logged_type1 min_value<logged_type1>() {
+                logged_type1 result(0.5);
+                mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline logged_type2 max_value<logged_type2>() {
+                logged_type2 result(0.5);
+                mpfi_mul_2exp(result.backend().value().data(), result.backend().value().data(), mpfr_get_emax());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+
+            template<>
+            inline logged_type2 min_value<logged_type2>() {
+                logged_type2 result(0.5);
+                mpfi_div_2exp(result.backend().value().data(), result.backend().value().data(), -mpfr_get_emin());
+                // BOOST_ASSERT(mpfi_number_p(result.backend().data()));
+                return result;
+            }
+        }    // namespace tools
+
+        namespace constants {
+            namespace detail {
+
+                template<class T>
+                struct constant_pi;
+                template<class T>
+                struct constant_ln_two;
+                template<class T>
+                struct constant_euler;
+                template<class T>
+                struct constant_catalan;
+
+                template<unsigned Digits10,
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                struct constant_pi<nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
+                    using result_type =
+                        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                             ExpressionTemplates>;
+                    template<int N>
+                    static inline const result_type& get(const std::integral_constant<int, N>&) {
+                        static result_type result;
+                        static bool has_init = false;
+                        if (!has_init) {
+                            has_init = true;
+                            mpfi_const_pi(result.backend().data());
+                        }
+                        return result;
+                    }
+                    static inline result_type get(const std::integral_constant<int, 0>&) {
+                        result_type result;
+                        mpfi_const_pi(result.backend().data());
+                        return result;
+                    }
+                };
+                template<unsigned Digits10,
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                struct constant_ln_two<nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
+                    using result_type =
+                        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                             ExpressionTemplates>;
+                    template<int N>
+                    static inline const result_type& get(const std::integral_constant<int, N>&) {
+                        static result_type result;
+                        static bool has_init = false;
+                        if (!has_init) {
+                            has_init = true;
+                            mpfi_const_log2(result.backend().data());
+                        }
+                        return result;
+                    }
+                    static inline result_type get(const std::integral_constant<int, 0>&) {
+                        result_type result;
+                        mpfi_const_log2(result.backend().data());
+                        return result;
+                    }
+                };
+                template<unsigned Digits10,
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                struct constant_euler<nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
+                    using result_type =
+                        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                             ExpressionTemplates>;
+                    template<int N>
+                    static inline const result_type& get(const std::integral_constant<int, N>&) {
+                        static result_type result;
+                        static bool has_init = false;
+                        if (!has_init) {
+                            has_init = true;
+                            mpfi_const_euler(result.backend().data());
+                        }
+                        return result;
+                    }
+                    static inline result_type get(const std::integral_constant<int, 0>&) {
+                        result_type result;
+                        mpfi_const_euler(result.backend().data());
+                        return result;
+                    }
+                };
+                template<unsigned Digits10,
+                         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+                struct constant_catalan<nil::crypto3::multiprecision::number<
+                    nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
+                    using result_type =
+                        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                             ExpressionTemplates>;
+                    template<int N>
+                    static inline const result_type& get(const std::integral_constant<int, N>&) {
+                        static result_type result;
+                        static bool has_init = false;
+                        if (!has_init) {
+                            has_init = true;
+                            mpfi_const_catalan(result.backend().data());
+                        }
+                        return result;
+                    }
+                    static inline result_type get(const std::integral_constant<int, 0>&) {
+                        result_type result;
+                        mpfi_const_catalan(result.backend().data());
+                        return result;
+                    }
+                };
+
+            }    // namespace detail
+        }        // namespace constants
+
+    }    // namespace math
+}    // namespace boost
 
 namespace std {
 
@@ -1520,15 +1497,15 @@ namespace std {
     // numeric_limits [partial] specializations for the types declared in this header:
     //
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    class numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
-        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>
-            number_type;
+    class numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>> {
+        using number_type =
+            nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
+                                                 ExpressionTemplates>;
 
     public:
-        BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+        static constexpr bool is_specialized = true;
         static number_type(min)() {
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 value.first = true;
@@ -1538,7 +1515,6 @@ namespace std {
             return value.second;
         }
         static number_type(max)() {
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 value.first = true;
@@ -1547,20 +1523,18 @@ namespace std {
             }
             return value.second;
         }
-        BOOST_STATIC_CONSTEXPR number_type lowest() {
+        static constexpr number_type lowest() {
             return -(max)();
         }
-        BOOST_STATIC_CONSTEXPR int digits =
-            static_cast<int>((Digits10 * 1000L) / 301L + ((Digits10 * 1000L) % 301 ? 2 : 1));
-        BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
+        static constexpr int digits = static_cast<int>((Digits10 * 1000L) / 301L + ((Digits10 * 1000L) % 301 ? 2 : 1));
+        static constexpr int digits10 = Digits10;
         // Is this really correct???
-        BOOST_STATIC_CONSTEXPR int max_digits10 = nil::crypto3::multiprecision::detail::calc_max_digits10<digits>::value;
-        BOOST_STATIC_CONSTEXPR bool is_signed = true;
-        BOOST_STATIC_CONSTEXPR bool is_integer = false;
-        BOOST_STATIC_CONSTEXPR bool is_exact = false;
-        BOOST_STATIC_CONSTEXPR int radix = 2;
+        static constexpr int max_digits10 = nil::crypto3::multiprecision::detail::calc_max_digits10<digits>::value;
+        static constexpr bool is_signed = true;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr int radix = 2;
         static number_type epsilon() {
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 value.first = true;
@@ -1573,7 +1547,6 @@ namespace std {
         // What value should this be????
         static number_type round_error() {
             // returns epsilon/2
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 value.first = true;
@@ -1582,17 +1555,16 @@ namespace std {
             }
             return value.second;
         }
-        BOOST_STATIC_CONSTEXPR long min_exponent = MPFR_EMIN_DEFAULT;
-        BOOST_STATIC_CONSTEXPR long min_exponent10 = (MPFR_EMIN_DEFAULT / 1000) * 301L;
-        BOOST_STATIC_CONSTEXPR long max_exponent = MPFR_EMAX_DEFAULT;
-        BOOST_STATIC_CONSTEXPR long max_exponent10 = (MPFR_EMAX_DEFAULT / 1000) * 301L;
-        BOOST_STATIC_CONSTEXPR bool has_infinity = true;
-        BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = true;
-        BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
-        BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
-        BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+        static constexpr long min_exponent = MPFR_EMIN_DEFAULT;
+        static constexpr long min_exponent10 = (MPFR_EMIN_DEFAULT / 1000) * 301L;
+        static constexpr long max_exponent = MPFR_EMAX_DEFAULT;
+        static constexpr long max_exponent10 = (MPFR_EMAX_DEFAULT / 1000) * 301L;
+        static constexpr bool has_infinity = true;
+        static constexpr bool has_quiet_NaN = true;
+        static constexpr bool has_signaling_NaN = false;
+        static constexpr float_denorm_style has_denorm = denorm_absent;
+        static constexpr bool has_denorm_loss = false;
         static number_type infinity() {
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 nil::crypto3::multiprecision::mpfr_float_backend<Digits10> t;
@@ -1603,7 +1575,6 @@ namespace std {
             return value.second;
         }
         static number_type quiet_NaN() {
-            initializer.do_nothing();
             static std::pair<bool, number_type> value;
             if (!value.first) {
                 nil::crypto3::multiprecision::mpfr_float_backend<Digits10> t;
@@ -1613,126 +1584,95 @@ namespace std {
             }
             return value.second;
         }
-        BOOST_STATIC_CONSTEXPR number_type signaling_NaN() {
+        static constexpr number_type signaling_NaN() {
             return number_type(0);
         }
-        BOOST_STATIC_CONSTEXPR number_type denorm_min() {
+        static constexpr number_type denorm_min() {
             return number_type(0);
         }
-        BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-        BOOST_STATIC_CONSTEXPR bool is_bounded = true;
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
-        BOOST_STATIC_CONSTEXPR bool traps = true;
-        BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-        BOOST_STATIC_CONSTEXPR float_round_style round_style = round_to_nearest;
-
-    private:
-        struct data_initializer {
-            data_initializer() {
-                std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::epsilon();
-                std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::round_error();
-                (std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::min)();
-                (std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::max)();
-                std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::infinity();
-                std::numeric_limits<
-                    nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<digits10>>>::quiet_NaN();
-            }
-            void do_nothing() const {
-            }
-        };
-        static const data_initializer initializer;
+        static constexpr bool is_iec559 = false;
+        static constexpr bool is_bounded = true;
+        static constexpr bool is_modulo = false;
+        static constexpr bool traps = true;
+        static constexpr bool tinyness_before = false;
+        static constexpr float_round_style round_style = round_to_nearest;
     };
 
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    const typename numeric_limits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                                ExpressionTemplates>>::data_initializer
-        numeric_limits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>,
-                                                     ExpressionTemplates>>::initializer;
-
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
-    template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::digits;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::digits10;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::max_digits10;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_signed;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_integer;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_exact;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::radix;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::radix;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST long numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr long numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::min_exponent;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST long numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr long numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::min_exponent10;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST long numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr long numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::max_exponent;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST long numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr long numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::max_exponent10;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::has_infinity;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::has_quiet_NaN;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::has_signaling_NaN;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr float_denorm_style numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::has_denorm;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::has_denorm_loss;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_iec559;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_bounded;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::is_modulo;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::traps;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::traps;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::tinyness_before;
     template<unsigned Digits10, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr float_round_style numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>>::round_style;
 
-#endif
-
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    class numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>> {
-        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>
-            number_type;
+    class numeric_limits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                              ExpressionTemplates>> {
+        using number_type = nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>,
+                                                                 ExpressionTemplates>;
 
     public:
-        BOOST_STATIC_CONSTEXPR bool is_specialized = false;
+        static constexpr bool is_specialized = false;
         static number_type(min)() {
             return number_type(0);
         }
@@ -1742,28 +1682,28 @@ namespace std {
         static number_type lowest() {
             return number_type(0);
         }
-        BOOST_STATIC_CONSTEXPR int digits = 0;
-        BOOST_STATIC_CONSTEXPR int digits10 = 0;
-        BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
-        BOOST_STATIC_CONSTEXPR bool is_signed = false;
-        BOOST_STATIC_CONSTEXPR bool is_integer = false;
-        BOOST_STATIC_CONSTEXPR bool is_exact = false;
-        BOOST_STATIC_CONSTEXPR int radix = 0;
+        static constexpr int digits = 0;
+        static constexpr int digits10 = 0;
+        static constexpr int max_digits10 = 0;
+        static constexpr bool is_signed = false;
+        static constexpr bool is_integer = false;
+        static constexpr bool is_exact = false;
+        static constexpr int radix = 0;
         static number_type epsilon() {
             return number_type(0);
         }
         static number_type round_error() {
             return number_type(0);
         }
-        BOOST_STATIC_CONSTEXPR int min_exponent = 0;
-        BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
-        BOOST_STATIC_CONSTEXPR int max_exponent = 0;
-        BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
-        BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-        BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
-        BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
-        BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
-        BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+        static constexpr int min_exponent = 0;
+        static constexpr int min_exponent10 = 0;
+        static constexpr int max_exponent = 0;
+        static constexpr int max_exponent10 = 0;
+        static constexpr bool has_infinity = false;
+        static constexpr bool has_quiet_NaN = false;
+        static constexpr bool has_signaling_NaN = false;
+        static constexpr float_denorm_style has_denorm = denorm_absent;
+        static constexpr bool has_denorm_loss = false;
         static number_type infinity() {
             return number_type(0);
         }
@@ -1776,83 +1716,80 @@ namespace std {
         static number_type denorm_min() {
             return number_type(0);
         }
-        BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-        BOOST_STATIC_CONSTEXPR bool is_bounded = false;
-        BOOST_STATIC_CONSTEXPR bool is_modulo = false;
-        BOOST_STATIC_CONSTEXPR bool traps = false;
-        BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-        BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+        static constexpr bool is_iec559 = false;
+        static constexpr bool is_bounded = false;
+        static constexpr bool is_modulo = false;
+        static constexpr bool traps = false;
+        static constexpr bool tinyness_before = false;
+        static constexpr float_round_style round_style = round_toward_zero;
     };
 
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::digits;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::digits;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::digits10;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::digits10;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::max_digits10;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::max_digits10;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_signed;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_signed;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_integer;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_integer;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_exact;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_exact;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::radix;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::radix;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::min_exponent;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::min_exponent;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::min_exponent10;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::max_exponent;
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::max_exponent;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr int numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::max_exponent10;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_infinity;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_infinity;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_quiet_NaN;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_signaling_NaN;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_denorm;
+    constexpr float_denorm_style numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_denorm;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::has_denorm_loss;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_iec559;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_iec559;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_bounded;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_bounded;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_modulo;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::is_modulo;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::traps;
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::traps;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
+    constexpr bool numeric_limits<nil::crypto3::multiprecision::number<
         nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::tinyness_before;
     template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::round_style;
+    constexpr float_round_style numeric_limits<nil::crypto3::multiprecision::number<
+        nil::crypto3::multiprecision::mpfi_float_backend<0>, ExpressionTemplates>>::round_style;
 
-#endif
 }    // namespace std
 #endif

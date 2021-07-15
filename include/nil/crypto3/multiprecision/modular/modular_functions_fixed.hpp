@@ -121,7 +121,7 @@ namespace nil {
 
                 template<typename Backend>
                 constexpr bool check_modulus_constraints(const Backend& m) {
-                    using ui_type = typename boost::mpl::front<typename Backend::unsigned_types>::type;
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_lt;
 
                     return !eval_lt(m, static_cast<ui_type>(0u));
@@ -129,7 +129,7 @@ namespace nil {
 
                 template<typename Backend>
                 constexpr bool check_montgomery_constraints(const Backend& m) {
-                    using ui_type = typename boost::mpl::front<typename Backend::unsigned_types>::type;
+                    using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
                     using default_ops::eval_eq;
                     using default_ops::eval_modulus;
 

@@ -63,10 +63,10 @@ namespace nil {
                 }
 
                 /* Conversion from the regular number A into Montgomery form r*A:
-                Montgomery_reduce((A mod N)*(r^2 mod N)) = Montgomery_reduce(A*r^2 mod N) = A*r mod N,
-                where result is A and get_mod() is N.
+                             Montgomery_reduce((A mod N)*(r^2 mod N)) = Montgomery_reduce(A*r^2 mod N) = A*r mod N,
+                             where result is A and get_mod() is N.
 
-                */
+                             */
                 void adjust_modular(Backend& result) {
                     this->barret_reduce(result);
                     if (get_mod() % 2 != 0) {
@@ -75,10 +75,10 @@ namespace nil {
                     }
                 }
                 /* Conversion from the number r*A (in the Montgomery form) into regular number A:
-                Montgomery_reduce(A * r mod N) = A mod N,
-                where result is A and get_mod() is N.
+                             Montgomery_reduce(A * r mod N) = A mod N,
+                             where result is A and get_mod() is N.
 
-                */
+                             */
                 void adjust_regular(Backend& result, const Backend& input) const {
                     result = input;
                     if (get_mod() % 2 != 0) {

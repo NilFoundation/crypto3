@@ -26,18 +26,13 @@ namespace nil {
                     BOOST_MP_USING_ABS
                     using default_ops::eval_convert_to;
                     using default_ops::eval_modulus;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Integer, Backend>::type int_type;
+                    using int_type = typename nil::crypto3::multiprecision::detail::canonical<Integer, Backend>::type;
                     Backend t;
                     eval_modulus(t, x, static_cast<int_type>(val));
                     Integer result(0);
                     eval_convert_to(&result, t);
                     return abs(result);
                 }
-
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4127)
-#endif
 
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b) {
@@ -92,13 +87,9 @@ namespace nil {
                     eval_left_shift(result, shift);
                 }
 
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
-
                 template<class B>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b) {
-                    typedef typename boost::mpl::front<typename B::unsigned_types>::type ui_type;
+                    using ui_type = typename std::tuple_element<0, typename B::unsigned_types>::type;
                     B t;
                     eval_gcd(t, a, b);
 
@@ -116,7 +107,7 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
                 divide_qr(const number<Backend, ExpressionTemplates>& x, const number<Backend, ExpressionTemplates>& y,
                           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r) {
                 using default_ops::eval_qr;
@@ -126,9 +117,9 @@ namespace nil {
             template<class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2,
                      class A3, class A4>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
                 divide_qr(const number<Backend, ExpressionTemplates>& x,
-                          const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& y,
+                          const multiprecision::detail::expression<tag, A1, A2, A3, A4>& y,
                           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r) {
                 divide_qr(x, number<Backend, ExpressionTemplates>(y), q, r);
             }
@@ -136,8 +127,8 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class Backend,
                      expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer>::type
-                divide_qr(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x,
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
+                divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x,
                           const number<Backend, ExpressionTemplates>& y, number<Backend, ExpressionTemplates>& q,
                           number<Backend, ExpressionTemplates>& r) {
                 divide_qr(number<Backend, ExpressionTemplates>(x), y, q, r);
@@ -146,52 +137,53 @@ namespace nil {
             template<class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b,
                      class A4b, class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer>::type
-                divide_qr(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x,
-                          const nil::crypto3::multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& y,
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer>::type
+                divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x,
+                          const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& y,
                           number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r) {
                 divide_qr(number<Backend, ExpressionTemplates>(x), number<Backend, ExpressionTemplates>(y), q, r);
             }
 
             template<class Backend, expression_template_option ExpressionTemplates, class Integer>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::is_integral<Integer>, boost::mpl::bool_<number_category<Backend>::value == number_kind_integer>>,
-                Integer>::type
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Integer>::value &&
+                                            (number_category<Backend>::value == number_kind_integer),
+                                        Integer>::type
                 integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val) {
                 using default_ops::eval_integer_modulus;
                 return eval_integer_modulus(x.backend(), val);
             }
 
             template<class tag, class A1, class A2, class A3, class A4, class Integer>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::is_integral<Integer>,
-                          boost::mpl::bool_<number_category<typename nil::crypto3::multiprecision::detail::expression<
-                                         tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer>>,
-                Integer>::type
-                integer_modulus(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, Integer val) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type result_type;
+            inline BOOST_MP_CXX14_CONSTEXPR
+                typename std::enable_if<nil::crypto3::multiprecision::detail::is_integral<Integer>::value &&
+                                            (number_category<typename multiprecision::detail::expression<
+                                                 tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer),
+                                        Integer>::type
+                integer_modulus(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, Integer val) {
+                using result_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return integer_modulus(result_type(x), val);
             }
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     unsigned>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        unsigned>::type
                 lsb(const number<Backend, ExpressionTemplates>& x) {
                 using default_ops::eval_lsb;
                 return eval_lsb(x.backend());
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                         number_kind_integer ||
-                    number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
+                    number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
                             value == number_kind_modular,
                 unsigned>::type
-                lsb(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                lsb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x) {
+                using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type n(x);
                 using default_ops::eval_lsb;
                 return eval_lsb(n.backend());
@@ -199,23 +191,23 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     unsigned>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        unsigned>::type
                 msb(const number<Backend, ExpressionTemplates>& x) {
                 using default_ops::eval_msb;
                 return eval_msb(x.backend());
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                         number_kind_integer ||
-                    number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
+                    number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
                             value == number_kind_modular,
                 unsigned>::type
-                msb(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                msb(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x) {
+                using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type n(x);
                 using default_ops::eval_msb;
                 return eval_msb(n.backend());
@@ -223,23 +215,23 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     bool>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        bool>::type
                 bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index) {
                 using default_ops::eval_bit_test;
                 return eval_bit_test(x.backend(), index);
             }
 
             template<class tag, class A1, class A2, class A3, class A4>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
-                number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value ==
                         number_kind_integer ||
-                    number_category<typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
+                    number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::
                             value == number_kind_modular,
                 bool>::type
-                bit_test(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+                bit_test(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, unsigned index) {
+                using number_type = typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 number_type n(x);
                 using default_ops::eval_bit_test;
                 return eval_bit_test(n.backend(), index);
@@ -247,9 +239,9 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     number<Backend, ExpressionTemplates>&>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        number<Backend, ExpressionTemplates>&>::type
                 bit_set(number<Backend, ExpressionTemplates>& x, unsigned index) {
                 using default_ops::eval_bit_set;
                 eval_bit_set(x.backend(), index);
@@ -258,9 +250,9 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     number<Backend, ExpressionTemplates>&>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        number<Backend, ExpressionTemplates>&>::type
                 bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index) {
                 using default_ops::eval_bit_unset;
                 eval_bit_unset(x.backend(), index);
@@ -269,9 +261,9 @@ namespace nil {
 
             template<class Backend, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR
-                typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer ||
-                                         number_category<Backend>::value == number_kind_modular,
-                                     number<Backend, ExpressionTemplates>&>::type
+                typename std::enable_if<number_category<Backend>::value == number_kind_integer ||
+                                            number_category<Backend>::value == number_kind_modular,
+                                        number<Backend, ExpressionTemplates>&>::type
                 bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index) {
                 using default_ops::eval_bit_flip;
                 eval_bit_flip(x.backend(), index);
@@ -286,7 +278,7 @@ namespace nil {
                 //
                 template<class Backend>
                 struct double_precision_type {
-                    typedef Backend type;
+                    using type = Backend;
                 };
 
                 //
@@ -294,13 +286,15 @@ namespace nil {
                 // check the value is positive:
                 //
                 template<class Backend>
-                inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v, const boost::mpl::true_) {
+                inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend& v,
+                                                                           const std::integral_constant<bool, true>) {
                     if (eval_get_sign(v) < 0) {
                         BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
                     }
                 }
                 template<class Backend>
-                inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend&, const boost::mpl::false_) {
+                inline BOOST_MP_CXX14_CONSTEXPR void check_sign_of_backend(const Backend&,
+                                                                           const std::integral_constant<bool, false>) {
                 }
                 //
                 // Calculate (a^p)%c:
@@ -314,10 +308,12 @@ namespace nil {
                     using default_ops::eval_multiply;
                     using default_ops::eval_right_shift;
 
-                    typedef typename double_precision_type<Backend>::type double_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
+                    using double_type = typename double_precision_type<Backend>::type;
+                    using ui_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type;
 
-                    check_sign_of_backend(p, boost::mpl::bool_<std::numeric_limits<number<Backend>>::is_signed>());
+                    check_sign_of_backend(
+                        p, std::integral_constant<bool, std::numeric_limits<number<Backend>>::is_signed>());
 
                     double_type x, y(a), b(p), t;
                     x = ui_type(1u);
@@ -338,10 +334,12 @@ namespace nil {
                 template<class Backend, class Integer>
                 BOOST_MP_CXX14_CONSTEXPR void eval_powm(Backend& result, const Backend& a, const Backend& p,
                                                         Integer c) {
-                    typedef typename double_precision_type<Backend>::type double_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Integer, double_type>::type i1_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Integer, Backend>::type i2_type;
+                    using double_type = typename double_precision_type<Backend>::type;
+                    using ui_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type;
+                    using i1_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<Integer, double_type>::type;
+                    using i2_type = typename nil::crypto3::multiprecision::detail::canonical<Integer, Backend>::type;
 
                     using default_ops::eval_bit_test;
                     using default_ops::eval_get_sign;
@@ -349,7 +347,8 @@ namespace nil {
                     using default_ops::eval_multiply;
                     using default_ops::eval_right_shift;
 
-                    check_sign_of_backend(p, boost::mpl::bool_<std::numeric_limits<number<Backend>>::is_signed>());
+                    check_sign_of_backend(
+                        p, std::integral_constant<bool, std::numeric_limits<number<Backend>>::is_signed>());
 
                     if (eval_get_sign(p) < 0) {
                         BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
@@ -372,10 +371,12 @@ namespace nil {
                 }
 
                 template<class Backend, class Integer>
-                BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_unsigned<Integer>>::type
+                BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<Integer>::value>::type
                     eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c) {
-                    typedef typename double_precision_type<Backend>::type double_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
+                    using double_type = typename double_precision_type<Backend>::type;
+                    using ui_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type;
 
                     using default_ops::eval_bit_test;
                     using default_ops::eval_get_sign;
@@ -400,21 +401,28 @@ namespace nil {
                 }
 
                 template<class Backend, class Integer>
-                BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_signed<Integer>>::type
+                BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_signed<Integer>::value &&
+                                            nil::crypto3::multiprecision::detail::is_integral<Integer>::value>::type
                     eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c) {
                     if (b < 0) {
                         BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
                     }
-                    eval_powm(result, a, static_cast<typename boost::make_unsigned<Integer>::type>(b), c);
+                    eval_powm(
+                        result, a,
+                        static_cast<typename nil::crypto3::multiprecision::detail::make_unsigned<Integer>::type>(b), c);
                 }
 
                 template<class Backend, class Integer1, class Integer2>
-                BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_unsigned<Integer1>>::type
+                BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<Integer1>::value>::type
                     eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c) {
-                    typedef typename double_precision_type<Backend>::type double_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type ui_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Integer1, double_type>::type i1_type;
-                    typedef typename nil::crypto3::multiprecision::detail::canonical<Integer2, Backend>::type i2_type;
+                    using double_type = typename double_precision_type<Backend>::type;
+                    using ui_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<unsigned char, double_type>::type;
+                    using i1_type =
+                        typename nil::crypto3::multiprecision::detail::canonical<Integer1, double_type>::type;
+                    using i2_type = typename nil::crypto3::multiprecision::detail::canonical<Integer2, Backend>::type;
 
                     using default_ops::eval_bit_test;
                     using default_ops::eval_get_sign;
@@ -439,12 +447,17 @@ namespace nil {
                 }
 
                 template<class Backend, class Integer1, class Integer2>
-                BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<boost::is_signed<Integer1>>::type
+                BOOST_MP_CXX14_CONSTEXPR
+                    typename std::enable_if<nil::crypto3::multiprecision::detail::is_signed<Integer1>::value &&
+                                            nil::crypto3::multiprecision::detail::is_integral<Integer1>::value>::type
                     eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c) {
                     if (b < 0) {
                         BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
                     }
-                    eval_powm(result, a, static_cast<typename boost::make_unsigned<Integer1>::type>(b), c);
+                    eval_powm(
+                        result, a,
+                        static_cast<typename nil::crypto3::multiprecision::detail::make_unsigned<Integer1>::type>(b),
+                        c);
                 }
 
                 struct powm_func {
@@ -452,7 +465,16 @@ namespace nil {
                     BOOST_MP_CXX14_CONSTEXPR void operator()(T& result, const T& b, const U& p, const V& m) const {
                         eval_powm(result, b, p, m);
                     }
+                    template<class R, class T, class U, class V>
+                    BOOST_MP_CXX14_CONSTEXPR void operator()(R& result, const T& b, const U& p, const V& m) const {
+                        T temp;
+                        eval_powm(temp, b, p, m);
+                        result = std::move(temp);
+                    }
 
+                    //
+                    // number_kind_modular
+                    //
                     template<class T, class U>
                     BOOST_MP_CXX14_CONSTEXPR void operator()(T& result, const T& b, const U& p) const {
                         eval_powm(result, b, p);
@@ -462,31 +484,36 @@ namespace nil {
             }    // namespace default_ops
 
             template<class T, class U, class V>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::mpl::bool_<number_category<T>::value == number_kind_integer>,
-                          boost::mpl::or_<is_number<T>, is_number_expression<T>>,
-                          boost::mpl::or_<is_number<U>, is_number_expression<U>, boost::is_integral<U>>,
-                          boost::mpl::or_<is_number<V>, is_number_expression<V>, boost::is_integral<V>>>,
-                typename boost::mpl::if_<
-                    is_no_et_number<T>, T,
-                    typename boost::mpl::if_<is_no_et_number<U>, U,
-                                      typename boost::mpl::if_<is_no_et_number<V>, V,
-                                                        detail::expression<detail::function, default_ops::powm_func, T,
-                                                                           U, V>>::type>::type>::type>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<T>::value == number_kind_integer) &&
+                    (is_number<T>::value || is_number_expression<T>::value) &&
+                    (is_number<U>::value || is_number_expression<U>::value ||
+                     nil::crypto3::multiprecision::detail::is_integral<U>::value) &&
+                    (is_number<V>::value || is_number_expression<V>::value ||
+                     nil::crypto3::multiprecision::detail::is_integral<V>::value),
+                typename std::conditional<
+                    is_no_et_number<T>::value, T,
+                    typename std::conditional<
+                        is_no_et_number<U>::value, U,
+                        typename std::conditional<is_no_et_number<V>::value, V,
+                                                  detail::expression<detail::function, default_ops::powm_func, T, U,
+                                                                     V>>::type>::type>::type>::type
                 powm(const T& b, const U& p, const V& mod) {
                 return detail::expression<detail::function, default_ops::powm_func, T, U, V>(default_ops::powm_func(),
                                                                                              b, p, mod);
             }
 
             template<class T, class U>
-            inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<
-                boost::mpl::and_<boost::mpl::bool_<number_category<T>::value == number_kind_modular>,
-                          boost::mpl::or_<is_number<T>, is_number_expression<T>>,
-                          boost::mpl::or_<is_number<U>, is_number_expression<U>, boost::is_integral<U>>>,
-                typename boost::mpl::if_<is_no_et_number<T>, T,
-                                  typename boost::mpl::if_<is_no_et_number<U>, U,
-                                                    detail::expression<detail::function, default_ops::powm_func, T,
-                                                                       U>>::type>::type>::type
+            inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
+                (number_category<T>::value == number_kind_modular) &&
+                    (is_number<T>::value || is_number_expression<T>::value) &&
+                    (is_number<U>::value || is_number_expression<U>::value ||
+                     nil::crypto3::multiprecision::detail::is_integral<U>::value),
+                typename std::conditional<
+                    is_no_et_number<T>::value, T,
+                    typename std::conditional<
+                        is_no_et_number<U>::value, U,
+                        detail::expression<detail::function, default_ops::powm_func, T, U>>::type>::type>::type
                 powm(const T& b, const U& p) {
                 return detail::expression<detail::function, default_ops::powm_func, T, U>(default_ops::powm_func(), b,
                                                                                           p);

@@ -16,17 +16,14 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127)    // conditional expression is constant
-#endif
-
                 //
                 // As above, but for adding a single limb to a non-trivial cpp_int:
                 //
                 template<class CppInt1, class CppInt2>
-                inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const limb_type& o)
-                    BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                inline BOOST_MP_CXX14_CONSTEXPR void
+                    add_unsigned(CppInt1& result,
+                                 const CppInt2& a,
+                                 const limb_type& o) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     // Addition using modular arithmetic.
                     // Nothing fancy, just let uintmax_t take the strain:
                     if (&result != &a)
@@ -64,16 +61,12 @@ namespace nil {
                 //
                 template<class CppInt1, class CppInt2>
                 inline BOOST_MP_CXX14_CONSTEXPR void
-                    subtract_unsigned(CppInt1& result, const CppInt2& a, const limb_type& b)
-                        BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value) {
+                    subtract_unsigned(CppInt1& result,
+                                      const CppInt2& a,
+                                      const limb_type& b) noexcept(is_non_throwing_cpp_int<CppInt1>::value) {
                     // Subtract one limb.
                     // Nothing fancy, just let uintmax_t take the strain:
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-                    BOOST_STATIC_CONSTANT(double_limb_type,
-                                          borrow = static_cast<double_limb_type>(CppInt1::max_limb_value) + 1);
-#else
                     constexpr double_limb_type borrow = static_cast<double_limb_type>(CppInt1::max_limb_value) + 1;
-#endif
                     result.resize(a.size(), a.size());
                     typename CppInt1::limb_pointer pr = result.limbs();
                     typename CppInt2::const_limb_pointer pa = a.limbs();
@@ -118,15 +111,17 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>&
+                                 o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     eval_add(result, result, o);
                 }
                 template<unsigned MinBits1,
@@ -144,17 +139,19 @@ namespace nil {
                          cpp_integer_type SignType3,
                          cpp_int_check_type Checked3,
                          class Allocator3>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>>::value>::
                     type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
                              const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                             const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>&
+                                 b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     if (a.sign() != b.sign()) {
                         subtract_unsigned(result, a, b);
                         return;
@@ -166,13 +163,15 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                    eval_add(
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                        const limb_type& o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                              MaxBits1,
+                                                                                              SignType1,
+                                                                                              Checked1,
+                                                                                              Allocator1>>::value)) {
                     if (result.sign()) {
                         subtract_unsigned(result, result, o);
                     } else
@@ -188,16 +187,18 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
-                    eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                             const limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                    eval_add(
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+                        const limb_type& o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                              MaxBits1,
+                                                                                              SignType1,
+                                                                                              Checked1,
+                                                                                              Allocator1>>::value)) {
                     if (a.sign()) {
                         subtract_unsigned(result, a, o);
                     } else
@@ -208,15 +209,18 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const signed_limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const signed_limb_type&
+                                 o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     if (o < 0)
-                        eval_subtract(result, static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
+                        eval_subtract(result,
+                                      static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
                     else if (o > 0)
                         eval_add(result, static_cast<limb_type>(o));
                 }
@@ -230,16 +234,18 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
                              const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                             const signed_limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const signed_limb_type&
+                                 o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     if (o < 0)
                         eval_subtract(
                             result, a, static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
@@ -253,13 +259,15 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                    eval_subtract(
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                        const limb_type& o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                              MaxBits1,
+                                                                                              SignType1,
+                                                                                              Checked1,
+                                                                                              Allocator1>>::value)) {
                     if (result.sign()) {
                         add_unsigned(result, result, o);
                     } else
@@ -275,16 +283,18 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
-                    eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                  const limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                    eval_subtract(
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+                        const limb_type& o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                              MaxBits1,
+                                                                                              SignType1,
+                                                                                              Checked1,
+                                                                                              Allocator1>>::value)) {
                     if (a.sign()) {
                         add_unsigned(result, a, o);
                     } else {
@@ -296,16 +306,19 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const signed_limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const signed_limb_type&
+                                      o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     if (o) {
                         if (o < 0)
-                            eval_add(result, static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
+                            eval_add(result,
+                                     static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
                         else
                             eval_subtract(result, static_cast<limb_type>(o));
                     }
@@ -320,19 +333,23 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
                                   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                  const signed_limb_type& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const signed_limb_type&
+                                      o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     if (o) {
                         if (o < 0)
-                            eval_add(result, a, static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
+                            eval_add(result,
+                                     a,
+                                     static_cast<limb_type>(nil::crypto3::multiprecision::detail::unsigned_abs(o)));
                         else
                             eval_subtract(result, a, static_cast<limb_type>(o));
                     } else if (&result != &a)
@@ -344,24 +361,23 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_increment(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-                    static const limb_type one = 1;
-#else
+                    eval_increment(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                       result) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                                 MaxBits1,
+                                                                                                 SignType1,
+                                                                                                 Checked1,
+                                                                                                 Allocator1>>::value)) {
                     constexpr const limb_type one = 1;
-#endif
+
                     if (!result.sign() &&
                         (result.limbs()[0] <
                          cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value))
                         ++result.limbs()[0];
                     else if (result.sign() && result.limbs()[0]) {
                         --result.limbs()[0];
-                        if (!result.limbs()[0])
+                        if (!result.limbs()[0] && (result.size() == 1))
                             result.sign(false);
                     } else
                         eval_add(result, one);
@@ -371,17 +387,16 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_decrement(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
-#ifdef BOOST_NO_CXX14_CONSTEXPR
-                    static const limb_type one = 1;
-#else
+                    eval_decrement(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                       result) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                                 MaxBits1,
+                                                                                                 SignType1,
+                                                                                                 Checked1,
+                                                                                                 Allocator1>>::value)) {
                     constexpr const limb_type one = 1;
-#endif
+
                     if (!result.sign() && result.limbs()[0])
                         --result.limbs()[0];
                     else if (result.sign() &&
@@ -401,15 +416,17 @@ namespace nil {
                          cpp_integer_type SignType2,
                          cpp_int_check_type Checked2,
                          class Allocator2>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>&
+                                      o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     eval_subtract(result, result, o);
                 }
                 template<unsigned MinBits1,
@@ -427,17 +444,19 @@ namespace nil {
                          cpp_integer_type SignType3,
                          cpp_int_check_type Checked3,
                          class Allocator3>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value &&
                     !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>>::value>::
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
                                   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                  const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>&
+                                      b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     if (a.sign() != b.sign()) {
                         add_unsigned(result, a, b);
                         return;
@@ -455,17 +474,19 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value ||
                      is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)>::
                     type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                 o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     if (result.sign() != o.sign()) {
                         if (*o.limbs() > *result.limbs()) {
                             *result.limbs() = detail::checked_subtract(
@@ -494,17 +515,19 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::
                     type
                     eval_add(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                             const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                             const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                 o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                      MaxBits1,
+                                                                                      SignType1,
+                                                                                      Checked1,
+                                                                                      Allocator1>>::value)) {
                     *result.limbs() = detail::checked_add(
                         *result.limbs(),
                         *o.limbs(),
@@ -518,17 +541,19 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value ||
                      is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)>::
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                      o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     if (result.sign() != o.sign()) {
                         *result.limbs() = detail::checked_add(
                             *result.limbs(),
@@ -556,27 +581,25 @@ namespace nil {
                          cpp_integer_type SignType1,
                          cpp_int_check_type Checked1,
                          class Allocator1>
-                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<
+                BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value &&
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
-                        BOOST_MP_NOEXCEPT_IF(
-                            (is_non_throwing_cpp_int<
-                                cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)) {
+                                  const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
+                                      o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     *result.limbs() = detail::checked_subtract(
                         *result.limbs(),
                         *o.limbs(),
                         typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
                     result.normalize();
                 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
             }    // namespace backends
         }        // namespace multiprecision

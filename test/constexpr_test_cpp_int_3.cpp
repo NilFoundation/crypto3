@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "constexpr_arithmetric_test.hpp"
-#include "boost/multiprecision/cpp_int.hpp"
+#include "nil/crypto3/multiprecision/cpp_int.hpp"
 #include "test.hpp"
 
 #if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && !defined(DISABLE_TESTS)

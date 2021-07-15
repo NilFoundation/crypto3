@@ -15,7 +15,7 @@ namespace nil {
                          Exponent MaxE>
                 void eval_exp_taylor(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res,
                                      const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg) {
-                    static const int bits =
+                    constexpr const int bits =
                         cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
                     //
                     // Taylor series for small argument, note returns exp(x) - 1:
@@ -137,9 +137,9 @@ namespace nil {
                                            cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>>()) < 0);
 
                     k = nn ? Exponent(1) << (msb(nn) / 2) : 0;
-                    k = (std::min)(
-                        k,
-                        (Exponent)(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count / 4));
+                    k = (std::min)(k, (Exponent)(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
+                                                               MaxE>::bit_count /
+                                                 4));
                     eval_ldexp(t, t, -k);
 
                     eval_exp_taylor(res, t);

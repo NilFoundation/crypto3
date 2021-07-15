@@ -17,7 +17,7 @@ namespace nil {
 
             template<typename Backend>
             std::vector<long> eval_find_wnaf(const size_t window_size, const Backend& scalar) {
-                typedef typename boost::mpl::front<typename Backend::unsigned_types>::type ui_type;
+                using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
                 using default_ops::eval_add;
                 using default_ops::eval_right_shift;

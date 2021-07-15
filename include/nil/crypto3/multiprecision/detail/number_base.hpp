@@ -7,14 +7,11 @@
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
 #include <limits>
-#include <boost/type_traits/add_const.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 #include <boost/core/nvp.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/type_traits/is_constructible.hpp>
-#include <boost/type_traits/decay.hpp>
 #include <boost/math/tools/complex.hpp>
 #include <nil/crypto3/multiprecision/traits/transcendental_reduction_type.hpp>
+#include <nil/crypto3/multiprecision/traits/std_integer_traits.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
@@ -23,27 +20,76 @@
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
-
-#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_TEMPLATE_ALIASES) ||              \
-    defined(BOOST_NO_CXX11_HDR_ARRAY) || defined(BOOST_NO_CXX11_ALLOCATOR) ||                             \
-    defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX11_CONSTEXPR) ||         \
-    defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || \
-    defined(BOOST_NO_CXX11_HDR_FUNCTIONAL) || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) ||               \
-    defined(BOOST_NO_CXX11_USER_DEFINED_LITERALS) || defined(BOOST_NO_CXX11_THREAD_LOCAL) ||              \
-    defined(BOOST_NO_CXX11_DECLTYPE) || defined(BOOST_NO_CXX11_STATIC_ASSERT) ||                          \
-    defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS) || defined(BOOST_NO_CXX11_NOEXCEPT) ||                    \
-    defined(BOOST_NO_CXX11_REF_QUALIFIERS)
 //
-// The above list includes everything we use, plus a few we're likely to use soon.
-// As from March 2020, C++03 support is deprecated, and as from March 2021 will be removed,
-// so mark up as such:
+// We now require C++11, if something we use is not supported, then error and say why:
 //
-#if (defined(_MSC_VER) || defined(__GNUC__)) && !defined(BOOST_MP_DISABLE_DEPRECATE_03_WARNING)
-#pragma message("CAUTION: One or more C++11 features were found to be unavailable")
-#pragma message( \
-    "CAUTION: Compiling Boost.Multiprecision in non-C++11 or later conformance modes is now deprecated and will be removed from March 2021.")
-#pragma message("CAUTION: Define BOOST_MP_DISABLE_DEPRECATE_03_WARNING to suppress this message.")
+#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_RVALUE_REFERENCES being set"
 #endif
+#ifdef BOOST_NO_CXX11_TEMPLATE_ALIASES
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_TEMPLATE_ALIASES being set"
+#endif
+#ifdef BOOST_NO_CXX11_HDR_ARRAY
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_ARRAY being set"
+#endif
+#ifdef BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_TYPE_TRAITS being set"
+#endif
+#ifdef BOOST_NO_CXX11_ALLOCATOR
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_ALLOCATOR being set"
+#endif
+#ifdef BOOST_NO_CXX11_CONSTEXPR
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_CONSTEXPR being set"
+#endif
+#ifdef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS being set"
+#endif
+#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
+#endif
+#ifdef BOOST_NO_CXX11_HDR_FUNCTIONAL
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_HDR_FUNCTIONAL being set"
+#endif
+#ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_VARIADIC_TEMPLATES being set"
+#endif
+#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
+#endif
+#ifdef BOOST_NO_CXX11_DECLTYPE
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DECLTYPE being set"
+#endif
+#ifdef BOOST_NO_CXX11_STATIC_ASSERT
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_STATIC_ASSERT being set"
+#endif
+#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_DEFAULTED_FUNCTIONS being set"
+#endif
+#ifdef BOOST_NO_CXX11_NOEXCEPT
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_NOEXCEPT being set"
+#endif
+#ifdef BOOST_NO_CXX11_REF_QUALIFIERS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_REF_QUALIFIERS being set"
+#endif
+#ifdef BOOST_NO_CXX11_USER_DEFINED_LITERALS
+#error \
+    "This library now requires a C++11 or later compiler - this message was generated as a result of BOOST_NO_CXX11_USER_DEFINED_LITERALS being set"
 #endif
 
 #if defined(NDEBUG) && !defined(_DEBUG)
@@ -52,25 +98,16 @@
 #define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140) || \
-    (defined(__clang_major__) && (__clang_major__ == 3) && (__clang_minor__ < 5))
-#define BOOST_MP_NOEXCEPT_IF(x)
-#else
-#define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
-#endif
-
-#if defined(BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140)
-#define BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#endif
-
 //
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL) && !defined(__MINGW32__)
+#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !(defined(__MINGW32__) && (__GNUC__ < 9) && !defined(__clang__))
 #define BOOST_MP_THREAD_LOCAL thread_local
 #define BOOST_MP_USING_THREAD_LOCAL
 #else
+#pragma GCC warning \
+    "thread_local on mingw is broken, please use MSys mingw gcc-9 or later, see https://sourceforge.net/p/mingw-w64/bugs/527/"
 #define BOOST_MP_THREAD_LOCAL
 #endif
 
@@ -155,7 +192,7 @@ namespace nil {
 
             template<class Backend>
             struct expression_template_default {
-                static const expression_template_option value = et_on;
+                static constexpr const expression_template_option value = et_on;
             };
 
             template<class Backend,
@@ -163,22 +200,22 @@ namespace nil {
             class number;
 
             template<class T>
-            struct is_number : public boost::mpl::false_ { };
+            struct is_number : public std::integral_constant<bool, false> { };
 
             template<class Backend, expression_template_option ExpressionTemplates>
-            struct is_number<number<Backend, ExpressionTemplates>> : public boost::mpl::true_ { };
+            struct is_number<number<Backend, ExpressionTemplates>> : public std::integral_constant<bool, true> { };
 
             template<class T>
-            struct is_et_number : public boost::mpl::false_ { };
+            struct is_et_number : public std::integral_constant<bool, false> { };
 
             template<class Backend>
-            struct is_et_number<number<Backend, et_on>> : public boost::mpl::true_ { };
+            struct is_et_number<number<Backend, et_on>> : public std::integral_constant<bool, true> { };
 
             template<class T>
-            struct is_no_et_number : public boost::mpl::false_ { };
+            struct is_no_et_number : public std::integral_constant<bool, false> { };
 
             template<class Backend>
-            struct is_no_et_number<number<Backend, et_off>> : public boost::mpl::true_ { };
+            struct is_no_et_number<number<Backend, et_off>> : public std::integral_constant<bool, true> { };
 
             namespace detail {
 
@@ -189,154 +226,168 @@ namespace nil {
             }    // namespace detail
 
             template<class T>
-            struct is_number_expression : public boost::mpl::false_ { };
+            struct is_number_expression : public std::integral_constant<bool, false> { };
 
             template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-            struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4>> : public boost::mpl::true_ { };
+            struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4>>
+                : public std::integral_constant<bool, true> { };
 
             template<class T, class Num>
             struct is_compatible_arithmetic_type
-                : public boost::mpl::bool_<boost::is_convertible<T, Num>::value && !boost::is_same<T, Num>::value &&
-                                           !is_number_expression<T>::value> { };
+                : public std::integral_constant<bool, std::is_convertible<T, Num>::value &&
+                                                          !std::is_same<T, Num>::value &&
+                                                          !is_number_expression<T>::value> { };
 
             namespace detail {
                 //
                 // Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
                 //
                 template<class T>
-                BOOST_CONSTEXPR
-                    typename boost::enable_if_c<(boost::is_signed<T>::value || boost::is_floating_point<T>::value),
-                                                T>::type
-                    abs(T t) BOOST_NOEXCEPT {
+                constexpr typename std::enable_if<(nil::crypto3::multiprecision::detail::is_signed<T>::value ||
+                                                   std::is_floating_point<T>::value),
+                                                  T>::type
+                    abs(T t) noexcept {
                     // This strange expression avoids a hardware trap in the corner case
                     // that val is the most negative value permitted in boost::long_long_type.
                     // See https://svn.boost.org/trac/boost/ticket/9740.
                     return t < 0 ? T(1u) + T(-(t + 1)) : t;
                 }
                 template<class T>
-                BOOST_CONSTEXPR typename boost::enable_if_c<(boost::is_unsigned<T>::value), T>::type
-                    abs(T t) BOOST_NOEXCEPT {
+                constexpr typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<T>::value, T>::type
+                    abs(T t) noexcept {
                     return t;
                 }
 
 #define BOOST_MP_USING_ABS using nil::crypto3::multiprecision::detail::abs;
 
                 template<class T>
-                BOOST_CONSTEXPR
-                    typename boost::enable_if_c<(boost::is_signed<T>::value || boost::is_floating_point<T>::value),
-                                                typename boost::make_unsigned<T>::type>::type
-                    unsigned_abs(T t) BOOST_NOEXCEPT {
+                constexpr
+                    typename std::enable_if<(nil::crypto3::multiprecision::detail::is_signed<T>::value ||
+                                             std::is_floating_point<T>::value),
+                                            typename nil::crypto3::multiprecision::detail::make_unsigned<T>::type>::type
+                    unsigned_abs(T t) noexcept {
                     // This strange expression avoids a hardware trap in the corner case
                     // that val is the most negative value permitted in boost::long_long_type.
                     // See https://svn.boost.org/trac/boost/ticket/9740.
-                    return t < 0 ? static_cast<typename boost::make_unsigned<T>::type>(1u) +
-                                       static_cast<typename boost::make_unsigned<T>::type>(-(t + 1)) :
-                                   static_cast<typename boost::make_unsigned<T>::type>(t);
+                    return t < 0 ?
+                               static_cast<typename nil::crypto3::multiprecision::detail::make_unsigned<T>::type>(1u) +
+                                   static_cast<typename nil::crypto3::multiprecision::detail::make_unsigned<T>::type>(
+                                       -(t + 1)) :
+                               static_cast<typename nil::crypto3::multiprecision::detail::make_unsigned<T>::type>(t);
                 }
                 template<class T>
-                BOOST_CONSTEXPR typename boost::enable_if_c<(boost::is_unsigned<T>::value), T>::type
-                    unsigned_abs(T t) BOOST_NOEXCEPT {
+                constexpr typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<T>::value, T>::type
+                    unsigned_abs(T t) noexcept {
                     return t;
                 }
 
-//
-// Move support:
-//
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-#define BOOST_MP_MOVE(x) std::move(x)
-#else
-#define BOOST_MP_MOVE(x) x
-#endif
-
                 template<class T>
                 struct bits_of {
-                    BOOST_STATIC_ASSERT(boost::is_integral<T>::value || boost::is_enum<T>::value ||
-                                        std::numeric_limits<T>::is_specialized);
-                    static const unsigned value = std::numeric_limits<T>::is_specialized ?
-                                                      std::numeric_limits<T>::digits :
-                                                      sizeof(T) * CHAR_BIT - (boost::is_signed<T>::value ? 1 : 0);
+                    static_assert(nil::crypto3::multiprecision::detail::is_integral<T>::value ||
+                                      std::is_enum<T>::value || std::numeric_limits<T>::is_specialized,
+                                  "Failed integer size check");
+                    static constexpr const unsigned value =
+                        std::numeric_limits<T>::is_specialized ?
+                            std::numeric_limits<T>::digits :
+                            sizeof(T) * CHAR_BIT - (nil::crypto3::multiprecision::detail::is_signed<T>::value ? 1 : 0);
                 };
 
 #if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
 #define BOOST_MP_BITS_OF_FLOAT128_DEFINED
                 template<>
                 struct bits_of<__float128> {
-                    static const unsigned value = 113;
+                    static constexpr const unsigned value = 113;
                 };
 #endif
 
                 template<int b>
                 struct has_enough_bits {
                     template<class T>
-                    struct type : public boost::mpl::bool_<bits_of<T>::value >= b> { };
+                    struct type : public std::integral_constant<bool, bits_of<T>::value >= b> { };
+                };
+
+                template<class Tuple, int i, int digits, bool = (i >= std::tuple_size<Tuple>::value)>
+                struct find_index_of_large_enough_type {
+                    static constexpr int value = bits_of<typename std::tuple_element<i, Tuple>::type>::value >= digits ?
+                                                     i :
+                                                     find_index_of_large_enough_type<Tuple, i + 1, digits>::value;
+                };
+                template<class Tuple, int i, int digits>
+                struct find_index_of_large_enough_type<Tuple, i, digits, true> {
+                    static constexpr int value = INT_MAX;
+                };
+
+                template<int index, class Tuple, class Fallback, bool = (std::tuple_size<Tuple>::value <= index)>
+                struct dereference_tuple {
+                    using type = typename std::tuple_element<index, Tuple>::type;
+                };
+                template<int index, class Tuple, class Fallback>
+                struct dereference_tuple<index, Tuple, Fallback, true> {
+                    using type = Fallback;
                 };
 
                 template<class Val, class Backend, class Tag>
                 struct canonical_imp {
-                    typedef typename boost::remove_cv<typename boost::decay<const Val>::type>::type type;
+                    using type = typename std::remove_cv<typename std::decay<const Val>::type>::type;
                 };
                 template<class B, class Backend, class Tag>
                 struct canonical_imp<number<B, et_on>, Backend, Tag> {
-                    typedef B type;
+                    using type = B;
                 };
                 template<class B, class Backend, class Tag>
                 struct canonical_imp<number<B, et_off>, Backend, Tag> {
-                    typedef B type;
+                    using type = B;
                 };
 #ifdef __SUNPRO_CC
                 template<class B, class Backend>
-                struct canonical_imp<number<B, et_on>, Backend, boost::mpl::int_<3>> {
-                    typedef B type;
+                struct canonical_imp<number<B, et_on>, Backend, std::integral_constant<int, 3>> {
+                    using type = B;
                 };
                 template<class B, class Backend>
-                struct canonical_imp<number<B, et_off>, Backend, boost::mpl::int_<3>> {
-                    typedef B type;
+                struct canonical_imp<number<B, et_off>, Backend, std::integral_constant<int, 3>> {
+                    using type = B;
                 };
 #endif
-
                 template<class Val, class Backend>
-                struct canonical_imp<Val, Backend, boost::mpl::int_<0>> {
-                    typedef typename has_enough_bits<bits_of<Val>::value>::template type<boost::mpl::_> pred_type;
-                    typedef typename boost::mpl::find_if<typename Backend::signed_types, pred_type>::type iter_type;
-                    typedef typename boost::mpl::end<typename Backend::signed_types>::type end_type;
-                    typedef typename boost::mpl::eval_if<boost::is_same<iter_type, end_type>, boost::mpl::identity<Val>,
-                                                         boost::mpl::deref<iter_type>>::type type;
+                struct canonical_imp<Val, Backend, std::integral_constant<int, 0>> {
+                    static constexpr int index =
+                        find_index_of_large_enough_type<typename Backend::signed_types, 0, bits_of<Val>::value>::value;
+                    using type = typename dereference_tuple<index, typename Backend::signed_types, Val>::type;
                 };
                 template<class Val, class Backend>
-                struct canonical_imp<Val, Backend, boost::mpl::int_<1>> {
-                    typedef typename has_enough_bits<bits_of<Val>::value>::template type<boost::mpl::_> pred_type;
-                    typedef typename boost::mpl::find_if<typename Backend::unsigned_types, pred_type>::type iter_type;
-                    typedef typename boost::mpl::end<typename Backend::unsigned_types>::type end_type;
-                    typedef typename boost::mpl::eval_if<boost::is_same<iter_type, end_type>, boost::mpl::identity<Val>,
-                                                         boost::mpl::deref<iter_type>>::type type;
+                struct canonical_imp<Val, Backend, std::integral_constant<int, 1>> {
+                    static constexpr int index = find_index_of_large_enough_type<typename Backend::unsigned_types, 0,
+                                                                                 bits_of<Val>::value>::value;
+                    using type = typename dereference_tuple<index, typename Backend::unsigned_types, Val>::type;
                 };
                 template<class Val, class Backend>
-                struct canonical_imp<Val, Backend, boost::mpl::int_<2>> {
-                    typedef typename has_enough_bits<bits_of<Val>::value>::template type<boost::mpl::_> pred_type;
-                    typedef typename boost::mpl::find_if<typename Backend::float_types, pred_type>::type iter_type;
-                    typedef typename boost::mpl::end<typename Backend::float_types>::type end_type;
-                    typedef typename boost::mpl::eval_if<boost::is_same<iter_type, end_type>, boost::mpl::identity<Val>,
-                                                         boost::mpl::deref<iter_type>>::type type;
+                struct canonical_imp<Val, Backend, std::integral_constant<int, 2>> {
+                    static constexpr int index =
+                        find_index_of_large_enough_type<typename Backend::float_types, 0, bits_of<Val>::value>::value;
+                    using type = typename dereference_tuple<index, typename Backend::float_types, Val>::type;
                 };
                 template<class Val, class Backend>
-                struct canonical_imp<Val, Backend, boost::mpl::int_<3>> {
-                    typedef const char* type;
+                struct canonical_imp<Val, Backend, std::integral_constant<int, 3>> {
+                    using type = const char*;
                 };
 
                 template<class Val, class Backend>
                 struct canonical {
-                    typedef typename boost::mpl::if_<
-                        boost::is_signed<Val>, boost::mpl::int_<0>,
-                        typename boost::mpl::if_<
-                            boost::is_unsigned<Val>, boost::mpl::int_<1>,
-                            typename boost::mpl::if_<
-                                boost::is_floating_point<Val>, boost::mpl::int_<2>,
-                                typename boost::mpl::if_<boost::mpl::or_<boost::is_convertible<Val, const char*>,
-                                                                         boost::is_same<Val, std::string>>,
-                                                         boost::mpl::int_<3>, boost::mpl::int_<4>>::type>::type>::
-                            type>::type tag_type;
+                    using tag_type = typename std::conditional<
+                        nil::crypto3::multiprecision::detail::is_signed<Val>::value &&
+                            nil::crypto3::multiprecision::detail::is_integral<Val>::value,
+                        std::integral_constant<int, 0>,
+                        typename std::conditional<
+                            nil::crypto3::multiprecision::detail::is_unsigned<Val>::value,
+                            std::integral_constant<int, 1>,
+                            typename std::conditional<
+                                std::is_floating_point<Val>::value, std::integral_constant<int, 2>,
+                                typename std::conditional<(std::is_convertible<Val, const char*>::value ||
+                                                           std::is_same<Val, std::string>::value),
+                                                          std::integral_constant<int, 3>,
+                                                          std::integral_constant<int, 4>>::type>::type>::type>::type;
 
-                    typedef typename canonical_imp<Val, Backend, tag_type>::type type;
+                    using type = typename canonical_imp<Val, Backend, tag_type>::type;
                 };
 
                 struct terminal { };
@@ -370,55 +421,50 @@ namespace nil {
 
                 template<class T, expression_template_option ExpressionTemplates>
                 struct backend_type<number<T, ExpressionTemplates>> {
-                    typedef T type;
+                    using type = T;
                 };
 
                 template<class tag, class A1, class A2, class A3, class A4>
                 struct backend_type<expression<tag, A1, A2, A3, A4>> {
-                    typedef typename backend_type<typename expression<tag, A1, A2, A3, A4>::result_type>::type type;
+                    using type = typename backend_type<typename expression<tag, A1, A2, A3, A4>::result_type>::type;
                 };
 
                 template<class T1, class T2>
                 struct combine_expression {
-#ifdef BOOST_NO_CXX11_DECLTYPE
-                    typedef typename boost::mpl::if_c<(sizeof(T1() + T2()) == sizeof(T1)), T1, T2>::type type;
-#else
-                    typedef decltype(T1() + T2()) type;
-#endif
+                    using type = decltype(T1() + T2());
                 };
 
                 template<class T1, expression_template_option ExpressionTemplates, class T2>
                 struct combine_expression<number<T1, ExpressionTemplates>, T2> {
-                    typedef number<T1, ExpressionTemplates> type;
+                    using type = number<T1, ExpressionTemplates>;
                 };
 
                 template<class T1, class T2, expression_template_option ExpressionTemplates>
                 struct combine_expression<T1, number<T2, ExpressionTemplates>> {
-                    typedef number<T2, ExpressionTemplates> type;
+                    using type = number<T2, ExpressionTemplates>;
                 };
 
                 template<class T, expression_template_option ExpressionTemplates>
                 struct combine_expression<number<T, ExpressionTemplates>, number<T, ExpressionTemplates>> {
-                    typedef number<T, ExpressionTemplates> type;
+                    using type = number<T, ExpressionTemplates>;
                 };
 
                 template<class T1, expression_template_option ExpressionTemplates1, class T2,
                          expression_template_option ExpressionTemplates2>
                 struct combine_expression<number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2>> {
-                    typedef typename boost::mpl::if_c<boost::is_convertible<number<T2, ExpressionTemplates2>,
-                                                                            number<T1, ExpressionTemplates2>>::value,
-                                                      number<T1, ExpressionTemplates1>,
-                                                      number<T2, ExpressionTemplates2>>::type type;
+                    using type = typename std::conditional<
+                        std::is_convertible<number<T2, ExpressionTemplates2>, number<T1, ExpressionTemplates2>>::value,
+                        number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2>>::type;
                 };
 
                 template<class T>
                 struct arg_type {
-                    typedef expression<terminal, T> type;
+                    using type = expression<terminal, T>;
                 };
 
                 template<class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
                 struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4>> {
-                    typedef expression<Tag, Arg1, Arg2, Arg3, Arg4> type;
+                    using type = expression<Tag, Arg1, Arg2, Arg3, Arg4>;
                 };
 
                 struct unmentionable {
@@ -431,46 +477,47 @@ namespace nil {
 
                 template<class T, bool b>
                 struct expression_storage_base {
-                    typedef const T& type;
+                    using type = const T&;
                 };
 
                 template<class T>
                 struct expression_storage_base<T, true> {
-                    typedef T type;
+                    using type = T;
                 };
 
                 template<class T>
-                struct expression_storage : public expression_storage_base<T, boost::is_arithmetic<T>::value> { };
+                struct expression_storage
+                    : public expression_storage_base<T, nil::crypto3::multiprecision::detail::is_arithmetic<T>::value> {
+                };
 
                 template<class T>
                 struct expression_storage<T*> {
-                    typedef T* type;
+                    using type = T*;
                 };
 
                 template<class T>
                 struct expression_storage<const T*> {
-                    typedef const T* type;
+                    using type = const T*;
                 };
 
                 template<class tag, class A1, class A2, class A3, class A4>
                 struct expression_storage<expression<tag, A1, A2, A3, A4>> {
-                    typedef expression<tag, A1, A2, A3, A4> type;
+                    using type = expression<tag, A1, A2, A3, A4>;
                 };
 
                 template<class tag, class Arg1>
                 struct expression<tag, Arg1, void, void, void> {
-                    typedef boost::mpl::int_<1> arity;
-                    typedef typename arg_type<Arg1>::type left_type;
-                    typedef typename left_type::result_type left_result_type;
-                    typedef typename left_type::result_type result_type;
-                    typedef tag tag_type;
+                    using arity = std::integral_constant<int, 1>;
+                    using left_type = typename arg_type<Arg1>::type;
+                    using left_result_type = typename left_type::result_type;
+                    using result_type = typename left_type::result_type;
+                    using tag_type = tag;
 
                     explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {
                     }
                     BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {
                     }
 
-#ifndef BOOST_NO_CXX11_STATIC_ASSERT
                     //
                     // If we have static_assert we can give a more useful error message
                     // than if we simply have no operator defined at all:
@@ -606,44 +653,23 @@ namespace nil {
                                       "an expression to a template function with deduced temnplate arguments?");
                         return *this;
                     }
-#endif
 
                     BOOST_MP_CXX14_CONSTEXPR left_type left() const {
                         return left_type(arg);
                     }
 
-                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept {
                         return arg;
                     }
 
-                    static const unsigned depth = left_type::depth + 1;
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || \
-    (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
-                    //
-                    // Horrible workaround for gcc-4.6.x which always prefers the template
-                    // operator bool() rather than the non-template operator when converting to
-                    // an arithmetic type:
-                    //
-                    template<class T, typename boost::enable_if<boost::is_same<T, bool>, int>::type = 0>
-                    explicit operator T() const {
-                        result_type r(*this);
-                        return static_cast<bool>(r);
-                    }
-                    template<class T,
-                             typename boost::disable_if_c<
-                                 boost::is_same<T, bool>::value || boost::is_void<T>::value || is_number<T>::value, int>::type = 0>
-                    explicit operator T() const {
-                        return static_cast<T>(static_cast<result_type>(*this));
-                    }
-#else
+                    static constexpr const unsigned depth = left_type::depth + 1;
                     template<class T
 #ifndef __SUNPRO_CC
                              ,
-                             typename boost::disable_if_c<is_number<T>::value ||
-                                                              boost::is_constructible<T const&, result_type>::value ||
-                                                              !boost::is_constructible<T, result_type>::value,
-                                                          int>::type = 0
+                             typename std::enable_if<!is_number<T>::value &&
+                                                         !std::is_convertible<result_type, T const&>::value &&
+                                                         std::is_constructible<T, result_type>::value,
+                                                     int>::type = 0
 #endif
                              >
                     explicit BOOST_MP_CXX14_CONSTEXPR operator T() const {
@@ -653,17 +679,6 @@ namespace nil {
                         result_type r(*this);
                         return static_cast<bool>(r);
                     }
-#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
-                    BOOST_MP_FORCEINLINE explicit operator void() const {
-                    }
-#endif
-#endif
-#else
-                    operator unmentionable_type() const {
-                        result_type r(*this);
-                        return r ? &unmentionable::proc : 0;
-                    }
-#endif
 
                     template<class T>
                     BOOST_MP_CXX14_CONSTEXPR T convert_to() {
@@ -678,16 +693,15 @@ namespace nil {
 
                 template<class Arg1>
                 struct expression<terminal, Arg1, void, void, void> {
-                    typedef boost::mpl::int_<0> arity;
-                    typedef Arg1 result_type;
-                    typedef terminal tag_type;
+                    using arity = std::integral_constant<int, 0>;
+                    using result_type = Arg1;
+                    using tag_type = terminal;
 
                     explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {
                     }
                     BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {
                     }
 
-#ifndef BOOST_NO_CXX11_STATIC_ASSERT
                     //
                     // If we have static_assert we can give a more useful error message
                     // than if we simply have no operator defined at all:
@@ -823,41 +837,20 @@ namespace nil {
                                       "an expression to a template function with deduced temnplate arguments?");
                         return *this;
                     }
-#endif
 
-                    BOOST_MP_CXX14_CONSTEXPR const Arg1& value() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg1& value() const noexcept {
                         return arg;
                     }
 
-                    static const unsigned depth = 0;
+                    static constexpr const unsigned depth = 0;
 
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || \
-    (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
-                    //
-                    // Horrible workaround for gcc-4.6.x which always prefers the template
-                    // operator bool() rather than the non-template operator when converting to
-                    // an arithmetic type:
-                    //
-                    template<class T, typename boost::enable_if<boost::is_same<T, bool>, int>::type = 0>
-                    explicit operator T() const {
-                        result_type r(*this);
-                        return static_cast<bool>(r);
-                    }
-                    template<class T,
-                             typename boost::disable_if_c<
-                                 boost::is_same<T, bool>::value || boost::is_void<T>::value || is_number<T>::value, int>::type = 0>
-                    explicit operator T() const {
-                        return static_cast<T>(static_cast<result_type>(*this));
-                    }
-#else
                     template<class T
 #ifndef __SUNPRO_CC
                              ,
-                             typename boost::disable_if_c<is_number<T>::value ||
-                                                              boost::is_constructible<T const&, result_type>::value ||
-                                                              !boost::is_constructible<T, result_type>::value,
-                                                          int>::type = 0
+                             typename std::enable_if<!is_number<T>::value &&
+                                                         !std::is_convertible<result_type, T const&>::value &&
+                                                         std::is_constructible<T, result_type>::value,
+                                                     int>::type = 0
 #endif
                              >
                     explicit BOOST_MP_CXX14_CONSTEXPR operator T() const {
@@ -867,16 +860,6 @@ namespace nil {
                         result_type r(*this);
                         return static_cast<bool>(r);
                     }
-#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
-                    BOOST_MP_FORCEINLINE explicit operator void() const {
-                    }
-#endif
-#endif
-#else
-                    operator unmentionable_type() const {
-                        return arg ? &unmentionable::proc : 0;
-                    }
-#endif
 
                     template<class T>
                     BOOST_MP_CXX14_CONSTEXPR T convert_to() {
@@ -891,20 +874,19 @@ namespace nil {
 
                 template<class tag, class Arg1, class Arg2>
                 struct expression<tag, Arg1, Arg2, void, void> {
-                    typedef boost::mpl::int_<2> arity;
-                    typedef typename arg_type<Arg1>::type left_type;
-                    typedef typename arg_type<Arg2>::type right_type;
-                    typedef typename left_type::result_type left_result_type;
-                    typedef typename right_type::result_type right_result_type;
-                    typedef typename combine_expression<left_result_type, right_result_type>::type result_type;
-                    typedef tag tag_type;
+                    using arity = std::integral_constant<int, 2>;
+                    using left_type = typename arg_type<Arg1>::type;
+                    using right_type = typename arg_type<Arg2>::type;
+                    using left_result_type = typename left_type::result_type;
+                    using right_result_type = typename right_type::result_type;
+                    using result_type = typename combine_expression<left_result_type, right_result_type>::type;
+                    using tag_type = tag;
 
                     BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2) : arg1(a1), arg2(a2) {
                     }
                     BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2) {
                     }
 
-#ifndef BOOST_NO_CXX11_STATIC_ASSERT
                     //
                     // If we have static_assert we can give a more useful error message
                     // than if we simply have no operator defined at all:
@@ -1040,7 +1022,6 @@ namespace nil {
                                       "an expression to a template function with deduced temnplate arguments?");
                         return *this;
                     }
-#endif
 
                     BOOST_MP_CXX14_CONSTEXPR left_type left() const {
                         return left_type(arg1);
@@ -1048,40 +1029,20 @@ namespace nil {
                     BOOST_MP_CXX14_CONSTEXPR right_type right() const {
                         return right_type(arg2);
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept {
                         return arg1;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg2& right_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg2& right_ref() const noexcept {
                         return arg2;
                     }
 
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || \
-    (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
-                    //
-                    // Horrible workaround for gcc-4.6.x which always prefers the template
-                    // operator bool() rather than the non-template operator when converting to
-                    // an arithmetic type:
-                    //
-                    template<class T, typename boost::enable_if<boost::is_same<T, bool>, int>::type = 0>
-                    explicit operator T() const {
-                        result_type r(*this);
-                        return static_cast<bool>(r);
-                    }
-                    template<class T,
-                             typename boost::disable_if_c<
-                                 boost::is_same<T, bool>::value || boost::is_void<T>::value || is_number<T>::value, int>::type = 0>
-                    explicit operator T() const {
-                        return static_cast<T>(static_cast<result_type>(*this));
-                    }
-#else
                     template<class T
 #ifndef __SUNPRO_CC
                              ,
-                             typename boost::disable_if_c<is_number<T>::value ||
-                                                              boost::is_constructible<T const&, result_type>::value ||
-                                                              !boost::is_constructible<T, result_type>::value,
-                                                          int>::type = 0
+                             typename std::enable_if<!is_number<T>::value &&
+                                                         !std::is_convertible<result_type, T const&>::value &&
+                                                         std::is_constructible<T, result_type>::value,
+                                                     int>::type = 0
 #endif
                              >
                     explicit BOOST_MP_CXX14_CONSTEXPR operator T() const {
@@ -1091,27 +1052,15 @@ namespace nil {
                         result_type r(*this);
                         return static_cast<bool>(r);
                     }
-#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
-                    BOOST_MP_FORCEINLINE explicit operator void() const {
-                    }
-#endif
-#endif
-#else
-                    operator unmentionable_type() const {
-                        result_type r(*this);
-                        return r ? &unmentionable::proc : 0;
-                    }
-#endif
                     template<class T>
                     BOOST_MP_CXX14_CONSTEXPR T convert_to() {
                         result_type r(*this);
                         return r.template convert_to<T>();
                     }
 
-                    static const BOOST_MP_CXX14_CONSTEXPR unsigned left_depth = left_type::depth + 1;
-                    static const BOOST_MP_CXX14_CONSTEXPR unsigned right_depth = right_type::depth + 1;
-                    static const BOOST_MP_CXX14_CONSTEXPR unsigned depth =
-                        left_depth > right_depth ? left_depth : right_depth;
+                    static const constexpr unsigned left_depth = left_type::depth + 1;
+                    static const constexpr unsigned right_depth = right_type::depth + 1;
+                    static const constexpr unsigned depth = left_depth > right_depth ? left_depth : right_depth;
 
                 private:
                     typename expression_storage<Arg1>::type arg1;
@@ -1121,17 +1070,17 @@ namespace nil {
 
                 template<class tag, class Arg1, class Arg2, class Arg3>
                 struct expression<tag, Arg1, Arg2, Arg3, void> {
-                    typedef boost::mpl::int_<3> arity;
-                    typedef typename arg_type<Arg1>::type left_type;
-                    typedef typename arg_type<Arg2>::type middle_type;
-                    typedef typename arg_type<Arg3>::type right_type;
-                    typedef typename left_type::result_type left_result_type;
-                    typedef typename middle_type::result_type middle_result_type;
-                    typedef typename right_type::result_type right_result_type;
-                    typedef typename combine_expression<
+                    using arity = std::integral_constant<int, 3>;
+                    using left_type = typename arg_type<Arg1>::type;
+                    using middle_type = typename arg_type<Arg2>::type;
+                    using right_type = typename arg_type<Arg3>::type;
+                    using left_result_type = typename left_type::result_type;
+                    using middle_result_type = typename middle_type::result_type;
+                    using right_result_type = typename right_type::result_type;
+                    using result_type = typename combine_expression<
                         left_result_type,
-                        typename combine_expression<right_result_type, middle_result_type>::type>::type result_type;
-                    typedef tag tag_type;
+                        typename combine_expression<right_result_type, middle_result_type>::type>::type;
+                    using tag_type = tag;
 
                     BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3) :
                         arg1(a1), arg2(a2), arg3(a3) {
@@ -1140,7 +1089,6 @@ namespace nil {
                         arg1(e.arg1), arg2(e.arg2), arg3(e.arg3) {
                     }
 
-#ifndef BOOST_NO_CXX11_STATIC_ASSERT
                     //
                     // If we have static_assert we can give a more useful error message
                     // than if we simply have no operator defined at all:
@@ -1276,7 +1224,6 @@ namespace nil {
                                       "an expression to a template function with deduced temnplate arguments?");
                         return *this;
                     }
-#endif
 
                     BOOST_MP_CXX14_CONSTEXPR left_type left() const {
                         return left_type(arg1);
@@ -1287,43 +1234,23 @@ namespace nil {
                     BOOST_MP_CXX14_CONSTEXPR right_type right() const {
                         return right_type(arg3);
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept {
                         return arg1;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg2& middle_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg2& middle_ref() const noexcept {
                         return arg2;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg3& right_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg3& right_ref() const noexcept {
                         return arg3;
                     }
 
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || \
-    (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
-                    //
-                    // Horrible workaround for gcc-4.6.x which always prefers the template
-                    // operator bool() rather than the non-template operator when converting to
-                    // an arithmetic type:
-                    //
-                    template<class T, typename boost::enable_if<boost::is_same<T, bool>, int>::type = 0>
-                    explicit operator T() const {
-                        result_type r(*this);
-                        return static_cast<bool>(r);
-                    }
-                    template<class T,
-                             typename boost::disable_if_c<
-                                 boost::is_same<T, bool>::value || boost::is_void<T>::value || is_number<T>::value, int>::type = 0>
-                    explicit operator T() const {
-                        return static_cast<T>(static_cast<result_type>(*this));
-                    }
-#else
                     template<class T
 #ifndef __SUNPRO_CC
                              ,
-                             typename boost::disable_if_c<is_number<T>::value ||
-                                                              boost::is_constructible<T const&, result_type>::value ||
-                                                              !boost::is_constructible<T, result_type>::value,
-                                                          int>::type = 0
+                             typename std::enable_if<!is_number<T>::value &&
+                                                         !std::is_convertible<result_type, T const&>::value &&
+                                                         std::is_constructible<T, result_type>::value,
+                                                     int>::type = 0
 #endif
                              >
                     explicit BOOST_MP_CXX14_CONSTEXPR operator T() const {
@@ -1333,29 +1260,18 @@ namespace nil {
                         result_type r(*this);
                         return static_cast<bool>(r);
                     }
-#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
-                    BOOST_MP_FORCEINLINE explicit operator void() const {
-                    }
-#endif
-#endif
-#else
-                    operator unmentionable_type() const {
-                        result_type r(*this);
-                        return r ? &unmentionable::proc : 0;
-                    }
-#endif
                     template<class T>
                     BOOST_MP_CXX14_CONSTEXPR T convert_to() {
                         result_type r(*this);
                         return r.template convert_to<T>();
                     }
 
-                    static const unsigned left_depth = left_type::depth + 1;
-                    static const unsigned middle_depth = middle_type::depth + 1;
-                    static const unsigned right_depth = right_type::depth + 1;
-                    static const unsigned depth = left_depth > right_depth ?
-                                                      (left_depth > middle_depth ? left_depth : middle_depth) :
-                                                      (right_depth > middle_depth ? right_depth : middle_depth);
+                    static constexpr const unsigned left_depth = left_type::depth + 1;
+                    static constexpr const unsigned middle_depth = middle_type::depth + 1;
+                    static constexpr const unsigned right_depth = right_type::depth + 1;
+                    static constexpr const unsigned
+                        depth = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) :
+                                                           (right_depth > middle_depth ? right_depth : middle_depth);
 
                 private:
                     typename expression_storage<Arg1>::type arg1;
@@ -1366,22 +1282,21 @@ namespace nil {
 
                 template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
                 struct expression {
-                    typedef boost::mpl::int_<4> arity;
-                    typedef typename arg_type<Arg1>::type left_type;
-                    typedef typename arg_type<Arg2>::type left_middle_type;
-                    typedef typename arg_type<Arg3>::type right_middle_type;
-                    typedef typename arg_type<Arg4>::type right_type;
-                    typedef typename left_type::result_type left_result_type;
-                    typedef typename left_middle_type::result_type left_middle_result_type;
-                    typedef typename right_middle_type::result_type right_middle_result_type;
-                    typedef typename right_type::result_type right_result_type;
-                    typedef typename combine_expression<
+                    using arity = std::integral_constant<int, 4>;
+                    using left_type = typename arg_type<Arg1>::type;
+                    using left_middle_type = typename arg_type<Arg2>::type;
+                    using right_middle_type = typename arg_type<Arg3>::type;
+                    using right_type = typename arg_type<Arg4>::type;
+                    using left_result_type = typename left_type::result_type;
+                    using left_middle_result_type = typename left_middle_type::result_type;
+                    using right_middle_result_type = typename right_middle_type::result_type;
+                    using right_result_type = typename right_type::result_type;
+                    using result_type = typename combine_expression<
                         left_result_type,
-                        typename combine_expression<
-                            left_middle_result_type,
-                            typename combine_expression<right_middle_result_type, right_result_type>::type>::type>::type
-                        result_type;
-                    typedef tag tag_type;
+                        typename combine_expression<left_middle_result_type,
+                                                    typename combine_expression<right_middle_result_type,
+                                                                                right_result_type>::type>::type>::type;
+                    using tag_type = tag;
 
                     BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3,
                                                         const Arg4& a4) :
@@ -1392,7 +1307,6 @@ namespace nil {
                         arg1(e.arg1), arg2(e.arg2), arg3(e.arg3), arg4(e.arg4) {
                     }
 
-#ifndef BOOST_NO_CXX11_STATIC_ASSERT
                     //
                     // If we have static_assert we can give a more useful error message
                     // than if we simply have no operator defined at all:
@@ -1528,7 +1442,6 @@ namespace nil {
                                       "an expression to a template function with deduced temnplate arguments?");
                         return *this;
                     }
-#endif
 
                     BOOST_MP_CXX14_CONSTEXPR left_type left() const {
                         return left_type(arg1);
@@ -1542,46 +1455,26 @@ namespace nil {
                     BOOST_MP_CXX14_CONSTEXPR right_type right() const {
                         return right_type(arg4);
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg1& left_ref() const noexcept {
                         return arg1;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg2& left_middle_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg2& left_middle_ref() const noexcept {
                         return arg2;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg3& right_middle_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg3& right_middle_ref() const noexcept {
                         return arg3;
                     }
-                    BOOST_MP_CXX14_CONSTEXPR const Arg4& right_ref() const BOOST_NOEXCEPT {
+                    BOOST_MP_CXX14_CONSTEXPR const Arg4& right_ref() const noexcept {
                         return arg4;
                     }
 
-#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || \
-    (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
-                    //
-                    // Horrible workaround for gcc-4.6.x which always prefers the template
-                    // operator bool() rather than the non-template operator when converting to
-                    // an arithmetic type:
-                    //
-                    template<class T, typename boost::enable_if<boost::is_same<T, bool>, int>::type = 0>
-                    explicit operator T() const {
-                        result_type r(*this);
-                        return static_cast<bool>(r);
-                    }
-                    template<class T,
-                             typename boost::disable_if_c<
-                                 boost::is_same<T, bool>::value || boost::is_void<T>::value || is_number<T>::value, int>::type = 0>
-                    explicit operator T() const {
-                        return static_cast<T>(static_cast<result_type>(*this));
-                    }
-#else
                     template<class T
 #ifndef __SUNPRO_CC
                              ,
-                             typename boost::disable_if_c<is_number<T>::value ||
-                                                              boost::is_constructible<T const&, result_type>::value ||
-                                                              !boost::is_constructible<T, result_type>::value,
-                                                          int>::type = 0
+                             typename std::enable_if<!is_number<T>::value &&
+                                                         !std::is_convertible<result_type, T const&>::value &&
+                                                         std::is_constructible<T, result_type>::value,
+                                                     int>::type = 0
 #endif
                              >
                     explicit BOOST_MP_CXX14_CONSTEXPR operator T() const {
@@ -1591,34 +1484,24 @@ namespace nil {
                         result_type r(*this);
                         return static_cast<bool>(r);
                     }
-#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
-                    BOOST_MP_FORCEINLINE explicit operator void() const {
-                    }
-#endif
-#endif
-#else
-                    operator unmentionable_type() const {
-                        result_type r(*this);
-                        return r ? &unmentionable::proc : 0;
-                    }
-#endif
                     template<class T>
                     BOOST_MP_CXX14_CONSTEXPR T convert_to() {
                         result_type r(*this);
                         return r.template convert_to<T>();
                     }
 
-                    static const unsigned left_depth = left_type::depth + 1;
-                    static const unsigned left_middle_depth = left_middle_type::depth + 1;
-                    static const unsigned right_middle_depth = right_middle_type::depth + 1;
-                    static const unsigned right_depth = right_type::depth + 1;
+                    static constexpr const unsigned left_depth = left_type::depth + 1;
+                    static constexpr const unsigned left_middle_depth = left_middle_type::depth + 1;
+                    static constexpr const unsigned right_middle_depth = right_middle_type::depth + 1;
+                    static constexpr const unsigned right_depth = right_type::depth + 1;
 
-                    static const unsigned left_max_depth =
+                    static constexpr const unsigned left_max_depth =
                         left_depth > left_middle_depth ? left_depth : left_middle_depth;
-                    static const unsigned right_max_depth =
+                    static constexpr const unsigned right_max_depth =
                         right_depth > right_middle_depth ? right_depth : right_middle_depth;
 
-                    static const unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
+                    static constexpr const unsigned depth =
+                        left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
 
                 private:
                     typename expression_storage<Arg1>::type arg1;
@@ -1630,15 +1513,17 @@ namespace nil {
 
                 template<class T>
                 struct digits2 {
-                    BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
-                    BOOST_STATIC_ASSERT((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10));
+                    static_assert(std::numeric_limits<T>::is_specialized, "numeric_limits must be specialized here");
+                    static_assert((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10),
+                                  "Failed radix check");
                     // If we really have so many digits that this fails, then we're probably going to hit other problems
                     // anyway:
-                    BOOST_STATIC_ASSERT(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1));
-                    static const long m_value = std::numeric_limits<T>::radix == 10 ?
-                                                    (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) :
-                                                    std::numeric_limits<T>::digits;
-                    static inline BOOST_CONSTEXPR long value() BOOST_NOEXCEPT {
+                    static_assert(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1),
+                                  "Too many digits to cope with here");
+                    static constexpr const long m_value = std::numeric_limits<T>::radix == 10 ?
+                                                              (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) :
+                                                              std::numeric_limits<T>::digits;
+                    static inline constexpr long value() noexcept {
                         return m_value;
                     }
                 };
@@ -1652,9 +1537,9 @@ namespace nil {
 #endif
 
                 template<class S>
-                void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
-                                         std::ios_base::fmtflags f, bool iszero) {
-                    typedef typename S::size_type size_type;
+                void format_float_string(S& str, std::intmax_t my_exp, std::intmax_t digits, std::ios_base::fmtflags f,
+                                         bool iszero) {
+                    using size_type = typename S::size_type;
                     bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
                     bool fixed = (f & std::ios_base::fixed) == std::ios_base::fixed;
                     bool showpoint = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
@@ -1708,7 +1593,7 @@ namespace nil {
                         //
                         // Pad out the end with zero's if we need to:
                         //
-                        boost::intmax_t chars = str.size();
+                        std::intmax_t chars = str.size();
                         chars = digits - chars;
                         if (scientific)
                             ++chars;
@@ -1718,12 +1603,12 @@ namespace nil {
                     }
 
                     if (fixed || (!scientific && (my_exp >= -4) && (my_exp < digits))) {
-                        if (1 + my_exp > static_cast<boost::intmax_t>(str.size())) {
+                        if (1 + my_exp > static_cast<std::intmax_t>(str.size())) {
                             // Just pad out the end with zeros:
                             str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
                             if (showpoint || fixed)
                                 str.append(".");
-                        } else if (my_exp + 1 < static_cast<boost::intmax_t>(str.size())) {
+                        } else if (my_exp + 1 < static_cast<std::intmax_t>(str.size())) {
                             if (my_exp < 0) {
                                 str.insert(static_cast<std::string::size_type>(0),
                                            static_cast<std::string::size_type>(-1 - my_exp), '0');
@@ -1737,7 +1622,7 @@ namespace nil {
 
                         if (fixed) {
                             // We may need to add trailing zeros:
-                            boost::intmax_t l = str.find('.') + 1;
+                            std::intmax_t l = str.find('.') + 1;
                             l = digits - (str.size() - l);
                             if (l > 0)
                                 str.append(size_type(l), '0');
@@ -1765,8 +1650,8 @@ namespace nil {
                 }
 
                 template<class V>
-                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const boost::mpl::true_&,
-                                                                const boost::mpl::true_&) {
+                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&,
+                                                                const std::integral_constant<bool, true>&) {
                     if (val > (std::numeric_limits<std::size_t>::max)())
                         BOOST_THROW_EXCEPTION(std::out_of_range(
                             "Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
@@ -1774,21 +1659,21 @@ namespace nil {
                         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
                 }
                 template<class V>
-                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const boost::mpl::false_&,
-                                                                const boost::mpl::true_&) {
+                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, false>&,
+                                                                const std::integral_constant<bool, true>&) {
                     if (val < 0)
                         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
                 }
                 template<class V>
-                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const boost::mpl::true_&,
-                                                                const boost::mpl::false_&) {
+                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V val, const std::integral_constant<bool, true>&,
+                                                                const std::integral_constant<bool, false>&) {
                     if (val > (std::numeric_limits<std::size_t>::max)())
                         BOOST_THROW_EXCEPTION(std::out_of_range(
                             "Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
                 }
                 template<class V>
-                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const boost::mpl::false_&,
-                                                                const boost::mpl::false_&) BOOST_NOEXCEPT {
+                BOOST_MP_CXX14_CONSTEXPR void check_shift_range(V, const std::integral_constant<bool, false>&,
+                                                                const std::integral_constant<bool, false>&) noexcept {
                 }
 
                 template<class T>
@@ -1817,17 +1702,19 @@ namespace nil {
             };
 
             template<class Num, bool, bool>
-            struct number_category_base : public boost::mpl::int_<number_kind_unknown> { };
+            struct number_category_base : public std::integral_constant<int, number_kind_unknown> { };
             template<class Num>
             struct number_category_base<Num, true, false>
-                : public boost::mpl::int_<std::numeric_limits<Num>::is_integer ?
-                                              number_kind_integer :
-                                              (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point :
-                                                                                        number_kind_unknown)> { };
+                : public std::integral_constant<int, std::numeric_limits<Num>::is_integer ?
+                                                         number_kind_integer :
+                                                         (std::numeric_limits<Num>::max_exponent ?
+                                                              number_kind_floating_point :
+                                                              number_kind_unknown)> { };
             template<class Num>
             struct number_category
-                : public number_category_base<Num, boost::is_class<Num>::value || boost::is_arithmetic<Num>::value,
-                                              boost::is_abstract<Num>::value> { };
+                : public number_category_base<
+                      Num, std::is_class<Num>::value || nil::crypto3::multiprecision::detail::is_arithmetic<Num>::value,
+                      std::is_abstract<Num>::value> { };
             template<class Backend, expression_template_option ExpressionTemplates>
             struct number_category<number<Backend, ExpressionTemplates>> : public number_category<Backend> { };
             template<class tag, class A1, class A2, class A3, class A4>
@@ -1838,18 +1725,18 @@ namespace nil {
 //
 #ifdef BOOST_HAS_INT128
             template<>
-            struct number_category<boost::int128_type> : public boost::mpl::int_<number_kind_integer> { };
+            struct number_category<boost::int128_type> : public std::integral_constant<int, number_kind_integer> { };
             template<>
-            struct number_category<boost::uint128_type> : public boost::mpl::int_<number_kind_integer> { };
+            struct number_category<boost::uint128_type> : public std::integral_constant<int, number_kind_integer> { };
 #endif
 #ifdef BOOST_HAS_FLOAT128
             template<>
-            struct number_category<__float128> : public boost::mpl::int_<number_kind_floating_point> { };
+            struct number_category<__float128> : public std::integral_constant<int, number_kind_floating_point> { };
 #endif
 
             template<class T>
             struct component_type {
-                typedef T type;
+                using type = T;
             };
             template<class tag, class A1, class A2, class A3, class A4>
             struct component_type<detail::expression<tag, A1, A2, A3, A4>>
@@ -1857,23 +1744,38 @@ namespace nil {
 
             template<class T>
             struct scalar_result_from_possible_complex {
-                typedef typename boost::mpl::if_c<number_category<T>::value == number_kind_complex,
-                                                  typename component_type<T>::type, T>::type type;
+                using type = typename std::conditional<number_category<T>::value == number_kind_complex,
+                                                       typename component_type<T>::type, T>::type;
             };
 
             template<class T>
             struct complex_result_from_scalar;    // individual backends must specialize this trait.
 
             template<class T>
-            struct is_unsigned_number : public boost::mpl::false_ { };
+            struct is_unsigned_number : public std::integral_constant<bool, false> { };
             template<class Backend, expression_template_option ExpressionTemplates>
             struct is_unsigned_number<number<Backend, ExpressionTemplates>> : public is_unsigned_number<Backend> { };
             template<class T>
-            struct is_signed_number : public boost::mpl::bool_<!is_unsigned_number<T>::value> { };
+            struct is_signed_number : public std::integral_constant<bool, !is_unsigned_number<T>::value> { };
             template<class T>
-            struct is_interval_number : public boost::mpl::false_ { };
+            struct is_interval_number : public std::integral_constant<bool, false> { };
             template<class Backend, expression_template_option ExpressionTemplates>
             struct is_interval_number<number<Backend, ExpressionTemplates>> : public is_interval_number<Backend> { };
+
+            template<class T, class U>
+            struct is_equivalent_number_type : public std::is_same<T, U> { };
+
+            template<class Backend, expression_template_option ExpressionTemplates, class T2>
+            struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, T2>
+                : public is_equivalent_number_type<Backend, T2> { };
+            template<class T1, class Backend, expression_template_option ExpressionTemplates>
+            struct is_equivalent_number_type<T1, number<Backend, ExpressionTemplates>>
+                : public is_equivalent_number_type<Backend, T1> { };
+            template<class Backend, expression_template_option ExpressionTemplates, class Backend2,
+                     expression_template_option ExpressionTemplates2>
+            struct is_equivalent_number_type<number<Backend, ExpressionTemplates>,
+                                             number<Backend2, ExpressionTemplates2>>
+                : public is_equivalent_number_type<Backend, Backend2> { };
 
         }    // namespace multiprecision
     }        // namespace crypto3
@@ -1888,8 +1790,8 @@ namespace boost {
 
             template<class tag, class A1, class A2, class A3, class A4>
             struct promote_arg<nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>> {
-                typedef
-                    typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
+                using type =
+                    typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
             };
 
             template<class R, class B, nil::crypto3::multiprecision::expression_template_option ET>
@@ -1899,15 +1801,15 @@ namespace boost {
 
             template<class R, class tag, class A1, class A2, class A3, class A4>
             inline R real_cast(const nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val) {
-                typedef typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-                    val_type;
+                using val_type =
+                    typename nil::crypto3::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type;
                 return val_type(val).template convert_to<R>();
             }
 
             template<class B, nil::crypto3::multiprecision::expression_template_option ET>
             struct is_complex_type<nil::crypto3::multiprecision::number<B, ET>>
-                : public boost::mpl::bool_<nil::crypto3::multiprecision::number_category<B>::value ==
-                                           nil::crypto3::multiprecision::number_kind_complex> { };
+                : public std::integral_constant<bool, nil::crypto3::multiprecision::number_category<B>::value ==
+                                                          nil::crypto3::multiprecision::number_kind_complex> { };
 
         }    // namespace tools
 
@@ -1918,7 +1820,7 @@ namespace boost {
 
             template<class B, nil::crypto3::multiprecision::expression_template_option ET>
             struct is_explicitly_convertible_from_string<nil::crypto3::multiprecision::number<B, ET>> {
-                static const bool value = true;
+                static constexpr const bool value = true;
             };
 
         }    // namespace constants
