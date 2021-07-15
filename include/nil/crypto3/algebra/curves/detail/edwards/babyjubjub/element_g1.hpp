@@ -276,6 +276,23 @@ namespace nil {
                             return element_twisted_edwards_g1(p_out[0], p_out[1], p_out[2]);
                         }
 
+                        element_twisted_edwards_g1 to_montgomery() const {
+                            underlying_field_value_type p_out[3];
+
+                            // The only points on the curve with x=0 or y=1 (for which birational equivalence is not valid), 
+                            // are (0,1) and (0,-1), both of which are of low order, and should therefore not occur.
+                            assert(!(this->X.is_zero()) && this->Y != underlying_field_type::value_type::one());
+                            
+                            // (x, y) -> (u, v) where
+                            //      u = (1 + y) / (1 - y)
+                            //      v = u / x
+                            typename underlying_field_type::value_type u = 
+                                (underlying_field_type::value_type::one() + y) * 
+                                (underlying_field_type::value_type::one() - y).inversed();
+                            return element_twisted_edwards_g1{u, 
+                                    policy_type::scale * u * this->X.inversed()};
+                        }
+
                     private:
                         constexpr static const g1_field_type_value a = policy_type::a;
                         constexpr static const g1_field_type_value d = policy_type::d;

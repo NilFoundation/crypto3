@@ -77,11 +77,18 @@ namespace nil {
                             scalar_field_modulus;    ///< characteristic of the scalar field (order of the group of
                                                      ///< points)
 
+                        // Edwards representation constants a and d
                         constexpr static const number_type a =              ///< twisted Edwards elliptic curve 
                             0x292FC_cppui18;                                ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                         constexpr static const number_type d =
                             0x292F8_cppui18;                                ///< twisted Edwards elliptic curve 
                                                                             ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                        // Montgomery representation constants A and scale
+                        constexpr static const number_type A = 
+                            0x292FA_cppui18;
+                        constexpr static const number_type scale = 
+                            0x01;
+
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
                             g1_field_type::value_type::zero(), g1_field_type::value_type::one(),
                             g1_field_type::value_type::zero()};

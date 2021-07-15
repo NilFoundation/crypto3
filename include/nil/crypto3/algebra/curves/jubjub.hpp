@@ -52,12 +52,18 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::extended_number_type extended_number_type;
 
-                    constexpr static const number_type p = policy_type::p;    ///< base field characteristic
+                    constexpr static const number_type p = 
+                        policy_type::p;    ///< base field characteristic
                     constexpr static const number_type q =
                         policy_type::q;    ///< scalar field characteristic (order of the group of points)
 
+                    // Edwards representation constants a and d
                     constexpr static const number_type a = policy_type::a;
                     constexpr static const number_type d = policy_type::d;
+
+                    // Montgomery representation constants A and scale
+                    constexpr static const number_type A = policy_type::A;
+                    constexpr static const number_type scale = policy_type::scale;
 
                     typedef typename detail::edwards_g1<version> g1_type;
 
@@ -72,6 +78,8 @@ namespace nil {
 
                 constexpr typename jubjub::number_type const jubjub::a;
                 constexpr typename jubjub::number_type const jubjub::d;
+                constexpr typename jubjub::number_type const jubjub::A;
+                constexpr typename jubjub::number_type const jubjub::scale;
 
                 constexpr typename jubjub::number_type const jubjub::p;
                 constexpr typename jubjub::number_type const jubjub::q;
