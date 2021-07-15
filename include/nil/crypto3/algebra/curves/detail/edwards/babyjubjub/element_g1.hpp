@@ -287,8 +287,8 @@ namespace nil {
                             //      u = (1 + y) / (1 - y)
                             //      v = u / x
                             typename underlying_field_type::value_type u = 
-                                (underlying_field_type::value_type::one() + y) * 
-                                (underlying_field_type::value_type::one() - y).inversed();
+                                (underlying_field_type::value_type::one() + this->Y) * 
+                                (underlying_field_type::value_type::one() - this->Y).inversed();
                             return element_twisted_edwards_g1{u, 
                                     policy_type::scale * u * this->X.inversed()};
                         }
