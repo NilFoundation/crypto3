@@ -2198,24 +2198,29 @@ namespace nil {
             }
 
         }    // namespace multiprecision
+    }
+}
+namespace boost {
+    namespace math {
 
-        namespace math {
+        //
+        // Import Math functions here, so they can be found by Boost.Math:
+        //
+        using nil::crypto3::multiprecision::changesign;
+        using nil::crypto3::multiprecision::copysign;
+        using nil::crypto3::multiprecision::fpclassify;
+        using nil::crypto3::multiprecision::isfinite;
+        using nil::crypto3::multiprecision::isinf;
+        using nil::crypto3::multiprecision::isnan;
+        using nil::crypto3::multiprecision::isnormal;
+        using nil::crypto3::multiprecision::sign;
+        using nil::crypto3::multiprecision::signbit;
 
-            //
-            // Import Math functions here, so they can be found by Boost.Math:
-            //
-            using nil::crypto3::multiprecision::changesign;
-            using nil::crypto3::multiprecision::copysign;
-            using nil::crypto3::multiprecision::fpclassify;
-            using nil::crypto3::multiprecision::isfinite;
-            using nil::crypto3::multiprecision::isinf;
-            using nil::crypto3::multiprecision::isnan;
-            using nil::crypto3::multiprecision::isnormal;
-            using nil::crypto3::multiprecision::sign;
-            using nil::crypto3::multiprecision::signbit;
+    }    // namespace math
+}
 
-        }    // namespace math
-
+namespace nil {
+    namespace crypto3 {
         namespace multiprecision {
 
             using c99_error_policy = ::boost::math::policies::policy<
@@ -3820,7 +3825,6 @@ namespace boost {
         using nil::crypto3::multiprecision::lcm;
 
     }    // namespace integer
-
 }    // namespace boost
 
 //
