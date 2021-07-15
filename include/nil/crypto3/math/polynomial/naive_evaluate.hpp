@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_NAIVE_EVALUATE_HPP
-#define CRYPTO3_ALGEBRA_FFT_NAIVE_EVALUATE_HPP
+#ifndef CRYPTO3_MATH_NAIVE_EVALUATE_HPP
+#define CRYPTO3_MATH_NAIVE_EVALUATE_HPP
 
 #include <algorithm>
 #include <vector>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /*!
              * @brief
@@ -46,8 +46,8 @@ namespace nil {
             template<typename FieldValueType>
             FieldValueType evaluate_polynomial(const std::size_t &m, const std::vector<FieldValueType> &coeff,
                                                const FieldValueType &t) {
-                // if (m != coeff.size())
-                //    throw DomainSizeException("expected m == coeff.size()");
+                 if (m != coeff.size())
+                    throw std::invalid_argument("expected m == coeff.size()");
 
                 FieldValueType result = FieldValueType::zero();
 
@@ -74,10 +74,10 @@ namespace nil {
             template<typename FieldValueType>
             FieldValueType evaluate_lagrange_polynomial(const std::size_t &m, const std::vector<FieldValueType> &domain,
                                                         const FieldValueType &t, const std::size_t &idx) {
-                // if (m != domain.size())
-                //    throw DomainSizeException("expected m == domain.size()");
-                // if (idx >= m)
-                //    throw InvalidSizeException("expected idx < m");
+                 if (m != domain.size())
+                    throw std::invalid_argument("expected m == domain.size()");
+                 if (idx >= m)
+                    throw std::invalid_argument("expected idx < m");
 
                 FieldValueType num = FieldValueType::one();
                 FieldValueType denom = FieldValueType::one();
@@ -93,7 +93,6 @@ namespace nil {
 
                 return num * denom.inversed();
             }
-
         }    // namespace fft
     }        // namespace crypto3
 }    // namespace nil

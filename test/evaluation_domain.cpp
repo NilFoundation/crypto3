@@ -43,21 +43,21 @@
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
-#include <nil/crypto3/fft/coset.hpp>
-#include <nil/crypto3/fft/domains/arithmetic_sequence_domain.hpp>
-#include <nil/crypto3/fft/domains/basic_radix2_domain.hpp>
-#include <nil/crypto3/fft/domains/extended_radix2_domain.hpp>
-#include <nil/crypto3/fft/domains/geometric_sequence_domain.hpp>
-#include <nil/crypto3/fft/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/math/coset.hpp>
+#include <nil/crypto3/math/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/math/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/fft/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/make_evaluation_domain.hpp>
 
-#include <nil/crypto3/fft/polynomial_arithmetic/naive_evaluate.hpp>
+#include <nil/crypto3/math/polynomial/naive_evaluate.hpp>
 
 #include <typeinfo>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::fft;
+using namespace nil::crypto3::math;
 
 /**
  * Note: Templatized type referenced with FieldType (instead of canonical FieldType)
@@ -88,7 +88,7 @@ void test_fft() {
 
     std::vector<value_type> a(f);
 
-    domain->FFT(a);
+    domain->fft(a);
 
     std::vector<value_type> idx(m);
 
@@ -134,8 +134,8 @@ void test_inverse_fft_of_fft() {
     domain = make_evaluation_domain<FieldType>(m);
 
     std::vector<value_type> a(f);
-    domain->FFT(a);
-    domain->iFFT(a);
+    domain->fft(a);
+    domain->inverse_fft(a);
 
     std::cout << "inverse FFT of FFT: key = " << typeid(*domain).name() << std::endl;
     for (std::size_t i = 0; i < m; i++) {
@@ -171,8 +171,8 @@ void test_inverse_coset_ftt_of_coset_fft() {
 
     std::vector<value_type> a(f);
     multiply_by_coset(a, coset);
-    domain->FFT(a);
-    domain->iFFT(a);
+    domain->fft(a);
+    domain->inverse_fft(a);
     multiply_by_coset(a, coset.inversed());
 
     for (std::size_t i = 0; i < m; i++) {

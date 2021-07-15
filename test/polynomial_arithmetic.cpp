@@ -35,11 +35,11 @@
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/polynomial/xgcd.hpp>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::fft;
+using namespace nil::crypto3::math;
 
 typedef fields::bls12<381> FieldType;
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition<FieldType>(c, a, b);
+    _polynomial_addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition<FieldType>(c, a, b);
+    _polynomial_addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
 
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition<FieldType>(c, a, b);
+    _polynomial_addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
     std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition<FieldType>(c, a, b);
+    _polynomial_addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
     std::vector<typename FieldType::value_type> b = {0, 0, 0};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_addition<FieldType>(c, a, b);
+    _polynomial_addition(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction<FieldType>(c, a, b);
+    _polynomial_subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 6, 2, -6};
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction<FieldType>(c, a, b);
+    _polynomial_subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 7, 7, 2};
 
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
     std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction<FieldType>(c, a, b);
+    _polynomial_subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, -1, -5, -8};
 
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
     std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction<FieldType>(c, a, b);
+    _polynomial_subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {-1, -3, -4, -25, -6, -7, -7, -2};
 
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
     std::vector<typename FieldType::value_type> b = {0, 0, 0};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_subtraction<FieldType>(c, a, b);
+    _polynomial_subtraction(c, a, b);
 
     std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 

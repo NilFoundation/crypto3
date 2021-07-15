@@ -23,21 +23,18 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_BASIS_CHANGE_HPP
-#define CRYPTO3_ALGEBRA_FFT_BASIS_CHANGE_HPP
+#ifndef CRYPTO3_MATH_BASIS_CHANGE_HPP
+#define CRYPTO3_MATH_BASIS_CHANGE_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <boost/math/tools/polynomial.hpp>
-
-//#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/polynomial/xgcd.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /**
              * Compute the Subproduct Tree of degree 2^M and store it in Tree T.
@@ -175,7 +172,7 @@ namespace nil {
                 for (std::size_t i = 0; i < m; i++) {
                     for (std::size_t j = 0; j < (1u << (m - i - 1)); j++) {
                         _polynomial_multiplication<FieldType>(temp, T[i][2 * j], f[2 * j + 1]);
-                        _polynomial_addition<FieldType>(f[j], f[2 * j], temp);
+                        _polynomial_addition(f[j], f[2 * j], temp);
                     }
                 }
 
@@ -272,7 +269,6 @@ namespace nil {
                     a[i] = w[i] * z[i];
                 }
             }
-
         }    // namespace fft
     }        // namespace crypto3
 }    // namespace nil
