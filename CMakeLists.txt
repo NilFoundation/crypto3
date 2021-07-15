@@ -21,6 +21,8 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pkpad/algorithm/pad.hpp
@@ -232,6 +234,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      ${CMAKE_WORKSPACE_NAME}::marshalling
 
                       ${Boost_LIBRARIES})
 
