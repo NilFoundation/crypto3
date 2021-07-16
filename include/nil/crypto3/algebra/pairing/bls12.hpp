@@ -38,6 +38,8 @@ namespace nil {
                 template<std::size_t Version>
                 struct bls12;
 
+                struct jubjub;
+
             }    // namespace curves
             namespace pairing {
 
