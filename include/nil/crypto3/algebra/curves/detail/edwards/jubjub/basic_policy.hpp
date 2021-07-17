@@ -109,6 +109,9 @@ namespace nil {
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::a;
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::d;
 
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::A;
+                    constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::scale;
+
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::p;
                     constexpr typename edwards_basic_policy<255>::number_type const edwards_basic_policy<255>::q;
 
