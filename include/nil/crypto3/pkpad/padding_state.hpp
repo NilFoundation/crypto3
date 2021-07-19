@@ -23,13 +23,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_SCHEME_STATE_HPP
-#define CRYPTO3_PUBKEY_PADDING_SCHEME_STATE_HPP
+#ifndef CRYPTO3_PK_PAD_SCHEME_STATE_HPP
+#define CRYPTO3_PK_PAD_SCHEME_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/pkpad/accumulators/encode.hpp>
+#include <nil/crypto3/pkpad/accumulators/verify.hpp>
 
 namespace nil {
     namespace crypto3 {

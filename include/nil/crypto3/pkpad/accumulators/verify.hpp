@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_VERIFY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_VERIFY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PK_PAD_VERIFY_HPP
+#define CRYPTO3_ACCUMULATORS_PK_PAD_VERIFY_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -107,4 +107,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PK_PAD_VERIFY_HPP

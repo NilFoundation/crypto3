@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_ENCODE_HPP
-#define CRYPTO3_PUBKEY_PADDING_ENCODE_HPP
+#ifndef CRYPTO3_PK_PAD_ENCODE_HPP
+#define CRYPTO3_PK_PAD_ENCODE_HPP
 
 #include <nil/crypto3/pkpad/padding_state.hpp>
 #include <nil/crypto3/pkpad/padding_value.hpp>
@@ -56,7 +56,7 @@ namespace nil {
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
             PaddingImpl encode(InputIterator first, InputIterator last) {
-                return PaddingImpl(rng, PaddingAccumulator());
+                return PaddingImpl(first, last, PaddingAccumulator());
             }
 
             /*!
@@ -105,7 +105,7 @@ namespace nil {
                 typedef padding::detail::ref_padding_impl<OutputAccumulator> StreamPaddingImpl;
                 typedef padding::detail::range_padding_impl<StreamPaddingImpl> PaddingImpl;
 
-                return PaddingImpl(r, std::forward<OutputAccumulator>(acc));
+                return PaddingImpl(first, last, std::forward<OutputAccumulator>(acc));
             }
 
             /*!

@@ -15,8 +15,8 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND OR NOT Boost_RANDOM_FOUND)
-    cm_find_package(Boost COMPONENTS random REQUIRED)
+if(NOT Boost_FOUND)
+    cm_find_package(Boost COMPONENTS)
 endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
@@ -25,14 +25,10 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/pkpad/algorithm/pad.hpp
-     include/nil/crypto3/pkpad/algorithm/unpad.hpp
-     include/nil/crypto3/pkpad/eme.hpp
-     include/nil/crypto3/pkpad/emsa.hpp)
+        include/nil/crypto3/pkpad/algorithm/encode.hpp
+        include/nil/crypto3/pkpad/algorithm/verify.hpp)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-
-     )
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 option(CRYPTO3_PK_PAD_EME_OAEP "Build with EME OAEP support" TRUE)
 option(CRYPTO3_PK_PAD_EME_PKCS1 "Build with EME PKCS1 support" TRUE)

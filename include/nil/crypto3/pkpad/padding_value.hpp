@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_SCHEME_VALUE_HPP
-#define CRYPTO3_PUBKEY_PADDING_SCHEME_VALUE_HPP
+#ifndef CRYPTO3_PK_PAD_SCHEME_VALUE_HPP
+#define CRYPTO3_PK_PAD_SCHEME_VALUE_HPP
 
 #include <type_traits>
 #include <iterator>
@@ -142,7 +142,7 @@ namespace nil {
 
                         template<typename SinglePassRange>
                         itr_padding_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
-                            PubkeyStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
+                            PaddingStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                             BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
                             BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));
 
@@ -152,7 +152,7 @@ namespace nil {
                         template<typename InputIterator>
                         itr_padding_impl(InputIterator first, InputIterator last, OutputIterator out,
                                         accumulator_set_type &&ise) :
-                            PubkeyStateImpl(std::forward<accumulator_set_type>(ise)),
+                            PaddingStateImpl(std::forward<accumulator_set_type>(ise)),
                             out(std::move(out)) {
                             BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
                             BOOST_CONCEPT_ASSERT((boost::OutputIteratorConcept<OutputIterator, result_type>));

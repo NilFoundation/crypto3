@@ -23,20 +23,45 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PK_PAD_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
-#define CRYPTO3_PK_PAD_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#define BOOST_TEST_MODULE emsa1_encoding_test
 
-#include <boost/parameter/keyword.hpp>
+#include <iostream>
+#include <unordered_map>
 
-#include <boost/accumulators/accumulators_fwd.hpp>
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
 
-namespace nil {
-    namespace crypto3 {
-        namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, iterator_last)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(iterator_last)
-        }    // namespace accumulators
-    }        // namespace crypto3
-}    // namespace nil
+#include <nil/crypto3/pkpad/emsa/emsa1.hpp>
 
-#endif    // CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_ITERATOR_LAST_HPP
+#include <nil/crypto3/pkpad/algorithms/encode.hpp>
+#include <nil/crypto3/pkpad/algorithms/verify.hpp>
+
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+
+#include <nil/crypto3/hash/sha1.hpp>
+
+using namespace nil::crypto3;
+
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename algebra::fields::detail::element_fp<FieldParams> &e) {
+    os << e.data << std::endl;
+}
+
+BOOST_AUTO_TEST_SUITE(emsa_bls12_fr_test_suite)
+
+BOOST_AUTO_TEST_CASE(emsa1_single_range_encode) {
+    using curve_type = algebra::curves::bls12_381;
+    using field_type = typename curve_type::scalar_field_type;
+    using field_value_type = typename field_type::value_type;
+
+    using hash_type = hashes::sha1;
+
+    using padding_type = pubkey::padding::emsa1<field_value_type, hash_type>;
+
+    std::vector<std::uint8_t> in {0,0,0,0,1};
+    field_value_type out = pubkey::encode<padding_type>(in);
+    print_field_element(std::cout, out);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

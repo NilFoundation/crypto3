@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_EMSA1_HPP
-#define CRYPTO3_PUBKEY_PADDING_EMSA1_HPP
+#ifndef CRYPTO3_PK_PAD_EMSA1_HPP
+#define CRYPTO3_PK_PAD_EMSA1_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -55,6 +55,7 @@ namespace nil {
                     protected:
                         typedef Hash hash_type;
                         typedef typename MsgReprType::field_type field_type;
+                        typedef ::nil::marshalling::option::big_endian endianness;
                         typedef ::nil::crypto3::marshalling::types::field_element<
                             ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
                             marshalling_field_element_type;
@@ -82,8 +83,9 @@ namespace nil {
                             //  object by copy it inside
                             // TODO: (deserialization) why marshalling object constructor take non-ref arg, for
                             //  multiprecision type it might cause overhead
-                            marshalling_field_element.read(digest.cbegin(), digest.size());
-                            return crypto3::marshalling::types::construct_field_element(marshalling_field_element);
+                            auto it = digest.cbegin();
+                            marshalling_field_element.read(it, digest.size());
+                            return crypto3::marshalling::types::construct_field_element<field_type, endianness>(marshalling_field_element);
                         }
                     };
 
@@ -146,4 +148,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_PADDING_EMSA1_HPP
+#endif    // CRYPTO3_PK_PAD_EMSA1_HPP

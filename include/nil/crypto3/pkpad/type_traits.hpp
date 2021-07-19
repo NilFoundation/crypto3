@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_TYPE_TRAITS_HPP
-#define CRYPTO3_PUBKEY_PADDING_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_PK_PAD_TYPE_TRAITS_HPP
+#define CRYPTO3_PK_PAD_TYPE_TRAITS_HPP
 
 #include <type_traits>
 
@@ -43,8 +43,6 @@ namespace nil {
             BOOST_TTI_HAS_TYPE(decoding_policy_type)
             BOOST_TTI_HAS_TYPE(recovering_policy_type)
 
-            BOOST_TTI_HAS_MEMBER_FUNCTION_TEMPLATE(update, )
-
             template<typename T>
             struct is_emsa_policy : std::bool_constant<hash_type_encoding_policy_type<T>::value &&
                                                        hash_type_verification_policy_type<T>::value> {
@@ -62,10 +60,8 @@ namespace nil {
                                                        hash_type_recovering_policy_type<T>::value> {
                 typedef T type;
             };
-
-
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_PADDING_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_PK_PAD_TYPE_TRAITS_HPP

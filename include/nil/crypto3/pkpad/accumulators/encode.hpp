@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PK_PAD_ENCODE_HPP
+#define CRYPTO3_ACCUMULATORS_PK_PAD_ENCODE_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -79,7 +79,7 @@ namespace nil {
                         processing_policy::update(acc, first, last);
                     }
 
-                    accumulator_type acc;
+                    mutable accumulator_type acc;
                 };
             }    // namespace impl
 
@@ -106,4 +106,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PK_PAD_ENCODE_HPP
