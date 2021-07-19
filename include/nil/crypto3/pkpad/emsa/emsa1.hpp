@@ -49,7 +49,9 @@ namespace nil {
                     template<typename MsgReprType, typename Hash>
                     struct emsa1_encoding_policy<
                         MsgReprType, Hash,
-                        typename std::enable_if<algebra::is_field<typename MsgReprType::field_type>::value>::type> {
+                        typename std::enable_if<
+                            algebra::is_field<typename MsgReprType::field_type>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
                     protected:
                         typedef Hash hash_type;
                         typedef typename MsgReprType::field_type field_type;
@@ -60,6 +62,7 @@ namespace nil {
                     public:
                         typedef MsgReprType msg_repr_type;
                         typedef accumulator_set<hash_type> accumulator_type;
+                        typedef msg_repr_type result_type;
 
                         template<typename InputRange>
                         static inline void update(accumulator_type &acc, const InputRange &range) {
@@ -71,7 +74,7 @@ namespace nil {
                             hash<hash_type>(first, last, acc);
                         }
 
-                        static inline msg_repr_type process(accumulator_type &acc) {
+                        static inline result_type process(accumulator_type &acc) {
                             typename hash_type::digest_type digest = accumulators::extract::hash<hash_type>(acc);
                             marshalling_field_element_type marshalling_field_element;
                             // TODO: for what purpose we supply size if read() didn't use it inside
@@ -90,7 +93,36 @@ namespace nil {
                     template<typename MsgReprType, typename Hash>
                     struct emsa1_verification_policy<
                         MsgReprType, Hash,
-                        typename std::enable_if<algebra::is_field<typename MsgReprType::field_type>::value>::type> { };
+                        typename std::enable_if<
+                            algebra::is_field<typename MsgReprType::field_type>::value &&
+                            !algebra::is_extended_field<typename MsgReprType::field_type>::value>::type> {
+                    protected:
+                        typedef Hash hash_type;
+                        typedef typename MsgReprType::field_type field_type;
+                        typedef ::nil::crypto3::marshalling::types::field_element<
+                            ::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
+                            marshalling_field_element_type;
+                        typedef emsa1_encoding_policy<MsgReprType, Hash> encoding_policy;
+
+                    public:
+                        typedef MsgReprType msg_repr_type;
+                        typedef typename encoding_policy::accumulator_type accumulator_type;
+                        typedef bool result_type;
+
+                        template<typename InputRange>
+                        static inline void update(accumulator_type &acc, const InputRange &range) {
+                            encoding_policy::update(range, acc);
+                        }
+
+                        template<typename InputIterator>
+                        static inline void update(accumulator_type &acc, InputIterator first, InputIterator last) {
+                            encoding_policy::update(first, last, acc);
+                        }
+
+                        static inline result_type process(accumulator_type &acc, const msg_repr_type &msg_repr) {
+                            return encoding_policy::process(acc) == msg_repr;
+                        }
+                    };
                 }    // namespace detail
 
                 /*!

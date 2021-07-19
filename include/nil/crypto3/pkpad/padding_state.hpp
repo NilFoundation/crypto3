@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_SCHEME_STATE_HPP
-#define CRYPTO3_PUBKEY_SCHEME_STATE_HPP
+#ifndef CRYPTO3_PUBKEY_PADDING_SCHEME_STATE_HPP
+#define CRYPTO3_PUBKEY_PADDING_SCHEME_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
@@ -40,14 +40,28 @@ namespace nil {
                  *
                  * Meets the requirements of AccumulatorSet
                  *
-                 * @ingroup pubkey
+                 * @ingroup pubkey_padding
                  *
-                 * @tparam Mode Scheme processing mode type (e.g. isomorphic_signing_policy<bls, nop_padding>)
+                 * @tparam EncodingPolicy
                  */
                 template<typename EncodingPolicy>
                 using encoding_accumulator_set = boost::accumulators::accumulator_set<
-                    typename EncodingPolicy::msg_repr_type,
+                    typename EncodingPolicy::result_type,
                     boost::accumulators::features<accumulators::tag::encode<EncodingPolicy>>>;
+
+                /*!
+                 * @brief Accumulator set with pre-defined signing accumulator params.
+                 *
+                 * Meets the requirements of AccumulatorSet
+                 *
+                 * @ingroup pubkey_padding
+                 *
+                 * @tparam VerificationPolicy
+                 */
+                template<typename VerificationPolicy>
+                using verification_accumulator_set = boost::accumulators::accumulator_set<
+                    typename VerificationPolicy::result_type,
+                    boost::accumulators::features<accumulators::tag::verify<VerificationPolicy>>>;
             }    // namespace padding
         }        // namespace pubkey
     }            // namespace crypto3

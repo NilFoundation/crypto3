@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_PADDING_ENCODE_HPP
-#define CRYPTO3_PUBKEY_PADDING_ENCODE_HPP
+#ifndef CRYPTO3_PUBKEY_PADDING_VERIFY_HPP
+#define CRYPTO3_PUBKEY_PADDING_VERIFY_HPP
 
 #include <nil/crypto3/pkpad/padding_state.hpp>
 #include <nil/crypto3/pkpad/padding_value.hpp>
@@ -34,7 +34,7 @@ namespace nil {
         namespace pubkey {
             namespace padding {
                 template<typename Padding>
-                using encoding_policy = typename Padding::encoding_policy;
+                using verification_policy = typename Padding::verification_policy;
             }
 
             /*!
@@ -51,12 +51,12 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename PaddingAccumulator = padding::encoding_accumulator_set<EncodingPolicy>,
+                     typename VerificationPolicy = padding::verification_policy<Padding>,
+                     typename PaddingAccumulator = padding::verification_accumulator_set<VerificationPolicy>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
-            PaddingImpl encode(InputIterator first, InputIterator last) {
-                return PaddingImpl(rng, PaddingAccumulator());
+            PaddingImpl verify(InputIterator first, InputIterator last, typename Padding::msg_repr_type &msg_repr) {
+                return PaddingImpl(rng, PaddingAccumulator(msg_repr));
             }
 
             /*!
@@ -72,12 +72,12 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename PaddingAccumulator = padding::encoding_accumulator_set<EncodingPolicy>,
+                     typename VerificationPolicy = padding::verification_policy<Padding>,
+                     typename PaddingAccumulator = padding::verification_accumulator_set<VerificationPolicy>,
                      typename StreamPaddingImpl = padding::detail::value_padding_impl<PaddingAccumulator>,
                      typename PaddingImpl = padding::detail::range_padding_impl<StreamPaddingImpl>>
-            PaddingImpl encode(const SinglePassRange &rng) {
-                return PaddingImpl(rng, PaddingAccumulator());
+            PaddingImpl verify(const SinglePassRange &rng, typename Padding::msg_repr_type &msg_repr) {
+                return PaddingImpl(rng, PaddingAccumulator(msg_repr));
             }
 
             /*!
@@ -87,7 +87,7 @@ namespace nil {
              *
              * @tparam Padding
              * @tparam InputIterator
-             * @tparam EncodingPolicy
+             * @tparam VerificationPolicy
              * @tparam OutputAccumulator
              *
              * @param first
@@ -97,11 +97,11 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename OutputAccumulator = padding::encoding_accumulator_set<EncodingPolicy>>
+                     typename VerificationPolicy = padding::verification_policy<Padding>,
+                     typename OutputAccumulator = padding::verification_accumulator_set<VerificationPolicy>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
-                encode(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+                verify(InputIterator first, InputIterator last, OutputAccumulator &acc) {
                 typedef padding::detail::ref_padding_impl<OutputAccumulator> StreamPaddingImpl;
                 typedef padding::detail::range_padding_impl<StreamPaddingImpl> PaddingImpl;
 
@@ -115,7 +115,7 @@ namespace nil {
              *
              * @tparam Padding
              * @tparam SinglePassRange
-             * @tparam EncodingPolicy
+             * @tparam VerificationPolicy
              * @tparam OutputAccumulator
              *
              * @param r
@@ -124,11 +124,11 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange,
-                     typename EncodingPolicy = padding::encoding_policy<Padding>,
-                     typename OutputAccumulator = padding::encoding_accumulator_set<EncodingPolicy>>
+                     typename VerificationPolicy = padding::verification_policy<Padding>,
+                     typename OutputAccumulator = padding::verification_accumulator_set<VerificationPolicy>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
                                     OutputAccumulator>::type &
-                encode(const SinglePassRange &r, OutputAccumulator &acc) {
+                verify(const SinglePassRange &r, OutputAccumulator &acc) {
                 typedef padding::detail::ref_padding_impl<OutputAccumulator> StreamPaddingImpl;
                 typedef padding::detail::range_padding_impl<StreamPaddingImpl> PaddingImpl;
 
@@ -151,14 +151,15 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename InputIterator, typename OutputIterator>
-            OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out) {
-                typedef padding::encoding_policy<Padding> EncodingPolicy;
-                typedef padding::encoding_accumulator_set<EncodingPolicy> PaddingAccumulator;
+            OutputIterator verify(InputIterator first, InputIterator last, OutputIterator out,
+                                  typename Padding::msg_repr_type &msg_repr) {
+                typedef padding::verification_policy<Padding> VerificationPolicy;
+                typedef padding::verification_accumulator_set<VerificationPolicy> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;
 
-                return PaddingImpl(first, last, std::move(out), PaddingAccumulator());
+                return PaddingImpl(first, last, std::move(out), PaddingAccumulator(msg_repr));
             }
 
             /*!
@@ -176,14 +177,15 @@ namespace nil {
              * @return
              */
             template<typename Padding, typename SinglePassRange, typename OutputIterator>
-            OutputIterator encode(const SinglePassRange &rng, OutputIterator out) {
-                typedef padding::encoding_policy<Padding> EncodingPolicy;
-                typedef padding::encoding_accumulator_set<EncodingPolicy> PaddingAccumulator;
+            OutputIterator verify(const SinglePassRange &rng, OutputIterator out,
+                                  typename Padding::msg_repr_type &msg_repr) {
+                typedef padding::verification_policy<Padding> VerificationPolicy;
+                typedef padding::verification_accumulator_set<VerificationPolicy> PaddingAccumulator;
 
                 typedef padding::detail::value_padding_impl<PaddingAccumulator> StreamPaddingImpl;
                 typedef padding::detail::itr_padding_impl<StreamPaddingImpl, OutputIterator> PaddingImpl;
 
-                return PaddingImpl(rng, std::move(out), PaddingAccumulator());
+                return PaddingImpl(rng, std::move(out), PaddingAccumulator(msg_repr));
             }
         }    // namespace pubkey
     }        // namespace crypto3

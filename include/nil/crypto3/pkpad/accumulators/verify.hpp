@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_ENCODE_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_VERIFY_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_PADDING_VERIFY_HPP
 
 #include <iterator>
 #include <type_traits>
@@ -43,20 +43,20 @@ namespace nil {
         namespace accumulators {
             namespace impl {
                 template<typename ProcessingPolicy, typename = void>
-                struct encode_impl;
+                struct verify_impl;
 
-                // TODO: maybe add dependant hash accumulator instead manually work with it inside
                 template<typename ProcessingPolicy>
-                struct encode_impl<ProcessingPolicy> : boost::accumulators::accumulator_base {
+                struct verify_impl<ProcessingPolicy> : boost::accumulators::accumulator_base {
                 protected:
                     typedef ProcessingPolicy processing_policy;
+                    typedef typename processing_policy::msg_repr_type msg_repr_type;
                     typedef typename processing_policy::accumulator_type accumulator_type;
 
                 public:
                     typedef typename processing_policy::result_type result_type;
 
                     template<typename Args>
-                    encode_impl(const Args &args) {
+                    verify_impl(const Args &args) : msg_repr(args[boost::accumulators::sample]) {
                     }
 
                     template<typename Args>
@@ -65,7 +65,7 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        return processing_policy::process(acc);
+                        return processing_policy::process(acc, msg_repr);
                     }
 
                 protected:
@@ -79,27 +79,28 @@ namespace nil {
                         processing_policy::update(acc, first, last);
                     }
 
+                    msg_repr_type msg_repr;
                     accumulator_type acc;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename ProcessingPolicy>
-                struct encode : boost::accumulators::depends_on<> {
+                struct verify : boost::accumulators::depends_on<> {
                     typedef ProcessingPolicy processing_policy;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::encode_impl<processing_policy>> impl;
+                    typedef boost::mpl::always<accumulators::impl::verify_impl<processing_policy>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
                 template<typename ProcessingPolicy, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::encode<ProcessingPolicy>>::type::result_type
-                    encode(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::encode<ProcessingPolicy>>(acc);
+                typename boost::mpl::apply<AccumulatorSet, tag::verify<ProcessingPolicy>>::type::result_type
+                    verify(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::verify<ProcessingPolicy>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators
