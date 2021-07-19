@@ -33,7 +33,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
             namespace detail {
 
                 using namespace nil::crypto3::algebra;

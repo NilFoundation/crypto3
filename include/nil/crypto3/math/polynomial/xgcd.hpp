@@ -23,18 +23,17 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_XGCD_HPP
-#define CRYPTO3_ALGEBRA_FFT_XGCD_HPP
+#ifndef CRYPTO3_MATH_XGCD_HPP
+#define CRYPTO3_MATH_XGCD_HPP
 
 #include <algorithm>
 #include <vector>
 
-//#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/math/polynomial/basic_operations.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /*!
              * @brief Perform the standard Extended Euclidean Division algorithm.
@@ -70,7 +69,7 @@ namespace nil {
                 while (!_is_zero(V3)) {
                     _polynomial_division<FieldType>(Q, R, G, V3);
                     _polynomial_multiplication<FieldType>(G, V1, Q);
-                    _polynomial_subtraction<FieldType>(T, U, G);
+                    _polynomial_subtraction(T, U, G);
 
                     U = V1;
                     G = V3;
@@ -79,7 +78,7 @@ namespace nil {
                 }
 
                 _polynomial_multiplication<FieldType>(V3, a, U);
-                _polynomial_subtraction<FieldType>(V3, G, V3);
+                _polynomial_subtraction(V3, G, V3);
                 _polynomial_division<FieldType>(V1, R, V3, b);
 
                 value_type lead_coeff = G.back().inversed();
@@ -94,7 +93,6 @@ namespace nil {
                 u = U;
                 v = V1;
             }
-
         }    // namespace fft
     }        // namespace crypto3
 }    // namespace nil

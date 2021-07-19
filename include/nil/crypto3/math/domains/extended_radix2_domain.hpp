@@ -23,17 +23,17 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_EXTENDED_RADIX2_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_EXTENDED_RADIX2_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_EXTENDED_RADIX2_DOMAIN_HPP
+#define CRYPTO3_MATH_EXTENDED_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             using namespace nil::crypto3::algebra;
 
@@ -67,9 +67,9 @@ namespace nil {
                     shift = detail::coset_shift<FieldType>();
                 }
 
-                void FFT(std::vector<field_value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
+                void fft(std::vector<field_value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     std::vector<field_value_type> a0(small_m, field_value_type::zero());
                     std::vector<field_value_type> a1(small_m, field_value_type::zero());
@@ -84,25 +84,26 @@ namespace nil {
                         shift_i *= shift;
                     }
 
-                    _basic_radix2_FFT<FieldType>(a0, omega);
-                    _basic_radix2_FFT<FieldType>(a1, omega);
+                    _basic_radix2_fft<FieldType>(a0, omega);
+                    _basic_radix2_fft<FieldType>(a1, omega);
 
                     for (std::size_t i = 0; i < small_m; ++i) {
                         a[i] = a0[i];
                         a[i + small_m] = a1[i];
                     }
                 }
-                void iFFT(std::vector<field_value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
+
+                void inverse_fft(std::vector<field_value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
                     std::vector<field_value_type> a0(a.begin(), a.begin() + small_m);
                     std::vector<field_value_type> a1(a.begin() + small_m, a.end());
 
                     const field_value_type omega_inverse = omega.inversed();
-                    _basic_radix2_FFT<FieldType>(a0, omega_inverse);
-                    _basic_radix2_FFT<FieldType>(a1, omega_inverse);
+                    _basic_radix2_fft<FieldType>(a0, omega_inverse);
+                    _basic_radix2_fft<FieldType>(a1, omega_inverse);
 
                     const field_value_type shift_to_small_m = shift.pow(small_m);
                     const field_value_type sconst =
@@ -118,6 +119,7 @@ namespace nil {
                         shift_inverse_i *= shift_inverse;
                     }
                 }
+
                 std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) {
                     const std::vector<field_value_type> T0 =
                         detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t);
@@ -152,7 +154,7 @@ namespace nil {
                     return (t.pow(small_m) - field_value_type::one()) * (t.pow(small_m) - shift.pow(small_m));
                 }
 
-                void add_poly_Z(const field_value_type &coeff, std::vector<field_value_type> &H) {
+                void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
                     // if (H.size() != this->m + 1)
                     //    throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
@@ -163,7 +165,7 @@ namespace nil {
                     H[0] += coeff * shift_to_small_m;
                 }
 
-                void divide_by_Z_on_coset(std::vector<field_value_type> &P) {
+                void divide_by_z_on_coset(std::vector<field_value_type> &P) {
                     const field_value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     const field_value_type coset_to_small_m = coset.pow(small_m);

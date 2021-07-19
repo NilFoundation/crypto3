@@ -23,25 +23,23 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_MAKE_EVALUATION_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_MAKE_EVALUATION_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
+#define CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
 
 #include <vector>
 
-#include <boost/math/tools/polynomial.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/math/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/math/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/arithmetic_sequence_domain.hpp>
-#include <nil/crypto3/fft/domains/basic_radix2_domain.hpp>
-#include <nil/crypto3/fft/domains/extended_radix2_domain.hpp>
-#include <nil/crypto3/fft/domains/geometric_sequence_domain.hpp>
-#include <nil/crypto3/fft/domains/step_radix2_domain.hpp>
-
-#include <nil/crypto3/fft/detail/field_utils.hpp>
+#include <nil/crypto3/math/detail/field_utils.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /*!
             @brief
@@ -162,4 +160,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_FFT_MAKE_EVALUATION_DOMAIN_HPP
+#endif    // CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP

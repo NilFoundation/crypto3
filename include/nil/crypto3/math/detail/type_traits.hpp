@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP
-#define CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_MATH_TYPE_TRAITS_HPP
+#define CRYPTO3_MATH_TYPE_TRAITS_HPP
 
 #include <boost/integer/static_log2.hpp>
 
@@ -215,4 +215,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_MATH_TYPE_TRAITS_HPP

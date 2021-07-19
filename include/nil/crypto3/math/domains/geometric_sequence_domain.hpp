@@ -23,15 +23,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_GEOMETRIC_SEQUENCE_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_GEOMETRIC_SEQUENCE_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_GEOMETRIC_SEQUENCE_DOMAIN_HPP
+#define CRYPTO3_MATH_GEOMETRIC_SEQUENCE_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-//#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
-#include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
+#include <nil/crypto3/math/polynomial/basis_change.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -39,7 +38,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             using namespace nil::crypto3::algebra;
 
@@ -84,10 +83,10 @@ namespace nil {
                             "true");
                     }
 
-                    precomputation_sentinel = 0;
+                    precomputation_sentinel = false;
                 }
 
-                void FFT(std::vector<value_type> &a) {
+                void fft(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("geometric: expected a.size() == this->m");
 
@@ -119,7 +118,7 @@ namespace nil {
                         a[i] *= T[i].inversed();
                     }
                 }
-                void iFFT(std::vector<value_type> &a) {
+                void inverse_fft(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("geometric: expected a.size() == this->m");
 
@@ -232,7 +231,7 @@ namespace nil {
                     }
                     return Z;
                 }
-                void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
+                void add_poly_z(const value_type &coeff, std::vector<value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("geometric: expected H.size() == this->m+1");
 
@@ -259,7 +258,7 @@ namespace nil {
                         H[i] += (x[i] * coeff);
                     }
                 }
-                void divide_by_Z_on_coset(std::vector<value_type> &P) {
+                void divide_by_z_on_coset(std::vector<value_type> &P) {
                     const value_type coset = value_type(
                         fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric
                                                                                             sequence? */

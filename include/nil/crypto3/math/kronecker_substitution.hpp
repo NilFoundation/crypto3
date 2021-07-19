@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
-#define CRYPTO3_ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
+#ifndef CRYPTO3_MATH_KRONECKER_SUBSTITUTION_HPP
+#define CRYPTO3_MATH_KRONECKER_SUBSTITUTION_HPP
 
 #include <vector>
 #include <algorithm>
@@ -34,7 +34,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
             /*!
              * @brief Given two polynomial vectors, A and B, the function performs
              * polynomial multiplication and returns the resulting polynomial vector.

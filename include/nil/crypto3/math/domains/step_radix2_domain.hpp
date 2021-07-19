@@ -23,17 +23,17 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_STEP_RADIX2_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_STEP_RADIX2_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_STEP_RADIX2_DOMAIN_HPP
+#define CRYPTO3_MATH_STEP_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             using namespace nil::crypto3::algebra;
 
@@ -52,14 +52,14 @@ namespace nil {
                 value_type small_omega;
 
                 step_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    // if (m <= 1)
-                    //    throw std::invalid_argument("step_radix2(): expected m > 1");
+                    if (m <= 1)
+                        throw std::invalid_argument("step_radix2(): expected m > 1");
 
                     big_m = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1);
                     small_m = m - big_m;
 
-                    // if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
-                    //    throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
+                    if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
+                        throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     omega = detail::unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
 
@@ -67,9 +67,9 @@ namespace nil {
                     small_omega = detail::unity_root<FieldType>(small_m);
                 }
 
-                void FFT(std::vector<value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("step_radix2: expected a.size() == this->m");
+                void fft(std::vector<value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<value_type> c(big_m, value_type::zero());
                     std::vector<value_type> d(big_m, value_type::zero());
@@ -90,8 +90,8 @@ namespace nil {
                         }
                     }
 
-                    _basic_radix2_FFT<FieldType>(c, omega.squared());
-                    _basic_radix2_FFT<FieldType>(e, detail::unity_root<FieldType>(small_m));
+                    _basic_radix2_fft<FieldType>(c, omega.squared());
+                    _basic_radix2_fft<FieldType>(e, detail::unity_root<FieldType>(small_m));
 
                     for (std::size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -101,15 +101,15 @@ namespace nil {
                         a[i + big_m] = e[i];
                     }
                 }
-                void iFFT(std::vector<value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("step_radix2: expected a.size() == this->m");
+                void inverse_fft(std::vector<value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<value_type> U0(a.begin(), a.begin() + big_m);
                     std::vector<value_type> U1(a.begin() + big_m, a.end());
 
-                    _basic_radix2_FFT<FieldType>(U0, omega.squared().inversed());
-                    _basic_radix2_FFT<FieldType>(U1, detail::unity_root<FieldType>(small_m).inversed());
+                    _basic_radix2_fft<FieldType>(U0, omega.squared().inversed());
+                    _basic_radix2_fft<FieldType>(U1, detail::unity_root<FieldType>(small_m).inversed());
 
                     const value_type U0_size_inv = value_type(big_m).inversed();
                     for (std::size_t i = 0; i < big_m; ++i) {
@@ -200,7 +200,7 @@ namespace nil {
                     return (t.pow(big_m) - value_type::one()) * (t.pow(small_m) - omega.pow(small_m));
                 }
 
-                void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
+                void add_poly_z(const value_type &coeff, std::vector<value_type> &H) {
                     // if (H.size() != this->m + 1)
                     //    throw std::invalid_argument("step_radix2: expected H.size() == this->m+1");
 
@@ -211,7 +211,7 @@ namespace nil {
                     H[small_m] -= coeff;
                     H[0] += coeff * omega_to_small_m;
                 }
-                void divide_by_Z_on_coset(std::vector<value_type> &P) {
+                void divide_by_z_on_coset(std::vector<value_type> &P) {
                     // (c^{2^k}-1) * (c^{2^r} * w^{2^{r+1}*i) - w^{2^r})
                     const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 

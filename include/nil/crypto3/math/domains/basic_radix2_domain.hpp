@@ -23,19 +23,19 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_BASIC_RADIX2_DOMAIN_HPP
+#define CRYPTO3_MATH_BASIC_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/detail/field_utils.hpp>
+#include <nil/crypto3/math/detail/field_utils.hpp>
 
-#include <nil/crypto3/fft/domains/evaluation_domain.hpp>
-#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             using namespace nil::crypto3::algebra;
 
@@ -50,31 +50,31 @@ namespace nil {
                 value_type omega;
 
                 basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
-                    // if (m <= 1)
-                    //    throw std::invalid_argument("basic_radix2(): expected m > 1");
+                    if (m <= 1)
+                        throw std::invalid_argument("basic_radix2(): expected m > 1");
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        // if (logm > (fields::arithmetic_params<FieldType>::s))
-                        //    throw std::invalid_argument(
-                        //        "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
+                        if (logm > (fields::arithmetic_params<FieldType>::s))
+                            throw std::invalid_argument(
+                                "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
 
                     omega = detail::unity_root<FieldType>(m);
                 }
 
-                void FFT(std::vector<value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                void fft(std::vector<value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
-                    _basic_radix2_FFT<FieldType>(a, omega);
+                    _basic_radix2_fft<FieldType>(a, omega);
                 }
 
-                void iFFT(std::vector<value_type> &a) {
-                    // if (a.size() != this->m)
-                    //    throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
+                void inverse_fft(std::vector<value_type> &a) {
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
-                    _basic_radix2_FFT<FieldType>(a, omega.inversed());
+                    _basic_radix2_fft<FieldType>(a, omega.inversed());
 
                     const value_type sconst = value_type(a.size()).inversed();
                     for (std::size_t i = 0; i < a.size(); ++i) {
@@ -94,15 +94,15 @@ namespace nil {
                     return (t.pow(this->m)) - value_type::one();
                 }
 
-                void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
-                    // if (H.size() != this->m + 1)
-                    //    throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
+                void add_poly_z(const value_type &coeff, std::vector<value_type> &H) {
+                    if (H.size() != this->m + 1)
+                        throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
 
                     H[this->m] += coeff;
                     H[0] -= coeff;
                 }
 
-                void divide_by_Z_on_coset(std::vector<value_type> &P) {
+                void divide_by_z_on_coset(std::vector<value_type> &P) {
                     const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (std::size_t i = 0; i < this->m; ++i) {

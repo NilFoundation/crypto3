@@ -36,7 +36,7 @@ macro(cm_find_package NAME)
     endforeach()
 endmacro()
 
-cm_project(fft WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
+cm_project(math WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)

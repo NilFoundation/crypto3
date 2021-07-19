@@ -23,16 +23,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
-#define CRYPTO3_ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
+#ifndef CRYPTO3_MATH_EVALUATION_DOMAIN_HPP
+#define CRYPTO3_MATH_EVALUATION_DOMAIN_HPP
 
 #include <vector>
 
-//#include <boost/math/tools/polynomial.hpp>
-
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /**
              * An evaluation domain.
@@ -60,12 +58,12 @@ namespace nil {
                 /**
                  * Compute the FFT, over the domain S, of the vector a.
                  */
-                virtual void FFT(std::vector<value_type> &a) = 0;
+                virtual void fft(std::vector<value_type> &a) = 0;
 
                 /**
                  * Compute the inverse FFT, over the domain S, of the vector a.
                  */
-                virtual void iFFT(std::vector<value_type> &a) = 0;
+                virtual void inverse_fft(std::vector<value_type> &a) = 0;
 
                 /**
                  * Evaluate all Lagrange polynomials.
@@ -86,12 +84,12 @@ namespace nil {
                 /**
                  * Add the coefficients of the vanishing polynomial of S to the coefficients of the polynomial H.
                  */
-                virtual void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) = 0;
+                virtual void add_poly_z(const value_type &coeff, std::vector<value_type> &H) = 0;
 
                 /**
                  * Multiply by the evaluation, on a coset of S, of the inverse of the vanishing polynomial of S.
                  */
-                virtual void divide_by_Z_on_coset(std::vector<value_type> &P) = 0;
+                virtual void divide_by_z_on_coset(std::vector<value_type> &P) = 0;
             };
         }    // namespace fft
     }        // namespace crypto3

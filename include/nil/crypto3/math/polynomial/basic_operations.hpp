@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_BASIC_OPERATIONS_HPP
-#define CRYPTO3_ALGEBRA_FFT_BASIC_OPERATIONS_HPP
+#ifndef CRYPTO3_MATH_BASIC_OPERATIONS_HPP
+#define CRYPTO3_MATH_BASIC_OPERATIONS_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/fft/detail/field_utils.hpp>
+#include <nil/crypto3/math/detail/field_utils.hpp>
 
-#include <nil/crypto3/fft/domains/detail/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -39,14 +39,20 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
 
             /**
              * Returns true if polynomial A is a zero polynomial.
              */
-            template<typename FieldValueType>
-            bool _is_zero(const std::vector<FieldValueType> &a) {
-                return std::all_of(a.begin(), a.end(), [](FieldValueType i) { return i == FieldValueType::zero(); });
+            template<typename Range>
+            bool _is_zero(const Range &a) {
+                return std::all_of(
+                    std::begin(a),
+                    std::end(a),
+                    [](typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type i) {
+                        return i ==
+                               typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
+                    });
             }
 
             /**
@@ -54,10 +60,15 @@ namespace nil {
              * Example - Degree-4 Polynomial: [0, 1, 2, 3, 4, 0, 0, 0, 0] -> [0, 1, 2, 3, 4]
              * Note: Simplest condensed form is a zero polynomial of vector form: [0]
              */
-            template<typename FieldValueType>
-            void _condense(std::vector<FieldValueType> &a) {
-                while (a.begin() != a.end() && a.back() == FieldValueType::zero())
+            template<typename Range>
+            void _condense(Range &a) {
+                for (auto first = std::begin(a);
+                     first != std::end(a) &&
+                     a.back() ==
+                         typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type();
+                     ++first) {
                     a.pop_back();
+                }
             }
 
             /**
@@ -65,9 +76,9 @@ namespace nil {
              * Below we make use of the reversal endomorphism definition from
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 38].
              */
-            template<typename FieldValueType>
-            void _reverse(std::vector<FieldValueType> &a, const std::size_t n) {
-                std::reverse(a.begin(), a.end());
+            template<typename Range>
+            void _reverse(Range &a, std::size_t n) {
+                std::reverse(std::begin(a), std::end(a));
                 a.resize(n);
             }
 
@@ -75,29 +86,30 @@ namespace nil {
              * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
              * polynomial C.
              */
-            template<typename FieldType>
-            void _polynomial_addition(std::vector<typename FieldType::value_type> &c,
-                                      const std::vector<typename FieldType::value_type> &a,
-                                      const std::vector<typename FieldType::value_type> &b) {
+            template<typename Range>
+            void _polynomial_addition(Range &c, const Range &a, const Range &b) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef
+                    typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
 
                 if (_is_zero(a)) {
                     c = b;
                 } else if (_is_zero(b)) {
                     c = a;
                 } else {
-                    std::size_t a_size = a.size();
-                    std::size_t b_size = b.size();
+                    std::size_t a_size = std::distance(std::begin(a), std::end(a));
+                    std::size_t b_size = std::distance(std::begin(b), std::end(b));
 
                     if (a_size > b_size) {
                         c.resize(a_size);
-                        std::transform(b.begin(), b.end(), a.begin(), c.begin(), std::plus<value_type>());
-                        std::copy(a.begin() + b_size, a.end(), c.begin() + b_size);
+                        std::transform(std::begin(b), std::end(b), std::begin(a), std::begin(c),
+                                       std::plus<value_type>());
+                        std::copy(std::begin(a) + b_size, std::end(a), std::begin(c) + b_size);
                     } else {
                         c.resize(b_size);
-                        std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::plus<value_type>());
-                        std::copy(b.begin() + a_size, b.end(), c.begin() + a_size);
+                        std::transform(std::begin(a), std::end(a), std::begin(b), std::begin(c),
+                                       std::plus<value_type>());
+                        std::copy(std::begin(b) + a_size, std::end(b), std::begin(c) + a_size);
                     }
                 }
 
@@ -108,12 +120,11 @@ namespace nil {
              * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
              * polynomial C.
              */
-            template<typename FieldType>
-            void _polynomial_subtraction(std::vector<typename FieldType::value_type> &c,
-                                         const std::vector<typename FieldType::value_type> &a,
-                                         const std::vector<typename FieldType::value_type> &b) {
+            template<typename Range>
+            void _polynomial_subtraction(Range &c, const Range &a, const Range &b) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef
+                    typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
 
                 if (_is_zero(b)) {
                     c = a;
@@ -142,12 +153,14 @@ namespace nil {
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores
              * result in polynomial C.
              */
-            template<typename FieldType>
-            void _polynomial_multiplication_on_fft(std::vector<typename FieldType::value_type> &c,
-                                                   const std::vector<typename FieldType::value_type> &a,
-                                                   const std::vector<typename FieldType::value_type> &b) {
+            template<typename FieldType, typename Range>
+            void _polynomial_multiplication_on_fft(Range &c, const Range &a, const Range &b) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef
+                    typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+
+                BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
+                BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
                 const std::size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
                 value_type omega = detail::unity_root<FieldType>(n);
@@ -159,19 +172,19 @@ namespace nil {
                 c.resize(n, value_type::zero());
 
 #ifdef MULTICORE
-                detail::basic_parallel_radix2_FFT<FieldType>(u, omega);
-                detail::basic_parallel_radix2_FFT<FieldType>(v, omega);
+                detail::basic_parallel_radix2_fft<FieldType>(u, omega);
+                detail::basic_parallel_radix2_fft<FieldType>(v, omega);
 #else
-                detail::basic_serial_radix2_FFT<FieldType>(u, omega);
-                detail::basic_serial_radix2_FFT<FieldType>(v, omega);
+                detail::basic_serial_radix2_fft<FieldType>(u, omega);
+                detail::basic_serial_radix2_fft<FieldType>(v, omega);
 #endif
 
                 std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<value_type>());
 
 #ifdef MULTICORE
-                detail::basic_parallel_radix2_FFT<FieldType>(c, omega.inversed());
+                detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
 #else
-                detail::basic_serial_radix2_FFT<FieldType>(c, omega.inversed());
+                detail::basic_serial_radix2_fft<FieldType>(c, omega.inversed());
 #endif
 
                 const value_type sconst = value_type(n).inversed();

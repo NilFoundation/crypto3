@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
-#define CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#ifndef CRYPTO3_MATH_BASIC_RADIX2_DOMAIN_AUX_HPP
+#define CRYPTO3_MATH_BASIC_RADIX2_DOMAIN_AUX_HPP
 
 #include <algorithm>
 #include <vector>
@@ -33,31 +33,36 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/fft/detail/field_utils.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
+
+#include <nil/crypto3/math/detail/field_utils.hpp>
 
 #ifdef MULTICORE
-#define _basic_radix2_FFT detail::basic_parallel_radix2_FFT
+#define _basic_radix2_fft detail::basic_parallel_radix2_fft
 #else
-#define _basic_radix2_FFT detail::basic_serial_radix2_FFT
+#define _basic_radix2_fft detail::basic_serial_radix2_fft
 #endif
 
 namespace nil {
     namespace crypto3 {
-        namespace fft {
+        namespace math {
             namespace detail {
 
                 /*
                  * Below we make use of pseudocode from [CLRS 2n Ed, pp. 864].
                  * Also, note that it's the caller's responsibility to multiply by 1/N.
                  */
-                template<typename FieldType>
-                void basic_serial_radix2_FFT(std::vector<typename FieldType::value_type> &a,
-                                             const typename FieldType::value_type &omega) {
-                    typedef typename FieldType::value_type value_type;
+                template<typename FieldType, typename Range>
+                void basic_serial_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
+
+                    BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
+                    BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
                     const std::size_t n = a.size(), logn = log2(n);
-                    // if (n != (1u << logn))
-                    //    throw std::invalid_argument("expected n == (1u << logn)");
+                    if (n != (1u << logn))
+                        throw std::invalid_argument("expected n == (1u << logn)");
 
                     /* swapping in place (from Storer's book) */
                     for (std::size_t k = 0; k < n; ++k) {
@@ -86,21 +91,25 @@ namespace nil {
                     }
                 }
 
-                template<typename FieldType>
-                void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a,
+                template<typename FieldType, typename Range>
+                void basic_parallel_radix2_fft_inner(Range &a,
                                                      const typename FieldType::value_type &omega,
                                                      const std::size_t log_cpus) {
-                    typedef typename FieldType::value_type value_type;
+                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
+                        value_type;
+
+                    BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
+                    BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
                     const std::size_t num_cpus = 1ul << log_cpus;
 
                     const std::size_t m = a.size();
                     const std::size_t log_m = log2(m);
-                    // if (m != 1ul << log_m)
-                    //    throw std::invalid_argument("expected m == 1ul<<log_m");
+                    if (m != 1ul << log_m)
+                        throw std::invalid_argument("expected m == 1ul<<log_m");
 
                     if (log_m < log_cpus) {
-                        basic_serial_radix2_FFT<FieldType>(a, omega);
+                        basic_serial_radix2_fft<FieldType>(a, omega);
                         return;
                     }
 
@@ -134,7 +143,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (std::size_t j = 0; j < num_cpus; ++j) {
-                        basic_serial_radix2_FFT<FieldType>(tmp[j], omega_num_cpus);
+                        basic_serial_radix2_fft<FieldType>(tmp[j], omega_num_cpus);
                     }
 
 #ifdef MULTICORE
@@ -150,9 +159,8 @@ namespace nil {
                     }
                 }
 
-                template<typename FieldType>
-                void basic_parallel_radix2_FFT(std::vector<typename FieldType::value_type> &a,
-                                               const typename FieldType::value_type &omega) {
+                template<typename FieldType, typename Range>
+                void basic_parallel_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
 #ifdef MULTICORE
                     const std::size_t num_cpus = omp_get_max_threads();
 #else
@@ -162,9 +170,9 @@ namespace nil {
                         ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
                     if (log_cpus == 0) {
-                        basic_serial_radix2_FFT<FieldType>(a, omega);
+                        basic_serial_radix2_fft<FieldType>(a, omega);
                     } else {
-                        basic_parallel_radix2_FFT_inner(a, omega, log_cpus);
+                        basic_parallel_radix2_fft_inner(a, omega, log_cpus);
                     }
                 }
 
@@ -182,8 +190,8 @@ namespace nil {
                         return std::vector<value_type>(1, value_type::one());
                     }
 
-                    // if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
-                    //    throw std::invalid_argument("expected m == (1u << log2(m))");
+                    if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
+                        throw std::invalid_argument("expected m == (1u << log2(m))");
 
                     const value_type omega = unity_root<FieldType>(m);
 
