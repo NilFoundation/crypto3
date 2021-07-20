@@ -1806,7 +1806,7 @@ if(TOMMATH_COMPILED)
     target_link_libraries(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath ${TomMath_LIBRARIES})
     target_include_directories(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath PRIVATE ${TomMath_INCLUDE_DIRS})
     target_compile_definitions(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath PUBLIC -DTEST_TOMMATH)
-    set_target_properties(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath SOURCES PROPERTIES CXX_STANDARD 14)
+    set_target_properties(${CURRENT_PROJECT_NAME}_test_test_jacobi_tommath PROPERTIES CXX_STANDARD 14)
 endif()
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_wnaf_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_wnaf.cpp)
